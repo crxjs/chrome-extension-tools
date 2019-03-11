@@ -1,7 +1,7 @@
 {
   "name": "rollup-plugin-input-json",
   "version": "0.1.0",
-  "description": "Use rollup.watch in tests with ease.",
+  "description": "Use a json file as an entry point.",
   "main": "build/bundle-cjs.js",
   "module": "build/bundle-esm.js",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
@@ -37,6 +37,7 @@
     "build"
   ],
   "dependencies": {
+    "@bumble/manifest-entry-points": "^0.2.1",
     "rollup": "^1.6.0"
   }
 }
