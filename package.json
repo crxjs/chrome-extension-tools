@@ -1,0 +1,42 @@
+{
+  "name": "rollup-plugin-input-json",
+  "version": "0.1.0",
+  "description": "Use rollup.watch in tests with ease.",
+  "main": "build/bundle-cjs.js",
+  "module": "build/bundle-esm.js",
+  "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@sucrase/jest-plugin": "^2.0.0",
+    "eslint": "^5.11.0",
+    "jest": "^24.1.0",
+    "replace-in-file": "^3.4.4",
+    "rollup-pluginutils": "^2.4.1",
+    "sucrase": "^3.9.5"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "start": "rollup -c -w",
+    "test": "jest",
+    "preversion": "npm run build",
+    "postversion": "git push && npm publish"
+  },
+  "jest": {
+    "transform": {
+      ".(js|jsx|ts|tsx)": "@sucrase/jest-plugin"
+    },
+    "setupFilesAfterEnv": [
+      "./tests/jest.setup.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "fixtures/dest"
+    ],
+    "clearMocks": true
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "rollup": "^1.6.0"
+  }
+}
