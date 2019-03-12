@@ -1,4 +1,6 @@
 {
-  "background": "basic/background.js",
-  "content": "basic/content.js"
+  "background": "background.js",
+  "content": "content.js",
+  "popupHtml": "popup.html",
+  "image": "icon-on-16.png"
 }

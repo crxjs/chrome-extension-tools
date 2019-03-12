@@ -1,1 +1,1 @@
-export const b = 'B'
+console.log('content')
