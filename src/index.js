@@ -37,15 +37,22 @@ export default function() {
 
       const cheerios = html.map(loadHtml)
 
+      const htmlTransform = (links, i) => {
+        const htmlDirName = path.dirname(html[i])
+        const newLinks = links.map(link =>
+          path.join(htmlDirName, link),
+        )
+
+        return newLinks
+      }
+
       const cssLinks = cheerios
         .map(getCssLinks)
-        .flat()
-        .map(transform)
+        .flatMap(htmlTransform)
 
       const jsScripts = cheerios
         .map(getScriptTags)
-        .flat()
-        .map(transform)
+        .flatMap(htmlTransform)
 
       assets.css.push(...css)
       assets.css.push(...cssLinks)
