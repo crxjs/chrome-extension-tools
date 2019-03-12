@@ -1,7 +1,7 @@
 import { deriveEntries } from '@bumble/manifest-entry-points'
 import { readFileSync } from 'jsonfile'
 import path from 'path'
-import getScriptTags from '../src/script-tags'
+import { loadHtml, getScriptTags, getCssLinks } from './cheerio'
 
 export default function() {
   let assets
@@ -14,11 +14,18 @@ export default function() {
       const manifest = readFileSync(input)
 
       const { js, css, html, img } = deriveEntries(manifest)
-      assets = [...css, ...img, ...html]
+      const cheerios = html.map(loadHtml(dirname))
+
+      assets = [
+        ...css,
+        ...img,
+        ...html,
+        ...cheerios.map(getCssLinks).flat(),
+      ]
 
       const inputs = [
         ...js,
-        ...html.reduce(getScriptTags(dirname), []),
+        ...cheerios.map(getScriptTags).flat(),
       ]
 
       return {
