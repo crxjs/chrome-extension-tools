@@ -1,6 +1,7 @@
 // import { watchAsync } from '../../src/index'
 // import replace from 'replace-in-file'
 // import git from 'simple-git/promise'
+import path from 'path'
 import { rollup } from 'rollup'
 import config from '../fixtures/basic/rollup.config'
 import {
@@ -10,19 +11,20 @@ import {
 } from '../../src/cheerio'
 
 describe('rollup', () => {
-  test.skip('bundles two chunks', async () => {
+  test('bundles chunks and assets', async () => {
     const bundle = await rollup(config)
     const { output } = await bundle.generate(config.output)
 
-    expect(output.length).toBe(3)
+    expect(output.length).toBe(6)
   })
 })
 
 describe('loadHtml', () => {
   test('cheerio!', () => {
-    const htmlDirName = 'tests/fixtures/basic/'
-    const partial = loadHtml(htmlDirName)
-    const result = partial('popup.html')
+    const htmlDir = 'tests/fixtures/basic/'
+    const name = 'popup.html'
+    const filePath = path.join(htmlDir, name)
+    const result = loadHtml(filePath)
 
     expect(result('link').length).toBe(1)
   })
@@ -32,7 +34,8 @@ describe('getScriptTags', () => {
   test('works', () => {
     const htmlDir = 'tests/fixtures/basic/'
     const name = 'popup.html'
-    const cheerio = loadHtml(htmlDir)(name)
+    const filePath = path.join(htmlDir, name)
+    const cheerio = loadHtml(filePath)
     const result = getScriptTags(cheerio)
 
     expect(result).toContain('popup.js')
@@ -43,7 +46,8 @@ describe('getCssLinks', () => {
   test('works', () => {
     const htmlDir = 'tests/fixtures/basic/'
     const name = 'popup.html'
-    const cheerio = loadHtml(htmlDir)(name)
+    const filePath = path.join(htmlDir, name)
+    const cheerio = loadHtml(filePath)
     const result = getCssLinks(cheerio)
 
     expect(result).toContain('popup.css')

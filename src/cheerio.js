@@ -1,9 +1,7 @@
-import path from 'path'
 import fs from 'fs'
 import cheerio from 'cheerio'
 
-export const loadHtml = dirname => name => {
-  const filePath = path.join(dirname, name)
+export const loadHtml = filePath => {
   const htmlCode = fs.readFileSync(filePath, 'utf8')
   const $ = cheerio.load(htmlCode)
 

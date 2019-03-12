@@ -37,9 +37,10 @@
     "build"
   ],
   "dependencies": {
-    "@bumble/manifest-entry-points": "^0.2.1",
+    "@bumble/manifest-entry-points": "^0.3.0",
     "cheerio": "^1.0.0-rc.2",
     "jsonfile": "^5.0.0",
+    "mz": "^2.7.0",
     "rollup": "^1.6.0"
   }
 }
