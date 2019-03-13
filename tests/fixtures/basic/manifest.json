@@ -2,5 +2,5 @@
   "background": "background.js",
   "content": "content.js",
   "popupHtml": "popup.html",
-  "image": "icon-on-16.png"
+  "image": "images/icon-on-16.png"
 }

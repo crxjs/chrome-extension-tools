@@ -1,9 +1,13 @@
 import path from 'path'
-import fs from 'mz/fs'
-import { readFileSync } from 'jsonfile'
-import { deriveEntries } from '@bumble/manifest-entry-points'
-import { getCssLinks, getScriptTags, loadHtml } from './cheerio'
+import mzFs from 'mz/fs'
+import { readFileSync as readJsonSync } from 'jsonfile'
 
+import { deriveEntries } from '@bumble/manifest-entry-points'
+
+import { getCssLinks, getScriptTags, loadHtml } from './cheerio'
+import { extendWriteFile } from './extend-fs'
+
+/* ---- predicate object for deriveEntries ---- */
 const predObj = {
   js: s => /\.js$/.test(s),
   css: s => /\.css$/.test(s),
@@ -16,78 +20,137 @@ const predObj = {
     !/^https?:/.test(v),
 }
 
-const getBasename = asset => path.basename(asset)
+/* ------------- helper functions ------------- */
+
+const transformLinksWith = htmlFilePaths => (links, i) => {
+  const dirname = path.dirname(htmlFilePaths[i])
+  const newLinks = links.map(link => path.join(dirname, link))
+
+  return newLinks
+}
+
+const readFiles = assets =>
+  Promise.all(assets.map(asset => mzFs.readFile(asset)))
 
 export default function() {
-  const assets = { css: [], img: [], html: [], html$: [] }
+  /* -------------- hooks closures -------------- */
+  let srcDirname = null
+  const assetPaths = { css: [], img: [], html: [], html$: [] }
+  const assetSrcs = { css: [], img: [], html: [] }
 
+  /**
+   * assetFileNameMap
+   * @example
+   * const outputOptions = {
+   *   assetFileNameMap: {
+   *     [assetId] : [assetPattern],
+   *     [hashedAssetPath]: [assetPath]
+   *   }
+   * }
+   */
+  const assetFileNameMap = {}
+
+  extendWriteFile(
+    assetPath => assetFileNameMap[assetPath] || assetPath,
+  )
+
+  /* --------------- plugin object -------------- */
   return {
     name: 'inputJson',
 
-    options({ input, ...options }) {
-      const dirname = path.dirname(input)
-      const transform = name => path.join(dirname, name)
+    /* ============================================ */
+    /*                 OPTIONS HOOK                 */
+    /* ============================================ */
 
-      const manifest = readFileSync(input)
-
-      const { js, css, html, img } = deriveEntries(manifest, {
-        ...predObj,
-        transform,
-      })
-
-      const cheerios = html.map(loadHtml)
-
-      const htmlTransform = (links, i) => {
-        const htmlDirName = path.dirname(html[i])
-        const newLinks = links.map(link =>
-          path.join(htmlDirName, link),
+    options({ input: manifestPath, ...inputOptions }) {
+      // Check that input is manifest
+      if (path.basename(manifestPath) !== 'manifest.json')
+        throw new Error(
+          'plugin error: input is not manifest.json',
         )
 
-        return newLinks
-      }
+      // Load manifest.json
+      const manifest = readJsonSync(manifestPath)
 
-      const cssLinks = cheerios
+      // Get web extension directory path
+      const dirname = path.dirname(manifestPath)
+      srcDirname = dirname
+
+      // Derive entry paths from manifest
+      const { js, css, html, img } = deriveEntries(manifest, {
+        ...predObj,
+        transform: name => path.join(dirname, name),
+      })
+
+      // Extract links from html files
+      // and transform to relative paths
+      const html$ = html.map(loadHtml)
+
+      const transformLinks = transformLinksWith(html)
+
+      const cssLinks = html$
         .map(getCssLinks)
-        .flatMap(htmlTransform)
+        .flatMap(transformLinks)
 
-      const jsScripts = cheerios
+      const jsScripts = html$
         .map(getScriptTags)
-        .flatMap(htmlTransform)
+        .flatMap(transformLinks)
 
-      assets.css.push(...css)
-      assets.css.push(...cssLinks)
-      assets.img.push(...img)
-      assets.html.push(...html)
-      assets.html$.push(...cheerios)
+      // Assign asset paths
+      assetPaths.css = css.concat(cssLinks)
+      assetPaths.img = img
+      assetPaths.html = html
+      assetPaths.html$ = html$
 
-      const inputs = [...js, ...jsScripts]
-
+      // Return new input options
       return {
-        ...options,
-        input: inputs,
+        ...inputOptions,
+        input: js.concat(jsScripts),
       }
     },
 
     async buildStart() {
-      const emitAssetFrom = srcArray => (name, i) => {
-        this.emitAsset(name, srcArray[i])
-      }
-
-      // html links and script tags may need updated
-      const htmlSrc = assets.html$.map($ => $.html())
-
-      const [cssSrc, imgSrc] = await Promise.all([
-        Promise.all(assets.css.map(asset => fs.readFile(asset))),
-        Promise.all(assets.img.map(asset => fs.readFile(asset))),
+      // Assign asset srcs
+      const [cssSrc, imgSrc, htmlSrc] = await Promise.all([
+        readFiles(assetPaths.css),
+        readFiles(assetPaths.img),
+        assetPaths.html$.map($ => $.html()),
       ])
 
-      assets.css.map(getBasename).forEach(emitAssetFrom(cssSrc))
+      assetSrcs.css = cssSrc
+      assetSrcs.img = imgSrc
+      assetSrcs.html = htmlSrc
+    },
 
-      assets.img.map(getBasename).forEach(emitAssetFrom(imgSrc))
+    /* ============================================ */
+    /*                GENERATEBUNDLE                */
+    /* ============================================ */
 
-      assets.html
-        .map(getBasename)
-        .forEach(emitAssetFrom(htmlSrc))
+    generateBundle({ dir }) {
+      const emitAssetWith = srcArray => (
+        relativeAssetPath,
+        i,
+      ) => {
+        const baseName = path.basename(relativeAssetPath)
+
+        const id = this.emitAsset(baseName, srcArray[i])
+
+        const hashedPath = this.getAssetFileName(id)
+        const hashedFilePath = path.resolve(dir, hashedPath)
+
+        const desiredFileName = relativeAssetPath.replace(
+          srcDirname,
+          dir,
+        )
+
+        assetFileNameMap[hashedFilePath] = path.resolve(
+          desiredFileName,
+        )
+      }
+
+      assetPaths.css.map(emitAssetWith(assetSrcs.css))
+      assetPaths.img.map(emitAssetWith(assetSrcs.img))
+      assetPaths.html.map(emitAssetWith(assetSrcs.html))
     },
   }
 }
