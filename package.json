@@ -7,6 +7,7 @@
   "files": [
     "build"
   ],
+  "repository": "bumble-org/rollup-plugin-manifest-entry.git",
   "main": "build/bundle-cjs.js",
   "module": "build/bundle-esm.js",
   "scripts": {
