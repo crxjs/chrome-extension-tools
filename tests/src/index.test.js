@@ -1,6 +1,6 @@
-// import { watchAsync } from '../../src/index'
-// import replace from 'replace-in-file'
-// import git from 'simple-git/promise'
+import { watchAsync } from '@bumble/rollup-watch-async'
+import replace from 'replace-in-file'
+import git from 'simple-git/promise'
 import path from 'path'
 import { rollup } from 'rollup'
 import config from '../fixtures/basic/rollup.config'
@@ -54,40 +54,39 @@ describe('getCssLinks', () => {
   })
 })
 
-// describe.skip('watch', () => {
-//   const spy = jest.fn()
-//   let watcher
+describe('watch', () => {
+  const spy = jest.fn()
+  let watcher
 
-//   afterEach(async () => {
-//     watcher.close()
-//     jest.clearAllMocks()
+  afterEach(async () => {
+    watcher.close()
 
-//     return git().checkout(['HEAD', 'tests/fixtures/basic'])
-//   })
+    return git().checkout(['HEAD', 'tests/fixtures/basic'])
+  })
 
-//   test('does not crash', async () => {
-//     watcher = watchAsync(config, spy)
+  test('does not crash', async () => {
+    watcher = watchAsync(config, spy)
 
-//     await watcher.next('END')
+    await watcher.next('END')
 
-//     expect(spy).toBeCalledTimes(4)
-//   })
+    expect(spy).toBeCalledTimes(4)
+  })
 
-//   test('updates file change', async () => {
-//     watcher = watchAsync(config, spy)
+  test('updates file change', async () => {
+    watcher = watchAsync(config, spy)
 
-//     await watcher.next('END')
+    await watcher.next('END')
 
-//     expect(spy).toBeCalledTimes(4)
+    expect(spy).toBeCalledTimes(4)
 
-//     await replace({
-//       files: 'tests/fixtures/basic/entry.js',
-//       from: 'add',
-//       to: 'subtract',
-//     })
+    await replace({
+      files: 'tests/fixtures/basic/background.js',
+      from: 'background',
+      to: 'something else',
+    })
 
-//     await watcher.next('END')
+    await watcher.next('END')
 
-//     expect(spy).toBeCalledTimes(8)
-//   })
-// })
+    expect(spy).toBeCalledTimes(8)
+  })
+})

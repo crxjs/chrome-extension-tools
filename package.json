@@ -1,19 +1,14 @@
 {
-  "name": "rollup-plugin-input-json",
+  "name": "rollup-plugin-manifest-entry",
   "version": "0.1.0",
-  "description": "Use a json file as an entry point.",
+  "description": "Use manifest.json as a rollup input.",
+  "license": "MIT",
+  "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "files": [
+    "build"
+  ],
   "main": "build/bundle-cjs.js",
   "module": "build/bundle-esm.js",
-  "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
-  "license": "MIT",
-  "devDependencies": {
-    "@sucrase/jest-plugin": "^2.0.0",
-    "eslint": "^5.11.0",
-    "jest": "^24.1.0",
-    "replace-in-file": "^3.4.4",
-    "rollup-pluginutils": "^2.4.1",
-    "sucrase": "^3.9.5"
-  },
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
@@ -22,25 +17,34 @@
     "postversion": "git push && npm publish"
   },
   "jest": {
-    "transform": {
-      ".(js|jsx|ts|tsx)": "@sucrase/jest-plugin"
-    },
-    "setupFilesAfterEnv": [
-      "./tests/jest.setup.js"
-    ],
+    "clearMocks": true,
     "modulePathIgnorePatterns": [
       "fixtures/dest"
     ],
-    "clearMocks": true
+    "setupFilesAfterEnv": [
+      "./tests/jest.setup.js"
+    ],
+    "transform": {
+      ".(js|jsx|ts|tsx)": "@sucrase/jest-plugin"
+    }
   },
-  "files": [
-    "build"
-  ],
   "dependencies": {
     "@bumble/manifest-entry-points": "^0.3.0",
     "cheerio": "^1.0.0-rc.2",
     "jsonfile": "^5.0.0",
-    "mz": "^2.7.0",
+    "mz": "^2.7.0"
+  },
+  "devDependencies": {
+    "@sucrase/jest-plugin": "^2.0.0",
+    "eslint": "^5.11.0",
+    "jest": "^24.1.0",
+    "replace-in-file": "^3.4.4",
+    "rollup": "^1.6.0",
+    "rollup-pluginutils": "^2.4.1",
+    "simple-git": "^1.107.0",
+    "sucrase": "^3.9.5"
+  },
+  "peerDependencies": {
     "rollup": "^1.6.0"
   }
 }

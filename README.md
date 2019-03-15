@@ -1,16 +1,16 @@
-# rollup-plugin-input-json
+# rollup-plugin-manifest-entry
 
 Description goes here.
 
 ## Installation
 
 ```sh
-npm i rollup-plugin-input-json -D
+npm i rollup-plugin-manifest-entry -D
 ```
 
 ## Usage
 
 ```js
 import { rollup } from 'rollup'
-import inputJson from 'rollup-input-json'
+import manifestEntry from 'rollup-plugin-manifest-entry'
 ```

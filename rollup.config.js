@@ -19,5 +19,13 @@ export default [
         sourcemap: 'inline',
       },
     ],
+    external: [
+      'mz/fs',
+      'path',
+      'jsonfile',
+      '@bumble/manifest-entry-points',
+      'cheerio',
+      'fs',
+    ],
   },
 ]

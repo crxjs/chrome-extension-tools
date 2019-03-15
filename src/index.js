@@ -32,18 +32,25 @@ const transformLinksWith = htmlFilePaths => (links, i) => {
 const readFiles = assets =>
   Promise.all(assets.map(asset => mzFs.readFile(asset)))
 
-export default function() {
+export default function(
+  { copyManifest } = { copyManifest: true },
+) {
   /* -------------- hooks closures -------------- */
   let srcDirname = null
-  const assetPaths = { css: [], img: [], html: [], html$: [] }
-  const assetSrcs = { css: [], img: [], html: [] }
+  const assetPaths = {
+    css: [],
+    img: [],
+    html: [],
+    html$: [],
+    manifest: [],
+  }
+  const assetSrcs = { css: [], img: [], html: [], manifest: {} }
 
   /**
    * assetFileNameMap
    * @example
    * const outputOptions = {
    *   assetFileNameMap: {
-   *     [assetId] : [assetPattern],
    *     [hashedAssetPath]: [assetPath]
    *   }
    * }
@@ -102,6 +109,10 @@ export default function() {
       assetPaths.html = html
       assetPaths.html$ = html$
 
+      // Save manifest data
+      assetPaths.manifest = [manifestPath]
+      assetSrcs.manifest = [JSON.stringify(manifest)]
+
       // Return new input options
       return {
         ...inputOptions,
@@ -151,6 +162,12 @@ export default function() {
       assetPaths.css.map(emitAssetWith(assetSrcs.css))
       assetPaths.img.map(emitAssetWith(assetSrcs.img))
       assetPaths.html.map(emitAssetWith(assetSrcs.html))
+
+      if (copyManifest) {
+        assetPaths.manifest.map(
+          emitAssetWith(assetSrcs.manifest),
+        )
+      }
     },
   }
 }
