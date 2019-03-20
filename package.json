@@ -1,7 +1,7 @@
 {
-  "name": "rollup-plugin-manifest-entry",
+  "name": "rollup-plugin-manifest-input",
   "version": "0.1.0",
-  "description": "Use manifest.json as a rollup input.",
+  "description": "Use a Chrome extension manifest in the rollup input field.",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
@@ -31,9 +31,7 @@
   },
   "dependencies": {
     "@bumble/manifest-entry-points": "^0.3.0",
-    "cheerio": "^1.0.0-rc.2",
-    "jsonfile": "^5.0.0",
-    "mz": "^2.7.0"
+    "fs-extra": "^7.0.1"
   },
   "devDependencies": {
     "@sucrase/jest-plugin": "^2.0.0",

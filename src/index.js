@@ -1,6 +1,5 @@
 import path from 'path'
-import mzFs from 'mz/fs'
-import { readFileSync as readJsonSync } from 'jsonfile'
+import fs from 'fs-extra'
 
 import { deriveEntries } from '@bumble/manifest-entry-points'
 
@@ -30,7 +29,7 @@ const transformLinksWith = htmlFilePaths => (links, i) => {
 }
 
 const readFiles = assets =>
-  Promise.all(assets.map(asset => mzFs.readFile(asset)))
+  Promise.all(assets.map(asset => fs.readFile(asset)))
 
 export default function(
   { copyManifest } = { copyManifest: true },
@@ -63,7 +62,7 @@ export default function(
 
   /* --------------- plugin object -------------- */
   return {
-    name: 'inputJson',
+    name: 'manifest-input',
 
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
@@ -72,12 +71,12 @@ export default function(
     options({ input: manifestPath, ...inputOptions }) {
       // Check that input is manifest
       if (path.basename(manifestPath) !== 'manifest.json')
-        throw new Error(
+        throw new TypeError(
           'plugin error: input is not manifest.json',
         )
 
       // Load manifest.json
-      const manifest = readJsonSync(manifestPath)
+      const manifest = fs.readJSONSync(manifestPath)
 
       // Get web extension directory path
       const dirname = path.dirname(manifestPath)
