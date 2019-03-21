@@ -2,6 +2,7 @@ import path from 'path'
 import fs from 'fs-extra'
 
 import { deriveEntries } from '@bumble/manifest-entry-points'
+import { mapObjectValues } from './mapObjectValues'
 
 const name = 'manifest-input'
 
@@ -20,7 +21,7 @@ const predObj = {
 
 /* ------------- helper functions ------------- */
 
-export default function(hooks) {
+export default function({ transform = x => x }) {
   /* -------------- hooks closures -------------- */
   let assets
   let manifest
@@ -70,10 +71,31 @@ export default function(hooks) {
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    generateBundle(options, bundle) {
+    async generateBundle(options) {
       destDir = options.dir
 
-      // emit assets here? and transform manifest
+      const assetPathMapFns = (await assets).map(
+        ([assetPath, assetSrc]) => {
+          const name = path.basename(assetPath)
+          const id = this.emitAsset(name, assetSrc)
+          const assetFileName = this.getAssetFileName(id)
+
+          return x => {
+            if (typeof x !== 'string') return x
+
+            if (assetPath.endsWith(x)) {
+              return assetFileName
+            } else {
+              return x
+            }
+          }
+        },
+      )
+
+      manifest = assetPathMapFns.reduce(
+        mapObjectValues,
+        manifest,
+      )
     },
 
     /* ============================================ */
@@ -81,11 +103,11 @@ export default function(hooks) {
     /* ============================================ */
 
     async writeBundle(bundle) {
-      const finalManifest = hooks.transform(bundle, manifest)
-
-      await fs.writeFile(
+      // Write manifest
+      await fs.writeJSON(
         path.join(destDir, 'manifest.json'),
-        JSON.stringify(finalManifest),
+        transform(bundle, manifest),
+        { spaces: 2 },
       )
     },
   }

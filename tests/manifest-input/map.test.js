@@ -26,4 +26,5 @@ test('replace strings in object', () => {
   const result = mapObjectValues(obj1, mapFn)
 
   expect(result).toEqual(obj2)
+  expect(result).not.toBe(obj1)
 })

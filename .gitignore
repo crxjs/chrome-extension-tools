@@ -2,3 +2,4 @@ node_modules/
 build/
 tests/fixtures/dest
 examples/
+tests/manifest-input/fixtures/dest

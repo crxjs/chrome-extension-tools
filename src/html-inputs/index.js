@@ -19,7 +19,7 @@ const resolveEntriesWith = htmlPaths => (jsSrcs, i) => {
   )
 }
 
-export default function() {
+export default function htmlInputs() {
   /* -------------- hooks closures -------------- */
   let htmlFiles
   let dest
@@ -87,7 +87,6 @@ export default function() {
 
     writeBundle() {
       const writeFile = dest => ([htmlPath, htmlSrc]) => {
-        
         fs.writeFile(path.join(dest, htmlPath), htmlSrc)
       }
       htmlFiles.forEach(writeFile(dest))

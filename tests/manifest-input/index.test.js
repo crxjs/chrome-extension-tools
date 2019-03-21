@@ -1,9 +1,13 @@
 import { rollup } from 'rollup'
 import config from './fixtures/basic/rollup.config'
 
-test('rollup bundles chunks and assets', async () => {
+test('bundles chunks and assets', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
-  expect(output.length).toBe(6)
+  const chunks = output.filter(({ isAsset }) => !isAsset)
+  const assets = output.filter(({ isAsset }) => isAsset)
+
+  expect(chunks.length).toBe(3)
+  expect(assets.length).toBe(1)
 })
