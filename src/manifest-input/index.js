@@ -3,8 +3,7 @@ import fs from 'fs-extra'
 
 import { deriveEntries } from '@bumble/manifest-entry-points'
 
-import { getCssLinks, getScriptTags, loadHtml } from './cheerio'
-import { extendWriteFile } from './extend-fs'
+const name = 'manifest-input'
 
 /* ---- predicate object for deriveEntries ---- */
 const predObj = {
@@ -21,48 +20,16 @@ const predObj = {
 
 /* ------------- helper functions ------------- */
 
-const transformLinksWith = htmlFilePaths => (links, i) => {
-  const dirname = path.dirname(htmlFilePaths[i])
-  const newLinks = links.map(link => path.join(dirname, link))
-
-  return newLinks
-}
-
-const readFiles = assets =>
-  Promise.all(assets.map(asset => fs.readFile(asset)))
-
-export default function(
-  { copyManifest } = { copyManifest: true },
-) {
+export default function(hooks) {
   /* -------------- hooks closures -------------- */
-  let srcDirname = null
-  const assetPaths = {
-    css: [],
-    img: [],
-    html: [],
-    html$: [],
-    manifest: [],
-  }
-  const assetSrcs = { css: [], img: [], html: [], manifest: {} }
-
-  /**
-   * assetFileNameMap
-   * @example
-   * const outputOptions = {
-   *   assetFileNameMap: {
-   *     [hashedAssetPath]: [assetPath]
-   *   }
-   * }
-   */
-  const assetFileNameMap = {}
-
-  extendWriteFile(
-    assetPath => assetFileNameMap[assetPath] || assetPath,
-  )
+  let assets
+  let manifest
+  let srcDir
+  let destDir
 
   /* --------------- plugin object -------------- */
   return {
-    name: 'manifest-input',
+    name,
 
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
@@ -72,101 +39,54 @@ export default function(
       // Check that input is manifest
       if (path.basename(manifestPath) !== 'manifest.json')
         throw new TypeError(
-          'plugin error: input is not manifest.json',
+          `${name}: input is not manifest.json`,
         )
 
       // Load manifest.json
-      const manifest = fs.readJSONSync(manifestPath)
-
-      // Get web extension directory path
-      const dirname = path.dirname(manifestPath)
-      srcDirname = dirname
+      manifest = fs.readJSONSync(manifestPath)
+      srcDir = path.dirname(manifestPath)
 
       // Derive entry paths from manifest
       const { js, css, html, img } = deriveEntries(manifest, {
         ...predObj,
-        transform: name => path.join(dirname, name),
+        transform: name => path.join(srcDir, name),
       })
 
-      // Extract links from html files
-      // and transform to relative paths
-      const html$ = html.map(loadHtml)
+      // Read assets async, emit later
+      assets = Promise.all(
+        [...css, ...img].map(asset =>
+          fs.readFile(asset).then(src => [asset, src]),
+        ),
+      )
 
-      const transformLinks = transformLinksWith(html)
-
-      const cssLinks = html$
-        .map(getCssLinks)
-        .flatMap(transformLinks)
-
-      const jsScripts = html$
-        .map(getScriptTags)
-        .flatMap(transformLinks)
-
-      // Assign asset paths
-      assetPaths.css = css.concat(cssLinks)
-      assetPaths.img = img
-      assetPaths.html = html
-      assetPaths.html$ = html$
-
-      // Save manifest data
-      assetPaths.manifest = [manifestPath]
-      assetSrcs.manifest = [JSON.stringify(manifest)]
-
-      // Return new input options
+      // Return input as [js, html]
       return {
         ...inputOptions,
-        input: js.concat(jsScripts),
+        input: js.concat(html),
       }
-    },
-
-    async buildStart() {
-      // Assign asset srcs
-      const [cssSrc, imgSrc, htmlSrc] = await Promise.all([
-        readFiles(assetPaths.css),
-        readFiles(assetPaths.img),
-        assetPaths.html$.map($ => $.html()),
-      ])
-
-      assetSrcs.css = cssSrc
-      assetSrcs.img = imgSrc
-      assetSrcs.html = htmlSrc
     },
 
     /* ============================================ */
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    generateBundle({ dir }) {
-      const emitAssetWith = srcArray => (
-        relativeAssetPath,
-        i,
-      ) => {
-        const baseName = path.basename(relativeAssetPath)
+    generateBundle(options, bundle) {
+      destDir = options.dir
 
-        const id = this.emitAsset(baseName, srcArray[i])
+      // emit assets here? and transform manifest
+    },
 
-        const hashedPath = this.getAssetFileName(id)
-        const hashedFilePath = path.resolve(dir, hashedPath)
+    /* ============================================ */
+    /*                  WRITEBUNDLE                 */
+    /* ============================================ */
 
-        const desiredFileName = relativeAssetPath.replace(
-          srcDirname,
-          dir,
-        )
+    async writeBundle(bundle) {
+      const finalManifest = hooks.transform(bundle, manifest)
 
-        assetFileNameMap[hashedFilePath] = path.resolve(
-          desiredFileName,
-        )
-      }
-
-      assetPaths.css.map(emitAssetWith(assetSrcs.css))
-      assetPaths.img.map(emitAssetWith(assetSrcs.img))
-      assetPaths.html.map(emitAssetWith(assetSrcs.html))
-
-      if (copyManifest) {
-        assetPaths.manifest.map(
-          emitAssetWith(assetSrcs.manifest),
-        )
-      }
+      await fs.writeFile(
+        path.join(destDir, 'manifest.json'),
+        JSON.stringify(finalManifest),
+      )
     },
   }
 }
