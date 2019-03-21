@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@bumble/manifest-entry-points": "^0.3.0",
+    "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1"
   },
   "devDependencies": {
@@ -41,6 +42,7 @@
     "rollup": "^1.6.0",
     "rollup-pluginutils": "^2.4.1",
     "simple-git": "^1.107.0",
+    "sinon": "^7.3.0",
     "sucrase": "^3.9.5"
   },
   "peerDependencies": {
