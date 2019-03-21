@@ -11,21 +11,22 @@ import {
 
 /* ------------- helper functions ------------- */
 
+const not = fn => x => !fn(x)
+
 const isHtml = path => /\.html?$/.test(path)
 
 const resolveEntriesWith = htmlPaths => (jsSrcs, i) => {
-  return jsSrcs.map(src =>
-    path.join(path.dirname(htmlPaths[i]), src),
-  )
+  return jsSrcs.map(src => path.join(path.dirname(htmlPaths[i]), src))
 }
 
 export default function htmlInputs() {
   /* -------------- hooks closures -------------- */
   let htmlFiles
-  let dest
+  let destDir
+
   /* --------------- plugin object -------------- */
   return {
-    name: 'html-input',
+    name: 'html-inputs',
 
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
@@ -35,7 +36,7 @@ export default function htmlInputs() {
       // Filter htm and html files
       const htmlPaths = input.filter(isHtml)
 
-      const inputs = input.filter(x => !isHtml(x))
+      const inputs = input.filter(not(isHtml))
 
       // Extract links from html files
       // and transform to relative paths
@@ -52,17 +53,11 @@ export default function htmlInputs() {
       const jsAssets = html$.flatMap(getJsAssets)
 
       if (cssLinks.length > 0) {
-        throw new Error(
-          'Stylesheets within HTML files are unsupported.',
-        )
+        throw new Error('Stylesheets within HTML files are unsupported.')
       } else if (imgSrcs.length > 0) {
-        throw new Error(
-          'Images within HTML files are unsupported.',
-        )
+        throw new Error('Images within HTML files are unsupported.')
       } else if (jsAssets.length > 0) {
-        throw new Error(
-          'JS assets within HTML files are unsupported.',
-        )
+        throw new Error('JS assets within HTML files are unsupported.')
       }
 
       htmlFiles = html$.map(($, i) => [
@@ -82,14 +77,15 @@ export default function htmlInputs() {
     /* ============================================ */
 
     generateBundle({ dir }) {
-      dest = dir
+      destDir = dir
     },
 
     writeBundle() {
       const writeFile = dest => ([htmlPath, htmlSrc]) => {
         fs.writeFile(path.join(dest, htmlPath), htmlSrc)
       }
-      htmlFiles.forEach(writeFile(dest))
+
+      htmlFiles.forEach(writeFile(destDir))
     },
   }
 }

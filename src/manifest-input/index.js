@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 
-import { deriveEntries } from '@bumble/manifest-entry-points'
+import { deriveEntries } from '@bumble/manifest'
 import { mapObjectValues } from './mapObjectValues'
 
 const name = 'manifest-input'
@@ -18,8 +18,6 @@ const predObj = {
     !v.includes('*') &&
     !/^https?:/.test(v),
 }
-
-/* ------------- helper functions ------------- */
 
 export default function({ transform = x => x }) {
   /* -------------- hooks closures -------------- */
@@ -39,9 +37,7 @@ export default function({ transform = x => x }) {
     options({ input: manifestPath, ...inputOptions }) {
       // Check that input is manifest
       if (path.basename(manifestPath) !== 'manifest.json')
-        throw new TypeError(
-          `${name}: input is not manifest.json`,
-        )
+        throw new TypeError(`${name}: input is not manifest.json`)
 
       // Load manifest.json
       manifest = fs.readJSONSync(manifestPath)
@@ -92,10 +88,7 @@ export default function({ transform = x => x }) {
         },
       )
 
-      manifest = assetPathMapFns.reduce(
-        mapObjectValues,
-        manifest,
-      )
+      manifest = assetPathMapFns.reduce(mapObjectValues, manifest)
     },
 
     /* ============================================ */
