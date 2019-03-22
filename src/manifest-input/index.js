@@ -3,7 +3,7 @@ import fs from 'fs-extra'
 
 import { deriveEntries } from '@bumble/manifest'
 import { mapObjectValues } from './mapObjectValues'
-import { loadAssetData } from '../helpers'
+import { loadAssetData, getAssetPathMapFns } from '../helpers'
 
 const name = 'manifest-input'
 
@@ -42,7 +42,9 @@ export default function({ transform = x => x }) {
     options({ input: manifestPath, ...inputOptions }) {
       // Check that input is manifest
       if (path.basename(manifestPath) !== 'manifest.json')
-        throw new TypeError(`${name}: input is not manifest.json`)
+        throw new TypeError(
+          `${name}: input is not manifest.json`,
+        )
 
       // Load manifest.json
       manifest = fs.readJSONSync(manifestPath)
@@ -74,25 +76,15 @@ export default function({ transform = x => x }) {
     async generateBundle(options) {
       destDir = options.dir
 
-      const assetPathMapFns = (await assets).map(
-        ([assetPath, assetSrc]) => {
-          const name = path.basename(assetPath)
-          const id = this.emitAsset(name, assetSrc)
-          const assetFileName = this.getAssetFileName(id)
-
-          return x => {
-            if (typeof x !== 'string') return x
-
-            if (assetPath.endsWith(x)) {
-              return assetFileName
-            } else {
-              return x
-            }
-          }
-        },
+      const assetPathMapFns = await getAssetPathMapFns.call(
+        this,
+        assets,
       )
 
-      manifest = assetPathMapFns.reduce(mapObjectValues, manifest)
+      manifest = assetPathMapFns.reduce(
+        mapObjectValues,
+        manifest,
+      )
     },
 
     /* ============================================ */

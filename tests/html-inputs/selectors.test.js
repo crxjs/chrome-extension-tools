@@ -7,8 +7,8 @@ import cheerio from 'cheerio'
 import {
   getJsEntries,
   getCssHrefs,
-  getImgSrc,
   getJsAssets,
+  getImgSrcs,
 } from '../../src/html-inputs/cheerio.js'
 
 const loadHtml = async name => {
@@ -22,79 +22,58 @@ const loadHtml = async name => {
 }
 
 test('getJsEntries', async () => {
-  const name = 'basic'
+  const name = 'with-assets'
   const param = await loadHtml(name)
 
-  const result = getJsEntries(param)
-
-  expect(result).toBeInstanceOf(Array)
-  expect(result.length).toBe(2)
-
-  const [htmlPath, jsEntries] = result
-
-  assert(htmlPath.includes(name))
-  assert(htmlPath.endsWith('.html'))
+  const jsEntries = getJsEntries(param)
 
   expect(jsEntries).toBeInstanceOf(Array)
   expect(jsEntries.length).toBe(1)
+
   assert(jsEntries.some(s => s.endsWith('popup.js')))
+  assert(jsEntries.every(s => s.endsWith('.js')))
+  assert(jsEntries.every(s => !s.endsWith('.html')))
 })
 
 test('getJsAssets', async () => {
   const name = 'with-assets'
   const param = await loadHtml(name)
 
-  const result = getJsAssets(param)
-
-  expect(result).toBeInstanceOf(Array)
-  expect(result.length).toBe(2)
-
-  const [htmlPath, jsAssets] = result
-
-  assert(htmlPath.includes(name))
-  assert(htmlPath.endsWith('.html'))
+  const jsAssets = getJsAssets(param)
 
   expect(jsAssets).toBeInstanceOf(Array)
   expect(jsAssets.length).toBe(1)
+
   assert(jsAssets.some(s => s.endsWith('react.js')))
+  assert(jsAssets.every(s => s.endsWith('.js')))
+  assert(jsAssets.every(s => !s.endsWith('.html')))
 })
 
 test('getCssHrefs', async () => {
   const name = 'with-styles'
   const param = await loadHtml(name)
 
-  const result = getCssHrefs(param)
-
-  expect(result).toBeInstanceOf(Array)
-  expect(result.length).toBe(2)
-
-  const [htmlPath, cssHrefs] = result
-
-  assert(htmlPath.includes(name))
-  assert(htmlPath.endsWith('.html'))
+  const cssHrefs = getCssHrefs(param)
 
   expect(cssHrefs).toBeInstanceOf(Array)
   expect(cssHrefs.length).toBe(1)
 
   assert(cssHrefs.some(s => s.endsWith('popup.css')))
+  assert(cssHrefs.every(s => s.endsWith('.css')))
+  assert(cssHrefs.every(s => !s.endsWith('.html')))
 })
 
 test('getImgSrc', async () => {
   const name = 'with-image'
   const param = await loadHtml(name)
 
-  const result = getImgSrc(param)
-
-  expect(result).toBeInstanceOf(Array)
-  expect(result.length).toBe(2)
-
-  const [htmlPath, imageSrcs] = result
-
-  assert(htmlPath.includes(name))
-  assert(htmlPath.endsWith('.html'))
+  const imageSrcs = getImgSrcs(param)
 
   expect(imageSrcs).toBeInstanceOf(Array)
   expect(imageSrcs.length).toBe(2)
+
+  assert(imageSrcs.every(s => s.endsWith('.png')))
+  assert(imageSrcs.every(s => !s.endsWith('.html')))
 
   const image =
     'tests/html-inputs/fixtures/with-image/images/icon-on-16.png'

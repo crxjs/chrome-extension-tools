@@ -1,29 +1,45 @@
-import path from 'path'
-import fs from 'fs-extra'
-
 import {
   getCssHrefs,
   getJsEntries,
   getJsAssets,
   loadHtml,
-  getImgSrc,
+  getImgSrcs,
+  mutateJsAssets,
+  mutateCssHrefs,
+  mutateImgSrcs,
 } from './cheerio'
-import { zipArrays } from '../helpers'
+
+import {
+  zipArrays,
+  loadAssetData,
+  getAssetPathMapFns,
+  writeFile,
+} from '../helpers'
 
 const name = 'html-inputs'
 
 /* ------------- helper functions ------------- */
 
 const not = fn => x => !fn(x)
-const callWith = data => fn => fn(data)
 
 const isHtml = path => /\.html?$/.test(path)
 
-const resolveEntriesWith = htmlPaths => (jsSrcs, i) => {
-  return jsSrcs.map(src =>
-    path.join(path.dirname(htmlPaths[i]), src),
+const loadHtmlAssets = htmlData =>
+  Promise.all(
+    htmlData.map(async data =>
+      data.concat({
+        js: await Promise.all(
+          getJsAssets(data).map(loadAssetData),
+        ),
+        img: await Promise.all(
+          getImgSrcs(data).map(loadAssetData),
+        ),
+        css: await Promise.all(
+          getCssHrefs(data).map(loadAssetData),
+        ),
+      }),
+    ),
   )
-}
 
 /* ============================================ */
 /*                  HTML-INPUTS                 */
@@ -31,10 +47,10 @@ const resolveEntriesWith = htmlPaths => (jsSrcs, i) => {
 
 export default function htmlInputs() {
   /* -------------- hooks closures -------------- */
-  let htmlData
+
+  // Assets will be a Promise
+  let htmlAssets
   let htmlFiles
-  let assets
-  let srcDir
   let destDir
 
   /* --------------- plugin object -------------- */
@@ -48,10 +64,12 @@ export default function htmlInputs() {
     options({ input, ...inputOptions }) {
       // Filter htm and html files
       const htmlPaths = input.filter(isHtml)
+
       // Load html files
       const html$ = htmlPaths.map(loadHtml)
 
-      htmlData = zipArrays(htmlPaths, html$)
+      const htmlData = zipArrays(htmlPaths, html$)
+      htmlAssets = loadHtmlAssets(htmlData)
 
       // Get JS entry file names
       const jsEntries = htmlData.flatMap(getJsEntries)
@@ -75,28 +93,22 @@ export default function htmlInputs() {
       // CONCERN: relative paths within CSS files will fail
       // SOLUTION: use postcss to process CSS asset src
       //   Probably inline images here
+      htmlFiles = (await htmlAssets).map(
+        ([htmlPath, $, { js, img, css }]) => {
+          const jsFns = getAssetPathMapFns.call(this, js)
+          const imgFns = getAssetPathMapFns.call(this, img)
+          const cssFns = getAssetPathMapFns.call(this, css)
 
-      assets = Promise.all([
-        htmlData.map(getJsAssets),
-        htmlData.map(getImgSrc),
-        htmlData.map(getCssHrefs),
-      ]).then(([js, img, css]) => {
-        js, img, css
-      })
+          mutateJsAssets($, jsFns)
+          mutateCssHrefs($, cssFns)
+          mutateImgSrcs($, imgFns)
 
-      assets = htmlData.map(data =>
-        Promise.all(
-          [getJsAssets, getImgSrc, getCssHrefs].map(
-            callWith(data),
-          ),
-        ),
+          return [htmlPath, $.html()]
+        },
       )
     },
 
     async writeBundle() {
-      const writeFile = dest => ([htmlPath, htmlSrc]) =>
-        fs.writeFile(path.join(dest, htmlPath), htmlSrc)
-
       await Promise.all(htmlFiles.map(writeFile(destDir)))
     },
   }
