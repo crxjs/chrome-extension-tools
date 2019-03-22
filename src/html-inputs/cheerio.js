@@ -1,3 +1,4 @@
+import path from 'path'
 import fs from 'fs-extra'
 import cheerio from 'cheerio'
 
@@ -8,45 +9,48 @@ export const loadHtml = filePath => {
   return $
 }
 
-export const getJsEntries = $ => {
-  const tags = []
+const getRelativePath = htmlPath => p =>
+  path.join(path.dirname(htmlPath), p)
 
+export const getJsEntries = ([htmlPath, $]) => [
+  htmlPath,
   $('script')
     .not('[data-rollup-asset]')
-    .each((i, elem) => {
-      tags[i] = $(elem).attr('src')
-    })
+    .toArray()
+    .map(elem => $(elem).attr('src'))
+    .map(getRelativePath(htmlPath)),
+]
 
-  return tags
-}
+export const getJsAssets = ([htmlPath, $]) => [
+  htmlPath,
+  $('script')
+    .filter('[data-rollup-asset="true"]')
+    .toArray()
+    .map(elem => $(elem).attr('src'))
+    .map(getRelativePath(htmlPath)),
+]
 
-// Get 'data-rollup-asset'
-export const getJsAssets = $ => {
-  const tags = []
+export const getCssHrefs = ([htmlPath, $]) => [
+  htmlPath,
+  $('link')
+    .filter('[rel="stylesheet"]')
+    .toArray()
+    .map(elem => $(elem).attr('href'))
+    .map(getRelativePath(htmlPath)),
+]
 
-  $('script[data-rollup-asset]').each((i, elem) => {
-    tags[i] = $(elem).attr('src')
-  })
-
-  return tags
-}
-
-export const getCssLinks = $ => {
-  const tags = []
-
-  $('link[rel="stylesheet"]').each((i, elem) => {
-    tags[i] = $(elem).attr('href')
-  })
-
-  return tags
-}
-
-export const getImgSrc = $ => {
-  const tags = []
-
-  $('img').each((i, elem) => {
-    tags[i] = $(elem).attr('src')
-  })
-
-  return tags
-}
+export const getImgSrc = ([htmlPath, $]) => [
+  htmlPath,
+  [
+    // get img tags
+    ...$('img')
+      .not('[src|="http:-https:-data:-/"]')
+      .toArray()
+      .map(elem => $(elem).attr('src')),
+    // get favicons
+    ...$('link[rel="icon"]')
+      .not('[href|="http:-https:-data:-/"]')
+      .toArray()
+      .map(elem => $(elem).attr('href')),
+  ].map(getRelativePath(htmlPath)),
+]

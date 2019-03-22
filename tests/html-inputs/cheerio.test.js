@@ -6,11 +6,7 @@ import cheerio from 'cheerio'
 
 import sinon from 'sinon'
 
-import {
-  loadHtml,
-  getCssLinks,
-  getJsEntries,
-} from '../../src/html-inputs/cheerio.js'
+import { loadHtml } from '../../src/html-inputs/cheerio.js'
 
 afterEach(() => {
   sinon.restore()
@@ -33,34 +29,4 @@ test('loadHtml', () => {
 
   assert(loadStub.calledOnce)
   assert(loadStub.calledWith(contents))
-})
-
-test('getJsEntries', async () => {
-  const popupHtml = await fs.readFile(
-    path.join('tests/html-inputs/fixtures/basic/popup.html'),
-    'utf8',
-  )
-
-  const $ = cheerio.load(popupHtml)
-
-  const result = getJsEntries($)
-
-  expect(result).toContain('popup.js')
-  expect(result.length).toBe(1)
-})
-
-test('getCssLinks', async () => {
-  const popupHtml = await fs.readFile(
-    path.join(
-      'tests/html-inputs/fixtures/unsupported/popup.html',
-    ),
-    'utf8',
-  )
-
-  const $ = cheerio.load(popupHtml)
-
-  const result = getCssLinks($)
-
-  expect(result).toContain('popup.css')
-  expect(result.length).toBe(1)
 })

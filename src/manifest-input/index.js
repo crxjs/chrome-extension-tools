@@ -3,6 +3,7 @@ import fs from 'fs-extra'
 
 import { deriveEntries } from '@bumble/manifest'
 import { mapObjectValues } from './mapObjectValues'
+import { loadAssetData } from '../helpers'
 
 const name = 'manifest-input'
 
@@ -19,10 +20,14 @@ const predObj = {
     !/^https?:/.test(v),
 }
 
+/* ============================================ */
+/*                MANIFEST-INPUT                */
+/* ============================================ */
+
 export default function({ transform = x => x }) {
   /* -------------- hooks closures -------------- */
-  let assets
   let manifest
+  let assets
   let srcDir
   let destDir
 
@@ -50,11 +55,10 @@ export default function({ transform = x => x }) {
       })
 
       // Read assets async, emit later
-      assets = Promise.all(
-        [...css, ...img].map(asset =>
-          fs.readFile(asset).then(src => [asset, src]),
-        ),
-      )
+      // CONCERN: relative paths within CSS files will fail
+      // SOLUTION: use postcss to process CSS asset src
+      //   Probably inline images here
+      assets = Promise.all([...css, ...img].map(loadAssetData))
 
       // Return input as [js, html]
       return {

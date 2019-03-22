@@ -2,31 +2,44 @@ import path from 'path'
 import fs from 'fs-extra'
 
 import {
-  getCssLinks,
+  getCssHrefs,
   getJsEntries,
   getJsAssets,
   loadHtml,
   getImgSrc,
 } from './cheerio'
+import { zipArrays } from '../helpers'
+
+const name = 'html-inputs'
 
 /* ------------- helper functions ------------- */
 
 const not = fn => x => !fn(x)
+const callWith = data => fn => fn(data)
 
 const isHtml = path => /\.html?$/.test(path)
 
 const resolveEntriesWith = htmlPaths => (jsSrcs, i) => {
-  return jsSrcs.map(src => path.join(path.dirname(htmlPaths[i]), src))
+  return jsSrcs.map(src =>
+    path.join(path.dirname(htmlPaths[i]), src),
+  )
 }
+
+/* ============================================ */
+/*                  HTML-INPUTS                 */
+/* ============================================ */
 
 export default function htmlInputs() {
   /* -------------- hooks closures -------------- */
+  let htmlData
   let htmlFiles
+  let assets
+  let srcDir
   let destDir
 
   /* --------------- plugin object -------------- */
   return {
-    name: 'html-inputs',
+    name,
 
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
@@ -35,37 +48,17 @@ export default function htmlInputs() {
     options({ input, ...inputOptions }) {
       // Filter htm and html files
       const htmlPaths = input.filter(isHtml)
-
-      const inputs = input.filter(not(isHtml))
-
-      // Extract links from html files
-      // and transform to relative paths
+      // Load html files
       const html$ = htmlPaths.map(loadHtml)
 
-      const jsEntries = html$
-        .map(getJsEntries)
-        .map(resolveEntriesWith(htmlPaths))
-        .flat()
+      htmlData = zipArrays(htmlPaths, html$)
 
-      // Throw for unsupported assets
-      const cssLinks = html$.flatMap(getCssLinks)
-      const imgSrcs = html$.flatMap(getImgSrc)
-      const jsAssets = html$.flatMap(getJsAssets)
-
-      if (cssLinks.length > 0) {
-        throw new Error('Stylesheets within HTML files are unsupported.')
-      } else if (imgSrcs.length > 0) {
-        throw new Error('Images within HTML files are unsupported.')
-      } else if (jsAssets.length > 0) {
-        throw new Error('JS assets within HTML files are unsupported.')
-      }
-
-      htmlFiles = html$.map(($, i) => [
-        path.basename(htmlPaths[i]),
-        $.html(),
-      ])
+      // Get JS entry file names
+      const jsEntries = htmlData.flatMap(getJsEntries)
 
       // Return new input options
+      const inputs = input.filter(not(isHtml))
+
       return {
         ...inputOptions,
         input: inputs.concat(jsEntries),
@@ -76,16 +69,35 @@ export default function htmlInputs() {
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    generateBundle({ dir }) {
+    async generateBundle({ dir }) {
       destDir = dir
+
+      // CONCERN: relative paths within CSS files will fail
+      // SOLUTION: use postcss to process CSS asset src
+      //   Probably inline images here
+
+      assets = Promise.all([
+        htmlData.map(getJsAssets),
+        htmlData.map(getImgSrc),
+        htmlData.map(getCssHrefs),
+      ]).then(([js, img, css]) => {
+        js, img, css
+      })
+
+      assets = htmlData.map(data =>
+        Promise.all(
+          [getJsAssets, getImgSrc, getCssHrefs].map(
+            callWith(data),
+          ),
+        ),
+      )
     },
 
-    writeBundle() {
-      const writeFile = dest => ([htmlPath, htmlSrc]) => {
+    async writeBundle() {
+      const writeFile = dest => ([htmlPath, htmlSrc]) =>
         fs.writeFile(path.join(dest, htmlPath), htmlSrc)
-      }
 
-      htmlFiles.forEach(writeFile(destDir))
+      await Promise.all(htmlFiles.map(writeFile(destDir)))
     },
   }
 }
