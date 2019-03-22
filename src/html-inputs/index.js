@@ -93,18 +93,26 @@ export default function htmlInputs() {
       // CONCERN: relative paths within CSS files will fail
       // SOLUTION: use postcss to process CSS asset src
       //   Probably inline images here
-      htmlFiles = (await htmlAssets).map(
-        ([htmlPath, $, { js, img, css }]) => {
-          const jsFns = getAssetPathMapFns.call(this, js)
-          const imgFns = getAssetPathMapFns.call(this, img)
-          const cssFns = getAssetPathMapFns.call(this, css)
+      htmlFiles = await Promise.all(
+        (await htmlAssets).map(
+          async ([htmlPath, $, { js, img, css }]) => {
+            const jsFns = await getAssetPathMapFns.call(this, js)
+            const imgFns = await getAssetPathMapFns.call(
+              this,
+              img,
+            )
+            const cssFns = await getAssetPathMapFns.call(
+              this,
+              css,
+            )
 
-          mutateJsAssets($, jsFns)
-          mutateCssHrefs($, cssFns)
-          mutateImgSrcs($, imgFns)
+            jsFns.reduce(mutateJsAssets, $)
+            cssFns.reduce(mutateCssHrefs, $)
+            imgFns.reduce(mutateImgSrcs, $)
 
-          return [htmlPath, $.html()]
-        },
+            return [htmlPath, $.html()]
+          },
+        ),
       )
     },
 

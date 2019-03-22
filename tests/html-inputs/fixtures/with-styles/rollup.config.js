@@ -5,7 +5,6 @@ import emptyOutputDir from '../../../../src/empty-output-dir'
 
 export default {
   input: [
-    'tests/html-inputs/fixtures/with-styles/options.html',
     'tests/html-inputs/fixtures/with-styles/popup.html',
     'tests/html-inputs/fixtures/with-styles/background.js',
     'tests/html-inputs/fixtures/with-styles/content.js',
