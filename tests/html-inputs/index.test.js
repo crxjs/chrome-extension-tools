@@ -21,7 +21,7 @@ test('rollup bundles chunks', async () => {
   assert(output.length === 4)
 })
 
-test.only('withAssets', async () => {
+test('withAssets', async () => {
   const bundle = await rollup(withAssets)
   const { output } = await bundle.generate(withAssets.output)
 
@@ -34,7 +34,7 @@ test.only('withAssets', async () => {
 
 test('withImage', async () => {
   const bundle = await rollup(withImage)
-  const { output } = await bundle.generate(withAssets.output)
+  const { output } = await bundle.generate(withImage.output)
 
   const chunks = output.filter(({ isAsset }) => !isAsset)
   const assets = output.filter(({ isAsset }) => isAsset)

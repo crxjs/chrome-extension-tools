@@ -28,7 +28,7 @@ export const getJsAssets = ([htmlPath, $]) =>
     .map(elem => $(elem).attr('src'))
     .map(getRelativePath(htmlPath))
 
-export const mutateJsAssets = ($, fn) =>
+export const mutateJsAssets = ($, fn) => {
   $('script')
     .filter('[data-rollup-asset="true"]')
     .toArray()
@@ -37,6 +37,9 @@ export const mutateJsAssets = ($, fn) =>
       const value = fn(e.attr('src'))
       e.attr('src', value)
     })
+
+  return $
+}
 
 /* -------------------- css ------------------- */
 
@@ -47,7 +50,7 @@ export const getCssHrefs = ([htmlPath, $]) =>
     .map(elem => $(elem).attr('href'))
     .map(getRelativePath(htmlPath))
 
-export const mutateCssHrefs = ($, fn) =>
+export const mutateCssHrefs = ($, fn) => {
   $('link')
     .filter('[rel="stylesheet"]')
     .toArray()
@@ -56,6 +59,9 @@ export const mutateCssHrefs = ($, fn) =>
       const value = fn(e.attr('href'))
       e.attr('href', value)
     })
+
+  return $
+}
 
 /* -------------------- img ------------------- */
 
@@ -91,4 +97,6 @@ export const mutateImgSrcs = ($, fn) => {
       const value = fn(e.attr('href'))
       e.attr('href', value)
     })
+
+  return $
 }
