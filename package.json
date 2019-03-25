@@ -35,11 +35,15 @@
     "fs-extra": "^7.0.1"
   },
   "devDependencies": {
+    "@bumble/clipboard": "^0.2.2",
+    "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
     "eslint": "^5.11.0",
     "jest": "^24.1.0",
     "replace-in-file": "^3.4.4",
     "rollup": "^1.6.0",
+    "rollup-plugin-commonjs": "^9.2.2",
+    "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-pluginutils": "^2.4.1",
     "simple-git": "^1.107.0",
     "sinon": "^7.3.0",

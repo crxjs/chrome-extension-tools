@@ -3,3 +3,5 @@ build/
 tests/fixtures/dest
 examples/
 tests/manifest-input/fixtures/dest
+tests/composed-plugin/fixtures/dest
+tests/final/fixtures/dest
