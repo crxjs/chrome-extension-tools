@@ -1,13 +1,13 @@
 {
-  "name": "rollup-plugin-manifest-input",
-  "version": "0.1.0",
-  "description": "Use a Chrome extension manifest in the rollup input field.",
+  "name": "rollup-plugin-chrome-extension",
+  "version": "0.2.0",
+  "description": "Build Chrome Extensions with this composed Rollup plugin.",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "build"
   ],
-  "repository": "bumble-org/rollup-plugin-manifest-entry.git",
+  "repository": "bumble-org/rollup-plugin-chrome-extension",
   "main": "build/bundle-cjs.js",
   "module": "build/bundle-esm.js",
   "scripts": {
@@ -30,17 +30,23 @@
     }
   },
   "dependencies": {
-    "@bumble/manifest-entry-points": "^0.3.0",
+    "@bumble/manifest": "^0.3.0",
+    "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1"
   },
   "devDependencies": {
+    "@bumble/clipboard": "^0.2.2",
+    "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
     "eslint": "^5.11.0",
     "jest": "^24.1.0",
     "replace-in-file": "^3.4.4",
     "rollup": "^1.6.0",
+    "rollup-plugin-commonjs": "^9.2.2",
+    "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-pluginutils": "^2.4.1",
     "simple-git": "^1.107.0",
+    "sinon": "^7.3.0",
     "sucrase": "^3.9.5"
   },
   "peerDependencies": {
