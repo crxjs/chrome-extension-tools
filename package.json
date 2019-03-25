@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-chrome-extension",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build Chrome Extensions with this composed Rollup plugin.",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
