@@ -19,6 +19,6 @@ export default [
         sourcemap: 'inline',
       },
     ],
-    external: ['@bumble/manifest', 'cheerio', 'fs-extra'],
+    external: ['@bumble/manifest', 'cheerio', 'fs-extra', 'path'],
   },
 ]
