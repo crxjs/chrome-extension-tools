@@ -1,13 +1,13 @@
 {
-  "name": "rollup-plugin-manifest-input",
+  "name": "rollup-plugin-chrome-extension",
   "version": "0.1.0",
-  "description": "Use a Chrome extension manifest in the rollup input field.",
+  "description": "Build Chrome Extensions with this composed Rollup plugin.",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "build"
   ],
-  "repository": "bumble-org/rollup-plugin-manifest-entry.git",
+  "repository": "bumble-org/rollup-plugin-chrome-extension",
   "main": "build/bundle-cjs.js",
   "module": "build/bundle-esm.js",
   "scripts": {

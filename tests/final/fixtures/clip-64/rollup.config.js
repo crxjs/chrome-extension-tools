@@ -13,8 +13,8 @@ export default {
     format: 'esm',
   },
   plugins: [
-    ...chromeExtension({ pkg }),
+    chromeExtension({ pkg }),
     resolve(),
-    commonjs()
-  ],
+    commonjs(),
+  ].flat(),
 }
