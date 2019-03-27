@@ -14,7 +14,7 @@
     "build": "rollup -c",
     "start": "rollup -c -w",
     "test": "jest",
-    "preversion": "npm run build",
+    "preversion": "npm test && npm run build",
     "postversion": "git push && npm publish"
   },
   "jest": {
@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "@bumble/manifest": "^0.3.1",
+    "@bumble/manifest": "^0.3.2",
     "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1"
   },
@@ -38,15 +38,17 @@
     "@bumble/clipboard": "^0.2.2",
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
-    "eslint": "^5.11.0",
-    "jest": "^24.1.0",
+    "eslint": "^5.15.3",
+    "jest": "^24.5.0",
+    "npm-run-all": "^4.1.5",
     "replace-in-file": "^3.4.4",
-    "rollup": "^1.6.0",
+    "rollup": "^1.7.3",
     "rollup-plugin-commonjs": "^9.2.2",
+    "rollup-plugin-zip": "git+https://github.com/jacksteamdev/rollup-plugin-zip.git#options-dest",
     "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-pluginutils": "^2.4.1",
-    "simple-git": "^1.107.0",
-    "sinon": "^7.3.0",
+    "rollup-pluginutils": "^2.5.0",
+    "simple-git": "^1.110.0",
+    "sinon": "^7.3.1",
     "sucrase": "^3.9.5"
   },
   "peerDependencies": {

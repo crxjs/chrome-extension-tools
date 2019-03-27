@@ -6,6 +6,10 @@ import {
 import htmlInputs from './html-inputs/index'
 import manifest from './manifest-input/index'
 import emptyOutputDir from './empty-output-dir/index'
+import zip from 'rollup-plugin-zip'
+
+const release = (value = true) =>
+  process.env.RELEASE === 'release' && value
 
 const transformManifest = pkg => (bundle, manifest) => {
   const permissions = Object.values(bundle).reduce(
@@ -24,11 +28,12 @@ const transformManifest = pkg => (bundle, manifest) => {
   return deriveManifest(pkg, manifest, [...permissions])
 }
 
-export default ({ pkg }) => [
+export default ({ pkg, zipDir }) => [
   manifest({
     // manifest transform hook, called in writeBundle
     transform: transformManifest(pkg),
   }),
   htmlInputs(),
   emptyOutputDir(),
+  release(zip({ dest: zipDir })),
 ]
