@@ -35,5 +35,5 @@ export default ({ pkg, zipDir }) => [
   }),
   htmlInputs(),
   emptyOutputDir(),
-  release(zip({ dest: zipDir })),
+  release(zip({ dir: zipDir })),
 ]

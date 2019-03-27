@@ -33,13 +33,13 @@
     "@bumble/manifest": "^0.3.2",
     "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1",
-    "rollup-plugin-zip": "git+https://github.com/jacksteamdev/rollup-plugin-zip.git#options-dest"
+    "rollup-plugin-zip": "^0.3.0"
   },
   "devDependencies": {
     "@bumble/clipboard": "^0.2.2",
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
-    "eslint": "^5.15.3",
+    "eslint": "5.15.1",
     "jest": "^24.5.0",
     "npm-run-all": "^4.1.5",
     "replace-in-file": "^3.4.4",

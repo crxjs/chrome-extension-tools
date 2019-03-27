@@ -19,6 +19,12 @@ export default [
         sourcemap: 'inline',
       },
     ],
-    external: ['@bumble/manifest', 'cheerio', 'fs-extra', 'path'],
+    external: [
+      '@bumble/manifest',
+      'cheerio',
+      'fs-extra',
+      'path',
+      'rollup-plugin-zip',
+    ],
   },
 ]
