@@ -32,7 +32,8 @@
   "dependencies": {
     "@bumble/manifest": "^0.3.2",
     "cheerio": "^1.0.0-rc.2",
-    "fs-extra": "^7.0.1"
+    "fs-extra": "^7.0.1",
+    "rollup-plugin-zip": "git+https://github.com/jacksteamdev/rollup-plugin-zip.git#options-dest"
   },
   "devDependencies": {
     "@bumble/clipboard": "^0.2.2",
@@ -44,7 +45,6 @@
     "replace-in-file": "^3.4.4",
     "rollup": "^1.7.3",
     "rollup-plugin-commonjs": "^9.2.2",
-    "rollup-plugin-zip": "git+https://github.com/jacksteamdev/rollup-plugin-zip.git#options-dest",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-pluginutils": "^2.5.0",
     "simple-git": "^1.110.0",
