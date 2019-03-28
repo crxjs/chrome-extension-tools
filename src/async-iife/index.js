@@ -27,10 +27,9 @@ export default function asyncIIFE() {
         c => c.replace(/^import/gm, 'const'),
         // as -> ':'
         c => c.replace(/(?<=\{.+)( as)(?=.+\})/g, ':'),
-        // from -> '='
-        c => c.replace(/ from /g, ' = '),
         // path -> 'await import(path)'
-        c => c.replace(/('.+?');$/gm, 'await import($1);'),
+        c =>
+          c.replace(/ from ('.+?');$/gm, ' = await import($1);'),
       ].reduce((c, fn) => fn(c), source)
 
       const magic = new MagicString(code)
