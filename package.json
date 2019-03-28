@@ -33,6 +33,7 @@
     "@bumble/manifest": "^0.3.2",
     "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1",
+    "magic-string": "^0.25.2",
     "rollup-plugin-zip": "^0.3.0"
   },
   "devDependencies": {
