@@ -25,6 +25,7 @@ export default [
       'fs-extra',
       'path',
       'rollup-plugin-zip',
+      'magic-string',
     ],
   },
 ]
