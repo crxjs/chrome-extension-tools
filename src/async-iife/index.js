@@ -14,7 +14,7 @@ export default function asyncIIFE() {
       active = true
 
       return {
-        format: 'esm',
+        format: 'es',
         ...options,
       }
     },

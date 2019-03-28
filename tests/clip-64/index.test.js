@@ -1,7 +1,7 @@
 import { rollup } from 'rollup'
-import config from '../clip-selector/fixtures/src/rollup.config'
+import config from './fixtures/src/rollup.config'
 
-test('bundles entry chunks as async iife', async () => {
+test('bundles chunks and assets', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
