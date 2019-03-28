@@ -9,7 +9,7 @@ import emptyOutputDir from './empty-output-dir/index'
 import zip from 'rollup-plugin-zip'
 
 const release = (value = true) =>
-  process.env.RELEASE === 'release' && value
+  process.env.RELEASE === 'true' && value
 
 const transformManifest = pkg => (bundle, manifest) => {
   const permissions = Object.values(bundle).reduce(
