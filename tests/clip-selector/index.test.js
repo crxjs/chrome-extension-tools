@@ -1,5 +1,5 @@
 import { rollup } from 'rollup'
-import config from './fixtures/clip-64/rollup.config'
+import config from './fixtures/src/rollup.config'
 
 test('bundles chunks and assets', async () => {
   const bundle = await rollup(config)
@@ -8,6 +8,6 @@ test('bundles chunks and assets', async () => {
   const chunks = output.filter(({ isAsset }) => !isAsset)
   const assets = output.filter(({ isAsset }) => isAsset)
 
-  expect(chunks.length).toBe(1)
-  expect(assets.length).toBe(4)
+  expect(chunks.length).toBe(3)
+  expect(assets.length).toBe(3)
 })

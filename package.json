@@ -36,9 +36,11 @@
     "rollup-plugin-zip": "^0.3.0"
   },
   "devDependencies": {
+    "@bumble/chrome": "^0.1.1",
     "@bumble/clipboard": "^0.2.2",
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
+    "chrome-promise": "^3.0.4",
     "eslint": "5.15.1",
     "jest": "^24.5.0",
     "npm-run-all": "^4.1.5",
@@ -47,9 +49,11 @@
     "rollup-plugin-commonjs": "^9.2.2",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-pluginutils": "^2.5.0",
+    "rxjs": "^6.4.0",
     "simple-git": "^1.110.0",
     "sinon": "^7.3.1",
-    "sucrase": "^3.9.5"
+    "sucrase": "^3.9.5",
+    "unique-selector": "^0.4.1"
   },
   "peerDependencies": {
     "rollup": "^1.6.0"

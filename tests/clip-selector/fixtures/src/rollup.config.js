@@ -7,9 +7,9 @@ import chromeExtension from '../../../../src/index'
 import pkg from './package.json'
 
 export default {
-  input: 'tests/final/fixtures/clip-64/manifest.json',
+  input: 'tests/clip-selector/fixtures/src/manifest.json',
   output: {
-    dir: 'tests/final/fixtures/dest',
+    dir: 'tests/clip-selector/fixtures/dest',
     format: 'esm',
   },
   plugins: [
