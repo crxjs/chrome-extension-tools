@@ -23,6 +23,16 @@
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+    },
+    {
+      "type": "node",
+      "name": "test-manifest",
+      "request": "launch",
+      "args": ["manifest", "--runInBand"],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
     }
   ]
 }
