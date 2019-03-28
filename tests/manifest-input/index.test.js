@@ -9,5 +9,5 @@ test('bundles chunks and assets', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(3)
-  expect(assets.length).toBe(2)
+  expect(assets.length).toBe(3)
 })

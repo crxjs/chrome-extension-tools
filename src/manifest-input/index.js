@@ -29,7 +29,6 @@ export default function({ transform = x => x }) {
   let manifest
   let assets
   let srcDir
-  let destDir
 
   /* --------------- plugin object -------------- */
   return {
@@ -73,31 +72,39 @@ export default function({ transform = x => x }) {
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    async generateBundle(options) {
-      destDir = options.dir
-
+    async generateBundle(options, bundle) {
       const assetPathMapFns = await getAssetPathMapFns.call(
         this,
         assets,
       )
 
-      manifest = assetPathMapFns.reduce(
-        mapObjectValues,
-        manifest,
+      const manifestBody = transform(
+        bundle,
+        // update asset paths
+        assetPathMapFns.reduce(mapObjectValues, manifest),
       )
+
+      const manifestName = 'manifest.json'
+
+      // Mutate bundle to emit custom asset
+      bundle[manifestName] = {
+        fileName: manifestName,
+        isAsset: true,
+        source: JSON.stringify(manifestBody, null, 2),
+      }
     },
 
     /* ============================================ */
     /*                  WRITEBUNDLE                 */
     /* ============================================ */
 
-    async writeBundle(bundle) {
-      // Write manifest
-      await fs.writeJSON(
-        path.join(destDir, 'manifest.json'),
-        transform(bundle, manifest),
-        { spaces: 2 },
-      )
-    },
+    // async writeBundle(bundle) {
+    //   // Write manifest
+    //   await fs.writeJSON(
+    //     path.join(destDir, 'manifest.json'),
+    //     transform(bundle, manifest),
+    //     { spaces: 2 },
+    //   )
+    // },
   }
 }
