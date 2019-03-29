@@ -3,31 +3,18 @@ import MagicString from 'magic-string'
 const name = 'async-iife'
 
 export default function asyncIIFE() {
-  let active = false
-
   return {
     name,
 
-    outputOptions({ format, ...options }) {
-      if (format !== 'async-iife') return null
-
-      active = true
-
-      return {
-        format: 'es',
-        ...options,
-      }
-    },
-
     renderChunk(source, chunk, { sourcemap }) {
-      if (!(active && chunk.isEntry)) return null
+      if (!chunk.isEntry) return null
 
       const code = [
         // import -> const
         c => c.replace(/^import/gm, 'const'),
-        // as -> ':'
-        c => c.replace(/(?<=\{.+)( as)(?=.+\})/g, ':'),
-        // path -> 'await import(path)'
+        // named imports to destructuring assignment
+        c => c.replace(/( as )(?=.+?\} from .+?$)/gm, ': '),
+        // 'path' -> 'await import(path)'
         c =>
           c.replace(/ from ('.+?');$/gm, ' = await import($1);'),
       ].reduce((c, fn) => fn(c), source)
