@@ -2,6 +2,11 @@ import MagicString from 'magic-string'
 
 const name = 'async-iife'
 
+const regx = {
+  importLine: /^import (.+) from ('.+?');$/gm,
+  asg: /(?<=\{.+)( as )(?=.+?\})/g,
+}
+
 export default function asyncIIFE() {
   return {
     name,
@@ -9,15 +14,13 @@ export default function asyncIIFE() {
     renderChunk(source, chunk, { sourcemap }) {
       if (!chunk.isEntry) return null
 
-      const code = [
-        // import -> const
-        c => c.replace(/^import/gm, 'const'),
-        // named imports to destructuring assignment
-        c => c.replace(/( as )(?=.+?\} from .+?$)/gm, ': '),
-        // 'path' -> 'await import(path)'
-        c =>
-          c.replace(/ from ('.+?');$/gm, ' = await import($1);'),
-      ].reduce((c, fn) => fn(c), source)
+      const code = source.replace(
+        regx.importLine,
+        (line, $1, $2) => {
+          const asg = $1.replace(regx.asg, ': ')
+          return `const ${asg} = await import(${$2});`
+        },
+      )
 
       const magic = new MagicString(code)
 
