@@ -10,7 +10,7 @@ export default {
   input: 'tests/clip-selector/fixtures/src/manifest.json',
   output: {
     dir: 'tests/clip-selector/fixtures/dest',
-    format: 'async-iife',
+    format: 'esm',
     sourcemap: true,
   },
   plugins: [

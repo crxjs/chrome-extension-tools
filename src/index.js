@@ -29,7 +29,7 @@ const transformManifest = pkg => (bundle, manifest) => {
   return deriveManifest(pkg, manifest, [...permissions])
 }
 
-export default ({ pkg, zipDir }) => [
+export default ({ pkg, zipDir = 'releases' }) => [
   manifest({
     // manifest transform hook, called in writeBundle
     transform: transformManifest(pkg),
