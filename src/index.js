@@ -13,6 +13,10 @@ const release = (value = true) =>
   process.env.RELEASE === 'true' && value
 
 const transformManifest = pkg => (bundle, manifest) => {
+  if (Object.values(pkg).some(x => !x)) {
+    throw 'chrome-extension: Failed to derive manifest, options.pkg is not fully defined. Please run through npm scripts.'
+  }
+
   const permissions = Object.values(bundle).reduce(
     (set, { code }) => {
       if (code) {
@@ -29,13 +33,23 @@ const transformManifest = pkg => (bundle, manifest) => {
   return deriveManifest(pkg, manifest, [...permissions])
 }
 
-export default ({ pkg, zipDir = 'releases' }) => [
+const npmPkgDetails = {
+  name: process.env.npm_package_name,
+  version: process.env.npm_package_version,
+  description: process.env.npm_package_description,
+  author: process.env.npm_package_author,
+}
+
+export default ({
+  pkg = npmPkgDetails,
+  zipDir = 'releases',
+} = {}) => [
   manifest({
     // manifest transform hook, called in writeBundle
     transform: transformManifest(pkg),
   }),
   htmlInputs(),
-  emptyOutputDir(),
-  release(zip({ dir: zipDir })),
   asyncIIFE(),
+  release(zip({ dir: zipDir })),
+  emptyOutputDir(),
 ]
