@@ -19,14 +19,12 @@ export const getJsEntries = ([htmlPath, $]) =>
     .map(elem => $(elem).attr('src'))
     .map(getRelativePath(htmlPath))
 
-export const mutateJsEntries = map => ($, fn) => {
+export const mutateJsEntries = $ => {
   $('script')
     .not('[data-rollup-asset]')
     .toArray()
     .map(elem => $(elem))
     .forEach(e => {
-      const value = fn(e.attr('src'))
-      e.attr('src', map(value))
       e.attr('type', 'module')
     })
 

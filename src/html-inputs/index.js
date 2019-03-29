@@ -16,14 +16,12 @@ const name = 'html-inputs'
 /*                  HTML-INPUTS                 */
 /* ============================================ */
 
-export default function htmlInputs({
-  mapFileNames = fileName =>
-    fileName.replace(/\.js$/m, '.esm.js'),
-} = {}) {
+export default function htmlInputs() {
   /* -------------- hooks closures -------------- */
 
   // Assets will be a Promise
   let htmlAssets
+  let jsEntries
 
   /* --------------- plugin object -------------- */
   return {
@@ -44,9 +42,7 @@ export default function htmlInputs({
       htmlAssets = loadHtmlAssets(htmlData)
 
       // Get JS entry file names
-      const jsEntries = htmlData
-        .flatMap(getJsEntries)
-        .map(mapFileNames)
+      jsEntries = htmlData.flatMap(getJsEntries)
 
       // Return new input options
       const inputs = input.filter(not(isHtml))
@@ -80,7 +76,7 @@ export default function htmlInputs({
               css,
             )
 
-            jsFns.reduce(mutateJsEntries(mapFileNames), $)
+            mutateJsEntries($)
             jsFns.reduce(mutateJsAssets, $)
             cssFns.reduce(mutateCssHrefs, $)
             imgFns.reduce(mutateImgSrcs, $)
