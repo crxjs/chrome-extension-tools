@@ -1,57 +1,26 @@
+import path from 'path'
+import { getAssetPathMapFns, zipArrays } from '../helpers'
 import {
-  getCssHrefs,
   getJsEntries,
-  getJsAssets,
   loadHtml,
-  getImgSrcs,
-  mutateJsAssets,
   mutateCssHrefs,
   mutateImgSrcs,
+  mutateJsAssets,
+  mutateJsEntries,
 } from './cheerio'
-
-import {
-  zipArrays,
-  loadAssetData,
-  getAssetPathMapFns,
-  writeFile,
-} from '../helpers'
+import { isHtml, loadHtmlAssets, not } from './helpers'
 
 const name = 'html-inputs'
-
-/* ------------- helper functions ------------- */
-
-const not = fn => x => !fn(x)
-
-const isHtml = path => /\.html?$/.test(path)
-
-const loadHtmlAssets = htmlData =>
-  Promise.all(
-    htmlData.map(async data =>
-      data.concat({
-        js: await Promise.all(
-          getJsAssets(data).map(loadAssetData),
-        ),
-        img: await Promise.all(
-          getImgSrcs(data).map(loadAssetData),
-        ),
-        css: await Promise.all(
-          getCssHrefs(data).map(loadAssetData),
-        ),
-      }),
-    ),
-  )
 
 /* ============================================ */
 /*                  HTML-INPUTS                 */
 /* ============================================ */
 
-export default function htmlInputs() {
+export default function htmlInputs({ mapFileNames = x => x }) {
   /* -------------- hooks closures -------------- */
 
   // Assets will be a Promise
   let htmlAssets
-  let htmlFiles
-  let destDir
 
   /* --------------- plugin object -------------- */
   return {
@@ -72,7 +41,9 @@ export default function htmlInputs() {
       htmlAssets = loadHtmlAssets(htmlData)
 
       // Get JS entry file names
-      const jsEntries = htmlData.flatMap(getJsEntries)
+      const jsEntries = htmlData
+        .flatMap(getJsEntries)
+        .map(mapFileNames)
 
       // Return new input options
       const inputs = input.filter(not(isHtml))
@@ -87,15 +58,15 @@ export default function htmlInputs() {
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    async generateBundle({ dir }) {
-      destDir = dir
-
+    async generateBundle(options, bundle) {
       // CONCERN: relative paths within CSS files will fail
       // SOLUTION: use postcss to process CSS asset src
       //   Probably inline images here
-      htmlFiles = await Promise.all(
+      await Promise.all(
         (await htmlAssets).map(
           async ([htmlPath, $, { js, img, css }]) => {
+            const htmlName = path.basename(htmlPath)
+
             const jsFns = await getAssetPathMapFns.call(this, js)
             const imgFns = await getAssetPathMapFns.call(
               this,
@@ -106,18 +77,20 @@ export default function htmlInputs() {
               css,
             )
 
+            jsFns.reduce(mutateJsEntries(mapFileNames), $)
             jsFns.reduce(mutateJsAssets, $)
             cssFns.reduce(mutateCssHrefs, $)
             imgFns.reduce(mutateImgSrcs, $)
 
-            return [htmlPath, $.html()]
+            // Mutate bundle to emit custom asset
+            bundle[htmlName] = {
+              fileName: htmlName,
+              isAsset: true,
+              source: $.html(),
+            }
           },
         ),
       )
-    },
-
-    async writeBundle() {
-      await Promise.all(htmlFiles.map(writeFile(destDir)))
     },
   }
 }
