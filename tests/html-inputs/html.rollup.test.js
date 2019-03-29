@@ -16,7 +16,7 @@ test('basic', async () => {
   const bundle = await rollup(basic)
   const { output } = await bundle.generate(basic.output)
 
-  assert(output.length === 4)
+  assert(output.length === 5)
 })
 
 test('withAssets', async () => {
@@ -27,7 +27,7 @@ test('withAssets', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(3)
-  expect(assets.length).toBe(2)
+  expect(assets.length).toBe(3)
 })
 
 test('withImage', async () => {
