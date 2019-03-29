@@ -1,0 +1,8 @@
+{
+  "background": [
+    "popup.html",
+    "options.html",
+    "background.js",
+    "content.js"
+  ]
+}
