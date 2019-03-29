@@ -1,5 +1,3 @@
-import assert from 'assert'
-
 import sinon from 'sinon'
 import { rollup } from 'rollup'
 
@@ -16,7 +14,11 @@ test('basic', async () => {
   const bundle = await rollup(basic)
   const { output } = await bundle.generate(basic.output)
 
-  assert(output.length === 5)
+  const chunks = output.filter(({ isAsset }) => !isAsset)
+  const assets = output.filter(({ isAsset }) => isAsset)
+
+  expect(chunks.length).toBe(4)
+  expect(assets.length).toBe(2)
 })
 
 test('withAssets', async () => {
@@ -38,7 +40,7 @@ test('withImage', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(3)
-  expect(assets.length).toBe(2)
+  expect(assets.length).toBe(3)
 })
 
 test('withStyles', async () => {
@@ -49,5 +51,5 @@ test('withStyles', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(3)
-  expect(assets.length).toBe(1)
+  expect(assets.length).toBe(2)
 })
