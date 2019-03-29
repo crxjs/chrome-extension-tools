@@ -5,6 +5,9 @@ import { deriveEntries } from '@bumble/manifest'
 import { mapObjectValues } from './mapObjectValues'
 import { loadAssetData, getAssetPathMapFns } from '../helpers'
 
+import MagicString from 'magic-string'
+import { createFilter } from 'rollup-pluginutils'
+
 const name = 'manifest-input'
 
 /* ---- predicate object for deriveEntries ---- */
@@ -20,13 +23,19 @@ const predObj = {
     !/^https?:/.test(v),
 }
 
+const regx = {
+  importLine: /^import (.+) from ('.+?');$/gm,
+  asg: /(?<=\{.+)( as )(?=.+?\})/g,
+}
+
 /* ============================================ */
 /*                MANIFEST-INPUT                */
 /* ============================================ */
 
-export default function({ transform = x => x }) {
+export default function({ transform = x => x } = {}) {
   /* -------------- hooks closures -------------- */
   let manifest
+  let filter
   let assets
   let srcDir
 
@@ -61,11 +70,49 @@ export default function({ transform = x => x }) {
       //   Probably inline images here
       assets = Promise.all([...css, ...img].map(loadAssetData))
 
+      filter = createFilter(js)
+
       // Return input as [js, html]
       return {
         ...inputOptions,
         input: js.concat(html),
       }
+    },
+
+    /* ============================================ */
+    /*                 RENDER CHUNK                 */
+    /* ============================================ */
+
+    renderChunk(
+      source,
+      { isEntry, facadeModuleId: id, fileName },
+      { sourcemap },
+    ) {
+      if (!isEntry || !filter(id)) return null
+
+      const code = source.replace(
+        regx.importLine,
+        (line, $1, $2) => {
+          const asg = $1.replace(regx.asg, ': ')
+          return `const ${asg} = await import(${$2});`
+        },
+      )
+
+      const magic = new MagicString(code)
+
+      magic
+        .indent('  ')
+        .prepend('(async () => {\n')
+        .append('\n})();\n')
+
+      return sourcemap
+        ? {
+            code: magic.toString(),
+            map: magic.generateMap({
+              source: fileName,
+            }),
+          }
+        : { code: magic.toString() }
     },
 
     /* ============================================ */

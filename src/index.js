@@ -7,7 +7,6 @@ import htmlInputs from './html-inputs/index'
 import manifest from './manifest-input/index'
 import emptyOutputDir from './empty-output-dir/index'
 import zip from 'rollup-plugin-zip'
-import asyncIIFE from './async-iife/index'
 
 const release = (value = true) =>
   process.env.RELEASE === 'true' && value
@@ -49,7 +48,6 @@ export default ({
     transform: transformManifest(pkg),
   }),
   htmlInputs(),
-  asyncIIFE(),
   release(zip({ dir: zipDir })),
   emptyOutputDir(),
 ]
