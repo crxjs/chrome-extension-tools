@@ -36,7 +36,7 @@
     },
     {
       "type": "node",
-      "name": "test-async-iife",
+      "name": "test-clip-selector",
       "request": "launch",
       "args": ["clip-selector", "--runInBand"],
       "cwd": "${workspaceFolder}",
@@ -49,6 +49,16 @@
       "name": "test-html",
       "request": "launch",
       "args": ["html.rollup", "--runInBand"],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+    },
+    {
+      "type": "node",
+      "name": "test-async-iife",
+      "request": "launch",
+      "args": ["async-iife", "--runInBand"],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
