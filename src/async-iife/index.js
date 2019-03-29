@@ -1,4 +1,5 @@
 import MagicString from 'magic-string'
+import { createFilter } from 'rollup-pluginutils'
 
 const name = 'async-iife'
 
@@ -7,12 +8,21 @@ const regx = {
   asg: /(?<=\{.+)( as )(?=.+?\})/g,
 }
 
-export default function asyncIIFE() {
+export default function asyncIIFE({
+  include,
+  exclude = ['**/*.esm.js'],
+} = {}) {
+  const filter = createFilter(include, exclude)
+
   return {
     name,
 
-    renderChunk(source, chunk, { sourcemap }) {
-      if (!chunk.isEntry) return null
+    renderChunk(
+      source,
+      { isEntry, facadeModuleId, fileName },
+      { sourcemap },
+    ) {
+      if (!isEntry || !filter(facadeModuleId)) return null
 
       const code = source.replace(
         regx.importLine,
@@ -33,7 +43,7 @@ export default function asyncIIFE() {
         ? {
             code: magic.toString(),
             map: magic.generateMap({
-              source: chunk.fileName,
+              source: fileName,
             }),
           }
         : { code: magic.toString() }
