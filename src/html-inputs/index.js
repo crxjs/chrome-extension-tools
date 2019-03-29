@@ -16,7 +16,10 @@ const name = 'html-inputs'
 /*                  HTML-INPUTS                 */
 /* ============================================ */
 
-export default function htmlInputs({ mapFileNames = x => x }) {
+export default function htmlInputs({
+  mapFileNames = fileName =>
+    fileName.replace(/\.js$/m, '.esm.js'),
+} = {}) {
   /* -------------- hooks closures -------------- */
 
   // Assets will be a Promise
