@@ -13,6 +13,7 @@ const release = (value = true) =>
 
 const transformManifest = pkg => (bundle, manifest) => {
   if (Object.values(pkg).some(x => !x)) {
+    // throw JSON.stringify(pkg)
     throw 'chrome-extension: Failed to derive manifest, options.pkg is not fully defined. Please run through npm scripts.'
   }
 
@@ -36,7 +37,6 @@ const npmPkgDetails = {
   name: process.env.npm_package_name,
   version: process.env.npm_package_version,
   description: process.env.npm_package_description,
-  author: process.env.npm_package_author,
 }
 
 export default ({
