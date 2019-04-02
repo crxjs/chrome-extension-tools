@@ -26,6 +26,7 @@ export default [
       'path',
       'rollup-plugin-zip',
       'magic-string',
+      'rollup-pluginutils',
     ],
   },
 ]

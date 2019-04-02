@@ -34,7 +34,8 @@
     "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1",
     "magic-string": "^0.25.2",
-    "rollup-plugin-zip": "^0.3.0"
+    "rollup-plugin-zip": "^0.3.0",
+    "rollup-pluginutils": "^2.5.0"
   },
   "devDependencies": {
     "@bumble/chrome": "^0.1.1",
@@ -49,7 +50,6 @@
     "rollup": "^1.7.3",
     "rollup-plugin-commonjs": "^9.2.2",
     "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-pluginutils": "^2.5.0",
     "rxjs": "^6.4.0",
     "simple-git": "^1.110.0",
     "sinon": "^7.3.1",
