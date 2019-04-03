@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "@bumble/manifest": "^0.3.2",
+    "@bumble/manifest": "^0.4.0",
     "cheerio": "^1.0.0-rc.2",
     "fs-extra": "^7.0.1",
     "magic-string": "^0.25.2",
