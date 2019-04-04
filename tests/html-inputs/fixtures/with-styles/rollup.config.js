@@ -2,15 +2,19 @@
 
 import htmlInputs from '../../../../src/html-inputs'
 import emptyOutputDir from '../../../../src/empty-output-dir'
+import { join } from 'path'
+
+const fixture = name =>
+  join('tests/html-inputs/fixtures/with-styles', name)
 
 export default {
   input: [
-    'tests/html-inputs/fixtures/with-styles/popup.html',
-    'tests/html-inputs/fixtures/with-styles/background.js',
-    'tests/html-inputs/fixtures/with-styles/content.js',
+    fixture('popup.html'),
+    fixture('background.js'),
+    fixture('content.js'),
   ],
   output: {
-    dir: 'tests/html-inputs/fixtures/dest',
+    dir: fixture('dest'),
     format: 'esm',
   },
   plugins: [htmlInputs(), emptyOutputDir()],

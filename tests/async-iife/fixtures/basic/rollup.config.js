@@ -2,11 +2,14 @@
 
 import manifestInput from '../../../../src/manifest-input'
 import htmlInputs from '../../../../src/html-inputs'
+import { join } from 'path'
+
+const fixture = name => join('tests/async-iife/fixtures', name)
 
 export default {
-  input: 'tests/async-iife/fixtures/basic/manifest.json',
+  input: fixture('basic/manifest.json'),
   output: {
-    dir: 'tests/async-iife/fixtures/dest',
+    dir: fixture('dest'),
     format: 'esm',
   },
   plugins: [manifestInput(), htmlInputs()],

@@ -5,17 +5,20 @@ import commonjs from 'rollup-plugin-commonjs'
 
 import chromeExtension from '../../../../src/index'
 import pkg from './package.json'
+import { join } from 'path'
+
+const fixture = name =>
+  join('tests/clip-selector/fixtures', name)
 
 export default {
-  input: 'tests/clip-selector/fixtures/src/manifest.json',
+  input: fixture('src/manifest.json'),
   output: {
-    dir: 'tests/clip-selector/fixtures/dest',
+    dir: fixture('dest'),
     format: 'esm',
     sourcemap: true,
   },
-  plugins: [
-    chromeExtension({ pkg }),
+  plugins: chromeExtension({ pkg }).concat(
     resolve(),
     commonjs(),
-  ].flat(),
+  ),
 }
