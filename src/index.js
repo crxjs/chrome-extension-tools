@@ -1,16 +1,6 @@
 import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
 
-// const release = (value = true) =>
-//   process.env.RELEASE === 'true' && value
-
-// export default ({ zipDir = 'releases', pkg } = {}) => [
-//   manifest({ pkg }),
-//   htmlInputs(),
-//   release(zip({ dir: zipDir })),
-//   emptyOutputDir(),
-// ]
-
 export default opts => {
   const manifest = manifestInput(opts)
   const html = htmlInputs(opts)
@@ -20,17 +10,20 @@ export default opts => {
     name: 'chrome-extension',
 
     options(options) {
-      const result = plugins.reduce(
+      return plugins.reduce(
         (o, p) => (p.options ? p.options.call(this, o) : o),
         options,
       )
-
-      // chrome extension options hook
-      return result
     },
 
     buildStart(options) {
       manifest.buildStart.call(this, options)
+      html.buildStart.call(this, options)
+    },
+
+    watchChange(id) {
+      manifest.watchChange.call(this, id)
+      html.watchChange.call(this, id)
     },
 
     transform(...args) {

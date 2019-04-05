@@ -7,19 +7,28 @@ const consoleLog = console.log
 console.log = jest.fn(consoleLog)
 let watcher
 
-beforeEach(() => {
-  copyFile(
+beforeEach(async () => {
+  await copyFile(
     'tests/complete1/fixtures/src/manifest-1.json',
     'tests/complete1/fixtures/src/manifest.json',
   )
+  await copyFile(
+    'tests/complete1/fixtures/src/popup1.html',
+    'tests/complete1/fixtures/src/popup.html',
+  )
 })
 
-afterEach(() => {
-  watcher.close && watcher.close()
+afterEach(async () => {
+  watcher && watcher.close()
+  watcher = null
 
-  copyFile(
+  await copyFile(
     'tests/complete1/fixtures/src/manifest-1.json',
     'tests/complete1/fixtures/src/manifest.json',
+  )
+  await copyFile(
+    'tests/complete1/fixtures/src/popup1.html',
+    'tests/complete1/fixtures/src/popup.html',
   )
 })
 
@@ -34,7 +43,7 @@ test('bundles chunks and assets', async () => {
   expect(assets.length).toBe(4)
 })
 
-test.only('reloads entries when manifest changes', async () => {
+test('reloads entries when manifest changes', async () => {
   const spy = jest.fn()
 
   watcher = watch(config, spy)
@@ -56,6 +65,47 @@ test.only('reloads entries when manifest changes', async () => {
   copyFile(
     'tests/complete1/fixtures/src/manifest-2.json',
     'tests/complete1/fixtures/src/manifest.json',
+  )
+
+  const {
+    value: { result: bundle2 },
+  } = await watcher.next('BUNDLE_END')
+
+  const { output: output2 } = await bundle2.generate(
+    config.output,
+  )
+
+  const chunks2 = output2.filter(({ isAsset }) => !isAsset)
+  const assets2 = output2.filter(({ isAsset }) => isAsset)
+
+  expect(chunks2.length).toBe(3)
+  expect(assets2.length).toBe(4)
+}, 60000)
+
+test('reloads entries when html file changes', async () => {
+  const spy = jest.fn()
+
+  watcher = watch(config, spy)
+
+  expect.assertions(4)
+
+  const {
+    value: { result: bundle1 },
+  } = await watcher.next('BUNDLE_END')
+
+  const { output: output1 } = await bundle1.generate(
+    config.output,
+  )
+
+  const chunks1 = output1.filter(({ isAsset }) => !isAsset)
+  const assets1 = output1.filter(({ isAsset }) => isAsset)
+
+  expect(chunks1.length).toBe(3)
+  expect(assets1.length).toBe(4)
+
+  copyFile(
+    'tests/complete1/fixtures/src/popup2.html',
+    'tests/complete1/fixtures/src/popup.html',
   )
 
   const {

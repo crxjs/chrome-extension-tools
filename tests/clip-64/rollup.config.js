@@ -14,8 +14,5 @@ export default {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: chromeExtension({ pkg }).concat(
-    resolve(),
-    commonjs(),
-  ),
+  plugins: [chromeExtension({ pkg }), resolve(), commonjs()],
 }

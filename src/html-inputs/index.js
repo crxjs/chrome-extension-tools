@@ -19,6 +19,8 @@ const name = 'html-inputs'
 export default function htmlInputs() {
   /* -------------- hooks closures -------------- */
 
+  const cache = {}
+
   // Assets will be a Promise
   let htmlAssets
   let jsEntries
@@ -31,36 +33,67 @@ export default function htmlInputs() {
     /*                 OPTIONS HOOK                 */
     /* ============================================ */
 
-    // TODO: use buildStart hook??
     options(options) {
+      // Skip if cache.input exists
+      if (cache.input) {
+        return {
+          ...options,
+          input: cache.input,
+        }
+      }
+
+      // Cast options.input to array
       if (typeof options.input === 'string') {
         options.input = [options.input]
       }
 
       // Filter htm and html files
-      const htmlPaths = options.input.filter(isHtml)
+      cache.htmlPaths = options.input.filter(isHtml)
 
-      if (!htmlPaths.length) return options
+      // Skip if no html files
+      if (!cache.htmlPaths.length) {
+        htmlAssets = Promise.resolve([])
+        return options
+      }
 
-      // Load html files
-      const html$ = htmlPaths.map(loadHtml)
+      /* -------------- Load html files ------------- */
 
-      const htmlData = zipArrays(htmlPaths, html$)
+      const html$ = cache.htmlPaths.map(loadHtml)
+
+      const htmlData = zipArrays(cache.htmlPaths, html$)
+
+      // Start async load for html assets
+      // TODO: reload html assets on change
       htmlAssets = loadHtmlAssets(htmlData)
 
       // Get JS entry file names
       jsEntries = htmlData.flatMap(getJsEntries)
 
-      // Return new input options
-      const inputs = options.input.filter(not(isHtml))
+      // Cache jsEntries with existing options.input
+      cache.input = options.input
+        .filter(not(isHtml))
+        .concat(jsEntries)
 
-      const result = {
+      return {
         ...options,
-        input: inputs.concat(jsEntries),
+        input: cache.input,
       }
+    },
 
-      // html options hook
-      return result
+    /* ============================================ */
+    /*              HANDLE FILE CHANGES             */
+    /* ============================================ */
+
+    buildStart() {
+      cache.htmlPaths.forEach(htmlPath => {
+        this.addWatchFile(htmlPath)
+      })
+    },
+
+    watchChange(id) {
+      if (id.endsWith('.html')) {
+        cache.input = null
+      }
     },
 
     /* ============================================ */
@@ -70,12 +103,12 @@ export default function htmlInputs() {
     async generateBundle(options, bundle) {
       // CONCERN: relative paths within CSS files will fail
       // SOLUTION: use postcss to process CSS asset src
-      //   Probably inline images here
       await Promise.all(
         (await htmlAssets).map(
           async ([htmlPath, $, { js, img, css }]) => {
             const htmlName = path.basename(htmlPath)
 
+            // Setup file path mapping fns
             const jsFns = await getAssetPathMapFns.call(this, js)
             const imgFns = await getAssetPathMapFns.call(
               this,
@@ -86,12 +119,14 @@ export default function htmlInputs() {
               css,
             )
 
+            // Update html file with new
+            // script and asset file paths
             mutateJsEntries($)
             jsFns.reduce(mutateJsAssets, $)
             cssFns.reduce(mutateCssHrefs, $)
             imgFns.reduce(mutateImgSrcs, $)
 
-            // Mutate bundle to emit custom asset
+            // Add custom asset to bundle
             bundle[htmlName] = {
               fileName: htmlName,
               isAsset: true,

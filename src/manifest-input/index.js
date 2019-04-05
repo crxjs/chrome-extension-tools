@@ -37,7 +37,7 @@ const npmPkgDetails = {
 /*                MANIFEST-INPUT                */
 /* ============================================ */
 
-export default function({ pkg } = {}) {
+export default function({ pkg, verbose } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
@@ -95,24 +95,34 @@ export default function({ pkg } = {}) {
         },
       )
 
-      // Read assets async, emit later
+      // Start async asset loading
       // CONCERN: relative paths within CSS files will fail
       // SOLUTION: use postcss to process CSS asset src
-      //   Probably inline images here
       assets = Promise.all([...css, ...img].map(loadAssetData))
 
+      // Render only manifest entry js files
+      // as async iife
       filter = createFilter(js)
 
+      // Cache derived inputs
       cache.input = js.concat(html)
 
-      const result = { ...options, input: cache.input }
-
-      // manifest options hook
-      return result
+      return { ...options, input: cache.input }
     },
+
+    /* ============================================ */
+    /*              HANDLE WATCH FILES              */
+    /* ============================================ */
 
     buildStart() {
       this.addWatchFile(manifestPath)
+    },
+
+    watchChange(id) {
+      if (id.endsWith(manifestName)) {
+        // Dump cache.manifest if manifest.json changes
+        cache.manifest = null
+      }
     },
 
     /* ============================================ */
@@ -120,11 +130,12 @@ export default function({ pkg } = {}) {
     /* ============================================ */
 
     transform(code, id) {
+      // Derive permissions by module
       cache.permissions[id] = derivePermissions(code)
     },
 
     /* ============================================ */
-    /*                 RENDER CHUNK                 */
+    /*       MAKE MANIFEST ENTRIES ASYNC IIFE       */
     /* ============================================ */
 
     renderChunk(
@@ -134,6 +145,7 @@ export default function({ pkg } = {}) {
     ) {
       if (!isEntry || !filter(id)) return null
 
+      // turn es imports to dynamic imports
       const code = source.replace(
         /^import (.+) from ('.+?');$/gm,
         (line, $1, $2) => {
@@ -147,11 +159,13 @@ export default function({ pkg } = {}) {
 
       const magic = new MagicString(code)
 
+      // Async IIFE-fy
       magic
         .indent('  ')
         .prepend('(async () => {\n')
         .append('\n})();\n')
 
+      // Generate sourcemaps
       return sourcemap
         ? {
             code: magic.toString(),
@@ -168,27 +182,20 @@ export default function({ pkg } = {}) {
     /* ============================================ */
 
     async generateBundle(options, bundle) {
-      const assetPathMapFns = await getAssetPathMapFns.call(
-        this,
-        assets,
-      )
-
+      // Get chunks
       const chunks = Object.values(bundle).filter(
-        // get chunks
         ({ isAsset }) => !isAsset,
       )
 
+      // Get module ids for all chunks
       const activeModules = Array.from(
-        chunks.reduce(
-          // get module ids for all chunks
-          (set, { modules }) => {
-            Object.keys(modules).forEach(m => set.add(m))
-            return set
-          },
-          new Set(),
-        ),
+        chunks.reduce((set, { modules }) => {
+          Object.keys(modules).forEach(m => set.add(m))
+          return set
+        }, new Set()),
       )
 
+      // Aggregate permissions from all modules
       const permissions = Array.from(
         activeModules.reduce((set, id) => {
           const cached = cache.permissions[id]
@@ -196,19 +203,31 @@ export default function({ pkg } = {}) {
           if (cached) {
             cached.forEach(p => set.add(p))
           } else {
-            throw 'missing cached permissions'
+            this.error('missing cached permissions')
           }
 
           return set
         }, new Set()),
       ).sort()
 
-      const permsHash = JSON.stringify(permissions)
+      if (verbose) {
+        // Compare to last permissions
+        const permsHash = JSON.stringify(permissions)
 
-      if (permsHash !== cache.permsHash) {
-        console.log('new permissions:', permissions)
+        if (!cache.permsHash) {
+          console.log('Permissions:', permissions)
+        } else if (permsHash !== cache.permsHash) {
+          console.log('New permissions:', permissions)
+        }
+
         cache.permsHash = permsHash
       }
+
+      // Update manifest file paths
+      const assetPathMapFns = await getAssetPathMapFns.call(
+        this,
+        assets,
+      )
 
       const manifestBody = deriveManifest(
         pkg,
@@ -221,12 +240,6 @@ export default function({ pkg } = {}) {
         fileName: manifestName,
         isAsset: true,
         source: JSON.stringify(manifestBody, null, 2),
-      }
-    },
-
-    watchChange(id) {
-      if (id.endsWith(manifestName)) {
-        cache.manifest = null
       }
     },
   }
