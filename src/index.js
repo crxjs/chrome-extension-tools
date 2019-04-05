@@ -1,53 +1,53 @@
-import {
-  deriveManifest,
-  derivePermissions,
-} from '@bumble/manifest'
-
 import htmlInputs from './html-inputs/index'
-import manifest from './manifest-input/index'
-import emptyOutputDir from './empty-output-dir/index'
-import zip from 'rollup-plugin-zip'
+import manifestInput from './manifest-input/index'
 
-const release = (value = true) =>
-  process.env.RELEASE === 'true' && value
+// const release = (value = true) =>
+//   process.env.RELEASE === 'true' && value
 
-const transformManifest = pkg => (bundle, manifest) => {
-  if (Object.values(pkg).some(x => !x)) {
-    // throw JSON.stringify(pkg)
-    throw 'chrome-extension: Failed to derive manifest, options.pkg is not fully defined. Please run through npm scripts.'
-  }
+// export default ({ zipDir = 'releases', pkg } = {}) => [
+//   manifest({ pkg }),
+//   htmlInputs(),
+//   release(zip({ dir: zipDir })),
+//   emptyOutputDir(),
+// ]
 
-  const permissions = Object.values(bundle).reduce(
-    (set, { code }) => {
-      if (code) {
-        derivePermissions(code).forEach(prm => {
-          set.add(prm)
-        })
-      }
+export default opts => {
+  const manifest = manifestInput(opts)
+  const html = htmlInputs(opts)
+  const plugins = [manifest, html]
 
-      return set
+  return {
+    name: 'chrome-extension',
+
+    options(options) {
+      const result = plugins.reduce(
+        (o, p) => (p.options ? p.options.call(this, o) : o),
+        options,
+      )
+
+      // chrome extension options hook
+      return result
     },
-    new Set(),
-  )
 
-  return deriveManifest(pkg, manifest, [...permissions])
+    buildStart(options) {
+      manifest.buildStart.call(this, options)
+    },
+
+    transform(...args) {
+      return manifest.transform.call(this, ...args)
+    },
+
+    renderChunk(...args) {
+      return manifest.renderChunk.call(this, ...args)
+    },
+
+    async generateBundle(...args) {
+      const hook = 'generateBundle'
+
+      await Promise.all([
+        manifest[hook].call(this, ...args),
+        html[hook].call(this, ...args),
+      ])
+    },
+  }
 }
-
-const npmPkgDetails = {
-  name: process.env.npm_package_name,
-  version: process.env.npm_package_version,
-  description: process.env.npm_package_description,
-}
-
-export default ({
-  pkg = npmPkgDetails,
-  zipDir = 'releases',
-} = {}) => [
-  manifest({
-    // manifest transform hook, called in writeBundle
-    transform: transformManifest(pkg),
-  }),
-  htmlInputs(),
-  release(zip({ dir: zipDir })),
-  emptyOutputDir(),
-]

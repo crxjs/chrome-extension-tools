@@ -1,7 +1,11 @@
 import path from 'path'
 import fs from 'fs-extra'
 
-import { deriveEntries } from '@bumble/manifest'
+import {
+  deriveEntries,
+  derivePermissions,
+  deriveManifest,
+} from '@bumble/manifest'
 import { mapObjectValues } from './mapObjectValues'
 import { loadAssetData, getAssetPathMapFns } from '../helpers'
 
@@ -23,21 +27,39 @@ const predObj = {
     !/^https?:/.test(v),
 }
 
-const regx = {
-  importLine: /^import (.+) from ('.+?');$/gm,
-  asg: /(?<=\{.+)( as )(?=.+?\})/g,
+const npmPkgDetails = {
+  name: process.env.npm_package_name,
+  version: process.env.npm_package_version,
+  description: process.env.npm_package_description,
 }
 
 /* ============================================ */
 /*                MANIFEST-INPUT                */
 /* ============================================ */
 
-export default function({ transform = x => x } = {}) {
+export default function({ pkg } = {}) {
+  if (!pkg) {
+    pkg = npmPkgDetails
+  }
+
+  /* ---- validate pkg for deriveManifest --- */
+  if (Object.values(pkg).some(x => !x)) {
+    // throw JSON.stringify(pkg)
+    throw 'chrome-extension: Failed to derive manifest, options.pkg is not fully defined. Please run through npm scripts.'
+  }
+
   /* -------------- hooks closures -------------- */
-  let manifest
   let filter
   let assets
   let srcDir
+
+  let manifestPath
+
+  const cache = {
+    permissions: {},
+  }
+
+  const manifestName = 'manifest.json'
 
   /* --------------- plugin object -------------- */
   return {
@@ -47,22 +69,31 @@ export default function({ transform = x => x } = {}) {
     /*                 OPTIONS HOOK                 */
     /* ============================================ */
 
-    options({ input: manifestPath, ...inputOptions }) {
+    options(options) {
+      if (cache.manifest)
+        return { ...options, input: cache.input }
+
+      manifestPath = options.input
+      srcDir = path.dirname(manifestPath)
+
       // Check that input is manifest
-      if (path.basename(manifestPath) !== 'manifest.json')
+      if (!manifestPath.endsWith(manifestName)) {
         throw new TypeError(
           `${name}: input is not manifest.json`,
         )
+      }
 
       // Load manifest.json
-      manifest = fs.readJSONSync(manifestPath)
-      srcDir = path.dirname(manifestPath)
+      cache.manifest = fs.readJSONSync(manifestPath)
 
       // Derive entry paths from manifest
-      const { js, css, html, img } = deriveEntries(manifest, {
-        ...predObj,
-        transform: name => path.join(srcDir, name),
-      })
+      const { js, css, html, img } = deriveEntries(
+        cache.manifest,
+        {
+          ...predObj,
+          transform: name => path.join(srcDir, name),
+        },
+      )
 
       // Read assets async, emit later
       // CONCERN: relative paths within CSS files will fail
@@ -72,11 +103,24 @@ export default function({ transform = x => x } = {}) {
 
       filter = createFilter(js)
 
-      // Return input as [js, html]
-      return {
-        ...inputOptions,
-        input: js.concat(html),
-      }
+      cache.input = js.concat(html)
+
+      const result = { ...options, input: cache.input }
+
+      // manifest options hook
+      return result
+    },
+
+    buildStart() {
+      this.addWatchFile(manifestPath)
+    },
+
+    /* ============================================ */
+    /*                   TRANSFORM                  */
+    /* ============================================ */
+
+    transform(code, id) {
+      cache.permissions[id] = derivePermissions(code)
     },
 
     /* ============================================ */
@@ -91,9 +135,12 @@ export default function({ transform = x => x } = {}) {
       if (!isEntry || !filter(id)) return null
 
       const code = source.replace(
-        regx.importLine,
+        /^import (.+) from ('.+?');$/gm,
         (line, $1, $2) => {
-          const asg = $1.replace(regx.asg, ': ')
+          const asg = $1.replace(
+            /(?<=\{.+)( as )(?=.+?\})/g,
+            ': ',
+          )
           return `const ${asg} = await import(${$2});`
         },
       )
@@ -110,6 +157,7 @@ export default function({ transform = x => x } = {}) {
             code: magic.toString(),
             map: magic.generateMap({
               source: fileName,
+              hires: true,
             }),
           }
         : { code: magic.toString() }
@@ -125,13 +173,48 @@ export default function({ transform = x => x } = {}) {
         assets,
       )
 
-      const manifestBody = transform(
-        bundle,
-        // update asset paths
-        assetPathMapFns.reduce(mapObjectValues, manifest),
+      const chunks = Object.values(bundle).filter(
+        // get chunks
+        ({ isAsset }) => !isAsset,
       )
 
-      const manifestName = 'manifest.json'
+      const activeModules = Array.from(
+        chunks.reduce(
+          // get module ids for all chunks
+          (set, { modules }) => {
+            Object.keys(modules).forEach(m => set.add(m))
+            return set
+          },
+          new Set(),
+        ),
+      )
+
+      const permissions = Array.from(
+        activeModules.reduce((set, id) => {
+          const cached = cache.permissions[id]
+
+          if (cached) {
+            cached.forEach(p => set.add(p))
+          } else {
+            throw 'missing cached permissions'
+          }
+
+          return set
+        }, new Set()),
+      ).sort()
+
+      const permsHash = JSON.stringify(permissions)
+
+      if (permsHash !== cache.permsHash) {
+        console.log('new permissions:', permissions)
+        cache.permsHash = permsHash
+      }
+
+      const manifestBody = deriveManifest(
+        pkg,
+        assetPathMapFns.reduce(mapObjectValues, cache.manifest),
+        permissions,
+      )
 
       // Mutate bundle to emit custom asset
       bundle[manifestName] = {
@@ -141,17 +224,10 @@ export default function({ transform = x => x } = {}) {
       }
     },
 
-    /* ============================================ */
-    /*                  WRITEBUNDLE                 */
-    /* ============================================ */
-
-    // async writeBundle(bundle) {
-    //   // Write manifest
-    //   await fs.writeJSON(
-    //     path.join(destDir, 'manifest.json'),
-    //     transform(bundle, manifest),
-    //     { spaces: 2 },
-    //   )
-    // },
+    watchChange(id) {
+      if (id.endsWith(manifestName)) {
+        cache.manifest = null
+      }
+    },
   }
 }

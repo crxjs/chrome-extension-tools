@@ -31,9 +31,16 @@ export default function htmlInputs() {
     /*                 OPTIONS HOOK                 */
     /* ============================================ */
 
-    options({ input, ...inputOptions }) {
+    // TODO: use buildStart hook??
+    options(options) {
+      if (typeof options.input === 'string') {
+        options.input = [options.input]
+      }
+
       // Filter htm and html files
-      const htmlPaths = input.filter(isHtml)
+      const htmlPaths = options.input.filter(isHtml)
+
+      if (!htmlPaths.length) return options
 
       // Load html files
       const html$ = htmlPaths.map(loadHtml)
@@ -45,12 +52,15 @@ export default function htmlInputs() {
       jsEntries = htmlData.flatMap(getJsEntries)
 
       // Return new input options
-      const inputs = input.filter(not(isHtml))
+      const inputs = options.input.filter(not(isHtml))
 
-      return {
-        ...inputOptions,
+      const result = {
+        ...options,
         input: inputs.concat(jsEntries),
       }
+
+      // html options hook
+      return result
     },
 
     /* ============================================ */
