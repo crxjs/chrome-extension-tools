@@ -13,7 +13,7 @@ afterEach(() => {
 
 test('loadHtml', () => {
   const contents = 'html file!'
-  const filePath = 'tests/fixtures/basic/popup.html'
+  const filePath = 'fake/file/path.html'
 
   const readStub = sinon
     .stub(fs, 'readFileSync')
