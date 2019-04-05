@@ -10,4 +10,4 @@ test('bundles chunks and assets', async () => {
 
   expect(chunks.length).toBe(3)
   expect(assets.length).toBe(3)
-})
+}, 7000)
