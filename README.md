@@ -1,6 +1,8 @@
-# rollup-chrome-extension
+# rollup-plugin-chrome-extension
 
-Build Chrome Extensions with this composed Rollup plugin. This plugin returns an array of plugins, so you will need to spread it into the Rollup config plugins array.
+Build Chrome Extensions easily, with minimal Rollup configuration.
+
+Use `manifest.json` as the input. Every file in the manifest will become an entry point or asset. It parses `html` files to retrieve both script tags and style sheets.
 
 ## Installation
 
@@ -25,11 +27,6 @@ export default {
     dir: 'build',
     format: 'esm'
   },
-  plugins: [
-    // Spread it out!
-    ...chromeExtension({ pkg }),
-    resolve(),
-    commonjs()
-  ]
+  plugins: [chromeExtension({ pkg }), resolve(), commonjs()]
 }
 ```
