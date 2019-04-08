@@ -12,6 +12,8 @@ import { loadAssetData, getAssetPathMapFns } from '../helpers'
 import MagicString from 'magic-string'
 import { createFilter } from 'rollup-pluginutils'
 
+import * as reloader from './reloader/server'
+
 const name = 'manifest-input'
 
 /* ---- predicate object for deriveEntries ---- */
@@ -42,10 +44,8 @@ export default function({ pkg, verbose } = {}) {
     pkg = npmPkgDetails
   }
 
-  /* ---- validate pkg for deriveManifest --- */
-  if (Object.values(pkg).some(x => !x)) {
-    // throw JSON.stringify(pkg)
-    throw 'chrome-extension: Failed to derive manifest, options.pkg is not fully defined. Please run through npm scripts.'
+  if (process.env.ROLLUP_WATCH) {
+    reloader.start()
   }
 
   /* -------------- hooks closures -------------- */
@@ -70,13 +70,15 @@ export default function({ pkg, verbose } = {}) {
     /* ============================================ */
 
     options(options) {
-      if (cache.manifest)
+      // Do not reload manifest without changes
+      if (cache.manifest) {
         return { ...options, input: cache.input }
+      }
 
       manifestPath = options.input
       srcDir = path.dirname(manifestPath)
 
-      // Check that input is manifest
+      // Check that input is manifest.json
       if (!manifestPath.endsWith(manifestName)) {
         throw new TypeError(
           `${name}: input is not manifest.json`,
@@ -85,6 +87,25 @@ export default function({ pkg, verbose } = {}) {
 
       // Load manifest.json
       cache.manifest = fs.readJSONSync(manifestPath)
+
+      // Add reloader code to background scripts array
+      // if (process.env.ROLLUP_WATCH) {
+      //   const reloaderClient = path.resolve(
+      //     __dirname,
+      //     'auto-reloader/reloader-client.js',
+      //   )
+
+      //   console.log('reloaderClient', reloaderClient)
+
+      //   const reloaderPath = path.relative(
+      //     srcDir,
+      //     reloaderClient,
+      //   )
+
+      //   console.log('reloaderPath', reloaderPath)
+
+      //   cache.manifest.background.scripts.push(reloaderPath)
+      // }
 
       // Derive entry paths from manifest
       const { js, css, html, img } = deriveEntries(
@@ -235,11 +256,41 @@ export default function({ pkg, verbose } = {}) {
         permissions,
       )
 
+      // Add reloader script
+      if (process.env.ROLLUP_WATCH) {
+        const clientId = this.emitAsset(
+          'reloader-client.js',
+          reloader.client,
+        )
+
+        const clientPath = this.getAssetFileName(clientId)
+
+        if (!manifestBody.background) {
+          manifestBody.background = {}
+        }
+
+        const { scripts = [] } = manifestBody.background
+
+        manifestBody.background.scripts = [
+          ...scripts,
+          clientPath,
+        ]
+
+        manifestBody.description =
+          'DEVELOPMENT BUILD with auto-reloader script.'
+      }
+
       // Mutate bundle to emit custom asset
       bundle[manifestName] = {
         fileName: manifestName,
         isAsset: true,
         source: JSON.stringify(manifestBody, null, 2),
+      }
+    },
+
+    writeBundle() {
+      if (process.env.ROLLUP_WATCH) {
+        reloader.reload()
       }
     },
   }

@@ -42,5 +42,9 @@ export default opts => {
         html[hook].call(this, ...args),
       ])
     },
+
+    writeBundle() {
+      manifest.writeBundle.call(this)
+    },
   }
 }

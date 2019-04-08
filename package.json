@@ -33,10 +33,14 @@
     "@bumble/manifest": "^0.4.0",
     "@bumble/rollup-watch-next": "^0.3.3",
     "cheerio": "^1.0.0-rc.2",
+    "cors": "^2.8.5",
+    "debounce": "^1.2.0",
+    "express": "^4.16.4",
     "fs-extra": "^7.0.1",
     "magic-string": "^0.25.2",
     "rollup-plugin-zip": "^0.3.0",
-    "rollup-pluginutils": "^2.5.0"
+    "rollup-pluginutils": "^2.5.0",
+    "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "@bumble/chrome": "^0.1.1",
@@ -49,6 +53,7 @@
     "npm-run-all": "^4.1.5",
     "replace-in-file": "^3.4.4",
     "rollup": "^1.7.3",
+    "rollup-plugin-code-string": "^0.1.1",
     "rollup-plugin-commonjs": "^9.2.2",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rxjs": "^6.4.0",

@@ -1,7 +1,8 @@
 /* eslint-env node */
 
-// import resolve from 'rollup-plugin-node-resolve'
-// import commonjs from 'rollup-plugin-commonjs'
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+import code from 'rollup-plugin-code-string'
 // import json from 'rollup-plugin-json'
 
 export default [
@@ -22,11 +23,17 @@ export default [
     external: [
       '@bumble/manifest',
       'cheerio',
+      'cors',
+      'debounce',
+      'express',
       'fs-extra',
+      'http',
+      'magic-string',
       'path',
       'rollup-plugin-zip',
-      'magic-string',
       'rollup-pluginutils',
+      'socket.io',
     ],
+    plugins: [code()],
   },
 ]
