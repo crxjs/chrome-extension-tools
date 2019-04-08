@@ -1,14 +1,21 @@
 import debounce from 'debounce'
+import express from 'express'
+import { Server } from 'http'
+import SocketIO from 'socket.io'
 import clientCode from './client.code.js'
 import { PORT } from './CONSTANTS'
-import * as handle from './reloader-server/handlers'
-import { http, io } from './reloader-server/io'
+import * as handle from './event-handlers'
+
+const app = express()
+
+export const http = Server(app)
+export const io = SocketIO(http)
 
 export function start() {
   io.on('connection', handle.connect)
 
   http.listen(PORT, function() {
-    console.log('auto-reloader waiting for extension...')
+    console.log(`auto-reloader on localhost:${PORT}...`)
   })
 
   return io

@@ -5,7 +5,7 @@ import { PORT } from './CONSTANTS'
 const socket = io(`http://localhost:${PORT}`)
 
 socket.on('connect', () =>
-  console.log('auto-reloading active. watching for changes...'),
+  console.log('auto-reloader watching for changes...'),
 )
 
 socket.on('reload', () => {
