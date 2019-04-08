@@ -13,19 +13,22 @@ export const connect = newSocket => {
 
 let reloadCount = 0
 export const reload = () => {
-  if (socket) {
-    socket.emit('reload')
-    reloadCount = 0
+  if (!socket) {
+    // Wait and try again
+    setTimeout(reload, 500)
+
+    reloadCount++
+
+    return false
   }
 
   if (reloadCount > 10) {
-    throw new Error('unable to reload extension.')
+    console.log('unable to reload extension.')
+  } else {
+    socket.emit('reload')
   }
 
-  // Wait and try again
-  setTimeout(reload, 500)
+  reloadCount = 0
 
-  reloadCount++
-
-  return null
+  return true
 }

@@ -272,6 +272,8 @@ export default function({
             clientPath,
           ]
 
+          manifestBody.background.persistent = true
+
           manifestBody.description =
             'DEVELOPMENT BUILD with auto-reloader script.'
         }
