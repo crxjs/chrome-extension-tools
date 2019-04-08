@@ -2,9 +2,6 @@
 
 import { join } from 'path'
 import pkg from './package.json'
-// import emptyOutputDir from '../../src/empty-output-dir/index'
-// import htmlInputs from '../../src/html-inputs/index'
-// import manifest from '../../src/manifest-input/index'
 import chromeExtension from '../../src/index'
 
 const fixture = name => join(__dirname, 'fixtures', name)
@@ -15,5 +12,14 @@ export default {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: [chromeExtension({ pkg })],
+  plugins: [
+    chromeExtension({
+      pkg,
+      // Include or exclude files
+      // from which to derive permissions
+      permissions: {
+        include: ['**/src/**/*', '**/@bumble/**/*'],
+      },
+    }),
+  ],
 }

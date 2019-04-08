@@ -1,8 +1,16 @@
 {
-  "background": [
-    "popup.html",
-    "options.html",
-    "background.js",
-    "content.js"
-  ]
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*.nytimes.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
 }

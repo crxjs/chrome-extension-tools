@@ -39,17 +39,22 @@ const npmPkgDetails = {
 /*                MANIFEST-INPUT                */
 /* ============================================ */
 
-export default function({ pkg, verbose } = {}) {
+export default function({
+  pkg,
+  verbose,
+  permissions = {},
+} = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
 
   if (process.env.ROLLUP_WATCH) {
+    console.log('starting reloader')
     reloader.start()
   }
 
   /* -------------- hooks closures -------------- */
-  let filter
+  let asyncIifeFilter
   let assets
   let srcDir
 
@@ -60,6 +65,11 @@ export default function({ pkg, verbose } = {}) {
   }
 
   const manifestName = 'manifest.json'
+
+  const permissionsFilter = createFilter(
+    permissions.include,
+    permissions.exclude,
+  )
 
   /* --------------- plugin object -------------- */
   return {
@@ -88,25 +98,6 @@ export default function({ pkg, verbose } = {}) {
       // Load manifest.json
       cache.manifest = fs.readJSONSync(manifestPath)
 
-      // Add reloader code to background scripts array
-      // if (process.env.ROLLUP_WATCH) {
-      //   const reloaderClient = path.resolve(
-      //     __dirname,
-      //     'auto-reloader/reloader-client.js',
-      //   )
-
-      //   console.log('reloaderClient', reloaderClient)
-
-      //   const reloaderPath = path.relative(
-      //     srcDir,
-      //     reloaderClient,
-      //   )
-
-      //   console.log('reloaderPath', reloaderPath)
-
-      //   cache.manifest.background.scripts.push(reloaderPath)
-      // }
-
       // Derive entry paths from manifest
       const { js, css, html, img } = deriveEntries(
         cache.manifest,
@@ -123,7 +114,7 @@ export default function({ pkg, verbose } = {}) {
 
       // Render only manifest entry js files
       // as async iife
-      filter = createFilter(js)
+      asyncIifeFilter = createFilter(js)
 
       // Cache derived inputs
       cache.input = js.concat(html)
@@ -151,8 +142,14 @@ export default function({ pkg, verbose } = {}) {
     /* ============================================ */
 
     transform(code, id) {
-      // Derive permissions by module
-      cache.permissions[id] = derivePermissions(code)
+      if (permissionsFilter(id)) {
+        const perms = derivePermissions(code)
+
+        if (perms.length) {
+          // Derive permissions by module
+          cache.permissions[id] = perms
+        }
+      }
     },
 
     /* ============================================ */
@@ -164,7 +161,7 @@ export default function({ pkg, verbose } = {}) {
       { isEntry, facadeModuleId: id, fileName },
       { sourcemap },
     ) {
-      if (!isEntry || !filter(id)) return null
+      if (!isEntry || !asyncIifeFilter(id)) return null
 
       // turn es imports to dynamic imports
       const code = source.replace(
@@ -203,33 +200,28 @@ export default function({ pkg, verbose } = {}) {
     /* ============================================ */
 
     async generateBundle(options, bundle) {
-      // Get chunks
-      const chunks = Object.values(bundle).filter(
-        ({ isAsset }) => !isAsset,
-      )
-
       // Get module ids for all chunks
-      const activeModules = Array.from(
-        chunks.reduce((set, { modules }) => {
+      const activeModuleSet = Object.values(bundle).reduce(
+        (set, { modules }) => {
           Object.keys(modules).forEach(m => set.add(m))
           return set
-        }, new Set()),
+        },
+        new Set(),
       )
 
       // Aggregate permissions from all modules
       const permissions = Array.from(
-        activeModules.reduce((set, id) => {
-          const cached = cache.permissions[id]
+        Object.entries(cache.permissions).reduce(
+          (set, [id, perms]) => {
+            if (perms.length && activeModuleSet.has(id)) {
+              perms.forEach(p => set.add(p))
+            }
 
-          if (cached) {
-            cached.forEach(p => set.add(p))
-          } else {
-            this.error('missing cached permissions')
-          }
-
-          return set
-        }, new Set()),
-      ).sort()
+            return set
+          },
+          new Set(),
+        ),
+      )
 
       if (verbose) {
         // Compare to last permissions
@@ -250,41 +242,62 @@ export default function({ pkg, verbose } = {}) {
         assets,
       )
 
-      const manifestBody = deriveManifest(
-        pkg,
-        assetPathMapFns.reduce(mapObjectValues, cache.manifest),
-        permissions,
-      )
-
-      // Add reloader script
-      if (process.env.ROLLUP_WATCH) {
-        const clientId = this.emitAsset(
-          'reloader-client.js',
-          reloader.client,
+      try {
+        const manifestBody = deriveManifest(
+          pkg,
+          assetPathMapFns.reduce(
+            mapObjectValues,
+            cache.manifest,
+          ),
+          permissions,
         )
 
-        const clientPath = this.getAssetFileName(clientId)
+        // Add reloader script
+        if (process.env.ROLLUP_WATCH) {
+          const clientId = this.emitAsset(
+            'reloader-client.js',
+            reloader.client,
+          )
 
-        if (!manifestBody.background) {
-          manifestBody.background = {}
+          const clientPath = this.getAssetFileName(clientId)
+
+          if (!manifestBody.background) {
+            manifestBody.background = {}
+          }
+
+          const { scripts = [] } = manifestBody.background
+
+          manifestBody.background.scripts = [
+            ...scripts,
+            clientPath,
+          ]
+
+          manifestBody.description =
+            'DEVELOPMENT BUILD with auto-reloader script.'
         }
 
-        const { scripts = [] } = manifestBody.background
+        // Mutate bundle to emit custom asset
+        bundle[manifestName] = {
+          fileName: manifestName,
+          isAsset: true,
+          source: JSON.stringify(manifestBody, null, 2),
+        }
+      } catch (error) {
+        if (error.name === 'ValidationError') {
+          this.error(error)
+        }
 
-        manifestBody.background.scripts = [
-          ...scripts,
-          clientPath,
-        ]
-
-        manifestBody.description =
-          'DEVELOPMENT BUILD with auto-reloader script.'
+        throw error
       }
+    },
 
-      // Mutate bundle to emit custom asset
-      bundle[manifestName] = {
-        fileName: manifestName,
-        isAsset: true,
-        source: JSON.stringify(manifestBody, null, 2),
+    renderError(error) {
+      if (error.name === 'ValidationError') {
+        console.error(error.message)
+
+        error.errors.forEach(err => {
+          console.error(err)
+        })
       }
     },
 

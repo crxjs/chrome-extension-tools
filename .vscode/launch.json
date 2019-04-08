@@ -73,6 +73,16 @@
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+    },
+    {
+      "type": "node",
+      "name": "test-validation",
+      "request": "launch",
+      "args": ["validation", "--runInBand"],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
     }
   ]
 }
