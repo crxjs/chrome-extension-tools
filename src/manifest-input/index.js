@@ -1,33 +1,32 @@
-import path from 'path'
-import fs from 'fs-extra'
-
 import {
   deriveEntries,
-  derivePermissions,
   deriveManifest,
+  derivePermissions,
 } from '@bumble/manifest'
-import { mapObjectValues } from './mapObjectValues'
-import { loadAssetData, getAssetPathMapFns } from '../helpers'
-
+import fs from 'fs-extra'
 import MagicString from 'magic-string'
+import path from 'path'
 import { createFilter } from 'rollup-pluginutils'
-
+import { getAssetPathMapFns, loadAssetData } from '../helpers'
+import { mapObjectValues } from './mapObjectValues'
 import * as reloader from './reloader/server'
+import pm from 'picomatch'
+import isValidPath from 'is-valid-path'
 
 const name = 'manifest-input'
 
 /* ---- predicate object for deriveEntries ---- */
-const predObj = {
-  js: s => /\.js$/.test(s),
-  css: s => /\.css$/.test(s),
-  html: s => /\.html$/.test(s),
-  img: s => /\.png$/.test(s),
-  filter: v =>
-    typeof v === 'string' &&
-    v.includes('.') &&
-    !v.includes('*') &&
-    !/^https?:/.test(v),
-}
+// const predObj = {
+//   js: s => /\.js$/.test(s),
+//   css: s => /\.css$/.test(s),
+//   html: s => /\.html$/.test(s),
+//   img: s => /\.png$/.test(s),
+//   filter: v =>
+//     typeof v === 'string' &&
+//     v.includes('.') &&
+//     !v.includes('*') &&
+//     !/^https?:/.test(v),
+// }
 
 const npmPkgDetails = {
   name: process.env.npm_package_name,
@@ -43,6 +42,12 @@ export default function({
   pkg,
   verbose,
   permissions = {},
+  assets = {
+    include: ['**/*.png', '**/*.css'],
+  },
+  entries = {
+    include: ['**/*'],
+  },
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
@@ -55,7 +60,7 @@ export default function({
 
   /* -------------- hooks closures -------------- */
   let asyncIifeFilter
-  let assets
+  let loadedAssets
   let srcDir
 
   let manifestPath
@@ -70,6 +75,14 @@ export default function({
     permissions.include,
     permissions.exclude,
   )
+
+  const assetFilter = pm(assets.include, {
+    ignore: assets.exclude,
+  })
+
+  const entryFilter = pm(entries.include, {
+    ignore: entries.exclude,
+  })
 
   /* --------------- plugin object -------------- */
   return {
@@ -99,25 +112,31 @@ export default function({
       cache.manifest = fs.readJSONSync(manifestPath)
 
       // Derive entry paths from manifest
-      const { js, css, html, img } = deriveEntries(
+      const { assetPaths, entryPaths } = deriveEntries(
         cache.manifest,
         {
-          ...predObj,
+          assetPaths: assetFilter,
+          entryPaths: entryFilter,
           transform: name => path.join(srcDir, name),
+          filter: v =>
+            typeof v === 'string' &&
+            isValidPath(v) &&
+            !/^https?:/.test(v),
         },
       )
 
       // Start async asset loading
       // CONCERN: relative paths within CSS files will fail
       // SOLUTION: use postcss to process CSS asset src
-      assets = Promise.all([...css, ...img].map(loadAssetData))
+      loadedAssets = Promise.all(assetPaths.map(loadAssetData))
 
       // Render only manifest entry js files
       // as async iife
+      const js = entryPaths.filter(p => /\.js$/.test(p))
       asyncIifeFilter = createFilter(js)
 
       // Cache derived inputs
-      cache.input = js.concat(html)
+      cache.input = entryPaths
 
       return { ...options, input: cache.input }
     },
@@ -236,15 +255,17 @@ export default function({
         cache.permsHash = permsHash
       }
 
-      // Update manifest file paths
+      // Emit loaded assets and
+      // Create asset path updaters
       const assetPathMapFns = await getAssetPathMapFns.call(
         this,
-        assets,
+        loadedAssets,
       )
 
       try {
         const manifestBody = deriveManifest(
           pkg,
+          // Update asset paths and return manifest
           assetPathMapFns.reduce(
             mapObjectValues,
             cache.manifest,

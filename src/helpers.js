@@ -1,6 +1,8 @@
 import fs from 'fs-extra'
 import path from 'path'
 
+export const not = fn => x => !fn(x)
+
 export const loadAssetData = assetPath =>
   fs.readFile(assetPath).then(src => [assetPath, src])
 

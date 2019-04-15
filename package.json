@@ -2,12 +2,12 @@
   "name": "rollup-plugin-chrome-extension",
   "version": "0.10.0",
   "description": "Build Chrome Extensions with this composed Rollup plugin.",
+  "repository": "bumble-org/rollup-plugin-chrome-extension",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "build"
   ],
-  "repository": "bumble-org/rollup-plugin-chrome-extension",
   "main": "build/bundle-cjs.js",
   "module": "build/bundle-esm.js",
   "scripts": {
@@ -19,6 +19,9 @@
   },
   "jest": {
     "clearMocks": true,
+    "moduleNameMapper": {
+      "\\.code\\.js": "<rootDir>/tests/stub.code.js"
+    },
     "modulePathIgnorePatterns": [
       "fixtures/dest"
     ],
@@ -37,7 +40,9 @@
     "debounce": "^1.2.0",
     "express": "^4.16.4",
     "fs-extra": "^7.0.1",
+    "is-valid-path": "^0.1.1",
     "magic-string": "^0.25.2",
+    "picomatch": "^2.0.4",
     "rollup-plugin-zip": "^0.3.0",
     "rollup-pluginutils": "^2.5.0",
     "socket.io": "^2.2.0"
