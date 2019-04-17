@@ -233,9 +233,9 @@ export default function({
         const permsHash = JSON.stringify(permissions)
 
         if (!cache.permsHash) {
-          console.log('Permissions:', permissions)
+          console.log('Derived permissions:', permissions)
         } else if (permsHash !== cache.permsHash) {
-          console.log('New permissions:', permissions)
+          console.log('Derived new permissions:', permissions)
         }
 
         cache.permsHash = permsHash
@@ -292,21 +292,13 @@ export default function({
           source: JSON.stringify(manifestBody, null, 2),
         }
       } catch (error) {
-        if (error.name === 'ValidationError') {
-          this.error(error)
-        }
-
-        throw error
-      }
-    },
-
-    renderError(error) {
-      if (error.name === 'ValidationError') {
-        console.error(error.message)
+        if (error.name !== 'ValidationError') throw error
 
         error.errors.forEach(err => {
-          console.error(err)
+          console.log(err)
         })
+
+        this.error(error.message)
       }
     },
 

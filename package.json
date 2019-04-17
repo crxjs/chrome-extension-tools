@@ -33,7 +33,7 @@
     }
   },
   "dependencies": {
-    "@bumble/manifest": "^0.5.1",
+    "@bumble/manifest": "^0.5.2",
     "@bumble/rollup-watch-next": "^0.3.3",
     "cheerio": "^1.0.0-rc.2",
     "cors": "^2.8.5",
