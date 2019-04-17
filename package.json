@@ -42,6 +42,7 @@
     "fs-extra": "^7.0.1",
     "is-valid-path": "^0.1.1",
     "magic-string": "^0.25.2",
+    "mem": "^4.3.0",
     "picomatch": "^2.0.4",
     "rollup-plugin-zip": "^0.3.0",
     "rollup-pluginutils": "^2.5.0",

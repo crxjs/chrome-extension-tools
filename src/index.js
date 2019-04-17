@@ -26,10 +26,6 @@ export default opts => {
       html.watchChange.call(this, id)
     },
 
-    transform(...args) {
-      return manifest.transform.call(this, ...args)
-    },
-
     renderChunk(...args) {
       return manifest.renderChunk.call(this, ...args)
     },

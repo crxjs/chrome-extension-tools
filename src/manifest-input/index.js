@@ -1,7 +1,7 @@
 import {
   deriveEntries,
   deriveManifest,
-  derivePermissions,
+  derivePermissions as dp,
 } from '@bumble/manifest'
 import fs from 'fs-extra'
 import MagicString from 'magic-string'
@@ -12,6 +12,7 @@ import { mapObjectValues } from './mapObjectValues'
 import * as reloader from './reloader/server'
 import pm from 'picomatch'
 import isValidPath from 'is-valid-path'
+import memoize from 'mem'
 
 const name = 'manifest-input'
 
@@ -65,9 +66,7 @@ export default function({
 
   let manifestPath
 
-  const cache = {
-    permissions: {},
-  }
+  const cache = {}
 
   const manifestName = 'manifest.json'
 
@@ -83,6 +82,8 @@ export default function({
   const entryFilter = pm(entries.include, {
     ignore: entries.exclude,
   })
+
+  const derivePermissions = memoize(dp)
 
   /* --------------- plugin object -------------- */
   return {
@@ -160,16 +161,7 @@ export default function({
     /*                   TRANSFORM                  */
     /* ============================================ */
 
-    transform(code, id) {
-      if (permissionsFilter(id)) {
-        const perms = derivePermissions(code)
-
-        if (perms.length) {
-          // Derive permissions by module
-          cache.permissions[id] = perms
-        }
-      }
-    },
+    // transform(code, id) {},
 
     /* ============================================ */
     /*       MAKE MANIFEST ENTRIES ASYNC IIFE       */
@@ -220,23 +212,17 @@ export default function({
 
     async generateBundle(options, bundle) {
       // Get module ids for all chunks
-      const activeModuleSet = Object.values(bundle).reduce(
-        (set, { modules }) => {
-          Object.keys(modules).forEach(m => set.add(m))
-          return set
-        },
-        new Set(),
-      )
-
-      // Aggregate permissions from all modules
       const permissions = Array.from(
-        Object.entries(cache.permissions).reduce(
-          (set, [id, perms]) => {
-            if (perms.length && activeModuleSet.has(id)) {
-              perms.forEach(p => set.add(p))
+        Object.values(bundle).reduce(
+          (set, { code, facadeModuleId: id }) => {
+            if (permissionsFilter(id)) {
+              return new Set([
+                ...derivePermissions(code),
+                ...set,
+              ])
+            } else {
+              return set
             }
-
-            return set
           },
           new Set(),
         ),
