@@ -49,6 +49,9 @@ export default function({
   entries = {
     include: ['**/*'],
   },
+  iiafe = {
+    // include is defaulted to [], so exclude can be used by itself
+  },
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
@@ -60,7 +63,9 @@ export default function({
   }
 
   /* -------------- hooks closures -------------- */
-  let asyncIifeFilter
+  iiafe.include = iiafe.include || []
+  let iiafeFilter
+
   let loadedAssets
   let srcDir
 
@@ -70,8 +75,8 @@ export default function({
 
   const manifestName = 'manifest.json'
 
-  const permissionsFilter = createFilter(
-    permissions.include,
+  const permissionsFilter = pm(
+    permissions.include || '**/*',
     permissions.exclude,
   )
 
@@ -134,7 +139,10 @@ export default function({
       // Render only manifest entry js files
       // as async iife
       const js = entryPaths.filter(p => /\.js$/.test(p))
-      asyncIifeFilter = createFilter(js)
+      iiafeFilter = createFilter(
+        iiafe.include.concat(js),
+        iiafe.exclude,
+      )
 
       // Cache derived inputs
       cache.input = entryPaths
@@ -172,7 +180,7 @@ export default function({
       { isEntry, facadeModuleId: id, fileName },
       { sourcemap },
     ) {
-      if (!isEntry || !asyncIifeFilter(id)) return null
+      if (!isEntry || !iiafeFilter(id)) return null
 
       // turn es imports to dynamic imports
       const code = source.replace(
@@ -215,7 +223,8 @@ export default function({
       const permissions = Array.from(
         Object.values(bundle).reduce(
           (set, { code, facadeModuleId: id }) => {
-            if (permissionsFilter(id)) {
+            // The only use for this is to exclude a chunk
+            if (id && permissionsFilter(id)) {
               return new Set([
                 ...derivePermissions(code),
                 ...set,
