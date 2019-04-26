@@ -52,6 +52,7 @@ export default function({
   iiafe = {
     // include is defaulted to [], so exclude can be used by itself
   },
+  manfestKey,
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
@@ -292,6 +293,12 @@ export default function({
 
           manifestBody.description =
             'DEVELOPMENT BUILD with auto-reloader script.'
+        }
+
+        if (manfestKey) {
+          manifestBody.key = manfestKey
+        } else {
+          delete manifestBody.key
         }
 
         // Mutate bundle to emit custom asset
