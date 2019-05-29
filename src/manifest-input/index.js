@@ -52,13 +52,14 @@ export default function({
   iiafe = {
     // include is defaulted to [], so exclude can be used by itself
   },
-  manfestKey,
+  publicKey,
+  useReloader = process.env.ROLLUP_WATCH,
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
 
-  if (process.env.ROLLUP_WATCH) {
+  if (useReloader) {
     console.log('starting reloader')
     reloader.start()
   }
@@ -270,7 +271,7 @@ export default function({
         )
 
         // Add reloader script
-        if (process.env.ROLLUP_WATCH) {
+        if (useReloader) {
           const clientId = this.emitAsset(
             'reloader-client.js',
             reloader.client,
@@ -295,8 +296,8 @@ export default function({
             'DEVELOPMENT BUILD with auto-reloader script.'
         }
 
-        if (manfestKey) {
-          manifestBody.key = manfestKey
+        if (publicKey) {
+          manifestBody.key = publicKey
         } else {
           delete manifestBody.key
         }
@@ -319,7 +320,7 @@ export default function({
     },
 
     writeBundle() {
-      if (process.env.ROLLUP_WATCH) {
+      if (useReloader) {
         reloader.reload()
       }
     },

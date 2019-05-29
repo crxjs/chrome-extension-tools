@@ -11,6 +11,7 @@ const app = express()
 export const http = Server(app)
 export const io = SocketIO(http)
 
+// TODO: use ip:port instead of localHost:port
 export function start() {
   io.on('connection', handle.connect)
 
