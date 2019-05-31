@@ -8,7 +8,19 @@
       name="viewport"
       content="width=device-width, initial-scale=1"
     />
+
+    <!-- rollup this script -->
     <script src="popup.js"></script>
+
+    <!-- ignore these script tags -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/core.js"></script>
+    <script src="data:text/javascript;base64,YWxlcnQoJ2FzYWRhc2QnKTsK"></script>
+    <script src="/scripts/another1.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/core.js"></script>
+
+    <!-- emit this script as an asset -->
+    <script src="react.js" data-rollup-asset="true"></script>
   </head>
   <body></body>
 </html>

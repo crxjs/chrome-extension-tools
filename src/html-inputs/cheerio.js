@@ -12,17 +12,22 @@ export const loadHtml = (filePath) => {
 const getRelativePath = (htmlPath) => (p) =>
   path.join(path.dirname(htmlPath), p)
 
-export const getJsEntries = ([htmlPath, $]) =>
+const getEntries = ($) =>
   $('script')
     .not('[data-rollup-asset]')
+    .not('[src^="http:"]')
+    .not('[src^="https:"]')
+    .not('[src^="data:"]')
+    .not('[src^="/"]')
     .toArray()
+
+export const getJsEntries = ([htmlPath, $]) =>
+  getEntries($)
     .map((elem) => $(elem).attr('src'))
     .map(getRelativePath(htmlPath))
 
 export const mutateJsEntries = ($) => {
-  $('script')
-    .not('[data-rollup-asset]')
-    .toArray()
+  getEntries($)
     .map((elem) => $(elem))
     .forEach((e) => {
       e.attr('type', 'module')
@@ -33,17 +38,22 @@ export const mutateJsEntries = ($) => {
 
 /* ----------------- js assets ---------------- */
 
-export const getJsAssets = ([htmlPath, $]) =>
+const getAssets = ($) =>
   $('script')
     .filter('[data-rollup-asset="true"]')
+    .not('[src^="http:"]')
+    .not('[src^="https:"]')
+    .not('[src^="data:"]')
+    .not('[src^="/"]')
     .toArray()
+
+export const getJsAssets = ([htmlPath, $]) =>
+  getAssets($)
     .map((elem) => $(elem).attr('src'))
     .map(getRelativePath(htmlPath))
 
 export const mutateJsAssets = ($, fn) => {
-  $('script')
-    .filter('[data-rollup-asset="true"]')
-    .toArray()
+  getAssets($)
     .map((elem) => $(elem))
     .forEach((e) => {
       const value = fn(e.attr('src'))
@@ -55,17 +65,22 @@ export const mutateJsAssets = ($, fn) => {
 
 /* -------------------- css ------------------- */
 
-export const getCssHrefs = ([htmlPath, $]) =>
+const getCss = ($) =>
   $('link')
     .filter('[rel="stylesheet"]')
+    .not('[href^="http:"]')
+    .not('[href^="https:"]')
+    .not('[href^="data:"]')
+    .not('[href^="/"]')
     .toArray()
+
+export const getCssHrefs = ([htmlPath, $]) =>
+  getCss($)
     .map((elem) => $(elem).attr('href'))
     .map(getRelativePath(htmlPath))
 
 export const mutateCssHrefs = ($, fn) => {
-  $('link')
-    .filter('[rel="stylesheet"]')
-    .toArray()
+  getCss($)
     .map((elem) => $(elem))
     .forEach((e) => {
       const value = fn(e.attr('href'))
@@ -76,46 +91,39 @@ export const mutateCssHrefs = ($, fn) => {
 }
 
 /* -------------------- img ------------------- */
-
-export const getImgSrcs = ([htmlPath, $]) =>
-  [
-    // get img tags
-    ...$('img')
-      .not('[src^="http://"]')
-      .not('[src^="https://"]')
-      .not('[src^="data://"]')
-      .not('[src^="/"]')
-      .toArray()
-      .map((elem) => $(elem).attr('src')),
-    // get favicons
-    ...$('link[rel="icon"]')
-      .not('[src^="http://"]')
-      .not('[src^="https://"]')
-      .not('[src^="data://"]')
-      .not('[src^="/"]')
-      .toArray()
-      .map((elem) => $(elem).attr('href')),
-  ].map(getRelativePath(htmlPath))
-
-export const mutateImgSrcs = ($, fn) => {
+const getImgs = ($) =>
   $('img')
     .not('[src^="http://"]')
     .not('[src^="https://"]')
-    .not('[src^="data://"]')
+    .not('[src^="data:"]')
     .not('[src^="/"]')
     .toArray()
+
+const getFavicons = ($) =>
+  $('link[rel="icon"]')
+    .not('[href^="http:"]')
+    .not('[href^="https:"]')
+    .not('[href^="data:"]')
+    .not('[href^="/"]')
+    .toArray()
+
+export const getImgSrcs = ([htmlPath, $]) => {
+  return [
+    ...getImgs($).map((elem) => $(elem).attr('src')),
+    // get favicons
+    ...getFavicons($).map((elem) => $(elem).attr('href')),
+  ].map(getRelativePath(htmlPath))
+}
+
+export const mutateImgSrcs = ($, fn) => {
+  getImgs($)
     .map((elem) => $(elem))
     .forEach((e) => {
       const value = fn(e.attr('src'))
       e.attr('src', value)
     })
 
-  $('link[rel="icon"]')
-    .not('[src^="http://"]')
-    .not('[src^="https://"]')
-    .not('[src^="data://"]')
-    .not('[src^="/"]')
-    .toArray()
+  getFavicons($)
     .map((elem) => $(elem))
     .forEach((e) => {
       const value = fn(e.attr('href'))

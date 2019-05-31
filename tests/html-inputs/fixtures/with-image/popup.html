@@ -4,9 +4,35 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>popup</title>
+    <!-- correct link -->
     <link
       rel="icon"
       href="images/favicon.png"
+      type="image/png"
+      sizes="16x16"
+    />
+    <!-- ignored links -->
+    <link
+      rel="icon"
+      href="//images/favicon.png"
+      type="image/png"
+      sizes="16x16"
+    />
+    <link
+      rel="icon"
+      href="/images/favicon.png"
+      type="image/png"
+      sizes="16x16"
+    />
+    <link
+      rel="icon"
+      href="http://www.photoplaces.com/photo.png"
+      type="image/png"
+      sizes="16x16"
+    />
+    <link
+      rel="icon"
+      href="https://www.photoplaces1.com/photo1.png"
       type="image/png"
       sizes="16x16"
     />
@@ -17,6 +43,21 @@
     <script src="popup.js"></script>
   </head>
   <body>
+    <!-- correct link -->
     <img src="images/icon-on-16.png" alt="icon" />
+    <!-- ignored links -->
+    <img src="/images/icon-on-16.png" alt="icon" />
+    <img src="//images/icon-on-16.png" alt="icon" />
+    <img src="http://www.photoplaces.com/photo.png" alt="icon" />
+    <img
+      src="https://www.photoplaces1.com/photo1.png"
+      alt="icon"
+    />
+    <img
+      src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUA
+AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
+    9TXL0Y4OHwAAAABJRU5ErkJggg=="
+      alt="Red dot"
+    />
   </body>
 </html>
