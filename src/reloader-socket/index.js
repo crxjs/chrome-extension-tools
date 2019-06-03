@@ -2,7 +2,7 @@ import debounce from 'debounce'
 import express from 'express'
 import { Server } from 'http'
 import SocketIO from 'socket.io'
-import clientCode from './client.code.js.js'
+import clientCode from './client.code'
 import { PORT } from './CONSTANTS'
 import * as handle from './event-handlers'
 
@@ -24,4 +24,4 @@ export function start() {
 
 export const reload = debounce(handle.reload, 200)
 
-export const client = clientCode
+export const getClientCode = () => clientCode

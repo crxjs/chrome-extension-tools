@@ -4,15 +4,15 @@ import {
   derivePermissions as dp,
 } from '@bumble/manifest'
 import fs from 'fs-extra'
+import isValidPath from 'is-valid-path'
 import MagicString from 'magic-string'
+import memoize from 'mem'
 import path from 'path'
+import pm from 'picomatch'
 import { createFilter } from 'rollup-pluginutils'
 import { getAssetPathMapFns, loadAssetData } from '../helpers'
 import { mapObjectValues } from './mapObjectValues'
-import * as reloader from './reloader/server'
-import pm from 'picomatch'
-import isValidPath from 'is-valid-path'
-import memoize from 'mem'
+import * as reloaderSocket from '../reloader-socket/index'
 
 const name = 'manifest-input'
 
@@ -54,6 +54,7 @@ export default function({
   },
   publicKey,
   useReloader = process.env.ROLLUP_WATCH,
+  reloader = reloaderSocket,
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
@@ -125,8 +126,8 @@ export default function({
         {
           assetPaths: assetFilter,
           entryPaths: entryFilter,
-          transform: name => path.join(srcDir, name),
-          filter: v =>
+          transform: (name) => path.join(srcDir, name),
+          filter: (v) =>
             typeof v === 'string' &&
             isValidPath(v) &&
             !/^https?:/.test(v),
@@ -140,7 +141,7 @@ export default function({
 
       // Render only manifest entry js files
       // as async iife
-      const js = entryPaths.filter(p => /\.js$/.test(p))
+      const js = entryPaths.filter((p) => /\.js$/.test(p))
       iiafeFilter = createFilter(
         iiafe.include.concat(js),
         iiafe.exclude,
@@ -274,7 +275,7 @@ export default function({
         if (useReloader) {
           const clientId = this.emitAsset(
             'reloader-client.js',
-            reloader.client,
+            reloader.getClientCode(),
           )
 
           const clientPath = this.getAssetFileName(clientId)
@@ -311,7 +312,7 @@ export default function({
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
 
-        error.errors.forEach(err => {
+        error.errors.forEach((err) => {
           console.log(err)
         })
 
