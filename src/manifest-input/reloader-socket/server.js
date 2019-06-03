@@ -2,7 +2,7 @@ import debounce from 'debounce'
 import express from 'express'
 import { Server } from 'http'
 import SocketIO from 'socket.io'
-import clientCode from './client.code.js'
+import clientCode from './client.code.js.js'
 import { PORT } from './CONSTANTS'
 import * as handle from './event-handlers'
 
