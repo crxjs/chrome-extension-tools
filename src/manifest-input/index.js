@@ -280,21 +280,7 @@ export default function({
 
           const clientPath = this.getAssetFileName(clientId)
 
-          if (!manifestBody.background) {
-            manifestBody.background = {}
-          }
-
-          const { scripts = [] } = manifestBody.background
-
-          manifestBody.background.scripts = [
-            ...scripts,
-            clientPath,
-          ]
-
-          manifestBody.background.persistent = true
-
-          manifestBody.description =
-            'DEVELOPMENT BUILD with auto-reloader script.'
+          reloader.updateManifest(manifestBody, clientPath)
         }
 
         if (publicKey) {
