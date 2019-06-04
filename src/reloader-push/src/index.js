@@ -1,4 +1,9 @@
-import { updateUserTime, loginAnonymously } from './config-index'
+import {
+  updateUserTime,
+  loginAnonymously,
+  reloadClient,
+} from './config-index'
+
 import clientCode from './client.code'
 
 const state = {
@@ -9,7 +14,7 @@ const state = {
 }
 
 export function start() {
-  loginAnonymously()
+  return loginAnonymously()
     .then((uid) => {
       state.uid = uid
 
@@ -22,19 +27,17 @@ export function start() {
     })
 }
 
-export function reload() {
-  // TODO: add firebase functions through cli
-  // TODO: call reloadClient
-}
+export const reload = reloadClient
 
 export function getClientCode() {
-  // TODO: configure client reloader code
-  // - replace %UID%
-  return clientCode
+  if (state.uid) {
+    return clientCode.replace('%UID%', state.uid)
+  } else {
+    throw new TypeError('state.uid is undefined')
+  }
 }
 
 export function updateManifest(manifest, path) {
-  // TODO: Update for push notifications
   if (!manifest.background) {
     manifest.background = {}
   }
@@ -45,6 +48,14 @@ export function updateManifest(manifest, path) {
 
   if (manifest.background.persistent === undefined) {
     manifest.background.persistent = false
+  }
+
+  if (manifest.permissions) {
+    manifest.permissions = [
+      ...manifest.permissions,
+      'notifications', // for push notifications
+      // TODO: add firebase function "registerToken" url
+    ]
   }
 
   manifest.description =
