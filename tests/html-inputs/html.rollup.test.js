@@ -19,7 +19,7 @@ test('basic', async () => {
 
   expect(chunks.length).toBe(4)
 
-  // TODO: 2 html files with the same asset should not emit two assets
+  // NEXT: 2 html files with the same asset should not emit two assets
   //  - See options.html and popup.html
   expect(assets.length).toBe(4)
 })
