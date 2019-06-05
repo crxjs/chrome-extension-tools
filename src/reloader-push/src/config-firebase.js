@@ -1,5 +1,3 @@
-export const messagingSenderId = '585702818423'
-
 export const config = {
   apiKey: 'AIzaSyAS9LYKPeLGOjeSYfgRyYrUYqwfPGbJS4A',
   authDomain: 'rpce-reloader.firebaseapp.com',
@@ -9,6 +7,8 @@ export const config = {
   messagingSenderId: '444790084672',
   appId: '1:444790084672:web:01c370a8f180e498',
 }
+
+export const { messagingSenderId } = config
 
 export const publicVapidKey =
   'BBnbRXsQa5zu5JXxlUT2fHFtNjiW8pFOX5PFSMWpJzKz7JkZl2-1mlu25MYZLM2AQ7YvS1p8TgEhCUn8oCbrlNw'

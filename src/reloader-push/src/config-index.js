@@ -11,8 +11,9 @@ firebase.initializeApp(config)
 export { firebase }
 
 export const loginAnonymously = async () => {
-  // TODO: anonymous login to firebase
-  // RESEARCH: login anonymously to firebase one time
+  const { user } = firebase.auth().signInAnonymously()
+
+  return user.uid
 }
 
 export const updateUserTime = firebase

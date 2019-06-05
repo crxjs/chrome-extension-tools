@@ -33,4 +33,12 @@ export const setupMessaging = async ({
   return { messaging, registration }
 }
 
+export const registerToken = firebase
+  .functions()
+  .httpsCallable('registerToken')
+  .catch((error) => {
+    console.log('Could not register fsm token')
+    console.error(error)
+  })
+
 export { firebase }

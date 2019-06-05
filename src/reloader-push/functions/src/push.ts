@@ -1,12 +1,16 @@
-export const pushClientReload = (messaging) => async (
-  token: string,
-) => {
-  // TODO: push "client-reload" to each client
-  // RESEARCH: send push notification
+import * as admin from 'firebase-admin'
+
+const sendMessage = (message: string) => (token: string) => {
+  // Send a message to the device corresponding to the provided
+  // registration token.
+  return admin.messaging().send({
+    data: {
+      message,
+    },
+    token,
+  })
 }
 
-export const pushClientLoad = (messaging) => async (
-  token: string,
-) => {
-  // TODO: push "client-load" to each client
-}
+export const pushClientReload = sendMessage('client-reload')
+
+export const pushClientLoad = sendMessage('client-load')
