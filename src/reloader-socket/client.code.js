@@ -1,5 +1,6 @@
 /* eslint-env webextensions */
 import io from 'socket.io-client/dist/socket.io'
+
 import { PORT } from './CONSTANTS'
 
 const socket = io(`http://localhost:${PORT}`)

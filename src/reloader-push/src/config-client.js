@@ -4,6 +4,7 @@
 // Firebase manual chunk
 import firebase from '@firebase/app'
 import '@firebase/messaging'
+import '@firebase/functions'
 
 import { config, publicVapidKey } from './config-firebase'
 
@@ -29,7 +30,7 @@ export const setupMessaging = async ({
     throw new TypeError('onMessage must be a function')
   }
 
-  return messaging
+  return { messaging, registration }
 }
 
 export { firebase }

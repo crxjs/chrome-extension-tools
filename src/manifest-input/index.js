@@ -12,7 +12,9 @@ import pm from 'picomatch'
 import { createFilter } from 'rollup-pluginutils'
 import { getAssetPathMapFns, loadAssetData } from '../helpers'
 import { mapObjectValues } from './mapObjectValues'
-import * as reloaderSocket from '../reloader-socket/index'
+
+import * as socketReloader from '../reloader-socket/index'
+import * as pushReloader from '../reloader-push/src/index'
 
 const name = 'manifest-input'
 
@@ -54,15 +56,20 @@ export default function({
   },
   publicKey,
   useReloader = process.env.ROLLUP_WATCH,
-  reloader = reloaderSocket,
+  reloader = 'socket',
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
 
+  const _reloader =
+    reloader === 'socket'
+      ? socketReloader
+      : reloader === 'push' && pushReloader
+
   if (useReloader) {
     console.log('starting reloader')
-    reloader.start()
+    _reloader.start()
   }
 
   /* -------------- hooks closures -------------- */
@@ -275,12 +282,12 @@ export default function({
         if (useReloader) {
           const clientId = this.emitAsset(
             'reloader-client.js',
-            reloader.getClientCode(),
+            _reloader.getClientCode(),
           )
 
           const clientPath = this.getAssetFileName(clientId)
 
-          reloader.updateManifest(manifestBody, clientPath)
+          _reloader.updateManifest(manifestBody, clientPath)
         }
 
         if (publicKey) {
@@ -308,7 +315,7 @@ export default function({
 
     writeBundle() {
       if (useReloader) {
-        reloader.reload()
+        _reloader.reload()
       }
     },
   }

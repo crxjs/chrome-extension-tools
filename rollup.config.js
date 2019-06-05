@@ -1,9 +1,22 @@
 /* eslint-env node */
 
-// import resolve from 'rollup-plugin-node-resolve'
-// import commonjs from 'rollup-plugin-commonjs'
-import code from 'rollup-plugin-code-string'
-// import json from 'rollup-plugin-json'
+import bundleImports from 'rollup-plugin-bundle-imports'
+
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+
+const plugins = [
+  bundleImports({
+    include: ['**/*.sw.js'],
+    importAs: 'path',
+    options: { plugins: [resolve(), commonjs()] },
+  }),
+  bundleImports({
+    include: ['**/*.code.js'],
+    importAs: 'code',
+    options: { plugins: [resolve(), commonjs()] },
+  }),
+]
 
 export default [
   {
@@ -22,21 +35,24 @@ export default [
     ],
     external: [
       '@bumble/manifest',
+      '@firebase/app',
+      '@firebase/auth',
+      '@firebase/functions',
       'cheerio',
       'cors',
       'debounce',
       'express',
       'fs-extra',
       'http',
+      'is-valid-path',
       'magic-string',
+      'mem',
       'path',
+      'picomatch',
       'rollup-plugin-zip',
       'rollup-pluginutils',
       'socket.io',
-      'picomatch',
-      'is-valid-path',
-      'mem',
     ],
-    plugins: [code()],
+    plugins,
   },
 ]

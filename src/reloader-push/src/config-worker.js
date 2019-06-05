@@ -13,10 +13,15 @@ import { messagingSenderId } from './config-firebase'
 // by passing in the messagingSenderId.
 firebase.initializeApp({ messagingSenderId })
 
-export const setupMessaging = async ({ onMessage }) => {
-  // Call this before firebase.messaging()
+export const setupMessaging = async ({ onPush, onMessage }) => {
+  // Add listeners before firebase.messaging()
   // in order to intercept PushEvents
   self.addEventListener('push', (event) => {
+    event.stopImmediatePropagation()
+    event.waitUntil(onPush(event))
+  })
+
+  self.addEventListener('message', (event) => {
     event.stopImmediatePropagation()
     event.waitUntil(onMessage(event))
   })

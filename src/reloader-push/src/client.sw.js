@@ -4,15 +4,26 @@
 
 import { setupMessaging } from './config-worker'
 
-const onMessage = async (event) => {
+const onPush = async (event) => {
   console.log(event)
 
   // TODO: get/wake extension as client
-  // TODO: send client a reload message
-  // TODO: emit notification
   const client = await chrome.runtime.getBackgroundClient()
 
+  // TODO: send client a reload message
   client.postMessage({ message: 'reload' })
+
+  // TODO: emit notification
+  // - before reload? "reloading extension"
 }
 
-setupMessaging({ onMessage })
+const onMessage = async (event) => {
+  console.log(event)
+
+  // TODO: update/create notification
+  // - get sw notifications
+  // - update/create notification w/ load message
+  //   "extension loaded successfully"
+}
+
+setupMessaging({ onPush, onMessage })
