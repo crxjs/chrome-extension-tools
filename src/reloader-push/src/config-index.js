@@ -12,7 +12,7 @@ export { firebase }
 
 export const loginAnonymously = async () => {
   // TODO: anonymous login to firebase
-  // TODO: research anonymous auth
+  // RESEARCH: login anonymously to firebase one time
 }
 
 export const updateUserTime = firebase
