@@ -11,6 +11,5 @@ const sendMessage = (message: string) => (token: string) => {
   })
 }
 
-export const pushClientReload = sendMessage('client-reload')
-
 export const pushClientLoad = sendMessage('client-load')
+export const pushClientReload = sendMessage('client-reload')
