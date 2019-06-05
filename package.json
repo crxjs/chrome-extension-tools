@@ -17,21 +17,6 @@
     "preversion": "npm test && npm run build",
     "postversion": "git push && npm publish"
   },
-  "jest": {
-    "clearMocks": true,
-    "moduleNameMapper": {
-      "\\.code\\.js": "<rootDir>/tests/stub.code.js"
-    },
-    "modulePathIgnorePatterns": [
-      "fixtures/dest"
-    ],
-    "setupFilesAfterEnv": [
-      "./tests/jest.setup.js"
-    ],
-    "transform": {
-      ".(js|jsx|ts|tsx)": "@sucrase/jest-plugin"
-    }
-  },
   "dependencies": {
     "@bumble/manifest": "^0.5.2",
     "@bumble/rollup-watch-next": "^0.3.3",
