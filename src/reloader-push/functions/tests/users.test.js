@@ -3,7 +3,7 @@ import { Mock } from 'firebase-nightlight'
 import { cleanUpUsers, setUserTime } from '../src/users'
 
 jest.mock('firebase-admin', () => {
-  const deleteUser = jest.fn()
+  const deleteUser = jest.fn(() => Promise.resolve())
   const auth = jest.fn(() => ({ deleteUser }))
 
   const database = jest.fn()
