@@ -83,6 +83,16 @@
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+    },
+    {
+      "type": "node",
+      "name": "test-reloader-functions-calls",
+      "request": "launch",
+      "args": ["calls.test", "--runInBand"],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
     }
   ]
 }

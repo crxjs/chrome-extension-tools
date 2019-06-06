@@ -1,10 +1,10 @@
-import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
-
+import {
+  CallableContext,
+  HttpsError,
+} from 'firebase-functions/lib/providers/https'
 import { pushClientLoad, pushClientReload } from './push'
 import { cleanUpUsers, setUserTime } from './users'
-
-const { HttpsError } = functions.https
 
 admin.initializeApp()
 
@@ -12,9 +12,9 @@ export const setupUser = async (user: admin.auth.UserRecord) => {
   return Promise.all([cleanUpUsers(), setUserTime(user.uid)])
 }
 
-export const updateUserTime = (
+export const updateUserTime = async (
   _: any,
-  context: functions.https.CallableContext,
+  context: CallableContext,
 ) => {
   if (!context.auth) {
     throw new HttpsError(
@@ -50,24 +50,21 @@ export const registerToken = async ({ uid, token }: any) => {
     throw new HttpsError('not-found', 'uid does not exist')
   }
 
-  await userSnap
-    .child(`clients/${token}`)
-    .ref.set(true)
-    .catch((e) => {
-      console.error(e)
-
-      throw new HttpsError(
-        'data-loss',
-        'could not store client token',
-      )
-    })
+  try {
+    await userSnap.child(`clients/${token}`).ref.set(true)
+  } catch (e) {
+    throw new HttpsError(
+      'data-loss',
+      'could not store client token',
+    )
+  }
 
   return pushClientLoad(token)
 }
 
 export const reloadClient = async (
   data: any,
-  context: functions.https.CallableContext,
+  context: CallableContext,
 ) => {
   if (!context.auth) {
     throw new HttpsError(
