@@ -18,7 +18,7 @@ const onMessage = async (event) => {
   // reload()
 }
 
-export const onLoad = async ({ messaging }) => {
+const onLoad = async ({ messaging }) => {
   const token = await messaging.getToken()
 
   return registerToken({ uid: '%UID%', token })

@@ -1,16 +1,13 @@
 module.exports = {
   clearMocks: true,
   moduleNameMapper: {
-    '\\.code\\.js': '<rootDir>/tests/stub.code.js',
+    '\\.code(\\.js)?': '<rootDir>/tests/stub.code.js',
   },
   modulePathIgnorePatterns: ['fixtures/dest'],
-  projects: [
-    '<rootDir>',
-    '<rootDir>/src/reloader-push/functions',
-  ],
+  projects: ['<rootDir>', '<rootDir>/reloader/push/functions'],
   setupFilesAfterEnv: ['./tests/jest.setup.js'],
   testPathIgnorePatterns: [
-    '<rootDir>/src/reloader-push/functions',
+    '<rootDir>/reloader/push/functions',
     '<rootDir>/node_modules/',
   ],
   transform: {

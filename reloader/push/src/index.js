@@ -1,8 +1,4 @@
-import {
-  updateUserTime,
-  loginAnonymously,
-  reloadClient,
-} from './config-index'
+import { update, login, reload } from './config-index'
 
 import clientCode from './client.code'
 
@@ -13,21 +9,17 @@ const state = {
   // interval: number,
 }
 
-export function start() {
-  return loginAnonymously()
-    .then((uid) => {
-      state.uid = uid
+export async function start(cb) {
+  const uid = await login(cb)
 
-      const update = updateUserTime(state)
-      state.interval = setInterval(update, 5 * 60 * 1000)
-    })
-    .catch((error) => {
-      console.log('Could not start push reloader')
-      console.error(error)
-    })
+  state.uid = uid
+
+  state.interval = setInterval(update, 5 * 60 * 1000)
+
+  return update()
 }
 
-export const reload = reloadClient
+export { reload }
 
 export function getClientCode() {
   if (state.uid) {

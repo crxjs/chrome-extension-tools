@@ -23,8 +23,8 @@ jest.mock('firebase-admin', () => {
   const database = jest.fn()
 
   database.ServerValue = {
-    get TIMESTAMP() {
-      return Date.now()
+    TIMESTAMP: {
+      '.sv': 'timestamp',
     },
   }
 

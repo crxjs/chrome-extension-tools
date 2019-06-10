@@ -13,9 +13,6 @@ import { createFilter } from 'rollup-pluginutils'
 import { getAssetPathMapFns, loadAssetData } from '../helpers'
 import { mapObjectValues } from './mapObjectValues'
 
-import * as socketReloader from '../reloader-socket/index'
-import * as pushReloader from '../reloader-push/src/index'
-
 const name = 'manifest-input'
 
 /* ---- predicate object for deriveEntries ---- */
@@ -56,21 +53,14 @@ export default function({
   },
   publicKey,
   useReloader = process.env.ROLLUP_WATCH,
-  reloader = 'socket',
+  reloader,
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
 
-  const _reloader =
-    reloader === 'socket'
-      ? socketReloader
-      : reloader === 'push' && pushReloader
-
-  if (useReloader) {
-    console.log('starting reloader')
-    _reloader.start()
-  }
+  let _useReloader = useReloader && reloader
+  let startReloader = true
 
   /* -------------- hooks closures -------------- */
   iiafe.include = iiafe.include || []
@@ -164,7 +154,7 @@ export default function({
     /*              HANDLE WATCH FILES              */
     /* ============================================ */
 
-    buildStart() {
+    async buildStart() {
       this.addWatchFile(manifestPath)
     },
 
@@ -279,15 +269,29 @@ export default function({
         )
 
         // Add reloader script
-        if (useReloader) {
+        if (_useReloader) {
+          console.log('_useReloader', _useReloader)
+
+          if (startReloader) {
+            await reloader.start((shouldStart) => {
+              startReloader = shouldStart
+            })
+
+            console.log('reloader is running...')
+          }
+
+          // TODO: reloader should be wrapped
+          //       in a dynamic import
+          //       to support module features.
           const clientId = this.emitAsset(
             'reloader-client.js',
-            _reloader.getClientCode(),
+            reloader.getClientCode(),
           )
 
           const clientPath = this.getAssetFileName(clientId)
 
-          _reloader.updateManifest(manifestBody, clientPath)
+          // TODO: here, client path should be the wrapper file.
+          reloader.updateManifest(manifestBody, clientPath)
         }
 
         if (publicKey) {
@@ -314,8 +318,11 @@ export default function({
     },
 
     writeBundle() {
-      if (useReloader) {
-        _reloader.reload()
+      if (_useReloader) {
+        return reloader.reload().catch((error) => {
+          const message = `${error.message} (${error.code})`
+          this.warn(message)
+        })
       }
     },
   }

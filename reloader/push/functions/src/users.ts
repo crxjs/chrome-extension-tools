@@ -1,13 +1,14 @@
 import * as admin from 'firebase-admin'
 
 export const cleanUpUsers = async () => {
-  const deadline =
-    admin.database.ServerValue.TIMESTAMP - 6 * 60 * 1000
+  // Six minutes ago
+  const deadline = Date.now() - 6 * 60 * 1000
 
   const inactiveUsers = admin
     .database()
     .ref('users')
     .orderByChild('time')
+    // Anything from before the deadline
     .endAt(deadline)
 
   const inactiveSnap = await inactiveUsers.once('value')

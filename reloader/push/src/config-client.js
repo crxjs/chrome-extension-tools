@@ -6,7 +6,7 @@ import firebase from '@firebase/app'
 import '@firebase/messaging'
 import '@firebase/functions'
 
-import { config, publicVapidKey } from './config-firebase'
+import { config, publicVapidKey } from './CONFIG'
 
 // Initialize full web app on import
 firebase.initializeApp(config)
@@ -36,9 +36,5 @@ export const setupMessaging = async ({
 export const registerToken = firebase
   .functions()
   .httpsCallable('registerToken')
-  .catch((error) => {
-    console.log('Could not register fsm token')
-    console.error(error)
-  })
 
 export { firebase }

@@ -6,10 +6,14 @@
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
-    "build"
+    "dist",
+    "reloader/push/package.json",
+    "reloader/push/dist",
+    "reloader/socket/package.json",
+    "reloader/socket/dist"
   ],
-  "main": "build/bundle-cjs.js",
-  "module": "build/bundle-esm.js",
+  "main": "dist/chrome-extension-cjs.js",
+  "module": "dist/chrome-extension-esm.js",
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",

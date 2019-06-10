@@ -7,7 +7,7 @@
 import firebase from '@firebase/app'
 import '@firebase/messaging'
 
-import { messagingSenderId } from './config-firebase'
+import { messagingSenderId } from './CONFIG'
 
 // Initialize the Firebase app in the service worker
 // by passing in the messagingSenderId.

@@ -12,12 +12,16 @@ export const http = Server(app)
 export const io = SocketIO(http)
 
 // NEXT: use ip:port instead of localHost:port
-export function start() {
+export async function start(cb) {
   io.on('connection', handle.connect)
 
   http.listen(PORT, function() {
     console.log(`auto-reloader on localhost:${PORT}...`)
   })
+
+  cb(false)
+
+  // TODO: call cb when socket problem
 
   return io
 }
