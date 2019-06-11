@@ -73,9 +73,11 @@ export const reloadClient = async (
     )
   }
 
+  const { uid } = context.auth
+
   const clientsSnap = await admin
     .database()
-    .ref(`users/${context.auth.uid}/clients`)
+    .ref(`users/${uid}/clients`)
     .once('value')
 
   if (!clientsSnap.exists()) {

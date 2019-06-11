@@ -9,13 +9,13 @@ import '@firebase/functions'
 import { config, publicVapidKey } from './CONFIG'
 
 // Initialize full web app on import
-firebase.initializeApp(config)
+const app = firebase.initializeApp(config, 'reloader')
 
 export const setupMessaging = async ({
   serviceWorkerPath,
   onMessage,
 } = {}) => {
-  const messaging = firebase.messaging()
+  const messaging = app.messaging()
 
   const registration = await navigator.serviceWorker.register(
     serviceWorkerPath,
@@ -25,7 +25,10 @@ export const setupMessaging = async ({
   messaging.usePublicVapidKey(publicVapidKey)
 
   if (typeof onMessage === 'function') {
-    registration.addEventListener('message', onMessage)
+    navigator.serviceWorker.addEventListener(
+      'message',
+      onMessage,
+    )
   } else {
     throw new TypeError('onMessage must be a function')
   }
@@ -33,7 +36,7 @@ export const setupMessaging = async ({
   return { messaging, registration }
 }
 
-export const registerToken = firebase
+export const registerToken = app
   .functions()
   .httpsCallable('registerToken')
 

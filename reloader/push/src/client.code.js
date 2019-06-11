@@ -4,18 +4,24 @@
 // Firebase manual chunk
 import { setupMessaging, registerToken } from './config-client'
 
-import serviceWorkerPath from './client.sw'
-
-// const reload = () => chrome.runtime.reload()
+const reload = () => chrome.runtime.reload()
 
 const onMessage = async (event) => {
   console.log('onMessage', event)
 
-  // RESEARCH: service worker registration addEventListener event data
+  const { message } = event.data
+
   // TODO: handle "client-reload" message
   // TODO: handle "client-load" message
 
-  // reload()
+  if (message === 'client-load') {
+    console.log('load', message)
+  } else if (message === 'client-reload') {
+    console.log('reload', message)
+    reload()
+  } else {
+    console.log('unknown message', message)
+  }
 }
 
 const onLoad = async ({ messaging }) => {
@@ -25,7 +31,7 @@ const onLoad = async ({ messaging }) => {
 }
 
 setupMessaging({
-  serviceWorkerPath,
+  serviceWorkerPath: '%SW_PATH%',
   onMessage,
 })
   .then(onLoad)

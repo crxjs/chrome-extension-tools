@@ -7,17 +7,14 @@ import { setupMessaging } from './config-worker'
 // Just return a promise or use an async function
 // - No need to use event.waitUntil, this is handled in ./config-worker
 const onPush = async (event) => {
-  console.log(event)
+  const { message } = event.data.json().data
 
   const client = await chrome.runtime.getBackgroundClient()
 
-  switch (event.data.message) {
+  switch (message) {
     case 'client-load': {
-      console.log('client-load')
-      // TODO: handle "client-load" message
-
       const notifications = await self.registration.getNotifications()
-      console.log(notifications)
+      console.log('notifications', notifications)
 
       // TODO: close/create notification
       // - get sw notifications
@@ -26,17 +23,17 @@ const onPush = async (event) => {
 
       const title = 'extension load success'
 
-      return self.registration.showNotification(title)
+      await self.registration.showNotification(title)
+
+      return client.postMessage({ message })
     }
 
     case 'client-reload': {
-      console.log('client-reload')
-
       const title = 'reloading extension'
 
       await self.registration.showNotification(title)
 
-      return client.postMessage({ message: 'reload' })
+      return client.postMessage({ message })
     }
 
     default: {

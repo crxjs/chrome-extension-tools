@@ -61,6 +61,7 @@ export default function({
 
   let _useReloader = useReloader && reloader
   let startReloader = true
+  let firstRun = true
 
   /* -------------- hooks closures -------------- */
   iiafe.include = iiafe.include || []
@@ -270,8 +271,6 @@ export default function({
 
         // Add reloader script
         if (_useReloader) {
-          console.log('_useReloader', _useReloader)
-
           if (startReloader) {
             await reloader.start((shouldStart) => {
               startReloader = shouldStart
@@ -283,15 +282,10 @@ export default function({
           // TODO: reloader should be wrapped
           //       in a dynamic import
           //       to support module features.
-          const clientId = this.emitAsset(
-            'reloader-client.js',
-            reloader.getClientCode(),
-          )
-
-          const clientPath = this.getAssetFileName(clientId)
+          reloader.createClientFiles.call(this)
 
           // TODO: here, client path should be the wrapper file.
-          reloader.updateManifest(manifestBody, clientPath)
+          reloader.updateManifest(manifestBody)
         }
 
         if (publicKey) {
@@ -318,11 +312,18 @@ export default function({
     },
 
     writeBundle() {
-      if (_useReloader) {
-        return reloader.reload().catch((error) => {
-          const message = `${error.message} (${error.code})`
-          this.warn(message)
-        })
+      if (_useReloader && !firstRun) {
+        return reloader
+          .reload()
+          .then(() => {
+            console.log('reload success...')
+          })
+          .catch((error) => {
+            const message = `${error.message} (${error.code})`
+            this.warn(message)
+          })
+      } else {
+        firstRun = false
       }
     },
   }
