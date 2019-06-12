@@ -12,7 +12,7 @@ const state = {
   // swPath: string,
 }
 
-export async function start(cb) {
+export async function startReloader(cb) {
   const uid = await login(cb)
 
   state.uid = uid
@@ -22,26 +22,32 @@ export async function start(cb) {
   return update()
 }
 
-export { reload }
+export function reloadClient() {
+  return reload()
+}
 
-export function createClientFiles() {
+export function createClientFiles(
+  options,
+  bundle,
+  _state = state,
+) {
   const emit = (name, code) => {
     const id = this.emitAsset(name, code)
 
     return this.getAssetFileName(id)
   }
 
-  if (state.uid) {
-    state.swPath = emit('reloader-sw.js', serviceWorkerCode)
+  if (_state.uid) {
+    _state.swPath = emit('reloader-sw.js', serviceWorkerCode)
 
     const clientPath = emit(
       'reloader-client.js',
       clientCode
-        .replace('%UID%', state.uid)
-        .replace('%SW_PATH%', state.swPath),
+        .replace('%UID%', _state.uid)
+        .replace('%SW_PATH%', _state.swPath),
     )
 
-    state.scriptPath = emit(
+    _state.scriptPath = emit(
       'reloader-wrapper.js',
       `import('/${clientPath}')`,
     )
@@ -50,7 +56,18 @@ export function createClientFiles() {
   }
 }
 
-export function updateManifest(manifest) {
+export function updateManifest(options, bundle, _state = state) {
+  const manifestKey = 'manifest.json'
+  const manifestSource = bundle[manifestKey].source
+
+  if (!manifestSource) {
+    throw new ReferenceError(
+      `bundle.${manifestKey} is undefined`,
+    )
+  }
+
+  const manifest = JSON.parse(manifestSource)
+
   if (!manifest.background) {
     manifest.background = {}
   }
@@ -62,12 +79,12 @@ export function updateManifest(manifest) {
     permissions = [],
   } = manifest
 
-  if (state.scriptPath) {
-    manifest.background.scripts = [...scripts, state.scriptPath]
+  if (_state.scriptPath) {
+    manifest.background.scripts = [...scripts, _state.scriptPath]
 
     manifest.web_accessible_resources = [
       ...web_accessible_resources,
-      state.scriptPath,
+      _state.scriptPath,
     ]
   } else {
     throw new TypeError('state.scriptPath is undefined')
@@ -89,4 +106,6 @@ export function updateManifest(manifest) {
 
   manifest.description =
     'DEVELOPMENT BUILD with auto-reloader script.'
+
+  bundle[manifestKey].source = JSON.stringify(manifest)
 }

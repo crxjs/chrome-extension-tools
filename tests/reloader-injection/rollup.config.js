@@ -4,6 +4,8 @@ import { join } from 'path'
 import pkg from './package.json'
 import chromeExtension from '../../src/index'
 
+import { reloader } from './reloader'
+
 const fixture = (name) => join(__dirname, 'fixtures', name)
 
 export default {
@@ -16,11 +18,14 @@ export default {
     chromeExtension({
       // Required if run outside npm
       pkg,
-      // Include or exclude files
-      // from which to derive permissions
-      // permissions: {
-      //   include: ['**/src/**/*', '**/@bumble/**/*'],
-      // },
+      // Permissions
+      permissions: {
+        include: ['**/*'],
+        exclude: ['**/background.js'],
+      },
+      // Add reloader
+      reloader,
+      useReloader: true,
     }),
   ],
 }

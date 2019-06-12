@@ -76,10 +76,10 @@ export default function({
 
   const manifestName = 'manifest.json'
 
-  const permissionsFilter = pm(
-    permissions.include || '**/*',
-    permissions.exclude,
-  )
+  // Files to include for permissions derivation
+  const permissionsFilter = pm(permissions.include || '**/*', {
+    ignore: permissions.exclude,
+  })
 
   const assetFilter = pm(assets.include, {
     ignore: assets.exclude,
@@ -133,12 +133,10 @@ export default function({
       )
 
       // Start async asset loading
-      // CONCERN: relative paths within CSS files will fail
-      // SOLUTION: use postcss to process CSS asset src
       loadedAssets = Promise.all(assetPaths.map(loadAssetData))
 
-      // Render only manifest entry js files
-      // as async iife
+      // TODO: Use dynamic import wrapper instead of iiafe
+      // Render only manifest entry js files as async iife
       const js = entryPaths.filter((p) => /\.js$/.test(p))
       iiafeFilter = createFilter(
         iiafe.include.concat(js),
@@ -167,15 +165,10 @@ export default function({
     },
 
     /* ============================================ */
-    /*                   TRANSFORM                  */
-    /* ============================================ */
-
-    // transform(code, id) {},
-
-    /* ============================================ */
     /*       MAKE MANIFEST ENTRIES ASYNC IIFE       */
     /* ============================================ */
 
+    // TODO: use dynamic import wrapper instead of iiafe
     renderChunk(
       source,
       { isEntry, facadeModuleId: id, fileName },
@@ -220,6 +213,8 @@ export default function({
     /* ============================================ */
 
     async generateBundle(options, bundle) {
+      /* ---------- derive permisions start --------- */
+
       // Get module ids for all chunks
       const permissions = Array.from(
         Object.values(bundle).reduce(
@@ -251,8 +246,24 @@ export default function({
         cache.permsHash = permsHash
       }
 
-      // Emit loaded assets and
-      // Create asset path updaters
+      /* ---------- derive permissions end ---------- */
+
+      // Add reloader script
+      if (_useReloader) {
+        if (startReloader) {
+          await reloader.start((shouldStart) => {
+            startReloader = shouldStart
+          })
+        }
+
+        // TODO: reloader should be wrapped
+        //       in a dynamic import
+        //       to support module features.
+        reloader.createClientFiles.call(this, options, bundle)
+      }
+
+      // Emit loaded manifest.json assets and
+      // Create asset path updater functions
       const assetPathMapFns = await getAssetPathMapFns.call(
         this,
         loadedAssets,
@@ -269,23 +280,6 @@ export default function({
           permissions,
         )
 
-        // Add reloader script
-        if (_useReloader) {
-          if (startReloader) {
-            await reloader.start((shouldStart) => {
-              startReloader = shouldStart
-            })
-          }
-
-          // TODO: reloader should be wrapped
-          //       in a dynamic import
-          //       to support module features.
-          reloader.createClientFiles.call(this)
-
-          // TODO: here, client path should be the wrapper file.
-          reloader.updateManifest(manifestBody)
-        }
-
         if (publicKey) {
           manifestBody.key = publicKey
         } else {
@@ -297,6 +291,10 @@ export default function({
           fileName: manifestName,
           isAsset: true,
           source: JSON.stringify(manifestBody, null, 2),
+        }
+
+        if (_useReloader) {
+          reloader.updateManifest.call(this, options, bundle)
         }
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
