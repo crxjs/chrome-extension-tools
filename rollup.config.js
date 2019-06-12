@@ -87,4 +87,20 @@ export default [
     ],
     plugins,
   },
+  {
+    input: 'reloader/interval/src/index.js',
+    output: [
+      {
+        file: 'reloader/interval/dist/reloader-esm.js',
+        format: 'esm',
+        sourcemap: 'inline',
+      },
+      {
+        file: 'reloader/interval/dist/reloader-cjs.js',
+        format: 'cjs',
+        sourcemap: 'inline',
+      },
+    ],
+    plugins,
+  },
 ]
