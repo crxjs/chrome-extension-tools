@@ -16,11 +16,14 @@ const _createClientFiles = function(...args) {
   return createClientFiles.call(this, ...args, { uid })
 }
 
-export const reloader = {
+const _reloader = {
+  name: 'spy-push-reloader',
   createClientFiles: jest.fn(_createClientFiles),
   updateManifest: jest.fn(_updateManifest),
 
   // Don't need to test firebase functionality
-  start: jest.fn(),
-  reload: jest.fn(),
+  startReloader: jest.fn(),
+  reloadClients: jest.fn(),
 }
+
+export const reloader = () => _reloader

@@ -15,19 +15,6 @@ import { mapObjectValues } from './mapObjectValues'
 
 const name = 'manifest-input'
 
-/* ---- predicate object for deriveEntries ---- */
-// const predObj = {
-//   js: s => /\.js$/.test(s),
-//   css: s => /\.css$/.test(s),
-//   html: s => /\.html$/.test(s),
-//   img: s => /\.png$/.test(s),
-//   filter: v =>
-//     typeof v === 'string' &&
-//     v.includes('.') &&
-//     !v.includes('*') &&
-//     !/^https?:/.test(v),
-// }
-
 const npmPkgDetails = {
   name: process.env.npm_package_name,
   version: process.env.npm_package_version,
@@ -52,16 +39,10 @@ export default function({
     // include is defaulted to [], so exclude can be used by itself
   },
   publicKey,
-  useReloader = process.env.ROLLUP_WATCH,
-  reloader,
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
-
-  let _useReloader = useReloader && reloader
-  let startReloader = true
-  let firstRun = true
 
   /* -------------- hooks closures -------------- */
   iiafe.include = iiafe.include || []
@@ -248,20 +229,6 @@ export default function({
 
       /* ---------- derive permissions end ---------- */
 
-      // Add reloader script
-      if (_useReloader) {
-        if (startReloader) {
-          await reloader.start((shouldStart) => {
-            startReloader = shouldStart
-          })
-        }
-
-        // TODO: reloader should be wrapped
-        //       in a dynamic import
-        //       to support module features.
-        reloader.createClientFiles.call(this, options, bundle)
-      }
-
       // Emit loaded manifest.json assets and
       // Create asset path updater functions
       const assetPathMapFns = await getAssetPathMapFns.call(
@@ -292,10 +259,6 @@ export default function({
           isAsset: true,
           source: JSON.stringify(manifestBody, null, 2),
         }
-
-        if (_useReloader) {
-          reloader.updateManifest.call(this, options, bundle)
-        }
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
 
@@ -304,25 +267,6 @@ export default function({
         })
 
         this.error(error.message)
-      }
-    },
-
-    writeBundle() {
-      if (_useReloader) {
-        if (!firstRun) {
-          return reloader
-            .reload()
-            .then(() => {
-              console.log('Reload success...')
-            })
-            .catch((error) => {
-              const message = `${error.message} (${error.code})`
-              this.warn(message)
-            })
-        } else {
-          firstRun = false
-          console.log('Dev reloader ready...')
-        }
       }
     },
   }

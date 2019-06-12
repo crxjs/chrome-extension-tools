@@ -6,13 +6,15 @@ import clientCode from './client.code'
 import { PORT } from './CONSTANTS'
 import * as handle from './event-handlers'
 
+const name = 'socket-reloader'
+
 const app = express()
 
 export const http = Server(app)
 export const io = SocketIO(http)
 
 // NEXT: use ip:port instead of localHost:port
-export async function start(cb) {
+export async function startReloader(options, bundle, cb) {
   io.on('connection', handle.connect)
 
   http.listen(PORT, function() {
@@ -26,9 +28,9 @@ export async function start(cb) {
   return io
 }
 
-export const reload = debounce(handle.reload, 200)
+export const reloadClients = debounce(handle.reload, 200)
 
-export const getClientCode = () => clientCode
+export const createClientFiles = () => clientCode
 
 export const updateManifest = (manifest, path) => {
   if (!manifest.background) {
@@ -43,4 +45,12 @@ export const updateManifest = (manifest, path) => {
 
   manifest.description =
     'DEVELOPMENT BUILD with auto-reloader script.'
+}
+
+export const reloader = {
+  name,
+  startReloader,
+  createClientFiles,
+  updateManifest,
+  reloadClients,
 }

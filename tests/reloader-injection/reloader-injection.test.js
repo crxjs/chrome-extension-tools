@@ -1,16 +1,18 @@
 import { rollup } from 'rollup'
 import config from './rollup.config'
 
-import { reloader } from './reloader'
+import { reloader as r } from './reloader'
+
+const reloader = r()
 
 test('calls reloader hooks', async () => {
   const bundle = await rollup(config)
   await bundle.generate(config.output)
 
-  expect(reloader.start).toBeCalled()
+  expect(reloader.startReloader).toBeCalled()
   expect(reloader.createClientFiles).toBeCalled()
   expect(reloader.updateManifest).toBeCalled()
-  expect(reloader.reload).not.toBeCalled()
+  expect(reloader.reloadClients).not.toBeCalled()
 })
 
 test('injects reloader scripts', async () => {
