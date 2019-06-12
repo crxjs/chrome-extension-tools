@@ -14,14 +14,10 @@ const onPush = async (event) => {
   switch (message) {
     case 'client-load': {
       const notifications = await self.registration.getNotifications()
-      console.log('notifications', notifications)
 
-      // TODO: close/create notification
-      // - get sw notifications
-      // - update/create notification w/ load message
-      //   "extension loaded successfully"
+      notifications.forEach((n) => n.close())
 
-      const title = 'extension load success'
+      const title = 'Reload done and waiting...'
 
       await self.registration.showNotification(title)
 
@@ -29,7 +25,7 @@ const onPush = async (event) => {
     }
 
     case 'client-reload': {
-      const title = 'reloading extension'
+      const title = 'Will reload now...'
 
       await self.registration.showNotification(title)
 
@@ -42,6 +38,7 @@ const onPush = async (event) => {
   }
 }
 
+// We're not using this right now.
 const onMessage = async (event) => {
   console.log(event)
 }

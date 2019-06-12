@@ -7,20 +7,16 @@ import { setupMessaging, registerToken } from './config-client'
 const reload = () => chrome.runtime.reload()
 
 const onMessage = async (event) => {
-  console.log('onMessage', event)
-
   const { message } = event.data
 
-  // TODO: handle "client-reload" message
-  // TODO: handle "client-load" message
-
   if (message === 'client-load') {
-    console.log('load', message)
+    console.log('Reloader waiting...')
   } else if (message === 'client-reload') {
-    console.log('reload', message)
-    reload()
+    console.log('Will reload now...')
+
+    setTimeout(reload, 500)
   } else {
-    console.log('unknown message', message)
+    console.log('Reloader received unknown message', message)
   }
 }
 

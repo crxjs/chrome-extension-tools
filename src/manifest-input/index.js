@@ -275,8 +275,6 @@ export default function({
             await reloader.start((shouldStart) => {
               startReloader = shouldStart
             })
-
-            console.log('reloader is running...')
           }
 
           // TODO: reloader should be wrapped
@@ -312,18 +310,21 @@ export default function({
     },
 
     writeBundle() {
-      if (_useReloader && !firstRun) {
-        return reloader
-          .reload()
-          .then(() => {
-            console.log('reload success...')
-          })
-          .catch((error) => {
-            const message = `${error.message} (${error.code})`
-            this.warn(message)
-          })
-      } else {
-        firstRun = false
+      if (_useReloader) {
+        if (!firstRun) {
+          return reloader
+            .reload()
+            .then(() => {
+              console.log('Reload success...')
+            })
+            .catch((error) => {
+              const message = `${error.message} (${error.code})`
+              this.warn(message)
+            })
+        } else {
+          firstRun = false
+          console.log('Dev reloader ready...')
+        }
       }
     },
   }
