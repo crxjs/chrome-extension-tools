@@ -10,7 +10,7 @@ const onMessage = async (event) => {
   const { message } = event.data
 
   if (message === 'client-load') {
-    console.log('Reloader waiting...')
+    console.log('Reloader ready and waiting...')
   } else if (message === 'client-reload') {
     console.log('Will reload now...')
 
@@ -22,6 +22,13 @@ const onMessage = async (event) => {
 
 const onLoad = async ({ messaging }) => {
   const token = await messaging.getToken()
+
+  console.log(
+    `
+DEVELOPMENT build with non-persistent auto-reloader.
+Loaded on ${new Date().toTimeString()}.
+`.trim(),
+  )
 
   return registerToken({ uid: '%UID%', token })
 }

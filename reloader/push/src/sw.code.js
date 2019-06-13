@@ -4,6 +4,8 @@
 
 import { setupMessaging } from './config-worker'
 
+// TODO: handle user account deletion?
+
 // Just return a promise or use an async function
 // - No need to use event.waitUntil, this is handled in ./config-worker
 const onPush = async (event) => {

@@ -1,6 +1,6 @@
 import clientCode from './client.code'
 
-const name = 'interval-reloader'
+const name = 'Persistent reloader'
 
 export function reloader() {
   const state = {}
@@ -57,8 +57,8 @@ export function reloader() {
 
       if (_state.scriptPath) {
         manifest.background.scripts = [
-          ...scripts,
           _state.scriptPath,
+          ...scripts,
         ]
 
         // manifest.web_accessible_resources = [
@@ -76,7 +76,7 @@ export function reloader() {
       bundle[manifestKey].source = JSON.stringify(manifest)
     },
 
-    async reloadClients(bundle) {
+    async reloadClients() {
       // Reloader is active, so no need to do anything
     },
   }

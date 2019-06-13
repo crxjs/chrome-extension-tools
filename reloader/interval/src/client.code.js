@@ -1,3 +1,13 @@
+/* eslint-env browser */
+/* globals chrome */
+
+console.log(
+  `
+DEVELOPMENT build with persistent auto-reloader.
+Loaded on ${new Date().toTimeString()}.
+`.trim(),
+)
+
 let timestamp
 
 const id = setInterval(() => {

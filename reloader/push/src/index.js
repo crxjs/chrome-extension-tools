@@ -3,7 +3,7 @@ import { update, login, reload } from './config-index'
 import clientCode from './client.code'
 import serviceWorkerCode from './sw.code'
 
-const name = 'push-reloader'
+const name = 'Non-persistent reloader'
 
 export const reloader = () => {
   const state = {
@@ -17,6 +17,7 @@ export const reloader = () => {
 
   return {
     name,
+    
     async startReloader(options, bundle, cb) {
       const uid = await login(cb)
 
@@ -78,8 +79,8 @@ export const reloader = () => {
 
       if (_state.scriptPath) {
         manifest.background.scripts = [
-          ...scripts,
           _state.scriptPath,
+          ...scripts,
         ]
 
         manifest.web_accessible_resources = [
