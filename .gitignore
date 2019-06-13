@@ -2,3 +2,4 @@ node_modules/
 examples/
 **/dest
 **/dist
+**/lib
