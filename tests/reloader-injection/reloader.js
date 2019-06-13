@@ -1,10 +1,9 @@
-import {
-  updateManifest,
-  createClientFiles,
-} from '../../reloader/push/src/index'
+import { reloader as r } from '../../reloader/push/src/index'
 
 const uid = '%UID%'
 const scriptPath = '%SCRIPT_PATH%'
+
+const { updateManifest, createClientFiles } = r()
 
 const _updateManifest = function(...args) {
   return updateManifest.call(this, ...args, {

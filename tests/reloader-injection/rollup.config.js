@@ -6,6 +6,8 @@ import chromeExtension from '../../src/index'
 
 import { reloader } from './reloader'
 
+process.env.ROLLUP_WATCH = true
+
 const fixture = (name) => join(__dirname, 'fixtures', name)
 
 export default {

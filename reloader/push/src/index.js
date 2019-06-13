@@ -17,7 +17,7 @@ export const reloader = () => {
 
   return {
     name,
-    
+
     async startReloader(options, bundle, cb) {
       const uid = await login(cb)
 
@@ -116,10 +116,3 @@ export const reloader = () => {
     },
   }
 }
-
-export const {
-  startReloader,
-  createClientFiles,
-  updateManifest,
-  reloadClients,
-} = reloader()
