@@ -4,30 +4,16 @@ import {
   derivePermissions as dp,
 } from '@bumble/manifest'
 import fs from 'fs-extra'
+import isValidPath from 'is-valid-path'
 import MagicString from 'magic-string'
+import memoize from 'mem'
 import path from 'path'
+import pm from 'picomatch'
 import { createFilter } from 'rollup-pluginutils'
 import { getAssetPathMapFns, loadAssetData } from '../helpers'
 import { mapObjectValues } from './mapObjectValues'
-import * as reloader from './reloader/server'
-import pm from 'picomatch'
-import isValidPath from 'is-valid-path'
-import memoize from 'mem'
 
 const name = 'manifest-input'
-
-/* ---- predicate object for deriveEntries ---- */
-// const predObj = {
-//   js: s => /\.js$/.test(s),
-//   css: s => /\.css$/.test(s),
-//   html: s => /\.html$/.test(s),
-//   img: s => /\.png$/.test(s),
-//   filter: v =>
-//     typeof v === 'string' &&
-//     v.includes('.') &&
-//     !v.includes('*') &&
-//     !/^https?:/.test(v),
-// }
 
 const npmPkgDetails = {
   name: process.env.npm_package_name,
@@ -53,15 +39,9 @@ export default function({
     // include is defaulted to [], so exclude can be used by itself
   },
   publicKey,
-  useReloader = process.env.ROLLUP_WATCH,
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
-  }
-
-  if (useReloader) {
-    console.log('starting reloader')
-    reloader.start()
   }
 
   /* -------------- hooks closures -------------- */
@@ -77,10 +57,10 @@ export default function({
 
   const manifestName = 'manifest.json'
 
-  const permissionsFilter = pm(
-    permissions.include || '**/*',
-    permissions.exclude,
-  )
+  // Files to include for permissions derivation
+  const permissionsFilter = pm(permissions.include || '**/*', {
+    ignore: permissions.exclude,
+  })
 
   const assetFilter = pm(assets.include, {
     ignore: assets.exclude,
@@ -125,8 +105,8 @@ export default function({
         {
           assetPaths: assetFilter,
           entryPaths: entryFilter,
-          transform: name => path.join(srcDir, name),
-          filter: v =>
+          transform: (name) => path.join(srcDir, name),
+          filter: (v) =>
             typeof v === 'string' &&
             isValidPath(v) &&
             !/^https?:/.test(v),
@@ -134,13 +114,11 @@ export default function({
       )
 
       // Start async asset loading
-      // CONCERN: relative paths within CSS files will fail
-      // SOLUTION: use postcss to process CSS asset src
       loadedAssets = Promise.all(assetPaths.map(loadAssetData))
 
-      // Render only manifest entry js files
-      // as async iife
-      const js = entryPaths.filter(p => /\.js$/.test(p))
+      // TODO: Use dynamic import wrapper instead of iiafe
+      // Render only manifest entry js files as async iife
+      const js = entryPaths.filter((p) => /\.js$/.test(p))
       iiafeFilter = createFilter(
         iiafe.include.concat(js),
         iiafe.exclude,
@@ -156,7 +134,7 @@ export default function({
     /*              HANDLE WATCH FILES              */
     /* ============================================ */
 
-    buildStart() {
+    async buildStart() {
       this.addWatchFile(manifestPath)
     },
 
@@ -168,15 +146,10 @@ export default function({
     },
 
     /* ============================================ */
-    /*                   TRANSFORM                  */
-    /* ============================================ */
-
-    // transform(code, id) {},
-
-    /* ============================================ */
     /*       MAKE MANIFEST ENTRIES ASYNC IIFE       */
     /* ============================================ */
 
+    // TODO: use dynamic import wrapper instead of iiafe
     renderChunk(
       source,
       { isEntry, facadeModuleId: id, fileName },
@@ -221,6 +194,8 @@ export default function({
     /* ============================================ */
 
     async generateBundle(options, bundle) {
+      /* ---------- derive permisions start --------- */
+
       // Get module ids for all chunks
       const permissions = Array.from(
         Object.values(bundle).reduce(
@@ -252,8 +227,10 @@ export default function({
         cache.permsHash = permsHash
       }
 
-      // Emit loaded assets and
-      // Create asset path updaters
+      /* ---------- derive permissions end ---------- */
+
+      // Emit loaded manifest.json assets and
+      // Create asset path updater functions
       const assetPathMapFns = await getAssetPathMapFns.call(
         this,
         loadedAssets,
@@ -270,32 +247,6 @@ export default function({
           permissions,
         )
 
-        // Add reloader script
-        if (useReloader) {
-          const clientId = this.emitAsset(
-            'reloader-client.js',
-            reloader.client,
-          )
-
-          const clientPath = this.getAssetFileName(clientId)
-
-          if (!manifestBody.background) {
-            manifestBody.background = {}
-          }
-
-          const { scripts = [] } = manifestBody.background
-
-          manifestBody.background.scripts = [
-            ...scripts,
-            clientPath,
-          ]
-
-          manifestBody.background.persistent = true
-
-          manifestBody.description =
-            'DEVELOPMENT BUILD with auto-reloader script.'
-        }
-
         if (publicKey) {
           manifestBody.key = publicKey
         } else {
@@ -311,17 +262,11 @@ export default function({
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
 
-        error.errors.forEach(err => {
+        error.errors.forEach((err) => {
           console.log(err)
         })
 
         this.error(error.message)
-      }
-    },
-
-    writeBundle() {
-      if (useReloader) {
-        reloader.reload()
       }
     },
   }

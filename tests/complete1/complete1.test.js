@@ -81,3 +81,20 @@ test('reloads entries when manifest changes', async () => {
   expect(chunks2.length).toBe(3)
   expect(assets2.length).toBe(4)
 }, 60000)
+
+test.only('derives correct permissions', async () => {
+  const bundle = await rollup(config)
+  const { output } = await bundle.generate(config.output)
+
+  const assets = output.filter(({ isAsset }) => isAsset)
+
+  const manifestAsset = assets.find(({ fileName }) =>
+    fileName.endsWith('manifest.json'),
+  )
+
+  expect(manifestAsset).toBeDefined()
+
+  const manifest = JSON.parse(manifestAsset.source)
+
+  expect(manifest.permissions).toEqual(['contextMenus'])
+})

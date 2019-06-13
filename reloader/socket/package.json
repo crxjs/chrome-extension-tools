@@ -1,0 +1,4 @@
+{
+  "main": "dist/reloader-cjs.js",
+  "module": "dist/reloader-esm.js"
+}

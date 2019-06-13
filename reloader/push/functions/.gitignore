@@ -1,0 +1,9 @@
+## Compiled JavaScript files
+**/*.js
+**/*.js.map
+!tests/*.js
+
+# Typescript v1 declaration files
+typings/
+
+node_modules/

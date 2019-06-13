@@ -63,7 +63,7 @@ export default function htmlInputs() {
       const htmlData = zipArrays(cache.htmlPaths, html$)
 
       // Start async load for html assets
-      // TODO: reload html assets on change
+      // NEXT: reload html assets on change
       htmlAssets = loadHtmlAssets(htmlData)
 
       // Get JS entry file names
@@ -85,7 +85,7 @@ export default function htmlInputs() {
     /* ============================================ */
 
     buildStart() {
-      cache.htmlPaths.forEach(htmlPath => {
+      cache.htmlPaths.forEach((htmlPath) => {
         this.addWatchFile(htmlPath)
       })
     },

@@ -1,1 +1,1 @@
-export default ''
+export default '%stub.code.js%'

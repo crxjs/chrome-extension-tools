@@ -1,29 +1,38 @@
 import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
+import useReloader from './reloader/index'
 
-export default opts => {
+export default (opts) => {
   const manifest = manifestInput(opts)
   const html = htmlInputs(opts)
-  const plugins = [manifest, html]
+  const reloader = useReloader(opts)
+  const plugins = [manifest, html, reloader]
 
   return {
     name: 'chrome-extension',
 
     options(options) {
+      const hook = 'options'
+
       return plugins.reduce(
-        (o, p) => (p.options ? p.options.call(this, o) : o),
+        (opts, plugin) =>
+          plugin[hook] ? plugin[hook].call(this, opts) : opts,
         options,
       )
     },
 
     buildStart(options) {
-      manifest.buildStart.call(this, options)
-      html.buildStart.call(this, options)
+      const hook = 'buildStart'
+
+      manifest[hook].call(this, options)
+      html[hook].call(this, options)
     },
 
     watchChange(id) {
-      manifest.watchChange.call(this, id)
-      html.watchChange.call(this, id)
+      const hook = 'watchChange'
+
+      manifest[hook].call(this, id)
+      html[hook].call(this, id)
     },
 
     renderChunk(...args) {
@@ -33,14 +42,15 @@ export default opts => {
     async generateBundle(...args) {
       const hook = 'generateBundle'
 
-      await Promise.all([
-        manifest[hook].call(this, ...args),
-        html[hook].call(this, ...args),
-      ])
+      await manifest[hook].call(this, ...args)
+      await html[hook].call(this, ...args)
+      await reloader[hook].call(this, ...args)
     },
 
-    writeBundle() {
-      manifest.writeBundle.call(this)
+    async writeBundle(...args) {
+      const hook = 'writeBundle'
+
+      await reloader[hook].call(this, ...args)
     },
   }
 }
