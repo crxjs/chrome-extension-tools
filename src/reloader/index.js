@@ -15,9 +15,9 @@ const loadReloader = (reloader) => {
 }
 
 export default function useReloader({
-  reloader = process.env.ROLLUP_WATCH && 'non-persistent',
+  reloader = 'non-persistent',
 } = {}) {
-  if (!reloader)
+  if (!process.env.ROLLUP_WATCH || !reloader)
     return {
       name: 'no-reloader',
       generateBundle() {},
