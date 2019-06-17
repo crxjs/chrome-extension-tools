@@ -30,10 +30,16 @@ export default function({
   verbose,
   permissions = {},
   assets = {
-    include: ['**/*.png', '**/*.css'],
+    include: [
+      '**/*.png',
+      '**/*.jpg',
+      '**/*.jpeg',
+      '**/*.gif',
+      '**/*.css',
+    ],
   },
   entries = {
-    include: ['**/*'],
+    include: ['**/*.*', '**/*.*'],
   },
   iiafe = {
     // include is defaulted to [], so exclude can be used by itself
