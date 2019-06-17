@@ -1,6 +1,8 @@
 /* eslint-env browser */
 /* globals chrome */
-import { loadMessage } from './loadMessage'
+
+// eslint-disable-next-line quotes
+const loadMessage = `%LOAD_MESSAGE%`
 
 // Log load message to browser dev console
 console.log(loadMessage)
@@ -25,7 +27,20 @@ const id = setInterval(() => {
       }
     })
     .catch((error) => {
-      console.error(error)
       clearInterval(id)
+
+      const errors = localStorage.chromeExtensionReloader || 0
+
+      // Should reload at least once if fetch fails
+      // - if fetch fails, the timestamp file is absent,
+      //   so the extension code will be different
+      if (errors < 5) {
+        localStorage.chromeExtensionReloader = errors + 1
+
+        chrome.runtime.reload()
+      } else {
+        console.log('AUTO-RELOADER ERROR:')
+        console.error(error)
+      }
     })
 }, 1000)
