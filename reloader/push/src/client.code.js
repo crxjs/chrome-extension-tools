@@ -3,6 +3,7 @@
 
 // Firebase manual chunk
 import { setupMessaging, registerToken } from './config-client'
+import { loadMessage } from './loadMessage'
 
 const reload = () => chrome.runtime.reload()
 
@@ -23,12 +24,7 @@ const onMessage = async (event) => {
 const onLoad = async ({ messaging }) => {
   const token = await messaging.getToken()
 
-  console.log(
-    `
-DEVELOPMENT build with non-persistent auto-reloader.
-Loaded on ${new Date().toTimeString()}.
-`.trim(),
-  )
+  console.log(loadMessage)
 
   return registerToken({ uid: '%UID%', token })
 }

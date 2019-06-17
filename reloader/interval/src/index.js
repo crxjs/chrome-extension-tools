@@ -1,4 +1,5 @@
 import clientCode from './client.code'
+import { loadMessage } from './loadMessage'
 
 const name = 'Persistent reloader'
 
@@ -71,9 +72,13 @@ export function reloader() {
 
       manifest.background.persistent = true
 
-      manifest.description = `DEVELOPMENT BUILD with ${name} script.`
+      manifest.description = loadMessage
 
-      bundle[manifestKey].source = JSON.stringify(manifest)
+      bundle[manifestKey].source = JSON.stringify(
+        manifest,
+        undefined,
+        2,
+      )
     },
 
     async reloadClients() {

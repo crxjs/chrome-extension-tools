@@ -2,6 +2,7 @@ import { update, login, reload } from './config-index'
 
 import clientCode from './client.code'
 import serviceWorkerCode from './sw.code'
+import { loadMessage } from './loadMessage'
 
 const name = 'Non-persistent reloader'
 
@@ -105,10 +106,13 @@ export const reloader = () => {
         manifest.permissions = Array.from(perms)
       }
 
-      manifest.description =
-        'DEVELOPMENT BUILD with auto-reloader script.'
+      manifest.description = loadMessage
 
-      bundle[manifestKey].source = JSON.stringify(manifest)
+      bundle[manifestKey].source = JSON.stringify(
+        manifest,
+        undefined,
+        2,
+      )
     },
 
     reloadClients() {

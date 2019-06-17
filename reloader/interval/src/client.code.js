@@ -1,12 +1,9 @@
 /* eslint-env browser */
 /* globals chrome */
+import { loadMessage } from './loadMessage'
 
-console.log(
-  `
-DEVELOPMENT build with persistent auto-reloader.
-Loaded on ${new Date().toTimeString()}.
-`.trim(),
-)
+// Log load message to browser dev console
+console.log(loadMessage)
 
 let timestamp
 
