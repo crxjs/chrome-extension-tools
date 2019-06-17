@@ -1,13 +1,14 @@
 import { update, login, reload } from './config-index'
 
-import clientCode from './client.code'
+import bgClientCode from './client.code'
+import ctClientCode from './ctClient.code'
 import serviceWorkerCode from './sw.code'
 import { loadMessage } from './loadMessage'
 
 const name = 'Non-persistent reloader'
 
 export const reloader = () => {
-  const state = {
+  const _state = {
     // Anonymous UID from Firebase
     // uid: string,
     // Interval ID for updateUid
@@ -22,40 +23,45 @@ export const reloader = () => {
     async startReloader(options, bundle, cb) {
       const uid = await login(cb)
 
-      state.uid = uid
+      _state.uid = uid
 
-      state.interval = setInterval(update, 5 * 60 * 1000)
+      await update()
 
-      return update()
+      _state.interval = setInterval(update, 5 * 60 * 1000)
     },
 
-    createClientFiles(options, bundle, _state = state) {
+    createClientFiles(options, bundle, state = _state) {
       const emit = (name, code) => {
         const id = this.emitAsset(name, code)
 
         return this.getAssetFileName(id)
       }
 
-      if (_state.uid) {
-        _state.swPath = emit('reloader-sw.js', serviceWorkerCode)
+      if (state.uid) {
+        state.swPath = emit('reloader-sw.js', serviceWorkerCode)
 
-        const clientPath = emit(
-          'reloader-client.js',
-          clientCode
-            .replace('%UID%', _state.uid)
-            .replace('%SW_PATH%', _state.swPath),
+        const bgClientPath = emit(
+          'bg-reloader-client.js',
+          bgClientCode
+            .replace('%UID%', state.uid)
+            .replace('%SW_PATH%', state.swPath),
         )
 
-        _state.scriptPath = emit(
-          'reloader-wrapper.js',
-          `import('/${clientPath}')`,
+        state.bgScriptPath = emit(
+          'bg-reloader-wrapper.js',
+          `import('/${bgClientPath}')`,
+        )
+
+        state.ctScriptPath = emit(
+          'ct-reloader-client.js',
+          ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
         )
       } else {
         throw new TypeError('state.uid is undefined')
       }
     },
 
-    updateManifest(options, bundle, _state = state) {
+    updateManifest(options, bundle, state = _state) {
       const manifestKey = 'manifest.json'
       const manifestSource = bundle[manifestKey].source
 
@@ -67,33 +73,45 @@ export const reloader = () => {
 
       const manifest = JSON.parse(manifestSource)
 
+      manifest.description = loadMessage
+
       if (!manifest.background) {
         manifest.background = {}
       }
 
-      const { scripts = [] } = manifest.background
+      if (manifest.background.persistent === undefined) {
+        manifest.background.persistent = false
+      }
+
+      const { scripts: bgScripts = [] } = manifest.background
+
+      if (state.bgScriptPath) {
+        manifest.background.scripts = [
+          state.bgScriptPath,
+          ...bgScripts,
+        ]
+      } else {
+        throw new Error(
+          'Background page reloader script was not emitted',
+        )
+      }
 
       const {
-        web_accessible_resources = [],
+        content_scripts: ctScripts = [],
         permissions = [],
       } = manifest
 
-      if (_state.scriptPath) {
-        manifest.background.scripts = [
-          _state.scriptPath,
-          ...scripts,
-        ]
-
-        manifest.web_accessible_resources = [
-          ...web_accessible_resources,
-          _state.scriptPath,
-        ]
+      if (state.ctScriptPath) {
+        manifest.content_scripts = ctScripts.map(
+          ({ js = [], ...rest }) => ({
+            js: [state.ctScriptPath, ...js],
+            ...rest,
+          }),
+        )
       } else {
-        throw new TypeError('state.scriptPath is undefined')
-      }
-
-      if (manifest.background.persistent === undefined) {
-        manifest.background.persistent = false
+        throw new Error(
+          'Content page reloader script was not emitted',
+        )
       }
 
       if (manifest.permissions) {
@@ -105,8 +123,6 @@ export const reloader = () => {
 
         manifest.permissions = Array.from(perms)
       }
-
-      manifest.description = loadMessage
 
       bundle[manifestKey].source = JSON.stringify(
         manifest,
