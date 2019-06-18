@@ -9,9 +9,8 @@ const fixture = (name) => join(__dirname, 'fixtures', name)
 export default {
   input: fixture('src/manifest.json'),
   manualChunks: {
-    bg: [
-      './tests/web-accessible-resources/fixtures/src/bg-chunk.js',
-    ],
+    bg: [fixture('src/bg-chunk.js')],
+    ct: [fixture('src/ct-chunk.js')],
   },
   output: {
     dir: fixture('dest'),

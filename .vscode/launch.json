@@ -86,9 +86,9 @@
     },
     {
       "type": "node",
-      "name": "test-dynamic-imports",
+      "name": "test-web-acc-res",
       "request": "launch",
-      "args": ["dynamic", "--runInBand"],
+      "args": ["resources", "--runInBand"],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",

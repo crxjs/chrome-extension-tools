@@ -1,13 +1,15 @@
 import { reloader as r } from '../../reloader/push/src/index'
 
 const uid = '%UID%'
-const scriptPath = '%SCRIPT_PATH%'
+const bgScriptPath = '%SCRIPT_PATH%'
+const ctScriptPath = '%SCRIPT_PATH%'
 
 const { updateManifest, createClientFiles } = r()
 
 const _updateManifest = function(...args) {
   return updateManifest.call(this, ...args, {
-    scriptPath,
+    bgScriptPath,
+    ctScriptPath,
   })
 }
 

@@ -125,6 +125,7 @@ export default function({
       // TODO: Use dynamic import wrapper instead of iiafe
       // Render only manifest entry js files as async iife
       const js = entryPaths.filter((p) => /\.js$/.test(p))
+
       iiafeFilter = createFilter(
         iiafe.include.concat(js),
         iiafe.exclude,
@@ -155,7 +156,7 @@ export default function({
     /*       MAKE MANIFEST ENTRIES ASYNC IIFE       */
     /* ============================================ */
 
-    // TODO: use dynamic import wrapper instead of iiafe
+    // FEATURE: use dynamic import wrapper instead of iiafe
     renderChunk(
       source,
       { isEntry, facadeModuleId: id, fileName },
@@ -235,14 +236,14 @@ export default function({
 
       /* ---------- derive permissions end ---------- */
 
-      // Emit loaded manifest.json assets and
-      // Create asset path updater functions
-      const assetPathMapFns = await getAssetPathMapFns.call(
-        this,
-        loadedAssets,
-      )
-
       try {
+        // Emit loaded manifest.json assets and
+        // Create asset path updater functions
+        const assetPathMapFns = await getAssetPathMapFns.call(
+          this,
+          loadedAssets,
+        )
+
         const manifestBody = deriveManifest(
           pkg,
           // Update asset paths and return manifest
@@ -252,6 +253,37 @@ export default function({
           ),
           permissions,
         )
+
+        /* ------ WEB ACCESSIBLE RESOURCES START ------ */
+
+        const {
+          content_scripts: cts = [],
+          web_accessible_resources: war = [],
+        } = manifestBody
+
+        const contentScripts = cts.reduce(
+          (r, { js }) => [...r, ...js],
+          [],
+        )
+
+        if (contentScripts.length) {
+          // make all imports & dynamic imports web_acc_res
+          // FEATURE: make imports for background not web_acc_res?
+          const imports = Object.values(bundle).reduce(
+            (r, { isEntry: e, isAsset: a, fileName: f }) =>
+              !e && !a ? [...r, f] : r,
+            [],
+          )
+
+          // web_accessible_resources can be used for fingerprinting extensions
+          manifestBody.web_accessible_resources = [
+            ...war,
+            ...imports,
+            ...contentScripts,
+          ]
+        }
+
+        /* ------- WEB ACCESSIBLE RESOURCES END ------- */
 
         if (publicKey) {
           manifestBody.key = publicKey
