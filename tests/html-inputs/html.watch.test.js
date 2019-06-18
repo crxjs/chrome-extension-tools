@@ -16,6 +16,7 @@ afterEach(async () => {
   watcher = null
 })
 
+// This test blocks jest from exiting
 test.skip('reloads entries when html file changes', async () => {
   const spy = jest.fn()
 
