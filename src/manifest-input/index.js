@@ -39,7 +39,7 @@ export default function({
     ],
   },
   entries = {
-    include: ['**/*.*', '**/*.*'],
+    include: ['**/*'],
   },
   iiafe = {
     // include is defaulted to [], so exclude can be used by itself
