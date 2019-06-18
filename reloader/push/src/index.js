@@ -91,7 +91,7 @@ export const reloader = () => {
           ...bgScripts,
         ]
       } else {
-        throw new Error(
+        this.warn(
           'Background page reloader script was not emitted',
         )
       }
@@ -109,9 +109,7 @@ export const reloader = () => {
           }),
         )
       } else {
-        throw new Error(
-          'Content page reloader script was not emitted',
-        )
+        this.warn('Content page reloader script was not emitted')
       }
 
       if (manifest.permissions) {
