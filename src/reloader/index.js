@@ -47,6 +47,7 @@ export default function useReloader({
           startReloader = false
         }
 
+        // TODO: combine createClientFiles and updateManifest
         _reloader.createClientFiles.call(this, options, bundle)
         _reloader.updateManifest.call(this, options, bundle)
       }
