@@ -4,8 +4,8 @@ module.exports = {
     '\\.code(\\.js)?': '<rootDir>/tests/stub.code.js',
   },
   modulePathIgnorePatterns: ['fixtures/dest'],
-  projects: ['<rootDir>', '<rootDir>/reloader/push/functions'],
   setupFilesAfterEnv: ['./tests/jest.setup.js'],
+  projects: ['<rootDir>', '<rootDir>/reloader/push/functions'],
   testPathIgnorePatterns: [
     '<rootDir>/reloader/push/functions',
     '<rootDir>/node_modules/',
