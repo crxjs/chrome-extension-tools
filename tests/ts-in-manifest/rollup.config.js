@@ -1,6 +1,7 @@
 /* eslint-env node */
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
+import typescript from 'rollup-plugin-typescript'
 
 import chromeExtension from '../../src/index'
 import pkg from './package.json'
@@ -14,5 +15,11 @@ export default {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: [chromeExtension({ pkg }), resolve(), commonjs()],
+  plugins: [
+    chromeExtension({ pkg }),
+    typescript(),
+    resolve(),
+    commonjs(),
+  ],
+  external: ['@bumble/messages', '@bumble/chrome-rxjs'],
 }

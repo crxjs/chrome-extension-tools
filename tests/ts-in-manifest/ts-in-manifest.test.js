@@ -10,4 +10,5 @@ test('bundles chunks and assets', async () => {
   )
 
   expect(manifest.source).toMatch('background.js')
+  expect(manifest.source).toMatch('content.js')
 }, 7000)

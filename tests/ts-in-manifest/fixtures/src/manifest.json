@@ -1,20 +1,28 @@
 {
-  "name": "Clip64 Base64 Decoder",
-  "short_name": "Clip64",
   "browser_action": {
-    "default_icon": { "16": "images/clip64-icon-16.png" }
+    "default_icon": {
+      "16": "images/icon-on-16.png"
+    }
   },
-
   "background": {
-    "scripts": ["background.ts"],
-    "persistent": false
+    "scripts": ["background.ts"]
   },
+  "permissions": [],
 
   "icons": {
-    "16": "images/clip64-icon-16.png",
-    "48": "images/clip64-icon-48.png",
-    "128": "images/clip64-icon-128.png"
+    "128": "images/icon-on-128.png"
   },
 
-  "permissions": []
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.ts"]
+    }
+  ],
+
+  "web_accessible_resources": [
+    "chunks/*",
+    "assets/*",
+    "*.js.map"
+  ]
 }

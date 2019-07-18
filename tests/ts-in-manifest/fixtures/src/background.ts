@@ -1,21 +1,29 @@
-import { listenTo } from '@bumble/stream'
-import { notifyCopy, clipboard } from '@bumble/clipboard'
+import { contextMenus } from '@bumble/chrome-rxjs'
+import { clipboard, notifyCopy } from '@bumble/clipboard'
+import { messages } from '@bumble/messages'
+import { filter } from 'rxjs/operators'
+// import { log } from '@bumble/rxjs-log'
 
-const id = 'clip-64'
-const title = 'Clip65: Decode to Clipboard'
-const contexts = ['selection']
+const cmid = 'Clip-selector'
+const title = 'Clip-selector'
+const contexts = [
+  'page',
+  'frame',
+  'link',
+  'editable',
+  'image',
+  'video',
+  'audio',
+]
 
-chrome.contextMenus.create({ id, title, contexts })
+chrome.contextMenus.create({ id: cmid, title, contexts })
 
-listenTo(chrome.contextMenus.onClicked)
-  .filter(({ menuItemId }) => menuItemId === id)
-  .map(({ selectionText }) => {
-    const decoded = atob(selectionText)
-    console.log('Decoded:', atob(selectionText))
-    return decoded
-  })
-  .await(clipboard.writeText)
-  .await(notifyCopy)
-  .catch(err => {
-    console.error(err)
-  })
+contextMenus.click$
+  .pipe(filter(([info]) => info.menuItemId === cmid))
+  .subscribe(([, { id }]) =>
+    messages
+      .asyncSend({ greeting: 'get-selector' }, id)
+      .then(({ selector: s }: { selector: string }) => s)
+      .then(clipboard.writeText)
+      .then(notifyCopy),
+  )
