@@ -36,6 +36,16 @@
     },
     {
       "type": "node",
+      "name": "test-ts-in-manifest",
+      "request": "launch",
+      "args": ["ts-in-manifest", "--runInBand"],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+    },
+    {
+      "type": "node",
       "name": "test-clip-selector",
       "request": "launch",
       "args": ["clip-selector", "--runInBand"],

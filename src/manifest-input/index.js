@@ -124,7 +124,7 @@ export default function({
 
       // TODO: Use dynamic import wrapper instead of iiafe
       // Render only manifest entry js files as async iife
-      const js = entryPaths.filter((p) => /\.js$/.test(p))
+      const js = entryPaths.filter((p) => /\.[jt]s$/.test(p))
 
       iiafeFilter = createFilter(
         iiafe.include.concat(js),
@@ -239,18 +239,30 @@ export default function({
       try {
         // Emit loaded manifest.json assets and
         // Create asset path updater functions
+        // Updater fn :: (string) -> string
         const assetPathMapFns = await getAssetPathMapFns.call(
           this,
           loadedAssets,
         )
 
+        const mapTsToJs = (x) => {
+          if (typeof x !== 'string') {
+            return x
+          }
+
+          if (x.endsWith('.ts')) {
+            return x.replace('.ts', '.js')
+          } else {
+            return x
+          }
+        }
+
+        const pathMapFns = [...assetPathMapFns, mapTsToJs]
+
         const manifestBody = deriveManifest(
           pkg,
           // Update asset paths and return manifest
-          assetPathMapFns.reduce(
-            mapObjectValues,
-            cache.manifest,
-          ),
+          pathMapFns.reduce(mapObjectValues, cache.manifest),
           permissions,
         )
 
