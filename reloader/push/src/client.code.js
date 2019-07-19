@@ -21,8 +21,11 @@ const onMessage = async (event) => {
   }
 }
 
-const onLoad = async ({ messaging }) => {
+const onLoad = async ({ messaging, registration }) => {
   const token = await messaging.getToken()
+  const notifications = await registration.getNotifications()
+
+  notifications.forEach((n) => n.close())
 
   console.log(loadMessage)
 
