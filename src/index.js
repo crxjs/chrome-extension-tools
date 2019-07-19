@@ -1,6 +1,6 @@
 import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
-import useReloader from './reloader/index'
+import useReloader from './reloader'
 
 export default (opts) => {
   const manifest = manifestInput(opts)

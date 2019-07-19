@@ -162,12 +162,6 @@ test('registerToken throws if set fail', async () => {
   })
 })
 
-test('registerToken calls pushClientLoad', async () => {
-  await registerToken({ uid, token })
-
-  expect(pushClientLoad).toBeCalled()
-})
-
 test('reloadClient throws if no auth', async () => {
   expect.assertions(3)
 

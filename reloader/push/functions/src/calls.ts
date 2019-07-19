@@ -3,7 +3,7 @@ import {
   CallableContext,
   HttpsError,
 } from 'firebase-functions/lib/providers/https'
-import { pushClientLoad, pushClientReload } from './push'
+import { pushClientReload } from './push'
 import { cleanUpUsers, setUserTime } from './users'
 
 admin.initializeApp()
@@ -58,8 +58,6 @@ export const registerToken = async ({ uid, token }: any) => {
       'could not store client token',
     )
   }
-
-  return pushClientLoad(token)
 }
 
 export const reloadClient = async (

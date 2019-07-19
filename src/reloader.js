@@ -1,3 +1,4 @@
+// Reloader paths are relative to the dist folder
 const loadReloader = (reloader) => {
   if (typeof reloader === 'function') {
     return reloader()
@@ -55,22 +56,23 @@ export default function useReloader({
     },
 
     writeBundle(bundle) {
-      if (_reloader) {
-        if (!firstRun) {
-          return _reloader.reloadClients
-            .call(this, bundle)
-            .then(() => {
-              console.log('Reload success...')
-            })
-            .catch((error) => {
-              const message = `${error.message} (${error.code})`
-              this.warn(message)
-            })
-        } else {
-          firstRun = false
-          console.log(_reloader.name, 'ready...')
-        }
+      if (!_reloader) return
+
+      if (firstRun) {
+        firstRun = false
+        console.log(_reloader.name, 'ready...')
+        return
       }
+
+      return _reloader.reloadClients
+        .call(this, bundle)
+        .then(() => {
+          console.log('Reload success...')
+        })
+        .catch((error) => {
+          const message = `${error.message} (${error.code})`
+          this.warn(message)
+        })
     },
   }
 }

@@ -26,7 +26,6 @@ const onLoad = async ({ messaging }) => {
 
   console.log(loadMessage)
 
-  // TODO: should fetch uid from file?
   return registerToken({ uid: '%UID%', token })
 }
 
