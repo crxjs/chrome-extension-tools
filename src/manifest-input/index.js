@@ -265,6 +265,7 @@ export default function({
           mapObjectValues,
           cache.manifest,
         )
+
         const manifestBody = deriveManifest(
           pkg,
           updatedManifest,
