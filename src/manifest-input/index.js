@@ -66,6 +66,10 @@ export default function({
   if (typeof dynamicImportWrapper === 'object') {
     const {
       eventDelay = false,
+      // FEATURE: add static code analysis for wake events
+      //  - Use code comments?
+      //  - This will be slower...
+      // WAKE_EVENT: chrome.runtime.onMessage
       wakeEvents = [],
     } = dynamicImportWrapper
 
