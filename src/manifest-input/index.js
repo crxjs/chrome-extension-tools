@@ -260,10 +260,14 @@ export default function({
 
         const pathMapFns = [...assetPathMapFns, mapTsToJs]
 
+        // Update asset paths
+        const updatedManifest = pathMapFns.reduce(
+          mapObjectValues,
+          cache.manifest,
+        )
         const manifestBody = deriveManifest(
           pkg,
-          // Update asset paths and return manifest
-          pathMapFns.reduce(mapObjectValues, cache.manifest),
+          updatedManifest,
           permissions,
         )
 
