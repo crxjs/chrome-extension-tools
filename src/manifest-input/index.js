@@ -5,11 +5,9 @@ import {
 } from '@bumble/manifest'
 import fs from 'fs-extra'
 import isValidPath from 'is-valid-path'
-import MagicString from 'magic-string'
 import memoize from 'mem'
 import path from 'path'
 import pm from 'picomatch'
-import { createFilter } from 'rollup-pluginutils'
 import { getAssetPathMapFns, loadAssetData } from '../helpers'
 import { mapObjectValues } from './mapObjectValues'
 
@@ -27,7 +25,7 @@ const npmPkgDetails = {
 
 export default function({
   pkg,
-  verbose,
+  verbose = true,
   permissions = {},
   assets = {
     include: [
@@ -41,18 +39,14 @@ export default function({
   entries = {
     include: ['**/*.js', '**/*.html', '**/*.ts'],
   },
-  iiafe = {
-    // include is defaulted to [], so exclude can be used by itself
-  },
   publicKey,
+  dynamicImportWrapper = {},
 } = {}) {
   if (!pkg) {
     pkg = npmPkgDetails
   }
 
-  /* -------------- hooks closures -------------- */
-  iiafe.include = iiafe.include || []
-  let iiafeFilter
+  /* ----------- HOOKS CLOSURES START ----------- */
 
   let loadedAssets
   let srcDir
@@ -62,6 +56,61 @@ export default function({
   const cache = {}
 
   const manifestName = 'manifest.json'
+
+  /* ------------ HOOKS CLOSURES END ------------ */
+
+  /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
+
+  let loaderScript
+
+  if (typeof dynamicImportWrapper === 'object') {
+    const {
+      eventDelay = false,
+      wakeEvents = [],
+    } = dynamicImportWrapper
+
+    const replaceDelay = (match, tag) => {
+      if (typeof eventDelay === 'number') {
+        return match.replace(tag, eventDelay)
+      } else if (eventDelay === false) {
+        return ''
+      } else {
+        throw new TypeError(
+          'dynamicImportEventDelay must be false or a number',
+        )
+      }
+    }
+
+    const replaceSwitchCase = (index) => {
+      const events = wakeEvents.map((e) => e.split('.')[index])
+
+      return (match, tag) => {
+        return events.length
+          ? events.map((e) => match.replace(tag, e)).join('')
+          : ''
+      }
+    }
+
+    loaderScript = fs
+      .readFileSync(
+        path.join(__dirname, 'dynamicImportWrapper.js'),
+        'utf-8',
+      )
+      .replace(
+        /[\n\s]+.then\(delay\(('%DELAY%')\)\)([\n\s]+)/,
+        replaceDelay,
+      )
+      .replace(
+        /[\n\s]+case '(%NAME%)':[\n\s]+return true/,
+        replaceSwitchCase(1),
+      )
+      .replace(
+        /[\n\s]+case '(%EVENT%)':[\n\s]+return true/,
+        replaceSwitchCase(2),
+      )
+  }
+
+  /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
   // Files to include for permissions derivation
   const permissionsFilter = pm(permissions.include || '**/*', {
@@ -122,15 +171,6 @@ export default function({
       // Start async asset loading
       loadedAssets = Promise.all(assetPaths.map(loadAssetData))
 
-      // TODO: Use dynamic import wrapper instead of iiafe
-      // Render only manifest entry js files as async iife
-      const js = entryPaths.filter((p) => /\.[jt]s$/.test(p))
-
-      iiafeFilter = createFilter(
-        iiafe.include.concat(js),
-        iiafe.exclude,
-      )
-
       // Cache derived inputs
       cache.input = entryPaths
 
@@ -141,7 +181,7 @@ export default function({
     /*              HANDLE WATCH FILES              */
     /* ============================================ */
 
-    async buildStart() {
+    buildStart() {
       this.addWatchFile(manifestPath)
     },
 
@@ -153,55 +193,11 @@ export default function({
     },
 
     /* ============================================ */
-    /*       MAKE MANIFEST ENTRIES ASYNC IIFE       */
-    /* ============================================ */
-
-    // FEATURE: use dynamic import wrapper instead of iiafe
-    renderChunk(
-      source,
-      { isEntry, facadeModuleId: id, fileName },
-      { sourcemap },
-    ) {
-      if (!isEntry || !iiafeFilter(id)) return null
-
-      // turn es imports to dynamic imports
-      const code = source.replace(
-        /^import (.+) from ('.+?');$/gm,
-        (line, $1, $2) => {
-          const asg = $1.replace(
-            /(?<=\{.+)( as )(?=.+?\})/g,
-            ': ',
-          )
-          return `const ${asg} = await import(${$2});`
-        },
-      )
-
-      const magic = new MagicString(code)
-
-      // Async IIFE-fy
-      magic
-        .indent('  ')
-        .prepend('(async () => {\n')
-        .append('\n})();\n')
-
-      // Generate sourcemaps
-      return sourcemap
-        ? {
-            code: magic.toString(),
-            map: magic.generateMap({
-              source: fileName,
-              hires: true,
-            }),
-          }
-        : { code: magic.toString() }
-    },
-
-    /* ============================================ */
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
     async generateBundle(options, bundle) {
-      /* ---------- derive permisions start --------- */
+      /* ---------- DERIVE PERMISIONS START --------- */
 
       // Get module ids for all chunks
       const permissions = Array.from(
@@ -234,7 +230,7 @@ export default function({
         cache.permsHash = permsHash
       }
 
-      /* ---------- derive permissions end ---------- */
+      /* ---------- DERIVE PERMISSIONS END ---------- */
 
       try {
         // Emit loaded manifest.json assets and
@@ -245,6 +241,7 @@ export default function({
           loadedAssets,
         )
 
+        // Support ts in manifest
         const mapTsToJs = (x) => {
           if (typeof x !== 'string') {
             return x
@@ -266,12 +263,13 @@ export default function({
           permissions,
         )
 
-        /* ------ WEB ACCESSIBLE RESOURCES START ------ */
-
         const {
           content_scripts: cts = [],
           web_accessible_resources: war = [],
+          background: { scripts: backgroundScripts = [] } = {},
         } = manifestBody
+
+        /* ------ WEB ACCESSIBLE RESOURCES START ------ */
 
         const contentScripts = cts.reduce(
           (r, { js }) => [...r, ...js],
@@ -297,11 +295,45 @@ export default function({
 
         /* ------- WEB ACCESSIBLE RESOURCES END ------- */
 
+        /* ---- SCRIPT DYNAMIC IMPORT WRAPPER BEGIN --- */
+
+        if (dynamicImportWrapper) {
+          const emitDynamicImportWrapper = (scriptPath) => {
+            const assetId = this.emitAsset(
+              scriptPath,
+              loaderScript.replace('%PATH%', `../${scriptPath}`),
+            )
+
+            return this.getAssetFileName(assetId)
+          }
+
+          // Emit background script wrappers
+          if (backgroundScripts.length) {
+            manifestBody.background.scripts = backgroundScripts.map(
+              emitDynamicImportWrapper,
+            )
+          }
+
+          // Emit content script wrappers
+          manifestBody.content_scripts = cts.map(
+            ({ js, ...rest }) => ({
+              js: js.map(emitDynamicImportWrapper),
+              ...rest,
+            }),
+          )
+        }
+
+        /* ----- SCRIPT DYNAMIC IMPORT WRAPPER END ---- */
+
+        /* --------- STABLE EXTENSION ID BEGIN -------- */
+
         if (publicKey) {
           manifestBody.key = publicKey
         } else {
           delete manifestBody.key
         }
+
+        /* ---------- STABLE EXTENSION ID END --------- */
 
         // Mutate bundle to emit custom asset
         bundle[manifestName] = {

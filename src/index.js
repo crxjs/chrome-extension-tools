@@ -35,10 +35,6 @@ export default (opts) => {
       html[hook].call(this, id)
     },
 
-    renderChunk(...args) {
-      return manifest.renderChunk.call(this, ...args)
-    },
-
     async generateBundle(...args) {
       const hook = 'generateBundle'
 

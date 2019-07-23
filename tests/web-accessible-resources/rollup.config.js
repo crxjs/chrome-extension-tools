@@ -25,6 +25,7 @@ export default {
         include: ['**/*'],
         exclude: ['**/background.js'],
       },
+      verbose: false,
     }),
   ],
 }

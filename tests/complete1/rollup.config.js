@@ -21,6 +21,7 @@ export default {
       // permissions: {
       //   include: ['**/src/**/*', '**/@bumble/**/*'],
       // },
+      verbose: false,
     }),
   ],
 }

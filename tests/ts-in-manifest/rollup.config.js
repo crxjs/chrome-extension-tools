@@ -16,7 +16,7 @@ export default {
     format: 'esm',
   },
   plugins: [
-    chromeExtension({ pkg }),
+    chromeExtension({ pkg, verbose: false }),
     typescript(),
     resolve(),
     commonjs(),

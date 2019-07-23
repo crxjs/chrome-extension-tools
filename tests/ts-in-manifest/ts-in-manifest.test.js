@@ -9,6 +9,7 @@ test('bundles chunks and assets', async () => {
     fileName.endsWith('manifest.json'),
   )
 
-  expect(manifest.source).toMatch('background.js')
+  expect(manifest).toBeDefined()
+  expect(manifest.source).toMatch(/assets\/background-.+?\.js/)
   expect(manifest.source).toMatch('content.js')
-}, 7000)
+}, 15000)

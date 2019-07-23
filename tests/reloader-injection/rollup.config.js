@@ -27,6 +27,7 @@ export default {
       },
       // Add reloader
       reloader,
+      verbose: false,
     }),
   ],
 }

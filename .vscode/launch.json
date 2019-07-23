@@ -66,16 +66,6 @@
     },
     {
       "type": "node",
-      "name": "test-async-iife",
-      "request": "launch",
-      "args": ["async-iife", "--runInBand"],
-      "cwd": "${workspaceFolder}",
-      "console": "internalConsole",
-      "internalConsoleOptions": "openOnSessionStart",
-      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-    },
-    {
-      "type": "node",
       "name": "test-complete",
       "request": "launch",
       "args": ["complete", "--runInBand"],

@@ -1,5 +1,5 @@
 {
-  "name": "clip-64",
+  "name": "ts-in-manifest",
   "version": "0.5.1",
   "description": "Decode Base64 to the clipboard.",
   "license": "MIT",

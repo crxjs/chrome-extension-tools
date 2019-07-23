@@ -103,4 +103,13 @@ export default [
     ],
     plugins,
   },
+  {
+    input: 'src/manifest-input/dynamicImportWrapper.js',
+    output: {
+      file: 'dist/dynamicImportWrapper.js',
+      format: 'iife',
+    },
+    external: ['%PATH%'],
+    treeshake: false,
+  },
 ]

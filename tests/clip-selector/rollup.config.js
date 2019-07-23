@@ -15,5 +15,9 @@ export default {
     format: 'esm',
     sourcemap: true,
   },
-  plugins: [chromeExtension(), resolve(), commonjs()],
+  plugins: [
+    chromeExtension({ verbose: false }),
+    resolve(),
+    commonjs(),
+  ],
 }

@@ -18,7 +18,7 @@
     "build": "rollup -c",
     "start": "rollup -c -w",
     "test": "jest",
-    "preversion": "npm test && npm run build",
+    "preversion": "jest --runInBand && npm run build",
     "postversion": "git push && npm publish"
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "@bumble/clipboard": "^0.2.2",
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
+    "@types/fs-extra": "^8.0.0",
     "@types/jest": "^24.0.15",
     "chrome-promise": "^3.0.5",
     "eslint": "5.15.1",

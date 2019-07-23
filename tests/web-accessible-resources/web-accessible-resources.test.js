@@ -20,17 +20,11 @@ test('adds content script dynamic imports to web_accessible_resources', async ()
 
   expect(contentScripts.length).toBe(1)
 
-  const contentScriptNames = contentScripts.reduce(
-    (r, { js }) => r.concat(js),
-    [],
-  )
-
-  expect(contentScriptNames.length).toBe(1)
-
   const contentScript = output.find(({ fileName }) =>
-    contentScriptNames.includes(fileName),
+    fileName.endsWith('content.js'),
   )
 
+  expect(contentScript).toBeDefined()
   expect(contentScript.name).toBe('content')
   expect(contentScript.code).toMatch(
     /web-accessible-resources\/\${content}\.js/,
@@ -67,17 +61,11 @@ test('adds content script imports to web_accessible_resources', async () => {
 
   expect(contentScripts.length).toBe(1)
 
-  const contentScriptNames = contentScripts.reduce(
-    (r, { js }) => r.concat(js),
-    [],
-  )
-
-  expect(contentScriptNames.length).toBe(1)
-
   const contentScript = output.find(({ fileName }) =>
-    contentScriptNames.includes(fileName),
+    fileName.endsWith('content.js'),
   )
 
+  expect(contentScript).toBeDefined()
   expect(contentScript.name).toBe('content')
   expect(contentScript.code).toMatch(
     /`web-accessible-resources\/\${content}\.js`/,
