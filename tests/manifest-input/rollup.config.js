@@ -2,11 +2,11 @@
 
 import { join } from 'path'
 import pkg from './package.json'
-import emptyOutputDir from '../../src/empty-output-dir/index'
+import emptyDir from 'rollup-plugin-empty-dir'
 import htmlInputs from '../../src/html-inputs/index'
 import manifestInput from '../../src/manifest-input/index'
 
-const fixture = name =>
+const fixture = (name) =>
   join('tests/manifest-input/fixtures/', name)
 
 export default {
@@ -15,5 +15,5 @@ export default {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: [manifestInput({ pkg }), htmlInputs(), emptyOutputDir()],
+  plugins: [manifestInput({ pkg }), htmlInputs(), emptyDir()],
 }
