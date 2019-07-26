@@ -1,7 +1,7 @@
 {
   "name": "rollup-plugin-chrome-extension",
   "version": "0.18.0",
-  "description": "Build Chrome Extensions with this composed Rollup plugin.",
+  "description": "Build Chrome Extensions with this Rollup plugin.",
   "repository": "bumble-org/rollup-plugin-chrome-extension",
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
@@ -14,6 +14,7 @@
   ],
   "main": "dist/chrome-extension-cjs.js",
   "module": "dist/chrome-extension-esm.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "start": "rollup -c -w",
