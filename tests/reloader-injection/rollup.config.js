@@ -2,7 +2,7 @@
 
 import { join } from 'path'
 import pkg from './package.json'
-import chromeExtension from '../../src/index'
+import { chromeExtension } from '../../src/index'
 
 import { reloader } from './reloader'
 
