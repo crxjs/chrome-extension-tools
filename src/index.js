@@ -2,7 +2,7 @@ import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
 import useReloader from './reloader'
 
-export default (opts) => {
+export const chromeExtension =  (opts) => {
   const manifest = manifestInput(opts)
   const html = htmlInputs(opts)
   const reloader = useReloader(opts)
