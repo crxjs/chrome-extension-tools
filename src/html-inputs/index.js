@@ -101,8 +101,8 @@ export default function htmlInputs() {
     /* ============================================ */
 
     async generateBundle(options, bundle) {
-      // CONCERN: relative paths within CSS files will fail
-      // SOLUTION: use postcss to process CSS asset src
+      // FIXME: relative paths within CSS files will fail
+      // NEXT: use postcss to process CSS asset src
       await Promise.all(
         (await htmlAssets).map(
           async ([htmlPath, $, { js, img, css }]) => {
