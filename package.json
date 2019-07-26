@@ -10,7 +10,8 @@
     "reloader/push/package.json",
     "reloader/push/dist",
     "reloader/socket/package.json",
-    "reloader/socket/dist"
+    "reloader/socket/dist",
+    "index.d.ts"
   ],
   "main": "dist/chrome-extension-cjs.js",
   "module": "dist/chrome-extension-esm.js",

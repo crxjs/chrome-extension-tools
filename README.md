@@ -52,14 +52,18 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or 
 ### Installation
 
 ```sh
-$ npm i rollup-plugin-chrome-extension -D
+$ npm i rollup rollup-plugin-chrome-extension -D
+```
+
+Install Node Resolve and CommonJS if you plan to use npm modules.
+
+```sh
+$ npm i rollup rollup-plugin-chrome-extension -D
 ```
 
 ## Usage <a name = "usage"></a>
 
-```sh
-$ npm i rollup rollup-plugin-node-resolve rollup-plugin-commonjs rollup-plugin-chrome-extension -D
-```
+Create a `rollup.config.js` file in your project root.
 
 ```javascript
 // rollup.config.json
@@ -80,6 +84,8 @@ export default {
 }
 ```
 
+Add these scripts to your `project.json` file.
+
 ```json
 // package.json
 {
@@ -89,6 +95,16 @@ export default {
   }
 }
 ```
+
+Put your Chrome extension source code in a folder named `src` in the root of your project and build with the following command:
+
+```sh
+$ npm run build
+```
+
+Your extension build will be in the `dist` folder. It has everything it needs: manifest, scripts, and assets (images, css, etc...).
+
+Install it in Chrome to test drive your extension! 🚗
 
 ## Features <a name = "features"></a>
 
