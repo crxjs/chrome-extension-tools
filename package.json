@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-chrome-extension",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Build Chrome Extensions with this Rollup plugin.",
   "repository": "bumble-org/rollup-plugin-chrome-extension",
   "license": "MIT",
