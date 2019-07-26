@@ -12,8 +12,7 @@ https://imgur.com/wEXnCYK.png
 
 <h3 align="center">rollup-plugin-chrome-extension</h3>
 
-<div style="text-align:center">
-<div style="display: inline-block">
+<div align="center">
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/rollup-plugin-chrome-extension.svg)](https://github.com/bumble-org/rollup-plugin-chrome-extension)
@@ -22,12 +21,11 @@ https://imgur.com/wEXnCYK.png
 
 </div>
 
-<div style="display: inline-block">
+<div align="center">
 
 [![Fiverr: We make Chrome extensions](https://img.shields.io/badge/Fiverr%20-We%20make%20Chrome%20extensions-brightgreen.svg)](https://www.fiverr.com/jacksteam)
 [![ko-fi](https://img.shields.io/badge/ko--fi-Buy%20me%20a%20coffee-ff5d5b)](https://ko-fi.com/K3K1QNTF)
 
-</div>
 </div>
 
 ---
@@ -44,6 +42,7 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or 
 - [Usage](#usage)
 - [Features](#features)
 - [Options API](#options)
+- [Automatic Reloader](#reloaders)
 
 ## Getting started <a name = "getting_started"></a>
 
@@ -106,27 +105,60 @@ Install it in Chrome to test drive your extension! 🚗
 
 ## Features <a name = "features"></a>
 
-### Derive Permissions Automatically <a name = "features-permissions"></a>
+### Worry Less About Your Manifest <a name = "features-manifest"></a>
 
-`rollup-plugin-chrome-extension` statically analyzes your bundled code to detect required permissions to declare in the manifest. Any permissions in the source manifest are always included. If a permission is added [that you don't want](#options-permissions), just add it to the source manifest and prefix it with `!` (for example, `"!alarms"`). We'll leave it out.
+`rollup-plugin-chrome-extension` validates your output manifest, so you discover mistakes when you build, not in a cryptic Chrome alert later.
+
+You can omit `manifest_version`, `version`, `name`, and `description` from your source `manifest.json`. We'll fill them out automatically from your `package.json`, if you use an npm script to run Rollup. Just manage your version number in `package.json` and it will reflect in your extension build.
+
+Don't worry, any value in your source manifest will override that value from `package.json`! 😉
 
 ### Reload Your Extension Automatically <a name = "features-reloader"></a>
 
-When Rollup is in watch mode, `rollup-plugin-chrome-extension` bundles an automatic reloader into your extension. This feature will reload your extension when Rollup produces a new build. You can view the [options here](#options-reloader), or read more about the [reloaders here](#reloaders). The only time you may need to manually reload is when you first start a watch session.
+Reloading your Chrome extension every time you change your code can be a pain, and if you forget to reload, you're left wondering, "Why isn't this working?"
 
-### Worry Less About Your Manifest <a name = ""></a>
+<!-- ![Patton Oswalt](https://media.giphy.com/media/oirLISmToyoeI/giphy.gif) -->
 
-You can omit `manifest_version`, `version`, `name`, and `description` from your source `manifest.json`. We'll fill them out automatically from your `package.json`, if you use an npm script to run Rollup.
+When Rollup is in watch mode, `rollup-plugin-chrome-extension` bundles an automatic reloader into your extension. This feature will reload your extension every time Rollup produces a new build. You can view the [options here](#options-reloader), or read more about the [reloaders here](#reloaders). The only time you may need to manually reload is when you first start a watch session.
 
-Don't worry, any value in your manifest will override that value from `package.json`! 😉
+Ever got the error `"Extension context invalidated"` in your content script? That happens when the extension reloads but the content script doesn't. Our reloader makes sure that doesn't happen by reloading your content scripts when it reloads your extension.
+
+### Write Chrome Extensions In TypeScript <a name = "typescript"></a>
+
+If you use [`rollup-plugin-typescript2`](https://www.npmjs.com/package/rollup-plugin-typescript2) in your plugins, you can write your Chrome extension in TypeScript. That's right, the scripts in your manifest and in your HTML script tags.
+
+TypeScript definitions are included, so no need to install an additional `@types` library!
+
+### Manage Your Assets With Ease <a name = "features-assets"></a>
+
+Your `manifest.json` doesn't only contain script files. There are images, icons, and even CSS files. We've got you covered. These assets are automatically copied into the output folder. Even the images in your HTML files get copied over.
+
+### Bundle Everything In Your HTML Files <a name = "features-html"></a>
+
+What about your Options and Popup pages? `rollup-plugin-chrome-extension` uses the JS or even TS files in your HTML files as entry points. Shared code is split out into chunks automatically, so libraries like React and Lodash aren't bundled into your extension multiple times.
+
+### Derive Permissions Automatically <a name = "features-permissions"></a>
+
+`rollup-plugin-chrome-extension` statically analyzes your bundled code to detect required permissions to declare in the manifest. Any permissions in the source manifest are always included. If a permission is somehow added [that you don't want](#options-permissions), just add it to the source manifest and prefix it with `!` (for example, `"!alarms"`). We'll leave it out.
 
 ### Use ES2015 Modules In Your Scripts <a name = "features-modules"></a>
 
 Chrome extensions don't support modules in background and content scripts. We've developed a [module loader](#dynamic-import-wrapper) specifically for Chrome extension scripts, so you can take advantage of Rollup's great code splitting features.
 
-### TypeScript Definitions <a name = "typescript"></a>
+### Plugins Take It Next Level <a name = ""></a>
 
-TypeScript definitions are included, so no need to install an additional `@types` library!
+Take advantage of other great Rollup plugins to do awesome things with your Chrome extensions!
+
+Some of our favorites are:
+
+- Write your extension in TS with [`rollup-plugin-typescript2`](https://www.npmjs.com/package/rollup-plugin-typescript2)
+- Import CSS in JS files with [`rollup-plugin-postcss`](https://www.npmjs.com/package/rollup-plugin-postcss)
+- Zip your extension when you build with [`rollup-plugin-zip`](https://www.npmjs.com/package/rollup-plugin-zip).
+
+Two of our own plugins that we're pretty proud of are:
+
+- Import a module as a string of code to use in `chrome.runtime.executeScript` with [`rollup-plugin-bundle-imports`](https://www.npmjs.com/package/rollup-plugin-bundle-imports#usage-script)
+- Empty your output folder before a new build with [`rollup-plugin-empty-dir`](https://www.npmjs.com/package/rollup-plugin-empty-dir)
 
 ## Options API <a name = "options"></a>
 
