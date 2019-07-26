@@ -70,7 +70,10 @@ export default function({
       //  - Use code comments?
       //  - This will be slower...
       // WAKE_EVENT: chrome.runtime.onMessage
-      wakeEvents = [],
+      wakeEvents = [
+        'chrome.runtime.onInstalled',
+        'chrome.runtime.onMessage',
+      ],
     } = dynamicImportWrapper
 
     const replaceDelay = (match, tag) => {
