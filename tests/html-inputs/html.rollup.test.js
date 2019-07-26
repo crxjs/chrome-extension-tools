@@ -5,6 +5,7 @@ import basic from './fixtures/basic/rollup.config'
 import withAssets from './fixtures/with-assets/rollup.config'
 import withImage from './fixtures/with-image/rollup.config'
 import withStyles from './fixtures/with-styles/rollup.config'
+import withTypeScript from './fixtures/with-ts/rollup.config'
 
 afterEach(() => {
   sinon.restore()
@@ -55,4 +56,15 @@ test('withStyles', async () => {
 
   expect(chunks.length).toBe(3)
   expect(assets.length).toBe(2)
+})
+
+test('withTypeScript', async () => {
+  const bundle = await rollup(withTypeScript)
+  const { output } = await bundle.generate(withAssets.output)
+
+  const chunks = output.filter(({ isAsset }) => !isAsset)
+  const assets = output.filter(({ isAsset }) => isAsset)
+
+  expect(chunks.length).toBe(2)
+  expect(assets.length).toBe(4)
 })

@@ -31,6 +31,13 @@ export const mutateJsEntries = ($) => {
     .map((elem) => $(elem))
     .forEach((e) => {
       e.attr('type', 'module')
+      // TODO: support ts files here
+      // TODO: add test for ts in html
+      const src = e.attr('src')
+
+      if (src.endsWith('.ts')) {
+        e.attr('src', src.replace(/\.ts/, '.js'))
+      }
     })
 
   return $

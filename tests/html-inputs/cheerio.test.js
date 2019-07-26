@@ -29,3 +29,6 @@ test('loadHtml', () => {
   assert(loadStub.calledOnce)
   assert(loadStub.calledWith(contents))
 })
+
+test.todo('mutate js entries')
+test.todo('mutate ts entries')

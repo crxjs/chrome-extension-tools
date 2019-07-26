@@ -21,7 +21,7 @@ const loadHtml = async (name) => {
   return [htmlPath, cheerio.load(html)]
 }
 
-test.only('getJsEntries', async () => {
+test('getJsEntries', async () => {
   const name = 'basic'
   const param = await loadHtml(name)
 
@@ -32,6 +32,20 @@ test.only('getJsEntries', async () => {
 
   assert(jsEntries.some((s) => s.endsWith('popup.js')))
   assert(jsEntries.every((s) => s.endsWith('.js')))
+  assert(jsEntries.every((s) => !s.endsWith('.html')))
+})
+
+test('getTsEntries', async () => {
+  const name = 'with-ts'
+  const param = await loadHtml(name)
+
+  const jsEntries = getJsEntries(param)
+
+  expect(jsEntries).toBeInstanceOf(Array)
+  expect(jsEntries.length).toBe(1)
+
+  assert(jsEntries.some((s) => s.endsWith('popup.ts')))
+  assert(jsEntries.every((s) => s.endsWith('.ts')))
   assert(jsEntries.every((s) => !s.endsWith('.html')))
 })
 
