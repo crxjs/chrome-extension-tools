@@ -15,7 +15,7 @@ https://imgur.com/wEXnCYK.png
 <p align="center">
 <div align="center">
 
-[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/${}/rollup-plugin-chrome-extension)
+[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/rollup-plugin-chrome-extension.svg)](https://github.com/bumble-org/rollup-plugin-chrome-extension)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
@@ -49,10 +49,6 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or 
 
 ## Getting started <a name = "getting_started"></a>
 
-You will need to use a bundler like [Rollup](https://rollupjs.org/guide/en/) or Webpack to include this library in the build of Chrome extension.
-
-See [`rollup-plugin-chrome-extension`](https://github.com/@bumble/rollup-plugin-chrome-extension) for an easy way use Rollup to build your Chrome extension!
-
 ### Installation
 
 ```sh
@@ -61,7 +57,12 @@ $ npm i rollup-plugin-chrome-extension -D
 
 ## Usage <a name = "usage"></a>
 
+```sh
+$ npm i rollup rollup-plugin-node-resolve rollup-plugin-commonjs rollup-plugin-chrome-extension -D
+```
+
 ```javascript
+// rollup.config.json
 import { rollup } from 'rollup'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
@@ -76,6 +77,16 @@ export default {
   },
   // always put chromeExtension() before other plugins
   plugins: [chromeExtension(), resolve(), commonjs()],
+}
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
+  }
 }
 ```
 
