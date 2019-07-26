@@ -12,8 +12,7 @@ https://imgur.com/wEXnCYK.png
 
 <h3 align="center">rollup-plugin-chrome-extension</h3>
 
-<p align="center">
-<div align="center">
+<div style="text-align:center">
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/rollup-plugin-chrome-extension.svg)](https://github.com/bumble-org/rollup-plugin-chrome-extension)
@@ -21,16 +20,13 @@ https://imgur.com/wEXnCYK.png
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
 </div>
-</p>
 
-<p align="center">
-<div align="center">
+<div style="text-align:center">
 
 [![Fiverr: We make Chrome extensions](https://img.shields.io/badge/Fiverr%20-We%20make%20Chrome%20extensions-brightgreen.svg)](https://www.fiverr.com/jacksteam)
 [![ko-fi](https://img.shields.io/badge/ko--fi-Buy%20me%20a%20coffee-ff5d5b)](https://ko-fi.com/K3K1QNTF)
 
 </div>
-</p>
 
 ---
 
