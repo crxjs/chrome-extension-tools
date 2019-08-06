@@ -11,6 +11,8 @@
     "reloader/push/dist",
     "reloader/socket/package.json",
     "reloader/socket/dist",
+    "reloader/interval/package.json",
+    "reloader/interval/dist",
     "index.d.ts"
   ],
   "main": "dist/chrome-extension-cjs.js",

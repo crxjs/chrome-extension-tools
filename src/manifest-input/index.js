@@ -327,12 +327,14 @@ export default function({
           }
 
           // Emit content script wrappers
-          manifestBody.content_scripts = cts.map(
-            ({ js, ...rest }) => ({
-              js: js.map(emitDynamicImportWrapper),
-              ...rest,
-            }),
-          )
+          if (cts.length) {
+            manifestBody.content_scripts = cts.map(
+              ({ js, ...rest }) => ({
+                js: js.map(emitDynamicImportWrapper),
+                ...rest,
+              }),
+            )
+          }
         }
 
         /* ----- SCRIPT DYNAMIC IMPORT WRAPPER END ---- */

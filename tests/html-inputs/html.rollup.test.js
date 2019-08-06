@@ -22,7 +22,7 @@ test('basic', async () => {
 
   // NEXT: 2 html files with the same asset should not emit two assets
   //  - See options.html and popup.html
-  expect(assets.length).toBe(4)
+  expect(assets.length).toBe(3)
 })
 
 test('withAssets', async () => {
@@ -44,7 +44,7 @@ test('withImage', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(3)
-  expect(assets.length).toBe(3)
+  expect(assets.length).toBe(2)
 })
 
 test('withStyles', async () => {
@@ -66,5 +66,5 @@ test('withTypeScript', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(2)
-  expect(assets.length).toBe(4)
+  expect(assets.length).toBe(3)
 })

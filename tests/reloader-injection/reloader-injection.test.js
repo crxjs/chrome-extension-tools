@@ -15,7 +15,7 @@ test('calls reloader hooks', async () => {
   expect(reloader.reloadClients).not.toBeCalled()
 })
 
-test('injects reloader scripts', async () => {
+test.skip('injects reloader scripts', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
