@@ -206,6 +206,7 @@ export default function({
     async generateBundle(options, bundle) {
       /* ---------- DERIVE PERMISIONS START --------- */
 
+      // FIXME: permissions are sometimes not derived
       // Get module ids for all chunks
       const permissions = Array.from(
         Object.values(bundle).reduce(
