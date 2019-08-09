@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { rollup } from 'rollup'
 
-const fixture = name => join('tests/theories/fixtures/', name)
+const fixture = (name) => join(__dirname, 'fixtures', name)
 
 const plugin = {
   name: 'theories',
@@ -13,7 +13,7 @@ const plugin = {
   },
 }
 
-Object.keys(plugin).forEach(key => {
+Object.keys(plugin).forEach((key) => {
   if (typeof plugin[key] === 'string') return
 
   plugin[key] = jest.fn(plugin[key])

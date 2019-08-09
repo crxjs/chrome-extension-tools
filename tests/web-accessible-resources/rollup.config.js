@@ -6,6 +6,7 @@ import { chromeExtension } from '../../src/index'
 
 const fixture = (name) => join(__dirname, 'fixtures', name)
 
+
 export default {
   input: fixture('src/manifest.json'),
   manualChunks: {

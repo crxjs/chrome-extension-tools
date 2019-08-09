@@ -9,6 +9,7 @@ import { join } from 'path'
 
 const fixture = (name) => join(__dirname, 'fixtures', name)
 
+
 export default {
   input: fixture('src/manifest.json'),
   output: {

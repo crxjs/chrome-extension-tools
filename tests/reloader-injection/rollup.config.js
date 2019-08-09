@@ -10,6 +10,7 @@ process.env.ROLLUP_WATCH = true
 
 const fixture = (name) => join(__dirname, 'fixtures', name)
 
+
 export default {
   input: fixture('src/manifest.json'),
   output: {

@@ -6,7 +6,8 @@ import { chromeExtension } from '../../src/index'
 import pkg from './package.json'
 import { join } from 'path'
 
-const fixture = (name) => join('tests/clip-64/fixtures', name)
+const fixture = (name) => join(__dirname, 'fixtures', name)
+
 
 export default {
   input: fixture('src/manifest.json'),

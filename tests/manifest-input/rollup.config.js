@@ -6,8 +6,7 @@ import emptyDir from 'rollup-plugin-empty-dir'
 import htmlInputs from '../../src/html-inputs/index'
 import manifestInput from '../../src/manifest-input/index'
 
-const fixture = (name) =>
-  join('tests/manifest-input/fixtures/', name)
+const fixture = (name) => join(__dirname, 'fixtures', name)
 
 export default {
   input: fixture('src/manifest.json'),
