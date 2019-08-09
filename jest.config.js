@@ -3,7 +3,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.code(\\.js)?': '<rootDir>/tests/stub.code.js',
   },
-  modulePathIgnorePatterns: ['fixtures/dest'],
+  modulePathIgnorePatterns: ['.+/fixtures/dest'],
   setupFilesAfterEnv: ['./tests/jest.setup.js'],
   projects: ['<rootDir>', '<rootDir>/reloader/push/functions'],
   testPathIgnorePatterns: [

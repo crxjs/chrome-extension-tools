@@ -8,7 +8,9 @@
       "type": "node",
       "name": "jest-tests",
       "request": "launch",
-      "args": ["--runInBand"],
+      "args": [
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -18,7 +20,10 @@
       "type": "node",
       "name": "test-selectors",
       "request": "launch",
-      "args": ["selectors", "--runInBand"],
+      "args": [
+        "selectors",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -28,7 +33,10 @@
       "type": "node",
       "name": "test-manifest",
       "request": "launch",
-      "args": ["manifest", "--runInBand"],
+      "args": [
+        "manifest",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -38,7 +46,10 @@
       "type": "node",
       "name": "test-ts-in-manifest",
       "request": "launch",
-      "args": ["ts-in-manifest", "--runInBand"],
+      "args": [
+        "ts-in-manifest",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -48,7 +59,10 @@
       "type": "node",
       "name": "test-clip-selector",
       "request": "launch",
-      "args": ["clip-selector", "--runInBand"],
+      "args": [
+        "clip-selector",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -58,7 +72,10 @@
       "type": "node",
       "name": "test-html",
       "request": "launch",
-      "args": ["html.rollup", "--runInBand"],
+      "args": [
+        "html.rollup",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -68,7 +85,10 @@
       "type": "node",
       "name": "test-complete",
       "request": "launch",
-      "args": ["complete", "--runInBand"],
+      "args": [
+        "complete",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -78,7 +98,10 @@
       "type": "node",
       "name": "test-reloader-injection",
       "request": "launch",
-      "args": ["reloader-injection", "--runInBand"],
+      "args": [
+        "reloader-injection",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -88,7 +111,10 @@
       "type": "node",
       "name": "test-web-acc-res",
       "request": "launch",
-      "args": ["resources", "--runInBand"],
+      "args": [
+        "resources",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -98,7 +124,10 @@
       "type": "node",
       "name": "test-validation",
       "request": "launch",
-      "args": ["validation", "--runInBand"],
+      "args": [
+        "validation",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",
@@ -108,7 +137,23 @@
       "type": "node",
       "name": "test-reloader-functions-calls",
       "request": "launch",
-      "args": ["calls.test", "--runInBand"],
+      "args": [
+        "calls.test",
+        "--runInBand"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart",
+      "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+    },
+    {
+      "type": "node",
+      "name": "test-permissions",
+      "request": "launch",
+      "args": [
+        "permissions.test",
+        "--runInBand"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
       "internalConsoleOptions": "openOnSessionStart",

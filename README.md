@@ -296,46 +296,56 @@ chromeExtension({
 
 ### `[permissions]` <a name = "options-permissions"></a>
 
-Type: `{ include?: glob[], exclude?: glob[], verbose: boolean }`
+#### If a wrong permission has been detected
 
-Specify modules to statically analyze for [permissions](https://developer.chrome.com/extensions/declare_permissions) to include in `manifest.permissions`.
+Sometimes a third-party module will reference a Chrome API to detect its environment, but you don't need the permission in your manifest.
 
-You may want to exclude a module file. Sometimes libraries check if a `chrome` property exists to detect if the environment is a Chrome extension. This can throw off static permissions analysis.
-
-**I Need A Quick Fix**: If a permission is added that you don't want, just add it to the source manifest and prefix it with `"!"` (i.e., `"!alarms"`). We'll leave it out.
-
-```javascript
-// Example usage
-chromeExtension({
-  exclude: ['node_modules/some-lib'],
-})
-
-// Default value
-chromeExtension({
-  include: ['**/*'],
-  verbose: true,
-})
+```jsonp
+// wrong permissions in output manifest.json
+{
+  "permissions": [
+    "alarms", // This should not be here
+    "storage"
+  ]
+}
 ```
 
-#### `[permissions.verbose]`
+**Solution:** Prefix unwanted permissions in the manifest with `"!"`, for example, `"!alarms"`.
+
+
+```jsonp
+// source manifest.json
+{
+  "permissions": [
+    "!alarms", // This permission will be excluded
+    "storage"
+  ]
+}
+```
+
+```jsonp
+// correct permissions in output manifest.json
+{
+  "permissions": ["storage"]
+}
+```
+**DEPRECATED:** Permissions can no longer be filtered by module in the options object.
+
+### `[verbose]`
 
 Type: `boolean`
 
-Set to `false` to suppress "Derived permissions" message.
+Set to `false` to suppress "Detected permissions" message.
 
 ```javascript
 // Example usage
 chromeExtension({
-  permissions: {
     verbose: false,
-  },
 })
 
 // Default value
 chromeExtension({
-  permissions: {
     verbose: true,
-  },
 })
 ```
 

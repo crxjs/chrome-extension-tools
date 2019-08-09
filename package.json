@@ -2,17 +2,15 @@
   "name": "rollup-plugin-chrome-extension",
   "version": "1.0.6",
   "description": "Build Chrome Extensions with this Rollup plugin.",
-  "repository": "bumble-org/rollup-plugin-chrome-extension",
+  "repository": {
+    "url": "https://github.com/bumble-org/rollup-plugin-chrome-extension.git"
+  },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "dist",
-    "reloader/push/package.json",
-    "reloader/push/dist",
-    "reloader/socket/package.json",
-    "reloader/socket/dist",
-    "reloader/interval/package.json",
-    "reloader/interval/dist",
+    "reloader/**/package.json",
+    "reloader/**/dist",
     "index.d.ts"
   ],
   "main": "dist/chrome-extension-cjs.js",
@@ -46,6 +44,8 @@
     "@babel/preset-typescript": "^7.3.3",
     "@bumble/chrome": "^0.1.1",
     "@bumble/clipboard": "^0.2.2",
+    "@bumble/notify": "^1.0.4",
+    "@bumble/storage": "^0.2.1",
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
     "@types/fs-extra": "^8.0.0",

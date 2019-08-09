@@ -22,11 +22,7 @@ export function chromeExtension(options?: {
     include?: string[]
     exclude?: string[]
   }
-  permissions?: {
-    include?: string[]
-    exclude?: string[]
-    verbose?: boolean
-  }
+  verbose?: boolean
   pkg?: {
     description?: string
     name?: string

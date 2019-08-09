@@ -26,7 +26,6 @@ const npmPkgDetails = {
 export default function({
   pkg,
   verbose = true,
-  permissions = {},
   assets = {
     include: [
       '**/*.png',
@@ -119,11 +118,6 @@ export default function({
 
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
-  // Files to include for permissions derivation
-  const permissionsFilter = pm(permissions.include || '**/*', {
-    ignore: permissions.exclude,
-  })
-
   const assetFilter = pm(assets.include, {
     ignore: assets.exclude,
   })
@@ -209,20 +203,9 @@ export default function({
       // FIXME: permissions are sometimes not derived
       // Get module ids for all chunks
       const permissions = Array.from(
-        Object.values(bundle).reduce(
-          (set, { code, facadeModuleId: id }) => {
-            // The only use for this is to exclude a chunk
-            if (id && permissionsFilter(id)) {
-              return new Set([
-                ...derivePermissions(code),
-                ...set,
-              ])
-            } else {
-              return set
-            }
-          },
-          new Set(),
-        ),
+        Object.values(bundle).reduce((set, { code }) => {
+          return new Set([...derivePermissions(code), ...set])
+        }, new Set()),
       )
 
       if (verbose) {
@@ -230,9 +213,9 @@ export default function({
         const permsHash = JSON.stringify(permissions)
 
         if (!cache.permsHash) {
-          console.log('Derived permissions:', permissions)
+          console.log('Detected permissions:', permissions)
         } else if (permsHash !== cache.permsHash) {
-          console.log('Derived new permissions:', permissions)
+          console.log('Detected new permissions:', permissions)
         }
 
         cache.permsHash = permsHash

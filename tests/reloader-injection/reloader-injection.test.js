@@ -45,23 +45,3 @@ test.skip('injects reloader scripts', async () => {
     ),
   ).toBeTruthy()
 })
-
-test('derives correct permissions', async () => {
-  const bundle = await rollup(config)
-  const { output } = await bundle.generate(config.output)
-
-  const assets = output.filter(({ isAsset }) => isAsset)
-
-  const manifestAsset = assets.find(({ fileName }) =>
-    fileName.endsWith('manifest.json'),
-  )
-
-  expect(manifestAsset).toBeDefined()
-
-  const manifest = JSON.parse(manifestAsset.source)
-
-  expect(manifest.permissions).toEqual([
-    'notifications',
-    'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
-  ])
-})
