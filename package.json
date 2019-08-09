@@ -9,8 +9,12 @@
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "dist",
-    "reloader/**/package.json",
-    "reloader/**/dist",
+    "reloader/interval/dist",
+    "reloader/interval/package.json",
+    "reloader/push/dist",
+    "reloader/push/package.json",
+    "reloader/socket/dist",
+    "reloader/socket/package.json",
     "index.d.ts"
   ],
   "main": "dist/chrome-extension-cjs.js",
