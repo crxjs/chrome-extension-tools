@@ -45,7 +45,7 @@ it('detects content permissions', async () => {
   expect(manifest.permissions).toContain('storage')
 })
 
-it.only('detects chunk permissions', async () => {
+it('detects chunk permissions', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
