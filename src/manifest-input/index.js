@@ -36,7 +36,13 @@ export default function({
     ],
   },
   entries = {
-    include: ['**/*.js', '**/*.html', '**/*.ts'],
+    include: [
+      '**/*.html',
+      '**/*.js',
+      '**/*.jsx',
+      '**/*.ts',
+      '**/*.tsx',
+    ],
   },
   publicKey,
   dynamicImportWrapper = {},
@@ -232,14 +238,14 @@ export default function({
           loadedAssets,
         )
 
-        // Support ts in manifest
+        // Support ts and tsx in manifest
         const mapTsToJs = (x) => {
           if (typeof x !== 'string') {
             return x
           }
 
-          if (x.endsWith('.ts')) {
-            return x.replace('.ts', '.js')
+          if (/\.tsx?/.test(x)) {
+            return x.replace(/\.tsx?/, '.js')
           } else {
             return x
           }

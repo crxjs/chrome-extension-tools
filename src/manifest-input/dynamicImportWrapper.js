@@ -55,14 +55,14 @@ function captureEvents() {
 
     event.addListener(handleEvent)
     function handleEvent() {
-      console.time(name)
+      // console.time(name)
       const error = chrome.runtime.lastError
 
       if (capture) {
-        console.log('delay', name)
+        // console.log('delay', name)
         events.add([error, ...arguments])
       } else {
-        console.log('direct', name)
+        // console.log('direct', name)
         callListeners(error, ...arguments)
       }
     }

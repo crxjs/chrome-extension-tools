@@ -12,4 +12,5 @@ test('bundles chunks and assets', async () => {
   expect(manifest).toBeDefined()
   expect(manifest.source).toMatch(/assets\/background-.+?\.js/)
   expect(manifest.source).toMatch('content.js')
+  expect(manifest.source).toMatch('react.js')
 }, 15000)

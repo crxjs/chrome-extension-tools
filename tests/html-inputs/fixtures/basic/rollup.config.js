@@ -1,11 +1,10 @@
 /* eslint-env node */
 
 import htmlInputs from '../../../../src/html-inputs'
-import emptyDir from 'rollup-plugin-empty-dir'
+// import emptyDir from 'rollup-plugin-empty-dir'
 import { join } from 'path'
 
-const fixture = (name) =>
-  join('tests/html-inputs/fixtures/basic', name)
+const fixture = (name) => join(__dirname, name)
 
 export default {
   input: [
@@ -18,5 +17,5 @@ export default {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: [htmlInputs(), emptyDir()],
+  plugins: [htmlInputs()],
 }

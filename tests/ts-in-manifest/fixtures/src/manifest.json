@@ -17,6 +17,10 @@
     {
       "matches": ["<all_urls>"],
       "js": ["content.ts"]
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["react.tsx"]
     }
   ],
 

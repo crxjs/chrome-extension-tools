@@ -7,64 +7,65 @@ import withImage from './fixtures/with-image/rollup.config'
 import withStyles from './fixtures/with-styles/rollup.config'
 import withTypeScript from './fixtures/with-ts/rollup.config'
 
+const build = async (config) => {
+  const bundle = await rollup(config)
+  const { output } = await bundle.write(config.output)
+
+  const chunks = output.filter(({ isAsset }) => !isAsset)
+  const assets = output.filter(({ isAsset }) => isAsset)
+
+  return { chunks, assets }
+}
+
 afterEach(() => {
   sinon.restore()
 })
 
 test('basic', async () => {
-  const bundle = await rollup(basic)
-  const { output } = await bundle.generate(basic.output)
-
-  const chunks = output.filter(({ isAsset }) => !isAsset)
-  const assets = output.filter(({ isAsset }) => isAsset)
+  const { chunks, assets } = await build(basic)
 
   expect(chunks.length).toBe(4)
-
-  // NEXT: 2 html files with the same asset should not emit two assets
-  //  - See options.html and popup.html
   expect(assets.length).toBe(3)
+
+  const optionsHtml = assets.find(({ fileName }) =>
+    fileName.endsWith('options.html'),
+  )
+
+  expect(optionsHtml.source.includes('options.js')).toBe(true)
+  expect(optionsHtml.source.includes('options.jsx')).toBe(false)
 })
 
 test('withAssets', async () => {
-  const bundle = await rollup(withAssets)
-  const { output } = await bundle.generate(withAssets.output)
-
-  const chunks = output.filter(({ isAsset }) => !isAsset)
-  const assets = output.filter(({ isAsset }) => isAsset)
+  const { chunks, assets } = await build(withAssets)
 
   expect(chunks.length).toBe(3)
   expect(assets.length).toBe(3)
 })
 
 test('withImage', async () => {
-  const bundle = await rollup(withImage)
-  const { output } = await bundle.generate(withImage.output)
-
-  const chunks = output.filter(({ isAsset }) => !isAsset)
-  const assets = output.filter(({ isAsset }) => isAsset)
+  const { chunks, assets } = await build(withImage)
 
   expect(chunks.length).toBe(3)
   expect(assets.length).toBe(2)
 })
 
 test('withStyles', async () => {
-  const bundle = await rollup(withStyles)
-  const { output } = await bundle.generate(withAssets.output)
-
-  const chunks = output.filter(({ isAsset }) => !isAsset)
-  const assets = output.filter(({ isAsset }) => isAsset)
+  const { chunks, assets } = await build(withStyles)
 
   expect(chunks.length).toBe(3)
   expect(assets.length).toBe(2)
 })
 
 test('withTypeScript', async () => {
-  const bundle = await rollup(withTypeScript)
-  const { output } = await bundle.generate(withAssets.output)
-
-  const chunks = output.filter(({ isAsset }) => !isAsset)
-  const assets = output.filter(({ isAsset }) => isAsset)
+  const { chunks, assets } = await build(withTypeScript)
 
   expect(chunks.length).toBe(2)
   expect(assets.length).toBe(3)
+
+  const optionsHtml = assets.find(({ fileName }) =>
+    fileName.endsWith('options.html'),
+  )
+
+  expect(optionsHtml.source.includes('options.js')).toBe(true)
+  expect(optionsHtml.source.includes('options.tsx')).toBe(false)
 })
