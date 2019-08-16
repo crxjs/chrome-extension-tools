@@ -2,22 +2,14 @@
 
 import bundleImports from 'rollup-plugin-bundle-imports'
 
-import resolve from 'rollup-plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
-
 const plugins = [
   bundleImports({
     include: ['**/*.sw.js'],
     importAs: 'path',
-    options: { plugins: [resolve(), commonjs()] },
   }),
   bundleImports({
     include: ['**/*.code.js'],
     importAs: 'code',
-    options: {
-      plugins: [resolve(), commonjs()],
-      format: 'iife',
-    },
   }),
 ]
 
