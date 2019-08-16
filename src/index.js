@@ -1,12 +1,14 @@
 import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
 import useReloader from './reloader'
+import { validate as v } from './validate-names/index'
 
-export const chromeExtension =  (opts) => {
+export const chromeExtension = (opts) => {
   const manifest = manifestInput(opts)
   const html = htmlInputs(opts)
   const reloader = useReloader(opts)
-  const plugins = [manifest, html, reloader]
+  const validate = v(opts)
+  const plugins = [manifest, html, reloader, validate]
 
   return {
     name: 'chrome-extension',
@@ -41,6 +43,7 @@ export const chromeExtension =  (opts) => {
       await manifest[hook].call(this, ...args)
       await html[hook].call(this, ...args)
       await reloader[hook].call(this, ...args)
+      await validate[hook].call(this, ...args)
     },
 
     async writeBundle(...args) {
