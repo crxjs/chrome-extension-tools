@@ -84,7 +84,7 @@ function captureEvents() {
     }
 
     function callListeners(error, ...args) {
-      console.timeEnd(name)
+      // console.timeEnd(name)
       callbacks.forEach((options, cb) => {
         chrome.runtime.lastError = error
         cb(...args)
