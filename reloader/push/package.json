@@ -1,6 +1,0 @@
-{
-  "name": "rpce-push-reloader",
-  "description": "Use with rollup-plugin-chrome-extension to reload your extension during development.",
-  "main": "dist/reloader-cjs.js",
-  "module": "dist/reloader-esm.js"
-}

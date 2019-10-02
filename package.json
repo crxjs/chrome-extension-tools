@@ -8,20 +8,15 @@
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
-    "dist",
-    "reloader/interval/dist",
-    "reloader/interval/package.json",
-    "reloader/push/dist",
-    "reloader/push/package.json",
-    "reloader/socket/dist",
-    "reloader/socket/package.json",
-    "index.d.ts"
+    "lib",
+    "types/index.d.ts"
   ],
-  "main": "dist/chrome-extension-cjs.js",
-  "module": "dist/chrome-extension-esm.js",
-  "types": "index.d.ts",
+  "main": "lib/index-cjs.js",
+  "module": "lib/index-esm.js",
+  "types": "types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
+    "build:types": "tsc -p tsconfig.d.json",
     "start": "rollup -c -w",
     "test": "jest",
     "preversion": "jest --runInBand && npm run build",
@@ -41,11 +36,11 @@
     "mem": "^4.3.0",
     "picomatch": "^2.0.7",
     "rollup-plugin-zip": "^0.3.0",
+    "rpce-interval-reloader": "^0.1.0",
+    "rpce-push-reloader": "^0.1.0",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.5.5",
-    "@babel/preset-typescript": "^7.3.3",
     "@bumble/chrome": "^0.1.1",
     "@bumble/chrome-rxjs": "^0.9.1",
     "@bumble/clipboard": "^0.2.2",
@@ -80,6 +75,7 @@
     "simple-git": "^1.124.0",
     "sinon": "^7.4.1",
     "sucrase": "^3.10.1",
+    "ts-jest": "^24.1.0",
     "tslib": "^1.10.0",
     "typescript": "^3.5.3",
     "unique-selector": "^0.4.1"

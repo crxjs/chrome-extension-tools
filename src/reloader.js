@@ -3,11 +3,9 @@ const loadReloader = (reloader) => {
   if (typeof reloader === 'function') {
     return reloader()
   } else if (reloader === 'non-persistent') {
-    return require('../reloader/push').reloader()
+    return require('rpce-push-reloader').reloader()
   } else if (reloader === 'persistent') {
-    return require('../reloader/interval').reloader()
-  } else if (reloader === 'socket') {
-    return require('../reloader/socket').reloader()
+    return require('rpce-interval-reloader').reloader()
   } else {
     throw new TypeError(
       'reloader type should be "persistent", "non-persistent", or a custom reloader',

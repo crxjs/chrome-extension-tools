@@ -1,8 +1,10 @@
 /* eslint-env node */
 
+import typescript from 'rollup-plugin-typescript'
 import bundleImports from 'rollup-plugin-bundle-imports'
 
 const plugins = [
+  typescript(),
   bundleImports({
     include: ['**/*.sw.js'],
     importAs: 'path',
@@ -18,12 +20,12 @@ export default [
     input: 'src/index.js',
     output: [
       {
-        file: 'dist/chrome-extension-esm.js',
+        file: 'lib/index-esm.js',
         format: 'esm',
         sourcemap: 'inline',
       },
       {
-        file: 'dist/chrome-extension-cjs.js',
+        file: 'lib/index-cjs.js',
         format: 'cjs',
         sourcemap: 'inline',
       },
@@ -42,63 +44,9 @@ export default [
     plugins,
   },
   {
-    input: 'reloader/socket/src/index.js',
-    output: [
-      {
-        file: 'reloader/socket/dist/reloader-esm.js',
-        format: 'esm',
-        sourcemap: 'inline',
-      },
-      {
-        file: 'reloader/socket/dist/reloader-cjs.js',
-        format: 'cjs',
-        sourcemap: 'inline',
-      },
-    ],
-    external: ['debounce', 'express', 'http', 'socket.io'],
-    plugins,
-  },
-  {
-    input: 'reloader/push/src/index.js',
-    output: [
-      {
-        file: 'reloader/push/dist/reloader-esm.js',
-        format: 'esm',
-        sourcemap: 'inline',
-      },
-      {
-        file: 'reloader/push/dist/reloader-cjs.js',
-        format: 'cjs',
-        sourcemap: 'inline',
-      },
-    ],
-    external: [
-      '@firebase/app',
-      '@firebase/auth',
-      '@firebase/functions',
-    ],
-    plugins,
-  },
-  {
-    input: 'reloader/interval/src/index.js',
-    output: [
-      {
-        file: 'reloader/interval/dist/reloader-esm.js',
-        format: 'esm',
-        sourcemap: 'inline',
-      },
-      {
-        file: 'reloader/interval/dist/reloader-cjs.js',
-        format: 'cjs',
-        sourcemap: 'inline',
-      },
-    ],
-    plugins,
-  },
-  {
     input: 'src/manifest-input/dynamicImportWrapper.js',
     output: {
-      file: 'dist/dynamicImportWrapper.js',
+      file: 'lib/dynamicImportWrapper.js',
       format: 'iife',
     },
     external: ['%PATH%'],

@@ -2,7 +2,7 @@
 /*         SETUP MOCK RELOADER FOR TESTS        */
 /* -------------------------------------------- */
 
-import { reloader as r } from '../../reloader/push/src/index'
+import { reloader as r } from 'rpce-push-reloader'
 
 const uid = '%UID%'
 const bgScriptPath = '%BG_SCRIPT_PATH%'

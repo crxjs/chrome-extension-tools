@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "jsx": "react",
+    "declaration": true,
+    "declarationDir": "types",
+    "emitDeclarationOnly": true,
     "lib": ["esnext"],
-    "module": "es2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitReturns": true,
     "noUnusedLocals": true,
-    "outDir": "lib",
     "sourceMap": true,
     "strict": true,
     "target": "es2017"
   },
-  "include": ["src", "tests"]
+  "include": ["src"]
 }
