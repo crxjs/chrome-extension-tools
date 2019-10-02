@@ -1,3 +1,5 @@
+import 'array-flat-polyfill'
+
 export const combinePerms = (...permissions) => {
   const { perms, xperms } = permissions.flat(Infinity).reduce(
     ({ perms, xperms }, perm) => {

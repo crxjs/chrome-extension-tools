@@ -1,3 +1,5 @@
+import 'array-flat-polyfill'
+
 import path from 'path'
 import { getAssetPathMapFns, zipArrays } from '../helpers'
 import {
