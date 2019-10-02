@@ -24,7 +24,6 @@
   },
   "dependencies": {
     "@bumble/manifest": "^0.6.1",
-    "@bumble/rollup-watch-next": "^0.3.3",
     "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
     "debounce": "^1.2.0",
@@ -46,6 +45,7 @@
     "@bumble/clipboard": "^0.2.2",
     "@bumble/messages": "^0.2.4",
     "@bumble/notify": "^1.0.4",
+    "@bumble/rollup-watch-next": "^0.3.3",
     "@bumble/storage": "^0.2.1",
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
