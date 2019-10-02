@@ -2,9 +2,11 @@
 
 import typescript from 'rollup-plugin-typescript'
 import bundleImports from 'rollup-plugin-bundle-imports'
+import json from 'rollup-plugin-json'
 
 const plugins = [
   typescript(),
+  json(),
   bundleImports({
     include: ['**/*.sw.js'],
     importAs: 'path',
@@ -40,6 +42,9 @@ export default [
       'path',
       'picomatch',
       'rollup-pluginutils',
+      'lodash.startcase',
+      'ajv',
+      'ajv/lib/refs/json-schema-draft-04.json',
     ],
     plugins,
   },
