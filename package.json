@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@bumble/manifest": "^0.6.1",
+    "ajv": "^6.10.2",
     "array-flat-polyfill": "^1.0.1",
     "cheerio": "^1.0.0-rc.3",
     "cors": "^2.8.5",
@@ -32,12 +33,13 @@
     "express": "^4.17.1",
     "fs-extra": "^7.0.1",
     "is-valid-path": "^0.1.1",
+    "lodash.startcase": "^4.4.0",
     "magic-string": "^0.25.4",
     "mem": "^4.3.0",
     "picomatch": "^2.0.7",
     "rollup-plugin-zip": "^0.3.0",
     "rpce-interval-reloader": "^0.1.0",
-    "rpce-push-reloader": "^0.1.0",
+    "rpce-push-reloader": "^0.1.1",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
@@ -56,7 +58,6 @@
     "@types/react-dom": "^16.9.1",
     "chrome-promise": "^3.0.5",
     "eslint": "5.15.1",
-    "firebase-nightlight": "^3.1.1",
     "jest": "^24.9.0",
     "mark.js": "^8.11.1",
     "npm-run-all": "^4.1.5",
@@ -68,6 +69,7 @@
     "rollup-plugin-code-string": "^0.1.1",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-empty-dir": "^0.1.4",
+    "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^4.2.4",
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript": "^1.0.1",
