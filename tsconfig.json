@@ -3,7 +3,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "lib": ["esnext"],
+    "lib": ["es2017"],
     "module": "es2015",
     "moduleResolution": "node",
     "noImplicitReturns": true,
@@ -13,5 +13,5 @@
     "strict": true,
     "target": "es2017"
   },
-  "include": ["src", "tests"]
+  "include": ["src"]
 }

@@ -11,6 +11,9 @@
     "lib",
     "types/index.d.ts"
   ],
+  "engines": {
+    "node": ">=8.10.0"
+  },
   "main": "lib/index-cjs.js",
   "module": "lib/index-esm.js",
   "types": "types/index.d.ts",
@@ -20,7 +23,8 @@
     "start": "rollup -c -w",
     "test": "jest",
     "preversion": "jest --runInBand && npm run build",
-    "postversion": "git push && npm publish"
+    "postversion": "git push && npm publish",
+    "lint": "tslint"
   },
   "dependencies": {
     "@bumble/manifest": "^0.6.1",
@@ -77,6 +81,7 @@
     "sucrase": "^3.10.1",
     "ts-jest": "^24.1.0",
     "tslib": "^1.10.0",
+    "tslint": "^5.20.0",
     "typescript": "^3.5.3",
     "unique-selector": "^0.4.1"
   },

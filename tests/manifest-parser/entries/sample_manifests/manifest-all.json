@@ -1,0 +1,43 @@
+{
+  "manifest_version": 2,
+
+  "name": "Keyword Tags for YouTube Upload",
+  "description": "Get keyword tag suggestions on the YouTube Video Upload page.",
+  "short_name": "Keyword Tags",
+  "version": "0.3.0",
+
+  "browser_action": {
+    "default_icon": "icon-16.png"
+  },
+
+  "background": {
+    "scripts": [
+      "background/chrome.message.bg.js",
+      "background/init.bg.js"
+    ],
+    "matches": ["https://www.youtube.com/upload"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/upload"],
+      "js": ["utils/web.interval.js", "content/state.ct.js"],
+      "css": ["content/styles.ct.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "options_page": "options/options.html",
+
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+
+  "permissions": [
+    "storage",
+    "https://api.dataforseo.com/v2/kwrd_finder_related_keywords_get"
+  ]
+}

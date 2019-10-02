@@ -2,7 +2,7 @@ import {
   deriveEntries,
   deriveManifest,
   derivePermissions as dp,
-} from '@bumble/manifest'
+} from './manifest-parser/index'
 import fs from 'fs-extra'
 import isValidPath from 'is-valid-path'
 import memoize from 'mem'
