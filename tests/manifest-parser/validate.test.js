@@ -1,4 +1,4 @@
-import { validate } from '../../../src/manifest-input/manifest-parser/validate'
+import { validate } from '../../src/manifest-input/manifest-parser/validate'
 
 test('passes valid manifest', () => {
   const throws = () => {

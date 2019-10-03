@@ -26,7 +26,8 @@ test('wraps background scripts in dynamic import', async () => {
   expect(bgWrapperAsset).toBeDefined()
 
   expect(bgWrapperAsset.source).toContain(
-    'import(\'../background.js\')',
+    // eslint-disable-next-line quotes
+    "import('../background.js')",
   )
   expect(bgWrapperAsset.source).not.toContain(
     /\.then\(delay\([\d]+?\)\)/,
@@ -54,8 +55,7 @@ test('updates manifest script paths', async () => {
   const [bgScript] = manifest.background.scripts
 
   expect(bgScript).not.toBe('background.js')
-  expect(bgScript.startsWith('assets/background')).toBe(true)
-  expect(bgScript.endsWith('.js')).toBe(true)
+  expect(bgScript).toMatch(/^assets\/background.+?\.js$/)
 })
 
 test('wraps content scripts in dynamic import', async () => {
@@ -70,7 +70,8 @@ test('wraps content scripts in dynamic import', async () => {
   expect(ctWrapperAsset).toBeDefined()
 
   expect(ctWrapperAsset.source).toContain(
-    'import(\'../content.js\')',
+    // eslint-disable-next-line quotes
+    "import('../content.js')",
   )
   expect(ctWrapperAsset.source).not.toContain(
     /\.then\(delay\([\d]+?\)\)/,

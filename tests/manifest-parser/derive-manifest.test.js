@@ -1,12 +1,9 @@
 import { deriveManifest } from '../../src/manifest-input/manifest-parser/index'
 
-const pkg = {
-  name: 'test-extension',
+const manifest = {
+  name: 'Test Extension',
   version: '1.1.1',
   description: 'Just a test extension',
-}
-
-const manifest = {
   options_page: 'options.html',
   permissions: ['http://*.google.com/*', 'storage'],
 }
@@ -14,7 +11,7 @@ const manifest = {
 const permissions = ['alarms', 'tabs']
 
 test('combine permissions', () => {
-  const result = deriveManifest(pkg, manifest, permissions)
+  const result = deriveManifest(manifest, permissions)
 
   expect(result).toEqual({
     description: 'Just a test extension',
@@ -33,7 +30,6 @@ test('combine permissions', () => {
 
 test('exclude permissions', () => {
   const result = deriveManifest(
-    pkg,
     manifest,
     permissions.concat('!storage'),
   )
