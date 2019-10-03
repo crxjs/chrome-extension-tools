@@ -7,7 +7,7 @@ interface RollupPluginChromeExtension {
   writeBundle(outputOptions: any): Promise<void>
 }
 
-export function chromeExtension(options?: {
+declare function chromeExtension(options?: {
   assets?: {
     include?: string[]
     exclude?: string[]

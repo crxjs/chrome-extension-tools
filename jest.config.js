@@ -9,4 +9,7 @@ module.exports = {
   transform: {
     '.(js|jsx|ts|tsx)': '@sucrase/jest-plugin',
   },
+  transformIgnorePatterns: [
+    '<rootDir>/node_modules/(?!lodash-es/.*)',
+  ],
 }
