@@ -54,6 +54,7 @@ function captureEvents() {
     const events = new Set()
 
     event.addListener(handleEvent)
+
     function handleEvent() {
       // console.time(name)
       const error = chrome.runtime.lastError

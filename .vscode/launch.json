@@ -31,10 +31,10 @@
     },
     {
       "type": "node",
-      "name": "test-manifest",
+      "name": "test-manifest-input",
       "request": "launch",
       "args": [
-        "manifest",
+        "manifest-input.test",
         "--runInBand"
       ],
       "cwd": "${workspaceFolder}",

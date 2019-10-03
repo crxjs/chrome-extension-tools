@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import memoize from 'mem'
-import path from 'path'
+import path, { basename } from 'path'
 import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
 import { ChromeExtensionManifest } from './manifest'
 import {
@@ -8,6 +8,7 @@ import {
   deriveManifest,
   derivePermissions as dp,
 } from './manifest-parser/index'
+import { setupLoaderScript } from './setupLoaderScript'
 
 const isOutputChunk = (x: any): x is OutputChunk =>
   x.type === 'chunk'
@@ -35,17 +36,22 @@ const npmPkgDetails =
 
 export default function(
   {
-    dynamicImportWrapper = {},
+    dynamicImportWrapper = {
+      // Use these wake events by default until dynamic wake events is implemented
+      wakeEvents: [
+        'chrome.runtime.onMessage',
+        'chrome.runtime.onInstalled',
+      ],
+    },
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
   } = {} as {
-    dynamicImportWrapper?:
-      | {
-          wakeEvents?: string[]
-          eventDelay?: number | false
-        }
-      | false
+    dynamicImportWrapper?: {
+      eventDelay?: number | false
+      wakeEvents?: string[]
+      noWakeEvents?: boolean
+    }
     pkg?: {
       description: string
       name: string
@@ -86,61 +92,7 @@ export default function(
 
   /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
 
-  let loaderScript: string
-
-  if (typeof dynamicImportWrapper === 'object') {
-    const {
-      eventDelay = false,
-      // FEATURE: add static code analysis for wake events
-      //  - Use code comments?
-      //  - This will be slower...
-      // WAKE_EVENT: chrome.runtime.onMessage
-      wakeEvents = [
-        'chrome.runtime.onInstalled',
-        'chrome.runtime.onMessage',
-      ],
-    } = dynamicImportWrapper
-
-    const replaceDelay = (match: string, tag: string) => {
-      if (typeof eventDelay === 'number') {
-        return match.replace(tag, eventDelay.toString())
-      } else if (eventDelay === false) {
-        return ''
-      } else {
-        throw new TypeError(
-          'dynamicImportEventDelay must be false or a number',
-        )
-      }
-    }
-
-    const replaceSwitchCase = (index: number) => {
-      const events = wakeEvents.map((e) => e.split('.')[index])
-
-      return (match: string, tag: string) => {
-        return events.length
-          ? events.map((e) => match.replace(tag, e)).join('')
-          : ''
-      }
-    }
-
-    loaderScript = fs
-      .readFileSync(
-        path.join(__dirname, 'dynamicImportWrapper.js'),
-        'utf-8',
-      )
-      .replace(
-        /[\n\s]+.then\(delay\(('%DELAY%')\)\)([\n\s]+)/,
-        replaceDelay,
-      )
-      .replace(
-        /[\n\s]+case '(%NAME%)':[\n\s]+return true/,
-        replaceSwitchCase(1),
-      )
-      .replace(
-        /[\n\s]+case '(%EVENT%)':[\n\s]+return true/,
-        replaceSwitchCase(2),
-      )
-  }
+  let loaderScript = setupLoaderScript(dynamicImportWrapper)
 
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
@@ -264,12 +216,17 @@ export default function(
       /* ---------- DERIVE PERMISSIONS END ---------- */
 
       try {
+        // Clone cache.manifest
+        const cachedManifest = JSON.parse(
+          JSON.stringify(cache.manifest || {}),
+        )
+
         const updatedManifest = {
           manifest_version: 2,
           name: pkg.name,
           version: pkg.version,
           description: pkg.description,
-          ...(cache.manifest || {}),
+          ...cachedManifest,
         }
 
         const manifestBody: ChromeExtensionManifest = deriveManifest(
@@ -314,22 +271,29 @@ export default function(
 
         /* ---- SCRIPT DYNAMIC IMPORT WRAPPER BEGIN --- */
 
-        if (dynamicImportWrapper) {
+        if (
+          dynamicImportWrapper.wakeEvents &&
+          dynamicImportWrapper.wakeEvents.length > 0
+        ) {
           const emitDynamicImportWrapper = (
             scriptPath: string,
           ) => {
-            const assetId = this.emitAsset(
-              scriptPath,
-              loaderScript.replace('%PATH%', `../${scriptPath}`),
-            )
+            const source = loaderScript(scriptPath)
 
-            return this.getAssetFileName(assetId)
+            const assetId = this.emitFile({
+              type: 'asset',
+              source,
+              name: basename(scriptPath),
+            })
+
+            return this.getFileName(assetId)
           }
 
           // Emit background script wrappers
           if (backgroundScripts.length) {
             manifestBody.background =
               manifestBody.background || {}
+
             manifestBody.background.scripts = backgroundScripts.map(
               emitDynamicImportWrapper,
             )
@@ -352,8 +316,6 @@ export default function(
 
         if (publicKey) {
           manifestBody.key = publicKey
-        } else {
-          delete manifestBody.key
         }
 
         /* ---------- STABLE EXTENSION ID END --------- */
