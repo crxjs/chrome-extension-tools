@@ -1,64 +1,84 @@
+import fs from 'fs-extra'
+import memoize from 'mem'
+import path from 'path'
+import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
+import { ChromeExtensionManifest } from './manifest'
 import {
-  deriveEntries,
+  deriveFiles,
   deriveManifest,
   derivePermissions as dp,
 } from './manifest-parser/index'
-import fs from 'fs-extra'
-import isValidPath from 'is-valid-path'
-import memoize from 'mem'
-import path from 'path'
-import pm from 'picomatch'
-import { getAssetPathMapFns, loadAssetData } from '../helpers'
-import { mapObjectValues } from './mapObjectValues'
+
+const isOutputChunk = (x: any): x is OutputChunk =>
+  x.type === 'chunk'
 
 const name = 'manifest-input'
 
-const npmPkgDetails = {
-  name: process.env.npm_package_name,
-  version: process.env.npm_package_version,
-  description: process.env.npm_package_description,
-}
+const npmPkgDetails =
+  process.env.npm_package_name &&
+  process.env.npm_package_version &&
+  process.env.npm_package_description
+    ? {
+        name: process.env.npm_package_name,
+        version: process.env.npm_package_version,
+        description: process.env.npm_package_description,
+      }
+    : {
+        name: '',
+        version: '',
+        description: '',
+      }
 
 /* ============================================ */
 /*                MANIFEST-INPUT                */
 /* ============================================ */
 
-export default function({
-  pkg,
-  verbose = true,
-  assets = {
-    include: [
-      '**/*.png',
-      '**/*.jpg',
-      '**/*.jpeg',
-      '**/*.gif',
-      '**/*.css',
-    ],
+export default function(
+  {
+    dynamicImportWrapper = {},
+    pkg = npmPkgDetails,
+    publicKey,
+    verbose = true,
+  } = {} as {
+    dynamicImportWrapper?:
+      | {
+          wakeEvents?: string[]
+          eventDelay?: number | false
+        }
+      | false
+    pkg?: {
+      description: string
+      name: string
+      version: string
+    }
+    publicKey?: string
+    verbose?: boolean
   },
-  entries = {
-    include: [
-      '**/*.html',
-      '**/*.js',
-      '**/*.jsx',
-      '**/*.ts',
-      '**/*.tsx',
-    ],
-  },
-  publicKey,
-  dynamicImportWrapper = {},
-} = {}) {
-  if (!pkg) {
-    pkg = npmPkgDetails
-  }
+) {
+  // TODO: remove all extra props from pkg
+
+  const derivePermissions = memoize(dp)
 
   /* ----------- HOOKS CLOSURES START ----------- */
 
-  let loadedAssets
-  let srcDir
+  let srcDir: string
 
-  let manifestPath
+  let manifestPath: string
 
-  const cache = {}
+  interface Asset {
+    srcPath: string
+    source?: string
+  }
+
+  const cache: {
+    assets: Asset[]
+    input?: string[]
+    manifest?: ChromeExtensionManifest
+    permsHash: string
+  } = {
+    assets: [] as Asset[],
+    permsHash: '',
+  }
 
   const manifestName = 'manifest.json'
 
@@ -66,7 +86,7 @@ export default function({
 
   /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
 
-  let loaderScript
+  let loaderScript: string
 
   if (typeof dynamicImportWrapper === 'object') {
     const {
@@ -81,9 +101,9 @@ export default function({
       ],
     } = dynamicImportWrapper
 
-    const replaceDelay = (match, tag) => {
+    const replaceDelay = (match: string, tag: string) => {
       if (typeof eventDelay === 'number') {
-        return match.replace(tag, eventDelay)
+        return match.replace(tag, eventDelay.toString())
       } else if (eventDelay === false) {
         return ''
       } else {
@@ -93,10 +113,10 @@ export default function({
       }
     }
 
-    const replaceSwitchCase = (index) => {
+    const replaceSwitchCase = (index: number) => {
       const events = wakeEvents.map((e) => e.split('.')[index])
 
-      return (match, tag) => {
+      return (match: string, tag: string) => {
         return events.length
           ? events.map((e) => match.replace(tag, e)).join('')
           : ''
@@ -124,18 +144,8 @@ export default function({
 
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
-  const assetFilter = pm(assets.include, {
-    ignore: assets.exclude,
-  })
-
-  const entryFilter = pm(entries.include, {
-    ignore: entries.exclude,
-  })
-
-  const derivePermissions = memoize(dp)
-
   /* --------------- plugin object -------------- */
-  return {
+  const plugin: Partial<PluginHooks> & { name: string } = {
     name,
 
     /* ============================================ */
@@ -148,38 +158,37 @@ export default function({
         return { ...options, input: cache.input }
       }
 
-      manifestPath = options.input
-      srcDir = path.dirname(manifestPath)
-
-      // Check that input is manifest.json
-      if (!manifestPath.endsWith(manifestName)) {
+      if (
+        typeof options.input === 'string' &&
+        options.input.endsWith('manifest.json')
+      ) {
+        manifestPath = options.input
+      } else {
         throw new TypeError(
-          `${name}: input is not manifest.json`,
+          'options.input must be "manifest.json"',
         )
       }
+
+      srcDir = path.dirname(manifestPath)
 
       // Load manifest.json
       cache.manifest = fs.readJSONSync(manifestPath)
 
+      if (!cache.manifest) {
+        throw new Error('Unable to load ' + manifestPath)
+      }
+
       // Derive entry paths from manifest
-      const { assetPaths, entryPaths } = deriveEntries(
+      const { js, html, css, img } = deriveFiles(
         cache.manifest,
-        {
-          assetPaths: assetFilter,
-          entryPaths: entryFilter,
-          transform: (name) => path.join(srcDir, name),
-          filter: (v) =>
-            typeof v === 'string' &&
-            isValidPath(v) &&
-            !/^https?:/.test(v),
-        },
+        srcDir,
       )
 
-      // Start async asset loading
-      loadedAssets = Promise.all(assetPaths.map(loadAssetData))
-
       // Cache derived inputs
-      cache.input = entryPaths
+      cache.input = [...js, ...html]
+      cache.assets = [...css, ...img].map((srcPath) => ({
+        srcPath,
+      }))
 
       return { ...options, input: cache.input }
     },
@@ -188,14 +197,39 @@ export default function({
     /*              HANDLE WATCH FILES              */
     /* ============================================ */
 
-    buildStart() {
+    async buildStart(options) {
       this.addWatchFile(manifestPath)
+
+      cache.assets.forEach(({ srcPath }) => {
+        this.addWatchFile(srcPath)
+      })
+
+      const assets: EmittedAsset[] = await Promise.all(
+        cache.assets.map(async ({ srcPath }) => {
+          const source = await fs.readFile(srcPath)
+
+          return {
+            type: 'asset' as 'asset',
+            source,
+            fileName: srcPath
+              .replace(srcDir, '')
+              .replace(/^\//, ''),
+          }
+        }),
+      )
+
+      assets.forEach((asset) => {
+        this.emitFile(asset)
+      })
     },
 
     watchChange(id) {
-      if (id.endsWith(manifestName)) {
-        // Dump cache.manifest if manifest.json changes
-        cache.manifest = null
+      if (
+        id.endsWith(manifestName) ||
+        cache.assets.some(({ srcPath }) => id === srcPath)
+      ) {
+        // Dump cache.manifest if manifest.json or manifest asset changes
+        cache.manifest = undefined
       }
     },
 
@@ -209,9 +243,9 @@ export default function({
       // FIXME: permissions are sometimes not derived
       // Get module ids for all chunks
       const permissions = Array.from(
-        Object.values(bundle).reduce((set, { code }) => {
-          return new Set([...derivePermissions(code), ...set])
-        }, new Set()),
+        Object.values(bundle)
+          .filter(isOutputChunk)
+          .reduce(derivePermissions, new Set<string>()),
       )
 
       if (verbose) {
@@ -230,37 +264,15 @@ export default function({
       /* ---------- DERIVE PERMISSIONS END ---------- */
 
       try {
-        // Emit loaded manifest.json assets and
-        // Create asset path updater functions
-        // Updater fn :: (string) -> string
-        const assetPathMapFns = await getAssetPathMapFns.call(
-          this,
-          loadedAssets,
-        )
-
-        // Support ts and tsx in manifest
-        const mapTsToJs = (x) => {
-          if (typeof x !== 'string') {
-            return x
-          }
-
-          if (/\.tsx?/.test(x)) {
-            return x.replace(/\.tsx?/, '.js')
-          } else {
-            return x
-          }
+        const updatedManifest = {
+          manifest_version: 2,
+          name: pkg.name,
+          version: pkg.version,
+          description: pkg.description,
+          ...(cache.manifest || {}),
         }
 
-        const pathMapFns = [...assetPathMapFns, mapTsToJs]
-
-        // Update asset paths
-        const updatedManifest = pathMapFns.reduce(
-          mapObjectValues,
-          cache.manifest,
-        )
-
-        const manifestBody = deriveManifest(
-          pkg,
+        const manifestBody: ChromeExtensionManifest = deriveManifest(
           updatedManifest,
           permissions,
         )
@@ -275,17 +287,20 @@ export default function({
 
         const contentScripts = cts.reduce(
           (r, { js }) => [...r, ...js],
-          [],
+          [] as string[],
         )
 
         if (contentScripts.length) {
           // make all imports & dynamic imports web_acc_res
           // FEATURE: make imports for background not web_acc_res?
-          const imports = Object.values(bundle).reduce(
-            (r, { isEntry: e, isAsset: a, fileName: f }) =>
-              !e && !a ? [...r, f] : r,
-            [],
-          )
+          const imports = Object.values(bundle)
+            .filter((x): x is OutputChunk => x.type === 'chunk')
+            .reduce(
+              (r, { isEntry, fileName }) =>
+                // Get imported filenames
+                !isEntry ? [...r, fileName] : r,
+              [] as string[],
+            )
 
           // web_accessible_resources can be used for fingerprinting extensions
           manifestBody.web_accessible_resources = [
@@ -300,7 +315,9 @@ export default function({
         /* ---- SCRIPT DYNAMIC IMPORT WRAPPER BEGIN --- */
 
         if (dynamicImportWrapper) {
-          const emitDynamicImportWrapper = (scriptPath) => {
+          const emitDynamicImportWrapper = (
+            scriptPath: string,
+          ) => {
             const assetId = this.emitAsset(
               scriptPath,
               loaderScript.replace('%PATH%', `../${scriptPath}`),
@@ -311,6 +328,8 @@ export default function({
 
           // Emit background script wrappers
           if (backgroundScripts.length) {
+            manifestBody.background =
+              manifestBody.background || {}
             manifestBody.background.scripts = backgroundScripts.map(
               emitDynamicImportWrapper,
             )
@@ -339,16 +358,24 @@ export default function({
 
         /* ---------- STABLE EXTENSION ID END --------- */
 
-        // Mutate bundle to emit custom asset
-        bundle[manifestName] = {
+        const manifestJson = JSON.stringify(
+          manifestBody,
+          null,
+          2,
+        )
+          // Replace ts and tsx in manifest
+          .replace(/\.[jt]sx?"/g, '.js"')
+
+        // Emit manifest.json
+        this.emitFile({
+          type: 'asset',
           fileName: manifestName,
-          isAsset: true,
-          source: JSON.stringify(manifestBody, null, 2),
-        }
+          source: manifestJson,
+        })
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
 
-        error.errors.forEach((err) => {
+        error.errors.forEach((err: { message: string }) => {
           console.log(err)
         })
 
@@ -356,4 +383,6 @@ export default function({
       }
     },
   }
+
+  return plugin
 }
