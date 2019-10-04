@@ -11,7 +11,7 @@ test('bundles chunks and assets', async () => {
   const assets = output.filter(({ isAsset }) => isAsset)
 
   expect(chunks.length).toBe(3)
-  expect(assets.length).toBe(5)
+  expect(assets.length).toBe(6)
 })
 
 test('wraps background scripts in dynamic import', async () => {
@@ -41,7 +41,7 @@ test('updates manifest script paths', async () => {
 
   const manifestAsset = output.find(
     ({ isAsset, fileName }) =>
-      isAsset && fileName.includes('manifest'),
+      isAsset && fileName.includes('manifest.json'),
   )
 
   expect(manifestAsset).toBeDefined()

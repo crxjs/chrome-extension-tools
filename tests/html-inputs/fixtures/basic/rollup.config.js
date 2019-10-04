@@ -2,11 +2,12 @@
 
 import htmlInputs from '../../../../src/html-inputs'
 // import emptyDir from 'rollup-plugin-empty-dir'
-import { join } from 'path'
+import { join, relative } from 'path'
 
-const fixture = (name) => join(__dirname, name)
+const fixture = (name) =>
+  relative(process.cwd(), join(__dirname, name))
 
-export default {
+module.exports = {
   input: [
     fixture('popup.html'),
     fixture('options.html'),

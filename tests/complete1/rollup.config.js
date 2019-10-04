@@ -1,11 +1,11 @@
 /* eslint-env node */
 
-import { join } from 'path'
+import { join, relative } from 'path'
 import pkg from './package.json'
 import { chromeExtension } from '../../src/index'
 
-const fixture = (name) => join(__dirname, 'fixtures', name)
-
+const fixture = (name) =>
+  relative(process.cwd(), join(__dirname, 'fixtures', name))
 
 export default {
   input: fixture('src/manifest.json'),

@@ -5,27 +5,27 @@ import fs from 'fs-extra'
 import cheerio from 'cheerio'
 
 import {
-  getJsEntries,
-  getJsAssets,
   getCssHrefs,
   getImgSrcs,
-} from '../../src/html-inputs/cheerio.js'
+  getScriptSrc,
+} from '../../src/html-inputs/cheerio'
 
 const loadHtml = async (name) => {
   const fixtures = 'tests/html-inputs/fixtures'
   const popup = 'popup.html'
-  const htmlPath = path.join(fixtures, name, popup)
+  const filePath = path.join(fixtures, name, popup)
 
-  const html = await fs.readFile(htmlPath, 'utf8')
+  const html = await fs.readFile(filePath, 'utf8')
+  const $ = cheerio.load(html)
 
-  return [htmlPath, cheerio.load(html)]
+  return Object.assign($, { filePath })
 }
 
-test('getJsEntries', async () => {
+test('getScriptSrc', async () => {
   const name = 'basic'
   const param = await loadHtml(name)
 
-  const jsEntries = getJsEntries(param)
+  const jsEntries = getScriptSrc(param)
 
   expect(jsEntries).toBeInstanceOf(Array)
   expect(jsEntries.length).toBe(1)
@@ -39,7 +39,7 @@ test('getTsEntries', async () => {
   const name = 'with-ts'
   const param = await loadHtml(name)
 
-  const jsEntries = getJsEntries(param)
+  const jsEntries = getScriptSrc(param)
 
   expect(jsEntries).toBeInstanceOf(Array)
   expect(jsEntries.length).toBe(1)
@@ -49,18 +49,15 @@ test('getTsEntries', async () => {
   assert(jsEntries.every((s) => !s.endsWith('.html')))
 })
 
-test('getJsAssets', async () => {
-  const name = 'with-assets'
-  const param = await loadHtml(name)
-
-  const jsAssets = getJsAssets(param)
-
-  expect(jsAssets).toBeInstanceOf(Array)
-  expect(jsAssets.length).toBe(1)
-
-  assert(jsAssets.some((s) => s.endsWith('react.js')))
-  assert(jsAssets.every((s) => s.endsWith('.js')))
-  assert(jsAssets.every((s) => !s.endsWith('.html')))
+test.skip('getJsAssets', async () => {
+  // const name = 'with-assets'
+  // const param = await loadHtml(name)
+  // const jsAssets = getJsAssets(param)
+  // expect(jsAssets).toBeInstanceOf(Array)
+  // expect(jsAssets.length).toBe(1)
+  // assert(jsAssets.some((s) => s.endsWith('react.js')))
+  // assert(jsAssets.every((s) => s.endsWith('.js')))
+  // assert(jsAssets.every((s) => !s.endsWith('.html')))
 })
 
 test('getCssHrefs', async () => {

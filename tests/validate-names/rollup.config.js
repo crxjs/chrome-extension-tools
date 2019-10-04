@@ -5,11 +5,12 @@ import commonjs from 'rollup-plugin-commonjs'
 import resolve from 'rollup-plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript'
 import { bundleImports } from 'rollup-plugin-bundle-imports'
-import { join } from 'path'
+import { join, relative } from 'path'
 
 const pkg = require('./package.json')
 
-const fixture = (name) => join(__dirname, name)
+const fixture = (name) =>
+  relative(process.cwd(), join(__dirname, name))
 
 const plugins = [
   chromeExtension({ pkg, verbose: false }),

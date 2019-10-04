@@ -5,7 +5,7 @@ import cheerio from 'cheerio'
 
 import sinon from 'sinon'
 
-import { loadHtml } from '../../src/html-inputs/cheerio.js'
+import { loadHtml } from '../../src/html-inputs/cheerio'
 
 afterEach(() => {
   sinon.restore()
@@ -19,7 +19,9 @@ test('loadHtml', () => {
     .stub(fs, 'readFileSync')
     .returns(contents)
 
-  const loadStub = sinon.stub(cheerio, 'load')
+  const loadStub = sinon
+    .stub(cheerio, 'load')
+    .returns(function cheerio() {})
 
   loadHtml(filePath)
 
@@ -29,6 +31,3 @@ test('loadHtml', () => {
   assert(loadStub.calledOnce)
   assert(loadStub.calledWith(contents))
 })
-
-test.todo('mutate js entries')
-test.todo('mutate ts entries')
