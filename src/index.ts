@@ -29,7 +29,7 @@ export const chromeExtension = (options: {
   name: string
 } => {
   const manifest = manifestInput(options)
-  const html = htmlInputs()
+  const html = htmlInputs(manifest)
   const reloader = useReloader(options)
   const validate = v()
   const plugins = [manifest, html, reloader, validate]

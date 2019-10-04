@@ -5,7 +5,7 @@ import { reloader as r } from './reloader'
 
 const reloader = r()
 
-test('calls reloader hooks', async () => {
+test.skip('calls reloader hooks', async () => {
   const bundle = await rollup(config)
   await bundle.generate(config.output)
 

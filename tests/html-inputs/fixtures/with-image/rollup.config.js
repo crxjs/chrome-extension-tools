@@ -18,5 +18,5 @@ module.exports = {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: [htmlInputs(), emptyDir()],
+  plugins: [htmlInputs({ srcDir: fixture('') }), emptyDir()],
 }

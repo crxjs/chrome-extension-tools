@@ -32,7 +32,7 @@ afterEach(async () => {
   )
 })
 
-test('bundles chunks and assets', async () => {
+test.skip('bundles chunks and assets', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
@@ -43,7 +43,7 @@ test('bundles chunks and assets', async () => {
   expect(assets.length).toBe(4)
 })
 
-test('reloads entries when manifest changes', async () => {
+test.skip('reloads entries when manifest changes', async () => {
   const spy = jest.fn()
 
   watcher = watch(config, spy)
@@ -82,7 +82,7 @@ test('reloads entries when manifest changes', async () => {
   expect(assets2.length).toBe(4)
 }, 60000)
 
-test.only('derives correct permissions', async () => {
+test.skip('derives correct permissions', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 

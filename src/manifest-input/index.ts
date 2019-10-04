@@ -60,14 +60,10 @@ export default function(
     publicKey?: string
     verbose?: boolean
   },
-) {
-  // TODO: remove all extra props from pkg
-
+): Partial<PluginHooks> & { name: string; srcDir: string } {
   const derivePermissions = memoize(dp)
 
   /* ----------- HOOKS CLOSURES START ----------- */
-
-  let srcDir: string
 
   let manifestPath: string
 
@@ -81,9 +77,11 @@ export default function(
     input?: string[]
     manifest?: ChromeExtensionManifest
     permsHash: string
+    srcDir: string
   } = {
     assets: [] as Asset[],
     permsHash: '',
+    srcDir: '',
   }
 
   const manifestName = 'manifest.json'
@@ -97,8 +95,12 @@ export default function(
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
   /* --------------- plugin object -------------- */
-  const plugin: Partial<PluginHooks> & { name: string } = {
+  return {
     name,
+
+    get srcDir() {
+      return cache.srcDir
+    },
 
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
@@ -121,7 +123,7 @@ export default function(
         )
       }
 
-      srcDir = path.dirname(manifestPath)
+      cache.srcDir = path.dirname(manifestPath)
 
       // Load manifest.json
       cache.manifest = fs.readJSONSync(manifestPath)
@@ -133,7 +135,7 @@ export default function(
       // Derive entry paths from manifest
       const { js, html, css, img } = deriveFiles(
         cache.manifest,
-        srcDir,
+        cache.srcDir,
       )
 
       // Cache derived inputs
@@ -164,7 +166,7 @@ export default function(
             type: 'asset' as 'asset',
             source,
             fileName: srcPath
-              .replace(srcDir, '')
+              .replace(cache.srcDir, '')
               .replace(/^\//, ''),
           }
         }),
@@ -345,6 +347,4 @@ export default function(
       }
     },
   }
-
-  return plugin
 }

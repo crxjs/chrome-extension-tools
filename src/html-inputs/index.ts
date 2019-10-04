@@ -1,14 +1,15 @@
 import 'array-flat-polyfill'
-import { flatten } from 'lodash-es'
+import { readFile } from 'fs-extra'
 import { PluginHooks } from 'rollup'
-import { zipArrays, not } from '../helpers'
+import { not } from '../helpers'
 import {
-  getScriptSrc,
-  loadHtml,
   getCssHrefs,
   getImgSrcs,
+  getScriptSrc,
+  loadHtml,
 } from './cheerio'
-import { readFile } from 'fs-extra'
+import flatten from 'lodash.flatten'
+import { relative } from 'path'
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 
@@ -18,7 +19,9 @@ const name = 'html-inputs'
 /*                  HTML-INPUTS                 */
 /* ============================================ */
 
-export default function htmlInputs(): Partial<PluginHooks> & {
+export default function htmlInputs(options: {
+  srcDir: string
+}): Partial<PluginHooks> & {
   name: string
 } {
   /* -------------- hooks closures -------------- */
@@ -111,7 +114,7 @@ export default function htmlInputs(): Partial<PluginHooks> & {
         this.emitFile({
           type: 'asset',
           source: replaced || source,
-          fileName: asset,
+          fileName: relative(options.srcDir, asset),
         })
       })
 

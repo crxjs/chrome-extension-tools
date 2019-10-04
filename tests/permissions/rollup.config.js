@@ -19,7 +19,7 @@ export default {
   },
   plugins: [
     manifestInput({ pkg }),
-    htmlInputs(),
+    htmlInputs({ srcDir: fixture('src') }),
     resolve(),
     commonjs(),
     emptyDir(),

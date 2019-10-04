@@ -15,5 +15,9 @@ export default {
     dir: fixture('dest'),
     format: 'esm',
   },
-  plugins: [manifestInput({ pkg }), htmlInputs(), emptyDir()],
+  plugins: [
+    manifestInput({ pkg }),
+    htmlInputs({ srcDir: fixture('src') }),
+    emptyDir(),
+  ],
 }

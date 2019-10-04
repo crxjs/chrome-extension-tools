@@ -1,5 +1,7 @@
 import glob from 'glob'
-import { get } from 'lodash-es'
+import get from 'lodash.get'
+import { join } from 'path'
+import { OutputChunk } from 'rollup'
 import {
   ChromeExtensionManifest,
   ContentScript,
@@ -7,8 +9,6 @@ import {
 import { combinePerms } from './combine'
 import * as permissions from './permissions'
 import { validate } from './validate'
-import { OutputChunk } from 'rollup'
-import { join } from 'path'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */
@@ -87,7 +87,10 @@ export function deriveFiles(
       manifest,
       'content_scripts',
       [] as ContentScript[],
-    ).reduce((r, { css = [] }) => [...r, ...css], [] as string[]),
+    ).reduce(
+      (r, { css = [] }) => [...r, ...css],
+      [] as string[],
+    ),
   ]
 
   // TODO: this can be a string or object

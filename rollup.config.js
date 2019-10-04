@@ -19,7 +19,7 @@ const plugins = [
 
 export default [
   {
-    input: 'src/index.js',
+    input: 'src/index.ts',
     output: [
       {
         file: 'lib/index-esm.js',
@@ -34,17 +34,21 @@ export default [
     ],
     external: [
       '@bumble/manifest',
+      'ajv',
+      'ajv/lib/refs/json-schema-draft-04.json',
       'cheerio',
       'fs-extra',
+      'fs',
+      'glob',
       'is-valid-path',
+      'lodash.flatten',
+      'lodash.get',
+      'lodash.startcase',
       'magic-string',
       'mem',
       'path',
       'picomatch',
       'rollup-pluginutils',
-      'lodash.startcase',
-      'ajv',
-      'ajv/lib/refs/json-schema-draft-04.json',
     ],
     plugins,
   },

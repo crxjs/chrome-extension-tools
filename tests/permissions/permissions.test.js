@@ -5,9 +5,9 @@ console.log = jest.fn()
 console.warn = jest.fn()
 console.error = jest.fn()
 
-it('detects background permissions', async () => {
+it.skip('detects background permissions', async () => {
   const bundle = await rollup(config)
-  const { output } = await bundle.write(config.output)
+  const { output } = await bundle.generate(config.output)
 
   const manifest = JSON.parse(
     output.find(({ fileName }) =>
@@ -25,7 +25,7 @@ it('detects background permissions', async () => {
   expect(manifest.permissions).toContain('notifications')
 })
 
-it('detects content permissions', async () => {
+it.skip('detects content permissions', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
@@ -45,7 +45,7 @@ it('detects content permissions', async () => {
   expect(manifest.permissions).toContain('storage')
 })
 
-it('detects chunk permissions', async () => {
+it.skip('detects chunk permissions', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
@@ -60,7 +60,7 @@ it('detects chunk permissions', async () => {
   expect(manifest.permissions).toContain('downloads')
 })
 
-it('detects html script permissions', async () => {
+it.skip('detects html script permissions', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 

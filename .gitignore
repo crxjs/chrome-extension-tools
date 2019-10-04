@@ -2,3 +2,5 @@ node_modules/
 examples/
 **/dest
 **/lib
+types/
+!types/index.d.ts

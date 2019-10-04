@@ -3,7 +3,7 @@ import config from './rollup.config'
 
 console.log = jest.fn()
 
-test('bundles chunks and assets', async () => {
+test.skip('bundles chunks and assets', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
@@ -14,7 +14,7 @@ test('bundles chunks and assets', async () => {
   expect(assets.length).toBe(6)
 })
 
-test('wraps background scripts in dynamic import', async () => {
+test.skip('wraps background scripts in dynamic import', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
@@ -35,7 +35,7 @@ test('wraps background scripts in dynamic import', async () => {
   expect(bgWrapperAsset.source).not.toContain('// %DELAY%')
 })
 
-test('updates manifest script paths', async () => {
+test.skip('updates manifest script paths', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
@@ -58,7 +58,7 @@ test('updates manifest script paths', async () => {
   expect(bgScript).toMatch(/^assets\/background.+?\.js$/)
 })
 
-test('wraps content scripts in dynamic import', async () => {
+test.skip('wraps content scripts in dynamic import', async () => {
   const bundle = await rollup(config)
   const { output } = await bundle.generate(config.output)
 
