@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { join } from 'path'
+import { join, relative } from 'path'
 
 export function setupLoaderScript({
   eventDelay = false,
@@ -59,6 +59,6 @@ export function setupLoaderScript({
         /[\n\s]+case '(%EVENT%)':[\n\s]+return true/,
         replaceSwitchCase(2),
       )
-      .replace('%PATH%', `../${scriptPath}`)
+      .replace('%PATH%', relative('assets', scriptPath))
   }
 }

@@ -280,12 +280,16 @@ export default function(
           const emitDynamicImportWrapper = (
             scriptPath: string,
           ) => {
-            const source = loaderScript(scriptPath)
+            const _scriptPath = scriptPath.replace(
+              /\.ts$/,
+              '.js',
+            )
+            const source = loaderScript(_scriptPath)
 
             const assetId = this.emitFile({
               type: 'asset',
               source,
-              name: basename(scriptPath),
+              name: basename(_scriptPath),
             })
 
             return this.getFileName(assetId)
