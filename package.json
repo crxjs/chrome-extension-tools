@@ -46,7 +46,7 @@
     "picomatch": "^2.0.7",
     "rollup-plugin-zip": "^0.3.0",
     "rpce-interval-reloader": "^0.1.0",
-    "rpce-push-reloader": "^0.1.3",
+    "rpce-push-reloader": "^0.1.4",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
