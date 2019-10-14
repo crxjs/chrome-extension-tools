@@ -1,4 +1,7 @@
 {
+  "manifest_version": 2,
+  "name": "clip-selector",
+  "version": "1.0.0",
   "browser_action": {
     "default_icon": {
       "16": "images/icon-on-16.png"
