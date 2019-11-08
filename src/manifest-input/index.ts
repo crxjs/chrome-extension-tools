@@ -10,6 +10,10 @@ import {
 } from './manifest-parser/index'
 import { setupLoaderScript } from './setupLoaderScript'
 
+import cosmiconfig from 'cosmiconfig'
+
+const explorer = cosmiconfig('manifest')
+
 const isOutputChunk = (x: any): x is OutputChunk =>
   x.type === 'chunk'
 
@@ -112,25 +116,31 @@ export default function(
         return { ...options, input: cache.input }
       }
 
-      if (
-        typeof options.input === 'string' &&
-        options.input.endsWith('manifest.json')
-      ) {
-        manifestPath = options.input
-      } else {
+      if (typeof options.input !== 'string') {
         throw new TypeError(
-          'options.input must be "manifest.json"',
+          'RollupOptions.input must be a single Chrome extension manifest.',
         )
       }
 
-      cache.srcDir = path.dirname(manifestPath)
-
-      // Load manifest.json
-      cache.manifest = fs.readJSONSync(manifestPath)
-
-      if (!cache.manifest) {
-        throw new Error('Unable to load ' + manifestPath)
+      const configResult = explorer.loadSync(options.input) as {
+        filepath: string
+        config: ChromeExtensionManifest
+        isEmpty?: true
+      } | null
+      if (
+        !configResult ||
+        typeof configResult.config === 'undefined' ||
+        configResult.isEmpty
+      ) {
+        throw new Error(
+          `Could not load ${options.input} as Chrome extension manifest.`,
+        )
       }
+
+      manifestPath = configResult.filepath
+      cache.manifest = configResult.config
+
+      cache.srcDir = path.dirname(manifestPath)
 
       // Derive entry paths from manifest
       const { js, html, css, img } = deriveFiles(
