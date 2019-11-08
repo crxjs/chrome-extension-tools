@@ -1,3 +1,4 @@
+import cosmiconfig from 'cosmiconfig'
 import fs from 'fs-extra'
 import memoize from 'mem'
 import path, { basename } from 'path'
@@ -8,9 +9,8 @@ import {
   deriveManifest,
   derivePermissions as dp,
 } from './manifest-parser/index'
+import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
-
-import cosmiconfig from 'cosmiconfig'
 
 const explorer = cosmiconfig('manifest')
 
@@ -78,7 +78,7 @@ export default function(
 
   const cache: {
     assets: Asset[]
-    input?: string[]
+    input: string[]
     manifest?: ChromeExtensionManifest
     permsHash: string
     srcDir: string
@@ -86,6 +86,7 @@ export default function(
     assets: [] as Asset[],
     permsHash: '',
     srcDir: '',
+    input: [] as string[],
   }
 
   const manifestName = 'manifest.json'
@@ -112,49 +113,59 @@ export default function(
 
     options(options) {
       // Do not reload manifest without changes
-      if (cache.manifest) {
-        return { ...options, input: cache.input }
-      }
+      if (!cache.manifest) {
+        /* ----------- LOAD AND PROCESS MANIFEST ----------- */
 
-      if (typeof options.input !== 'string') {
-        throw new TypeError(
-          'RollupOptions.input must be a single Chrome extension manifest.',
+        if (typeof options.input !== 'string') {
+          throw new TypeError(
+            'RollupOptions.input must be a single Chrome extension manifest.',
+          )
+        }
+
+        const configResult = explorer.loadSync(
+          options.input,
+        ) as {
+          filepath: string
+          config: ChromeExtensionManifest
+          isEmpty?: true
+        } | null
+        if (
+          !configResult ||
+          typeof configResult.config === 'undefined' ||
+          configResult.isEmpty
+        ) {
+          throw new Error(
+            `Could not load ${options.input} as Chrome extension manifest.`,
+          )
+        }
+
+        manifestPath = configResult.filepath
+        cache.manifest = configResult.config
+
+        cache.srcDir = path.dirname(manifestPath)
+
+        // Derive entry paths from manifest
+        const { js, html, css, img } = deriveFiles(
+          cache.manifest,
+          cache.srcDir,
         )
+
+        // Cache derived inputs
+        cache.input = [...js, ...html]
+        cache.assets = [...css, ...img].map((srcPath) => ({
+          srcPath,
+        }))
+
+        /* --------------- END LOAD MANIFEST --------------- */
       }
 
-      const configResult = explorer.loadSync(options.input) as {
-        filepath: string
-        config: ChromeExtensionManifest
-        isEmpty?: true
-      } | null
-      if (
-        !configResult ||
-        typeof configResult.config === 'undefined' ||
-        configResult.isEmpty
-      ) {
-        throw new Error(
-          `Could not load ${options.input} as Chrome extension manifest.`,
-        )
+      return {
+        ...options,
+        input: cache.input.reduce(
+          reduceToRecord(cache.srcDir),
+          {},
+        ),
       }
-
-      manifestPath = configResult.filepath
-      cache.manifest = configResult.config
-
-      cache.srcDir = path.dirname(manifestPath)
-
-      // Derive entry paths from manifest
-      const { js, html, css, img } = deriveFiles(
-        cache.manifest,
-        cache.srcDir,
-      )
-
-      // Cache derived inputs
-      cache.input = [...js, ...html]
-      cache.assets = [...css, ...img].map((srcPath) => ({
-        srcPath,
-      }))
-
-      return { ...options, input: cache.input }
     },
 
     /* ============================================ */
@@ -336,6 +347,8 @@ export default function(
 
         /* ---------- STABLE EXTENSION ID END --------- */
 
+        /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
+
         const manifestJson = JSON.stringify(
           manifestBody,
           null,
@@ -359,6 +372,8 @@ export default function(
 
         this.error(error.message)
       }
+
+      /* ------------ OUTPUT MANIFEST.JSON END ----------- */
     },
   }
 }

@@ -10,6 +10,7 @@ import {
 } from './cheerio'
 import flatten from 'lodash.flatten'
 import { relative } from 'path'
+import { reduceToRecord } from '../manifest-input/reduceToRecord'
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 
@@ -19,15 +20,15 @@ const name = 'html-inputs'
 /*                  HTML-INPUTS                 */
 /* ============================================ */
 
-export default function htmlInputs(options: {
-  srcDir: string
+export default function htmlInputs(_options: {
+  readonly srcDir: string
 }): Partial<PluginHooks> & {
   name: string
 } {
   /* -------------- hooks closures -------------- */
 
   const cache: {
-    input?: string[]
+    input: string[]
     html: string[]
     js: string[]
     img: string[]
@@ -37,6 +38,7 @@ export default function htmlInputs(options: {
     js: [],
     css: [],
     img: [],
+    input: [],
   }
 
   /* --------------- plugin object -------------- */
@@ -49,46 +51,41 @@ export default function htmlInputs(options: {
 
     options(options) {
       // Skip if cache.input exists
-      if (cache.input) {
-        return {
-          ...options,
-          input: cache.input,
+      if (cache.input.length === 0) {
+        // Cast options.input to array
+        let input: string[]
+        if (typeof options.input === 'string') {
+          input = [options.input]
+        } else if (Array.isArray(options.input)) {
+          input = [...options.input]
+        } else if (typeof options.input === 'object') {
+          input = Object.values(options.input)
+        } else {
+          throw new TypeError('options.input is undefined')
         }
+
+        // Filter htm and html files
+        cache.html = input.filter(isHtml)
+
+        if (cache.html.length === 0) {
+          return options
+        }
+
+        /* -------------- Load html files ------------- */
+
+        const html$ = cache.html.map(loadHtml)
+
+        cache.js = flatten(html$.map(getScriptSrc))
+        cache.css = flatten(html$.map(getCssHrefs))
+        cache.img = flatten(html$.map(getImgSrcs))
+
+        // Cache jsEntries with existing options.input
+        cache.input = input.filter(not(isHtml)).concat(cache.js)
       }
-
-      // Cast options.input to array
-      let input: string[]
-      if (typeof options.input === 'string') {
-        input = [options.input]
-      } else if (Array.isArray(options.input)) {
-        input = [...options.input]
-      } else {
-        throw new TypeError(
-          'options.input must be a string or string[]',
-        )
-      }
-
-      // Filter htm and html files
-      cache.html = input.filter(isHtml)
-
-      if (cache.html.length === 0) {
-        return options
-      }
-
-      /* -------------- Load html files ------------- */
-
-      const html$ = cache.html.map(loadHtml)
-
-      cache.js = flatten(html$.map(getScriptSrc))
-      cache.css = flatten(html$.map(getCssHrefs))
-      cache.img = flatten(html$.map(getImgSrcs))
-
-      // Cache jsEntries with existing options.input
-      cache.input = input.filter(not(isHtml)).concat(cache.js)
 
       return {
         ...options,
-        input: cache.input,
+        input: cache.input.reduce(reduceToRecord(_options.srcDir), {}),
       }
     },
 
@@ -114,7 +111,7 @@ export default function htmlInputs(options: {
         this.emitFile({
           type: 'asset',
           source: replaced || source,
-          fileName: relative(options.srcDir, asset),
+          fileName: relative(_options.srcDir, asset),
         })
       })
 
@@ -123,7 +120,7 @@ export default function htmlInputs(options: {
 
     watchChange(id) {
       if (id.endsWith('.html')) {
-        cache.input = undefined
+        cache.input = []
       }
     },
   }

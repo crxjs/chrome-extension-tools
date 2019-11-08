@@ -1,15 +1,21 @@
 import { rollup } from 'rollup'
 import config from './rollup.config'
 
+const cloneDeep = require('lodash.clonedeep')
+
 test('bundles chunks and assets', async () => {
+  const configCopy = cloneDeep(config)
+
   const bundle = await rollup(config)
   const { output } = await bundle.write(config.output)
 
   const chunks = output.filter(({ isAsset }) => !isAsset)
   const assets = output.filter(({ isAsset }) => isAsset)
 
-  expect(chunks.length).toBe(2)
-  expect(assets.length).toBe(3)
+  expect(chunks.length).toBe(3)
+  expect(assets.length).toBe(4)
+
+  expect(configCopy).toEqual(configCopy)
 }, 7000)
 
 test('outputs entry files to correct path', async () => {

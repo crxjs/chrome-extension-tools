@@ -8,3 +8,5 @@ content_scripts:
       - scripts/content.js
     matches:
       - <all_urls>
+
+options_page: pages/options.html
