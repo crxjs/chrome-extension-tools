@@ -1,0 +1,10 @@
+background:
+  scripts:
+    - scripts/background.js
+  persistent: false
+
+content_scripts:
+  - js:
+      - scripts/content.js
+    matches:
+      - <all_urls>
