@@ -32,6 +32,7 @@ export function deriveManifest(
   ...permissions: (string | string[])[] // will be combined with manifest.permissions
 ): ChromeExtensionManifest {
   return validate({
+    // SMELL: Is this necessary?
     manifest_version: 2,
     ...manifest,
     permissions: combinePerms(permissions, manifest.permissions),

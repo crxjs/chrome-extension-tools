@@ -51,6 +51,7 @@ export default function htmlInputs(_options: {
 
     options(options) {
       // Skip if cache.input exists
+      // cache is dumped in watchChange hook
       if (cache.input.length === 0) {
         // Cast options.input to array
         let input: string[]

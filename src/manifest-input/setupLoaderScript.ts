@@ -36,6 +36,8 @@ export function setupLoaderScript({
     }
   }
 
+  // TODO: use bundleImports
+  // TODO: convert dynamicImportWrapper to TS
   const script = readFileSync(
     join(__dirname, 'dynamicImportWrapper.js'),
     'utf-8',

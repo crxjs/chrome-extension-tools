@@ -201,9 +201,12 @@ export default function(
     watchChange(id) {
       if (
         id.endsWith(manifestName) ||
+        // SMELL: why dump manifest if asset changes?
+        //  - triggers reload of all assets if one changes
+        //  - should trigger reload of one asset if it changes?
         cache.assets.some(({ srcPath }) => id === srcPath)
       ) {
-        // Dump cache.manifest if manifest.json or manifest asset changes
+        // Dump cache.manifest if manifest changes
         cache.manifest = undefined
       }
     },
@@ -241,9 +244,11 @@ export default function(
       try {
         // Clone cache.manifest
         const cachedManifest = JSON.parse(
+          // FIXME: assert cache.manifest exists, should error if not
           JSON.stringify(cache.manifest || {}),
         )
 
+        // SMELL: Is this necessary?
         const updatedManifest = {
           manifest_version: 2,
           name: pkg.name,
@@ -252,6 +257,7 @@ export default function(
           ...cachedManifest,
         }
 
+        // TODO: refactor, as this isn't really necessary
         const manifestBody: ChromeExtensionManifest = deriveManifest(
           updatedManifest,
           permissions,
@@ -356,6 +362,8 @@ export default function(
         )
           // Replace ts and tsx in manifest
           .replace(/\.[jt]sx?"/g, '.js"')
+
+        // TODO: validate manifest by schema
 
         // Emit manifest.json
         this.emitFile({

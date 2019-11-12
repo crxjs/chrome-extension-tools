@@ -1,11 +1,15 @@
 export const validate = () => ({
+  // TODO: refactor to TS
+  // TODO: name everything carefully
   name: 'validate-names',
+  
   generateBundle(options, bundle) {
     const chunks = Object.values(bundle).filter(
       ({ isAsset }) => !isAsset,
     )
 
-    // TODO: loop through each file and check for "_" in filename
+    // Files cannot start with "_" in Chrome Extensions
+    // Loop through each file and check for "_" in filename
     Object.keys(bundle)
       .filter((fileName) => fileName.startsWith('_'))
       .forEach((fileName) => {

@@ -16,6 +16,8 @@ const getRelativePath = (filePath: string) => (p: string) => {
   return path.join(relDir, p)
 }
 
+/* -------------------- SCRIPTS -------------------- */
+
 const getScripts = ($: CheerioStatic) =>
   $('script')
     .not('[data-rollup-asset]')
@@ -33,6 +35,10 @@ export const getScriptSrc = (
   getScripts($)
     .map((elem) => $(elem).attr('src'))
     .map(getRelativePath($.filePath))
+
+/* ----------------- ASSET SCRIPTS ----------------- */
+
+// TODO: Recover getAssetScripts from Git
 
 /* -------------------- css ------------------- */
 
@@ -55,6 +61,7 @@ export const getCssHrefs = (
     .map(getRelativePath($.filePath))
 
 /* -------------------- img ------------------- */
+
 const getImgs = ($: CheerioStatic) =>
   $('img')
     .not('[src^="http://"]')

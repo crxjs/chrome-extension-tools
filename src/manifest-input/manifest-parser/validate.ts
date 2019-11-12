@@ -1,5 +1,6 @@
 import Ajv from 'ajv'
 
+// TODO: fix schema path
 import manifestSchema from './schema.json'
 import jsonSchema from 'ajv/lib/refs/json-schema-draft-04.json'
 
@@ -16,13 +17,13 @@ export const ajv = new Ajv({
 
 const validator = ajv.compile(manifestSchema)
 
-export const validate = json => {
+export const validate = (json: any) => {
   if (validator(json)) {
     return json
   }
 
   const { errors } = validator
-  const msg = `This manifest has ${errors.length} problems.`
+  const msg = `This manifest has ${errors!.length} problems.`
 
   throw new ValidationError(msg, errors)
 }

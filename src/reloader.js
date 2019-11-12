@@ -1,4 +1,7 @@
+// TODO: refactor to TS
+
 // Reloader paths are relative to the dist folder
+// TODO: refactor to separate file to support mocking
 const loadReloader = (reloader) => {
   if (typeof reloader === 'function') {
     return reloader()
@@ -32,6 +35,9 @@ export default function useReloader({
   return {
     name: _reloader.name || 'reloader',
 
+    // TODO: add buildStart hook
+    //  - Signal that the build has started
+
     async generateBundle(options, bundle) {
       if (_reloader) {
         if (startReloader) {
@@ -56,6 +62,7 @@ export default function useReloader({
     writeBundle(bundle) {
       if (!_reloader) return
 
+      // TODO: consider if this is the job of the reloader
       if (firstRun) {
         firstRun = false
         console.log(_reloader.name, 'ready...')
