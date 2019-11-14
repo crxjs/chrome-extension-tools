@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 import htmlInputs from '../../../../src/html-inputs'
-// import emptyDir from 'rollup-plugin-empty-dir'
+// import { emptyDir } from 'rollup-plugin-empty-dir'
 import { join, relative } from 'path'
 
 const fixture = (name) =>

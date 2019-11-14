@@ -1,7 +1,7 @@
 /* eslint-env node */
 
 import htmlInputs from '../../../../src/html-inputs/index'
-import emptyDir from 'rollup-plugin-empty-dir'
+import { emptyDir } from 'rollup-plugin-empty-dir'
 
 import { join, relative } from 'path'
 

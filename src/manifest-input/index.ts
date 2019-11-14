@@ -1,4 +1,4 @@
-import cosmiconfig from 'cosmiconfig'
+import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import memoize from 'mem'
 import path, { basename } from 'path'
@@ -12,7 +12,7 @@ import {
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 
-const explorer = cosmiconfig('manifest')
+const explorer = cosmiconfigSync('manifest')
 
 const isOutputChunk = (x: any): x is OutputChunk =>
   x.type === 'chunk'
@@ -122,7 +122,7 @@ export default function(
           )
         }
 
-        const configResult = explorer.loadSync(
+        const configResult = explorer.load(
           options.input,
         ) as {
           filepath: string

@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "@bumble/manifest": "^0.6.1",
-    "@types/cosmiconfig": "^6.0.0",
     "@types/glob": "^7.1.1",
     "@types/lodash-es": "^4.17.3",
     "@types/lodash.flatten": "^4.4.6",

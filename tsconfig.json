@@ -13,7 +13,7 @@
     "strict": true,
     "target": "es2017",
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "include": ["src"]
 }
