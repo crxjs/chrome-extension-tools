@@ -49,6 +49,7 @@
     "rollup-plugin-zip": "^0.5.2",
     "rpce-interval-reloader": "^0.1.0",
     "rpce-push-reloader": "^0.2.3",
+    "slash": "^3.0.0",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
