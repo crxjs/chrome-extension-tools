@@ -1,26 +1,13 @@
-test.todo('throws if input is not manifest', () => {
-  // TODO: --
-})
+test.todo('throws if input is not manifest')
 
-test.todo('loads manifest via cosmicConfig', () => {
-  // TODO: 
-})
+test.todo('loads manifest via cosmicConfig')
 
-test.todo('sets correct cache values', () => {
+test.skip('sets correct cache values', () => {
   // TODO: manifest, srcDir, input, assets
 })
 
-test.todo('calls deriveFiles', () => {
-  // TODO: --
-})
+test.todo('calls deriveFiles')
 
-test.todo(
-  'does nothing if manifest cacheDists',
-  () => {
-    // TODO: --
-  },
-)
+test.todo('does nothing if manifest cacheDists')
 
-test.todo('returns inputRecord', () => {
-  // TODO: --
-})
+test.todo('returns inputRecord')

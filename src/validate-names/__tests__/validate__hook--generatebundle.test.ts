@@ -1,4 +1,4 @@
-test.todo('modify bundle -mutate', () => {
+test.skip('modify bundle -mutate', () => {
   // - all files that start with "_"
   // - rename w/o "_"
   // - Fix in manifest asset

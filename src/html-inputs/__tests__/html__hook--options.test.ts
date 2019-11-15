@@ -1,26 +1,13 @@
-test.todo('if cached input, do nothing', () => {
-  // TODO: --
-})
+test.todo('if cached input, do nothing')
 
-test.todo('if no html do nothing', () => {
+test.skip('if no html do nothing', () => {
   // TODO: what to mock?
 })
 
-test.todo('calls load html', () => {
-  // TODO: --
-})
+test.todo('calls load html')
 
-test.todo('caches correct input', () => {
-  // TODO: --
-})
+test.todo('caches correct input')
 
-test.todo(
-  'caches correct js, ts, jsx, tsx, css, img, assets',
-  () => {
-    // TODO: --
-  },
-)
+test.todo('caches correct js, ts, jsx, tsx, css, img, assets')
 
-test.todo('returns options.input as input record', () => {
-  // TODO: --
-})
+test.todo('returns options.input as input record')

@@ -1,7 +1,3 @@
-test.todo('dumps manifest if id is manifest', () => {
-  // TODO: --
-})
+test.todo('dumps manifest if id is manifest')
 
-test.todo('dumps asset if it changes?', () => {
-  // TODO: --
-})
+test.todo('dumps asset if it changes?')
