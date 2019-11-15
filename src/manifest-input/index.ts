@@ -64,7 +64,10 @@ export default function(
     publicKey?: string
     verbose?: boolean
   },
-): Partial<PluginHooks> & { name: string; srcDir: string } {
+): Pick<
+  PluginHooks,
+  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
+> & { name: string; srcDir: string } {
   const derivePermissions = memoize(dp)
 
   /* ----------- HOOKS CLOSURES START ----------- */
@@ -122,9 +125,7 @@ export default function(
           )
         }
 
-        const configResult = explorer.load(
-          options.input,
-        ) as {
+        const configResult = explorer.load(options.input) as {
           filepath: string
           config: ChromeExtensionManifest
           isEmpty?: true

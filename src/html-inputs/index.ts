@@ -22,7 +22,10 @@ const name = 'html-inputs'
 
 export default function htmlInputs(_options: {
   readonly srcDir: string
-}): Partial<PluginHooks> & {
+}): Pick<
+  PluginHooks,
+  'options' | 'buildStart' | 'watchChange'
+> & {
   name: string
 } {
   /* -------------- hooks closures -------------- */
@@ -86,7 +89,10 @@ export default function htmlInputs(_options: {
 
       return {
         ...options,
-        input: cache.input.reduce(reduceToRecord(_options.srcDir), {}),
+        input: cache.input.reduce(
+          reduceToRecord(_options.srcDir),
+          {},
+        ),
       }
     },
 

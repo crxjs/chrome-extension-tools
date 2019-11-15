@@ -1,8 +1,8 @@
+import { PluginHooks } from 'rollup'
 import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
 import useReloader from './reloader'
 import { validate as v } from './validate-names/index'
-import { PluginHooks } from 'rollup'
 
 export interface ChromeExtensionOptions {
   assets?: {
@@ -29,27 +29,35 @@ export interface ChromeExtensionOptions {
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
-): Partial<PluginHooks> & {
+): Pick<
+  PluginHooks,
+  | 'options'
+  | 'buildStart'
+  | 'watchChange'
+  | 'generateBundle'
+  | 'writeBundle'
+> & {
   name: string
+  _plugins: Record<
+    string,
+    Partial<PluginHooks> & { name: string; srcDir?: string }
+  >
 } => {
   const manifest = manifestInput(options)
   const html = htmlInputs(manifest)
   const reloader = useReloader(options)
   const validate = v()
-  const plugins = [manifest, html, reloader, validate]
 
   return {
     name: 'chrome-extension',
+    _plugins: { manifest, html, reloader, validate },
 
     options(options) {
-      const hook = 'options'
+      return [manifest, html].reduce((opts, plugin) => {
+        const result = plugin.options.call(this, opts)
 
-      return plugins.reduce(
-        (opts, plugin) =>
-          // @ts-ignore
-          plugin[hook] ? plugin[hook].call(this, opts) : opts,
-        options,
-      )
+        return result || options
+      }, options)
     },
 
     buildStart(options) {
