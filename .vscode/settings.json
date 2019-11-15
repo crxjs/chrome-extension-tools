@@ -1,16 +1,11 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "json.schemas": [{
-    "fileMatch": ["manifest.json", "*__fixture--manifest.json"],
-    "url": "/manifest.schema.json"
-  }
-],
-"spellright.language": [
-  "en"
-],
-"spellright.documentTypes": [
-  "markdown",
-  "latex",
-  "typescript"
-]
+  "json.schemas": [
+    {
+      "fileMatch": ["manifest.json"],
+      "url": "/manifest.schema.json"
+    }
+  ],
+  "spellright.language": ["en"],
+  "spellright.documentTypes": ["markdown", "latex", "typescript"]
 }
