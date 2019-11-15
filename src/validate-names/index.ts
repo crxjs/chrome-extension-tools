@@ -1,11 +1,20 @@
-export const validate = () => ({
+import { PluginHooks, OutputChunk, OutputAsset } from 'rollup'
+
+interface ManifestAsset extends OutputAsset {
+  source: string
+}
+
+export const validate = (): Pick<
+  PluginHooks,
+  'generateBundle'
+> & { name: string } => ({
   // TODO: refactor to TS
   // TODO: name everything carefully
   name: 'validate-names',
-  
+
   generateBundle(options, bundle) {
     const chunks = Object.values(bundle).filter(
-      ({ isAsset }) => !isAsset,
+      (x): x is OutputChunk => x.type === 'chunk',
     )
 
     // Files cannot start with "_" in Chrome Extensions
@@ -18,7 +27,7 @@ export const validate = () => ({
         const fixed = fileName.slice(1)
 
         // Fix manifest
-        const manifest = bundle['manifest.json']
+        const manifest = bundle['manifest.json'] as ManifestAsset
         manifest.source = manifest.source.replace(regex, fixed)
 
         // Change bundle key
