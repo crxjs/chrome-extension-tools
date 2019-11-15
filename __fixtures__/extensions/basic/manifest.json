@@ -1,0 +1,6 @@
+{
+  "background": { "scripts": ["background.js"] },
+  "content_scripts": [
+    { "js": ["content.js"], "matches": ["<all_urls>"] }
+  ]
+}
