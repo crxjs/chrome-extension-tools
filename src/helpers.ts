@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 
-export const not = (fn: any) => (x: any) => !fn(x)
+export const not = <T>(fn: (x: T) => boolean) => (x: T) => !fn(x)
 
 export const loadAssetData = (assetPath: string) =>
   fs.readFile(assetPath).then((src) => [assetPath, src])

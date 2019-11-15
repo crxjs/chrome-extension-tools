@@ -4,7 +4,7 @@ import useReloader from './reloader'
 import { validate as v } from './validate-names/index'
 import { PluginHooks } from 'rollup'
 
-export const chromeExtension = (options: {
+export interface ChromeExtensionOptions {
   assets?: {
     include?: string[]
     exclude?: string[]
@@ -25,7 +25,11 @@ export const chromeExtension = (options: {
   }
   publicKey?: string
   reloader?: 'non-persistent' | 'persistent'
-}): Partial<PluginHooks> & {
+}
+
+export const chromeExtension = (
+  options = {} as ChromeExtensionOptions,
+): Partial<PluginHooks> & {
   name: string
 } => {
   const manifest = manifestInput(options)
