@@ -1,5 +1,4 @@
 module.exports = {
-  clearMocks: true,
   moduleNameMapper: {
     '\\.code(\\.js)?': '<rootDir>/tests/stub.code.js',
   },

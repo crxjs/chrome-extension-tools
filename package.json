@@ -10,7 +10,7 @@
   "files": [
     "lib",
     "types/index.d.ts",
-    "schema-manifest.json"
+    "manifest.schema.json"
   ],
   "main": "lib/index-cjs.js",
   "module": "lib/index-esm.js",
