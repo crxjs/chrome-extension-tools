@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["src", "jest.setup.js", "jest.config.js"]
+  "include": ["src", "__fixtures__", "jest.setup.js", "jest.config.js"]
 }
