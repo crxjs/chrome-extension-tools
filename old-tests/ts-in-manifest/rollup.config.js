@@ -4,7 +4,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import typescript from 'rollup-plugin-typescript'
 
 import { chromeExtension } from '../../src/index'
-import pkg from './package.json'
+import pkg from './package.json.js'
 import { join } from 'path'
 
 const fixture = (name) => join(__dirname, 'fixtures', name)
