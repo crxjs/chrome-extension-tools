@@ -1,6 +1,6 @@
 import 'array-flat-polyfill'
 
-export const combinePerms = (...permissions) => {
+export const combinePerms = (...permissions: string[]) => {
   const { perms, xperms } = permissions
     .filter((x) => Array.isArray(x))
     .flat(Infinity)
