@@ -3,7 +3,7 @@
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "lib": ["es2017"],
+    "lib": ["es2017", "esnext.array"],
     "module": "es2015",
     "moduleResolution": "node",
     "noImplicitReturns": true,
@@ -13,7 +13,7 @@
     "strict": true,
     "target": "es2017",
     "skipLibCheck": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["src", "jest.setup.js", "jest.config.js"]
 }
