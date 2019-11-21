@@ -14,7 +14,7 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
-} from '../../../__fixtures__/paths'
+} from '../../../__fixtures__/basic-paths'
 
 const srcDir = join(
   process.cwd(),
