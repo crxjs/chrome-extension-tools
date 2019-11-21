@@ -19,13 +19,13 @@ test('bundles chunks and assets', async () => {
   expect(output.find(byFileName('options2.js'))).toBeDefined()
   expect(output.find(byFileName('options3.js'))).toBeDefined()
   expect(output.find(byFileName('options4.js'))).toBeDefined()
-  expect(output.find(byFileName('popup.js'))).toBeDefined()
+  expect(output.find(byFileName('popup/popup.js'))).toBeDefined()
 
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.length).toBe(9)
   expect(output.find(byFileName('asset.js'))).toBeDefined()
-  expect(output.find(byFileName('popup.html'))).toBeDefined()
+  expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
   expect(output.find(byFileName('options.html'))).toBeDefined()
   expect(output.find(byFileName('options.css'))).toBeDefined()
   expect(output.find(byFileName('options.png'))).toBeDefined()

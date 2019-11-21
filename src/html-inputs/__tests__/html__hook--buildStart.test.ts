@@ -4,6 +4,20 @@ import { getExtPath } from '../../../__fixtures__/utils'
 import { InputOptions, EmittedAsset } from 'rollup'
 import { context } from '../../../__fixtures__/plugin-context'
 import { readFile } from 'fs-extra'
+import {
+  optionsHtml,
+  popupHtml,
+  optionsJs,
+  optionsJsx,
+  optionsTs,
+  optionsTsx,
+  popupJs,
+  backgroundJs,
+  optionsCss,
+  optionsPng,
+  optionsJpg,
+  assetJs,
+} from '../../../__fixtures__/paths'
 
 const srcDir = join(
   process.cwd(),
@@ -19,26 +33,6 @@ const cache: HtmlInputsPluginCache = {
 }
 
 const plugin = htmlInputs({ srcDir }, cache)
-
-// Html files
-const optionsHtml = getExtPath('basic/options.html')
-const popupHtml = getExtPath('basic/popup.html')
-
-// Html scripts
-const optionsJs = getExtPath('basic/options1.js')
-const optionsJsx = getExtPath('basic/options2.jsx')
-const optionsTs = getExtPath('basic/options3.ts')
-const optionsTsx = getExtPath('basic/options4.tsx')
-const popupJs = getExtPath('basic/popup.js')
-
-// Html assets
-const optionsCss = getExtPath('basic/options.css')
-const optionsPng = getExtPath('basic/options.png')
-const optionsJpg = getExtPath('basic/options.jpg')
-const assetJs = getExtPath('basic/asset.js')
-
-// External script file
-const backgroundJs = getExtPath('basic/background.js')
 
 let options: InputOptions
 beforeEach(() => {
@@ -75,7 +69,7 @@ test('emits all assets', async () => {
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
     source: expect.any(String),
-    fileName: 'popup.html',
+    fileName: 'popup/popup.html',
   })
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
@@ -122,7 +116,7 @@ test('modifies html source', async () => {
   ) as [EmittedAsset]
 
   const [popupCall] = context.emitFile.mock.calls.find(
-    ([{ fileName }]) => fileName === 'popup.html',
+    ([{ fileName }]) => fileName === 'popup/popup.html',
   ) as [EmittedAsset]
 
   expect(optionsCall.source).toBe(optionsSource)

@@ -1,11 +1,22 @@
 import { join } from 'path'
 import { InputOptions } from 'rollup'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
-import {
-  getExtPath,
-  getRelative,
-} from '../../../__fixtures__/utils'
+import { getRelative } from '../../../__fixtures__/utils'
 import htmlInputs, { HtmlInputsPluginCache } from '../index'
+import {
+  assetJs,
+  backgroundJs,
+  optionsCss,
+  optionsHtml,
+  optionsJpg,
+  optionsJs,
+  optionsJsx,
+  optionsPng,
+  optionsTs,
+  optionsTsx,
+  popupHtml,
+  popupJs,
+} from '../../../__fixtures__/paths'
 
 const cheerio = require('../cheerio')
 
@@ -23,26 +34,6 @@ const cache: HtmlInputsPluginCache = {
 }
 
 const plugin = htmlInputs({ srcDir }, cache)
-
-// Html files
-const optionsHtml = getExtPath('basic/options.html')
-const popupHtml = getExtPath('basic/popup.html')
-
-// Html scripts
-const optionsJs = getExtPath('basic/options1.js')
-const optionsJsx = getExtPath('basic/options2.jsx')
-const optionsTs = getExtPath('basic/options3.ts')
-const optionsTsx = getExtPath('basic/options4.tsx')
-const popupJs = getExtPath('basic/popup.js')
-
-// Html assets
-const optionsCss = getExtPath('basic/options.css')
-const optionsPng = getExtPath('basic/options.png')
-const optionsJpg = getExtPath('basic/options.jpg')
-const assetJs = getExtPath('basic/asset.js')
-
-// External script file
-const backgroundJs = getExtPath('basic/background.js')
 
 let options: InputOptions
 beforeEach(() => {
@@ -67,7 +58,7 @@ test('returns options.input as input record', () => {
       options2: '__fixtures__/extensions/basic/options2.jsx',
       options3: '__fixtures__/extensions/basic/options3.ts',
       options4: '__fixtures__/extensions/basic/options4.tsx',
-      popup: '__fixtures__/extensions/basic/popup.js',
+      'popup/popup': '__fixtures__/extensions/basic/popup/popup.js',
       // External script paths won't be touched
       background: backgroundJs,
     },
