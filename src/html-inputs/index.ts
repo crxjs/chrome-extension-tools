@@ -1,16 +1,41 @@
 import 'array-flat-polyfill'
+
 import { readFile } from 'fs-extra'
+import flatten from 'lodash.flatten'
+import { relative } from 'path'
 import { PluginHooks } from 'rollup'
 import { not } from '../helpers'
+import { reduceToRecord } from '../manifest-input/reduceToRecord'
+
 import {
   getCssHrefs,
   getImgSrcs,
+  getJsAssets,
   getScriptSrc,
   loadHtml,
 } from './cheerio'
-import flatten from 'lodash.flatten'
-import { relative } from 'path'
-import { reduceToRecord } from '../manifest-input/reduceToRecord'
+
+export interface HtmlInputsPluginCache {
+  /** Scripts that should not be bundled */
+  scripts: string[]
+  /** Scripts that should be bundled */
+  js: string[]
+  /** Absolute paths for HTML files to emit */
+  html: string[]
+  /** Image files to emit */
+  img: string[]
+  /** Stylesheets to emit */
+  css: string[]
+  /** Cache of last options.input, will have other scripts */
+  input: string[]
+}
+
+export type HtmlInputsPlugin = Pick<
+  PluginHooks,
+  'options' | 'buildStart' | 'watchChange'
+> & {
+  name: string
+}
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 
@@ -20,31 +45,21 @@ const name = 'html-inputs'
 /*                  HTML-INPUTS                 */
 /* ============================================ */
 
-export default function htmlInputs(_options: {
-  readonly srcDir: string
-}): Pick<
-  PluginHooks,
-  'options' | 'buildStart' | 'watchChange'
-> & {
-  name: string
-} {
-  /* -------------- hooks closures -------------- */
-
-  const cache: {
-    input: string[]
-    html: string[]
-    js: string[]
-    img: string[]
-    css: string[]
-  } = {
+export default function htmlInputs(
+  _options: {
+    /** This is a getter, so cannot destructure */
+    readonly srcDir: string | null
+  },
+  /** Used for testing */
+  cache = {
+    scripts: [],
     html: [],
     js: [],
     css: [],
     img: [],
     input: [],
-  }
-
-  /* --------------- plugin object -------------- */
+  } as HtmlInputsPluginCache,
+): HtmlInputsPlugin {
   return {
     name,
 
@@ -55,37 +70,41 @@ export default function htmlInputs(_options: {
     options(options) {
       // Skip if cache.input exists
       // cache is dumped in watchChange hook
-      if (cache.input.length === 0) {
-        // Cast options.input to array
-        let input: string[]
-        if (typeof options.input === 'string') {
-          input = [options.input]
-        } else if (Array.isArray(options.input)) {
-          input = [...options.input]
-        } else if (typeof options.input === 'object') {
-          input = Object.values(options.input)
-        } else {
-          throw new TypeError('options.input is undefined')
-        }
+      if (cache.input.length) return options
 
-        // Filter htm and html files
-        cache.html = input.filter(isHtml)
-
-        if (cache.html.length === 0) {
-          return options
-        }
-
-        /* -------------- Load html files ------------- */
-
-        const html$ = cache.html.map(loadHtml)
-
-        cache.js = flatten(html$.map(getScriptSrc))
-        cache.css = flatten(html$.map(getCssHrefs))
-        cache.img = flatten(html$.map(getImgSrcs))
-
-        // Cache jsEntries with existing options.input
-        cache.input = input.filter(not(isHtml)).concat(cache.js)
+      // Parse options.input to array
+      let input: string[]
+      if (typeof options.input === 'string') {
+        input = [options.input]
+      } else if (Array.isArray(options.input)) {
+        input = [...options.input]
+      } else if (typeof options.input === 'object') {
+        input = Object.values(options.input)
+      } else {
+        throw new TypeError(
+          `options.input cannot be ${typeof options.input}`,
+        )
       }
+
+      // Filter htm and html files
+      cache.html = input.filter(isHtml)
+
+      // If no html files, do nothing
+      if (cache.html.length === 0) return options
+
+      /* ------------------------------------------------- */
+      /*                 HANDLE HTML FILES                 */
+      /* ------------------------------------------------- */
+
+      const html$ = cache.html.map(loadHtml)
+
+      cache.js = flatten(html$.map(getScriptSrc))
+      cache.css = flatten(html$.map(getCssHrefs))
+      cache.img = flatten(html$.map(getImgSrcs))
+      cache.scripts = flatten(html$.map(getJsAssets))
+
+      // Cache jsEntries with existing options.input
+      cache.input = input.filter(not(isHtml)).concat(cache.js)
 
       return {
         ...options,
@@ -101,7 +120,12 @@ export default function htmlInputs(_options: {
     /* ============================================ */
 
     async buildStart() {
-      const assets = [...cache.css, ...cache.img, ...cache.html]
+      const assets = [
+        ...cache.css,
+        ...cache.img,
+        ...cache.html,
+        ...cache.scripts,
+      ]
 
       assets.forEach((asset) => {
         this.addWatchFile(asset)
@@ -115,10 +139,15 @@ export default function htmlInputs(_options: {
           replaced = source.replace(/\.[jt]sx?"/g, '.js"')
         }
 
+        const fileName = relative(
+          _options.srcDir as string,
+          asset,
+        )
+
         this.emitFile({
           type: 'asset',
           source: replaced || source,
-          fileName: relative(_options.srcDir, asset),
+          fileName,
         })
       })
 
@@ -127,6 +156,7 @@ export default function htmlInputs(_options: {
 
     watchChange(id) {
       if (id.endsWith('.html')) {
+        // Dump cache if html file changes
         cache.input = []
       }
     },

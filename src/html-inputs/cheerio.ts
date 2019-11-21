@@ -38,7 +38,23 @@ export const getScriptSrc = (
 
 /* ----------------- ASSET SCRIPTS ----------------- */
 
-// TODO: Recover getAssetScripts from Git
+const getAssets = ($: CheerioStatic) =>
+  $('script')
+    .filter('[data-rollup-asset="true"]')
+    .not('[src^="http:"]')
+    .not('[src^="https:"]')
+    .not('[src^="data:"]')
+    .not('[src^="/"]')
+    .toArray()
+
+export const getJsAssets = (
+  $: CheerioStatic & {
+    filePath: string
+  },
+) =>
+  getAssets($)
+    .map((elem) => $(elem).attr('src'))
+    .map(getRelativePath($.filePath))
 
 /* -------------------- css ------------------- */
 

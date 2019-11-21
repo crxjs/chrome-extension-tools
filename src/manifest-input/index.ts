@@ -67,7 +67,7 @@ export default function(
 ): Pick<
   PluginHooks,
   'options' | 'buildStart' | 'watchChange' | 'generateBundle'
-> & { name: string; srcDir: string } {
+> & { name: string; srcDir: string | null } {
   const derivePermissions = memoize(dp)
 
   /* ----------- HOOKS CLOSURES START ----------- */
@@ -84,11 +84,11 @@ export default function(
     input: string[]
     manifest?: ChromeExtensionManifest
     permsHash: string
-    srcDir: string
+    srcDir: string | null
   } = {
     assets: [] as Asset[],
     permsHash: '',
-    srcDir: '',
+    srcDir: null,
     input: [] as string[],
   }
 
@@ -188,7 +188,7 @@ export default function(
             type: 'asset' as 'asset',
             source,
             fileName: srcPath
-              .replace(cache.srcDir, '')
+              .replace(cache.srcDir as string, '')
               .replace(/^\//, ''),
           }
         }),

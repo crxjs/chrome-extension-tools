@@ -40,7 +40,7 @@ export const chromeExtension = (
   name: string
   _plugins: Record<
     string,
-    Partial<PluginHooks> & { name: string; srcDir?: string }
+    Partial<PluginHooks> & { name: string; srcDir?: string | null }
   >
 } => {
   const manifest = manifestInput(options)

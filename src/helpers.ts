@@ -14,3 +14,9 @@ export function isChunk(
 ): x is OutputChunk {
   return x.type === 'chunk'
 }
+
+export function isAsset(
+  x: OutputChunk | OutputAsset,
+): x is OutputChunk {
+  return x.type === 'asset'
+}
