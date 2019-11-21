@@ -27,11 +27,11 @@ test('returns plugin with srcDir getter', () => {
   expect(plugin.srcDir).toBeNull()
 
   // Rollup config
-  const config: RollupOptions = {
+  const options: RollupOptions = {
     input: getExtPath('basic/manifest.json'),
   }
 
-  plugin.options.call(context, config)
+  plugin.options.call(context, options)
 
   expect(plugin.srcDir).toBe(getExtPath('basic'))
 })
