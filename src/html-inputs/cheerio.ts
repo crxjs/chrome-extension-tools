@@ -9,7 +9,7 @@ export const loadHtml = (filePath: string) => {
   return Object.assign($, { filePath })
 }
 
-const getRelativePath = (filePath: string) => (p: string) => {
+export const getRelativePath = (filePath: string) => (p: string) => {
   const fileDir = path.dirname(filePath)
   const relDir = path.relative(process.cwd(), fileDir)
 
