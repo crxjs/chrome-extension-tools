@@ -33,7 +33,7 @@ export interface DynamicImportWrapper {
   noWakeEvents?: boolean
 }
 
-const explorer = cosmiconfigSync('manifest')
+export const explorer = cosmiconfigSync('manifest')
 
 const name = 'manifest-input'
 
