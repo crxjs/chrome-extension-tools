@@ -1,7 +1,7 @@
-import { getExtPath } from '../../../__fixtures__/utils'
 import { loadHtml, getCssHrefs } from '../cheerio'
+import { optionsHtml } from '../../../__fixtures__/basic-paths'
 
-const html$ = loadHtml(getExtPath('basic/options.html'))
+const html$ = loadHtml(optionsHtml)
 
 test('scrapes correct stylesheets', () => {
   const result = getCssHrefs(html$)

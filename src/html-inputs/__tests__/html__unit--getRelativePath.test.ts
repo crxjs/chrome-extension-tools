@@ -1,8 +1,8 @@
 import { getRelativePath } from '../cheerio'
-import { getExtPath } from '../../../__fixtures__/utils'
+import { optionsHtml } from '../../../__fixtures__/basic-paths'
 
 test('returns correct path', () => {
-  const filePath = getExtPath('basic/options.html')
+  const filePath = optionsHtml
   const getter = getRelativePath(filePath)
 
   expect(getter('options.js')).toBe(

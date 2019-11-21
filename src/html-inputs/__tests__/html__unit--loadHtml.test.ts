@@ -1,5 +1,6 @@
 import { getExtPath } from '../../../__fixtures__/utils'
 import { loadHtml } from '../cheerio'
+import { optionsHtml } from '../../../__fixtures__/basic-paths'
 
 const fs = require('fs-extra')
 const cheerio = require('cheerio')
@@ -11,8 +12,8 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
+const filePath = optionsHtml
 test('calls readFileSync', () => {
-  const filePath = getExtPath('basic/options.html')
   const result = loadHtml(filePath)
 
   expect(result).toBeInstanceOf(Function)
@@ -22,7 +23,6 @@ test('calls readFileSync', () => {
 })
 
 test('calls cheerio.load', () => {
-  const filePath = getExtPath('basic/options.html')
   const htmlCode = fs.readFileSync(filePath, 'utf8')
 
   loadHtml(filePath)
