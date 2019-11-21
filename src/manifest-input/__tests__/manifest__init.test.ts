@@ -1,15 +1,7 @@
-test.skip('memoizes derive permissions', () => {
-  // TODO: name, options, buildStart, watchChange
-})
+test.todo('memoizes derive permissions')
 
-test.skip('sets up cache', () => {
-  // TODO: name, options, buildStart, watchChange
-})
+test.todo('sets up cache')
 
-test.skip('sets up loader script', () => {
-  // TODO: name, options, buildStart, watchChange
-})
+test.todo('sets up loader script')
 
-test.skip('returns plugin with srcDir getter', () => {
-  // TODO: name, options, buildStart, watchChange
-})
+test.todo('returns plugin with srcDir getter')
