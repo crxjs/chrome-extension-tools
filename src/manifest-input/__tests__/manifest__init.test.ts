@@ -1,7 +1,37 @@
-test.todo('memoizes derive permissions')
+import { manifestInput, DynamicImportWrapper } from '../index'
+import { context } from '../../../__fixtures__/minimal-plugin-context'
+import { getExtPath } from '../../../__fixtures__/utils'
+import { RollupOptions } from 'rollup'
 
-test.todo('sets up cache')
+const sls = require('../setupLoaderScript')
+jest.spyOn(sls, 'setupLoaderScript')
+const { setupLoaderScript } = sls
 
-test.todo('sets up loader script')
+test('sets up loader script', () => {
+  const dynamicImportWrapper: DynamicImportWrapper = {
+    wakeEvents: [
+      'chrome.runtime.onMessage',
+      'chrome.tabs.onUpdated',
+    ],
+  }
 
-test.todo('returns plugin with srcDir getter')
+  manifestInput({ dynamicImportWrapper })
+
+  expect(setupLoaderScript).toBeCalled()
+  expect(setupLoaderScript).toBeCalledWith(dynamicImportWrapper)
+})
+
+test('returns plugin with srcDir getter', () => {
+  const plugin = manifestInput()
+
+  expect(plugin.srcDir).toBeNull()
+
+  // Rollup config
+  const config: RollupOptions = {
+    input: getExtPath('basic/manifest.json'),
+  }
+
+  plugin.options.call(context, config)
+
+  expect(plugin.srcDir).toBe(getExtPath('basic'))
+})

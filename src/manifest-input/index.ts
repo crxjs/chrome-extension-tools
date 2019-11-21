@@ -11,11 +11,29 @@ import {
 } from './manifest-parser/index'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
+import { isChunk } from '../helpers'
+import { wakeEvents } from './wakeEvents'
+
+export interface ManifestAsset {
+  srcPath: string
+  source?: string
+}
+
+export interface ManifestInputPluginCache {
+  assets: ManifestAsset[]
+  input: string[]
+  manifest?: ChromeExtensionManifest
+  permsHash: string
+  srcDir: string | null
+}
+
+export interface DynamicImportWrapper {
+  eventDelay?: number | false
+  wakeEvents?: string[]
+  noWakeEvents?: boolean
+}
 
 const explorer = cosmiconfigSync('manifest')
-
-const isOutputChunk = (x: any): x is OutputChunk =>
-  x.type === 'chunk'
 
 const name = 'manifest-input'
 
@@ -38,24 +56,23 @@ const npmPkgDetails =
 /*                MANIFEST-INPUT                */
 /* ============================================ */
 
-export default function(
+export function manifestInput(
   {
     dynamicImportWrapper = {
       // Use these wake events by default until dynamic wake events is implemented
-      wakeEvents: [
-        'chrome.runtime.onMessage',
-        'chrome.runtime.onInstalled',
-      ],
+      wakeEvents,
     },
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
+    cache = {
+      assets: [],
+      permsHash: '',
+      srcDir: null,
+      input: [],
+    },
   } = {} as {
-    dynamicImportWrapper?: {
-      eventDelay?: number | false
-      wakeEvents?: string[]
-      noWakeEvents?: boolean
-    }
+    dynamicImportWrapper?: DynamicImportWrapper
     pkg?: {
       description: string
       name: string
@@ -63,6 +80,7 @@ export default function(
     }
     publicKey?: string
     verbose?: boolean
+    cache?: ManifestInputPluginCache
   },
 ): Pick<
   PluginHooks,
@@ -73,24 +91,6 @@ export default function(
   /* ----------- HOOKS CLOSURES START ----------- */
 
   let manifestPath: string
-
-  interface Asset {
-    srcPath: string
-    source?: string
-  }
-
-  const cache: {
-    assets: Asset[]
-    input: string[]
-    manifest?: ChromeExtensionManifest
-    permsHash: string
-    srcDir: string | null
-  } = {
-    assets: [] as Asset[],
-    permsHash: '',
-    srcDir: null,
-    input: [] as string[],
-  }
 
   const manifestName = 'manifest.json'
 
@@ -223,7 +223,7 @@ export default function(
       // Get module ids for all chunks
       const permissions = Array.from(
         Object.values(bundle)
-          .filter(isOutputChunk)
+          .filter(isChunk)
           .reduce(derivePermissions, new Set<string>()),
       )
 
@@ -386,3 +386,5 @@ export default function(
     },
   }
 }
+
+export default manifestInput
