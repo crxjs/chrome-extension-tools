@@ -10,12 +10,15 @@
 </head>
 
 <body>
+  <!-- Script chunks: to bundle -->
   <script src="./options1.js" type="module"></script>
   <script src="./options2.jsx" type="module"></script>
   <script src="./options3.ts" type="module"></script>
   <script src="./options4.tsx" type="module"></script>
+  <!-- Image assets -->
   <img src="./options.png">
   <img src="./options.jpg">
+  <!-- Script asset: do not bundle -->
   <script src="./asset.js" data-rollup-asset="true"></script>
 </body>
 

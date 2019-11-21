@@ -4,3 +4,4 @@ examples/
 **/lib
 types/
 !types/index.d.ts
+__fixtures__/extensions/basic-dist
