@@ -17,9 +17,11 @@ export const ajv = new Ajv({
 
 const validator = ajv.compile(manifestSchema)
 
-export const validate = (json: any) => {
-  if (validator(json)) {
-    return json
+export const validateManifest = (
+  manifest: ChromeExtensionManifest,
+) => {
+  if (validator(manifest)) {
+    return manifest
   }
 
   const { errors } = validator
@@ -28,10 +30,12 @@ export const validate = (json: any) => {
   throw new ValidationError(msg, errors)
 }
 
+type ValidationErrorsArray = Ajv.ErrorObject[] | null | undefined
 class ValidationError extends Error {
-  constructor(msg, errors) {
+  constructor(msg: string, errors: ValidationErrorsArray) {
     super(msg)
     this.name = 'ValidationError'
     this.errors = errors
   }
+  errors: ValidationErrorsArray
 }

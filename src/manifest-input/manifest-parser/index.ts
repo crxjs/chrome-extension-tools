@@ -2,13 +2,9 @@ import glob from 'glob'
 import get from 'lodash.get'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
-import {
-  ChromeExtensionManifest,
-  ContentScript,
-} from '../manifest'
 import { combinePerms } from './combine'
 import * as permissions from './permissions'
-import { validate } from './validate'
+import { validateManifest } from './validate'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */
@@ -23,21 +19,21 @@ export const derivePermissions = (
     .map(([key]) => key)
     .reduce((s, p) => s.add(p), set)
 
-/* ============================================ */
-/*                DERIVE MANIFEST               */
-/* ============================================ */
+// /* ============================================ */
+// /*                DERIVE MANIFEST               */
+// /* ============================================ */
 
-export function deriveManifest(
-  manifest: ChromeExtensionManifest, // manifest.json
-  ...permissions: (string | string[])[] // will be combined with manifest.permissions
-): ChromeExtensionManifest {
-  return validate({
-    // SMELL: Is this necessary?
-    manifest_version: 2,
-    ...manifest,
-    permissions: combinePerms(permissions, manifest.permissions),
-  })
-}
+// export function deriveManifest(
+//   manifest: ChromeExtensionManifest, // manifest.json
+//   ...permissions: string[] | string[][] // will be combined with manifest.permissions
+// ): ChromeExtensionManifest {
+//   return validateManifest({
+//     // SMELL: Is this necessary?
+//     manifest_version: 2,
+//     ...manifest,
+//     permissions: combinePerms(permissions, manifest.permissions),
+//   })
+// }
 
 /* -------------------------------------------- */
 /*                 DERIVE FILES                 */
@@ -51,17 +47,14 @@ export function deriveFiles(
     manifest,
     'web_accessible_resources',
     [] as string[],
-  ).reduce(
-    (r, x) => {
-      if (glob.hasMagic(x)) {
-        const files = glob.sync(x, { cwd: srcDir })
-        return [...r, ...files.map((f) => f.replace(srcDir, ''))]
-      } else {
-        return [...r, x]
-      }
-    },
-    [] as string[],
-  )
+  ).reduce((r, x) => {
+    if (glob.hasMagic(x)) {
+      const files = glob.sync(x, { cwd: srcDir })
+      return [...r, ...files.map((f) => f.replace(srcDir, ''))]
+    } else {
+      return [...r, x]
+    }
+  }, [] as string[])
 
   const js = [
     ...files.filter((f) => /\.[jt]sx?$/.test(f)),
