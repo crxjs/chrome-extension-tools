@@ -3,6 +3,13 @@ import { getExtPath } from './utils'
 export const srcDir = getExtPath('basic')
 export const manifestJson = getExtPath('basic/manifest.json')
 
+// Icons
+export const icon16 = getExtPath('basic/images/icon-main-16.png')
+export const icon48 = getExtPath('basic/images/icon-main-48.png')
+export const icon128 = getExtPath(
+  'basic/images/icon-main-128.png',
+)
+
 // Options assets
 export const optionsHtml = getExtPath('basic/options.html')
 export const optionsCss = getExtPath('basic/options.css')
@@ -23,3 +30,5 @@ export const contentJs = getExtPath('basic/content.js')
 // Popup subfolder
 export const popupHtml = getExtPath('basic/popup/popup.html')
 export const popupJs = getExtPath('basic/popup/popup.js')
+
+export const contentCss = getExtPath('basic/content.css')

@@ -23,11 +23,15 @@ test('bundles chunks and assets', async () => {
 
   // Assets
   const assets = output.filter(isAsset)
-  expect(assets.length).toBe(9)
+  expect(assets.length).toBe(13)
   expect(output.find(byFileName('asset.js'))).toBeDefined()
   expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
+  expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
+  expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
+  expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
   expect(output.find(byFileName('options.html'))).toBeDefined()
   expect(output.find(byFileName('options.css'))).toBeDefined()
+  expect(output.find(byFileName('content.css'))).toBeDefined()
   expect(output.find(byFileName('options.png'))).toBeDefined()
   expect(output.find(byFileName('options.jpg'))).toBeDefined()
   expect(output.find(byFileName('manifest.json'))).toBeDefined()

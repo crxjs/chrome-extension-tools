@@ -6,6 +6,11 @@ import {
   popupHtml,
   manifestJson,
   srcDir,
+  contentCss,
+  icon16,
+  icon48,
+  icon128,
+  optionsJpg,
 } from '../../../__fixtures__/basic-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
@@ -74,7 +79,15 @@ test('loads manifest via cosmicConfig', () => {
 test('sets correct cache values', () => {
   plugin.options.call(context, options)
 
-  expect(cache.assets).toEqual([])
+  expect(cache.assets).toEqual(
+    [
+      contentCss,
+      icon16,
+      optionsJpg,
+      icon48,
+      icon128,
+    ].map((srcPath) => ({ srcPath })),
+  )
   expect(cache.input).toEqual([
     backgroundJs,
     contentJs,
