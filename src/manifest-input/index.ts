@@ -3,15 +3,15 @@ import fs from 'fs-extra'
 import memoize from 'mem'
 import path, { basename } from 'path'
 import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
-import { ChromeExtensionManifest } from './manifest'
+import { isChunk } from '../helpers'
+import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
-  deriveManifest,
   derivePermissions as dp,
 } from './manifest-parser/index'
+import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
-import { isChunk } from '../helpers'
 import { wakeEvents } from './wakeEvents'
 
 export interface ManifestAsset {
@@ -51,6 +51,8 @@ const npmPkgDetails =
         version: '',
         description: '',
       }
+
+const cloneObject = (obj: any) => JSON.parse(JSON.stringify(obj))
 
 /* ============================================ */
 /*                MANIFEST-INPUT                */
@@ -244,25 +246,24 @@ export function manifestInput(
 
       try {
         // Clone cache.manifest
-        const cachedManifest = JSON.parse(
-          // FIXME: assert cache.manifest exists, should error if not
-          JSON.stringify(cache.manifest || {}),
-        )
+        if (!cache.manifest)
+          throw new TypeError(
+            `cache.manifest is ${typeof cache.manifest}`,
+          )
 
-        // SMELL: Is this necessary?
-        const updatedManifest = {
+        const clonedManifest = cloneObject(cache.manifest)
+
+        const manifestBody = validateManifest({
           manifest_version: 2,
           name: pkg.name,
           version: pkg.version,
           description: pkg.description,
-          ...cachedManifest,
-        }
-
-        // TODO: refactor, as this isn't really necessary
-        const manifestBody: ChromeExtensionManifest = deriveManifest(
-          updatedManifest,
-          permissions,
-        )
+          ...clonedManifest,
+          permissions: combinePerms(
+            permissions,
+            clonedManifest.permissions,
+          ),
+        })
 
         const {
           content_scripts: cts = [],

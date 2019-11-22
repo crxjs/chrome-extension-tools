@@ -4,7 +4,17 @@ interface ContentScript {
   matches: string[]
 }
 
-export interface ChromeExtensionManifest {
+type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | Json[]
+  | JsonRecord
+
+type JsonRecord = { [key: string]: Json | undefined }
+
+interface ChromeExtensionManifest {
   manifest_version: number
   name: string
   version: string
