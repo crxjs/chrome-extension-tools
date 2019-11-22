@@ -23,5 +23,5 @@
     "default_popup": "popup/popup.html"
   },
 
-  "web_accessible_resources": ["*.jpg"]
+  "web_accessible_resources": ["options.jpg"]
 }

@@ -14,16 +14,21 @@ import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
 
-export interface ManifestAsset {
-  srcPath: string
-  source?: string
+export interface ManifestInputPluginCache {
+  assets: string[]
+  input: string[]
+  permsHash: string
+  srcDir: string | null
+  /** for memoized fs.readFile */
+  readFile: Map<string, any>
+  manifest?: ChromeExtensionManifest
 }
 
-export interface ManifestInputPluginCache {
-  assets: ManifestAsset[]
-  input: string[]
-  manifest?: ChromeExtensionManifest
-  permsHash: string
+export type ManifestInputPlugin = Pick<
+  PluginHooks,
+  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
+> & {
+  name: string
   srcDir: string | null
 }
 
@@ -72,7 +77,8 @@ export function manifestInput(
       permsHash: '',
       srcDir: null,
       input: [],
-    },
+      readFile: new Map(),
+    } as ManifestInputPluginCache,
   } = {} as {
     dynamicImportWrapper?: DynamicImportWrapper
     pkg?: {
@@ -84,10 +90,14 @@ export function manifestInput(
     verbose?: boolean
     cache?: ManifestInputPluginCache
   },
-): Pick<
-  PluginHooks,
-  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
-> & { name: string; srcDir: string | null } {
+): ManifestInputPlugin {
+  const readFile = memoize(
+    (filepath: string) => fs.readFile(filepath, 'utf8'),
+    {
+      cache: cache.readFile,
+    },
+  )
+
   const derivePermissions = memoize(dp)
 
   /* ----------- HOOKS CLOSURES START ----------- */
@@ -155,9 +165,10 @@ export function manifestInput(
 
         // Cache derived inputs
         cache.input = [...js, ...html]
-        cache.assets = [...css, ...img].map((srcPath) => ({
-          srcPath,
-        }))
+        cache.assets = [
+          // Dedupe assets
+          ...new Set([...css, ...img]),
+        ]
 
         /* --------------- END LOAD MANIFEST --------------- */
       }
@@ -178,19 +189,21 @@ export function manifestInput(
     async buildStart(options) {
       this.addWatchFile(manifestPath)
 
-      cache.assets.forEach(({ srcPath }) => {
+      cache.assets.forEach((srcPath) => {
         this.addWatchFile(srcPath)
       })
 
       const assets: EmittedAsset[] = await Promise.all(
-        cache.assets.map(async ({ srcPath }) => {
-          const source = await fs.readFile(srcPath)
+        cache.assets.map(async (srcPath) => {
+          const source = await readFile(srcPath)
 
           return {
             type: 'asset' as 'asset',
             source,
             fileName: srcPath
+              // Get relative path
               .replace(cache.srcDir as string, '')
+              // Remove initial slash
               .replace(/^\//, ''),
           }
         }),
@@ -202,15 +215,12 @@ export function manifestInput(
     },
 
     watchChange(id) {
-      if (
-        id.endsWith(manifestName) ||
-        // SMELL: why dump manifest if asset changes?
-        //  - triggers reload of all assets if one changes
-        //  - should trigger reload of one asset if it changes?
-        cache.assets.some(({ srcPath }) => id === srcPath)
-      ) {
+      if (id.endsWith(manifestName)) {
         // Dump cache.manifest if manifest changes
         cache.manifest = undefined
+      } else {
+        // Force new read of changed asset
+        cache.readFile.delete(id)
       }
     },
 

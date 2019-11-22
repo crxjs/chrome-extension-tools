@@ -19,7 +19,6 @@ import {
   manifestInput,
   ManifestInputPluginCache,
 } from '../index'
-import { ChromeExtensionManifest } from '../manifest'
 
 jest.spyOn(explorer, 'load')
 
@@ -33,6 +32,7 @@ const cache: ManifestInputPluginCache = {
   permsHash: '',
   srcDir: null,
   input: [],
+  readFile: new Map(),
 }
 
 const plugin = manifestInput({ cache })
@@ -79,15 +79,13 @@ test('loads manifest via cosmicConfig', () => {
 test('sets correct cache values', () => {
   plugin.options.call(context, options)
 
-  expect(cache.assets).toEqual(
-    [
-      contentCss,
-      icon16,
-      optionsJpg,
-      icon48,
-      icon128,
-    ].map((srcPath) => ({ srcPath })),
-  )
+  expect(cache.assets).toEqual([
+    contentCss,
+    icon16,
+    optionsJpg,
+    icon48,
+    icon128,
+  ])
   expect(cache.input).toEqual([
     backgroundJs,
     contentJs,
