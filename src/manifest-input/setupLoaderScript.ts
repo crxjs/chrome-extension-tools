@@ -44,24 +44,30 @@ export function setupLoaderScript({
     'utf-8',
   )
 
-  return (scriptPath: string, events?: string[]) => {
-    if (events) {
-      wakeEvents = events
-    }
-
-    return script
-      .replace(
-        /[\n\s]+.then\(delay\(('%DELAY%')\)\)([\n\s]+)/,
-        replaceDelay,
-      )
-      .replace(
-        /[\n\s]+case '(%NAME%)':[\n\s]+return true/,
-        replaceSwitchCase(1),
-      )
-      .replace(
-        /[\n\s]+case '(%EVENT%)':[\n\s]+return true/,
-        replaceSwitchCase(2),
-      )
-      .replace('%PATH%', slash(relative('assets', scriptPath)))
+  return (scriptPath: string) => {
+    return (
+      script
+        // Delay events by ms
+        .replace(
+          /[\n\s]+.then\(delay\(('%DELAY%')\)\)([\n\s]+)/,
+          replaceDelay,
+        )
+        // Chrome namespace (ie, runtime, tabs, etc...)
+        .replace(
+          /[\n\s]+case '(%NAME%)':[\n\s]+return true/,
+          replaceSwitchCase(1),
+        )
+        // Chrome event (ie, onMessage, onUpdated, etc...)
+        .replace(
+          /[\n\s]+case '(%EVENT%)':[\n\s]+return true/,
+          replaceSwitchCase(2),
+        )
+        // Path to module being loaded
+        .replace(
+          '%PATH%',
+          // Fix path slashes to support Windows
+          slash(relative('assets', scriptPath)),
+        )
+    )
   }
 }
