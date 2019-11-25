@@ -217,7 +217,7 @@ export function manifestInput(
     watchChange(id) {
       if (id.endsWith(manifestName)) {
         // Dump cache.manifest if manifest changes
-        cache.manifest = undefined
+        delete cache.manifest
       } else {
         // Force new read of changed asset
         cache.readFile.delete(id)
