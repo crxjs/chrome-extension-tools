@@ -1,6 +1,7 @@
 import { rollup } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { byFileName, getExtPath } from '../__fixtures__/utils'
+import { writeJSON } from 'fs-extra'
 
 const { default: config } = require(getExtPath(
   'basic/rollup.config.js',
@@ -8,6 +9,13 @@ const { default: config } = require(getExtPath(
 
 test('bundles chunks and assets', async () => {
   const bundle = await rollup(config)
+
+  if (!process.env.JEST_WATCH) {
+    writeJSON(getExtPath('basic-build.json'), bundle, {
+      spaces: 2,
+    })
+  }
+
   const { output } = await bundle.generate(config.output)
 
   // Chunks
@@ -25,10 +33,18 @@ test('bundles chunks and assets', async () => {
   const assets = output.filter(isAsset)
   expect(assets.length).toBe(13)
   expect(output.find(byFileName('asset.js'))).toBeDefined()
-  expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
-  expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
-  expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
-  expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
+  expect(
+    output.find(byFileName('popup/popup.html')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
   expect(output.find(byFileName('options.html'))).toBeDefined()
   expect(output.find(byFileName('options.css'))).toBeDefined()
   expect(output.find(byFileName('content.css'))).toBeDefined()

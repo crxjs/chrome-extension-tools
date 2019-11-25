@@ -25,6 +25,7 @@ beforeEach(async () => {
     srcDir: null,
     input: [],
     readFile: new Map(),
+    assetChanged: false,
   }
   plugin = manifestInput({ cache })
 
@@ -36,10 +37,18 @@ beforeEach(async () => {
 
 test('dumps manifest if id is manifest', () => {
   expect(cache.manifest).toBeDefined()
-  
+
   plugin.watchChange(manifestJson)
 
   expect(cache.manifest).toBeUndefined()
+})
+
+test('clears cache.assetChanged if id is manifest', () => {
+  expect(cache.assetChanged).toBe(false)
+
+  plugin.watchChange(manifestJson)
+
+  expect(cache.assetChanged).toBe(false)
 })
 
 test('dumps asset cache in readFile if asset changes', () => {
@@ -48,4 +57,12 @@ test('dumps asset cache in readFile if asset changes', () => {
   plugin.watchChange(contentCss)
 
   expect(cache.readFile.has(contentCss)).toBe(false)
+})
+
+test('sets cache.assetChanged if asset changes', () => {
+  expect(cache.assetChanged).toBe(false)
+
+  plugin.watchChange(contentCss)
+
+  expect(cache.assetChanged).toBe(true)
 })

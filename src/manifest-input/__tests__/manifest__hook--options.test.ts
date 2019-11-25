@@ -33,6 +33,7 @@ const cache: ManifestInputPluginCache = {
   srcDir: null,
   input: [],
   readFile: new Map(),
+  assetChanged: false,
 }
 
 const plugin = manifestInput({ cache })

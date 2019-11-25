@@ -28,7 +28,8 @@ beforeEach(() => {
     permsHash: '',
     srcDir: null,
     input: [],
-    readFile: new Map()
+    readFile: new Map(),
+    assetChanged: false
   }
   plugin = manifestInput({ cache })
   plugin.options.call(minContext, options)

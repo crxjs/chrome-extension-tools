@@ -7,12 +7,16 @@ import { isChunk } from '../helpers'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
-  derivePermissions as dp,
+  derivePermissions,
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
+
+export function dedupe<T>(x: T[]): T[] {
+  return [...new Set(x)]
+}
 
 export interface ManifestInputPluginCache {
   assets: string[]
@@ -22,6 +26,7 @@ export interface ManifestInputPluginCache {
   /** for memoized fs.readFile */
   readFile: Map<string, any>
   manifest?: ChromeExtensionManifest
+  assetChanged: boolean
 }
 
 export type ManifestInputPlugin = Pick<
@@ -78,6 +83,7 @@ export function manifestInput(
       srcDir: null,
       input: [],
       readFile: new Map(),
+      assetChanged: false,
     } as ManifestInputPluginCache,
   } = {} as {
     dynamicImportWrapper?: DynamicImportWrapper
@@ -97,8 +103,6 @@ export function manifestInput(
       cache: cache.readFile,
     },
   )
-
-  const derivePermissions = memoize(dp)
 
   /* ----------- HOOKS CLOSURES START ----------- */
 
@@ -218,9 +222,10 @@ export function manifestInput(
       if (id.endsWith(manifestName)) {
         // Dump cache.manifest if manifest changes
         delete cache.manifest
+        cache.assetChanged = false
       } else {
         // Force new read of changed asset
-        cache.readFile.delete(id)
+        cache.assetChanged = cache.readFile.delete(id)
       }
     },
 
@@ -231,22 +236,29 @@ export function manifestInput(
     async generateBundle(options, bundle) {
       /* ---------- DERIVE PERMISIONS START --------- */
 
-      // FIXME: permissions are sometimes not derived
       // Get module ids for all chunks
-      const permissions = Array.from(
-        Object.values(bundle)
-          .filter(isChunk)
-          .reduce(derivePermissions, new Set<string>()),
-      )
+      let permissions: string[]
+      if (cache.assetChanged && cache.permsHash) {
+        // Permissions did not change
+        permissions = JSON.parse(cache.permsHash)
 
-      if (verbose) {
-        // Compare to last permissions
+        cache.assetChanged = false
+      } else {
+        const chunks = Object.values(bundle).filter(isChunk)
+
+        // Permissions may have changed
+        permissions = Array.from(
+          chunks.reduce(derivePermissions, new Set<string>()),
+        )
+
         const permsHash = JSON.stringify(permissions)
 
-        if (!cache.permsHash) {
-          console.log('Detected permissions:', permissions)
-        } else if (permsHash !== cache.permsHash) {
-          console.log('Detected new permissions:', permissions)
+        if (verbose) {
+          if (!cache.permsHash) {
+            console.log('Detected permissions:', permissions)
+          } else if (permsHash !== cache.permsHash) {
+            console.log('Detected new permissions:', permissions)
+          }
         }
 
         cache.permsHash = permsHash
@@ -278,7 +290,7 @@ export function manifestInput(
         const {
           content_scripts: cts = [],
           web_accessible_resources: war = [],
-          background: { scripts: backgroundScripts = [] } = {},
+          background: { scripts: bgs = [] } = {},
         } = manifestBody
 
         /* ------ WEB ACCESSIBLE RESOURCES START ------ */
@@ -301,11 +313,11 @@ export function manifestInput(
             )
 
           // web_accessible_resources can be used for fingerprinting extensions
-          manifestBody.web_accessible_resources = [
+          manifestBody.web_accessible_resources = dedupe([
             ...war,
             ...imports,
             ...contentScripts,
-          ]
+          ])
         }
 
         /* ------- WEB ACCESSIBLE RESOURCES END ------- */
@@ -316,30 +328,30 @@ export function manifestInput(
           dynamicImportWrapper.wakeEvents &&
           dynamicImportWrapper.wakeEvents.length > 0
         ) {
-          const emitDynamicImportWrapper = (
-            scriptPath: string,
-          ) => {
-            const _scriptPath = scriptPath.replace(
-              /\.ts$/,
-              '.js',
-            )
-            const source = loaderScript(_scriptPath)
+          const emitDynamicImportWrapper = memoize(
+            (scriptPath: string) => {
+              const _scriptPath = scriptPath.replace(
+                /\.ts$/,
+                '.js',
+              )
+              const source = loaderScript(_scriptPath)
 
-            const assetId = this.emitFile({
-              type: 'asset',
-              source,
-              name: basename(_scriptPath),
-            })
+              const assetId = this.emitFile({
+                type: 'asset',
+                source,
+                name: basename(_scriptPath),
+              })
 
-            return this.getFileName(assetId)
-          }
+              return this.getFileName(assetId)
+            },
+          )
 
           // Emit background script wrappers
-          if (backgroundScripts.length) {
+          if (bgs.length) {
             manifestBody.background =
               manifestBody.background || {}
 
-            manifestBody.background.scripts = backgroundScripts.map(
+            manifestBody.background.scripts = bgs.map(
               emitDynamicImportWrapper,
             )
           }
@@ -352,6 +364,8 @@ export function manifestInput(
                 ...rest,
               }),
             )
+          } else {
+            delete manifestBody.content_scripts
           }
         }
 
