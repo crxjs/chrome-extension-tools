@@ -1,12 +1,10 @@
 import 'array-flat-polyfill'
-
 import { readFile } from 'fs-extra'
 import flatten from 'lodash.flatten'
 import { relative } from 'path'
-import { PluginHooks } from 'rollup'
+import { Plugin } from 'rollup'
 import { not } from '../helpers'
 import { reduceToRecord } from '../manifest-input/reduceToRecord'
-
 import {
   getCssHrefs,
   getImgSrcs,
@@ -31,11 +29,9 @@ export interface HtmlInputsPluginCache {
 }
 
 export type HtmlInputsPlugin = Pick<
-  PluginHooks,
-  'options' | 'buildStart' | 'watchChange'
-> & {
-  name: string
-}
+  Required<Plugin>,
+  'name' | 'options' | 'buildStart' | 'watchChange'
+>
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 

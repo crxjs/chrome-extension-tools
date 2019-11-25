@@ -1,15 +1,15 @@
-import { PluginHooks, OutputChunk, OutputAsset } from 'rollup'
+import { OutputAsset, OutputChunk, Plugin } from 'rollup'
 
 interface ManifestAsset extends OutputAsset {
   source: string
 }
 
-export const validate = (): Pick<
-  PluginHooks,
-  'generateBundle'
-> & { name: string } => ({
-  // TODO: refactor to TS
-  // TODO: name everything carefully
+export type ValidateNamesPlugin = Pick<
+  Required<Plugin>,
+  'name' | 'generateBundle'
+>
+
+export const validateNames = (): ValidateNamesPlugin => ({
   name: 'validate-names',
 
   generateBundle(options, bundle) {

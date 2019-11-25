@@ -1,7 +1,7 @@
 import { OutputBundle, OutputChunk } from 'rollup'
 import { context } from '../../../__fixtures__/plugin-context'
 import { isChunk } from '../../helpers'
-import { validate } from '../index'
+import { validateNames } from '../index'
 
 const bundle: OutputBundle = require('../../../__fixtures__/validate-names__sample-bundle.json')
 
@@ -14,7 +14,7 @@ const helperName = helperKey.split('-')[0]
 const fixedKey = helperKey.slice(1)
 const fixedName = helperName.slice(1)
 
-const plugin = validate()
+const plugin = validateNames()
 
 test('renames chunks by mutating the bundle', () => {
   const helperChunk = bundle[helperKey] as OutputChunk

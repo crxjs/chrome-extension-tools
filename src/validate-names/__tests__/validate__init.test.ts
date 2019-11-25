@@ -1,7 +1,7 @@
-import { validate } from '../index'
+import { validateNames } from '../index'
 
 test('returns object with name & generatedBundle', () => {
-  const plugin = validate()
+  const plugin = validateNames()
 
   expect(plugin).toEqual({
     name: 'validate-names',

@@ -1,7 +1,29 @@
-import { PluginHooks } from 'rollup'
-import htmlInputs from './html-inputs/index'
-import manifestInput from './manifest-input/index'
-import { validate as v } from './validate-names/index'
+import { Plugin } from 'rollup'
+import htmlInputs, {
+  HtmlInputsPlugin,
+} from './html-inputs/index'
+import manifestInput, {
+  ManifestInputPlugin,
+} from './manifest-input/index'
+import {
+  validateNames as v,
+  ValidateNamesPlugin,
+} from './validate-names/index'
+
+export type ChromeExtensionPlugin = Pick<
+  Required<Plugin>,
+  | 'name'
+  | 'options'
+  | 'buildStart'
+  | 'watchChange'
+  | 'generateBundle'
+> & {
+  _plugins: {
+    manifest: ManifestInputPlugin
+    html: HtmlInputsPlugin
+    validate: ValidateNamesPlugin
+  }
+}
 
 export interface ChromeExtensionOptions {
   assets?: {
@@ -47,19 +69,7 @@ export interface ChromeExtensionOptions {
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
-): Pick<
-  PluginHooks,
-  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
-> & {
-  name: string
-  _plugins: Record<
-    string,
-    Partial<PluginHooks> & {
-      name: string
-      srcDir?: string | null
-    }
-  >
-} => {
+): ChromeExtensionPlugin => {
   const manifest = manifestInput(options)
   const html = htmlInputs(manifest)
   const validate = v()
