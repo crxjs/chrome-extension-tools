@@ -1,30 +1,35 @@
-// TODO: refactor to TS
+import { PluginHooks } from 'rollup'
 
-// Reloader paths are relative to the dist folder
-// TODO: refactor to separate file to support mocking
-const loadReloader = (reloader) => {
-  if (typeof reloader === 'function') {
-    return reloader()
-  } else if (reloader === 'non-persistent') {
-    return require('rpce-push-reloader').reloader()
-  } else if (reloader === 'persistent') {
-    return require('rpce-interval-reloader').reloader()
+export type ReloaderPlugin = Pick<
+  PluginHooks,
+  'buildStart' | 'generateBundle' | 'writeBundle'
+> & { name: string }
+
+export interface ReloaderPluginOptions {
+  reloader: 'persistent' | 'non-persistent' | ReloaderPlugin
+}
+
+export function useReloader(
+  { reloader = 'non-persistent' } = {} as ReloaderPluginOptions,
+): ReloaderPlugin {
+  if (!process.env.ROLLUP_WATCH || !reloader) {
+    return {
+      name: 'no-reloader',
+      buildStart() {},
+      generateBundle() {},
+      writeBundle() {},
+    }
+  } else if (
+    typeof reloader === 'object' &&
+    typeof reloader.buildStart === 'function' &&
+    typeof reloader.generateBundle === 'function' &&
+    typeof reloader.writeBundle === 'function'
+  ) {
+    return reloader
   } else {
     throw new TypeError(
       'reloader type should be "persistent", "non-persistent", or a custom reloader',
     )
-  }
-}
-
-export default function useReloader({
-  reloader = 'non-persistent',
-} = {}) {
-  if (!process.env.ROLLUP_WATCH || !reloader) {
-    return {
-      name: 'no-reloader',
-      generateBundle() {},
-      writeBundle() {},
-    }
   }
 
   const _reloader = loadReloader(reloader)
@@ -45,7 +50,7 @@ export default function useReloader({
             this,
             options,
             bundle,
-            (shouldStart) => {
+            (shouldStart: boolean) => {
               startReloader = shouldStart
             },
           )
@@ -62,7 +67,6 @@ export default function useReloader({
     writeBundle(bundle) {
       if (!_reloader) return
 
-      // TODO: consider if this is the job of the reloader
       if (firstRun) {
         firstRun = false
         console.log(_reloader.name, 'ready...')
@@ -74,10 +78,12 @@ export default function useReloader({
         .then(() => {
           console.log('Reload success...')
         })
-        .catch((error) => {
+        .catch((error: any) => {
           const message = `${error.message} (${error.code})`
           this.warn(message)
         })
     },
   }
 }
+
+export default useReloader

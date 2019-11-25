@@ -2,7 +2,7 @@ module.exports = {
   moduleNameMapper: {
     '\\.code(\\.js)?': '<rootDir>/tests/stub.code.js',
   },
-  modulePathIgnorePatterns: ['.+/fixtures/dest', 'old-tests'],
+  modulePathIgnorePatterns: ['.+/fixtures/dest', '~~.+'],
   preset: 'ts-jest',
   setupFilesAfterEnv: ['./jest.setup.js'],
   transform: {
