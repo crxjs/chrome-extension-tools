@@ -7,10 +7,11 @@
 // export const enterprise.hardwarePlatform = s => /chromep?[\s\n]*\.[\s\n]*enterprise\.hardwarePlatform/.test(s)
 // export const enterprise.platformKeys = s => /chromep?[\s\n]*\.[\s\n]*enterprise\.platformKeys/.test(s)
 // export const networking.config = s => /chromep?[\s\n]*\.[\s\n]*networking\.config/.test(s)
-//export const system.cpu = s => /chromep?[\s\n]*\.[\s\n]*system\.cpu/.test(s)
-//export const system.display = s => /chromep?[\s\n]*\.[\s\n]*system\.display/.test(s)
-//export const system.memory = s => /chromep?[\s\n]*\.[\s\n]*system\.memory/.test(s)
-//export const system.storage = s => /chromep?[\s\n]*\.[\s\n]*system\.storage/.test(s)
+// export const system.cpu = s => /chromep?[\s\n]*\.[\s\n]*system\.cpu/.test(s)
+// export const system.display = s => /chromep?[\s\n]*\.[\s\n]*system\.display/.test(s)
+// export const system.memory = s => /chromep?[\s\n]*\.[\s\n]*system\.memory/.test(s)
+// export const system.storage = s => /chromep?[\s\n]*\.[\s\n]*system\.storage/.test(s)
+
 export const alarms = (s: string) =>
   /chromep?[\s\n]*\.[\s\n]*alarms/.test(s)
 

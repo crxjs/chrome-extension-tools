@@ -2,9 +2,7 @@ import glob from 'glob'
 import get from 'lodash.get'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
-import { combinePerms } from './combine'
 import * as permissions from './permissions'
-import { validateManifest } from './validate'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */

@@ -1,7 +1,5 @@
 import 'array-flat-polyfill'
 
-
-
 export const combinePerms = (
   ...permissions: string[] | string[][]
 ) => {

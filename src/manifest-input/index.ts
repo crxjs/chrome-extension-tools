@@ -385,11 +385,7 @@ export function manifestInput(
           manifestBody,
           null,
           2,
-        )
-          // Replace ts and tsx in manifest
-          .replace(/\.[jt]sx?"/g, '.js"')
-
-        // TODO: validate manifest by schema
+        ).replace(/\.[jt]sx?"/g, '.js"')
 
         // Emit manifest.json
         this.emitFile({
