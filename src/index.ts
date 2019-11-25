@@ -1,7 +1,6 @@
 import { PluginHooks } from 'rollup'
 import htmlInputs from './html-inputs/index'
 import manifestInput from './manifest-input/index'
-import useReloader from './reloader'
 import { validate as v } from './validate-names/index'
 
 export interface ChromeExtensionOptions {
@@ -27,30 +26,49 @@ export interface ChromeExtensionOptions {
   reloader?: 'non-persistent' | 'persistent'
 }
 
+// export const pushReloader = (): Pick<
+//   PluginHooks,
+//   'buildStart' | 'generateBundle' | 'writeBundle'
+// > & { name: string } => ({
+//   name: 'push-reloader',
+//   buildStart() {},
+//   generateBundle() {},
+//   writeBundle() {},
+// })
+
+// export const intervalReloader = (): Pick<
+//   PluginHooks,
+//   'generateBundle' | 'writeBundle'
+// > & { name: string } => ({
+//   name: 'interval-reloader',
+//   generateBundle() {},
+//   writeBundle() {},
+// })
+
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
 ): Pick<
   PluginHooks,
-  | 'options'
-  | 'buildStart'
-  | 'watchChange'
-  | 'generateBundle'
-  | 'writeBundle'
+  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
 > & {
   name: string
   _plugins: Record<
     string,
-    Partial<PluginHooks> & { name: string; srcDir?: string | null }
+    Partial<PluginHooks> & {
+      name: string
+      srcDir?: string | null
+    }
   >
 } => {
   const manifest = manifestInput(options)
   const html = htmlInputs(manifest)
-  const reloader = useReloader(options)
   const validate = v()
 
   return {
     name: 'chrome-extension',
-    _plugins: { manifest, html, reloader, validate },
+
+    // For testing
+    _plugins: { manifest, html, validate },
 
     options(options) {
       return [manifest, html].reduce((opts, plugin) => {
@@ -60,40 +78,22 @@ export const chromeExtension = (
       }, options)
     },
 
-    buildStart(options) {
-      const hook = 'buildStart'
-
-      // @ts-ignore
-      manifest[hook].call(this, options)
-      // @ts-ignore
-      html[hook].call(this, options)
+    async buildStart(options) {
+      await Promise.all([
+        manifest.buildStart.call(this, options),
+        html.buildStart.call(this, options),
+      ])
     },
 
     watchChange(id) {
-      const hook = 'watchChange'
-
-      // @ts-ignore
-      manifest[hook].call(this, id)
-      // @ts-ignore
-      html[hook].call(this, id)
+      manifest.watchChange.call(this, id)
+      html.watchChange.call(this, id)
     },
 
     async generateBundle(...args) {
-      const hook = 'generateBundle'
-
-      // @ts-ignore
-      await manifest[hook].call(this, ...args)
-      // @ts-ignore
-      await reloader[hook].call(this, ...args)
-      // @ts-ignore
-      await validate[hook].call(this, ...args)
-    },
-
-    async writeBundle(...args) {
-      const hook = 'writeBundle'
-
-      // @ts-ignore
-      await reloader[hook].call(this, ...args)
+      await manifest.generateBundle.call(this, ...args)
+      // TODO: run validate-names in writeBundle
+      await validate.generateBundle.call(this, ...args)
     },
   }
 }
