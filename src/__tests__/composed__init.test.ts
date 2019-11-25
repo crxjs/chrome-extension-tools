@@ -1,10 +1,10 @@
 import { Plugin } from 'rollup'
-import { chromeExtension } from '..'
+import { chromeExtension, ChromeExtensionPlugin } from '..'
 
 test('returns correct object', () => {
   const plugin = chromeExtension()
 
-  expect(plugin).toEqual({
+  expect(plugin).toEqual<ChromeExtensionPlugin>({
     name: 'chrome-extension',
 
     _plugins: expect.objectContaining({
