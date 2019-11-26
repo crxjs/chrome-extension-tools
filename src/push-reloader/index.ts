@@ -1,6 +1,6 @@
 import { Plugin, OutputAsset } from 'rollup'
 
-import { update, login, reload } from './config-index'
+import { update, login, reload } from './fb-functions'
 
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
@@ -20,7 +20,7 @@ export interface PushReloaderCache {
   // Anonymous UID from Firebase
   uid?: string
   // Interval ID for updateUid
-  interval?: number | NodeJS.Timeout
+  interval?: NodeJS.Timeout
   // Path to service worker
   swPath?: string
   firstRun: boolean
@@ -29,13 +29,15 @@ export interface PushReloaderCache {
   ctScriptPath?: string
 }
 
-export const pushReloader = ({
-  cache = {
-    firstRun: true,
+export const pushReloader = (
+  {
+    cache = {
+      firstRun: true,
+    },
+  } = {} as {
+    cache: PushReloaderCache
   },
-}: {
-  cache: PushReloaderCache
-}): PushReloaderPlugin => {
+): PushReloaderPlugin => {
   return {
     name: 'push-reloader',
 
@@ -46,18 +48,24 @@ export const pushReloader = ({
     async generateBundle(options, bundle, isWrite) {
       /* -------------- LOGIN ON FIRST BUILD ------------- */
 
-      cache.uid = await login()
+      if (cache.firstRun) {
+        // Login user
+        cache.uid = await login()
 
-      await update()
+        // Update last user access time
+        await update()
 
-      cache.interval = setInterval(update, 5 * 60 * 1000)
+        cache.interval = setInterval(update, 5 * 60 * 1000)
+
+        cache.firstRun = false
+      }
 
       /* ------- CREATE CLIENT FILES ON EACH BUILD ------- */
 
       const emit = (name: string, source: string) => {
         const id = this.emitFile({ type: 'asset', name, source })
 
-        return this.getAssetFileName(id)
+        return this.getFileName(id)
       }
 
       if (cache.uid) {
@@ -68,7 +76,7 @@ export const pushReloader = ({
           bgClientCode
             .replace('%UID%', cache.uid)
             .replace('%SW_PATH%', cache.swPath)
-            .replace('%LOAD_MESSAGE%', loadMessage)
+            .replace('%LOAD_MESSAGE%', loadMessage),
         )
 
         cache.bgScriptPath = emit(
