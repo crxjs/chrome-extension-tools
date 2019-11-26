@@ -1,10 +1,14 @@
 module.exports = {
   moduleNameMapper: {
-    '\\.code(\\.js)?': '<rootDir>/tests/stub.code.js',
+    'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
   },
-  modulePathIgnorePatterns: ['.+/fixtures/dest', '~~.+'],
+  modulePathIgnorePatterns: [
+    '~~.+',
+    'push-reloader',
+    'simple-reloader',
+  ],
   preset: 'ts-jest',
-  setupFilesAfterEnv: ['./jest.setup.js'],
+  setupFilesAfterEnv: ['./jest.setup.ts'],
   transform: {
     // Not really sure what Sucrase does here,
     // but Jest can't read the files without it.
