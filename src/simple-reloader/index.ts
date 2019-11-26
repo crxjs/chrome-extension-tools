@@ -2,7 +2,7 @@ import { Plugin, EmittedAsset, OutputAsset } from 'rollup'
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
 
-export type SimpleReloader = Pick<
+export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
   'name' | 'generateBundle'
 >
@@ -12,16 +12,16 @@ export interface SimpleReloaderCache {
   ctScriptPath?: string
 }
 
-const loadMessage: string = `
+export const loadMessage: string = `
 DEVELOPMENT build with simple auto-reloader.
 Loaded on ${new Date().toTimeString()}.
 `.trim()
 
 const timestampPath = 'assets/timestamp.js'
 
-export const simpleReloader = (): SimpleReloader => {
-  const state: SimpleReloaderCache = {}
-
+export const simpleReloader = (
+  cache = {} as SimpleReloaderCache,
+): SimpleReloaderPlugin => {
   return {
     name: 'simple-reloader',
 
@@ -29,10 +29,14 @@ export const simpleReloader = (): SimpleReloader => {
       /* ----------------- Start Reloader -------------------------- */
 
       /* ----------------- Create Client Files -------------------------- */
-      const emit = (name: string, code: string) => {
-        const id = this.emitAsset(name, code)
+      const emit = (name: string, source: string) => {
+        const id = this.emitFile({
+          type: 'asset',
+          name,
+          source,
+        })
 
-        return this.getAssetFileName(id)
+        return this.getFileName(id)
       }
 
       const timestampFile: EmittedAsset = {
@@ -43,14 +47,14 @@ export const simpleReloader = (): SimpleReloader => {
 
       this.emitFile(timestampFile)
 
-      state.bgScriptPath = emit(
+      cache.bgScriptPath = emit(
         'bg-reloader-client.js',
         bgClientCode
           .replace('%TIMESTAMP_PATH%', timestampPath)
           .replace('%LOAD_MESSAGE%', loadMessage),
       )
 
-      state.ctScriptPath = emit(
+      cache.ctScriptPath = emit(
         'ct-reloader-client.js',
         ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
       )
@@ -81,9 +85,9 @@ export const simpleReloader = (): SimpleReloader => {
 
       const { scripts: bgScripts = [] } = manifest.background
 
-      if (state.bgScriptPath) {
+      if (cache.bgScriptPath) {
         manifest.background.scripts = [
-          state.bgScriptPath,
+          cache.bgScriptPath,
           ...bgScripts,
         ]
       } else {
@@ -94,10 +98,10 @@ export const simpleReloader = (): SimpleReloader => {
 
       const { content_scripts: ctScripts = [] } = manifest
 
-      if (state.ctScriptPath) {
+      if (cache.ctScriptPath) {
         manifest.content_scripts = ctScripts.map(
           ({ js = [], ...rest }) => ({
-            js: [state.ctScriptPath!, ...js],
+            js: [cache.ctScriptPath!, ...js],
             ...rest,
           }),
         )
