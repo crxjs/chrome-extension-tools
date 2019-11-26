@@ -8,12 +8,10 @@ const plugins = [
   typescript(),
   json(),
   bundleImports({
-    include: ['**/*.sw.js'],
-    importAs: 'path',
-  }),
-  bundleImports({
-    include: ['**/*.code.js'],
-    importAs: 'code',
+    useVirtualModule: true,
+    options: {
+      external: ['%PATH%'],
+    },
   }),
 ]
 
@@ -37,6 +35,7 @@ export default [
       'ajv',
       'ajv/lib/refs/json-schema-draft-04.json',
       'cheerio',
+      'cosmiconfig',
       'fs-extra',
       'fs',
       'glob',
@@ -49,16 +48,8 @@ export default [
       'path',
       'picomatch',
       'rollup-pluginutils',
+      'slash',
     ],
     plugins,
-  },
-  {
-    input: 'src/manifest-input/dynamicImportWrapper.js',
-    output: {
-      file: 'lib/dynamicImportWrapper.js',
-      format: 'iife',
-    },
-    external: ['%PATH%'],
-    treeshake: false,
   },
 ]
