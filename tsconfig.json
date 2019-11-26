@@ -1,25 +1,13 @@
 {
+  "extends": "./tsconfig-main.json",
   "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "jsx": "react",
-    "lib": ["es2017", "esnext.array"],
-    "module": "es2015",
-    "moduleResolution": "node",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2017",
-    "skipLibCheck": true,
-    "resolveJsonModule": true
+    "lib": ["es2017", "esnext.array"]
   },
-  "include": [
-    "src",
-    "old-tests",
-    "jest.setup.js",
-    "jest.config.js",
-    "__fixtures__"
-  ]
+  "references": [
+    { "path": "./src/push-reloader/sw" },
+    { "path": "./src/push-reloader/client" },
+    { "path": "./src/simple-reloader/client" }
+  ],
+  "include": ["src", "**/*.js"],
+  "exclude": ["__tests__", "~~tests"]
 }
