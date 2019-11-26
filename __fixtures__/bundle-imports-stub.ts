@@ -1,3 +1,5 @@
+// IDEA: could use Rollup API to bundle this file
+export const code = `
 const triggerEvents = captureEvents()
 
 import('%PATH%')
@@ -110,3 +112,5 @@ function delay(ms) {
       setTimeout(resolve, ms, x)
     })
 }
+
+`

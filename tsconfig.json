@@ -6,8 +6,9 @@
   "references": [
     { "path": "./src/push-reloader/sw" },
     { "path": "./src/push-reloader/client" },
-    { "path": "./src/simple-reloader/client" }
+    { "path": "./src/simple-reloader/client" },
+    { "path": "./src/manifest-input/browser" },
   ],
-  "include": ["src", "**/*.js"],
+  "include": ["src", "**/*.js", "jest.setup.ts"],
   "exclude": ["__tests__", "~~tests"]
 }

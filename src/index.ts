@@ -18,6 +18,7 @@ export type ChromeExtensionPlugin = Pick<
   | 'watchChange'
   | 'generateBundle'
 > & {
+  // For testing
   _plugins: {
     manifest: ManifestInputPlugin
     html: HtmlInputsPlugin
@@ -45,27 +46,7 @@ export interface ChromeExtensionOptions {
     version: string
   }
   publicKey?: string
-  reloader?: 'non-persistent' | 'persistent'
 }
-
-// export const pushReloader = (): Pick<
-//   PluginHooks,
-//   'buildStart' | 'generateBundle' | 'writeBundle'
-// > & { name: string } => ({
-//   name: 'push-reloader',
-//   buildStart() {},
-//   generateBundle() {},
-//   writeBundle() {},
-// })
-
-// export const intervalReloader = (): Pick<
-//   PluginHooks,
-//   'generateBundle' | 'writeBundle'
-// > & { name: string } => ({
-//   name: 'interval-reloader',
-//   generateBundle() {},
-//   writeBundle() {},
-// })
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
@@ -102,7 +83,6 @@ export const chromeExtension = (
 
     async generateBundle(...args) {
       await manifest.generateBundle.call(this, ...args)
-      // TODO: run validate-names in writeBundle
       await validate.generateBundle.call(this, ...args)
     },
   }

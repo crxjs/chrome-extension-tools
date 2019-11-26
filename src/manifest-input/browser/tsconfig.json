@@ -1,0 +1,8 @@
+{
+  // Webextension client config
+  "extends": "../../../tsconfig-main.json",
+  "compilerOptions": {
+    "lib": ["es2017", "dom", "es2019.array"],
+    "module": "esnext"
+  }
+}

@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs'
-import { join, relative } from 'path'
+import { code as script } from 'code ./browser/dynamicImportWrapper.ts'
+import { relative } from 'path'
 import slash from 'slash'
 
 export function setupLoaderScript({
@@ -36,13 +36,6 @@ export function setupLoaderScript({
         : ''
     }
   }
-
-  // TODO: use bundleImports
-  // TODO: convert dynamicImportWrapper to TS
-  const script = readFileSync(
-    join(__dirname, 'dynamicImportWrapper.js'),
-    'utf-8',
-  )
 
   return (scriptPath: string) => {
     return (
