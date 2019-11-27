@@ -12,7 +12,7 @@ const bundle: OutputBundle = require(getExtPath(
   'basic-bundle.json',
 ))
 
-let { _plugins, ...plugin } = chromeExtension({ verbose: false })
+const { _plugins, ...plugin } = chromeExtension({ verbose: false })
 
 jest.spyOn(_plugins.manifest, 'generateBundle')
 jest.spyOn(_plugins.validate, 'generateBundle')

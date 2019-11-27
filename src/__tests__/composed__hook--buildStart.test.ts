@@ -8,7 +8,7 @@ const config: RollupOptions = {
   input: getExtPath('basic/manifest.json'),
 }
 
-let { _plugins, ...plugin } = chromeExtension()
+const { _plugins, ...plugin } = chromeExtension()
 
 jest.spyOn(_plugins.manifest, 'buildStart')
 jest.spyOn(_plugins.html, 'buildStart')

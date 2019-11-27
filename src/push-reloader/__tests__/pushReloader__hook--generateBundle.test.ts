@@ -125,7 +125,7 @@ test('does not start another update interval on later runs', async () => {
   expect(functions.update).not.toBeCalled()
 })
 
-test('emits assets', async () => {
+test('emits assets', () => {
   expect(context.emitFile).toBeCalledTimes(4)
 
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
@@ -150,7 +150,7 @@ test('emits assets', async () => {
   })
 })
 
-test('updates manifest in bundle', async () => {
+test('updates manifest in bundle', () => {
   expect(manifestObj).toBe(bundle['manifest.json'])
   expect(manifestObj).not.toEqual(manifestClone)
 
@@ -169,24 +169,24 @@ test('updates manifest in bundle', async () => {
   })
 })
 
-test('set manifest description', async () => {
+test('set manifest description', () => {
   expect(manifest.description).toBe(loadMessage)
 })
 
-test('adds permissions', async () => {
+test('adds permissions', () => {
   expect(manifest.permissions).toContain('notifications')
   expect(manifest.permissions).toContain(
     'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
   )
 })
 
-test('add reloader script to background', async () => {
+test('add reloader script to background', () => {
   expect(manifest.background!.scripts).toContain(
     'mock-file-name',
   )
 })
 
-test('add reloader script to content scripts', async () => {
+test('add reloader script to content scripts', () => {
   expect(manifest.content_scripts!.length).toBe(2)
   expect(manifest.content_scripts!).toContainEqual({
     js: ['mock-file-name', contentJs],

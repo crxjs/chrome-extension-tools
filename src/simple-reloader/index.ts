@@ -1,7 +1,5 @@
 import { Plugin, EmittedAsset, OutputAsset } from 'rollup'
-// @ts-ignore
 import { code as bgClientCode } from 'code ./client/background.ts'
-// @ts-ignore
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { ChromeExtensionManifest } from '../manifest'
 
@@ -28,7 +26,7 @@ export const simpleReloader = (
   return {
     name: 'simple-reloader',
 
-    async generateBundle(options, bundle) {
+    generateBundle(options, bundle) {
       /* ----------------- Start Reloader -------------------------- */
 
       /* ----------------- Create Client Files -------------------------- */

@@ -3,6 +3,16 @@ import { readJSONSync } from 'fs-extra'
 import { resolve } from 'path'
 import { ChromeExtensionManifest } from '../../manifest'
 
+type ValidationErrorsArray = Ajv.ErrorObject[] | null | undefined
+class ValidationError extends Error {
+  constructor(msg: string, errors: ValidationErrorsArray) {
+    super(msg)
+    this.name = 'ValidationError'
+    this.errors = errors
+  }
+  errors: ValidationErrorsArray
+}
+
 // import jsonSchema from 'ajv/lib/refs/json-schema-draft-04.json'
 const jsonSchema = readJSONSync(
   resolve(__dirname, 'json-schema-draft-04.json'),
@@ -36,14 +46,4 @@ export const validateManifest = (
   const msg = `This manifest has ${errors!.length} problems.`
 
   throw new ValidationError(msg, errors)
-}
-
-type ValidationErrorsArray = Ajv.ErrorObject[] | null | undefined
-class ValidationError extends Error {
-  constructor(msg: string, errors: ValidationErrorsArray) {
-    super(msg)
-    this.name = 'ValidationError'
-    this.errors = errors
-  }
-  errors: ValidationErrorsArray
 }

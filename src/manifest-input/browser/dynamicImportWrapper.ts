@@ -50,7 +50,7 @@ function captureEvents() {
       return t()
     })
 
-  function captureEvent([name, event]: [string, ChromeEvent]) {
+  function captureEvent([, event]: [string, ChromeEvent]) {
     let capture = true
 
     const callbacks = new Map<Function, any[]>()
@@ -58,16 +58,16 @@ function captureEvents() {
 
     event.addListener(handleEvent)
 
-    function handleEvent() {
+    function handleEvent(...args: any[]) {
       // console.time(name)
       const error = chrome.runtime.lastError
 
       if (capture) {
         // console.log('delay', name)
-        events.add([error, ...arguments])
+        events.add([error, ...args])
       } else {
         // console.log('direct', name)
-        callListeners(error, ...arguments)
+        callListeners(error, ...args)
       }
     }
 

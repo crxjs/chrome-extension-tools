@@ -22,12 +22,12 @@ test('replaces namespace and event', () => {
   const result = loaderScript('background.js')
 
   // Namespaces
-  expect(result).not.toMatch("case '%NAME%':")
+  expect(result).not.toMatch('case \'%NAME%\':')
   expect(result).toMatch(`case '${'runtime'}':`)
   expect(result).toMatch(`case '${'tabs'}':`)
   
   // Events
-  expect(result).not.toMatch("case '%EVENT%':")
+  expect(result).not.toMatch('case \'%EVENT%\':')
   expect(result).toMatch(`case '${'onMessage'}':`)
   expect(result).toMatch(`case '${'onUpdated'}':`)
 })

@@ -8,7 +8,7 @@ const config: RollupOptions = {
   input: getExtPath('basic/manifest.json'),
 }
 
-let { _plugins, ...plugin } = chromeExtension({ verbose: false })
+const { _plugins, ...plugin } = chromeExtension({ verbose: false })
 
 jest.spyOn(_plugins.manifest, 'watchChange')
 jest.spyOn(_plugins.html, 'watchChange')

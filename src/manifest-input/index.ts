@@ -114,7 +114,7 @@ export function manifestInput(
 
   /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
 
-  let loaderScript = setupLoaderScript(dynamicImportWrapper)
+  const loaderScript = setupLoaderScript(dynamicImportWrapper)
 
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
@@ -190,7 +190,7 @@ export function manifestInput(
     /*              HANDLE WATCH FILES              */
     /* ============================================ */
 
-    async buildStart(options) {
+    async buildStart() {
       this.addWatchFile(manifestPath)
 
       cache.assets.forEach((srcPath) => {
@@ -233,7 +233,7 @@ export function manifestInput(
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    async generateBundle(options, bundle) {
+    generateBundle(options, bundle) {
       /* ---------- DERIVE PERMISIONS START --------- */
 
       // Get module ids for all chunks

@@ -1,11 +1,8 @@
 import { Plugin, OutputAsset } from 'rollup'
 
 import { update, login, reload } from './fb-functions'
-// @ts-ignore
 import { code as bgClientCode } from 'code ./client/background.ts'
-// @ts-ignore
 import { code as ctClientCode } from 'code ./client/content.ts'
-// @ts-ignore
 import { code as serviceWorkerCode } from 'code ./sw/index.ts'
 import { ChromeExtensionManifest } from '../manifest'
 
@@ -48,7 +45,7 @@ export const pushReloader = (
       /* ----- SIGNAL CLIENTS THAT BUILD HAS STARTED ----- */
     },
 
-    async generateBundle(options, bundle, isWrite) {
+    async generateBundle(options, bundle) {
       /* -------------- LOGIN ON FIRST BUILD ------------- */
 
       if (cache.firstRun) {
@@ -58,7 +55,9 @@ export const pushReloader = (
         // Update last user access time
         await update()
 
-        cache.interval = setInterval(update, 5 * 60 * 1000)
+        cache.interval = setInterval(() => {
+          update()
+        }, 5 * 60 * 1000)
 
         cache.firstRun = false
       }

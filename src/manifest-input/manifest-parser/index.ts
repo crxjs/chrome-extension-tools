@@ -75,7 +75,7 @@ export function deriveFiles(
   ]
 
   const css = [
-    ...files.filter((f) => /\.css$/.test(f)),
+    ...files.filter((f) => f.endsWith('.css')),
     ...get(
       manifest,
       'content_scripts',
