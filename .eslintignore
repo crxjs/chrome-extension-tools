@@ -1,6 +1,2 @@
 /node_modules
 /build
-/tests/**/fixtures
-**/dynamicImportWrapper.js
-~~*/**/*
-jest.config.js
