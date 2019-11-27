@@ -41,6 +41,7 @@
     "magic-string": "^0.25.4",
     "mem": "^6.0.0",
     "picomatch": "^2.1.1",
+    "rollup": "^1.27.5",
     "slash": "^3.0.0"
   },
   "devDependencies": {
@@ -76,7 +77,6 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "replace-in-file": "^4.2.0",
-    "rollup": "^1.22.0",
     "rollup-plugin-bundle-imports": "^1.4.5",
     "rollup-plugin-code-string": "^0.1.1",
     "rollup-plugin-commonjs": "^10.1.0",
