@@ -2,8 +2,14 @@
   "extends": "./tsconfigs/tsconfig-base.json",
   "compilerOptions": {
     "rootDir": ".",
+    "outDir": "lib"
     // "composite": true
   },
-  "include": ["*"],
+  "include": [
+    "src/**/*",
+    "__fixtures__/**/*",
+    "__tests__/**/*",
+    "jest.setup.ts"
+  ],
   "exclude": ["src/push-reloader/sw", "src/push-reloader/client"]
 }
