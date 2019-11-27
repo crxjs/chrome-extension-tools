@@ -1,6 +1,5 @@
-import { getExtPath } from '../../../__fixtures__/utils'
-import { loadHtml, getJsAssets } from '../cheerio'
 import { optionsHtml } from '../../../__fixtures__/basic-paths'
+import { getJsAssets, loadHtml } from '../cheerio'
 
 const html$ = loadHtml(optionsHtml)
 

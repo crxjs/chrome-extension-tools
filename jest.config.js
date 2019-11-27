@@ -8,4 +8,9 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!lodash-es/.*)',
   ],
+  transform: {
+    // Not really sure what Sucrase does here,
+    // but Jest can't read the files without it.
+    '.(js|jsx)': '@sucrase/jest-plugin',
+  },
 }

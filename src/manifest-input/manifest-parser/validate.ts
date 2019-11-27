@@ -1,8 +1,16 @@
 import Ajv from 'ajv'
+import { readJSONSync } from 'fs-extra'
+import { resolve } from 'path'
+import { ChromeExtensionManifest } from '../../manifest'
 
-// TODO: fix schema path
-import manifestSchema from './schema.json'
-import jsonSchema from 'ajv/lib/refs/json-schema-draft-04.json'
+// import jsonSchema from 'ajv/lib/refs/json-schema-draft-04.json'
+const jsonSchema = readJSONSync(
+  resolve(__dirname, 'json-schema-draft-04.json'),
+)
+// import manifestSchema from './schema.json'
+const manifestSchema = readJSONSync(
+  resolve(__dirname, 'schema-web-ext-manifest-v2.json'),
+)
 
 export const ajv = new Ajv({
   verbose: true,

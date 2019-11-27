@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig-main",
+  "compilerOptions": {
+    "lib": ["es2017", "esnext.array"]
+  },
+  "references": [
+    { "path": "./src/push-reloader/sw" },
+    { "path": "./src/push-reloader/client" },
+    { "path": "./src/simple-reloader/client" },
+    { "path": "./src/manifest-input/browser" },
+  ],
+}

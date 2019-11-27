@@ -1,20 +1,10 @@
-interface ContentScript {
+export interface ContentScript {
   css: string[]
   js: string[]
   matches: string[]
 }
 
-type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | Json[]
-  | JsonRecord
-
-type JsonRecord = { [key: string]: Json | undefined }
-
-interface ChromeExtensionManifest {
+export interface ChromeExtensionManifest {
   manifest_version: number
   name: string
   version: string

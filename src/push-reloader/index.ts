@@ -1,10 +1,13 @@
 import { Plugin, OutputAsset } from 'rollup'
 
 import { update, login, reload } from './fb-functions'
-
+// @ts-ignore
 import { code as bgClientCode } from 'code ./client/background.ts'
+// @ts-ignore
 import { code as ctClientCode } from 'code ./client/content.ts'
+// @ts-ignore
 import { code as serviceWorkerCode } from 'code ./sw/index.ts'
+import { ChromeExtensionManifest } from '../manifest'
 
 export const loadMessage = `
 DEVELOPMENT build with non-persistent auto-reloader.

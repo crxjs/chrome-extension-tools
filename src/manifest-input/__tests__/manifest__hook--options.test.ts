@@ -19,6 +19,7 @@ import {
   manifestInput,
   ManifestInputPluginCache,
 } from '../index'
+import { ChromeExtensionManifest } from '../../manifest'
 
 jest.spyOn(explorer, 'load')
 

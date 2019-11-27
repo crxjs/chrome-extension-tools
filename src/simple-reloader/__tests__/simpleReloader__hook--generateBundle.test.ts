@@ -8,6 +8,7 @@ import {
 import { simpleReloader, loadMessage } from '..'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
+import { ChromeExtensionManifest } from '../../manifest'
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
 

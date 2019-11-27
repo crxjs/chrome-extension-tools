@@ -15,6 +15,7 @@ import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 
 import * as functions from '../fb-functions'
+import { ChromeExtensionManifest } from '../../manifest'
 
 jest.mock('../fb-functions.ts', () => ({
   login: jest.fn(() => Promise.resolve('UID')),

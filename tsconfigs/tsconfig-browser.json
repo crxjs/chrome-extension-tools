@@ -1,5 +1,5 @@
 {
-  // Webextension client config
+  // manifest-inputs Browser Config
   "extends": "../../../tsconfig-main.json",
   "compilerOptions": {
     "lib": ["es2017", "dom", "es2019.array"],

@@ -1,14 +1,9 @@
 {
-  "extends": "./tsconfig-main.json",
+  "extends": "./tsconfigs/tsconfig-base.json",
   "compilerOptions": {
-    "lib": ["es2017", "esnext.array"]
+    "rootDir": ".",
+    // "composite": true
   },
-  "references": [
-    { "path": "./src/push-reloader/sw" },
-    { "path": "./src/push-reloader/client" },
-    { "path": "./src/simple-reloader/client" },
-    { "path": "./src/manifest-input/browser" },
-  ],
-  "include": ["src", "**/*.js", "jest.setup.ts"],
-  "exclude": ["__tests__", "~~tests"]
+  "include": ["*"],
+  "exclude": ["src/push-reloader/sw", "src/push-reloader/client"]
 }

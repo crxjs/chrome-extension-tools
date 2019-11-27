@@ -41,6 +41,7 @@
     "magic-string": "^0.25.4",
     "mem": "^6.0.0",
     "picomatch": "^2.1.1",
+    "read-pkg-up": "^7.0.0",
     "rollup": "^1.27.5",
     "slash": "^3.0.0"
   },

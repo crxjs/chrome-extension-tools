@@ -1,3 +1,4 @@
+// @ts-ignore
 import { code as script } from 'code ./browser/dynamicImportWrapper.ts'
 import { relative } from 'path'
 import slash from 'slash'

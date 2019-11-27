@@ -1,6 +1,9 @@
 import { Plugin, EmittedAsset, OutputAsset } from 'rollup'
+// @ts-ignore
 import { code as bgClientCode } from 'code ./client/background.ts'
+// @ts-ignore
 import { code as ctClientCode } from 'code ./client/content.ts'
+import { ChromeExtensionManifest } from '../manifest'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,

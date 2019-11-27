@@ -14,6 +14,7 @@ import { manifestJson } from '../../../__fixtures__/basic-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
+import { ChromeExtensionManifest } from '../../manifest'
 
 const validate = require('../manifest-parser/validate')
 jest.spyOn(validate, 'validateManifest')

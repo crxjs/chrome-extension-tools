@@ -3,6 +3,7 @@ import get from 'lodash.get'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
 import * as permissions from './permissions'
+import { ChromeExtensionManifest, ContentScript } from '../../manifest'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */

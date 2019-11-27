@@ -14,6 +14,7 @@ import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
 import { cloneObject } from './cloneObject'
+import { ChromeExtensionManifest } from '../manifest'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]

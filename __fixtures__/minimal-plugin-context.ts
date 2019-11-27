@@ -1,7 +1,9 @@
 import { MinimalPluginContext } from 'rollup'
-import pkg from '../package.json'
+import readPkgUp from 'read-pkg-up'
 
-const rollupVersion = pkg.devDependencies.rollup
+const { packageJson } = readPkgUp.sync() || {}
+
+const rollupVersion = packageJson?.dependencies?.rollup || 'unknown'
 
 export const context: MinimalPluginContext = {
   meta: { rollupVersion },

@@ -1,6 +1,5 @@
-import { getExtPath } from '../../../__fixtures__/utils'
-import { loadHtml } from '../cheerio'
 import { optionsHtml } from '../../../__fixtures__/basic-paths'
+import { loadHtml } from '../cheerio'
 
 const fs = require('fs-extra')
 const cheerio = require('cheerio')
