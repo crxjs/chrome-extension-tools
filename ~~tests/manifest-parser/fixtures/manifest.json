@@ -1,8 +1,0 @@
-{
-  "web_accessible_resources": [
-    "img/*.png",
-    "options.html",
-    "styles/style.css",
-    "content/script.js"
-  ]
-}
