@@ -282,7 +282,7 @@ export function manifestInput(
           ...clonedManifest,
           permissions: combinePerms(
             permissions,
-            clonedManifest.permissions,
+            clonedManifest.permissions || [],
           ),
         })
 
