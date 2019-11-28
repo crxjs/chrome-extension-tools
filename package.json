@@ -55,6 +55,7 @@
     "@bumble/stream": "^0.2.2",
     "@sucrase/jest-plugin": "^2.0.0",
     "@types/cheerio": "^0.22.14",
+    "@types/chrome": "0.0.91",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
     "@types/is-valid-path": "^0.1.0",
