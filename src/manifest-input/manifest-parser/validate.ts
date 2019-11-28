@@ -1,7 +1,7 @@
 import Ajv from 'ajv'
-import { readJSONSync } from 'fs-extra'
-import { resolve } from 'path'
 import { ChromeExtensionManifest } from '../../manifest'
+import jsonSchema from './json-schema-draft-04.json'
+import manifestSchema from './schema-web-ext-manifest-v2.json'
 
 type ValidationErrorsArray = Ajv.ErrorObject[] | null | undefined
 class ValidationError extends Error {
@@ -13,14 +13,13 @@ class ValidationError extends Error {
   errors: ValidationErrorsArray
 }
 
-// import jsonSchema from 'ajv/lib/refs/json-schema-draft-04.json'
-const jsonSchema = readJSONSync(
-  resolve(__dirname, 'json-schema-draft-04.json'),
-)
-// import manifestSchema from './schema.json'
-const manifestSchema = readJSONSync(
-  resolve(__dirname, 'schema-web-ext-manifest-v2.json'),
-)
+// const jsonSchema = readJSONSync(
+//   resolve(__dirname, 'json-schema-draft-04.json'),
+// )
+
+// const manifestSchema = readJSONSync(
+//   resolve(__dirname, 'schema-web-ext-manifest-v2.json'),
+// )
 
 export const ajv = new Ajv({
   verbose: true,
