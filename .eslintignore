@@ -2,3 +2,4 @@
 /lib
 jest.config.js
 rollup.config.js
+/types

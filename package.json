@@ -9,7 +9,7 @@
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
   "files": [
     "lib",
-    "types/index.d.ts",
+    "types",
     "manifest.schema.json"
   ],
   "main": "lib/index-cjs.js",
@@ -17,7 +17,7 @@
   "types": "types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
-    "build:types": "tsc -p tsconfig.d.json",
+    "build:types": "tsc -p tsconfigs/tsconfig-types.json",
     "lint": "tslint",
     "start": "rollup -c -w",
     "test": "jest",

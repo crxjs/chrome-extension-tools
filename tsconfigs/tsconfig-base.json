@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom", "esnext.array"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
