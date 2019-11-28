@@ -1,2 +1,4 @@
 /node_modules
 /lib
+jest.config.js
+rollup.config.js

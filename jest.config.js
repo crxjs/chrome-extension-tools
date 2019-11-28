@@ -7,8 +7,7 @@ module.exports = {
   preset: 'ts-jest',
   setupFilesAfterEnv: ['./jest.setup.ts'],
   transform: {
-    // Not really sure what Sucrase does here,
-    // but Jest can't read the files without it.
+    // Use Sucrase to convert ES6 modules in JS files
     '.(js|jsx)': '@sucrase/jest-plugin',
   },
   transformIgnorePatterns: [
