@@ -26,6 +26,9 @@ export type ChromeExtensionPlugin = Pick<
   }
 }
 
+export { pushReloader } from './push-reloader'
+export { simpleReloader } from './simple-reloader'
+
 export interface ChromeExtensionOptions {
   assets?: {
     include?: string[]
