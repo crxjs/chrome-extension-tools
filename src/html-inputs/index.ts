@@ -128,11 +128,13 @@ export default function htmlInputs(
       })
 
       const loading = assets.map(async (asset) => {
-        const source = await readFile(asset, 'utf8')
-
+        let source: string | Buffer
         let replaced: string | undefined
         if (asset.endsWith('html')) {
+          source = await readFile(asset, 'utf8')
           replaced = source.replace(/\.[jt]sx?"/g, '.js"')
+        } else {
+          source = await readFile(asset)
         }
 
         const fileName = relative(

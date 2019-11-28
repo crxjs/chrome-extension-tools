@@ -98,7 +98,7 @@ export function manifestInput(
   },
 ): ManifestInputPlugin {
   const readFile = memoize(
-    (filepath: string) => fs.readFile(filepath, 'utf8'),
+    (filepath: string) => fs.readFile(filepath),
     {
       cache: cache.readFile,
     },
@@ -296,7 +296,7 @@ export function manifestInput(
         /* ------ WEB ACCESSIBLE RESOURCES START ------ */
 
         const contentScripts = cts.reduce(
-          (r, { js }) => [...r, ...js],
+          (r, { js = [] }) => [...r, ...js],
           [] as string[],
         )
 
@@ -359,7 +359,7 @@ export function manifestInput(
           // Emit content script wrappers
           if (cts.length) {
             manifestBody.content_scripts = cts.map(
-              ({ js, ...rest }) => ({
+              ({ js = [], ...rest }) => ({
                 js: js.map(emitDynamicImportWrapper),
                 ...rest,
               }),
