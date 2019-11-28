@@ -6,7 +6,7 @@ import { setupMessaging, registerToken } from './config-client'
 
 const reload = () => chrome.runtime.reload()
 
-const onMessage = async (event: MessageEvent) => {
+const onMessage = (event: MessageEvent) => {
   const { message } = event.data
 
   if (message === 'client-load') {
