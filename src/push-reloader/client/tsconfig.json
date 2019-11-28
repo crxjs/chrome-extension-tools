@@ -1,10 +1,8 @@
 {
-  // Push Browser client config
+  // Push Browser Client Config
   "extends": "../../../tsconfigs/tsconfig-base.json",
   "compilerOptions": {
     "lib": ["es2017", "dom"],
-    "composite": true,
-    "declaration": true,
   },
   "include": ["*.ts", "../CONFIG.ts"],
 }

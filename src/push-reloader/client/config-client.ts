@@ -1,6 +1,3 @@
-/* eslint-env browser */
-/* eslint-env webextensions */
-
 // Firebase manual chunk
 import firebase from 'firebase/app'
 import 'firebase/messaging'
