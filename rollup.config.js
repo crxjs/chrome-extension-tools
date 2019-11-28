@@ -4,8 +4,12 @@ import typescript from 'rollup-plugin-typescript'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import json from 'rollup-plugin-json'
 
+const {
+  compilerOptions,
+} = require('./tsconfigs/tsconfig-base.json')
+
 const plugins = [
-  typescript(),
+  typescript(compilerOptions),
   json(),
   bundleImports({
     useVirtualModule: true,
@@ -43,7 +47,7 @@ export default [
       'glob',
       'lodash.get',
       'ajv',
-      'slash'
+      'slash',
     ],
     plugins,
   },

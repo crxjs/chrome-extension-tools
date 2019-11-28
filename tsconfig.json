@@ -11,7 +11,7 @@
     "src/push-reloader/sw",
     "src/push-reloader/client",
     "src/manifest-input/browser"
-  ],
+  ]
   // "references": [
   //   { "path": "src/push-reloader/sw" },
   //   { "path": "src/push-reloader/client" },

@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": ["es2017", "dom", "esnext.array"],
+    "lib": ["es2017", "dom", "es2019.array"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
@@ -15,5 +15,6 @@
     "strict": true,
     "target": "es2017",
     "rootDir": "..",
+    "resolveJsonModule": true
   }
 }
