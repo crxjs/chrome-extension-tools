@@ -1,6 +1,6 @@
 /* eslint-env browser */
 /* eslint-env serviceworker */
-declare var self: ServiceWorkerGlobalScope
+declare let self: ServiceWorkerGlobalScope
 export {}
 
 // Give the service worker access to Firebase Messaging.

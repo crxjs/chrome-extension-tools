@@ -1,8 +1,8 @@
 /* eslint-env browser */
 /* eslint-env serviceworker */
-/* global chrome */
-declare var self: ServiceWorkerGlobalScope
-declare var chrome: {
+
+declare let self: ServiceWorkerGlobalScope
+declare let chrome: {
   runtime: {
     getBackgroundClient: () => Client
   }
@@ -47,7 +47,7 @@ const onPush = async (event: PushEvent) => {
 }
 
 // We're not using this right now.
-const onMessage = async (event: ExtendableMessageEvent) => {
+const onMessage = (event: ExtendableMessageEvent) => {
   console.log(event)
 }
 
