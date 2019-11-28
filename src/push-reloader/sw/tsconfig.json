@@ -1,0 +1,10 @@
+{
+  // Push Service worker config
+  "extends": "../../../tsconfigs/tsconfig-base.json",
+  "compilerOptions": {
+    "lib": ["es2017", "webworker"],
+    "composite": true,
+    "declaration": true
+  },
+  "include": ["*.ts", "../CONFIG.ts"]
+}
