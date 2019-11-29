@@ -78,7 +78,8 @@ export const pushReloader = (
           bgClientCode
             .replace('%UID%', cache.uid)
             .replace('%SW_PATH%', cache.swPath)
-            .replace('%LOAD_MESSAGE%', loadMessage),
+            // eslint-disable-next-line quotes
+            .replace(`%LOAD_MESSAGE%`, loadMessage),
         )
 
         cache.bgScriptPath = emit(
@@ -88,7 +89,8 @@ export const pushReloader = (
 
         cache.ctScriptPath = emit(
           'ct-reloader-client.js',
-          ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
+          // eslint-disable-next-line quotes
+          ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
         )
       } else {
         throw new TypeError(

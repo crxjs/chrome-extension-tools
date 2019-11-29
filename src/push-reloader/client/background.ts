@@ -32,7 +32,8 @@ const onLoad = async ({
 
   notifications.forEach((n) => n.close())
 
-  console.log('%LOAD_MESSAGE%')
+  // eslint-disable-next-line quotes
+  console.log(`%LOAD_MESSAGE%`)
 
   return registerToken({ uid: '%UID%', token })
 }

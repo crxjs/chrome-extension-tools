@@ -52,12 +52,13 @@ export const simpleReloader = (
         'bg-reloader-client.js',
         bgClientCode
           .replace('%TIMESTAMP_PATH%', timestampPath)
-          .replace('%LOAD_MESSAGE%', loadMessage),
+          // eslint-disable-next-line quotes
+          .replace(`%LOAD_MESSAGE%`, loadMessage),
       )
 
       cache.ctScriptPath = emit(
         'ct-reloader-client.js',
-        ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
+        ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
       )
 
       /* ----------------- Update Manifest -------------------------- */
