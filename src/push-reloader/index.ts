@@ -37,7 +37,11 @@ export const pushReloader = (
   } = {} as {
     cache: PushReloaderCache
   },
-): PushReloaderPlugin => {
+): PushReloaderPlugin | undefined => {
+  if (!process.env.ROLLUP_WATCH) {
+    return undefined
+  }
+  
   return {
     name: 'push-reloader',
 

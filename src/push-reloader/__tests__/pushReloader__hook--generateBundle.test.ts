@@ -38,12 +38,14 @@ let manifestObj: OutputAsset
 let manifestClone: OutputAsset
 let manifest: ChromeExtensionManifest
 beforeEach(async () => {
+  process.env.ROLLUP_WATCH = 'true'
+
   jest.clearAllMocks()
   context.getFileName.mockImplementation(() => 'mock-file-name')
 
   bundle = cloneObject(originalBundle)
   cache = { firstRun: true }
-  plugin = pushReloader({ cache })
+  plugin = pushReloader({ cache })!
 
   manifestObj = bundle['manifest.json'] as OutputAsset
   manifestClone = cloneObject(manifestObj)

@@ -16,13 +16,15 @@ const originalBundle: OutputBundle = require('../../../__fixtures__/extensions/b
 let bundle: OutputBundle
 let cache: PushReloaderCache
 beforeEach(() => {
+  process.env.ROLLUP_WATCH = 'true'
+
   context.getFileName.mockImplementation(() => 'mock-file-name')
   bundle = cloneObject(originalBundle)
   cache = { firstRun: true }
 })
 
 test('calls reload cloud function', async () => {
-  const plugin = pushReloader({ cache })
+  const plugin = pushReloader({ cache })!
 
   await plugin.writeBundle.call(context, bundle)
 
