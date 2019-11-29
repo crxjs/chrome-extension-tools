@@ -133,7 +133,7 @@ export const pushReloader = (
         ]
       } else {
         this.warn(
-          'Background page reloader script was not emitted',
+          'Background page reloader script was not emitted.',
         )
       }
 
@@ -150,7 +150,7 @@ export const pushReloader = (
           }),
         )
       } else {
-        this.warn('Content page reloader script was not emitted')
+        this.warn('Content page reloader script was not emitted.')
       }
 
       if (manifest.permissions) {
@@ -172,7 +172,15 @@ export const pushReloader = (
 
     async writeBundle() {
       /* ----------------- RELOAD CLIENTS ---------------- */
-      await reload()
+      try {
+        await reload()
+      } catch (error) {
+        if (error.message === 'no registered clients') {
+          this.warn('Reload the extension in Chrome to start hot-reloading.')
+        } else {
+          this.error(error.message)
+        }
+      }
     },
   }
 }
