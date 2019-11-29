@@ -31,7 +31,7 @@ test('bundles chunks and assets', async () => {
 
   // Assets
   const assets = output.filter(isAsset)
-  expect(assets.length).toBe(13)
+  expect(assets.length).toBe(16)
   expect(output.find(byFileName('asset.js'))).toBeDefined()
   expect(
     output.find(byFileName('popup/popup.html')),
@@ -51,5 +51,16 @@ test('bundles chunks and assets', async () => {
   expect(output.find(byFileName('options.png'))).toBeDefined()
   expect(output.find(byFileName('options.jpg'))).toBeDefined()
   expect(output.find(byFileName('manifest.json'))).toBeDefined()
+
+  expect(
+    output.find(byFileName('fonts/NotoSans-Light.ttf')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('fonts/NotoSans-Black.ttf')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('fonts/Missaali-Regular.otf')),
+  ).toBeDefined()
+
   // plus 2 wrappers background and content
-})
+}, 5 * 60 * 1000)

@@ -149,11 +149,13 @@ test('includes content script imports in web_accessible_resources', async () => 
     (manifestFile as EmittedAsset).source as string,
   )
 
-  expect(manifest.web_accessible_resources!.length).toBe(2)
+  expect(manifest.web_accessible_resources!.length).toBe(4)
   expect(manifest.web_accessible_resources).toEqual(
     expect.arrayContaining([
       'options.jpg',
       expect.stringMatching('content'),
+      'fonts/*.otf',
+      'fonts/*.ttf',
     ]),
   )
 })

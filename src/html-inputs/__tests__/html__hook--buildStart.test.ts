@@ -73,22 +73,22 @@ test('emits all assets', async () => {
   })
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
-    source: expect.any(String),
+    source: expect.any(Buffer),
     fileName: 'options.css',
   })
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
-    source: expect.any(String),
+    source: expect.any(Buffer),
     fileName: 'options.png',
   })
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
-    source: expect.any(String),
+    source: expect.any(Buffer),
     fileName: 'options.jpg',
   })
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
-    source: expect.any(String),
+    source: expect.any(Buffer),
     fileName: 'asset.js',
   })
 })

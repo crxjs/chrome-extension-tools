@@ -10,6 +10,17 @@ export const icon128 = getExtPath(
   'basic/images/icon-main-128.png',
 )
 
+// Fonts
+export const notoSansBlack = getExtPath(
+  'basic/fonts/NotoSans-Black.ttf',
+)
+export const missaaliOtf = getExtPath(
+  'basic/fonts/Missaali-Regular.otf',
+)
+export const notoSansLight = getExtPath(
+  'basic/fonts/NotoSans-Light.ttf',
+)
+
 // Options assets
 export const optionsHtml = getExtPath('basic/options.html')
 export const optionsCss = getExtPath('basic/options.css')

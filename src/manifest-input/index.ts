@@ -97,8 +97,10 @@ export function manifestInput(
     cache?: ManifestInputPluginCache
   },
 ): ManifestInputPlugin {
-  const readFile = memoize(
-    (filepath: string) => fs.readFile(filepath),
+  const readAssetAsBuffer = memoize(
+    (filepath: string) => {
+      return fs.readFile(filepath)
+    },
     {
       cache: cache.readFile,
     },
@@ -162,7 +164,7 @@ export function manifestInput(
         cache.srcDir = path.dirname(manifestPath)
 
         // Derive entry paths from manifest
-        const { js, html, css, img } = deriveFiles(
+        const { js, html, css, img, others } = deriveFiles(
           cache.manifest,
           cache.srcDir,
         )
@@ -171,7 +173,7 @@ export function manifestInput(
         cache.input = [...js, ...html]
         cache.assets = [
           // Dedupe assets
-          ...new Set([...css, ...img]),
+          ...new Set([...css, ...img, ...others]),
         ]
 
         /* --------------- END LOAD MANIFEST --------------- */
@@ -199,7 +201,7 @@ export function manifestInput(
 
       const assets: EmittedAsset[] = await Promise.all(
         cache.assets.map(async (srcPath) => {
-          const source = await readFile(srcPath)
+          const source = await readAssetAsBuffer(srcPath)
 
           return {
             type: 'asset' as 'asset',
