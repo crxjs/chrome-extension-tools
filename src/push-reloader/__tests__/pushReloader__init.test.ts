@@ -8,7 +8,7 @@ test('should return plugin in watch mode', () => {
   const plugin = pushReloader()
 
   expect(plugin).toMatchObject<PushReloaderPlugin>({
-    name: 'push-reloader',
+    name: 'chrome-extension-push-reloader',
     buildStart: expect.any(Function),
     generateBundle: expect.any(Function),
     writeBundle: expect.any(Function),

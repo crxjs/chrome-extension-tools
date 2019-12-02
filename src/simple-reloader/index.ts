@@ -24,7 +24,7 @@ export const simpleReloader = (
   cache = {} as SimpleReloaderCache,
 ): SimpleReloaderPlugin => {
   return {
-    name: 'simple-reloader',
+    name: 'chrome-extension-simple-reloader',
 
     generateBundle(options, bundle) {
       /* ----------------- Start Reloader -------------------------- */

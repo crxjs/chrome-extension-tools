@@ -43,7 +43,7 @@ export const pushReloader = (
   }
   
   return {
-    name: 'push-reloader',
+    name: 'chrome-extension-push-reloader',
 
     async buildStart() {
       /* ----- SIGNAL CLIENTS THAT BUILD HAS STARTED ----- */

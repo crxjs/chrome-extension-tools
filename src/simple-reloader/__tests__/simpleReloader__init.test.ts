@@ -4,7 +4,7 @@ test('creates correct plugin', () => {
   const reloader = simpleReloader()
 
   expect(reloader).toEqual({
-    name: 'simple-reloader',
+    name: 'chrome-extension-simple-reloader',
     generateBundle: expect.any(Function),
   })
 })
