@@ -31,6 +31,7 @@ export { simpleReloader } from './simple-reloader'
 
 export interface ChromeExtensionOptions {
   dynamicImportWrapper?: {
+    // TODO: Add dynamic or static event detection
     wakeEvents?: string[]
     eventDelay?: number | false
   }
