@@ -30,17 +30,9 @@ export { pushReloader } from './push-reloader'
 export { simpleReloader } from './simple-reloader'
 
 export interface ChromeExtensionOptions {
-  assets?: {
-    include?: string[]
-    exclude?: string[]
-  }
   dynamicImportWrapper?: {
     wakeEvents?: string[]
     eventDelay?: number | false
-  }
-  entries?: {
-    include?: string[]
-    exclude?: string[]
   }
   verbose?: boolean
   pkg?: {
