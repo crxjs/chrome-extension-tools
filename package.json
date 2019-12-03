@@ -49,6 +49,7 @@
     "@types/lodash.difference": "^4.5.6",
     "@types/lodash.flatten": "^4.4.6",
     "@types/lodash.get": "^4.4.6",
+    "@types/node": "^12.12.14",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "eslint": "^6.7.1",
