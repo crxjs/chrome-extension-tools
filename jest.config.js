@@ -1,5 +1,4 @@
 module.exports = {
-  coverageReporters: ['json-summary', 'text', 'lcov'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/push-reloader/sw/**/*',
@@ -7,11 +6,13 @@ module.exports = {
     '!src/push-reloader/client/**/*',
     '!src/simple-reloader/client/**/*',
   ],
+  coverageReporters: ['json-summary', 'text', 'lcov'],
   moduleNameMapper: {
     'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
   },
   modulePathIgnorePatterns: ['~~.+'],
   preset: 'ts-jest',
+  reporters: ['default', 'jest-html-reporters'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
   transform: {
     // Use Sucrase to convert ES6 modules in JS files
