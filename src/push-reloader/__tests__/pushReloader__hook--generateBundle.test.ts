@@ -200,3 +200,7 @@ test('add reloader script to content scripts', () => {
     matches: ['https://www.yahoo.com/*'],
   })
 })
+
+test.todo('Throws if cache.uid is undefined')
+test.todo('Warns if manifest is not in the bundle')
+test.todo('Creates permissions if manifest has no permissions')

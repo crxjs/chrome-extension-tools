@@ -30,3 +30,6 @@ test('calls reload cloud function', async () => {
 
   expect(functions.reload)
 })
+
+test.todo('Warns if no registered clients')
+test.todo('Errors if reload throws')

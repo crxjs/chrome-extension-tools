@@ -243,3 +243,8 @@ test('emits manifest via this.emitFile', async () => {
     source: expect.any(String),
   })
 })
+
+
+test.todo('Sets cache.assetChanged to false if cache.permsHash is defined')
+test.todo('Logs if new permissions are detected')
+test.todo('Throws if cache.manifest is falsey')

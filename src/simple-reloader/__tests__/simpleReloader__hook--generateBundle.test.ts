@@ -175,3 +175,5 @@ test('add reloader script to content scripts', async () => {
     matches: ['https://www.yahoo.com/*'],
   })
 })
+
+test.todo('Warns if manifest is not in the bundle')

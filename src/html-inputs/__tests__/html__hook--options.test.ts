@@ -134,3 +134,6 @@ test('if no input has no html, do nothing', () => {
 
   expect(result).toBe(options)
 })
+
+test.todo('Throws with invalid input type')
+test.todo('Converts option.input as string to array')

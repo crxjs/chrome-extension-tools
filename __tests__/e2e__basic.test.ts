@@ -64,3 +64,5 @@ test('bundles chunks and assets', async () => {
 
   // plus 2 wrappers background and content
 }, 5 * 60 * 1000)
+
+test.todo('Includes imports in web_accessible_resources')

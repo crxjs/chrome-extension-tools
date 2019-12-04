@@ -139,3 +139,5 @@ test('returns inputRecord', () => {
     'popup/popup': popupHtml,
   })
 })
+
+test.todo('Throws if explorer cannot load manifest')

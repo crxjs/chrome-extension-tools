@@ -11,3 +11,5 @@ test('scrapes correct img tags', () => {
     '__fixtures__/extensions/basic/options.jpg',
   ])
 })
+
+test.todo('scrapes favicons')
