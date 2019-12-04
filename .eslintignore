@@ -3,3 +3,4 @@
 /tests/**/fixtures
 **/dynamicImportWrapper.js
 ~~*/**/*
+jest.config.js
