@@ -9,16 +9,6 @@ import { config } from './CONFIG'
 export const firebase = fb.initializeApp(config, 'reloader')
 
 export const login = async () => {
-  const unsubscribe = firebase
-    .auth()
-    .onAuthStateChanged((user) => {
-      const shouldRestart = !user
-
-      if (shouldRestart) {
-        unsubscribe()
-      }
-    })
-
   const { user } = await firebase.auth().signInAnonymously()
 
   return user?.uid
