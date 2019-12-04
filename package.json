@@ -21,6 +21,7 @@
     "lint": "tslint",
     "start": "rollup -c -w",
     "test": "jest",
+    "test:ci": "jest --runInBand --coverage",
     "preversion": "jest --runInBand && npm run build",
     "postversion": "git push && npm publish"
   },

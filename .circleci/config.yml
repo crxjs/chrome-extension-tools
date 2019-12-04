@@ -2,7 +2,11 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
+
+orbs:
+  coveralls: coveralls/coveralls@1.0.4
+  
 jobs:
   build:
     docker:
@@ -34,4 +38,6 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: npm test
+      - run: npm run test:ci
+
+      - coveralls/upload

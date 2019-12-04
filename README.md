@@ -17,6 +17,7 @@ https://imgur.com/wEXnCYK.png
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](http://bit.ly/2qmljDl)
 [![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/rollup-plugin-chrome-extension.svg)](http://bit.ly/35hLMR8)
 [![CircleCI](https://img.shields.io/circleci/build/github/bumble-org/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba)](https://circleci.com/gh/bumble-org/rollup-plugin-chrome-extension)
+[![Coverage Status](https://coveralls.io/repos/github/bumble-org/rollup-plugin-chrome-extension/badge.svg?branch=master)](https://coveralls.io/github/bumble-org/rollup-plugin-chrome-extension?branch=master)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
 </div>
