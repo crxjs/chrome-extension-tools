@@ -5,8 +5,8 @@
 version: 2.1
 
 orbs:
-  coveralls: coveralls/coveralls@1.0.4
-  
+  codecov: codecov/codecov@1.0.2
+
 jobs:
   build:
     docker:
@@ -17,8 +17,6 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
       # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
 
     steps:
       - checkout
@@ -40,4 +38,5 @@ jobs:
       # run tests!
       - run: npm run test:ci
 
-      - coveralls/upload
+      - codecov/upload:
+          file: coverage/*.json
