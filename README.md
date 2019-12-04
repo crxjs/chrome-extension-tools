@@ -42,21 +42,20 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or 
 - [Getting Started](#getting_started)
 - [Usage](#usage)
 - [Features](#features)
-- [Options API](#options)
-- [Automatic Reloader](#reloaders)
+- [API Documentation](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/API.md)
 
 ## Getting started <a name = "getting_started"></a>
 
 ### Installation
 
 ```sh
-$ npm i rollup rollup-plugin-chrome-extension -D
+$ npm i rollup rollup-plugin-chrome-extension@latest -D
 ```
 
-Install Node Resolve and CommonJS if you plan to use npm modules.
+Install the plugins [Node Resolve](https://www.npmjs.com/package/@rollup/plugin-node-resolve) and [CommonJS](https://github.com/rollup/rollup-plugin-commonjs) if you plan to use npm modules.
 
 ```sh
-$ npm i rollup rollup-plugin-chrome-extension -D
+$ npm i @rollup/plugin-node-resolve rollup-plugin-commonjs -D
 ```
 
 ## Usage <a name = "usage"></a>
@@ -65,11 +64,13 @@ Create a `rollup.config.js` file in your project root.
 
 ```javascript
 // rollup.config.json
+
 import { rollup } from 'rollup'
+
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 
-import { chromeExtension } from 'rollup-plugin-chrome-extension'
+import { chromeExtension, pushReloader } from 'rollup-plugin-chrome-extension'
 
 export default {
   input: 'src/manifest.json',
@@ -77,15 +78,22 @@ export default {
     dir: 'dist',
     format: 'esm',
   },
-  // always put chromeExtension() before other plugins
-  plugins: [chromeExtension(), resolve(), commonjs()],
+  plugins: [
+    // always put chromeExtension() before other plugins
+    chromeExtension(),
+    pushReloader(),
+    // the plugins below are optional
+    resolve(),
+    commonjs()
+  ],
 }
 ```
 
 Add these scripts to your `project.json` file.
 
-```json
+```jsonc
 // package.json
+
 {
   "scripts": {
     "build": "rollup -c",
@@ -118,15 +126,13 @@ Don't worry, any value in your source manifest will override that value from `pa
 
 Reloading your Chrome extension every time you change your code can be a pain, and if you forget to reload, you're left wondering, "Why isn't this working?"
 
-<!-- ![Patton Oswalt](https://media.giphy.com/media/oirLISmToyoeI/giphy.gif) -->
-
-When Rollup is in watch mode, `rollup-plugin-chrome-extension` bundles an automatic reloader into your extension. This feature will reload your extension every time Rollup produces a new build. You can view the [options here](#options-reloader), or read more about the [reloaders here](#reloaders). The only time you may need to manually reload is when you first start a watch session.
+If you've included the helper plugin `pushReloader` in your config,when Rollup is in watch mode the it will include an auto-reloader script. This feature will reload your extension every time Rollup produces a new build. You should know that `pushReloader` connects to Firebase to do its magic. [Get the details here.](#reloaders) The only time you may need to manually reload is when you first start a watch session.
 
 Ever got the error `"Extension context invalidated"` in your content script? That happens when the extension reloads but the content script doesn't. Our reloader makes sure that doesn't happen by reloading your content scripts when it reloads your extension.
 
 ### Write Chrome Extensions In TypeScript <a name = "typescript"></a>
 
-If you use [`rollup-plugin-typescript2`](https://www.npmjs.com/package/rollup-plugin-typescript2) in your plugins, you can write your Chrome extension in TypeScript. That's right, the scripts in your manifest and in your HTML script tags.
+If you use [`rollup-plugin-typescript`](https://www.npmjs.com/package/rollup-plugin-typescript) in your plugins, you can write your Chrome extension in TypeScript. That's right, the scripts in your manifest and in your HTML script tags.
 
 TypeScript definitions are included, so no need to install an additional `@types` library!
 
@@ -140,23 +146,23 @@ What about your Options and Popup pages? `rollup-plugin-chrome-extension` uses t
 
 ### Derive Permissions Automatically <a name = "features-permissions"></a>
 
-`rollup-plugin-chrome-extension` statically analyzes your bundled code to detect required permissions to declare in the manifest. Any permissions in the source manifest are always included. If a permission is somehow added [that you don't want](#options-permissions), just add it to the source manifest and prefix it with `!` (for example, `"!alarms"`). We'll leave it out.
+`rollup-plugin-chrome-extension` statically analyzes your bundled code to detect required permissions to declare in the manifest. Any permissions in the source manifest are always included.
 
 ### Use ES2015 Modules In Your Scripts <a name = "features-modules"></a>
 
 Chrome extensions don't support modules in background and content scripts. We've developed a [module loader](#dynamic-import-wrapper) specifically for Chrome extension scripts, so you can take advantage of Rollup's great code splitting features.
 
-### Plugins Take It Next Level <a name = ""></a>
+### Plugins Take It To The Next Level <a name = ""></a>
 
 Take advantage of other great Rollup plugins to do awesome things with your Chrome extensions!
 
 Some of our favorites are:
 
-- Write your extension in TS with [`rollup-plugin-typescript2`](https://www.npmjs.com/package/rollup-plugin-typescript2)
+- Write your extension in TS with [`rollup-plugin-typescript`](https://www.npmjs.com/package/rollup-plugin-typescript)
 - Import CSS in JS files with [`rollup-plugin-postcss`](https://www.npmjs.com/package/rollup-plugin-postcss)
 - Zip your extension when you build with [`rollup-plugin-zip`](https://www.npmjs.com/package/rollup-plugin-zip).
 
-Two of our own plugins that we're pretty proud of are:
+Two of our own plugins:
 
 - Import a module as a string of code to use in `chrome.runtime.executeScript` with [`rollup-plugin-bundle-imports`](http://bit.ly/2O2AKcC)
 - Empty your output folder before a new build with [`rollup-plugin-empty-dir`](https://www.npmjs.com/package/rollup-plugin-empty-dir)
@@ -165,15 +171,15 @@ Two of our own plugins that we're pretty proud of are:
 
 ## Automatic Reloaders <a name = "reloaders"></a>
 
-**TLDR;** The default reloader creates system notifications to let you know when the extension will reload. It uses [Firebase](https://firebase.google.com/) and creates an [anonymous account](https://firebase.google.com/docs/auth/web/anonymous-auth) to associate installs with the Rollup watch session. We don't keep any data about you after you exit Rollup.
+**TLDR;** The `pushReloader` plugin creates system notifications to let you know when the extension will reload. It uses [Firebase](https://firebase.google.com/) and creates an [anonymous account](https://firebase.google.com/docs/auth/web/anonymous-auth) to associate installs with the Rollup watch session. We don't keep any data about you after you exit Rollup.
 
 > Make sure you do a production build before releasing to the Chrome Web Store! The reloader won't hurt anything, but there's no reason to include it.
 
-There are two reloaders to choose from: a Push notification reloader that is compatible with [non-persistent background ~~Event~~ pages](https://developer.chrome.com/extensions/background_pages#manifest), or a simple interval based reloader that makes the background page persistent.
+There are two reloaders to choose from: a Push notification reloader that is compatible with [non-persistent background ~~Event~~ pages](https://developer.chrome.com/extensions/background_pages#manifest), or a simple reloader that makes the background page persistent.
 
 You should know that the Push reloader uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) to tell the extension when to reload. It creates an anonymous account for each Rollup watch session, which is deleted when Rollup exits that watch session. This is necessary to associate the extension installation with the watch session.
 
-If you're not comfortable with anonymous accounts, or need to develop without an internet connection, you can [use the persistent reloader](#options-reloader). It's dead simple and just uses a timestamp file. It also works between watch sessions.
+If you're not comfortable with anonymous accounts, or need to develop without an internet connection, you can [use the simple reloader](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/API#exports-simple-reloader.md). It just checks a timestamp file periodically. It also works between watch sessions.
 
 <!-- ARTICLE: ES2015 Modules and Chrome Extensions -->
 <!-- ## Script Module Loader <a name = "module-loader"></a> -->

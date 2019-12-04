@@ -54,7 +54,6 @@ When active, `pushReloader` will replace the manifest description and log its pr
 
 > Extensions built with the push reloader should not be uploaded to the Chrome Web Store. Be sure to do the production build of your extension outside of watch mode (`rollup -c`), or disable this plugin during production builds.
 
-
 This reloader uses Firebase Cloud Messaging to tell the extension to reload. [See below for details.](#exports-push-reloader-privacy)
 
 #### Usage for `pushReloader`
@@ -84,9 +83,9 @@ $ npx rollup -c -w
 
 Add your extension to Chrome, or reload it manually if it was already installed. Now your extension will notify you and reload itself whenever Rollup builds again during that watch session!
 
-#### `pushReloader` Privacy Note <a name = "exports-push-reloader-privacy"></a>
+#### How `pushReloader` Works and Privacy Details <a name = "exports-push-reloader-privacy"></a>
 
-The `pushReloader` Rollup plugin signs into an **anonymous** Firebase account each time Rollup starts in watch mode. 
+The `pushReloader` Rollup plugin signs into an anonymous Firebase account each time Rollup starts in watch mode. 
 
 When the Chrome extension loads in Chrome, it registers for Push Notifications from the Rollup watch session that built it. After the Rollup watch session has ended, all data from that session is automatically deleted within 24 hours. 
 
