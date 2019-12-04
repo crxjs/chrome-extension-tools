@@ -8,6 +8,7 @@ export type SimpleReloaderPlugin = Pick<
   'name' | 'generateBundle'
 >
 
+// TODO: factor out this cache
 export interface SimpleReloaderCache {
   bgScriptPath?: string
   ctScriptPath?: string
@@ -74,12 +75,6 @@ export const simpleReloader = (
       /* ----------------- Update Manifest -------------------------- */
 
       const manifestSource = manifestAsset.source as string
-
-      if (!manifestSource) {
-        throw new ReferenceError(
-          `bundle.${manifestKey} is undefined`,
-        )
-      }
 
       const manifest: ChromeExtensionManifest = JSON.parse(
         manifestSource,

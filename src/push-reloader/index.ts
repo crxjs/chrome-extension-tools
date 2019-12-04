@@ -84,6 +84,7 @@ export const pushReloader = (
         return this.getFileName(id)
       }
 
+      // TODO: invert this if statement
       if (cache.uid) {
         cache.swPath = emit('reloader-sw.js', serviceWorkerCode)
 
@@ -160,6 +161,7 @@ export const pushReloader = (
         )
       }
 
+      // TODO: 
       if (manifest.permissions) {
         const perms = new Set(permissions)
         perms.add('notifications')
