@@ -24,6 +24,7 @@ export interface PushReloaderCache {
   // Path to service worker
   swPath?: string
   firstRun: boolean
+  // TODO: do not cache these values
   bgClientPath?: string
   bgScriptPath?: string
   ctScriptPath?: string
@@ -41,7 +42,7 @@ export const pushReloader = (
   if (!process.env.ROLLUP_WATCH) {
     return undefined
   }
-  
+
   return {
     name: 'chrome-extension-push-reloader',
 
@@ -50,6 +51,15 @@ export const pushReloader = (
     },
 
     async generateBundle(options, bundle) {
+      const manifestKey = 'manifest.json'
+      const manifestAsset = bundle[manifestKey] as OutputAsset
+
+      if (!manifestAsset) {
+        this.warn('No manifest.json in the bundle')
+
+        return
+      }
+
       /* -------------- LOGIN ON FIRST BUILD ------------- */
 
       if (cache.firstRun) {
@@ -104,16 +114,7 @@ export const pushReloader = (
 
       /* ---------------- UPDATE MANIFEST ---------------- */
 
-      const manifestKey = 'manifest.json'
-      const manifestAsset = bundle[manifestKey] as OutputAsset
       const manifestSource = manifestAsset.source as string
-
-      if (!manifestSource) {
-        throw new ReferenceError(
-          `bundle.${manifestKey} is undefined`,
-        )
-      }
-
       const manifest: ChromeExtensionManifest = JSON.parse(
         manifestSource,
       )
@@ -154,7 +155,9 @@ export const pushReloader = (
           }),
         )
       } else {
-        this.warn('Content page reloader script was not emitted.')
+        this.warn(
+          'Content page reloader script was not emitted.',
+        )
       }
 
       if (manifest.permissions) {
@@ -180,7 +183,9 @@ export const pushReloader = (
         await reload()
       } catch (error) {
         if (error.message === 'no registered clients') {
-          this.warn('Reload the extension in Chrome to start hot-reloading.')
+          this.warn(
+            'Reload the extension in Chrome to start hot-reloading.',
+          )
         } else {
           this.error(error.message)
         }

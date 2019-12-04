@@ -27,6 +27,15 @@ export const simpleReloader = (
     name: 'chrome-extension-simple-reloader',
 
     generateBundle(options, bundle) {
+      const manifestKey = 'manifest.json'
+      const manifestAsset = bundle[manifestKey] as OutputAsset
+
+      if (!manifestAsset) {
+        this.warn('No manifest.json in the bundle')
+
+        return
+      }
+
       /* ----------------- Start Reloader -------------------------- */
 
       /* ----------------- Create Client Files -------------------------- */
@@ -58,14 +67,13 @@ export const simpleReloader = (
 
       cache.ctScriptPath = emit(
         'ct-reloader-client.js',
+        // eslint-disable-next-line quotes
         ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
       )
 
       /* ----------------- Update Manifest -------------------------- */
 
-      const manifestKey = 'manifest.json'
-      const manifestObj = bundle[manifestKey] as OutputAsset
-      const manifestSource = manifestObj.source as string
+      const manifestSource = manifestAsset.source as string
 
       if (!manifestSource) {
         throw new ReferenceError(
@@ -113,7 +121,7 @@ export const simpleReloader = (
         )
       }
 
-      manifestObj.source = JSON.stringify(manifest, undefined, 2)
+      manifestAsset.source = JSON.stringify(manifest, undefined, 2)
     },
   }
 }
