@@ -3,17 +3,17 @@
 `rollup-plugin-chrome-extension` works out of the box, but sometimes you need more.
 
 ## Table of Contents
-- Exports
-- Manifest
-- Options
-- [dynamicImportWrapper](#options-dynamic-import-wrapper)
-- [permissions](#options-permissions)
-- [pkg](#options-pkg)
-- [publicKey](#options-public-key)
-- [reloader](#exports-push-reloader)
-- [reloader](#exports-push-reloader-privacy)
+- [Exports](#exports)
+  - [reloader](#exports-push-reloader)
+  - [reloader](#exports-push-reloader-privacy)
+- [Manifest](#manifest)
+  - [permissions](#options-permissions)
+- [Options](#options)
+  - [dynamicImportWrapper](#options-dynamic-import-wrapper)
+  - [pkg](#options-pkg)
+  - [publicKey](#options-public-key)
 
-## Exports
+## Exports <a name = "exports"></a>
 
 ### `chromeExtension`
 
@@ -40,23 +40,10 @@ export default {
 
 ### `pushReloader`
 
-Type: `function`
+| Type       | Call Signature                   |
+| ---------- | -------------------------------- |
+| `function` | `() => RollupPlugin | undefined` |
 
-Call signature: `() => PushReloaderPlugin | undefined`
-
-Use case: The Chrome extension uses a non-persistent background page (Event Page).
-
-Returns a Rollup plugin to add an auto-reload script to Chrome Extensions. Add it to the plugins array after `chromeExtension`.
-
-When Rollup is not in watch mode, `pushReloader` disables itself.
-
-When active, `pushReloader` will replace the manifest description and log its presence in the background console and every content script.
-
-> Extensions built with the push reloader should not be uploaded to the Chrome Web Store. Be sure to do the production build of your extension outside of watch mode (`rollup -c`), or disable this plugin during production builds.
-
-This reloader uses Firebase Cloud Messaging to tell the extension to reload. [See below for details.](#exports-push-reloader-privacy)
-
-#### Usage for `pushReloader`
 
 ```javascript
 import { chromeExtension, pushReloader } from 'rollup-plugin-chrome-extension'
@@ -75,29 +62,19 @@ export default {
 }
 ```
 
-Start Rollup in watch mode.
+Returns a Rollup plugin to add an auto-reload script to Chrome Extensions. Add it to the plugins array after `chromeExtension`.
 
-```sh
-$ npx rollup -c -w
-```
+When Rollup is not in watch mode, `pushReloader` disables itself.
 
-Add your extension to Chrome, or reload it manually if it was already installed. Now your extension will notify you and reload itself whenever Rollup builds again during that watch session!
+When active, `pushReloader` will replace the manifest description and log its presence in the background console and every content script.
 
-#### How `pushReloader` Works and Privacy Details <a name = "exports-push-reloader-privacy"></a>
-
-The `pushReloader` Rollup plugin signs into an anonymous Firebase account each time Rollup starts in watch mode. 
-
-When the Chrome extension loads in Chrome, it registers for Push Notifications from the Rollup watch session that built it. After the Rollup watch session has ended, all data from that session is automatically deleted within 24 hours. 
-
-We do not collect any identifiable user data, and never share data with any third party, except to temporarily store anonymous session data in a Firebase database for use as outlined above.
-
-If you are uncomfortable with anonymous accounts or do not have an internet connection, please consider using the [`simpleReloader`](#exports-simple-reloader).
+This reloader uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) to tell the extension to reload. [Click here for more details and privacy info.](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/README#reloaders.md)
 
 ### `simpleReloader` <a name = "exports-simple-reloader"></a>
 
-**Type**: `function`
-
-**Call Signature**: `() => SimpleReloaderPlugin | undefined`
+| Type       | Call Signature                           |
+| ---------- | ---------------------------------------- |
+| `function` | `() => SimpleReloaderPlugin | undefined` |
 
 **Use Case**: You don't care if the background page can sleep, you don't want to use `pushReloader` and its fancy Push Notifications, or you don't have an internet connection.
 
@@ -126,7 +103,7 @@ export default {
 
 Start Rollup in watch mode. Enjoy auto-reloading whenever Rollup makes a new build.
 
-## Manifest API
+## Manifest API <a name = "manifest"></a>
 
 ### `[permissions]` <a name = "options-permissions"></a>
 
@@ -182,7 +159,7 @@ They will be written to `output.dir` with the same folder structure as the sourc
 }
 ```
 
-## Options API <a name = "options-api"></a>
+## Options API <a name = "options"></a>
 
 You can use an options object with any of the following properties. Everything is optional.
 
