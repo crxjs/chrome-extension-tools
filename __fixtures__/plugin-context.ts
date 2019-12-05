@@ -62,7 +62,9 @@ export const context: MockPluginContext = {
   emitChunk: null,
   emitFile: jest.fn(),
   // @ts-ignore
-  error: jest.fn(),
+  error: jest.fn((message: string) => {
+    throw new Error(message)
+  }),
   /** @deprecated Use `this.getFileName` instead */
   // @ts-ignore
   getAssetFileName: null,
