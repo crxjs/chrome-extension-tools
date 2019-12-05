@@ -55,9 +55,9 @@ export const pushReloader = (
       const manifestAsset = bundle[manifestKey] as OutputAsset
 
       if (!manifestAsset) {
-        this.warn('No manifest.json in the bundle')
-
-        return
+        this.error(
+          'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?',
+        )
       }
 
       /* -------------- LOGIN ON FIRST BUILD ------------- */
@@ -108,9 +108,7 @@ export const pushReloader = (
           ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
         )
       } else {
-        throw new TypeError(
-          'Not signed into Firebase: no UID in cache',
-        )
+        this.error('Not signed into Firebase: no UID in cache')
       }
 
       /* ---------------- UPDATE MANIFEST ---------------- */
@@ -161,16 +159,13 @@ export const pushReloader = (
         )
       }
 
-      // TODO: 
-      if (manifest.permissions) {
-        const perms = new Set(permissions)
-        perms.add('notifications')
-        perms.add(
-          'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
-        )
+      const perms = new Set(permissions)
+      perms.add('notifications')
+      perms.add(
+        'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
+      )
 
-        manifest.permissions = Array.from(perms)
-      }
+      manifest.permissions = Array.from(perms)
 
       manifestAsset.source = JSON.stringify(
         manifest,
