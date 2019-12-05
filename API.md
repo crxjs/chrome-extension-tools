@@ -3,6 +3,7 @@
 `rollup-plugin-chrome-extension` works out of the box, but sometimes you need more.
 
 ## Table of Contents
+
 - [Exports](#exports)
   - [reloader](#exports-push-reloader)
   - [reloader](#exports-push-reloader-privacy)
@@ -44,9 +45,11 @@ export default {
 | ---------- | -------------------------------- |
 | `function` | `() => RollupPlugin | undefined` |
 
-
 ```javascript
-import { chromeExtension, pushReloader } from 'rollup-plugin-chrome-extension'
+import {
+  chromeExtension,
+  pushReloader,
+} from 'rollup-plugin-chrome-extension'
 
 export default {
   input: 'src/manifest.json',
@@ -85,7 +88,10 @@ If Rollup is not in watch mode, `simpleReloader` disables itself.
 #### Usage for `simpleReloader`
 
 ```javascript
-import { chromeExtension, simpleReloader } from 'rollup-plugin-chrome-extension'
+import {
+  chromeExtension,
+  simpleReloader,
+} from 'rollup-plugin-chrome-extension'
 
 export default {
   input: 'src/manifest.json',
@@ -123,7 +129,6 @@ Sometimes a third-party module will reference a Chrome API to detect its environ
 
 **Solution:** Prefix unwanted permissions in the manifest with `"!"`, for example, `"!alarms"`.
 
-
 ```jsonc
 // source manifest.json
 {
@@ -154,7 +159,7 @@ They will be written to `output.dir` with the same folder structure as the sourc
     // HTML files are parsed like any other HTML file.
     "options2.html",
     // Globs are supported too!
-    "**/*.png",
+    "**/*.png"
   ]
 }
 ```
@@ -165,7 +170,9 @@ You can use an options object with any of the following properties. Everything i
 
 ### `[dynamicImportWrapper]` <a name = "options-dynamic-import-wrapper"></a>
 
-Type: `object | false`
+| Type                |
+| ------------------- |
+| `object` or `false` |
 
 We use dynamic imports to support ES2015 modules and [code splitting](https://medium.com/rollup/rollup-now-has-code-splitting-and-we-need-your-help-46defd901c82) for JS files.
 
@@ -175,7 +182,9 @@ We use dynamic imports to support ES2015 modules and [code splitting](https://me
 
 #### `[dynamicImportWrapper.wakeEvents]`
 
-Type: `string[]`
+| Type       |
+| ---------- |
+| `string[]` |
 
 Events that wake (reactivate) an extension may be lost if that extension uses dynamic imports to load modules or asynchronously adds event listeners.
 
@@ -205,8 +214,10 @@ chromeExtension({
 ```
 
 #### `[dynamicImportWrapper.eventDelay]`
+| Type       | 
+| ---------- | 
+| `number` or `boolean`  |
 
-Type: `number | boolean`
 
 Delay Event page wake events by `n` milliseconds after the all background page modules have finished loading. This may be useful for event listeners that are added asynchronously.
 
@@ -220,25 +231,29 @@ chromeExtension({
 
 ### `[verbose]`
 
-Type: `boolean`
+| Type       | 
+| ---------- | 
+| `boolean`  |
 
 Set to `false` to suppress "Detected permissions" message.
 
 ```javascript
 // Example usage
 chromeExtension({
-    verbose: false,
+  verbose: false,
 })
 
 // Default value
 chromeExtension({
-    verbose: true,
+  verbose: true,
 })
 ```
 
 ### `[pkg]` <a name = "options-pkg"></a>
+| Type       | 
+| ---------- | 
+| `object`  |
 
-Type: `object`
 
 Only use this field if you will not run Rollup using npm scripts (for example, `$ npm run build`), since npm provides scripts with the package info as an environment variable.
 
@@ -262,8 +277,9 @@ chromeExtension({
 ```
 
 ### `[publicKey]` <a name = "options-public-key"></a>
-
-Type: `string`
+| Type       | 
+| ---------- | 
+| `string`  |
 
 <!-- ARTICLE: how to get stable extension id -->
 
