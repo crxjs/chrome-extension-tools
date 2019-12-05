@@ -23,7 +23,11 @@ const timestampPath = 'assets/timestamp.js'
 
 export const simpleReloader = (
   cache = {} as SimpleReloaderCache,
-): SimpleReloaderPlugin => {
+): SimpleReloaderPlugin | undefined => {
+  if (!process.env.ROLLUP_WATCH) {
+    return undefined
+  }
+
   return {
     name: 'chrome-extension-simple-reloader',
 
@@ -32,9 +36,9 @@ export const simpleReloader = (
       const manifestAsset = bundle[manifestKey] as OutputAsset
 
       if (!manifestAsset) {
-        this.warn('No manifest.json in the bundle')
-
-        return
+        this.error(
+          'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?',
+        )
       }
 
       /* ----------------- Start Reloader -------------------------- */
@@ -116,7 +120,11 @@ export const simpleReloader = (
         )
       }
 
-      manifestAsset.source = JSON.stringify(manifest, undefined, 2)
+      manifestAsset.source = JSON.stringify(
+        manifest,
+        undefined,
+        2,
+      )
     },
   }
 }

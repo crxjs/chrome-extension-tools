@@ -147,15 +147,10 @@ export function manifestInput(
           filepath: string
           config: ChromeExtensionManifest
           isEmpty?: true
-        } | null
-        if (
-          !configResult ||
-          typeof configResult.config === 'undefined' ||
-          configResult.isEmpty
-        ) {
-          throw new Error(
-            `Could not load ${options.input} as Chrome extension manifest.`,
-          )
+        }
+
+        if (configResult.isEmpty) {
+          throw new Error(`${options.input} is an empty file.`)
         }
 
         manifestPath = configResult.filepath
@@ -257,9 +252,9 @@ export function manifestInput(
 
         if (verbose) {
           if (!cache.permsHash) {
-            console.log('Detected permissions:', permissions)
+            this.warn(`Detected permissions: ${permissions}`)
           } else if (permsHash !== cache.permsHash) {
-            console.log('Detected new permissions:', permissions)
+            this.warn(`Detected new permissions: ${permissions}`)
           }
         }
 
@@ -271,6 +266,7 @@ export function manifestInput(
       try {
         // Clone cache.manifest
         if (!cache.manifest)
+          // This is a programming error, so it should throw
           throw new TypeError(
             `cache.manifest is ${typeof cache.manifest}`,
           )
