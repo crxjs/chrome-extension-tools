@@ -19,6 +19,7 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
+    '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/member-delimiter-style': [
@@ -29,7 +30,7 @@ module.exports = {
           requireLast: false,
         },
         singleline: {
-          delimiter: 'comma',
+          delimiter: 'semi',
           requireLast: false,
         },
       },
@@ -64,8 +65,9 @@ module.exports = {
       },
     ],
     'no-console': 'off',
-    quotes: ['warn', 'single'],
+    quotes: ['warn', 'single', { avoidEscape: true }],
     'require-atomic-updates': 'off',
     semi: ['warn', 'never'],
+    'no-extra-semi': 'off',
   },
 }
