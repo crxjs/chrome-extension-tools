@@ -31,5 +31,44 @@ test('calls reload cloud function', async () => {
   expect(functions.reload)
 })
 
-test.todo('Warns if no registered clients')
-test.todo('Errors if reload throws')
+test('Warns if no registered clients', async () => {
+  // @ts-ignore
+  const reload = functions.reload as jest.MockInstance<
+    Promise<void>,
+    []
+  >
+
+  reload.mockImplementation(() =>
+    Promise.reject(new Error('no registered clients')),
+  )
+
+  const plugin = pushReloader({ cache })!
+
+  await plugin.writeBundle.call(context, bundle)
+
+  expect(context.warn).toBeCalledWith(
+    'Reload the extension in Chrome to start hot-reloading.',
+  )
+})
+
+test('Errors if reload throws', async () => {
+  // @ts-ignore
+  const reload = functions.reload as jest.MockInstance<
+    Promise<void>,
+    []
+  >
+
+  const errorMessage = 'some error'
+  reload.mockImplementation(() =>
+    Promise.reject(new Error(errorMessage)),
+  )
+
+  const plugin = pushReloader({ cache })!
+
+  try {
+    await plugin.writeBundle.call(context, bundle)
+  } catch (error) {
+    expect(error).toEqual(new Error(errorMessage))
+    expect(context.error).toBeCalledWith(errorMessage)
+  }
+})

@@ -42,4 +42,17 @@ test('replaces path', () => {
   expect(result).toMatch(`import('${'../background.js'}')`)
 })
 
-test.todo('Should throws with invalid dymanicImportEventDelay')
+test('Should throw with invalid dymanicImportEventDelay', () => {
+  const error = new TypeError(
+    'dynamicImportEventDelay must be false or a number',
+  )
+
+  const call = () => {
+    setupLoaderScript({
+      // @ts-ignore
+      eventDelay: '200ms',
+    })('some/script/path')
+  }
+
+  expect(call).toThrow(error)
+})

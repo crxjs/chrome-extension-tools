@@ -58,17 +58,20 @@ beforeEach(() => {
 })
 
 test('throws if input is not a manifest path', () => {
+  const errorMessage =
+    'RollupOptions.input must be a single Chrome extension manifest.'
+
   expect(() => {
     plugin.options.call(context, {
       input: ['not-a-manifest'],
     })
-  }).toThrow()
+  }).toThrow(new TypeError(errorMessage))
 
   expect(() => {
     plugin.options.call(context, {
       input: { wrong: 'not-a-manifest' },
     })
-  }).toThrow()
+  }).toThrow(new TypeError(errorMessage))
 })
 
 test('loads manifest via cosmicConfig', () => {
@@ -140,4 +143,30 @@ test('returns inputRecord', () => {
   })
 })
 
-test.todo('Throws if explorer cannot load manifest')
+test('should throw if cosmiconfig cannot load manifest file', () => {
+  const call = () => {
+    plugin.options.call(context, {
+      input: 'not-a-manifest.json',
+    })
+  }
+
+  const error = new Error(
+    "ENOENT: no such file or directory, open '/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/not-a-manifest.json'",
+  )
+
+  expect(call).toThrow(error)
+})
+
+test('should throw if manifest file is empty', () => {
+  const call = () => {
+    plugin.options.call(context, {
+      input: getExtPath('empty/manifest.json'),
+    })
+  }
+
+  const error = new Error(
+    `${getExtPath('empty/manifest.json')} is an empty file.`,
+  )
+
+  expect(call).toThrow(error)
+})

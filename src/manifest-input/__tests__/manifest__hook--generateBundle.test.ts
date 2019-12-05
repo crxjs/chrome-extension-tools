@@ -75,10 +75,7 @@ test('derives permissions from chunks', async () => {
   expect(manifest.permissions!.length).toBe(4)
 })
 
-test('does not log for verbose false', async () => {
-  const _log = console.log
-  console.log = jest.fn()
-
+test('does not warn permissions for verbose false', async () => {
   const bundle: OutputBundle = JSON.parse(bundleJson)
 
   await plugin.generateBundle.call(
@@ -88,15 +85,10 @@ test('does not log for verbose false', async () => {
     false,
   )
 
-  expect(console.log).not.toBeCalled()
-
-  console.log = _log
+  expect(context.warn).not.toBeCalled()
 })
 
-test('does log for verbose true', async () => {
-  const _log = console.log
-  console.log = jest.fn()
-
+test('Warns permissions for verbose true', async () => {
   const bundle: OutputBundle = JSON.parse(bundleJson)
 
   const plugin = manifestInput({
@@ -113,9 +105,7 @@ test('does log for verbose true', async () => {
   await plugin.buildStart.call(context, opts!)
   await plugin.generateBundle.call(context, opts!, bundle, false)
 
-  expect(console.log).toBeCalled()
-
-  console.log = _log
+  expect(context.warn).toBeCalled()
 })
 
 test('calls combinePerms', async () => {
@@ -244,7 +234,62 @@ test('emits manifest via this.emitFile', async () => {
   })
 })
 
+test('Sets cache.assetChanged to false if cache.permsHash is truthy', async () => {
+  cache.assetChanged = true
+  cache.permsHash = JSON.stringify('asdk')
 
-test.todo('Sets cache.assetChanged to false if cache.permsHash is defined')
-test.todo('Logs if new permissions are detected')
-test.todo('Throws if cache.manifest is falsey')
+  const bundle: OutputBundle = JSON.parse(bundleJson)
+
+  await plugin.generateBundle.call(
+    context,
+    options,
+    bundle,
+    false,
+  )
+
+  expect(cache.assetChanged).toBe(false)
+})
+
+test('Warns if new permissions are detected', async () => {
+  cache.permsHash = JSON.stringify('asdk')
+
+  plugin = manifestInput({ cache })
+
+  const opts = plugin.options.call(minContext, options)
+  await plugin.buildStart.call(context, opts!)
+
+  jest.clearAllMocks()
+
+  const bundle: OutputBundle = JSON.parse(bundleJson)
+
+  await plugin.generateBundle.call(
+    context,
+    options,
+    bundle,
+    false,
+  )
+
+  expect(context.warn).toBeCalled()
+})
+
+test('Throws if cache.manifest is falsey', async () => {
+
+  delete cache.manifest
+
+  const bundle: OutputBundle = JSON.parse(bundleJson)
+
+  const errorMessage = 'cache.manifest is undefined'
+
+  try {
+    await plugin.generateBundle.call(
+      context,
+      options,
+      bundle,
+      false,
+    )
+  } catch (error) {
+    expect(error).toEqual(
+      new TypeError(errorMessage),
+    )
+  }
+})

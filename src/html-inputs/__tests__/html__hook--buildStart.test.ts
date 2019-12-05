@@ -17,6 +17,8 @@ import {
   optionsPng,
   optionsJpg,
   assetJs,
+  faviconIco,
+  faviconPng,
 } from '../../../__fixtures__/basic-paths'
 
 const srcDir = join(
@@ -52,14 +54,14 @@ beforeEach(() => {
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
   cache.css = [optionsCss]
-  cache.img = [optionsPng, optionsJpg]
+  cache.img = [optionsPng, optionsJpg, faviconIco, faviconPng]
   cache.scripts = [assetJs]
 })
 
 test('emits all assets', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(context.emitFile).toBeCalledTimes(6)
+  expect(context.emitFile).toBeCalledTimes(8)
 
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
@@ -70,6 +72,11 @@ test('emits all assets', async () => {
     type: 'asset',
     source: expect.any(String),
     fileName: 'popup/popup.html',
+  })
+  expect(context.emitFile).toBeCalledWith({
+    type: 'asset',
+    source: expect.any(Buffer),
+    fileName: 'images/favicon.png',
   })
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
@@ -89,6 +96,11 @@ test('emits all assets', async () => {
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
     source: expect.any(Buffer),
+    fileName: 'images/favicon.ico',
+  })
+  expect(context.emitFile).toBeCalledWith({
+    type: 'asset',
+    source: expect.any(Buffer),
     fileName: 'asset.js',
   })
 })
@@ -96,7 +108,7 @@ test('emits all assets', async () => {
 test('calls this.addWatchFile for each asset', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(context.addWatchFile).toBeCalledTimes(6)
+  expect(context.addWatchFile).toBeCalledTimes(8)
 })
 
 test('modifies html source', async () => {
