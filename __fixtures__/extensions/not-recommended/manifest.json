@@ -1,0 +1,14 @@
+{
+  "name": "not-recommended",
+  "description": "not-recommended chrome extension",
+  "manifest_version": 2,
+  "version": "0.1.0",
+
+  "background": { "page": "background.html" },
+  "content_scripts": [
+    {
+      "css": ["content.css"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ]
+}

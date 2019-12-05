@@ -9,6 +9,12 @@ export const icon48 = getExtPath('basic/images/icon-main-48.png')
 export const icon128 = getExtPath(
   'basic/images/icon-main-128.png',
 )
+export const faviconIco = getExtPath(
+  'basic/images/favicon.ico',
+)
+export const faviconPng = getExtPath(
+  'basic/images/favicon.png',
+)
 
 // Fonts
 export const notoSansBlack = getExtPath(
