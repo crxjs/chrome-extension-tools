@@ -4,7 +4,6 @@
   "manifest_version": 2,
   "version": "0.1.0",
   "browser_action": {
-    "default_icon": { "16": "images/icon-main-16.png" },
-    "default_popup": "popup/popup.html"
+    "default_icon": { "16": "images/icon-main-16.png" }
   }
 }

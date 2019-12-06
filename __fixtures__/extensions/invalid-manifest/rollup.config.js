@@ -4,7 +4,6 @@ import resolve from 'rollup-plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript'
 import { chromeExtension } from '../../../src/index'
 import { getExtPath } from '../../utils'
-import { saveBundle } from './saveBundle'
 
 const pkg = require('../../../package.json')
 
@@ -19,6 +18,5 @@ export default {
     typescript(),
     resolve(),
     commonjs(),
-    saveBundle(),
   ],
 }

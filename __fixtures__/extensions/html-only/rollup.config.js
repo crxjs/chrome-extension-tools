@@ -8,9 +8,9 @@ import { getExtPath } from '../../utils'
 const pkg = require('../../../package.json')
 
 export default {
-  input: getExtPath('no-scripts/manifest.json'),
+  input: getExtPath('html-only/manifest.json'),
   output: {
-    dir: getExtPath('no-scripts-dist'),
+    dir: getExtPath('html-only-dist'),
     format: 'esm',
   },
   plugins: [
