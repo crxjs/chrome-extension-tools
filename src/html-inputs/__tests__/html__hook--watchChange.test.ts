@@ -14,6 +14,8 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
+  faviconPng,
+  faviconIco,
 } from '../../../__fixtures__/basic-paths'
 
 const srcDir = join(
@@ -44,7 +46,7 @@ beforeEach(() => {
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
   cache.css = [optionsCss]
-  cache.img = [optionsPng, optionsJpg]
+  cache.img = [optionsPng, optionsJpg, faviconPng, faviconIco]
   cache.scripts = [assetJs]
 })
 

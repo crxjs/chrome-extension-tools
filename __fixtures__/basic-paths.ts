@@ -9,6 +9,23 @@ export const icon48 = getExtPath('basic/images/icon-main-48.png')
 export const icon128 = getExtPath(
   'basic/images/icon-main-128.png',
 )
+export const faviconIco = getExtPath(
+  'basic/images/favicon.ico',
+)
+export const faviconPng = getExtPath(
+  'basic/images/favicon.png',
+)
+
+// Fonts
+export const notoSansBlack = getExtPath(
+  'basic/fonts/NotoSans-Black.ttf',
+)
+export const missaaliOtf = getExtPath(
+  'basic/fonts/Missaali-Regular.otf',
+)
+export const notoSansLight = getExtPath(
+  'basic/fonts/NotoSans-Light.ttf',
+)
 
 // Options assets
 export const optionsHtml = getExtPath('basic/options.html')

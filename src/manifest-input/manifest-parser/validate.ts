@@ -1,16 +1,28 @@
 import Ajv from 'ajv'
-import { readJSONSync } from 'fs-extra'
-import { resolve } from 'path'
 import { ChromeExtensionManifest } from '../../manifest'
+import jsonSchema from './json-schema-draft-04.json'
+import manifestSchema from './schema-web-ext-manifest-v2.json'
 
-// import jsonSchema from 'ajv/lib/refs/json-schema-draft-04.json'
-const jsonSchema = readJSONSync(
-  resolve(__dirname, 'json-schema-draft-04.json'),
-)
-// import manifestSchema from './schema.json'
-const manifestSchema = readJSONSync(
-  resolve(__dirname, 'schema-web-ext-manifest-v2.json'),
-)
+export type ValidationErrorsArray =
+  | Ajv.ErrorObject[]
+  | null
+  | undefined
+export class ValidationError extends Error {
+  constructor(msg: string, errors: ValidationErrorsArray) {
+    super(msg)
+    this.name = 'ValidationError'
+    this.errors = errors
+  }
+  errors: ValidationErrorsArray
+}
+
+// const jsonSchema = readJSONSync(
+//   resolve(__dirname, 'json-schema-draft-04.json'),
+// )
+
+// const manifestSchema = readJSONSync(
+//   resolve(__dirname, 'schema-web-ext-manifest-v2.json'),
+// )
 
 export const ajv = new Ajv({
   verbose: true,
@@ -33,17 +45,7 @@ export const validateManifest = (
   }
 
   const { errors } = validator
-  const msg = `This manifest has ${errors!.length} problems.`
+  const msg = 'There were problems with the extension manifest.'
 
   throw new ValidationError(msg, errors)
-}
-
-type ValidationErrorsArray = Ajv.ErrorObject[] | null | undefined
-class ValidationError extends Error {
-  constructor(msg: string, errors: ValidationErrorsArray) {
-    super(msg)
-    this.name = 'ValidationError'
-    this.errors = errors
-  }
-  errors: ValidationErrorsArray
 }

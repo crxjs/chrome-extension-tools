@@ -1,11 +1,8 @@
 import { Plugin, OutputAsset } from 'rollup'
 
-import { update, login, reload } from './fb-functions'
-// @ts-ignore
+import { update, login, reload, buildStart } from './fb-functions'
 import { code as bgClientCode } from 'code ./client/background.ts'
-// @ts-ignore
 import { code as ctClientCode } from 'code ./client/content.ts'
-// @ts-ignore
 import { code as serviceWorkerCode } from 'code ./sw/index.ts'
 import { ChromeExtensionManifest } from '../manifest'
 
@@ -27,6 +24,7 @@ export interface PushReloaderCache {
   // Path to service worker
   swPath?: string
   firstRun: boolean
+  // TODO: do not cache these values
   bgClientPath?: string
   bgScriptPath?: string
   ctScriptPath?: string
@@ -40,15 +38,28 @@ export const pushReloader = (
   } = {} as {
     cache: PushReloaderCache
   },
-): PushReloaderPlugin => {
+): PushReloaderPlugin | undefined => {
+  if (!process.env.ROLLUP_WATCH) {
+    return undefined
+  }
+
   return {
-    name: 'push-reloader',
+    name: 'chrome-extension-push-reloader',
 
     async buildStart() {
-      /* ----- SIGNAL CLIENTS THAT BUILD HAS STARTED ----- */
+      await buildStart()
     },
 
-    async generateBundle(options, bundle, isWrite) {
+    async generateBundle(options, bundle) {
+      const manifestKey = 'manifest.json'
+      const manifestAsset = bundle[manifestKey] as OutputAsset
+
+      if (!manifestAsset) {
+        this.error(
+          'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?',
+        )
+      }
+
       /* -------------- LOGIN ON FIRST BUILD ------------- */
 
       if (cache.firstRun) {
@@ -58,7 +69,9 @@ export const pushReloader = (
         // Update last user access time
         await update()
 
-        cache.interval = setInterval(update, 5 * 60 * 1000)
+        cache.interval = setInterval(() => {
+          update()
+        }, 5 * 60 * 1000)
 
         cache.firstRun = false
       }
@@ -71,6 +84,7 @@ export const pushReloader = (
         return this.getFileName(id)
       }
 
+      // TODO: invert this if statement
       if (cache.uid) {
         cache.swPath = emit('reloader-sw.js', serviceWorkerCode)
 
@@ -79,7 +93,8 @@ export const pushReloader = (
           bgClientCode
             .replace('%UID%', cache.uid)
             .replace('%SW_PATH%', cache.swPath)
-            .replace('%LOAD_MESSAGE%', loadMessage),
+            // eslint-disable-next-line quotes
+            .replace(`%LOAD_MESSAGE%`, loadMessage),
         )
 
         cache.bgScriptPath = emit(
@@ -89,26 +104,16 @@ export const pushReloader = (
 
         cache.ctScriptPath = emit(
           'ct-reloader-client.js',
-          ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
+          // eslint-disable-next-line quotes
+          ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
         )
       } else {
-        throw new TypeError(
-          'Not signed into Firebase: no UID in cache',
-        )
+        this.error('Not signed into Firebase: no UID in cache')
       }
 
       /* ---------------- UPDATE MANIFEST ---------------- */
 
-      const manifestKey = 'manifest.json'
-      const manifestAsset = bundle[manifestKey] as OutputAsset
       const manifestSource = manifestAsset.source as string
-
-      if (!manifestSource) {
-        throw new ReferenceError(
-          `bundle.${manifestKey} is undefined`,
-        )
-      }
-
       const manifest: ChromeExtensionManifest = JSON.parse(
         manifestSource,
       )
@@ -132,7 +137,7 @@ export const pushReloader = (
         ]
       } else {
         this.warn(
-          'Background page reloader script was not emitted',
+          'Background page reloader script was not emitted.',
         )
       }
 
@@ -149,18 +154,18 @@ export const pushReloader = (
           }),
         )
       } else {
-        this.warn('Content page reloader script was not emitted')
-      }
-
-      if (manifest.permissions) {
-        const perms = new Set(permissions)
-        perms.add('notifications')
-        perms.add(
-          'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
+        this.warn(
+          'Content page reloader script was not emitted.',
         )
-
-        manifest.permissions = Array.from(perms)
       }
+
+      const perms = new Set(permissions)
+      perms.add('notifications')
+      perms.add(
+        'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
+      )
+
+      manifest.permissions = Array.from(perms)
 
       manifestAsset.source = JSON.stringify(
         manifest,
@@ -171,7 +176,17 @@ export const pushReloader = (
 
     async writeBundle() {
       /* ----------------- RELOAD CLIENTS ---------------- */
-      await reload()
+      try {
+        await reload()
+      } catch (error) {
+        if (error.message === 'no registered clients') {
+          this.warn(
+            'Reload the extension in Chrome to start hot-reloading.',
+          )
+        } else {
+          this.error(error.message)
+        }
+      }
     },
   }
 }

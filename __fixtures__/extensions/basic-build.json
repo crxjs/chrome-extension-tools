@@ -417,43 +417,30 @@
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 78,
+          "end": 64,
           "body": [
             {
               "type": "ExpressionStatement",
               "start": 0,
-              "end": 13,
-              "expression": {
-                "type": "Literal",
-                "start": 0,
-                "end": 12,
-                "value": "use strict",
-                "raw": "\"use strict\""
-              },
-              "directive": "use strict"
-            },
-            {
-              "type": "ExpressionStatement",
-              "start": 14,
-              "end": 41,
+              "end": 27,
               "expression": {
                 "type": "CallExpression",
-                "start": 14,
-                "end": 40,
+                "start": 0,
+                "end": 26,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 14,
-                  "end": 25,
+                  "start": 0,
+                  "end": 11,
                   "object": {
                     "type": "Identifier",
-                    "start": 14,
-                    "end": 21,
+                    "start": 0,
+                    "end": 7,
                     "name": "console"
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 22,
-                    "end": 25,
+                    "start": 8,
+                    "end": 11,
                     "name": "log"
                   },
                   "computed": false
@@ -461,8 +448,8 @@
                 "arguments": [
                   {
                     "type": "Literal",
-                    "start": 26,
-                    "end": 39,
+                    "start": 12,
+                    "end": 25,
                     "value": "options3.ts",
                     "raw": "'options3.ts'"
                   }
@@ -472,7 +459,7 @@
           ],
           "sourceType": "module"
         },
-        "code": "\"use strict\";\nconsole.log('options3.ts');\n//# sourceMappingURL=options3.js.map",
+        "code": "console.log('options3.ts');\n//# sourceMappingURL=options3.js.map",
         "customTransformCache": false,
         "dependencies": [],
         "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",
@@ -486,11 +473,10 @@
             "file": "options3.js",
             "sourceRoot": "",
             "sources": [
-              "../__fixtures__/extensions/basic/options3.ts"
+              "options3.ts"
             ],
             "names": [],
             "mappings": [
-              [],
               [
                 [
                   0,
@@ -550,43 +536,30 @@
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 79,
+          "end": 66,
           "body": [
             {
               "type": "ExpressionStatement",
               "start": 0,
-              "end": 13,
-              "expression": {
-                "type": "Literal",
-                "start": 0,
-                "end": 12,
-                "value": "use strict",
-                "raw": "\"use strict\""
-              },
-              "directive": "use strict"
-            },
-            {
-              "type": "ExpressionStatement",
-              "start": 14,
-              "end": 42,
+              "end": 28,
               "expression": {
                 "type": "CallExpression",
-                "start": 14,
-                "end": 41,
+                "start": 0,
+                "end": 27,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 14,
-                  "end": 25,
+                  "start": 0,
+                  "end": 11,
                   "object": {
                     "type": "Identifier",
-                    "start": 14,
-                    "end": 21,
+                    "start": 0,
+                    "end": 7,
                     "name": "console"
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 22,
-                    "end": 25,
+                    "start": 8,
+                    "end": 11,
                     "name": "log"
                   },
                   "computed": false
@@ -594,8 +567,8 @@
                 "arguments": [
                   {
                     "type": "Literal",
-                    "start": 26,
-                    "end": 40,
+                    "start": 12,
+                    "end": 26,
                     "value": "options4.tsx",
                     "raw": "'options4.tsx'"
                   }
@@ -605,7 +578,7 @@
           ],
           "sourceType": "module"
         },
-        "code": "\"use strict\";\nconsole.log('options4.tsx');\n//# sourceMappingURL=options4.js.map",
+        "code": "console.log('options4.tsx');\n//# sourceMappingURL=options4.jsx.map",
         "customTransformCache": false,
         "dependencies": [],
         "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options4.tsx",
@@ -616,14 +589,13 @@
         "sourcemapChain": [
           {
             "version": 3,
-            "file": "options4.js",
+            "file": "options4.jsx",
             "sourceRoot": "",
             "sources": [
-              "../__fixtures__/extensions/basic/options4.tsx"
+              "options4.tsx"
             ],
             "names": [],
             "mappings": [
-              [],
               [
                 [
                   0,
@@ -746,14 +718,19 @@
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.jpg",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-48.png",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-128.png",
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/NotoSans-Black.ttf",
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/NotoSans-Light.ttf",
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/Missaali-Regular.otf",
     "__fixtures__/extensions/basic/options.css",
     "__fixtures__/extensions/basic/options.png",
     "__fixtures__/extensions/basic/options.jpg",
+    "__fixtures__/extensions/basic/images/favicon.ico",
+    "__fixtures__/extensions/basic/images/favicon.png",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html",
     "__fixtures__/extensions/basic/asset.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options1.js",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options2.jsx",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",

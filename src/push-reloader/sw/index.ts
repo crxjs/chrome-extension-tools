@@ -1,10 +1,7 @@
-/* eslint-env browser */
-/* eslint-env serviceworker */
-/* global chrome */
-declare var self: ServiceWorkerGlobalScope
-declare var chrome: {
+declare let self: ServiceWorkerGlobalScope
+declare let chrome: {
   runtime: {
-    getBackgroundClient: () => Client
+    getBackgroundClient: () => Promise<Client>
   }
 }
 
@@ -15,7 +12,9 @@ import { setupMessaging } from './config-worker'
 // Just return a promise or use an async function
 // - No need to use event.waitUntil, this is handled in ./config-worker
 const onPush = async (event: PushEvent) => {
-  const { message } = event.data?.json().data
+  if (!event.data) return
+
+  const { message } = event.data.json().data
 
   const client = await chrome.runtime.getBackgroundClient()
 
@@ -47,7 +46,7 @@ const onPush = async (event: PushEvent) => {
 }
 
 // We're not using this right now.
-const onMessage = async (event: ExtendableMessageEvent) => {
+const onMessage = (event: ExtendableMessageEvent) => {
   console.log(event)
 }
 

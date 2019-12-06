@@ -1,7 +1,0 @@
-{
-  // Push Browser client config
-  "extends": "../../../tsconfig-main.json",
-  "compilerOptions": {
-    "lib": ["es2017", "dom"]
-  }
-}

@@ -25,20 +25,34 @@ test('replaces namespace and event', () => {
   expect(result).not.toMatch("case '%NAME%':")
   expect(result).toMatch(`case '${'runtime'}':`)
   expect(result).toMatch(`case '${'tabs'}':`)
-  
+
   // Events
   expect(result).not.toMatch("case '%EVENT%':")
   expect(result).toMatch(`case '${'onMessage'}':`)
   expect(result).toMatch(`case '${'onUpdated'}':`)
 })
 
-
 test('replaces path', () => {
   const loaderScript = setupLoaderScript({
     eventDelay: 2000,
   })
-  
+
   const result = loaderScript('background.js')
-  
+
   expect(result).toMatch(`import('${'../background.js'}')`)
+})
+
+test('Should throw with invalid dymanicImportEventDelay', () => {
+  const error = new TypeError(
+    'dynamicImportEventDelay must be false or a number',
+  )
+
+  const call = () => {
+    setupLoaderScript({
+      // @ts-ignore
+      eventDelay: '200ms',
+    })('some/script/path')
+  }
+
+  expect(call).toThrow(error)
 })

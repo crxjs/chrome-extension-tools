@@ -27,5 +27,9 @@
     "default_popup": "popup/popup.html"
   },
 
-  "web_accessible_resources": ["options.jpg"]
+  "web_accessible_resources": [
+    "options.jpg",
+    "fonts/*.ttf",
+    "fonts/*.otf"
+  ]
 }

@@ -1,8 +1,5 @@
 import { join } from 'path'
 import { InputOptions } from 'rollup'
-import { context } from '../../../__fixtures__/minimal-plugin-context'
-import { getRelative } from '../../../__fixtures__/utils'
-import htmlInputs, { HtmlInputsPluginCache } from '../index'
 import {
   assetJs,
   backgroundJs,
@@ -16,7 +13,12 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
+  faviconPng,
+  faviconIco,
 } from '../../../__fixtures__/basic-paths'
+import { context } from '../../../__fixtures__/minimal-plugin-context'
+import { getRelative } from '../../../__fixtures__/utils'
+import htmlInputs, { HtmlInputsPluginCache } from '../index'
 
 const cheerio = require('../cheerio')
 
@@ -58,7 +60,8 @@ test('returns options.input as input record', () => {
       options2: '__fixtures__/extensions/basic/options2.jsx',
       options3: '__fixtures__/extensions/basic/options3.ts',
       options4: '__fixtures__/extensions/basic/options4.tsx',
-      'popup/popup': '__fixtures__/extensions/basic/popup/popup.js',
+      'popup/popup':
+        '__fixtures__/extensions/basic/popup/popup.js',
       // External script paths won't be touched
       background: backgroundJs,
     },
@@ -113,7 +116,11 @@ test('caches correct inputs & assets', () => {
   expect(cache.css).toEqual([optionsCss].map(getRelative))
   expect(cache.html).toEqual([optionsHtml, popupHtml])
   expect(cache.img).toEqual(
-    [optionsPng, optionsJpg].map(getRelative),
+    expect.arrayContaining(
+      [optionsPng, optionsJpg, faviconPng, faviconIco].map(
+        getRelative,
+      ),
+    ),
   )
   // non-bundled js
   expect(cache.scripts).toEqual([assetJs].map(getRelative))
@@ -133,4 +140,33 @@ test('if no input has no html, do nothing', () => {
   const result = plugin.options.call(context, options)
 
   expect(result).toBe(options)
+})
+
+test('Throws with invalid input type', () => {
+  const options = { input: () => {} }
+
+  const call = () => {
+    // eslint-disable-next-line
+    // @ts-ignore
+    plugin.options.call(context, options)
+  }
+
+  expect(call).toThrow(
+    new TypeError('options.input cannot be function'),
+  )
+})
+
+test('Handles option.input as string', () => {
+  const options = { input: optionsHtml }
+
+  const result = plugin.options.call(context, options)
+
+  expect(result).toMatchObject({
+    input: {
+      options1: '__fixtures__/extensions/basic/options1.js',
+      options2: '__fixtures__/extensions/basic/options2.jsx',
+      options3: '__fixtures__/extensions/basic/options3.ts',
+      options4: '__fixtures__/extensions/basic/options4.tsx',
+    },
+  })
 })

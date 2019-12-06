@@ -1,9 +1,13 @@
 import glob from 'glob'
 import get from 'lodash.get'
+import diff from 'lodash.difference'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
 import * as permissions from './permissions'
-import { ChromeExtensionManifest, ContentScript } from '../../manifest'
+import {
+  ChromeExtensionManifest,
+  ContentScript,
+} from '../../manifest'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */
@@ -75,7 +79,7 @@ export function deriveFiles(
   ]
 
   const css = [
-    ...files.filter((f) => /\.css$/.test(f)),
+    ...files.filter((f) => f.endsWith('.css')),
     ...get(
       manifest,
       'content_scripts',
@@ -114,11 +118,15 @@ export function deriveFiles(
     ...Object.values(get(manifest, 'icons', {})),
   ]
 
+  // Files like fonts, things that are not expected
+  const others = diff(files, css, js, html, img)
+
   return {
     css: validate(css),
     js: validate(js),
     html: validate(html),
     img: validate(img),
+    others: validate(others),
   }
 
   function validate(ary: any[]) {

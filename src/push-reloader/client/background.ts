@@ -6,7 +6,7 @@ import { setupMessaging, registerToken } from './config-client'
 
 const reload = () => chrome.runtime.reload()
 
-const onMessage = async (event: MessageEvent) => {
+const onMessage = (event: MessageEvent) => {
   const { message } = event.data
 
   if (message === 'client-load') {
@@ -32,7 +32,8 @@ const onLoad = async ({
 
   notifications.forEach((n) => n.close())
 
-  console.log('%LOAD_MESSAGE%')
+  // eslint-disable-next-line quotes
+  console.log(`%LOAD_MESSAGE%`)
 
   return registerToken({ uid: '%UID%', token })
 }

@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import commonjs from 'rollup-plugin-commonjs'
-import resolve from 'rollup-plugin-node-resolve'
+import resolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript'
 import { chromeExtension } from '../../../src/index'
 import { getExtPath } from '../../utils'
-import { saveBundle } from './saveBundle'
+import { saveBundle } from '../../save-bundle-plugin'
 
 const pkg = require('../../../package.json')
 

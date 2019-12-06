@@ -4,8 +4,12 @@ import typescript from 'rollup-plugin-typescript'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import json from 'rollup-plugin-json'
 
+const {
+  compilerOptions,
+} = require('./tsconfigs/tsconfig-base.json')
+
 const plugins = [
-  typescript(),
+  typescript(compilerOptions),
   json(),
   bundleImports({
     useVirtualModule: true,
@@ -31,23 +35,19 @@ export default [
       },
     ],
     external: [
-      '@bumble/manifest',
       'ajv',
-      'ajv/lib/refs/json-schema-draft-04.json',
       'cheerio',
       'cosmiconfig',
+      'firebase/app',
+      'firebase/auth',
+      'firebase/functions',
       'fs-extra',
-      'fs',
       'glob',
-      'is-valid-path',
+      'lodash.difference',
       'lodash.flatten',
       'lodash.get',
-      'lodash.startcase',
-      'magic-string',
       'mem',
       'path',
-      'picomatch',
-      'rollup-pluginutils',
       'slash',
     ],
     plugins,

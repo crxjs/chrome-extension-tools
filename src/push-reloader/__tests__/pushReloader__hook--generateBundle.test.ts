@@ -38,12 +38,14 @@ let manifestObj: OutputAsset
 let manifestClone: OutputAsset
 let manifest: ChromeExtensionManifest
 beforeEach(async () => {
+  process.env.ROLLUP_WATCH = 'true'
+
   jest.clearAllMocks()
   context.getFileName.mockImplementation(() => 'mock-file-name')
 
   bundle = cloneObject(originalBundle)
   cache = { firstRun: true }
-  plugin = pushReloader({ cache })
+  plugin = pushReloader({ cache })!
 
   manifestObj = bundle['manifest.json'] as OutputAsset
   manifestClone = cloneObject(manifestObj)
@@ -125,7 +127,7 @@ test('does not start another update interval on later runs', async () => {
   expect(functions.update).not.toBeCalled()
 })
 
-test('emits assets', async () => {
+test('emits assets', () => {
   expect(context.emitFile).toBeCalledTimes(4)
 
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
@@ -150,7 +152,7 @@ test('emits assets', async () => {
   })
 })
 
-test('updates manifest in bundle', async () => {
+test('updates manifest in bundle', () => {
   expect(manifestObj).toBe(bundle['manifest.json'])
   expect(manifestObj).not.toEqual(manifestClone)
 
@@ -169,24 +171,65 @@ test('updates manifest in bundle', async () => {
   })
 })
 
-test('set manifest description', async () => {
+test('set manifest description', () => {
   expect(manifest.description).toBe(loadMessage)
 })
 
-test('adds permissions', async () => {
+test('adds permissions', () => {
   expect(manifest.permissions).toContain('notifications')
   expect(manifest.permissions).toContain(
     'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
   )
 })
 
-test('add reloader script to background', async () => {
+test('adds permissions property if manifest has no permissions', async () => {
+  const plugin = pushReloader()!
+
+  const bundle = cloneObject(originalBundle)
+
+  {
+    /* ---------- REMOVE MANIFEST PERMISSIONS ---------- */
+    const manifestAsset = bundle['manifest.json'] as OutputAsset
+    const manifestSrc = manifestAsset.source as string
+    const manifest: ChromeExtensionManifest = JSON.parse(
+      manifestSrc,
+    )
+
+    delete manifest.permissions
+    bundle['manifest.json'] = {
+      ...manifestAsset,
+      source: JSON.stringify(manifest),
+    }
+  }
+
+  await plugin.generateBundle.call(
+    context,
+    options,
+    bundle,
+    false,
+  )
+
+  const manifestAsset = bundle['manifest.json']
+  const manifestSrc = manifestAsset.source as string
+  const manifest: ChromeExtensionManifest = JSON.parse(
+    manifestSrc,
+  )
+
+  expect(manifest).toMatchObject({
+    permissions: expect.arrayContaining([
+      'notifications',
+      'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
+    ]),
+  })
+})
+
+test('add reloader script to background', () => {
   expect(manifest.background!.scripts).toContain(
     'mock-file-name',
   )
 })
 
-test('add reloader script to content scripts', async () => {
+test('add reloader script to content scripts', () => {
   expect(manifest.content_scripts!.length).toBe(2)
   expect(manifest.content_scripts!).toContainEqual({
     js: ['mock-file-name', contentJs],
@@ -197,4 +240,57 @@ test('add reloader script to content scripts', async () => {
     css: ['content.css'],
     matches: ['https://www.yahoo.com/*'],
   })
+})
+
+test('Errors if manifest is not in the bundle', async () => {
+  expect.assertions(3)
+
+  const plugin = pushReloader()!
+
+  const bundle = cloneObject(originalBundle)
+  delete bundle['manifest.json']
+
+  const bundleCopy = cloneObject(bundle)
+
+  const errorMessage =
+    'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?'
+
+  try {
+    await plugin.generateBundle.call(
+      context,
+      options,
+      bundle,
+      false,
+    )
+  } catch (error) {
+    expect(error).toEqual(new Error(errorMessage))
+    expect(context.error).toBeCalledWith(errorMessage)
+
+    expect(bundle).toEqual(bundleCopy)
+  }
+})
+
+test('Errors if cache.uid is undefined', async () => {
+  process.env.ROLLUP_WATCH = 'true'
+
+  jest.clearAllMocks()
+  context.getFileName.mockImplementation(() => 'mock-file-name')
+
+  bundle = cloneObject(originalBundle)
+  cache = { firstRun: false }
+  plugin = pushReloader({ cache })!
+
+  const errorMessage =
+    'Not signed into Firebase: no UID in cache'
+
+  try {
+    await plugin.generateBundle.call(
+      context,
+      options,
+      bundle,
+      false,
+    )
+  } catch (error) {
+    expect(context.error).toBeCalledWith(errorMessage)
+  }
 })

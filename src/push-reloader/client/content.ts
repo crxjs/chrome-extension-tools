@@ -1,6 +1,3 @@
-/* eslint-env browser */
-/* globals chrome */
-
 {
   // eslint-disable-next-line quotes
   const loadMessage = `%LOAD_MESSAGE%`

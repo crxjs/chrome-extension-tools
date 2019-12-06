@@ -1,7 +1,5 @@
 import { Plugin, EmittedAsset, OutputAsset } from 'rollup'
-// @ts-ignore
 import { code as bgClientCode } from 'code ./client/background.ts'
-// @ts-ignore
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { ChromeExtensionManifest } from '../manifest'
 
@@ -10,6 +8,7 @@ export type SimpleReloaderPlugin = Pick<
   'name' | 'generateBundle'
 >
 
+// TODO: factor out this cache
 export interface SimpleReloaderCache {
   bgScriptPath?: string
   ctScriptPath?: string
@@ -24,11 +23,24 @@ const timestampPath = 'assets/timestamp.js'
 
 export const simpleReloader = (
   cache = {} as SimpleReloaderCache,
-): SimpleReloaderPlugin => {
-  return {
-    name: 'simple-reloader',
+): SimpleReloaderPlugin | undefined => {
+  if (!process.env.ROLLUP_WATCH) {
+    return undefined
+  }
 
-    async generateBundle(options, bundle) {
+  return {
+    name: 'chrome-extension-simple-reloader',
+
+    generateBundle(options, bundle) {
+      const manifestKey = 'manifest.json'
+      const manifestAsset = bundle[manifestKey] as OutputAsset
+
+      if (!manifestAsset) {
+        this.error(
+          'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?',
+        )
+      }
+
       /* ----------------- Start Reloader -------------------------- */
 
       /* ----------------- Create Client Files -------------------------- */
@@ -54,25 +66,19 @@ export const simpleReloader = (
         'bg-reloader-client.js',
         bgClientCode
           .replace('%TIMESTAMP_PATH%', timestampPath)
-          .replace('%LOAD_MESSAGE%', loadMessage),
+          // eslint-disable-next-line quotes
+          .replace(`%LOAD_MESSAGE%`, loadMessage),
       )
 
       cache.ctScriptPath = emit(
         'ct-reloader-client.js',
-        ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
+        // eslint-disable-next-line quotes
+        ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
       )
 
       /* ----------------- Update Manifest -------------------------- */
 
-      const manifestKey = 'manifest.json'
-      const manifestObj = bundle[manifestKey] as OutputAsset
-      const manifestSource = manifestObj.source as string
-
-      if (!manifestSource) {
-        throw new ReferenceError(
-          `bundle.${manifestKey} is undefined`,
-        )
-      }
+      const manifestSource = manifestAsset.source as string
 
       const manifest: ChromeExtensionManifest = JSON.parse(
         manifestSource,
@@ -114,7 +120,11 @@ export const simpleReloader = (
         )
       }
 
-      manifestObj.source = JSON.stringify(manifest, undefined, 2)
+      manifestAsset.source = JSON.stringify(
+        manifest,
+        undefined,
+        2,
+      )
     },
   }
 }

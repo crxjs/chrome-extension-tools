@@ -1,8 +1,16 @@
 {
-  "extends": "./tsconfig-main.json",
+  "extends": "./tsconfig-base.json",
   "compilerOptions": {
     "declaration": true,
-    "declarationDir": "types",
-    "emitDeclarationOnly": true
-  }
+    "declarationDir": "../types",
+    "emitDeclarationOnly": true,
+    "noEmit": false
+  },
+  "include": ["../src"],
+  "exclude": [
+    "../**/__tests__/**/*",
+    "../src/push-reloader/sw",
+    "../src/push-reloader/client",
+    "../src/manifest-input/browser"
+  ],
 }

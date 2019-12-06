@@ -102,6 +102,12 @@ export default function htmlInputs(
       // Cache jsEntries with existing options.input
       cache.input = input.filter(not(isHtml)).concat(cache.js)
 
+      if (cache.input.length === 0) {
+        throw new Error(
+          'At least one HTML file must have at least one script.',
+        )
+      }
+
       return {
         ...options,
         input: cache.input.reduce(
@@ -128,11 +134,13 @@ export default function htmlInputs(
       })
 
       const loading = assets.map(async (asset) => {
-        const source = await readFile(asset, 'utf8')
-
+        let source: string | Buffer
         let replaced: string | undefined
         if (asset.endsWith('html')) {
+          source = await readFile(asset, 'utf8')
           replaced = source.replace(/\.[jt]sx?"/g, '.js"')
+        } else {
+          source = await readFile(asset)
         }
 
         const fileName = relative(

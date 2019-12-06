@@ -1,7 +1,4 @@
-/* eslint-env browser */
-/* eslint-env serviceworker */
-declare var self: ServiceWorkerGlobalScope
-export {}
+declare let self: ServiceWorkerGlobalScope
 
 // Give the service worker access to Firebase Messaging.
 // Note that you can only use Firebase Messaging here,
@@ -15,7 +12,7 @@ import { messagingSenderId } from '../CONFIG'
 // by passing in the messagingSenderId.
 firebase.initializeApp({ messagingSenderId })
 
-export const setupMessaging = async ({
+export const setupMessaging = ({
   onPush,
   onMessage,
 }: {

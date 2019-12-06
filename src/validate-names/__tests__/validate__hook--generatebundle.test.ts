@@ -25,8 +25,8 @@ test('renames chunks by mutating the bundle', () => {
     const { facadeModuleId, fileName, name } = helperChunk
 
     /* ------------------ PRE MUTATION ----------------- */
-    expect(fileName!).toMatch(helperKey)
-    expect(name!).toMatch(helperName)
+    expect(fileName).toMatch(helperKey)
+    expect(name).toMatch(helperName)
 
     expect(facadeModuleId!).toBeNull()
   }
@@ -42,11 +42,11 @@ test('renames chunks by mutating the bundle', () => {
     const { facadeModuleId, fileName, name } = helperChunk
 
     /* ----------------- POST MUTATION ----------------- */
-    expect(fileName!).not.toMatch(helperKey)
-    expect(name!).not.toMatch(helperKey)
+    expect(fileName).not.toMatch(helperKey)
+    expect(name).not.toMatch(helperKey)
 
-    expect(fileName!).toMatch(fixedKey)
-    expect(name!).toMatch(fixedName)
+    expect(fileName).toMatch(fixedKey)
+    expect(name).toMatch(fixedName)
 
     expect(facadeModuleId!).toBeNull()
   }

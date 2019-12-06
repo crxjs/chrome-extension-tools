@@ -5,7 +5,11 @@ import {
   OutputAsset,
 } from 'rollup'
 
-import { simpleReloader, loadMessage } from '..'
+import {
+  simpleReloader,
+  loadMessage,
+  SimpleReloaderPlugin,
+} from '..'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import { ChromeExtensionManifest } from '../../manifest'
@@ -18,10 +22,16 @@ const originalBundle: OutputBundle = require('../../../__fixtures__/extensions/b
 
 const contentJs = expect.stringMatching(/assets\/content.+?\.js/)
 
-test('emit assets', async () => {
-  const bundle = cloneObject(originalBundle)
-  const plugin = simpleReloader()
+let bundle: OutputBundle
+let plugin: SimpleReloaderPlugin
+beforeEach(() => {
+  process.env.ROLLUP_WATCH = 'true'
 
+  bundle = cloneObject(originalBundle)
+  plugin = simpleReloader()!
+})
+
+test('emit assets', async () => {
   await plugin.generateBundle.call(
     context,
     options,
@@ -48,9 +58,6 @@ test('emit assets', async () => {
 })
 
 test('updates manifest in bundle', async () => {
-  const bundle = cloneObject(originalBundle)
-  const plugin = simpleReloader()
-
   const manifestObj = bundle['manifest.json'] as OutputAsset
   const manifestClone = cloneObject(manifestObj)
 
@@ -86,9 +93,6 @@ test('updates manifest in bundle', async () => {
 })
 
 test('set manifest description', async () => {
-  const bundle = cloneObject(originalBundle)
-  const plugin = simpleReloader()
-
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -106,9 +110,6 @@ test('set manifest description', async () => {
 })
 
 test('add reloader script to background', async () => {
-  const bundle = cloneObject(originalBundle)
-  const plugin = simpleReloader()
-
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -128,9 +129,6 @@ test('add reloader script to background', async () => {
 })
 
 test('set background script to persistent', async () => {
-  const bundle = cloneObject(originalBundle)
-  const plugin = simpleReloader()
-
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -148,9 +146,6 @@ test('set background script to persistent', async () => {
 })
 
 test('add reloader script to content scripts', async () => {
-  const bundle = cloneObject(originalBundle)
-  const plugin = simpleReloader()
-
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -174,4 +169,25 @@ test('add reloader script to content scripts', async () => {
     css: ['content.css'],
     matches: ['https://www.yahoo.com/*'],
   })
+})
+
+test('Errors if manifest is not in the bundle', async () => {
+  expect.assertions(2)
+
+  delete bundle['manifest.json']
+
+  const errorMessage =
+    'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?'
+
+  try {
+    await plugin.generateBundle.call(
+      context,
+      options,
+      bundle,
+      false,
+    )
+  } catch (error) {
+    expect(error).toEqual(new Error(errorMessage))
+    expect(context.error).toBeCalledWith(errorMessage)
+  }
 })

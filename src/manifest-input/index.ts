@@ -4,17 +4,20 @@ import memoize from 'mem'
 import path, { basename } from 'path'
 import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
 import { isChunk } from '../helpers'
+import { ChromeExtensionManifest } from '../manifest'
+import { cloneObject } from './cloneObject'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
   derivePermissions,
 } from './manifest-parser/index'
-import { validateManifest } from './manifest-parser/validate'
+import {
+  validateManifest,
+  ValidationErrorsArray,
+} from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
-import { cloneObject } from './cloneObject'
-import { ChromeExtensionManifest } from '../manifest'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
@@ -97,8 +100,10 @@ export function manifestInput(
     cache?: ManifestInputPluginCache
   },
 ): ManifestInputPlugin {
-  const readFile = memoize(
-    (filepath: string) => fs.readFile(filepath, 'utf8'),
+  const readAssetAsBuffer = memoize(
+    (filepath: string) => {
+      return fs.readFile(filepath)
+    },
     {
       cache: cache.readFile,
     },
@@ -114,7 +119,7 @@ export function manifestInput(
 
   /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
 
-  let loaderScript = setupLoaderScript(dynamicImportWrapper)
+  const loaderScript = setupLoaderScript(dynamicImportWrapper)
 
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
@@ -145,15 +150,10 @@ export function manifestInput(
           filepath: string
           config: ChromeExtensionManifest
           isEmpty?: true
-        } | null
-        if (
-          !configResult ||
-          typeof configResult.config === 'undefined' ||
-          configResult.isEmpty
-        ) {
-          throw new Error(
-            `Could not load ${options.input} as Chrome extension manifest.`,
-          )
+        }
+
+        if (configResult.isEmpty) {
+          throw new Error(`${options.input} is an empty file.`)
         }
 
         manifestPath = configResult.filepath
@@ -162,7 +162,7 @@ export function manifestInput(
         cache.srcDir = path.dirname(manifestPath)
 
         // Derive entry paths from manifest
-        const { js, html, css, img } = deriveFiles(
+        const { js, html, css, img, others } = deriveFiles(
           cache.manifest,
           cache.srcDir,
         )
@@ -171,12 +171,18 @@ export function manifestInput(
         cache.input = [...js, ...html]
         cache.assets = [
           // Dedupe assets
-          ...new Set([...css, ...img]),
+          ...new Set([...css, ...img, ...others]),
         ]
 
         /* --------------- END LOAD MANIFEST --------------- */
       }
 
+      if (cache.input.length === 0) {
+        throw new Error('The manifest must have at least one script or HTML file.')
+      }
+
+      // TODO: handle case where no input is returned
+      // - Error: "You must supply options.input to rollup"
       return {
         ...options,
         input: cache.input.reduce(
@@ -190,7 +196,7 @@ export function manifestInput(
     /*              HANDLE WATCH FILES              */
     /* ============================================ */
 
-    async buildStart(options) {
+    async buildStart() {
       this.addWatchFile(manifestPath)
 
       cache.assets.forEach((srcPath) => {
@@ -199,7 +205,7 @@ export function manifestInput(
 
       const assets: EmittedAsset[] = await Promise.all(
         cache.assets.map(async (srcPath) => {
-          const source = await readFile(srcPath)
+          const source = await readAssetAsBuffer(srcPath)
 
           return {
             type: 'asset' as 'asset',
@@ -233,7 +239,7 @@ export function manifestInput(
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    async generateBundle(options, bundle) {
+    generateBundle(options, bundle) {
       /* ---------- DERIVE PERMISIONS START --------- */
 
       // Get module ids for all chunks
@@ -255,9 +261,9 @@ export function manifestInput(
 
         if (verbose) {
           if (!cache.permsHash) {
-            console.log('Detected permissions:', permissions)
+            this.warn(`Detected permissions: ${permissions}`)
           } else if (permsHash !== cache.permsHash) {
-            console.log('Detected new permissions:', permissions)
+            this.warn(`Detected new permissions: ${permissions}`)
           }
         }
 
@@ -269,6 +275,7 @@ export function manifestInput(
       try {
         // Clone cache.manifest
         if (!cache.manifest)
+          // This is a programming error, so it should throw
           throw new TypeError(
             `cache.manifest is ${typeof cache.manifest}`,
           )
@@ -296,7 +303,7 @@ export function manifestInput(
         /* ------ WEB ACCESSIBLE RESOURCES START ------ */
 
         const contentScripts = cts.reduce(
-          (r, { js }) => [...r, ...js],
+          (r, { js = [] }) => [...r, ...js],
           [] as string[],
         )
 
@@ -359,7 +366,7 @@ export function manifestInput(
           // Emit content script wrappers
           if (cts.length) {
             manifestBody.content_scripts = cts.map(
-              ({ js, ...rest }) => ({
+              ({ js = [], ...rest }) => ({
                 js: js.map(emitDynamicImportWrapper),
                 ...rest,
               }),
@@ -396,9 +403,14 @@ export function manifestInput(
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
 
-        error.errors.forEach((err: { message: string }) => {
-          console.log(err)
-        })
+        const errors = error.errors as ValidationErrorsArray
+
+        if (errors) {
+          errors.forEach((err) => {
+            // FIXME: make a better validation error message
+            this.warn(JSON.stringify(err, undefined, 2))
+          })
+        }
 
         this.error(error.message)
       }

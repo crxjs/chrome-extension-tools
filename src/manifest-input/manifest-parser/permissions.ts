@@ -109,7 +109,7 @@ export const webNavigation = (s: string) =>
 export const webRequest = (s: string) =>
   /chromep?[\s\n]*\.[\s\n]*webRequest/.test(s)
 export const webRequestBlocking = (s: string) =>
-  webRequest(s) && /'blocking'/.test(s)
+  webRequest(s) && s.includes('\'blocking\'')
 
 // TODO: add readClipboard
 // TODO: add writeClipboard
