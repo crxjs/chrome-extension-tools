@@ -36,10 +36,10 @@
     "lodash.get": "^4.4.2",
     "mem": "^6.0.1",
     "read-pkg-up": "^7.0.1",
-    "rollup": "^1.27.8",
     "slash": "^3.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-node-resolve": "^6.0.0",
     "@sucrase/jest-plugin": "^2.0.0",
     "@types/cheerio": "^0.22.15",
     "@types/chrome": "0.0.91",
@@ -57,10 +57,10 @@
     "jest-html-reporters": "^1.2.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
+    "rollup": "^1.27.8",
     "rollup-plugin-bundle-imports": "^1.4.5",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.1",
     "ts-jest": "^24.2.0",
     "tslib": "^1.10.0",

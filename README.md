@@ -67,7 +67,7 @@ Create a `rollup.config.js` file in your project root.
 
 import { rollup } from 'rollup'
 
-import resolve from 'rollup-plugin-node-resolve'
+import resolve from '@rollup/plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 
 import { chromeExtension, pushReloader } from 'rollup-plugin-chrome-extension'
