@@ -124,6 +124,8 @@ test('calls deriveFiles', () => {
 test('does nothing if cache.manifest exists', () => {
   cache.manifest = {} as ChromeExtensionManifest
   cache.srcDir = getExtPath('basic')
+  // bypass no scripts error
+  cache.input = ['x']
 
   plugin.options.call(context, options)
 

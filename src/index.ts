@@ -58,11 +58,29 @@ export const chromeExtension = (
     _plugins: { manifest, html, validate },
 
     options(options) {
-      return [manifest, html].reduce((opts, plugin) => {
-        const result = plugin.options.call(this, opts)
+      try {
+        return [manifest, html].reduce((opts, plugin) => {
+          const result = plugin.options.call(this, opts)
 
-        return result || options
-      }, options)
+          return result || options
+        }, options)
+      } catch (error) {
+        const manifestError =
+          'The manifest must have at least one script or HTML file.'
+        const htmlError =
+          'At least one HTML file must have at least one script.'
+
+        if (
+          error.message === manifestError ||
+          error.message === htmlError
+        ) {
+          throw new Error(
+            'A Chrome extension must have at least one script or HTML file.',
+          )
+        } else {
+          throw error
+        }
+      }
     },
 
     async buildStart(options) {

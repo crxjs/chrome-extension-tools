@@ -4,17 +4,20 @@ import memoize from 'mem'
 import path, { basename } from 'path'
 import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
 import { isChunk } from '../helpers'
+import { ChromeExtensionManifest } from '../manifest'
+import { cloneObject } from './cloneObject'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
   derivePermissions,
 } from './manifest-parser/index'
-import { validateManifest } from './manifest-parser/validate'
+import {
+  validateManifest,
+  ValidationErrorsArray,
+} from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
-import { cloneObject } from './cloneObject'
-import { ChromeExtensionManifest } from '../manifest'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
@@ -174,6 +177,12 @@ export function manifestInput(
         /* --------------- END LOAD MANIFEST --------------- */
       }
 
+      if (cache.input.length === 0) {
+        throw new Error('The manifest must have at least one script or HTML file.')
+      }
+
+      // TODO: handle case where no input is returned
+      // - Error: "You must supply options.input to rollup"
       return {
         ...options,
         input: cache.input.reduce(
@@ -394,9 +403,14 @@ export function manifestInput(
       } catch (error) {
         if (error.name !== 'ValidationError') throw error
 
-        error.errors.forEach((err: { message: string }) => {
-          console.log(err)
-        })
+        const errors = error.errors as ValidationErrorsArray
+
+        if (errors) {
+          errors.forEach((err) => {
+            // FIXME: make a better validation error message
+            this.warn(JSON.stringify(err, undefined, 2))
+          })
+        }
 
         this.error(error.message)
       }

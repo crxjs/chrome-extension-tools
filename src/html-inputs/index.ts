@@ -102,6 +102,12 @@ export default function htmlInputs(
       // Cache jsEntries with existing options.input
       cache.input = input.filter(not(isHtml)).concat(cache.js)
 
+      if (cache.input.length === 0) {
+        throw new Error(
+          'At least one HTML file must have at least one script.',
+        )
+      }
+
       return {
         ...options,
         input: cache.input.reduce(
