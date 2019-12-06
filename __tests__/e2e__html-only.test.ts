@@ -3,22 +3,20 @@ import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, getExtPath } from '../__fixtures__/utils'
 
 const { default: config } = require(getExtPath(
-  'no-scripts/rollup.config.js',
+  'html-only/rollup.config.js',
 ))
 
-test('Throws for extension with no scripts at all', async () => {
+test('Throws for extension only html and no scripts at all', async () => {
   try {
     await rollup(config)
   } catch (error) {
     expect(error).toEqual(
-      new Error(
-        'A Chrome extension must have at least one script or HTML file.',
-      ),
+      new Error('A Chrome extension must have at least one script or HTML file.'),
     )
   }
 })
 
-test.skip('Handles extension with no scripts at all', async () => {
+test.skip('Handles extension only html and no scripts at all', async () => {
   let bundle: RollupBuild
   try {
     bundle = await rollup(config)
