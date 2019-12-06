@@ -21,7 +21,8 @@
     "lint": "tslint",
     "start": "rollup -c -w",
     "test": "jest",
-    "test:ci": "jest --runInBand --coverage"
+    "test:ci": "jest --runInBand --coverage",
+    "prepublishOnly": "run-p build build:types"
   },
   "dependencies": {
     "ajv": "^6.10.2",
