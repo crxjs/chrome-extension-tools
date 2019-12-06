@@ -13,3 +13,7 @@ export function isAsset(
 ): x is OutputChunk {
   return x.type === 'asset'
 }
+
+export function isString(x: any): x is string {
+  return typeof x === 'string'
+}

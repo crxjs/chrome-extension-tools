@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs-extra'
 import cheerio from 'cheerio'
+import { isString } from '../helpers'
 
 export const loadHtml = (filePath: string) => {
   const htmlCode = fs.readFileSync(filePath, 'utf8')
@@ -9,7 +10,9 @@ export const loadHtml = (filePath: string) => {
   return Object.assign($, { filePath })
 }
 
-export const getRelativePath = (filePath: string) => (p: string) => {
+export const getRelativePath = (filePath: string) => (
+  p: string,
+) => {
   const fileDir = path.dirname(filePath)
   const relDir = path.relative(process.cwd(), fileDir)
 
@@ -34,6 +37,7 @@ export const getScriptSrc = (
 ) =>
   getScripts($)
     .map((elem) => $(elem).attr('src'))
+    .filter(isString)
     .map(getRelativePath($.filePath))
 
 /* ----------------- ASSET SCRIPTS ----------------- */
@@ -54,6 +58,7 @@ export const getJsAssets = (
 ) =>
   getAssets($)
     .map((elem) => $(elem).attr('src'))
+    .filter(isString)
     .map(getRelativePath($.filePath))
 
 /* -------------------- css ------------------- */
@@ -74,6 +79,7 @@ export const getCssHrefs = (
 ) =>
   getCss($)
     .map((elem) => $(elem).attr('href'))
+    .filter(isString)
     .map(getRelativePath($.filePath))
 
 /* -------------------- img ------------------- */
@@ -102,5 +108,7 @@ export const getImgSrcs = (
   return [
     ...getImgs($).map((elem) => $(elem).attr('src')),
     ...getFavicons($).map((elem) => $(elem).attr('href')),
-  ].map(getRelativePath($.filePath))
+  ]
+    .filter(isString)
+    .map(getRelativePath($.filePath))
 }
