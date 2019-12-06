@@ -10,3 +10,4 @@ if (process.env.npm_config_argv) {
 
 jest.spyOn(console, 'log')
 jest.spyOn(console, 'error')
+jest.spyOn(console, 'warn')
