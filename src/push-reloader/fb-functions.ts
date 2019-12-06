@@ -13,3 +13,11 @@ export const update = firebase
 export const reload = firebase
   .functions()
   .httpsCallable('reloadClient')
+
+// TODO: Implement "buildStart" Cloud Function on Firebase
+export const buildStart =
+  process.env.NODE_ENV === 'test'
+    ? // Don't stub in tests because firebase is mocked
+      firebase.functions().httpsCallable('buildStart')
+    : // Stub right now b/c it's not implemented
+      async () => {}

@@ -1,6 +1,6 @@
 import { Plugin, OutputAsset } from 'rollup'
 
-import { update, login, reload } from './fb-functions'
+import { update, login, reload, buildStart } from './fb-functions'
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { code as serviceWorkerCode } from 'code ./sw/index.ts'
@@ -47,7 +47,7 @@ export const pushReloader = (
     name: 'chrome-extension-push-reloader',
 
     async buildStart() {
-      /* ----- SIGNAL CLIENTS THAT BUILD HAS STARTED ----- */
+      await buildStart()
     },
 
     async generateBundle(options, bundle) {

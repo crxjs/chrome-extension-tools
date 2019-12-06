@@ -1,32 +1,7 @@
 import { login } from '../fb-functions'
 import { firebase } from '../firebase'
 
-jest.mock('../firebase.ts', () => {
-  const signInAnonymously = jest.fn(() => ({
-    user: { uid: 'fake_uid' },
-  }))
-  const auth = jest.fn(() => ({
-    signInAnonymously,
-  }))
-
-  const httpsCallable = jest.fn()
-  const functions = jest.fn(() => ({
-    httpsCallable,
-  }))
-
-  const initializeApp = jest.fn(() => ({
-    auth,
-    functions,
-  }))
-
-  return {
-    firebase: {
-      initializeApp,
-      auth,
-      functions,
-    },
-  }
-})
+jest.mock('../firebase.ts')
 
 test('signs in anonymously', async () => {
   const result = await login()
