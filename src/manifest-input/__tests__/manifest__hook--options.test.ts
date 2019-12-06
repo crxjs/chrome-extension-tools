@@ -152,11 +152,7 @@ test('should throw if cosmiconfig cannot load manifest file', () => {
     })
   }
 
-  const error = new Error(
-    "ENOENT: no such file or directory, open '/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/not-a-manifest.json'",
-  )
-
-  expect(call).toThrow(error)
+  expect(call).toThrow(/^ENOENT: no such file or directory/)
 })
 
 test('should throw if manifest file is empty', () => {
