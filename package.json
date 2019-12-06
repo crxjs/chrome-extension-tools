@@ -67,7 +67,8 @@
     "typescript": "^3.7.3"
   },
   "peerDependencies": {
-    "rollup": "^1.27.8"
+    "rollup": "^1.27.8",
+    "rollup-plugin-commonjs": "^10.1.0"
   },
   "engines": {
     "node": ">=8.16.0"
