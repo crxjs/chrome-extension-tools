@@ -143,6 +143,7 @@ test('if no input has no html, do nothing', () => {
 })
 
 test('Throws with invalid input type', () => {
+  // eslint-disable-next-line
   const options = { input: () => {} }
 
   const call = () => {
