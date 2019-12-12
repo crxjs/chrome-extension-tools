@@ -126,15 +126,66 @@ test('caches correct inputs & assets', () => {
   expect(cache.scripts).toEqual([assetJs].map(getRelative))
 })
 
-test('if cache.input exists, do nothing', () => {
+test('always parse HTML files', () => {
+  cache.input = [optionsJs, popupHtml]
+
+  const result = plugin.options.call(context, options)
+
+  expect(result).toEqual({
+    input: {
+      background: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/background\.js$/,
+      ),
+      options1: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options1\.js$/,
+      ),
+      options2: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options2\.jsx$/,
+      ),
+      options3: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options3\.ts$/,
+      ),
+      options4: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options4\.tsx$/,
+      ),
+      'popup/popup': expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/popup\/popup\.js$/,
+      ),
+    },
+  })
+})
+
+test.skip('if cache.input exists, skip parsing html files', () => {
   cache.input = [optionsJs]
 
   const result = plugin.options.call(context, options)
 
-  expect(result).toBe(options)
+  // FIXME: remove html files from options
+  expect(result).toEqual({
+    input: {
+      background: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/background\.js$/,
+      ),
+      options1: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options1\.js$/,
+      ),
+      options2: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options2\.jsx$/,
+      ),
+      options3: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options3\.ts$/,
+      ),
+      options4: expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/options4\.tsx$/,
+      ),
+      'popup/popup': expect.stringMatching(
+        /__fixtures__\/extensions\/basic\/popup\/popup\.js$/,
+      ),
+    },
+  })
 })
 
-test('if no input has no html, do nothing', () => {
+test('if input has no html, do nothing', () => {
   const options = { input: [optionsJs] }
 
   const result = plugin.options.call(context, options)
@@ -143,6 +194,7 @@ test('if no input has no html, do nothing', () => {
 })
 
 test('Throws with invalid input type', () => {
+  // eslint-disable-next-line
   const options = { input: () => {} }
 
   const call = () => {
