@@ -126,6 +126,25 @@ test('caches correct inputs & assets', () => {
   expect(cache.scripts).toEqual([assetJs].map(getRelative))
 })
 
+test('always parse HTML files', () => {
+  cache.input = [optionsJs, popupHtml]
+
+  const result = plugin.options.call(context, options)
+
+  expect(result).toEqual({
+    input: {
+      background:
+        '/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js',
+      options1: '__fixtures__/extensions/basic/options1.js',
+      options2: '__fixtures__/extensions/basic/options2.jsx',
+      options3: '__fixtures__/extensions/basic/options3.ts',
+      options4: '__fixtures__/extensions/basic/options4.tsx',
+      'popup/popup':
+        '__fixtures__/extensions/basic/popup/popup.js',
+    },
+  })
+})
+
 test.skip('if cache.input exists, skip parsing html files', () => {
   cache.input = [optionsJs]
 
