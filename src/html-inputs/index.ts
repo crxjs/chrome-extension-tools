@@ -66,7 +66,8 @@ export default function htmlInputs(
     options(options) {
       // Skip if cache.input exists
       // cache is dumped in watchChange hook
-      if (cache.input.length) return options
+      // FIXME: skip HTML parsing if dependencies have not changed
+      // if (cache.input.length) return options
 
       // Parse options.input to array
       let input: string[]
@@ -108,6 +109,8 @@ export default function htmlInputs(
         )
       }
 
+      // TODO: simply remove HTML files from options.input
+      // - Parse HTML and emit chunks and assets in buildStart
       return {
         ...options,
         input: cache.input.reduce(
