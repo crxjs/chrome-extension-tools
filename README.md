@@ -52,10 +52,10 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or 
 $ npm i rollup rollup-plugin-chrome-extension@latest -D
 ```
 
-Install the plugins [Node Resolve](https://www.npmjs.com/package/@rollup/plugin-node-resolve) and [CommonJS](https://github.com/rollup/rollup-plugin-commonjs) if you plan to use npm modules.
+Install the plugins [Node Resolve](https://www.npmjs.com/package/@rollup/plugin-node-resolve) and [CommonJS](https://github.com/rollup/@rollup/plugin-commonjs) if you plan to use npm modules.
 
 ```sh
-$ npm i @rollup/plugin-node-resolve rollup-plugin-commonjs -D
+$ npm i @rollup/plugin-node-resolve @rollup/plugin-commonjs -D
 ```
 
 ## Usage <a name = "usage"></a>
@@ -68,7 +68,7 @@ Create a `rollup.config.js` file in your project root.
 import { rollup } from 'rollup'
 
 import resolve from '@rollup/plugin-node-resolve'
-import commonjs from 'rollup-plugin-commonjs'
+import commonjs from '@rollup/plugin-commonjs'
 
 import { chromeExtension, pushReloader } from 'rollup-plugin-chrome-extension'
 
