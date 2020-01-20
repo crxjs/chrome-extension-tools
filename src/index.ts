@@ -9,6 +9,8 @@ import {
   validateNames as v,
   ValidateNamesPlugin,
 } from './validate-names/index'
+import { readJSONSync } from 'fs-extra'
+import { join } from 'path'
 
 export type ChromeExtensionPlugin = Pick<
   Required<Plugin>,
@@ -47,9 +49,20 @@ export interface ChromeExtensionOptions {
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
 ): ChromeExtensionPlugin => {
+  /* --------------- LOAD PACKAGE.JSON --------------- */
+
+  try {
+    const packageJsonPath = join(process.cwd(), 'package.json')
+    options.pkg = options.pkg || readJSONSync(packageJsonPath)
+  } catch (error) {}
+
+  /* ----------------- SETUP PLUGINS ----------------- */
+
   const manifest = manifestInput(options)
   const html = htmlInputs(manifest)
   const validate = v()
+
+  /* ----------------- RETURN PLUGIN ----------------- */
 
   return {
     name: 'chrome-extension',

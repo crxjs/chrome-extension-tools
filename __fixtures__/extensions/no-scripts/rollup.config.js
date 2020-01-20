@@ -5,8 +5,6 @@ import typescript from '@rollup/plugin-typescript'
 import { chromeExtension } from '../../../src/index'
 import { getExtPath } from '../../utils'
 
-const pkg = require('../../../package.json')
-
 export default {
   input: getExtPath('no-scripts/manifest.json'),
   output: {
@@ -14,7 +12,7 @@ export default {
     format: 'esm',
   },
   plugins: [
-    chromeExtension({ pkg, verbose: false }),
+    chromeExtension({ verbose: false }),
     typescript(),
     resolve(),
     commonjs(),
