@@ -2,6 +2,7 @@ import 'array-flat-polyfill'
 import { readFile } from 'fs-extra'
 import flatten from 'lodash.flatten'
 import { relative } from 'path'
+import prettier from 'prettier'
 import { Plugin } from 'rollup'
 import { not } from '../helpers'
 import { reduceToRecord } from '../manifest-input/reduceToRecord'
@@ -11,7 +12,13 @@ import {
   getJsAssets,
   getScriptSrc,
   loadHtml,
+  mutateScriptElems,
 } from './cheerio'
+
+/** CheerioStatic objects with a file path */
+type CheerioFile = CheerioStatic & {
+  filePath: string
+}
 
 export interface HtmlInputsPluginCache {
   /** Scripts that should not be bundled */
@@ -20,6 +27,8 @@ export interface HtmlInputsPluginCache {
   js: string[]
   /** Absolute paths for HTML files to emit */
   html: string[]
+  /** Html files as Cheerio objects */
+  html$: CheerioFile[]
   /** Image files to emit */
   img: string[]
   /** Stylesheets to emit */
@@ -50,6 +59,7 @@ export default function htmlInputs(
   cache = {
     scripts: [],
     html: [],
+    html$: [],
     js: [],
     css: [],
     img: [],
@@ -66,8 +76,6 @@ export default function htmlInputs(
     options(options) {
       // Skip if cache.input exists
       // cache is dumped in watchChange hook
-      // FIXME: skip HTML parsing if dependencies have not changed
-      // if (cache.input.length) return options
 
       // Parse options.input to array
       let input: string[]
@@ -83,30 +91,38 @@ export default function htmlInputs(
         )
       }
 
+      /* ------------------------------------------------- */
+      /*                 HANDLE HTML FILES                 */
+      /* ------------------------------------------------- */
+
       // Filter htm and html files
       cache.html = input.filter(isHtml)
 
       // If no html files, do nothing
       if (cache.html.length === 0) return options
 
-      /* ------------------------------------------------- */
-      /*                 HANDLE HTML FILES                 */
-      /* ------------------------------------------------- */
+      // If the cache has been dumped, reload from files
+      if (cache.html$.length === 0) {
+        // This is all done once
+        cache.html$ = cache.html.map(loadHtml)
+        // FIXME: not the place to do this
 
-      const html$ = cache.html.map(loadHtml)
+        cache.js = flatten(cache.html$.map(getScriptSrc))
+        cache.css = flatten(cache.html$.map(getCssHrefs))
+        cache.img = flatten(cache.html$.map(getImgSrcs))
+        cache.scripts = flatten(cache.html$.map(getJsAssets))
 
-      cache.js = flatten(html$.map(getScriptSrc))
-      cache.css = flatten(html$.map(getCssHrefs))
-      cache.img = flatten(html$.map(getImgSrcs))
-      cache.scripts = flatten(html$.map(getJsAssets))
+        // Cache jsEntries with existing options.input
+        cache.input = input.filter(not(isHtml)).concat(cache.js)
 
-      // Cache jsEntries with existing options.input
-      cache.input = input.filter(not(isHtml)).concat(cache.js)
+        // Prepare cache.html$ for asset emission
+        cache.html$.forEach(mutateScriptElems)
 
-      if (cache.input.length === 0) {
-        throw new Error(
-          'At least one HTML file must have at least one script.',
-        )
+        if (cache.input.length === 0) {
+          throw new Error(
+            'At least one HTML file must have at least one script.',
+          )
+        }
       }
 
       // TODO: simply remove HTML files from options.input
@@ -128,23 +144,16 @@ export default function htmlInputs(
       const assets = [
         ...cache.css,
         ...cache.img,
-        ...cache.html,
         ...cache.scripts,
       ]
 
-      assets.forEach((asset) => {
+      assets.concat(cache.html).forEach((asset) => {
         this.addWatchFile(asset)
       })
 
-      const loading = assets.map(async (asset) => {
-        let source: string | Buffer
-        let replaced: string | undefined
-        if (asset.endsWith('html')) {
-          source = await readFile(asset, 'utf8')
-          replaced = source.replace(/\.[jt]sx?"/g, '.js"')
-        } else {
-          source = await readFile(asset)
-        }
+      const emitting = assets.map(async (asset) => {
+        // Read these files as Buffers
+        const source = await readFile(asset)
 
         const fileName = relative(
           _options.srcDir as string,
@@ -153,18 +162,36 @@ export default function htmlInputs(
 
         this.emitFile({
           type: 'asset',
-          source: replaced || source,
+          source, // Buffer
           fileName,
         })
       })
 
-      await Promise.all(loading)
+      cache.html$.map(($) => {
+        const source = prettier.format($.html(), {
+          parser: 'html',
+          htmlWhitespaceSensitivity: 'strict',
+        })
+
+        const fileName = relative(
+          _options.srcDir as string,
+          $.filePath,
+        )
+
+        this.emitFile({
+          type: 'asset',
+          source, // String
+          fileName,
+        })
+      })
+
+      await Promise.all(emitting)
     },
 
     watchChange(id) {
-      if (id.endsWith('.html')) {
-        // Dump cache if html file changes
-        cache.input = []
+      if (id.endsWith('.html') || id.endsWith('manifest.json')) {
+        // Dump cache if html file or manifest changes
+        cache.html$ = []
       }
     },
   }

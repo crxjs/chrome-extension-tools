@@ -17,6 +17,7 @@ import {
   faviconPng,
   faviconIco,
 } from '../../../__fixtures__/basic-paths'
+import { loadHtml } from '../cheerio'
 
 const srcDir = join(
   process.cwd(),
@@ -25,6 +26,7 @@ const srcDir = join(
 const cache: HtmlInputsPluginCache = {
   css: [],
   html: [],
+  html$: [],
   img: [],
   input: [],
   js: [],
@@ -45,26 +47,34 @@ beforeEach(() => {
   ]
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
+  cache.html$ = cache.html.map(loadHtml)
   cache.css = [optionsCss]
   cache.img = [optionsPng, optionsJpg, faviconPng, faviconIco]
   cache.scripts = [assetJs]
 })
 
-test('dumps cache.input if id is html file', () => {
-  expect(cache.input.length).toBe(3)
+test('dumps cache.html$ if id is html file', () => {
+  expect(cache.html$.length).toBe(2)
 
   plugin.watchChange.call(context, 'options.html')
 
-  expect(cache.input.length).toBe(0)
+  expect(cache.html$.length).toBe(0)
+})
+
+test('dumps cache.html$ if id is manifest file', () => {
+  expect(cache.html$.length).toBe(2)
+
+  plugin.watchChange.call(context, 'manifest.json')
+
+  expect(cache.html$.length).toBe(0)
 })
 
 test('does nothing if id is not html file', () => {
-  expect(cache.input.length).toBe(3)
+  expect(cache.html$.length).toBe(2)
 
   plugin.watchChange.call(context, 'options.js')
   plugin.watchChange.call(context, 'options.css')
-  plugin.watchChange.call(context, 'manifest.json')
   plugin.watchChange.call(context, 'background.ts')
 
-  expect(cache.input.length).toBe(3)
+  expect(cache.html$.length).toBe(2)
 })

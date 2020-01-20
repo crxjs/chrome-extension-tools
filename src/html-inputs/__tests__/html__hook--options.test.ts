@@ -1,8 +1,12 @@
+import { readFile } from 'fs-extra'
 import { join } from 'path'
+import prettier from 'prettier'
 import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
+  faviconIco,
+  faviconPng,
   optionsCss,
   optionsHtml,
   optionsJpg,
@@ -13,11 +17,12 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
-  faviconPng,
-  faviconIco,
 } from '../../../__fixtures__/basic-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
-import { getRelative } from '../../../__fixtures__/utils'
+import {
+  getExtPath,
+  getRelative,
+} from '../../../__fixtures__/utils'
 import htmlInputs, { HtmlInputsPluginCache } from '../index'
 
 const cheerio = require('../cheerio')
@@ -29,6 +34,7 @@ const srcDir = join(
 const cache: HtmlInputsPluginCache = {
   css: [],
   html: [],
+  html$: [],
   img: [],
   input: [],
   js: [],
@@ -36,6 +42,12 @@ const cache: HtmlInputsPluginCache = {
 }
 
 const plugin = htmlInputs({ srcDir }, cache)
+
+let prettierOptions: prettier.Options
+beforeAll(async () => {
+  prettierOptions =
+    (await prettier.resolveConfig(process.cwd())) || {}
+})
 
 let options: InputOptions
 beforeEach(() => {
@@ -45,6 +57,7 @@ beforeEach(() => {
 
   cache.css = []
   cache.html = []
+  cache.html$ = []
   cache.img = []
   cache.input = []
   cache.js = []
@@ -152,6 +165,32 @@ test('always parse HTML files', () => {
         /__fixtures__\/extensions\/basic\/popup\/popup\.js$/,
       ),
     },
+  })
+})
+
+test('modifies html source', async () => {
+  const files = await Promise.all([
+    await readFile(
+      getExtPath('basic/options-result.html'),
+      'utf8',
+    ),
+    await readFile(
+      getExtPath('basic/popup-result.html'),
+      'utf8',
+    ),
+  ])
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($, i) => {
+    const html = $.html()
+    const result = prettier.format(html, {
+      parser: 'html',
+      ...prettierOptions,
+    })
+    const expected = files[i]
+
+    expect(result).toBe(expected)
   })
 })
 

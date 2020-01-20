@@ -21,14 +21,33 @@ export const getRelativePath = (filePath: string) => (
 
 /* -------------------- SCRIPTS -------------------- */
 
-const getScripts = ($: CheerioStatic) =>
+export const getScriptElems = ($: CheerioStatic) =>
   $('script')
     .not('[data-rollup-asset]')
     .not('[src^="http:"]')
     .not('[src^="https:"]')
     .not('[src^="data:"]')
     .not('[src^="/"]')
-    .toArray()
+
+// Mutative action
+export const mutateScriptElems = (
+  $: CheerioStatic & {
+    filePath: string
+  },
+) => {
+  getScriptElems($)
+    .attr('type', 'module')
+    .attr('src', (i, value) => {
+      const replaced = value.replace(/\.[jt]sx?/g, '.js')
+
+      return replaced
+    })
+
+  return $
+}
+
+export const getScripts = ($: CheerioStatic) =>
+  getScriptElems($).toArray()
 
 export const getScriptSrc = (
   $: CheerioStatic & {
