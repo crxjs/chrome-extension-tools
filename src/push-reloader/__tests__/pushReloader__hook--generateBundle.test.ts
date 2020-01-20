@@ -242,6 +242,12 @@ test('add reloader script to content scripts', () => {
   })
 })
 
+test('does not alter other manifest properties', () => {
+  expect(manifest.content_security_policy!).toBe(
+    "script-src 'self'; object-src 'self'",
+  )
+})
+
 test('Errors if manifest is not in the bundle', async () => {
   expect.assertions(3)
 

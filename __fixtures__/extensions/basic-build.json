@@ -5,30 +5,150 @@
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 60,
+          "end": 20,
           "body": [
             {
-              "type": "ExpressionStatement",
+              "type": "ExportNamedDeclaration",
               "start": 0,
-              "end": 28,
+              "end": 20,
+              "declaration": {
+                "type": "VariableDeclaration",
+                "start": 7,
+                "end": 20,
+                "declarations": [
+                  {
+                    "type": "VariableDeclarator",
+                    "start": 13,
+                    "end": 20,
+                    "id": {
+                      "type": "Identifier",
+                      "start": 13,
+                      "end": 14,
+                      "name": "x"
+                    },
+                    "init": {
+                      "type": "Literal",
+                      "start": 17,
+                      "end": 20,
+                      "value": "x",
+                      "raw": "'x'"
+                    }
+                  }
+                ],
+                "kind": "const"
+              },
+              "specifiers": [],
+              "source": null
+            }
+          ],
+          "sourceType": "module"
+        },
+        "code": "export const x = 'x'",
+        "customTransformCache": false,
+        "dependencies": [],
+        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+        "moduleSideEffects": true,
+        "originalCode": "export const x = 'x'",
+        "originalSourcemap": null,
+        "resolvedIds": {},
+        "sourcemapChain": [],
+        "transformDependencies": []
+      },
+      {
+        "ast": {
+          "type": "Program",
+          "start": 0,
+          "end": 114,
+          "body": [
+            {
+              "type": "ImportDeclaration",
+              "start": 0,
+              "end": 30,
+              "specifiers": [
+                {
+                  "type": "ImportSpecifier",
+                  "start": 9,
+                  "end": 10,
+                  "imported": {
+                    "type": "Identifier",
+                    "start": 9,
+                    "end": 10,
+                    "name": "x"
+                  },
+                  "local": {
+                    "type": "Identifier",
+                    "start": 9,
+                    "end": 10,
+                    "name": "x"
+                  }
+                }
+              ],
+              "source": {
+                "type": "Literal",
+                "start": 18,
+                "end": 30,
+                "value": "./imported",
+                "raw": "'./imported'"
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 34,
+              "end": 48,
               "expression": {
                 "type": "CallExpression",
-                "start": 0,
-                "end": 28,
+                "start": 34,
+                "end": 48,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 0,
-                  "end": 11,
+                  "start": 34,
+                  "end": 45,
                   "object": {
                     "type": "Identifier",
-                    "start": 0,
-                    "end": 7,
+                    "start": 34,
+                    "end": 41,
                     "name": "console"
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 8,
-                    "end": 11,
+                    "start": 42,
+                    "end": 45,
+                    "name": "log"
+                  },
+                  "computed": false
+                },
+                "arguments": [
+                  {
+                    "type": "Identifier",
+                    "start": 46,
+                    "end": 47,
+                    "name": "x"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 52,
+              "end": 80,
+              "expression": {
+                "type": "CallExpression",
+                "start": 52,
+                "end": 80,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 52,
+                  "end": 63,
+                  "object": {
+                    "type": "Identifier",
+                    "start": 52,
+                    "end": 59,
+                    "name": "console"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 60,
+                    "end": 63,
                     "name": "log"
                   },
                   "computed": false
@@ -36,8 +156,8 @@
                 "arguments": [
                   {
                     "type": "Literal",
-                    "start": 12,
-                    "end": 27,
+                    "start": 64,
+                    "end": 79,
                     "value": "background.js",
                     "raw": "'background.js'"
                   }
@@ -46,50 +166,50 @@
             },
             {
               "type": "ExpressionStatement",
-              "start": 32,
-              "end": 60,
+              "start": 84,
+              "end": 112,
               "expression": {
                 "type": "CallExpression",
-                "start": 32,
-                "end": 60,
+                "start": 84,
+                "end": 112,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 32,
-                  "end": 58,
+                  "start": 84,
+                  "end": 110,
                   "object": {
                     "type": "MemberExpression",
-                    "start": 32,
-                    "end": 52,
+                    "start": 84,
+                    "end": 104,
                     "object": {
                       "type": "MemberExpression",
-                      "start": 32,
-                      "end": 46,
+                      "start": 84,
+                      "end": 98,
                       "object": {
                         "type": "Identifier",
-                        "start": 32,
-                        "end": 38,
+                        "start": 84,
+                        "end": 90,
                         "name": "chrome"
                       },
                       "property": {
                         "type": "Identifier",
-                        "start": 39,
-                        "end": 46,
+                        "start": 91,
+                        "end": 98,
                         "name": "storage"
                       },
                       "computed": false
                     },
                     "property": {
                       "type": "Identifier",
-                      "start": 47,
-                      "end": 52,
+                      "start": 99,
+                      "end": 104,
                       "name": "local"
                     },
                     "computed": false
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 53,
-                    "end": 58,
+                    "start": 105,
+                    "end": 110,
                     "name": "clear"
                   },
                   "computed": false
@@ -100,14 +220,22 @@
           ],
           "sourceType": "module"
         },
-        "code": "console.log('background.js')\r\n\r\nchrome.storage.local.clear()",
+        "code": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('background.js')\r\n\r\nchrome.storage.local.clear()\r\n",
         "customTransformCache": false,
-        "dependencies": [],
+        "dependencies": [
+          "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
+        ],
         "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
         "moduleSideEffects": true,
-        "originalCode": "console.log('background.js')\r\n\r\nchrome.storage.local.clear()",
+        "originalCode": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('background.js')\r\n\r\nchrome.storage.local.clear()\r\n",
         "originalSourcemap": null,
-        "resolvedIds": {},
+        "resolvedIds": {
+          "./imported": {
+            "external": false,
+            "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+            "moduleSideEffects": true
+          }
+        },
         "sourcemapChain": [],
         "transformDependencies": []
       },
@@ -115,30 +243,97 @@
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 60,
+          "end": 114,
           "body": [
             {
-              "type": "ExpressionStatement",
+              "type": "ImportDeclaration",
               "start": 0,
-              "end": 25,
+              "end": 30,
+              "specifiers": [
+                {
+                  "type": "ImportSpecifier",
+                  "start": 9,
+                  "end": 10,
+                  "imported": {
+                    "type": "Identifier",
+                    "start": 9,
+                    "end": 10,
+                    "name": "x"
+                  },
+                  "local": {
+                    "type": "Identifier",
+                    "start": 9,
+                    "end": 10,
+                    "name": "x"
+                  }
+                }
+              ],
+              "source": {
+                "type": "Literal",
+                "start": 18,
+                "end": 30,
+                "value": "./imported",
+                "raw": "'./imported'"
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 34,
+              "end": 48,
               "expression": {
                 "type": "CallExpression",
-                "start": 0,
-                "end": 25,
+                "start": 34,
+                "end": 48,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 0,
-                  "end": 11,
+                  "start": 34,
+                  "end": 45,
                   "object": {
                     "type": "Identifier",
-                    "start": 0,
-                    "end": 7,
+                    "start": 34,
+                    "end": 41,
                     "name": "console"
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 8,
-                    "end": 11,
+                    "start": 42,
+                    "end": 45,
+                    "name": "log"
+                  },
+                  "computed": false
+                },
+                "arguments": [
+                  {
+                    "type": "Identifier",
+                    "start": 46,
+                    "end": 47,
+                    "name": "x"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 52,
+              "end": 77,
+              "expression": {
+                "type": "CallExpression",
+                "start": 52,
+                "end": 77,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 52,
+                  "end": 63,
+                  "object": {
+                    "type": "Identifier",
+                    "start": 52,
+                    "end": 59,
+                    "name": "console"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 60,
+                    "end": 63,
                     "name": "log"
                   },
                   "computed": false
@@ -146,8 +341,8 @@
                 "arguments": [
                   {
                     "type": "Literal",
-                    "start": 12,
-                    "end": 24,
+                    "start": 64,
+                    "end": 76,
                     "value": "content.js",
                     "raw": "'content.js'"
                   }
@@ -156,38 +351,38 @@
             },
             {
               "type": "ExpressionStatement",
-              "start": 29,
-              "end": 60,
+              "start": 81,
+              "end": 112,
               "expression": {
                 "type": "CallExpression",
-                "start": 29,
-                "end": 60,
+                "start": 81,
+                "end": 112,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 29,
-                  "end": 58,
+                  "start": 81,
+                  "end": 110,
                   "object": {
                     "type": "MemberExpression",
-                    "start": 29,
-                    "end": 48,
+                    "start": 81,
+                    "end": 100,
                     "object": {
                       "type": "Identifier",
-                      "start": 29,
-                      "end": 35,
+                      "start": 81,
+                      "end": 87,
                       "name": "chrome"
                     },
                     "property": {
                       "type": "Identifier",
-                      "start": 36,
-                      "end": 48,
+                      "start": 88,
+                      "end": 100,
                       "name": "contextMenus"
                     },
                     "computed": false
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 49,
-                    "end": 58,
+                    "start": 101,
+                    "end": 110,
                     "name": "removeAll"
                   },
                   "computed": false
@@ -198,14 +393,22 @@
           ],
           "sourceType": "module"
         },
-        "code": "console.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()",
+        "code": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()\r\n",
         "customTransformCache": false,
-        "dependencies": [],
+        "dependencies": [
+          "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
+        ],
         "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
         "moduleSideEffects": true,
-        "originalCode": "console.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()",
+        "originalCode": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()\r\n",
         "originalSourcemap": null,
-        "resolvedIds": {},
+        "resolvedIds": {
+          "./imported": {
+            "external": false,
+            "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+            "moduleSideEffects": true
+          }
+        },
         "sourcemapChain": [],
         "transformDependencies": []
       },
@@ -709,7 +912,14 @@
         "transformDependencies": []
       }
     ],
-    "plugins": {}
+    "plugins": {
+      "chrome-extension": {},
+      "typescript": {},
+      "node-resolve": {},
+      "commonjs": {},
+      "save-bundle-plugin": {},
+      "Rollup Core": {}
+    }
   },
   "watchFiles": [
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/manifest.json",
@@ -729,12 +939,13 @@
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html",
     "__fixtures__/extensions/basic/asset.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options1.js",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options2.jsx",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",
     "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options4.tsx",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.js"
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.js",
+    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
   ]
 }

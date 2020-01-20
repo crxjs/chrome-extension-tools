@@ -10,5 +10,6 @@
       "css": ["content.css"],
       "matches": ["https://www.google.com/*"]
     }
-  ]
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'"
 }

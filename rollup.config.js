@@ -1,8 +1,8 @@
 /* eslint-env node */
 
-import typescript from 'rollup-plugin-typescript'
+import typescript from '@rollup/plugin-typescript'
 import bundleImports from 'rollup-plugin-bundle-imports'
-import json from 'rollup-plugin-json'
+import json from '@rollup/plugin-json'
 
 const {
   compilerOptions,

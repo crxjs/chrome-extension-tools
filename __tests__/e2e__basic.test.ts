@@ -22,7 +22,7 @@ beforeAll(async () => {
   output = o
 
   if (!process.env.JEST_WATCH) {
-    writeJSON(getExtPath('basic-build.json'), bundle, {
+    await writeJSON(getExtPath('basic-build.json'), bundle, {
       spaces: 2,
     })
   }
@@ -105,6 +105,21 @@ test('Includes content script imports in web_accessible_resources', () => {
       'content.js',
       expect.stringMatching(/imported-.+?\.js/),
     ]),
+  })
+})
+
+test('Includes content_security_policy untouched', () => {
+  const manifestAsset = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
+  const manifestSource = manifestAsset.source as string
+  const manifest: ChromeExtensionManifest = JSON.parse(
+    manifestSource,
+  )
+
+  expect(manifest).toMatchObject({
+    content_security_policy:
+      "script-src 'self'; object-src 'self'",
   })
 })
 

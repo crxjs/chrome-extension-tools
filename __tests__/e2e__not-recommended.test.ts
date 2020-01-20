@@ -1,5 +1,6 @@
 import { getExtPath, byFileName } from '../__fixtures__/utils'
-import { rollup, RollupOutput } from 'rollup'
+import { rollup, RollupOutput, OutputAsset } from 'rollup'
+import { ChromeExtensionManifest } from '../src/manifest'
 
 const { default: config } = require(getExtPath(
   'not-recommended/rollup.config.js',
@@ -32,4 +33,18 @@ test('Handles content scripts with only css', () => {
   const contentCss = output.find(byFileName('content.css'))
 
   expect(contentCss).toBeDefined()
+})
+
+test('Handles CSP in manifest.json', () => {
+  const manifestJson = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
+
+  const manifest = JSON.parse(
+    manifestJson.source as string,
+  ) as ChromeExtensionManifest
+
+  expect(manifest.content_security_policy).toBe(
+    "script-src 'self'; object-src 'self'",
+  )
 })
