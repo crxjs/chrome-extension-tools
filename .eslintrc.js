@@ -19,6 +19,8 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
+    'no-empty': ["error", { "allowEmptyCatch": true }],
+    '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
