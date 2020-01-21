@@ -1,10 +1,14 @@
-import { Plugin, OutputAsset } from 'rollup'
-
-import { update, login, reload, buildStart } from './fb-functions'
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { code as serviceWorkerCode } from 'code ./sw/index.ts'
-import { ChromeExtensionManifest } from '../manifest'
+import { Plugin } from 'rollup'
+import { updateManifest } from '../helpers'
+import {
+  buildStart,
+  login,
+  reload,
+  update,
+} from './fb-functions'
 
 export const loadMessage = `
 DEVELOPMENT build with non-persistent auto-reloader.
@@ -51,15 +55,6 @@ export const pushReloader = (
     },
 
     async generateBundle(options, bundle) {
-      const manifestKey = 'manifest.json'
-      const manifestAsset = bundle[manifestKey] as OutputAsset
-
-      if (!manifestAsset) {
-        this.error(
-          'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?',
-        )
-      }
-
       /* -------------- LOGIN ON FIRST BUILD ------------- */
 
       if (cache.firstRun) {
@@ -84,7 +79,6 @@ export const pushReloader = (
         return this.getFileName(id)
       }
 
-      // TODO: invert this if statement
       if (cache.uid) {
         cache.swPath = emit('reloader-sw.js', serviceWorkerCode)
 
@@ -113,65 +107,58 @@ export const pushReloader = (
 
       /* ---------------- UPDATE MANIFEST ---------------- */
 
-      const manifestSource = manifestAsset.source as string
-      const manifest: ChromeExtensionManifest = JSON.parse(
-        manifestSource,
-      )
+      updateManifest((manifest) => {
+        manifest.description = loadMessage
 
-      manifest.description = loadMessage
+        if (!manifest.background) {
+          manifest.background = {}
+        }
 
-      if (!manifest.background) {
-        manifest.background = {}
-      }
+        if (manifest.background.persistent === undefined) {
+          manifest.background.persistent = false
+        }
 
-      if (manifest.background.persistent === undefined) {
-        manifest.background.persistent = false
-      }
+        const { scripts: bgScripts = [] } = manifest.background
 
-      const { scripts: bgScripts = [] } = manifest.background
+        if (cache.bgScriptPath) {
+          manifest.background.scripts = [
+            cache.bgScriptPath,
+            ...bgScripts,
+          ]
+        } else {
+          this.warn(
+            'Background page reloader script was not emitted.',
+          )
+        }
 
-      if (cache.bgScriptPath) {
-        manifest.background.scripts = [
-          cache.bgScriptPath,
-          ...bgScripts,
-        ]
-      } else {
-        this.warn(
-          'Background page reloader script was not emitted.',
+        const {
+          content_scripts: ctScripts = [],
+          permissions = [],
+        } = manifest
+
+        if (cache.ctScriptPath) {
+          manifest.content_scripts = ctScripts.map(
+            ({ js = [], ...rest }) => ({
+              js: [cache.ctScriptPath!, ...js],
+              ...rest,
+            }),
+          )
+        } else {
+          this.warn(
+            'Content page reloader script was not emitted.',
+          )
+        }
+
+        const perms = new Set(permissions)
+        perms.add('notifications')
+        perms.add(
+          'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
         )
-      }
 
-      const {
-        content_scripts: ctScripts = [],
-        permissions = [],
-      } = manifest
+        manifest.permissions = Array.from(perms)
 
-      if (cache.ctScriptPath) {
-        manifest.content_scripts = ctScripts.map(
-          ({ js = [], ...rest }) => ({
-            js: [cache.ctScriptPath!, ...js],
-            ...rest,
-          }),
-        )
-      } else {
-        this.warn(
-          'Content page reloader script was not emitted.',
-        )
-      }
-
-      const perms = new Set(permissions)
-      perms.add('notifications')
-      perms.add(
-        'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
-      )
-
-      manifest.permissions = Array.from(perms)
-
-      manifestAsset.source = JSON.stringify(
-        manifest,
-        undefined,
-        2,
-      )
+        return manifest
+      }, bundle)
     },
 
     async writeBundle() {

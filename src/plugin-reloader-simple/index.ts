@@ -2,6 +2,7 @@ import { Plugin, EmittedAsset, OutputAsset } from 'rollup'
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { ChromeExtensionManifest } from '../manifest'
+import { updateManifest } from '../helpers'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
@@ -32,17 +33,6 @@ export const simpleReloader = (
     name: 'chrome-extension-simple-reloader',
 
     generateBundle(options, bundle) {
-      const manifestKey = 'manifest.json'
-      const manifestAsset = bundle[manifestKey] as OutputAsset
-
-      if (!manifestAsset) {
-        this.error(
-          'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?',
-        )
-      }
-
-      /* ----------------- Start Reloader -------------------------- */
-
       /* ----------------- Create Client Files -------------------------- */
       const emit = (name: string, source: string) => {
         const id = this.emitFile({
@@ -78,53 +68,45 @@ export const simpleReloader = (
 
       /* ----------------- Update Manifest -------------------------- */
 
-      const manifestSource = manifestAsset.source as string
+      updateManifest((manifest) => {
+        manifest.description = loadMessage
 
-      const manifest: ChromeExtensionManifest = JSON.parse(
-        manifestSource,
-      )
+        if (!manifest.background) {
+          manifest.background = {}
+        }
 
-      manifest.description = loadMessage
+        manifest.background.persistent = true
 
-      if (!manifest.background) {
-        manifest.background = {}
-      }
+        const { scripts: bgScripts = [] } = manifest.background
 
-      manifest.background.persistent = true
+        if (cache.bgScriptPath) {
+          manifest.background.scripts = [
+            cache.bgScriptPath,
+            ...bgScripts,
+          ]
+        } else {
+          throw new Error(
+            'Background page reloader script was not emitted',
+          )
+        }
 
-      const { scripts: bgScripts = [] } = manifest.background
+        const { content_scripts: ctScripts = [] } = manifest
 
-      if (cache.bgScriptPath) {
-        manifest.background.scripts = [
-          cache.bgScriptPath,
-          ...bgScripts,
-        ]
-      } else {
-        throw new Error(
-          'Background page reloader script was not emitted',
-        )
-      }
+        if (cache.ctScriptPath) {
+          manifest.content_scripts = ctScripts.map(
+            ({ js = [], ...rest }) => ({
+              js: [cache.ctScriptPath!, ...js],
+              ...rest,
+            }),
+          )
+        } else {
+          throw new Error(
+            'Content page reloader script was not emitted',
+          )
+        }
 
-      const { content_scripts: ctScripts = [] } = manifest
-
-      if (cache.ctScriptPath) {
-        manifest.content_scripts = ctScripts.map(
-          ({ js = [], ...rest }) => ({
-            js: [cache.ctScriptPath!, ...js],
-            ...rest,
-          }),
-        )
-      } else {
-        throw new Error(
-          'Content page reloader script was not emitted',
-        )
-      }
-
-      manifestAsset.source = JSON.stringify(
-        manifest,
-        undefined,
-        2,
-      )
+        return manifest
+      }, bundle)
     },
   }
 }
