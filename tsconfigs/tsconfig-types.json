@@ -4,13 +4,14 @@
     "declaration": true,
     "declarationDir": "../types",
     "emitDeclarationOnly": true,
-    "noEmit": false
+    "noEmit": false,
+    "rootDir": "../src"
   },
   "include": ["../src"],
   "exclude": [
     "../**/__tests__/**/*",
-    "../src/push-reloader/sw",
-    "../src/push-reloader/client",
+    "../src/plugin-reloader-push/sw",
+    "../src/plugin-reloader-simple/client",
     "../src/manifest-input/browser"
   ],
 }
