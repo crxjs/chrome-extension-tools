@@ -107,58 +107,62 @@ export const pushReloader = (
 
       /* ---------------- UPDATE MANIFEST ---------------- */
 
-      updateManifest((manifest) => {
-        manifest.description = loadMessage
+      updateManifest(
+        (manifest) => {
+          manifest.description = loadMessage
 
-        if (!manifest.background) {
-          manifest.background = {}
-        }
+          if (!manifest.background) {
+            manifest.background = {}
+          }
 
-        if (manifest.background.persistent === undefined) {
-          manifest.background.persistent = false
-        }
+          if (manifest.background.persistent === undefined) {
+            manifest.background.persistent = false
+          }
 
-        const { scripts: bgScripts = [] } = manifest.background
+          const { scripts: bgScripts = [] } = manifest.background
 
-        if (cache.bgScriptPath) {
-          manifest.background.scripts = [
-            cache.bgScriptPath,
-            ...bgScripts,
-          ]
-        } else {
-          this.warn(
-            'Background page reloader script was not emitted.',
+          if (cache.bgScriptPath) {
+            manifest.background.scripts = [
+              cache.bgScriptPath,
+              ...bgScripts,
+            ]
+          } else {
+            this.warn(
+              'Background page reloader script was not emitted.',
+            )
+          }
+
+          const {
+            content_scripts: ctScripts = [],
+            permissions = [],
+          } = manifest
+
+          if (cache.ctScriptPath) {
+            manifest.content_scripts = ctScripts.map(
+              ({ js = [], ...rest }) => ({
+                js: [cache.ctScriptPath!, ...js],
+                ...rest,
+              }),
+            )
+          } else {
+            this.warn(
+              'Content page reloader script was not emitted.',
+            )
+          }
+
+          const perms = new Set(permissions)
+          perms.add('notifications')
+          perms.add(
+            'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
           )
-        }
 
-        const {
-          content_scripts: ctScripts = [],
-          permissions = [],
-        } = manifest
+          manifest.permissions = Array.from(perms)
 
-        if (cache.ctScriptPath) {
-          manifest.content_scripts = ctScripts.map(
-            ({ js = [], ...rest }) => ({
-              js: [cache.ctScriptPath!, ...js],
-              ...rest,
-            }),
-          )
-        } else {
-          this.warn(
-            'Content page reloader script was not emitted.',
-          )
-        }
-
-        const perms = new Set(permissions)
-        perms.add('notifications')
-        perms.add(
-          'https://us-central1-rpce-reloader.cloudfunctions.net/registerToken',
-        )
-
-        manifest.permissions = Array.from(perms)
-
-        return manifest
-      }, bundle)
+          return manifest
+        },
+        bundle,
+        this.error,
+      )
     },
 
     async writeBundle() {

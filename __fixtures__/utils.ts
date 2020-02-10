@@ -1,5 +1,5 @@
 import { resolve } from 'path'
-import { OutputAsset, OutputChunk } from 'rollup'
+import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 
 export const getExtPath = (path: string) =>
   resolve(__dirname, 'extensions', path)
@@ -11,4 +11,24 @@ export const getRelative = (p: string) =>
 export function byFileName(n: string) {
   return ({ fileName }: OutputAsset | OutputChunk) =>
     fileName === n
+}
+
+/**
+ * Get the source of an OutputAsset as a string
+ */
+export const getAssetSource = (
+  key: string,
+  bundle: OutputBundle,
+): string => {
+  const asset = bundle[key] as OutputAsset
+
+  if (!asset) {
+    throw new Error(`Unable to find ${key} in bundle`)
+  }
+
+  if (asset.source instanceof Buffer) {
+    return asset.source.toString('utf8')
+  } else {
+    return asset.source
+  }
 }

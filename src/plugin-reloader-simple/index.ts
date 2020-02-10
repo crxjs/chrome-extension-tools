@@ -1,7 +1,6 @@
-import { Plugin, EmittedAsset, OutputAsset } from 'rollup'
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
-import { ChromeExtensionManifest } from '../manifest'
+import { EmittedAsset, Plugin } from 'rollup'
 import { updateManifest } from '../helpers'
 
 export type SimpleReloaderPlugin = Pick<
@@ -68,45 +67,49 @@ export const simpleReloader = (
 
       /* ----------------- Update Manifest -------------------------- */
 
-      updateManifest((manifest) => {
-        manifest.description = loadMessage
+      updateManifest(
+        (manifest) => {
+          manifest.description = loadMessage
 
-        if (!manifest.background) {
-          manifest.background = {}
-        }
+          if (!manifest.background) {
+            manifest.background = {}
+          }
 
-        manifest.background.persistent = true
+          manifest.background.persistent = true
 
-        const { scripts: bgScripts = [] } = manifest.background
+          const { scripts: bgScripts = [] } = manifest.background
 
-        if (cache.bgScriptPath) {
-          manifest.background.scripts = [
-            cache.bgScriptPath,
-            ...bgScripts,
-          ]
-        } else {
-          throw new Error(
-            'Background page reloader script was not emitted',
-          )
-        }
+          if (cache.bgScriptPath) {
+            manifest.background.scripts = [
+              cache.bgScriptPath,
+              ...bgScripts,
+            ]
+          } else {
+            throw new Error(
+              'Background page reloader script was not emitted',
+            )
+          }
 
-        const { content_scripts: ctScripts = [] } = manifest
+          const { content_scripts: ctScripts = [] } = manifest
 
-        if (cache.ctScriptPath) {
-          manifest.content_scripts = ctScripts.map(
-            ({ js = [], ...rest }) => ({
-              js: [cache.ctScriptPath!, ...js],
-              ...rest,
-            }),
-          )
-        } else {
-          throw new Error(
-            'Content page reloader script was not emitted',
-          )
-        }
+          if (cache.ctScriptPath) {
+            manifest.content_scripts = ctScripts.map(
+              ({ js = [], ...rest }) => ({
+                js: [cache.ctScriptPath!, ...js],
+                ...rest,
+              }),
+            )
+          } else {
+            throw new Error(
+              'Content page reloader script was not emitted',
+            )
+          }
 
-        return manifest
-      }, bundle)
+          return manifest
+        },
+        bundle,
+        this.error,
+      )
     },
   }
 }

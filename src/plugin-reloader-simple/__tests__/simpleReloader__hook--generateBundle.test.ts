@@ -177,7 +177,7 @@ test('Errors if manifest is not in the bundle', async () => {
   delete bundle['manifest.json']
 
   const errorMessage =
-    'No manifest.json in the bundle!\nAre you using the `chromeExtension` Rollup plugin?'
+    'No manifest.json in the rollup output bundle.'
 
   try {
     await plugin.generateBundle.call(
