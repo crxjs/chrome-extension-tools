@@ -620,7 +620,7 @@
     "match_pattern": {
       "type": "string",
       "format": "match-pattern",
-      "pattern": "^((\\*|http|https|file|ftp|chrome-extension):\\/\\/(\\*|\\*\\.[^\\/\\*]+|[^\\/\\*]+)?(\\/.*))|<all_urls>$"
+      "pattern": "^((\\*|http|https|file|ftp|chrome-extension):\\/\\/(\\*|(([^\\/\\*:]+:(\\d{1,5}|\\*)))|(\\*\\.[^\\/\\*\\:]+)|[^\\/\\*\\:]+)?(\\/.*))|<all_urls>$"
     },
     "mime_type": {
       "type": "string",
