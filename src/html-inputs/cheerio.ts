@@ -37,6 +37,8 @@ export const mutateScriptElems = (
 ) => {
   getScriptElems($)
     .attr('type', 'module')
+    // FIXME: @types/cheerio is wrong for AttrFunction: index.d.ts, line 16
+    // declare type AttrFunction = (i: number, currentValue: string) => any;
     .attr('src', (i, value) => {
       const replaced = value.replace(/\.[jt]sx?/g, '.js')
 
