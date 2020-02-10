@@ -1,28 +1,29 @@
+import { writeJSON, readJSON } from 'fs-extra'
 import { RollupOptions } from 'rollup'
 import {
   backgroundJs,
-  contentJs,
-  optionsHtml,
-  popupHtml,
-  manifestJson,
-  srcDir,
   contentCss,
+  contentJs,
+  icon128,
   icon16,
   icon48,
-  icon128,
-  optionsJpg,
+  manifestJson,
   missaaliOtf,
   notoSansBlack,
   notoSansLight,
+  optionsHtml,
+  optionsJpg,
+  popupHtml,
+  srcDir,
 } from '../../../__fixtures__/basic-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
+import { ChromeExtensionManifest } from '../../manifest'
 import {
   explorer,
   manifestInput,
   ManifestInputPluginCache,
 } from '../index'
-import { ChromeExtensionManifest } from '../../manifest'
 
 jest.spyOn(explorer, 'load')
 
@@ -55,6 +56,10 @@ beforeEach(() => {
   cache.input = []
   cache.srcDir = null
   delete cache.manifest
+})
+
+afterAll(async () => {
+  await writeJSON(manifestJson, manifest, { spaces: 2 })
 })
 
 test('throws if input is not a manifest path', () => {
@@ -167,4 +172,22 @@ test('should throw if manifest file is empty', () => {
   )
 
   expect(call).toThrow(error)
+})
+
+test('on second run and not cache.manifest, loads manifest from file system', async () => {
+  const newManifest = {
+    ...manifest,
+    version: '2.0.0',
+  }
+
+  plugin.options.call(context, options)
+
+  await writeJSON(manifestJson, newManifest)
+  delete cache.manifest
+  jest.clearAllMocks()
+
+  plugin.options.call(context, options)
+
+  expect(cache.manifest).not.toEqual(manifest)
+  expect(cache.manifest).toEqual(await readJSON(manifestJson))
 })

@@ -48,7 +48,9 @@ export interface DynamicImportWrapper {
   noWakeEvents?: boolean
 }
 
-export const explorer = cosmiconfigSync('manifest')
+export const explorer = cosmiconfigSync('manifest', {
+  cache: false,
+})
 
 const name = 'manifest-input'
 
@@ -178,7 +180,9 @@ export function manifestInput(
       }
 
       if (cache.input.length === 0) {
-        throw new Error('The manifest must have at least one script or HTML file.')
+        throw new Error(
+          'The manifest must have at least one script or HTML file.',
+        )
       }
 
       // TODO: handle case where no input is returned
@@ -408,6 +412,7 @@ export function manifestInput(
         if (errors) {
           errors.forEach((err) => {
             // FIXME: make a better validation error message
+            // https://github.com/atlassian/better-ajv-errors
             this.warn(JSON.stringify(err, undefined, 2))
           })
         }

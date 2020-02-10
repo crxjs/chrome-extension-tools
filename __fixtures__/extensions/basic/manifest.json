@@ -8,30 +8,43 @@
     "48": "images/icon-main-48.png",
     "128": "images/icon-main-128.png"
   },
-
-  "background": { "scripts": ["background.js"] },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
   "content_scripts": [
     {
-      "js": ["content.js"],
-      "matches": ["https://www.google.com/*"]
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "https://www.google.com/*"
+      ]
     },
     {
-      "js": ["content.js"],
-      "css": ["content.css"],
-      "matches": ["https://www.yahoo.com/*"]
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "matches": [
+        "https://www.yahoo.com/*"
+      ]
     }
   ],
   "options_page": "options.html",
   "browser_action": {
-    "default_icon": { "16": "images/icon-main-16.png" },
+    "default_icon": {
+      "16": "images/icon-main-16.png"
+    },
     "default_popup": "popup/popup.html"
   },
-
   "web_accessible_resources": [
     "options.jpg",
     "fonts/*.ttf",
     "fonts/*.otf"
   ],
-
   "content_security_policy": "script-src 'self'; object-src 'self'"
 }
