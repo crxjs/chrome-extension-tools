@@ -46,6 +46,7 @@
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-json": "^4.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-sucrase": "^3.0.0",
     "@rollup/plugin-typescript": "^3.0.0",
     "@sucrase/jest-plugin": "^2.0.0",
     "@testing-library/dom": "^6.12.2",

@@ -1,6 +1,7 @@
 /* eslint-env node */
 
-import typescript from '@rollup/plugin-typescript'
+// import typescript from '@rollup/plugin-typescript'
+import sucrase from '@rollup/plugin-sucrase'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import json from '@rollup/plugin-json'
 
@@ -10,16 +11,19 @@ const external = Object.keys(dependencies).concat(
   'firebase/app',
   'firebase/auth',
   'firebase/functions',
-  'path'
+  'path',
 )
 
-const {
-  compilerOptions,
-} = require('./tsconfigs/tsconfig-base.json')
+// Was used for typescript plugin
+// const {
+//   compilerOptions,
+// } = require('./tsconfigs/tsconfig-base.json')
 
 const plugins = [
-  typescript(compilerOptions),
   json(),
+  sucrase({
+    transforms: ['typescript'],
+  }),
   bundleImports({
     useVirtualModule: true,
     options: {

@@ -28,8 +28,8 @@ export type ChromeExtensionPlugin = Pick<
   }
 }
 
-export { pushReloader } from './plugin-reloader-push'
-export { simpleReloader } from './plugin-reloader-simple'
+export { pushReloader } from './plugin-reloader-push/index'
+export { simpleReloader } from './plugin-reloader-simple/index'
 
 export interface ChromeExtensionOptions {
   dynamicImportWrapper?: {
