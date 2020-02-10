@@ -2,9 +2,8 @@ import 'array-flat-polyfill'
 import { readFile } from 'fs-extra'
 import flatten from 'lodash.flatten'
 import { relative } from 'path'
-import prettier from 'prettier'
 import { Plugin } from 'rollup'
-import { not } from '../helpers'
+import { formatHtml, not } from '../helpers'
 import { reduceToRecord } from '../manifest-input/reduceToRecord'
 import {
   getCssHrefs,
@@ -16,8 +15,13 @@ import {
 } from './cheerio'
 
 /** CheerioStatic objects with a file path */
-type CheerioFile = CheerioStatic & {
+export type CheerioFile = CheerioStatic & {
   filePath: string
+}
+
+export interface HtmlInputsOptions {
+  /** This will change between builds, so cannot destructure */
+  readonly srcDir: string | null
 }
 
 export interface HtmlInputsPluginCache {
@@ -35,12 +39,14 @@ export interface HtmlInputsPluginCache {
   css: string[]
   /** Cache of last options.input, will have other scripts */
   input: string[]
+  /** Source dir for calculating relative paths */
+  srcDir?: string
 }
 
 export type HtmlInputsPlugin = Pick<
   Required<Plugin>,
   'name' | 'options' | 'buildStart' | 'watchChange'
->
+> & { cache: HtmlInputsPluginCache }
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 
@@ -51,10 +57,7 @@ const name = 'html-inputs'
 /* ============================================ */
 
 export default function htmlInputs(
-  _options: {
-    /** This is a getter, so cannot destructure */
-    readonly srcDir: string | null
-  },
+  htmlInputsOptions: HtmlInputsOptions,
   /** Used for testing */
   cache = {
     scripts: [],
@@ -68,6 +71,7 @@ export default function htmlInputs(
 ): HtmlInputsPlugin {
   return {
     name,
+    cache,
 
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
@@ -105,7 +109,6 @@ export default function htmlInputs(
       if (cache.html$.length === 0) {
         // This is all done once
         cache.html$ = cache.html.map(loadHtml)
-        // FIXME: not the place to do this
 
         cache.js = flatten(cache.html$.map(getScriptSrc))
         cache.css = flatten(cache.html$.map(getCssHrefs))
@@ -130,7 +133,7 @@ export default function htmlInputs(
       return {
         ...options,
         input: cache.input.reduce(
-          reduceToRecord(_options.srcDir),
+          reduceToRecord(htmlInputsOptions.srcDir),
           {},
         ),
       }
@@ -141,6 +144,14 @@ export default function htmlInputs(
     /* ============================================ */
 
     async buildStart() {
+      const { srcDir } = htmlInputsOptions
+
+      if (srcDir) {
+        cache.srcDir = srcDir
+      } else {
+        throw new TypeError('options.srcDir not initialized')
+      }
+
       const assets = [
         ...cache.css,
         ...cache.img,
@@ -154,11 +165,7 @@ export default function htmlInputs(
       const emitting = assets.map(async (asset) => {
         // Read these files as Buffers
         const source = await readFile(asset)
-
-        const fileName = relative(
-          _options.srcDir as string,
-          asset,
-        )
+        const fileName = relative(srcDir, asset)
 
         this.emitFile({
           type: 'asset',
@@ -168,15 +175,8 @@ export default function htmlInputs(
       })
 
       cache.html$.map(($) => {
-        const source = prettier.format($.html(), {
-          parser: 'html',
-          htmlWhitespaceSensitivity: 'strict',
-        })
-
-        const fileName = relative(
-          _options.srcDir as string,
-          $.filePath,
-        )
+        const source = formatHtml($)
+        const fileName = relative(srcDir, $.filePath)
 
         this.emitFile({
           type: 'asset',
