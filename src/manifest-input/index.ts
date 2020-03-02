@@ -190,7 +190,7 @@ export function manifestInput(
       return {
         ...options,
         input: cache.input.reduce(
-          reduceToRecord(cache.srcDir),
+          reduceToRecord.call(this, cache.srcDir),
           {},
         ),
       }
