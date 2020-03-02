@@ -1,13 +1,8 @@
 import { writeJSON } from 'fs-extra'
-import {
-  rollup,
-  RollupBuild,
-  OutputChunk,
-  OutputAsset,
-} from 'rollup'
+import { OutputAsset, OutputChunk, rollup, RollupBuild } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
-import { byFileName, getExtPath } from '../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../src/manifest'
+import { byFileName, getExtPath } from '../__fixtures__/utils'
 
 const { default: config } = require(getExtPath(
   'basic/rollup.config.js',
@@ -16,15 +11,19 @@ const { default: config } = require(getExtPath(
 let bundle: RollupBuild
 let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
 beforeAll(async () => {
-  bundle = await rollup(config)
+  try {
+    bundle = await rollup(config)
 
-  const { output: o } = await bundle.generate(config.output)
-  output = o
+    const { output: o } = await bundle.generate(config.output)
+    output = o
 
-  if (!process.env.JEST_WATCH) {
-    await writeJSON(getExtPath('basic-build.json'), bundle, {
-      spaces: 2,
-    })
+    if (!process.env.JEST_WATCH) {
+      await writeJSON(getExtPath('basic-build.json'), bundle, {
+        spaces: 2,
+      })
+    }
+  } catch (error) {
+    console.error(error)
   }
 })
 
