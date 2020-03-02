@@ -7,14 +7,8 @@ import { isChunk } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
 import { cloneObject } from './cloneObject'
 import { combinePerms } from './manifest-parser/combine'
-import {
-  deriveFiles,
-  derivePermissions,
-} from './manifest-parser/index'
-import {
-  validateManifest,
-  ValidationErrorsArray,
-} from './manifest-parser/validate'
+import { deriveFiles, derivePermissions } from './manifest-parser/index'
+import { validateManifest, ValidationErrorsArray } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
@@ -211,14 +205,14 @@ export function manifestInput(
         cache.assets.map(async (srcPath) => {
           const source = await readAssetAsBuffer(srcPath)
 
+          if (!cache.srcDir) {
+            throw new TypeError('cache.srcDir is undefined')
+          }
+
           return {
             type: 'asset' as 'asset',
             source,
-            fileName: srcPath
-              // Get relative path
-              .replace(cache.srcDir as string, '')
-              // Remove initial slash
-              .replace(/^\//, ''),
+            fileName: path.relative(cache.srcDir, srcPath),
           }
         }),
       )
