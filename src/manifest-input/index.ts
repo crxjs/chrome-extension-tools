@@ -205,14 +205,10 @@ export function manifestInput(
         cache.assets.map(async (srcPath) => {
           const source = await readAssetAsBuffer(srcPath)
 
-          if (!cache.srcDir) {
-            throw new TypeError('cache.srcDir is undefined')
-          }
-
           return {
             type: 'asset' as 'asset',
             source,
-            fileName: path.relative(cache.srcDir, srcPath),
+            fileName: path.relative(cache.srcDir!, srcPath),
           }
         }),
       )
