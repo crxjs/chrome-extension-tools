@@ -1,6 +1,6 @@
-import path from 'path'
-import fs from 'fs-extra'
 import cheerio from 'cheerio'
+import fs from 'fs-extra'
+import path from 'path'
 import { isString } from '../helpers'
 
 export const loadHtml = (filePath: string) => {
@@ -37,9 +37,11 @@ export const mutateScriptElems = (
 ) => {
   getScriptElems($)
     .attr('type', 'module')
-    // FIXME: @types/cheerio is wrong for AttrFunction: index.d.ts, line 16
-    // declare type AttrFunction = (i: number, currentValue: string) => any;
     .attr('src', (i, value) => {
+      // FIXME: @types/cheerio is wrong for AttrFunction: index.d.ts, line 16
+      // declare type AttrFunction = (i: number, currentValue: string) => any;
+      // eslint-disable-next-line
+      // @ts-ignore
       const replaced = value.replace(/\.[jt]sx?/g, '.js')
 
       return replaced

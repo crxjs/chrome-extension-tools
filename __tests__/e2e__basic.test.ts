@@ -10,12 +10,16 @@ const { default: config } = require(getExtPath(
 
 let bundle: RollupBuild
 let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
+let ready: Promise<void>
 beforeAll(async () => {
   try {
     bundle = await rollup(config)
 
-    const { output: o } = await bundle.generate(config.output)
-    output = o
+    ready = bundle
+      .generate(config.output)
+      .then(({ output: o }) => {
+        output = o
+      })
 
     if (!process.env.JEST_WATCH) {
       await writeJSON(getExtPath('basic-build.json'), bundle, {
@@ -25,9 +29,12 @@ beforeAll(async () => {
   } catch (error) {
     console.error(error)
   }
-})
+}, 10000)
 
-test('bundles chunks', () => {
+test('bundles chunks', async () => {
+  expect(ready).toBeInstanceOf(Promise)
+  await ready
+
   // Chunks
   const chunks = output.filter(isChunk)
   expect(chunks.length).toBe(8)
@@ -43,7 +50,10 @@ test('bundles chunks', () => {
 
 test(
   'bundles assets',
-  () => {
+  async () => {
+    expect(ready).toBeDefined()
+    await ready
+
     // Assets
     const assets = output.filter(isAsset)
     expect(assets.length).toBe(18)
@@ -90,7 +100,10 @@ test(
   5 * 60 * 1000,
 )
 
-test('Includes content script imports in web_accessible_resources', () => {
+test('Includes content script imports in web_accessible_resources', async () => {
+  expect(ready).toBeDefined()
+  await ready
+
   const manifestAsset = output.find(
     byFileName('manifest.json'),
   ) as OutputAsset
@@ -107,7 +120,10 @@ test('Includes content script imports in web_accessible_resources', () => {
   })
 })
 
-test('Includes content_security_policy untouched', () => {
+test('Includes content_security_policy untouched', async () => {
+  expect(ready).toBeDefined()
+  await ready
+
   const manifestAsset = output.find(
     byFileName('manifest.json'),
   ) as OutputAsset

@@ -24,4 +24,9 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!lodash-es/.*)',
   ],
+  globals: {
+    'ts-jest': {
+      packageJson: 'package.json',
+    },
+  }
 }
