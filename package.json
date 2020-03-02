@@ -21,7 +21,7 @@
     "lint": "tslint",
     "prepublishOnly": "run-p build build:types",
     "start": "rollup -c -w",
-    "test": "jest",
+    "test": "jest --changedSince=master",
     "test:ci": "jest --runInBand --coverage"
   },
   "dependencies": {
