@@ -7,22 +7,24 @@
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "main": "lib/index-cjs.js",
+  "module": "lib/index-esm.js",
+  "types": "types/index.d.ts",
   "files": [
     "lib",
     "types",
     "manifest.schema.json"
   ],
-  "main": "lib/index-cjs.js",
-  "module": "lib/index-esm.js",
-  "types": "types/index.d.ts",
   "scripts": {
     "build": "rollup -c",
     "build:types": "tsc -p tsconfigs/tsconfig-types.json",
     "lint": "tslint",
     "prepublishOnly": "run-p build build:types",
+    "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "start": "rollup -c -w",
-    "test": "jest --changedSince=master",
-    "test:ci": "jest --runInBand --coverage"
+    "test": "jest",
+    "test:ci": "jest --runInBand --coverage",
+    "test:precommit": "jest --changedSince=master"
   },
   "dependencies": {
     "@bumble/chrome-rxjs": "^0.10.1",
