@@ -7,3 +7,5 @@ types/
 __fixtures__/extensions/basic-dist
 coverage
 jest_html_reporters.html
+package-lock.json
+*.log
