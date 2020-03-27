@@ -6,6 +6,7 @@ import {
   srcDir,
   popupHtml,
   optionsHtml,
+  devtoolsHtml,
   contentCss,
   icon16,
   icon128,
@@ -26,6 +27,7 @@ test('gets correct html', () => {
 
   expect(result.html).toContain(optionsHtml)
   expect(result.html).toContain(popupHtml)
+  expect(result.html).toContain(devtoolsHtml)
 })
 
 test('gets correct css', () => {

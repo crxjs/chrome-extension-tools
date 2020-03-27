@@ -49,3 +49,6 @@ export const popupHtml = getExtPath('basic/popup/popup.html')
 export const popupJs = getExtPath('basic/popup/popup.js')
 
 export const contentCss = getExtPath('basic/content.css')
+
+// Devtools subfolder
+export const devtoolsHtml = getExtPath('basic/devtools/devtools.html')

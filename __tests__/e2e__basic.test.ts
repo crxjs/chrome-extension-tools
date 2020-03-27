@@ -37,8 +37,8 @@ test('bundles chunks', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(chunks.length).toBe(8)
-  // 7 chunks + one shared import (imported.js)
+  expect(chunks.length).toBe(10)
+  // 9 chunks + one shared import (imported.js)
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
   expect(output.find(byFileName('options1.js'))).toBeDefined()
@@ -46,6 +46,8 @@ test('bundles chunks', async () => {
   expect(output.find(byFileName('options3.js'))).toBeDefined()
   expect(output.find(byFileName('options4.js'))).toBeDefined()
   expect(output.find(byFileName('popup/popup.js'))).toBeDefined()
+  expect(output.find(byFileName('devtools/devtools1.js'))).toBeDefined()
+  expect(output.find(byFileName('devtools/devtools2.js'))).toBeDefined()
 })
 
 test(
@@ -56,12 +58,15 @@ test(
 
     // Assets
     const assets = output.filter(isAsset)
-    expect(assets.length).toBe(18)
+    expect(assets.length).toBe(19)
 
-    // 16 assets + 2 wrapper scripts
+    // 17 assets + 2 wrapper scripts
     expect(output.find(byFileName('asset.js'))).toBeDefined()
     expect(
       output.find(byFileName('popup/popup.html')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('devtools/devtools.html')),
     ).toBeDefined()
     expect(
       output.find(byFileName('images/icon-main-16.png')),

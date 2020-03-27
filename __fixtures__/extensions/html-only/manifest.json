@@ -6,5 +6,6 @@
   "browser_action": {
     "default_icon": { "16": "images/icon-main-16.png" },
     "default_popup": "popup/popup.html"
-  }
+  },
+  "devtools_page": "devtools/devtools.html"
 }
