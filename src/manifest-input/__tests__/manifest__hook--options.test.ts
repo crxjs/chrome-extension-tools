@@ -4,6 +4,7 @@ import {
   backgroundJs,
   contentCss,
   contentJs,
+  devtoolsHtml,
   icon128,
   icon16,
   icon48,
@@ -110,6 +111,7 @@ test('sets correct cache values', () => {
       contentJs,
       optionsHtml,
       popupHtml,
+      devtoolsHtml,
     ]),
   )
   expect(cache.manifest).toEqual(manifest)
@@ -147,6 +149,7 @@ test('returns inputRecord', () => {
     content: contentJs,
     options: optionsHtml,
     'popup/popup': popupHtml,
+    'devtools/devtools': devtoolsHtml,
   })
 })
 
