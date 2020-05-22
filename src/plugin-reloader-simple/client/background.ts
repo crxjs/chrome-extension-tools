@@ -22,8 +22,6 @@ const id = setInterval(async () => {
     chrome.runtime.reload()
   }
 
-  console.count('simple reloader fetch')
-
   function handleFetchError(error: any) {
     clearInterval(id)
 
