@@ -8,6 +8,7 @@ test('creates correct plugin', () => {
   expect(reloader).toEqual({
     name: 'chrome-extension-simple-reloader',
     generateBundle: expect.any(Function),
+    writeBundle: expect.any(Function),
   })
 })
 

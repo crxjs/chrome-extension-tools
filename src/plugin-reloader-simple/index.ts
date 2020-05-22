@@ -1,10 +1,9 @@
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
-import { EmittedAsset, Plugin } from 'rollup'
-import { updateManifest } from '../helpers'
-import { writeJson } from 'fs-extra'
 import { outputJson } from 'fs-extra'
 import { join } from 'path'
+import { Plugin } from 'rollup'
+import { updateManifest } from '../helpers'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,

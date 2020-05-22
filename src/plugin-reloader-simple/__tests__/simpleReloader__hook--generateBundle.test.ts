@@ -42,7 +42,7 @@ test('emit assets', async () => {
   expect(context.emitFile).toBeCalledTimes(3)
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
-    fileName: 'assets/timestamp.js',
+    name: 'timestamp.json',
     source: expect.any(String),
   })
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({

@@ -7,8 +7,14 @@ import { isChunk } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
 import { cloneObject } from './cloneObject'
 import { combinePerms } from './manifest-parser/combine'
-import { deriveFiles, derivePermissions } from './manifest-parser/index'
-import { validateManifest, ValidationErrorsArray } from './manifest-parser/validate'
+import {
+  deriveFiles,
+  derivePermissions,
+} from './manifest-parser/index'
+import {
+  validateManifest,
+  ValidationErrorsArray,
+} from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { setupLoaderScript } from './setupLoaderScript'
 import { wakeEvents } from './wakeEvents'
@@ -81,7 +87,7 @@ export function manifestInput(
       permsHash: '',
       srcDir: null,
       input: [],
-      readFile: new Map(),
+      readFile: new Map<string, any>(),
       assetChanged: false,
     } as ManifestInputPluginCache,
   } = {} as {
@@ -206,7 +212,7 @@ export function manifestInput(
           const source = await readAssetAsBuffer(srcPath)
 
           return {
-            type: 'asset' as 'asset',
+            type: 'asset' as const,
             source,
             fileName: path.relative(cache.srcDir!, srcPath),
           }
@@ -240,7 +246,7 @@ export function manifestInput(
       let permissions: string[]
       if (cache.assetChanged && cache.permsHash) {
         // Permissions did not change
-        permissions = JSON.parse(cache.permsHash)
+        permissions = JSON.parse(cache.permsHash) as string[]
 
         cache.assetChanged = false
       } else {
@@ -255,9 +261,13 @@ export function manifestInput(
 
         if (verbose) {
           if (!cache.permsHash) {
-            this.warn(`Detected permissions: ${permissions}`)
+            this.warn(
+              `Detected permissions: ${permissions.toString()}`,
+            )
           } else if (permsHash !== cache.permsHash) {
-            this.warn(`Detected new permissions: ${permissions}`)
+            this.warn(
+              `Detected new permissions: ${permissions.toString()}`,
+            )
           }
         }
 
@@ -395,8 +405,10 @@ export function manifestInput(
           source: manifestJson,
         })
       } catch (error) {
+        // eslint-disable-next-line
         if (error.name !== 'ValidationError') throw error
 
+        // eslint-disable-next-line
         const errors = error.errors as ValidationErrorsArray
 
         if (errors) {
@@ -407,6 +419,7 @@ export function manifestInput(
           })
         }
 
+        // eslint-disable-next-line
         this.error(error.message)
       }
 

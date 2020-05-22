@@ -14,6 +14,7 @@ import { setupMessaging } from './config-worker'
 const onPush = async (event: PushEvent) => {
   if (!event.data) return
 
+  // eslint-disable-next-line
   const { message } = event.data.json().data
 
   const client = await chrome.runtime.getBackgroundClient()
@@ -28,6 +29,7 @@ const onPush = async (event: PushEvent) => {
 
       await self.registration.showNotification(title)
 
+      // eslint-disable-next-line
       return client.postMessage({ message })
     }
 
@@ -36,6 +38,7 @@ const onPush = async (event: PushEvent) => {
 
       await self.registration.showNotification(title)
 
+      // eslint-disable-next-line
       return client.postMessage({ message })
     }
 
@@ -46,6 +49,8 @@ const onPush = async (event: PushEvent) => {
 }
 
 // We're not using this right now.
+// eslint-disable-next-line
+// @ts-ignore
 const onMessage = (event: ExtendableMessageEvent) => {
   console.log(event)
 }

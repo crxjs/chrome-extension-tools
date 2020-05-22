@@ -1,15 +1,15 @@
 import { resolve } from 'path'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 
-export const getExtPath = (path: string) =>
+export const getExtPath = (path: string): string =>
   resolve(__dirname, 'extensions', path)
 
 /**  Make relative to project root */
-export const getRelative = (p: string) =>
+export const getRelative = (p: string): string =>
   p.replace(process.cwd() + '/', '')
 
 export function byFileName(n: string) {
-  return ({ fileName }: OutputAsset | OutputChunk) =>
+  return ({ fileName }: OutputAsset | OutputChunk): boolean =>
     fileName === n
 }
 
