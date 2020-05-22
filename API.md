@@ -41,6 +41,8 @@ export default {
 
 ### `pushReloader`
 
+> The `pushReloader` currently does not work. Use the `simpleReloader` instead. See [this issue](https://github.com/bumble-org/rollup-plugin-chrome-extension/issues/30) for more info. 
+
 | Type       | Call Signature                   |
 | ---------- | -------------------------------- |
 | `function` | `() => RollupPlugin | undefined` |
