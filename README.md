@@ -70,7 +70,7 @@ import { rollup } from 'rollup'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 
-import { chromeExtension, pushReloader } from 'rollup-plugin-chrome-extension'
+import { chromeExtension, simpleReloader } from 'rollup-plugin-chrome-extension'
 
 export default {
   input: 'src/manifest.json',
@@ -81,7 +81,7 @@ export default {
   plugins: [
     // always put chromeExtension() before other plugins
     chromeExtension(),
-    pushReloader(),
+    simpleReloader(),
     // the plugins below are optional
     resolve(),
     commonjs()
@@ -126,7 +126,9 @@ Don't worry, any value in your source manifest will override that value from `pa
 
 Reloading your Chrome extension every time you change your code can be a pain, and if you forget to reload, you're left wondering, "Why isn't this working?"
 
-If you've included the helper plugin `pushReloader` in your config,when Rollup is in watch mode the it will include an auto-reloader script. This feature will reload your extension every time Rollup produces a new build. You should know that `pushReloader` connects to Firebase to do its magic. [Get the details here.](#reloaders) The only time you may need to manually reload is when you first start a watch session.
+If you've included the helper plugin `simpleReloader` in your config, when Rollup is in watch mode the it will include an auto-reloader script. This feature will reload your extension every time Rollup produces a new build.
+
+<!-- You should know that `pushReloader` connects to Firebase to do its magic. [Get the details here.](#reloaders) The only time you may need to manually reload is when you first start a watch session. -->
 
 Ever got the error `"Extension context invalidated"` in your content script? That happens when the extension reloads but the content script doesn't. Our reloader makes sure that doesn't happen by reloading your content scripts when it reloads your extension.
 
@@ -171,6 +173,8 @@ Two of our own plugins:
 
 ## Automatic Reloaders <a name = "reloaders"></a>
 
+> The `pushReloader` currently does not work. Use the `simpleReloader` instead. See [this issue](https://github.com/bumble-org/rollup-plugin-chrome-extension/issues/30) for more info. 
+
 **TLDR;** The `pushReloader` plugin creates system notifications to let you know when the extension will reload. It uses [Firebase](https://firebase.google.com/) and creates an [anonymous account](https://firebase.google.com/docs/auth/web/anonymous-auth) to associate installs with the Rollup watch session. We don't keep any data about you after you exit Rollup.
 
 > Make sure you do a production build before releasing to the Chrome Web Store! The reloader won't hurt anything, but there's no reason to include it.
@@ -179,7 +183,7 @@ There are two reloaders to choose from: a Push notification reloader that is com
 
 You should know that the Push reloader uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) to tell the extension when to reload. It creates an anonymous account for each Rollup watch session, which is deleted when Rollup exits that watch session. This is necessary to associate the extension installation with the watch session.
 
-If you're not comfortable with anonymous accounts, or need to develop without an internet connection, you can [use the simple reloader](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/API#exports-simple-reloader.md). It just checks a timestamp file periodically. It also works between watch sessions.
+If you're not comfortable with anonymous accounts, or need to develop without an internet connection, you can [use the simple reloader](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/API.md#exports-simple-reloader). It just checks a timestamp file periodically. It also works between watch sessions.
 
 <!-- ARTICLE: ES2015 Modules and Chrome Extensions -->
 <!-- ## Script Module Loader <a name = "module-loader"></a> -->

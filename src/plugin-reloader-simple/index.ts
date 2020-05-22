@@ -1,25 +1,27 @@
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
-import { EmittedAsset, Plugin } from 'rollup'
+import { outputJson } from 'fs-extra'
+import { join } from 'path'
+import { Plugin } from 'rollup'
 import { updateManifest } from '../helpers'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
-  'name' | 'generateBundle'
+  'name' | 'generateBundle' | 'writeBundle'
 >
 
 // TODO: factor out this cache
 export interface SimpleReloaderCache {
   bgScriptPath?: string
   ctScriptPath?: string
+  timestampPath?: string
+  outputDir?: string
 }
 
 export const loadMessage: string = `
 DEVELOPMENT build with simple auto-reloader.
 Loaded on ${new Date().toTimeString()}.
 `.trim()
-
-const timestampPath = 'assets/timestamp.js'
 
 export const simpleReloader = (
   cache = {} as SimpleReloaderCache,
@@ -31,7 +33,9 @@ export const simpleReloader = (
   return {
     name: 'chrome-extension-simple-reloader',
 
-    generateBundle(options, bundle) {
+    generateBundle({ dir }, bundle) {
+      cache.outputDir = dir
+
       /* ----------------- Create Client Files -------------------------- */
       const emit = (name: string, source: string) => {
         const id = this.emitFile({
@@ -43,18 +47,15 @@ export const simpleReloader = (
         return this.getFileName(id)
       }
 
-      const timestampFile: EmittedAsset = {
-        fileName: timestampPath,
-        type: 'asset',
-        source: `export default ${Date.now()}`,
-      }
-
-      this.emitFile(timestampFile)
+      cache.timestampPath = emit(
+        'timestamp.json',
+        JSON.stringify(Date.now()),
+      )
 
       cache.bgScriptPath = emit(
         'bg-reloader-client.js',
         bgClientCode
-          .replace('%TIMESTAMP_PATH%', timestampPath)
+          .replace('%TIMESTAMP_PATH%', cache.timestampPath)
           // eslint-disable-next-line quotes
           .replace(`%LOAD_MESSAGE%`, loadMessage),
       )
@@ -110,6 +111,19 @@ export const simpleReloader = (
         bundle,
         this.error,
       )
+
+      // We just need a safe path to write the timestamp
+      delete bundle[cache.timestampPath]
+    },
+    async writeBundle() {
+      try {
+        await outputJson(
+          join(cache.outputDir!, cache.timestampPath!),
+          Date.now(),
+        )
+      } catch (err) {
+        this.warn('The timestamp file was not written')
+      }
     },
   }
 }

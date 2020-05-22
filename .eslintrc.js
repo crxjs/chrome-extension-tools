@@ -19,7 +19,8 @@ module.exports = {
   },
   plugins: ['@typescript-eslint'],
   rules: {
-    'no-empty': ["error", { "allowEmptyCatch": true }],
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    'no-empty': ['error', { allowEmptyCatch: true }],
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -71,5 +72,11 @@ module.exports = {
     'require-atomic-updates': 'off',
     semi: ['warn', 'never'],
     'no-extra-semi': 'off',
+    '@typescript-eslint/no-misused-promises': [
+      'error',
+      {
+        checksVoidReturn: false,
+      },
+    ],
   },
 }

@@ -6,42 +6,39 @@ import { loadMessage, timestampPath } from './load-message'
 // Log load message to browser dev console
 console.log(loadMessage)
 
-let timestamp: string | undefined
+let timestamp: number | undefined
 
-const id = setInterval(() => {
-  fetch(timestampPath)
-    .then(({ body }) => {
-      if (!body) throw new Error('Unable to fetch timestamp')
-
-      const reader = body.getReader()
-
-      return reader.read()
+const id = setInterval(async () => {
+  const t = await fetch(timestampPath)
+    .then((res) => {
+      localStorage.removeItem('chromeExtensionReloader')
+      return res.json()
     })
-    .then(({ value }) => {
-      return new TextDecoder('utf-8').decode(value)
-    })
-    .then((t) => {
-      if (!timestamp) {
-        timestamp = t
-      } else if (timestamp !== t) {
-        chrome.runtime.reload()
-      }
-    })
-    .catch((error) => {
-      clearInterval(id)
+    .catch(handleFetchError)
 
-      const errors = localStorage.chromeExtensionReloader || 0
+  if (typeof timestamp === 'undefined') {
+    timestamp = t
+  } else if (timestamp !== t) {
+    chrome.runtime.reload()
+  }
 
-      // Should reload at least once if fetch fails
-      // - if fetch fails, the timestamp file is absent,
-      //   so the extension code will be different
-      if (errors < 5) {
-        localStorage.chromeExtensionReloader = errors + 1
+  function handleFetchError(error: any) {
+    clearInterval(id)
 
-        chrome.runtime.reload()
-      } else {
-        console.log('AUTO-RELOADER ERROR:')
-        console.error(error)
-      }
-    })
+    const errors = localStorage.chromeExtensionReloader || 0
+
+    if (errors < 5) {
+      localStorage.chromeExtensionReloader = errors + 1
+
+      // Should reload at least once if fetch fails.
+      // The fetch will fail if the timestamp file is absent,
+      // thus the new build does not include the reloader
+      return 0
+    } else {
+      console.log('AUTO-RELOADER ERROR:')
+      console.error(error)
+
+      return timestamp
+    }
+  }
 }, 1000)

@@ -8,8 +8,8 @@
     "jest.setup.ts"
   ],
   "exclude": [
-    "src/push-reloader/sw",
-    "src/push-reloader/client",
+    "src/plugin-reloader-push/sw",
+    "src/plugin-reloader-push/client",
     "src/manifest-input/browser"
   ],
   // "references": [
