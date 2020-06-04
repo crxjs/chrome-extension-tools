@@ -63,7 +63,7 @@ $ npm i @rollup/plugin-node-resolve @rollup/plugin-commonjs -D
 Create a `rollup.config.js` file in your project root.
 
 ```javascript
-// rollup.config.json
+// rollup.config.js
 
 import { rollup } from 'rollup'
 
@@ -89,7 +89,7 @@ export default {
 }
 ```
 
-Add these scripts to your `project.json` file.
+Add these scripts to your `package.json` file.
 
 ```jsonc
 // package.json
