@@ -41,7 +41,7 @@ export default {
 
 ### `pushReloader`
 
-> The `pushReloader` currently does not work. Use the `simpleReloader` instead. See [this issue](https://github.com/bumble-org/rollup-plugin-chrome-extension/issues/30) for more info. 
+> The `pushReloader` currently does not work. Use the `simpleReloader` instead. See [this issue](https://github.com/extend-chrome/rollup-plugin-chrome-extension/issues/30) for more info. 
 
 | Type       | Call Signature                   |
 | ---------- | -------------------------------- |
@@ -73,7 +73,7 @@ When Rollup is not in watch mode, `pushReloader` disables itself.
 
 When active, `pushReloader` will replace the manifest description and log its presence in the background console and every content script.
 
-This reloader uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) to tell the extension to reload. [Click here for more details and privacy info.](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/README#reloaders.md)
+This reloader uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) to tell the extension to reload. [Click here for more details and privacy info.](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/README#reloaders.md)
 
 ### `simpleReloader` <a name = "exports-simple-reloader"></a>
 
