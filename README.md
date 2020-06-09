@@ -1,12 +1,13 @@
 <!--
 Template tags:
-bumble-org
+extend-chrome
 rollup-plugin-chrome-extension
 https://imgur.com/wEXnCYK.png
 -->
 
 <p align="center">
-  <a href="https: //github.com/bumble-org/rollup-plugin-chrome-extension" rel="noopener">
+  <a href="https: //github.com/extend-chrome/rollup-plugin-chrome-extension" rel="noopener">
+  <!-- TODO: add new logo image -->
   <img width=200px height=200px src="https://imgur.com/wEXnCYK.png" alt="rollup-plugin-chrome-extension logo"></a>
 </p>
 
@@ -15,17 +16,18 @@ https://imgur.com/wEXnCYK.png
 <div align="center">
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](http://bit.ly/2qmljDl)
-[![GitHub last commit](https://img.shields.io/github/last-commit/bumble-org/rollup-plugin-chrome-extension.svg)](http://bit.ly/35hLMR8)
-[![CircleCI](https://img.shields.io/circleci/build/github/bumble-org/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba)](https://circleci.com/gh/bumble-org/rollup-plugin-chrome-extension)
-[![Codecov](https://img.shields.io/codecov/c/github/bumble-org/rollup-plugin-chrome-extension)](https://codecov.io/gh/bumble-org/rollup-plugin-chrome-extension)
+[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg)](http://bit.ly/35hLMR8)
+[![CircleCI](https://img.shields.io/circleci/build/github/extend-chrome/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba)](https://circleci.com/gh/extend-chrome/rollup-plugin-chrome-extension)
+[![Codecov](https://img.shields.io/codecov/c/github/extend-chrome/rollup-plugin-chrome-extension)](https://codecov.io/gh/extend-chrome/rollup-plugin-chrome-extension)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
 </div>
 
 <div align="center">
 
-[![Fiverr: We make Chrome extensions](https://img.shields.io/badge/Fiverr%20-We%20make%20Chrome%20extensions-brightgreen.svg)](http://bit.ly/37mZsfA)
-[![ko-fi](https://img.shields.io/badge/ko--fi-Buy%20me%20a%20coffee-ff5d5b)](http://bit.ly/2qmaQYB)
+[![Tutorials on YouTube: Tutorials](https://img.shields.io/badge/Tutorials-YouTube-c4302b.svg)](http://bit.ly/37mZsfA)
+[![Fiverr: We make Chrome extensions](https://img.shields.io/badge/We%20make%20Chrome%20extensions-Fiverr-brightgreen.svg)](http://bit.ly/37mZsfA)
+[![ko-fi](https://img.shields.io/badge/Buy%20us%20a%20tea-ko--fi-29ABE0)](http://bit.ly/2qmaQYB)
 
 </div>
 
@@ -42,7 +44,7 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or 
 - [Getting Started](#getting_started)
 - [Usage](#usage)
 - [Features](#features)
-- [API Documentation](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/API.md)
+- [API Documentation](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/API.md)
 
 ## Getting started <a name = "getting_started"></a>
 
@@ -173,7 +175,7 @@ Two of our own plugins:
 
 ## Automatic Reloaders <a name = "reloaders"></a>
 
-> The `pushReloader` currently does not work. Use the `simpleReloader` instead. See [this issue](https://github.com/bumble-org/rollup-plugin-chrome-extension/issues/30) for more info. 
+> The `pushReloader` currently does not work. Use the `simpleReloader` instead. See [this issue](https://github.com/extend-chrome/rollup-plugin-chrome-extension/issues/30) for more info. 
 
 **TLDR;** The `pushReloader` plugin creates system notifications to let you know when the extension will reload. It uses [Firebase](https://firebase.google.com/) and creates an [anonymous account](https://firebase.google.com/docs/auth/web/anonymous-auth) to associate installs with the Rollup watch session. We don't keep any data about you after you exit Rollup.
 
@@ -183,7 +185,7 @@ There are two reloaders to choose from: a Push notification reloader that is com
 
 You should know that the Push reloader uses [Firebase Cloud Messaging](https://firebase.google.com/docs/cloud-messaging) to tell the extension when to reload. It creates an anonymous account for each Rollup watch session, which is deleted when Rollup exits that watch session. This is necessary to associate the extension installation with the watch session.
 
-If you're not comfortable with anonymous accounts, or need to develop without an internet connection, you can [use the simple reloader](https://github.com/bumble-org/rollup-plugin-chrome-extension/blob/master/API.md#exports-simple-reloader). It just checks a timestamp file periodically. It also works between watch sessions.
+If you're not comfortable with anonymous accounts, or need to develop without an internet connection, you can [use the simple reloader](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/API.md#exports-simple-reloader). It just checks a timestamp file periodically. It also works between watch sessions.
 
 <!-- ARTICLE: ES2015 Modules and Chrome Extensions -->
 <!-- ## Script Module Loader <a name = "module-loader"></a> -->

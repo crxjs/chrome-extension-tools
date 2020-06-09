@@ -3,7 +3,7 @@
   "version": "2.2.1",
   "description": "Build Chrome Extensions with this Rollup plugin.",
   "repository": {
-    "url": "https://github.com/bumble-org/rollup-plugin-chrome-extension.git"
+    "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension.git"
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
@@ -27,7 +27,6 @@
     "test:precommit": "jest --changedSince=master"
   },
   "dependencies": {
-    "@bumble/chrome-rxjs": "^0.10.1",
     "ajv": "^6.11.0",
     "array-flat-polyfill": "^1.0.1",
     "cheerio": "^1.0.0-rc.3",
@@ -40,7 +39,6 @@
     "lodash.get": "^4.4.2",
     "mem": "^6.0.1",
     "prettier": "^1.19.1",
-    "rxjs": "^6.5.4",
     "slash": "^3.0.0"
   },
   "devDependencies": {
