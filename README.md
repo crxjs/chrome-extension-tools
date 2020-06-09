@@ -7,6 +7,7 @@ https://imgur.com/wEXnCYK.png
 
 <p align="center">
   <a href="https: //github.com/extend-chrome/rollup-plugin-chrome-extension" rel="noopener">
+  <!-- TODO: add new logo image -->
   <img width=200px height=200px src="https://imgur.com/wEXnCYK.png" alt="rollup-plugin-chrome-extension logo"></a>
 </p>
 
@@ -24,8 +25,9 @@ https://imgur.com/wEXnCYK.png
 
 <div align="center">
 
-[![Fiverr: We make Chrome extensions](https://img.shields.io/badge/Fiverr%20-We%20make%20Chrome%20extensions-brightgreen.svg)](http://bit.ly/37mZsfA)
-[![ko-fi](https://img.shields.io/badge/ko--fi-Buy%20me%20a%20coffee-ff5d5b)](http://bit.ly/2qmaQYB)
+[![Tutorials on YouTube: Tutorials](https://img.shields.io/badge/Tutorials-YouTube-c4302b.svg)](http://bit.ly/37mZsfA)
+[![Fiverr: We make Chrome extensions](https://img.shields.io/badge/We%20make%20Chrome%20extensions-Fiverr-brightgreen.svg)](http://bit.ly/37mZsfA)
+[![ko-fi](https://img.shields.io/badge/Buy%20us%20a%20tea-ko--fi-29ABE0)](http://bit.ly/2qmaQYB)
 
 </div>
 
