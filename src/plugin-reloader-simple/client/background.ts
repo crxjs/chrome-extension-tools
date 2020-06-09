@@ -11,7 +11,7 @@ let timestamp: number | undefined
 const id = setInterval(async () => {
   const t = await fetch(timestampPath)
     .then((res) => {
-      localStorage.removeItem('chromeExtensionReloader')
+      localStorage.removeItem('chromeExtensionReloaderErrors')
       return res.json()
     })
     .catch(handleFetchError)
@@ -25,17 +25,17 @@ const id = setInterval(async () => {
   function handleFetchError(error: any) {
     clearInterval(id)
 
-    const errors = localStorage.chromeExtensionReloader || 0
+    const errors = localStorage.chromeExtensionReloaderErrors || 0
 
     if (errors < 5) {
-      localStorage.chromeExtensionReloader = errors + 1
+      localStorage.chromeExtensionReloaderErrors = errors + 1
 
       // Should reload at least once if fetch fails.
       // The fetch will fail if the timestamp file is absent,
       // thus the new build does not include the reloader
       return 0
     } else {
-      console.log('AUTO-RELOADER ERROR:')
+      console.log('rollup-plugin-chrome-extension simple reloader error:')
       console.error(error)
 
       return timestamp

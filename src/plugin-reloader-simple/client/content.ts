@@ -1,7 +1,6 @@
 /* eslint-env browser */
 /* globals chrome */
 
-// eslint-disable-next-line quotes
 import { loadMessage } from './load-message'
 
 // Log load message to browser dev console

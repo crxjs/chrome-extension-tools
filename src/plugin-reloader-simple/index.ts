@@ -10,7 +10,6 @@ export type SimpleReloaderPlugin = Pick<
   'name' | 'generateBundle' | 'writeBundle'
 >
 
-// TODO: factor out this cache
 export interface SimpleReloaderCache {
   bgScriptPath?: string
   ctScriptPath?: string
@@ -36,7 +35,8 @@ export const simpleReloader = (
     generateBundle({ dir }, bundle) {
       cache.outputDir = dir
 
-      /* ----------------- Create Client Files -------------------------- */
+      /* --------------- EMIT CLIENT FILES --------------- */
+
       const emit = (name: string, source: string) => {
         const id = this.emitFile({
           type: 'asset',
@@ -53,24 +53,26 @@ export const simpleReloader = (
       )
 
       cache.bgScriptPath = emit(
-        'bg-reloader-client.js',
+        'background-page-reloader.js',
         bgClientCode
           .replace('%TIMESTAMP_PATH%', cache.timestampPath)
-          // eslint-disable-next-line quotes
-          .replace(`%LOAD_MESSAGE%`, loadMessage),
+          .replace('%LOAD_MESSAGE%', loadMessage),
       )
 
       cache.ctScriptPath = emit(
-        'ct-reloader-client.js',
-        // eslint-disable-next-line quotes
-        ctClientCode.replace(`%LOAD_MESSAGE%`, loadMessage),
+        'content-script-reloader.js',
+        ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
       )
 
-      /* ----------------- Update Manifest -------------------------- */
+      /* ---------------- UPDATE MANIFEST ---------------- */
 
       updateManifest(
         (manifest) => {
+          /* ------------------ DESCRIPTION ------------------ */
+
           manifest.description = loadMessage
+
+          /* ---------------- BACKGROUND PAGE ---------------- */
 
           if (!manifest.background) {
             manifest.background = {}
@@ -86,10 +88,10 @@ export const simpleReloader = (
               ...bgScripts,
             ]
           } else {
-            throw new Error(
-              'Background page reloader script was not emitted',
-            )
+            this.error('Unable to emit background page reloader')
           }
+
+          /* ---------------- CONTENT SCRIPTS ---------------- */
 
           const { content_scripts: ctScripts = [] } = manifest
 
@@ -101,9 +103,7 @@ export const simpleReloader = (
               }),
             )
           } else {
-            throw new Error(
-              'Content page reloader script was not emitted',
-            )
+            this.error('Unable to emit content script reloader')
           }
 
           return manifest
@@ -112,17 +112,25 @@ export const simpleReloader = (
         this.error,
       )
 
-      // We just need a safe path to write the timestamp
+      // We'll write this file ourselves, we just need a safe path to write the timestamp
       delete bundle[cache.timestampPath]
     },
     async writeBundle() {
+      /* -------------- WRITE TIMESTAMP FILE ------------- */
+
       try {
         await outputJson(
           join(cache.outputDir!, cache.timestampPath!),
           Date.now(),
         )
       } catch (err) {
-        this.warn('The timestamp file was not written')
+        if (typeof err.message === 'string') {
+          this.error(
+            `Unable to update timestamp file:\n\t${err.message}`,
+          )
+        } else {
+          this.error('Unable to update timestamp file')
+        }
       }
     },
   }
