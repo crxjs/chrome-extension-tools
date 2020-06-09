@@ -1,5 +1,4 @@
 dependencies:
-  '@bumble/chrome-rxjs': 0.10.1
   ajv: 6.12.0
   array-flat-polyfill: 1.0.1
   cheerio: 1.0.0-rc.3
@@ -12,7 +11,6 @@ dependencies:
   lodash.get: 4.4.2
   mem: 6.0.1
   prettier: 1.19.1
-  rxjs: 6.5.4
   slash: 3.0.0
 devDependencies:
   '@bumble/jest-chrome': 0.2.0_jest@25.1.0
@@ -190,6 +188,7 @@ packages:
   /@bumble/chrome-rxjs/0.10.1:
     dependencies:
       rxjs: 6.5.4
+    dev: true
     resolution:
       integrity: sha512-S0ZhMfgaY8XDscJp0urbZjPg7ulhkty+jc8tLLyxR8AZn2lrqrUlsQd7mg3gZtiBx8Ng1TnzLF4URgsu2DYANQ==
   /@bumble/jest-chrome/0.2.0_jest@25.1.0:
@@ -4640,6 +4639,7 @@ packages:
   /rxjs/6.5.4:
     dependencies:
       tslib: 1.11.1
+    dev: true
     engines:
       npm: '>=2.0.0'
     resolution:
@@ -5265,6 +5265,7 @@ packages:
     resolution:
       integrity: sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
   /tslib/1.11.1:
+    dev: true
     resolution:
       integrity: sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
   /tsutils/3.17.1_typescript@3.8.3:
@@ -5647,7 +5648,6 @@ packages:
     resolution:
       integrity: sha1-AwiOnr+edWtpdRYR0qXvWRSCyZU=
 specifiers:
-  '@bumble/chrome-rxjs': ^0.10.1
   '@bumble/jest-chrome': ^0.2.0
   '@rollup/plugin-commonjs': ^11.0.2
   '@rollup/plugin-json': ^4.0.2
@@ -5688,7 +5688,6 @@ specifiers:
   read-pkg-up: ^7.0.1
   rollup: ^1.31.0
   rollup-plugin-bundle-imports: ^1.4.5
-  rxjs: ^6.5.4
   slash: ^3.0.0
   ts-jest: ^25.2.0
   tslib: ^1.10.0
