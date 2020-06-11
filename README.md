@@ -6,7 +6,7 @@ https://imgur.com/wEXnCYK.png
 -->
 
 <p align="center">
-  <a href="https: //github.com/extend-chrome/rollup-plugin-chrome-extension" rel="noopener">
+  <a href="https://github.com/extend-chrome/rollup-plugin-chrome-extension" rel="noopener">
   <!-- TODO: add new logo image -->
   <img width=200px height=200px src="https://imgur.com/wEXnCYK.png" alt="rollup-plugin-chrome-extension logo"></a>
 </p>
