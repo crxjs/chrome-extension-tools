@@ -1,10 +1,3 @@
-<!--
-Template tags:
-extend-chrome
-rollup-plugin-chrome-extension
-https://imgur.com/wEXnCYK.png
--->
-
 <p align="center">
   <a href="https://github.com/extend-chrome/rollup-plugin-chrome-extension" rel="noopener">
   <!-- TODO: add new logo image -->
@@ -15,8 +8,8 @@ https://imgur.com/wEXnCYK.png
 
 <div align="center">
 
-[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](http://bit.ly/2qmljDl)
-[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg)](http://bit.ly/35hLMR8)
+[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
+[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
 [![CircleCI](https://img.shields.io/circleci/build/github/extend-chrome/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba)](https://circleci.com/gh/extend-chrome/rollup-plugin-chrome-extension)
 [![Codecov](https://img.shields.io/codecov/c/github/extend-chrome/rollup-plugin-chrome-extension)](https://codecov.io/gh/extend-chrome/rollup-plugin-chrome-extension)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
@@ -25,9 +18,8 @@ https://imgur.com/wEXnCYK.png
 
 <div align="center">
 
-[![Tutorials on YouTube: Tutorials](https://img.shields.io/badge/Tutorials-YouTube-c4302b.svg)](http://bit.ly/37mZsfA)
-[![Fiverr: We make Chrome extensions](https://img.shields.io/badge/We%20make%20Chrome%20extensions-Fiverr-brightgreen.svg)](http://bit.ly/37mZsfA)
-[![ko-fi](https://img.shields.io/badge/Buy%20us%20a%20tea-ko--fi-29ABE0)](http://bit.ly/2qmaQYB)
+[![Tutorials on YouTube: Tutorials](https://img.shields.io/badge/Tutorials-YouTube-c4302b.svg)](https://www.youtube.com/channel/UCVj3dGw75v8aHFYD6CL1tFg)
+[![ko-fi](https://img.shields.io/badge/Buy%20us%20a%20tea-ko--fi-29ABE0)](https://ko-fi.com/jacksteam)
 
 </div>
 
@@ -168,7 +160,7 @@ Some of our favorites are:
 
 Two of our own plugins:
 
-- Import a module as a string of code to use in `chrome.runtime.executeScript` with [`rollup-plugin-bundle-imports`](http://bit.ly/2O2AKcC)
+- Import a module as a string of code to use in `chrome.runtime.executeScript` with [`rollup-plugin-bundle-imports`](https://www.npmjs.com/package/rollup-plugin-bundle-imports)
 - Empty your output folder before a new build with [`rollup-plugin-empty-dir`](https://www.npmjs.com/package/rollup-plugin-empty-dir)
 
 <!-- ARTICLE: What I Learned Designing a Chrome Extension Reloader -->
