@@ -7,14 +7,8 @@
     "__tests__/**/*",
     "jest.setup.ts"
   ],
-  "exclude": [
-    "src/plugin-reloader-push/sw",
-    "src/plugin-reloader-push/client",
-    "src/manifest-input/browser"
-  ],
+  "exclude": ["src/manifest-input/browser"],
   // "references": [
-  //   { "path": "src/push-reloader/sw" },
-  //   { "path": "src/push-reloader/client" },
   //   { "path": "src/manifest-input/browser" }
   // ]
   "typeAcquisition": { "enable": true }

@@ -1,9 +1,7 @@
 module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/push-reloader/sw/**/*',
     '!src/manifest-input/browser/**/*',
-    '!src/push-reloader/client/**/*',
     '!src/simple-reloader/client/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
@@ -28,5 +26,5 @@ module.exports = {
     'ts-jest': {
       packageJson: 'package.json',
     },
-  }
+  },
 }

@@ -10,8 +10,7 @@
   "include": ["../src"],
   "exclude": [
     "../**/__tests__/**/*",
-    "../src/plugin-reloader-push/sw",
     "../src/plugin-reloader-simple/client",
     "../src/manifest-input/browser"
-  ],
+  ]
 }
