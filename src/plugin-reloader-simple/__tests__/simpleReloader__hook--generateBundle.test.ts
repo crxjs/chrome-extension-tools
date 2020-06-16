@@ -41,11 +41,14 @@ test('emit assets', async () => {
   )
 
   expect(context.emitFile).toBeCalledTimes(3)
+
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
+    // This file is used between builds and has to be "fileName"!
     fileName: timestampFilename,
     source: expect.any(String),
   })
+  
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
     name: backgroundPageReloader,
