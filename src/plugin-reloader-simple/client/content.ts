@@ -4,7 +4,7 @@
 import { loadMessagePlaceholder } from '../CONSTANTS'
 
 // Log load message to browser dev console
-console.log(loadMessagePlaceholder)
+console.log(loadMessagePlaceholder.slice(1, -1))
 
 const { name } = chrome.runtime.getManifest()
 

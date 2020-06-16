@@ -39,10 +39,30 @@ export const simpleReloader = (
     name: 'chrome-extension-simple-reloader',
 
     generateBundle({ dir }, bundle) {
+      const date = new Date()
+      const time = `${date
+        .getFullYear()
+        .toString()
+        .padStart(2, '0')}-${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}-${date
+        .getDate()
+        .toString()
+        .padStart(2, '0')} ${date
+        .getHours()
+        .toString()
+        .padStart(2, '0')}:${date
+        .getMinutes()
+        .toString()
+        .padStart(2, '0')}:${date
+        .getSeconds()
+        .toString()
+        .padStart(2, '0')}`
+
       cache.outputDir = dir
       cache.loadMessage = [
-        'DEVELOPMENT build with simple auto-reloader.',
-        `Loaded on ${new Date().toTimeString()}.`,
+        'DEVELOPMENT build with simple auto-reloader',
+        `[${time}] waiting for changes...`,
       ].join('\n')
 
       /* --------------- EMIT CLIENT FILES --------------- */
@@ -71,14 +91,17 @@ export const simpleReloader = (
         backgroundPageReloader,
         bgClientCode
           .replace(timestampPathPlaceholder, cache.timestampPath)
-          .replace(loadMessagePlaceholder, cache.loadMessage),
+          .replace(
+            loadMessagePlaceholder,
+            JSON.stringify(cache.loadMessage),
+          ),
       )
 
       cache.ctScriptPath = emit(
         contentScriptReloader,
         ctClientCode.replace(
           loadMessagePlaceholder,
-          cache.loadMessage,
+          JSON.stringify(cache.loadMessage),
         ),
       )
 
