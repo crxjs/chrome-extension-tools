@@ -60,7 +60,7 @@ export const context: MockPluginContext = {
   /** @deprecated Use `this.emitFile` instead */
   // @ts-ignore
   emitChunk: null,
-  emitFile: jest.fn(),
+  emitFile: jest.fn(({ name, fileName }) => (name || fileName)!),
   // @ts-ignore
   error: jest.fn((message: string) => {
     throw new Error(message)

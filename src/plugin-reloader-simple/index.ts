@@ -109,7 +109,9 @@ export const simpleReloader = (
               ...bgScripts,
             ]
           } else {
-            this.error('Unable to emit background page reloader')
+            this.error(
+              `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
+            )
           }
 
           /* ---------------- CONTENT SCRIPTS ---------------- */
@@ -124,7 +126,9 @@ export const simpleReloader = (
               }),
             )
           } else {
-            this.error('Unable to emit content script reloader')
+            this.error(
+              `cache.ctScriptPath is ${typeof cache.ctScriptPath}`,
+            )
           }
 
           return manifest

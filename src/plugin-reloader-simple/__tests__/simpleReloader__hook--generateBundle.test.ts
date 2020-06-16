@@ -5,7 +5,11 @@ import {
   OutputAsset,
 } from 'rollup'
 
-import { simpleReloader, _internalCache, SimpleReloaderPlugin } from '..'
+import {
+  simpleReloader,
+  _internalCache,
+  SimpleReloaderPlugin,
+} from '..'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import { ChromeExtensionManifest } from '../../manifest'
@@ -32,6 +36,8 @@ beforeEach(() => {
   plugin = simpleReloader()!
 })
 
+afterEach(jest.clearAllMocks)
+
 test('emit assets', async () => {
   await plugin.generateBundle.call(
     context,
@@ -48,7 +54,7 @@ test('emit assets', async () => {
     fileName: timestampFilename,
     source: expect.any(String),
   })
-  
+
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
     name: backgroundPageReloader,
@@ -193,5 +199,49 @@ test('Errors if manifest is not in the bundle', async () => {
   } catch (error) {
     expect(error).toEqual(new Error(errorMessage))
     expect(context.error).toBeCalledWith(errorMessage)
+  }
+})
+
+test('Errors if cache.bgScriptPath is undefined', async () => {
+  expect.assertions(1)
+
+  // @ts-ignore
+  context.getFileName.mockImplementation((id) => {
+    return id !== backgroundPageReloader ? id : undefined
+  })
+
+  try {
+    await plugin.generateBundle.call(
+      context,
+      options,
+      bundle,
+      false,
+    )
+  } catch (error) {
+    expect(context.error).toBeCalledWith(
+      'cache.bgScriptPath is undefined',
+    )
+  }
+})
+
+test('Errors if cache.ctScriptPath is undefined', async () => {
+  expect.assertions(1)
+
+  // @ts-ignore
+  context.getFileName.mockImplementation((id) => {
+    return id !== contentScriptReloader ? id : undefined
+  })
+
+  try {
+    await plugin.generateBundle.call(
+      context,
+      options,
+      bundle,
+      false,
+    )
+  } catch (error) {
+    expect(context.error).toBeCalledWith(
+      'cache.ctScriptPath is undefined',
+    )
   }
 })

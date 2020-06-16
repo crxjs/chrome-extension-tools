@@ -40,7 +40,7 @@ test('Writes timestamp file', async () => {
   )
 })
 
-test('Handles write errors', async () => {
+test('Handles write errors with message prop', async () => {
   const message = 'ERROR!'
 
   mockOutputJson.mockImplementation(() =>
@@ -54,5 +54,22 @@ test('Handles write errors', async () => {
 
   expect(context.error).toBeCalledWith(
     expect.stringContaining(message),
+  )
+})
+
+test('Handles other write errors', async () => {
+  const message = 'ERROR!'
+
+  mockOutputJson.mockImplementation(() =>
+    Promise.reject(message),
+  )
+
+  // @ts-ignore
+  context.error.mockImplementationOnce(() => {})
+
+  await plugin.writeBundle.call(context, bundle)
+
+  expect(context.error).toBeCalledWith(
+    expect.stringContaining('Unable to update timestamp file'),
   )
 })
