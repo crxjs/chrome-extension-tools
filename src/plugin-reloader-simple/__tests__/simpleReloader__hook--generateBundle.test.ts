@@ -5,11 +5,7 @@ import {
   OutputAsset,
 } from 'rollup'
 
-import {
-  simpleReloader,
-  loadMessage,
-  SimpleReloaderPlugin,
-} from '..'
+import { simpleReloader, _internalCache, SimpleReloaderPlugin } from '..'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import { ChromeExtensionManifest } from '../../manifest'
@@ -51,12 +47,12 @@ test('emit assets', async () => {
   })
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
-    name: 'bg-reloader-client.js',
+    name: backgroundPageReloader,
     source: expect.any(String),
   })
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
-    name: 'ct-reloader-client.js',
+    name: contentScriptReloader,
     source: expect.any(String),
   })
 })
@@ -110,7 +106,7 @@ test('set manifest description', async () => {
     manifestObj.source as string,
   )
 
-  expect(manifest.description).toBe(loadMessage)
+  expect(manifest.description).toBe(_internalCache.loadMessage)
 })
 
 test('add reloader script to background', async () => {

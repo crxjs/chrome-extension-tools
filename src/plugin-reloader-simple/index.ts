@@ -22,12 +22,11 @@ export interface SimpleReloaderCache {
   ctScriptPath?: string
   timestampPath?: string
   outputDir?: string
+  loadMessage?: string
 }
 
-export const loadMessage: string = `
-DEVELOPMENT build with simple auto-reloader.
-Loaded on ${new Date().toTimeString()}.
-`.trim()
+// Used for testing
+export const _internalCache: SimpleReloaderCache = {}
 
 export const simpleReloader = (
   cache = {} as SimpleReloaderCache,
@@ -41,6 +40,10 @@ export const simpleReloader = (
 
     generateBundle({ dir }, bundle) {
       cache.outputDir = dir
+      cache.loadMessage = [
+        'DEVELOPMENT build with simple auto-reloader.',
+        `Loaded on ${new Date().toTimeString()}.`,
+      ].join('\n')
 
       /* --------------- EMIT CLIENT FILES --------------- */
 
@@ -74,13 +77,16 @@ export const simpleReloader = (
         ),
       )
 
+      // Update the exported cache
+      Object.assign(_internalCache, cache)
+
       /* ---------------- UPDATE MANIFEST ---------------- */
 
       updateManifest(
         (manifest) => {
           /* ------------------ DESCRIPTION ------------------ */
 
-          manifest.description = loadMessage
+          manifest.description = cache.loadMessage
 
           /* ---------------- BACKGROUND PAGE ---------------- */
 
@@ -125,9 +131,9 @@ export const simpleReloader = (
       // We'll write this file ourselves, we just need a safe path to write the timestamp
       delete bundle[cache.timestampPath]
     },
-    async writeBundle() {
-      /* -------------- WRITE TIMESTAMP FILE ------------- */
 
+    /* -------------- WRITE TIMESTAMP FILE ------------- */
+    async writeBundle() {
       try {
         await outputJson(
           join(cache.outputDir!, cache.timestampPath!),
