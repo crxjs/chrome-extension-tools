@@ -12,6 +12,7 @@ import { ChromeExtensionManifest } from '../../manifest'
 import {
   backgroundPageReloader,
   contentScriptReloader,
+  timestampFilename,
 } from '../CONSTANTS'
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
@@ -42,7 +43,7 @@ test('emit assets', async () => {
   expect(context.emitFile).toBeCalledTimes(3)
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
-    name: 'timestamp.json',
+    fileName: timestampFilename,
     source: expect.any(String),
   })
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({

@@ -47,10 +47,14 @@ export const simpleReloader = (
 
       /* --------------- EMIT CLIENT FILES --------------- */
 
-      const emit = (name: string, source: string) => {
+      const emit = (
+        name: string,
+        source: string,
+        isFileName?: boolean,
+      ) => {
         const id = this.emitFile({
           type: 'asset',
-          name,
+          [isFileName ? 'fileName' : 'name']: name,
           source,
         })
 
@@ -60,6 +64,7 @@ export const simpleReloader = (
       cache.timestampPath = emit(
         timestampFilename,
         JSON.stringify(Date.now()),
+        true,
       )
 
       cache.bgScriptPath = emit(
