@@ -1,10 +1,10 @@
 /* eslint-env browser */
 /* globals chrome */
 
-import { loadMessage } from './load-message'
+import { loadMessagePlaceholder } from '../CONSTANTS'
 
 // Log load message to browser dev console
-console.log(loadMessage)
+console.log(loadMessagePlaceholder)
 
 const { name } = chrome.runtime.getManifest()
 

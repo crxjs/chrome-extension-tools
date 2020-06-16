@@ -13,6 +13,10 @@ import {
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import { ChromeExtensionManifest } from '../../manifest'
+import {
+  backgroundPageReloader,
+  contentScriptReloader,
+} from '../CONSTANTS'
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
 

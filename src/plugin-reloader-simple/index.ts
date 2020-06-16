@@ -4,6 +4,13 @@ import { outputJson } from 'fs-extra'
 import { join } from 'path'
 import { Plugin } from 'rollup'
 import { updateManifest } from '../helpers'
+import {
+  backgroundPageReloader,
+  contentScriptReloader,
+  timestampPathPlaceholder,
+  loadMessagePlaceholder,
+  timestampFilename,
+} from './CONSTANTS'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
@@ -48,20 +55,23 @@ export const simpleReloader = (
       }
 
       cache.timestampPath = emit(
-        'timestamp.json',
+        timestampFilename,
         JSON.stringify(Date.now()),
       )
 
       cache.bgScriptPath = emit(
-        'background-page-reloader.js',
+        backgroundPageReloader,
         bgClientCode
-          .replace('%TIMESTAMP_PATH%', cache.timestampPath)
-          .replace('%LOAD_MESSAGE%', loadMessage),
+          .replace(timestampPathPlaceholder, cache.timestampPath)
+          .replace(loadMessagePlaceholder, cache.loadMessage),
       )
 
       cache.ctScriptPath = emit(
-        'content-script-reloader.js',
-        ctClientCode.replace('%LOAD_MESSAGE%', loadMessage),
+        contentScriptReloader,
+        ctClientCode.replace(
+          loadMessagePlaceholder,
+          cache.loadMessage,
+        ),
       )
 
       /* ---------------- UPDATE MANIFEST ---------------- */
