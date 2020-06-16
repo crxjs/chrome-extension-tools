@@ -7,7 +7,7 @@ import {
 } from '../CONSTANTS'
 
 // Log load message to browser dev console
-console.log(loadMessagePlaceholder)
+console.log(loadMessagePlaceholder.slice(1, -1))
 
 let timestamp: number | undefined
 
