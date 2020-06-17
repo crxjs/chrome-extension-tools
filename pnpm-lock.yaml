@@ -12,7 +12,6 @@ dependencies:
   prettier: 1.19.1
   slash: 3.0.0
 devDependencies:
-  '@bumble/jest-chrome': 0.2.0_jest@25.1.0
   '@rollup/plugin-commonjs': 11.0.2_rollup@1.32.0
   '@rollup/plugin-json': 4.0.2_rollup@1.32.0
   '@rollup/plugin-node-resolve': 7.1.1_rollup@1.32.0
@@ -35,6 +34,7 @@ devDependencies:
   '@typescript-eslint/parser': 2.21.0_eslint@6.8.0+typescript@3.8.3
   eslint: 6.8.0
   jest: 25.1.0
+  jest-chrome: 0.6.0_jest@25.1.0
   jest-html-reporters: 1.2.1
   npm-run-all: 4.1.5
   read-pkg-up: 7.0.1
@@ -184,23 +184,6 @@ packages:
     dev: true
     resolution:
       integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
-  /@bumble/chrome-rxjs/0.10.1:
-    dependencies:
-      rxjs: 6.5.4
-    dev: true
-    resolution:
-      integrity: sha512-S0ZhMfgaY8XDscJp0urbZjPg7ulhkty+jc8tLLyxR8AZn2lrqrUlsQd7mg3gZtiBx8Ng1TnzLF4URgsu2DYANQ==
-  /@bumble/jest-chrome/0.2.0_jest@25.1.0:
-    dependencies:
-      '@bumble/chrome-rxjs': 0.10.1
-      '@types/chrome': 0.0.92
-      jest: 25.1.0
-      rxjs: 6.5.4
-    dev: true
-    peerDependencies:
-      jest: ^24.9.0
-    resolution:
-      integrity: sha512-GpkPuJwD4wFQrbnNhtoRJYY2zUszLF7bz56EBv9okBt896aQw4fbR5n2GoCbepVFoON7sjMRZwaZOEZv0NY0Zg==
   /@cnakazawa/watch/1.0.4:
     dependencies:
       exec-sh: 0.3.4
@@ -568,12 +551,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-bSbnU/D4yzFdzLpp3+rcDj0aQQMIRUBNJU7azPxdqMpnexjUSvGJyDuOBQBHeOZh1mMKgsJm6Dy+LLh80Ew4tQ==
-  /@types/chrome/0.0.92:
+  /@types/chrome/0.0.114:
     dependencies:
       '@types/filesystem': 0.0.29
+      '@types/har-format': 1.2.4
     dev: true
     resolution:
-      integrity: sha512-bTv1EljZ03bexRJwS5FwSZmrudtw+QNbzwUY2sxVtXWgtxk752G4I2owhZ+Mlzbf3VKvG+rBYSw/FnvzuZ4xOA==
+      integrity: sha512-i7qRr74IrxHtbnrZSKUuP5Uvd5EOKwlwJq/yp7+yTPihOXnPhNQO4Z5bqb1XTnrjdbUKEJicaVVbhcgtRijmLA==
   /@types/chrome/0.0.93:
     dependencies:
       '@types/filesystem': 0.0.29
@@ -624,6 +608,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-1Bh06cbWJUHMC97acuD6UMG29nMt0Aqz1vF3guLfG+kHHJhy3AyohZFFxYk2f7Q1SQIrNwvncxAE0N/9s70F2w==
+  /@types/har-format/1.2.4:
+    dev: true
+    resolution:
+      integrity: sha512-iUxzm1meBm3stxUMzRqgOVHjj4Kgpgu5w9fm4X7kPRfSgVRzythsucEN7/jtOo8SQzm+HfcxWWzJS0mJDH/3DQ==
   /@types/istanbul-lib-coverage/2.0.1:
     dev: true
     resolution:
@@ -2581,6 +2569,15 @@ packages:
       node: '>= 8.3'
     resolution:
       integrity: sha512-bdL1aHjIVy3HaBO3eEQeemGttsq1BDlHgWcOjEOIAcga7OOEGWHD2WSu8HhL7I1F0mFFyci8VKU4tRNk+qtwDA==
+  /jest-chrome/0.6.0_jest@25.1.0:
+    dependencies:
+      '@types/chrome': 0.0.114
+      jest: 25.1.0
+    dev: true
+    peerDependencies:
+      jest: ^24.9.0
+    resolution:
+      integrity: sha512-qrvxU7MUJHH9ApN5iFejh0+DtsdRnkQefxaDZMfHuo39M/+y3mtp1qE2fjn9IYpO2OqkXuEYUjZwqAWos8QVwQ==
   /jest-cli/25.1.0:
     dependencies:
       '@jest/core': 25.1.0
@@ -5019,7 +5016,6 @@ packages:
     resolution:
       integrity: sha512-T39FNN1b6hCW4SOIk1XyTOWxtXdcen0t+XYrysQmChzSipvhBO8Bj0nK1ozAasdk24dNWuMZvr4k24nz+8HHLg==
 specifiers:
-  '@bumble/jest-chrome': ^0.2.0
   '@rollup/plugin-commonjs': ^11.0.2
   '@rollup/plugin-json': ^4.0.2
   '@rollup/plugin-node-resolve': ^7.1.1
@@ -5048,6 +5044,7 @@ specifiers:
   fs-extra: ^8.1.0
   glob: ^7.1.6
   jest: ^25.1.0
+  jest-chrome: ^0.6.0
   jest-html-reporters: ^1.2.1
   lodash.difference: ^4.5.0
   lodash.flatten: ^4.4.0

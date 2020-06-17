@@ -1,4 +1,4 @@
-import { code as script } from 'code ./browser/dynamicImportWrapper.ts'
+import { code as script } from 'code ./browser/explicitImportWrapper.ts'
 import { relative } from 'path'
 import slash from 'slash'
 
