@@ -1,5 +1,5 @@
 import { chrome } from 'jest-chrome'
-import {defer} from './defer'
+import { defer } from './defer'
 Object.assign(global, { chrome })
 
 jest.mock('./placeholders')
@@ -29,6 +29,15 @@ test('delays events before delay resolves', async () => {
 })
 
 test('captures all events', () => {
+  /* --------------- DEPRECATED EVENTS --------------- */
+
+  // @ts-ignore
+  expect(chrome.extension.onRequest.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.extension.onRequestExternal.__isCapturedEvent).toBeUndefined()
+
+  /* ------------------ VALID EVENTS ----------------- */
+
   // @ts-ignore
   expect(chrome.alarms.onAlarm.__isCapturedEvent).toBe(true)
   // @ts-ignore
@@ -77,10 +86,6 @@ test('captures all events', () => {
   expect(chrome.downloads.onDeterminingFilename.__isCapturedEvent).toBe(true)
   // @ts-ignore
   expect(chrome.downloads.onErased.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.extension.onRequest.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.extension.onRequestExternal.__isCapturedEvent).toBe(true)
   // @ts-ignore
   expect(chrome.fileBrowserHandler.onExecute.__isCapturedEvent).toBe(true)
   // @ts-ignore
@@ -331,5 +336,3 @@ test('captures all events', () => {
   // @ts-ignore
   expect(chrome.windows.onRemoved.__isCapturedEvent).toBe(true)
 })
-
-

@@ -12,6 +12,8 @@ export interface DynamicImportWrapperOptions {
   eventDelay?: number
   /** Limit which wake events to capture. Use if the default event discovery is too slow. */
   wakeEvents?: string[]
+  /** API namespaces to exclude from automatic detection */
+  excludeNames?: string[]
 }
 
 // FEATURE: add static code analysis for wake events
@@ -19,6 +21,7 @@ export interface DynamicImportWrapperOptions {
 export function prepImportWrapperScript({
   eventDelay = 0,
   wakeEvents = [],
+  excludeNames = ['extension'],
 }: DynamicImportWrapperOptions) {
   const delay = JSON.stringify(eventDelay)
   const events = wakeEvents.length
@@ -26,10 +29,11 @@ export function prepImportWrapperScript({
         wakeEvents.map((ev) => ev.replace(/^chrome\./, '')),
       )
     : false
+  const exclude = JSON.stringify(excludeNames)
 
   const script = (events
     ? explicitScript.replace('%EVENTS%', events)
-    : implicitScript
+    : implicitScript.replace('%EXCLUDE%', exclude)
   ).replace('%DELAY%', delay)
 
   return script

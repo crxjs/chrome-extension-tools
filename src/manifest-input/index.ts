@@ -314,7 +314,10 @@ export function manifestInput(
             (scriptPath: string) => {
               const source = contentScriptWrapper.replace(
                 '%PATH%',
-                scriptPath,
+                // Fix path slashes to support Windows
+                JSON.stringify(
+                  slash(relative('assets', scriptPath)),
+                ),
               )
 
               const assetId = this.emitFile({
@@ -333,7 +336,9 @@ export function manifestInput(
               typeof js === 'undefined'
                 ? rest
                 : {
-                    js: js.map(memoizedEmitter),
+                    js: js
+                      .map((p) => p.replace(/\.ts$/, '.js'))
+                      .map(memoizedEmitter),
                     ...rest,
                   },
           )
@@ -375,7 +380,9 @@ export function manifestInput(
                 wrapperScript.replace(
                   '%PATH%',
                   // Fix path slashes to support Windows
-                  slash(relative('assets', scriptPath)),
+                  JSON.stringify(
+                    slash(relative('assets', scriptPath)),
+                  ),
                 )
 
               const assetId = this.emitFile({
