@@ -1,5 +1,5 @@
-import { code as explicitScript } from 'code ./browser/explicitImportWrapper.ts'
-import { code as implicitScript } from 'code ./browser/implicitImportWrapper.ts'
+import { code as explicitScript } from 'code ./browser/importWrapper--explicit.ts'
+import { code as implicitScript } from 'code ./browser/importWrapper--implicit.ts'
 
 /**
  * This options object allows fine-tuning of the dynamic import wrapper.
