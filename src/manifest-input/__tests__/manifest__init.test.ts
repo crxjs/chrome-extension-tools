@@ -1,24 +1,46 @@
-import { manifestInput, DynamicImportWrapper } from '../index'
+import { manifestInput } from '../index'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { RollupOptions } from 'rollup'
+import { DynamicImportWrapperOptions } from '../dynamicImportWrapper'
 
-const sls = require('../setupLoaderScript')
-jest.spyOn(sls, 'setupLoaderScript')
-const { setupLoaderScript } = sls
+const diw = require('../dynamicImportWrapper')
+jest.spyOn(diw, 'prepImportWrapperScript')
+const { prepImportWrapperScript } = diw
 
-test('sets up loader script', () => {
-  const dynamicImportWrapper: DynamicImportWrapper = {
-    wakeEvents: [
-      'chrome.runtime.onMessage',
-      'chrome.tabs.onUpdated',
-    ],
+test('sets up explicit import wrapper script', () => {
+  const dynamicImportWrapper: DynamicImportWrapperOptions = {
+    wakeEvents: ['runtime.onInstalled', 'tabs.onUpdated'],
   }
 
   manifestInput({ dynamicImportWrapper })
 
-  expect(setupLoaderScript).toBeCalled()
-  expect(setupLoaderScript).toBeCalledWith(dynamicImportWrapper)
+  expect(prepImportWrapperScript).toBeCalledTimes(1)
+  expect(prepImportWrapperScript).toBeCalledWith(
+    dynamicImportWrapper,
+  )
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining('BUNDLE IMPORTS STUB'),
+  )
+
+  // TODO: check for static replacements
+})
+
+test('sets up explicit import wrapper script', () => {
+  const dynamicImportWrapper: DynamicImportWrapperOptions = {}
+
+  manifestInput({ dynamicImportWrapper })
+
+  expect(prepImportWrapperScript).toBeCalled()
+  expect(prepImportWrapperScript).toBeCalledWith(
+    dynamicImportWrapper,
+  )
+
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining('BUNDLE IMPORTS STUB'),
+  )
+
+  // TODO: check for static replacements
 })
 
 test('returns plugin with srcDir getter', () => {

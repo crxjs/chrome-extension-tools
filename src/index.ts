@@ -11,6 +11,7 @@ import {
 } from './validate-names/index'
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
+import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
 
 export type ChromeExtensionPlugin = Pick<
   Required<Plugin>,
@@ -31,11 +32,7 @@ export type ChromeExtensionPlugin = Pick<
 export { simpleReloader } from './plugin-reloader-simple/index'
 
 export interface ChromeExtensionOptions {
-  dynamicImportWrapper?: {
-    // TODO: Add dynamic or static event detection
-    wakeEvents?: string[]
-    eventDelay?: number | false
-  }
+  dynamicImportWrapper?: DynamicImportWrapperOptions
   verbose?: boolean
   pkg?: {
     description: string
