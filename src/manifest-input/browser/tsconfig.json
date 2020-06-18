@@ -4,5 +4,5 @@
   "compilerOptions": {
     "lib": ["es2017", "dom"],
   },
-  "include": ["./*.ts"]
+  "include": ["./**/*.ts"]
 }

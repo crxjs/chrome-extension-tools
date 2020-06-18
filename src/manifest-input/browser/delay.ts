@@ -1,6 +1,5 @@
-
-export function delay<T>(ms: string) {
-  return (x: T) => new Promise<T>((resolve) => {
-    setTimeout(resolve, parseInt(ms), x);
-  });
+export function delay<T>(ms: number) {
+  return new Promise<T>((resolve) => {
+    setTimeout(resolve, ms)
+  })
 }
