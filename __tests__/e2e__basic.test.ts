@@ -10,8 +10,6 @@ let bundle: RollupBuild
 let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
 let ready: Promise<void>
 beforeAll(async () => {
-  // TODO: make live bundle imports stub
-  // __fixtures__/bundle-imports-stub/rollup.config.js
   try {
     bundle = await rollup(config)
 

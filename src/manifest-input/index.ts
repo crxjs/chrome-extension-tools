@@ -183,8 +183,10 @@ export function manifestInput(
         )
       }
 
-      // TODO: handle case where no input is returned
-      // - Error: "You must supply options.input to rollup"
+      // TODO: consider using this.emitFile in buildStart instead
+      //  - the input record is unusual, but would this be more unusual?
+      //  - would need to put something here, can't return an empty input
+      //    - maybe a dummy file to remove in generateBundle?
       return {
         ...options,
         input: cache.input.reduce(
