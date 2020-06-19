@@ -8,6 +8,8 @@ const diw = require('../dynamicImportWrapper')
 jest.spyOn(diw, 'prepImportWrapperScript')
 const { prepImportWrapperScript } = diw
 
+afterEach(jest.clearAllMocks)
+
 test('sets up explicit import wrapper script', () => {
   const dynamicImportWrapper: DynamicImportWrapperOptions = {
     wakeEvents: ['runtime.onInstalled', 'tabs.onUpdated'],
@@ -19,14 +21,45 @@ test('sets up explicit import wrapper script', () => {
   expect(prepImportWrapperScript).toBeCalledWith(
     dynamicImportWrapper,
   )
+
+  // Is stubbed wrapper script
   expect(prepImportWrapperScript).toReturnWith(
     expect.stringContaining('BUNDLE IMPORTS STUB'),
   )
+  /* -------------- STATIC REPLACEMENTS -------------- */
 
-  // TODO: check for static replacements
+  // %DELAY% should ALWAYS be replaced
+  expect(prepImportWrapperScript).not.toReturnWith(
+    expect.stringContaining('%DELAY%'),
+  )
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining(JSON.stringify(0)),
+  )
+
+  // %PATH% should NEVER be replaced at this stage
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining('%PATH%'),
+  )
+
+  /* ------------ CONDITIONAL REPLACEMENTS ----------- */
+
+  // %EVENTS% should be replaced in explicit wrapper
+  expect(prepImportWrapperScript).not.toReturnWith(
+    expect.stringContaining('%EVENTS%'),
+  )
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining(
+      JSON.stringify(dynamicImportWrapper.wakeEvents),
+    ),
+  )
+
+  // %EXCLUDE% should NOT be replaced in explicit wrapper
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining('%EXCLUDE%'),
+  )
 })
 
-test('sets up explicit import wrapper script', () => {
+test('sets up implicit import wrapper script', () => {
   const dynamicImportWrapper: DynamicImportWrapperOptions = {}
 
   manifestInput({ dynamicImportWrapper })
@@ -36,11 +69,39 @@ test('sets up explicit import wrapper script', () => {
     dynamicImportWrapper,
   )
 
+  // Is stubbed wrapper script
   expect(prepImportWrapperScript).toReturnWith(
     expect.stringContaining('BUNDLE IMPORTS STUB'),
   )
+  /* -------------- STATIC REPLACEMENTS -------------- */
 
-  // TODO: check for static replacements
+  // %DELAY% should ALWAYS be replaced
+  expect(prepImportWrapperScript).not.toReturnWith(
+    expect.stringContaining('%DELAY%'),
+  )
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining(JSON.stringify(0)),
+  )
+
+  // %PATH% should NEVER be replaced at this stage
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining('%PATH%'),
+  )
+
+  /* ------------ CONDITIONAL REPLACEMENTS ----------- */
+
+  // %EVENTS% should NOT be replaced in implicit wrapper
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining('%EVENTS%'),
+  )
+
+  // %EXCLUDE% should be replaced in implicit wrapper
+  expect(prepImportWrapperScript).not.toReturnWith(
+    expect.stringContaining('%EXCLUDE%'),
+  )
+  expect(prepImportWrapperScript).toReturnWith(
+    expect.stringContaining(JSON.stringify(['extension'])),
+  )
 })
 
 test('returns plugin with srcDir getter', () => {

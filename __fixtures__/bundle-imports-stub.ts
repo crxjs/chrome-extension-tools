@@ -5,9 +5,10 @@ export const code = `
 
 // BUNDLE IMPORTS STUB
 
-const eventPaths = JSON.parse('%EVENTS%') as string[]
-const importPath = JSON.parse('%PATH%') as string
-const delayLength = JSON.parse('%DELAY%') as number
+const eventPaths = /*@__PURE__*/JSON.parse('%EVENTS%') as string[]
+const importPath = /*@__PURE__*/JSON.parse('%PATH%') as string
+const delayLength = /*@__PURE__*/JSON.parse('%DELAY%') as number
+const excludedPaths = /*@__PURE__*/JSON.parse('%EXCLUDE%') as string[]
 
 const events = eventPaths.map((eventPath) => resolvePath<ChromeEvent>(chrome, eventPath))
 const triggerEvents = captureEvents(events)
