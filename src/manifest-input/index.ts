@@ -1,11 +1,17 @@
+import { code as contentScriptWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import memoize from 'mem'
-import path, { basename } from 'path'
+import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
+import slash from 'slash'
 import { isChunk } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
 import { cloneObject } from './cloneObject'
+import {
+  DynamicImportWrapperOptions,
+  prepImportWrapperScript,
+} from './dynamicImportWrapper'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
@@ -16,8 +22,6 @@ import {
   ValidationErrorsArray,
 } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import { setupLoaderScript } from './setupLoaderScript'
-import { wakeEvents } from './wakeEvents'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
@@ -40,12 +44,6 @@ export type ManifestInputPlugin = Pick<
 > & {
   name: string
   srcDir: string | null
-}
-
-export interface DynamicImportWrapper {
-  eventDelay?: number | false
-  wakeEvents?: string[]
-  noWakeEvents?: boolean
 }
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -75,10 +73,7 @@ const npmPkgDetails =
 
 export function manifestInput(
   {
-    dynamicImportWrapper = {
-      // Use these wake events by default until dynamic wake events is implemented
-      wakeEvents,
-    },
+    dynamicImportWrapper = {},
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
@@ -91,7 +86,7 @@ export function manifestInput(
       assetChanged: false,
     } as ManifestInputPluginCache,
   } = {} as {
-    dynamicImportWrapper?: DynamicImportWrapper
+    dynamicImportWrapper?: DynamicImportWrapperOptions | false
     pkg?: {
       description: string
       name: string
@@ -121,7 +116,10 @@ export function manifestInput(
 
   /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
 
-  const loaderScript = setupLoaderScript(dynamicImportWrapper)
+  let wrapperScript = ''
+  if (dynamicImportWrapper !== false) {
+    wrapperScript = prepImportWrapperScript(dynamicImportWrapper)
+  }
 
   /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
 
@@ -185,8 +183,10 @@ export function manifestInput(
         )
       }
 
-      // TODO: handle case where no input is returned
-      // - Error: "You must supply options.input to rollup"
+      // TODO: consider using this.emitFile in buildStart instead
+      //  - the input record is unusual, but would this be more unusual?
+      //  - would need to put something here, can't return an empty input
+      //    - maybe a dummy file to remove in generateBundle?
       return {
         ...options,
         input: cache.input.reduce(
@@ -304,7 +304,7 @@ export function manifestInput(
           background: { scripts: bgs = [] } = {},
         } = manifestBody
 
-        /* ------ WEB ACCESSIBLE RESOURCES START ------ */
+        /* ------------- SETUP CONTENT SCRIPTS ------------- */
 
         const contentScripts = cts.reduce(
           (r, { js = [] }) => [...r, ...js],
@@ -312,8 +312,40 @@ export function manifestInput(
         )
 
         if (contentScripts.length) {
+          const memoizedEmitter = memoize(
+            (scriptPath: string) => {
+              const source = contentScriptWrapper.replace(
+                '%PATH%',
+                // Fix path slashes to support Windows
+                JSON.stringify(
+                  slash(relative('assets', scriptPath)),
+                ),
+              )
+
+              const assetId = this.emitFile({
+                type: 'asset',
+                source,
+                name: basename(scriptPath),
+              })
+
+              return this.getFileName(assetId)
+            },
+          )
+
+          // Setup content script import wrapper
+          manifestBody.content_scripts = cts.map(
+            ({ js, ...rest }) =>
+              typeof js === 'undefined'
+                ? rest
+                : {
+                    js: js
+                      .map((p) => p.replace(/\.ts$/, '.js'))
+                      .map(memoizedEmitter),
+                    ...rest,
+                  },
+          )
+
           // make all imports & dynamic imports web_acc_res
-          // FEATURE: make imports for background not web_acc_res?
           const imports = Object.values(bundle)
             .filter((x): x is OutputChunk => x.type === 'chunk')
             .reduce(
@@ -323,64 +355,49 @@ export function manifestInput(
               [] as string[],
             )
 
-          // web_accessible_resources can be used for fingerprinting extensions
+          // SMELL: web accessible resources can be used for fingerprinting extensions
           manifestBody.web_accessible_resources = dedupe([
             ...war,
+            // FEATURE: filter out imports for background?
             ...imports,
+            // Need to be web accessible b/c of import
             ...contentScripts,
           ])
         }
 
-        /* ------- WEB ACCESSIBLE RESOURCES END ------- */
+        /* ----------- END SETUP CONTENT SCRIPTS ----------- */
 
-        /* ---- SCRIPT DYNAMIC IMPORT WRAPPER BEGIN --- */
+        /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
 
-        if (
-          dynamicImportWrapper.wakeEvents &&
-          dynamicImportWrapper.wakeEvents.length > 0
-        ) {
-          const emitDynamicImportWrapper = memoize(
-            (scriptPath: string) => {
-              const _scriptPath = scriptPath.replace(
-                /\.ts$/,
-                '.js',
-              )
-              const source = loaderScript(_scriptPath)
+        // Emit background script wrappers
+        if (bgs.length && wrapperScript.length) {
+          // background exists because bgs has scripts
+          manifestBody.background!.scripts = bgs
+            // SMELL: is this replace necessary? are we doing somewhere else?
+            .map((p) => p.replace(/\.ts$/, '.js'))
+            .map((scriptPath: string) => {
+              // Loader script exists because of type guard above
+              const source =
+                // Path to module being loaded
+                wrapperScript.replace(
+                  '%PATH%',
+                  // Fix path slashes to support Windows
+                  JSON.stringify(
+                    slash(relative('assets', scriptPath)),
+                  ),
+                )
 
               const assetId = this.emitFile({
                 type: 'asset',
                 source,
-                name: basename(_scriptPath),
+                name: basename(scriptPath),
               })
 
               return this.getFileName(assetId)
-            },
-          )
-
-          // Emit background script wrappers
-          if (bgs.length) {
-            manifestBody.background =
-              manifestBody.background || {}
-
-            manifestBody.background.scripts = bgs.map(
-              emitDynamicImportWrapper,
-            )
-          }
-
-          // Emit content script wrappers
-          if (cts.length) {
-            manifestBody.content_scripts = cts.map(
-              ({ js = [], ...rest }) => ({
-                js: js.map(emitDynamicImportWrapper),
-                ...rest,
-              }),
-            )
-          } else {
-            delete manifestBody.content_scripts
-          }
+            })
         }
 
-        /* ----- SCRIPT DYNAMIC IMPORT WRAPPER END ---- */
+        /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
 
         /* --------- STABLE EXTENSION ID BEGIN -------- */
 
@@ -396,7 +413,9 @@ export function manifestInput(
           manifestBody,
           null,
           2,
-        ).replace(/\.[jt]sx?"/g, '.js"')
+        )
+          // SMELL: is this necessary?
+          .replace(/\.[jt]sx?"/g, '.js"')
 
         // Emit manifest.json
         this.emitFile({
@@ -405,12 +424,10 @@ export function manifestInput(
           source: manifestJson,
         })
       } catch (error) {
-        // eslint-disable-next-line
+        // Catch here because we need the validated result in scope
+
         if (error.name !== 'ValidationError') throw error
-
-        // eslint-disable-next-line
         const errors = error.errors as ValidationErrorsArray
-
         if (errors) {
           errors.forEach((err) => {
             // FIXME: make a better validation error message
@@ -418,8 +435,6 @@ export function manifestInput(
             this.warn(JSON.stringify(err, undefined, 2))
           })
         }
-
-        // eslint-disable-next-line
         this.error(error.message)
       }
 

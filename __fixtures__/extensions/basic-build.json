@@ -46,12 +46,13 @@
         "code": "export const x = 'x'",
         "customTransformCache": false,
         "dependencies": [],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
         "moduleSideEffects": true,
         "originalCode": "export const x = 'x'",
         "originalSourcemap": null,
         "resolvedIds": {},
         "sourcemapChain": [],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
@@ -223,20 +224,22 @@
         "code": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('background.js')\r\n\r\nchrome.storage.local.clear()\r\n",
         "customTransformCache": false,
         "dependencies": [
-          "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
+          "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
         ],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
         "moduleSideEffects": true,
         "originalCode": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('background.js')\r\n\r\nchrome.storage.local.clear()\r\n",
         "originalSourcemap": null,
         "resolvedIds": {
           "./imported": {
             "external": false,
-            "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
-            "moduleSideEffects": true
+            "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+            "moduleSideEffects": true,
+            "syntheticNamedExports": false
           }
         },
         "sourcemapChain": [],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
@@ -396,20 +399,22 @@
         "code": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()\r\n",
         "customTransformCache": false,
         "dependencies": [
-          "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
+          "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
         ],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
         "moduleSideEffects": true,
         "originalCode": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()\r\n",
         "originalSourcemap": null,
         "resolvedIds": {
           "./imported": {
             "external": false,
-            "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
-            "moduleSideEffects": true
+            "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+            "moduleSideEffects": true,
+            "syntheticNamedExports": false
           }
         },
         "sourcemapChain": [],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
@@ -510,12 +515,13 @@
         "code": "console.log('options1.js')\r\n\r\nchrome.bookmarks.get('main')\r\n",
         "customTransformCache": false,
         "dependencies": [],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options1.js",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options1.js",
         "moduleSideEffects": true,
         "originalCode": "console.log('options1.js')\r\n\r\nchrome.bookmarks.get('main')\r\n",
         "originalSourcemap": null,
         "resolvedIds": {},
         "sourcemapChain": [],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
@@ -608,42 +614,56 @@
         "code": "console.log('options2.jsx')\r\n\r\nchrome.cookies.getAll()",
         "customTransformCache": false,
         "dependencies": [],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options2.jsx",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options2.jsx",
         "moduleSideEffects": true,
         "originalCode": "console.log('options2.jsx')\r\n\r\nchrome.cookies.getAll()",
         "originalSourcemap": null,
         "resolvedIds": {},
         "sourcemapChain": [],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 64,
+          "end": 78,
           "body": [
             {
               "type": "ExpressionStatement",
               "start": 0,
-              "end": 27,
+              "end": 13,
+              "expression": {
+                "type": "Literal",
+                "start": 0,
+                "end": 12,
+                "value": "use strict",
+                "raw": "\"use strict\""
+              },
+              "directive": "use strict"
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 14,
+              "end": 41,
               "expression": {
                 "type": "CallExpression",
-                "start": 0,
-                "end": 26,
+                "start": 14,
+                "end": 40,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 0,
-                  "end": 11,
+                  "start": 14,
+                  "end": 25,
                   "object": {
                     "type": "Identifier",
-                    "start": 0,
-                    "end": 7,
+                    "start": 14,
+                    "end": 21,
                     "name": "console"
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 8,
-                    "end": 11,
+                    "start": 22,
+                    "end": 25,
                     "name": "log"
                   },
                   "computed": false
@@ -651,8 +671,8 @@
                 "arguments": [
                   {
                     "type": "Literal",
-                    "start": 12,
-                    "end": 25,
+                    "start": 26,
+                    "end": 39,
                     "value": "options3.ts",
                     "raw": "'options3.ts'"
                   }
@@ -662,10 +682,10 @@
           ],
           "sourceType": "module"
         },
-        "code": "console.log('options3.ts');\n//# sourceMappingURL=options3.js.map",
+        "code": "\"use strict\";\nconsole.log('options3.ts');\n//# sourceMappingURL=options3.js.map",
         "customTransformCache": false,
         "dependencies": [],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",
         "moduleSideEffects": true,
         "originalCode": "console.log('options3.ts')\r\n",
         "originalSourcemap": null,
@@ -680,6 +700,7 @@
             ],
             "names": [],
             "mappings": [
+              [],
               [
                 [
                   0,
@@ -733,36 +754,50 @@
             ]
           }
         ],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 66,
+          "end": 79,
           "body": [
             {
               "type": "ExpressionStatement",
               "start": 0,
-              "end": 28,
+              "end": 13,
+              "expression": {
+                "type": "Literal",
+                "start": 0,
+                "end": 12,
+                "value": "use strict",
+                "raw": "\"use strict\""
+              },
+              "directive": "use strict"
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 14,
+              "end": 42,
               "expression": {
                 "type": "CallExpression",
-                "start": 0,
-                "end": 27,
+                "start": 14,
+                "end": 41,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 0,
-                  "end": 11,
+                  "start": 14,
+                  "end": 25,
                   "object": {
                     "type": "Identifier",
-                    "start": 0,
-                    "end": 7,
+                    "start": 14,
+                    "end": 21,
                     "name": "console"
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 8,
-                    "end": 11,
+                    "start": 22,
+                    "end": 25,
                     "name": "log"
                   },
                   "computed": false
@@ -770,8 +805,8 @@
                 "arguments": [
                   {
                     "type": "Literal",
-                    "start": 12,
-                    "end": 26,
+                    "start": 26,
+                    "end": 40,
                     "value": "options4.tsx",
                     "raw": "'options4.tsx'"
                   }
@@ -781,10 +816,10 @@
           ],
           "sourceType": "module"
         },
-        "code": "console.log('options4.tsx');\n//# sourceMappingURL=options4.jsx.map",
+        "code": "\"use strict\";\nconsole.log('options4.tsx');\n//# sourceMappingURL=options4.js.map",
         "customTransformCache": false,
         "dependencies": [],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options4.tsx",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options4.tsx",
         "moduleSideEffects": true,
         "originalCode": "console.log('options4.tsx')\r\n",
         "originalSourcemap": null,
@@ -792,13 +827,14 @@
         "sourcemapChain": [
           {
             "version": 3,
-            "file": "options4.jsx",
+            "file": "options4.js",
             "sourceRoot": "",
             "sources": [
               "options4.tsx"
             ],
             "names": [],
             "mappings": [
+              [],
               [
                 [
                   0,
@@ -852,6 +888,391 @@
             ]
           }
         ],
+        "syntheticNamedExports": false,
+        "transformDependencies": []
+      },
+      {
+        "ast": {
+          "type": "Program",
+          "start": 0,
+          "end": 108,
+          "body": [
+            {
+              "type": "ImportDeclaration",
+              "start": 0,
+              "end": 31,
+              "specifiers": [
+                {
+                  "type": "ImportSpecifier",
+                  "start": 9,
+                  "end": 10,
+                  "imported": {
+                    "type": "Identifier",
+                    "start": 9,
+                    "end": 10,
+                    "name": "x"
+                  },
+                  "local": {
+                    "type": "Identifier",
+                    "start": 9,
+                    "end": 10,
+                    "name": "x"
+                  }
+                }
+              ],
+              "source": {
+                "type": "Literal",
+                "start": 18,
+                "end": 31,
+                "value": "../imported",
+                "raw": "'../imported'"
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 33,
+              "end": 47,
+              "expression": {
+                "type": "CallExpression",
+                "start": 33,
+                "end": 47,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 33,
+                  "end": 44,
+                  "object": {
+                    "type": "Identifier",
+                    "start": 33,
+                    "end": 40,
+                    "name": "console"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 41,
+                    "end": 44,
+                    "name": "log"
+                  },
+                  "computed": false
+                },
+                "arguments": [
+                  {
+                    "type": "Identifier",
+                    "start": 45,
+                    "end": 46,
+                    "name": "x"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 49,
+              "end": 77,
+              "expression": {
+                "type": "CallExpression",
+                "start": 49,
+                "end": 77,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 49,
+                  "end": 60,
+                  "object": {
+                    "type": "Identifier",
+                    "start": 49,
+                    "end": 56,
+                    "name": "console"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 57,
+                    "end": 60,
+                    "name": "log"
+                  },
+                  "computed": false
+                },
+                "arguments": [
+                  {
+                    "type": "Literal",
+                    "start": 61,
+                    "end": 76,
+                    "value": "background.js",
+                    "raw": "'background.js'"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 79,
+              "end": 107,
+              "expression": {
+                "type": "CallExpression",
+                "start": 79,
+                "end": 107,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 79,
+                  "end": 105,
+                  "object": {
+                    "type": "MemberExpression",
+                    "start": 79,
+                    "end": 99,
+                    "object": {
+                      "type": "MemberExpression",
+                      "start": 79,
+                      "end": 93,
+                      "object": {
+                        "type": "Identifier",
+                        "start": 79,
+                        "end": 85,
+                        "name": "chrome"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "start": 86,
+                        "end": 93,
+                        "name": "storage"
+                      },
+                      "computed": false
+                    },
+                    "property": {
+                      "type": "Identifier",
+                      "start": 94,
+                      "end": 99,
+                      "name": "local"
+                    },
+                    "computed": false
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 100,
+                    "end": 105,
+                    "name": "clear"
+                  },
+                  "computed": false
+                },
+                "arguments": []
+              }
+            }
+          ],
+          "sourceType": "module"
+        },
+        "code": "import { x } from '../imported'\n\nconsole.log(x)\n\nconsole.log('background.js')\n\nchrome.storage.local.clear()\n",
+        "customTransformCache": false,
+        "dependencies": [
+          "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
+        ],
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools2.js",
+        "moduleSideEffects": true,
+        "originalCode": "import { x } from '../imported'\n\nconsole.log(x)\n\nconsole.log('background.js')\n\nchrome.storage.local.clear()\n",
+        "originalSourcemap": null,
+        "resolvedIds": {
+          "../imported": {
+            "external": false,
+            "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js",
+            "moduleSideEffects": true,
+            "syntheticNamedExports": false
+          }
+        },
+        "sourcemapChain": [],
+        "syntheticNamedExports": false,
+        "transformDependencies": []
+      },
+      {
+        "ast": {
+          "type": "Program",
+          "start": 0,
+          "end": 104,
+          "body": [
+            {
+              "type": "ExpressionStatement",
+              "start": 0,
+              "end": 13,
+              "expression": {
+                "type": "Literal",
+                "start": 0,
+                "end": 12,
+                "value": "use strict",
+                "raw": "\"use strict\""
+              },
+              "directive": "use strict"
+            },
+            {
+              "type": "VariableDeclaration",
+              "start": 14,
+              "end": 44,
+              "declarations": [
+                {
+                  "type": "VariableDeclarator",
+                  "start": 20,
+                  "end": 43,
+                  "id": {
+                    "type": "Identifier",
+                    "start": 20,
+                    "end": 27,
+                    "name": "message"
+                  },
+                  "init": {
+                    "type": "Literal",
+                    "start": 30,
+                    "end": 43,
+                    "value": "devtools.ts",
+                    "raw": "'devtools.ts'"
+                  }
+                }
+              ],
+              "kind": "const"
+            },
+            {
+              "type": "ExpressionStatement",
+              "start": 45,
+              "end": 66,
+              "expression": {
+                "type": "CallExpression",
+                "start": 45,
+                "end": 65,
+                "callee": {
+                  "type": "MemberExpression",
+                  "start": 45,
+                  "end": 56,
+                  "object": {
+                    "type": "Identifier",
+                    "start": 45,
+                    "end": 52,
+                    "name": "console"
+                  },
+                  "property": {
+                    "type": "Identifier",
+                    "start": 53,
+                    "end": 56,
+                    "name": "log"
+                  },
+                  "computed": false
+                },
+                "arguments": [
+                  {
+                    "type": "Identifier",
+                    "start": 57,
+                    "end": 64,
+                    "name": "message"
+                  }
+                ]
+              }
+            }
+          ],
+          "sourceType": "module"
+        },
+        "code": "\"use strict\";\nconst message = 'devtools.ts';\nconsole.log(message);\n//# sourceMappingURL=devtools1.js.map",
+        "customTransformCache": false,
+        "dependencies": [],
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools1.ts",
+        "moduleSideEffects": true,
+        "originalCode": "const message = 'devtools.ts'\nconsole.log(message)\n",
+        "originalSourcemap": null,
+        "resolvedIds": {},
+        "sourcemapChain": [
+          {
+            "version": 3,
+            "file": "devtools1.js",
+            "sourceRoot": "",
+            "sources": [
+              "devtools1.ts"
+            ],
+            "names": [],
+            "mappings": [
+              [],
+              [
+                [
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  6,
+                  0,
+                  0,
+                  6
+                ],
+                [
+                  13,
+                  0,
+                  0,
+                  13
+                ],
+                [
+                  16,
+                  0,
+                  0,
+                  16
+                ],
+                [
+                  29,
+                  0,
+                  0,
+                  29
+                ],
+                [
+                  30,
+                  0,
+                  0,
+                  29
+                ]
+              ],
+              [
+                [
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  7,
+                  0,
+                  1,
+                  7
+                ],
+                [
+                  8,
+                  0,
+                  1,
+                  8
+                ],
+                [
+                  11,
+                  0,
+                  1,
+                  11
+                ],
+                [
+                  12,
+                  0,
+                  1,
+                  12
+                ],
+                [
+                  19,
+                  0,
+                  1,
+                  19
+                ],
+                [
+                  20,
+                  0,
+                  1,
+                  20
+                ],
+                [
+                  21,
+                  0,
+                  1,
+                  20
+                ]
+              ]
+            ]
+          }
+        ],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       },
       {
@@ -903,12 +1324,13 @@
         "code": "console.log('popup.js')\r\n",
         "customTransformCache": false,
         "dependencies": [],
-        "id": "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.js",
+        "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.js",
         "moduleSideEffects": true,
         "originalCode": "console.log('popup.js')\r\n",
         "originalSourcemap": null,
         "resolvedIds": {},
         "sourcemapChain": [],
+        "syntheticNamedExports": false,
         "transformDependencies": []
       }
     ],
@@ -922,30 +1344,33 @@
     }
   },
   "watchFiles": [
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/manifest.json",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.css",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-16.png",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.jpg",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-48.png",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-128.png",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/NotoSans-Black.ttf",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/NotoSans-Light.ttf",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/Missaali-Regular.otf",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/manifest.json",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.css",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-16.png",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.jpg",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-48.png",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/images/icon-main-128.png",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/NotoSans-Black.ttf",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/NotoSans-Light.ttf",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/fonts/Missaali-Regular.otf",
     "__fixtures__/extensions/basic/options.css",
     "__fixtures__/extensions/basic/options.png",
     "__fixtures__/extensions/basic/options.jpg",
     "__fixtures__/extensions/basic/images/favicon.ico",
     "__fixtures__/extensions/basic/images/favicon.png",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html",
     "__fixtures__/extensions/basic/asset.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options1.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options2.jsx",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options4.tsx",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.js",
-    "/home/jack/Documents/Rollup/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools.html",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options1.js",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options2.jsx",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options3.ts",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options4.tsx",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools2.js",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools1.ts",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.js",
+    "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
   ]
 }
