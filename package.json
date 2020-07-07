@@ -73,10 +73,6 @@
     "tslib": "^1.10.0",
     "typescript": "^3.7.5"
   },
-  "peerDependencies": {
-    "@rollup/plugin-commonjs": "^11.0.2",
-    "rollup": "^1.31.0"
-  },
   "engines": {
     "node": ">=8.16.0"
   }
