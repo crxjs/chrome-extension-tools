@@ -11,7 +11,9 @@ export function captureEvents(events: ChromeEvent[]) {
     const callbacks = new Map<Function, any[]>()
     const events = new Set<any[]>()
 
-    event.addListener(handleEvent)
+    if (event.constructor.name !== 'WebRequestEvent') {
+      event.addListener(handleEvent)
+    }
 
     function handleEvent(...args: any[]) {
       const error = chrome.runtime.lastError
