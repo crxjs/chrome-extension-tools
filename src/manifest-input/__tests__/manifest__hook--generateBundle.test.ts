@@ -72,7 +72,9 @@ test('derives permissions from chunks', async () => {
   expect(manifest.permissions).toContain('contextMenus')
   expect(manifest.permissions).toContain('bookmarks')
   expect(manifest.permissions).toContain('cookies')
-  expect(manifest.permissions!.length).toBe(4)
+  expect(manifest.permissions).toContain('webRequest')
+  expect(manifest.permissions).toContain('webRequestBlocking')
+  expect(manifest.permissions!.length).toBe(6)
 })
 
 test('does not warn permissions for verbose false', async () => {
