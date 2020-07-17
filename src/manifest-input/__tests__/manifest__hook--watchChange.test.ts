@@ -25,6 +25,8 @@ beforeEach(async () => {
     input: [],
     readFile: new Map(),
     assetChanged: false,
+    inputAry: [],
+    inputObj: {},
   }
   plugin = manifestInput({ cache })
 

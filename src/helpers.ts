@@ -21,6 +21,10 @@ export function isString(x: any): x is string {
   return typeof x === 'string'
 }
 
+export function isJsonFilePath(x: any): x is string {
+  return isString(x) && x.endsWith('json')
+}
+
 export const formatHtml = ($: CheerioFile) =>
   prettier.format($.html(), { parser: 'html' })
 

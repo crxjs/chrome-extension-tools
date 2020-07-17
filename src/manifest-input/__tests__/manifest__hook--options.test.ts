@@ -8,6 +8,7 @@ import {
   icon128,
   icon16,
   icon48,
+  indexHtml,
   manifestJson,
   missaaliOtf,
   notoSansBlack,
@@ -40,6 +41,8 @@ const cache: ManifestInputPluginCache = {
   input: [],
   readFile: new Map(),
   assetChanged: false,
+  inputAry: [],
+  inputObj: {},
 }
 
 const plugin = manifestInput({ cache })
@@ -56,14 +59,22 @@ beforeEach(() => {
   cache.permsHash = ''
   cache.input = []
   cache.srcDir = null
+  cache.inputAry = []
+  cache.inputObj = {}
   delete cache.manifest
+})
+
+beforeAll(async () => {
+  // Reset manifest in case of test crash
+  manifest.version = '1.0.0'
+  await writeJSON(manifestJson, manifest)
 })
 
 afterAll(async () => {
   await writeJSON(manifestJson, manifest, { spaces: 2 })
 })
 
-test('throws if input is not a manifest path', () => {
+test('throws if input does not contain a manifest', () => {
   const errorMessage =
     'RollupOptions.input must be a single Chrome extension manifest.'
 
@@ -78,6 +89,67 @@ test('throws if input is not a manifest path', () => {
       input: { wrong: 'not-a-manifest' },
     })
   }).toThrow(new TypeError(errorMessage))
+})
+
+test('handles input array', () => {
+  const options: RollupOptions = {
+    input: [manifestJson, indexHtml],
+  }
+
+  const result = plugin.options.call(context, options)
+
+  expect(explorer.load).toBeCalledWith(manifestJson)
+  expect(explorer.load).toReturnWith({
+    config: cache.manifest,
+    filepath: manifestJson,
+  })
+
+  expect(result?.input).toEqual({
+    background:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js',
+    content:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js',
+    'devtools/devtools':
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools.html',
+    index:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/index.html',
+    options:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html',
+    'popup/popup':
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html',
+  })
+})
+
+test('handles input object', () => {
+  const options: RollupOptions = {
+    input: {
+      manifest: manifestJson,
+      index: indexHtml,
+    },
+  }
+
+  const result = plugin.options.call(context, options)
+
+  expect(explorer.load).toBeCalledWith(manifestJson)
+  expect(explorer.load).toReturnWith({
+    config: cache.manifest,
+    filepath: manifestJson,
+  })
+
+  expect(result?.input).toEqual({
+    background:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js',
+    content:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js',
+    'devtools/devtools':
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools.html',
+    index:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/index.html',
+    options:
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html',
+    'popup/popup':
+      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html',
+  })
 })
 
 test('loads manifest via cosmicConfig', () => {

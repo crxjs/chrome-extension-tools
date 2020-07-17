@@ -6,16 +6,6 @@ const { default: config } = require(getExtPath(
   'html-only/rollup.config.js',
 ))
 
-test('Throws for extension only html and no scripts at all', async () => {
-  try {
-    await rollup(config)
-  } catch (error) {
-    expect(error).toEqual(
-      new Error('A Chrome extension must have at least one script or HTML file.'),
-    )
-  }
-})
-
 test.skip('Handles extension only html and no scripts at all', async () => {
   let bundle: RollupBuild
   try {

@@ -33,6 +33,8 @@ beforeEach(() => {
     input: [],
     readFile: new Map(),
     assetChanged: false,
+    inputObj: {},
+    inputAry: [],
   }
   plugin = manifestInput({ cache })
   plugin.options.call(minContext, options)

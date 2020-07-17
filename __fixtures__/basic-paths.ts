@@ -2,6 +2,7 @@ import { getExtPath } from './utils'
 
 export const srcDir = getExtPath('basic')
 export const manifestJson = getExtPath('basic/manifest.json')
+export const indexHtml = getExtPath('basic/index.html')
 
 // Icons
 export const icon16 = getExtPath('basic/images/icon-main-16.png')

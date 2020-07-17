@@ -5,7 +5,7 @@ import memoize from 'mem'
 import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
 import slash from 'slash'
-import { isChunk } from '../helpers'
+import { isChunk, isJsonFilePath } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
 import { cloneObject } from './cloneObject'
 import {
@@ -30,6 +30,8 @@ export function dedupe<T>(x: T[]): T[] {
 export interface ManifestInputPluginCache {
   assets: string[]
   input: string[]
+  inputAry: string[]
+  inputObj: Record<string, string>
   permsHash: string
   srcDir: string | null
   /** for memoized fs.readFile */
@@ -78,12 +80,14 @@ export function manifestInput(
     publicKey,
     verbose = true,
     cache = {
-      assets: [],
-      permsHash: '',
-      srcDir: null,
-      input: [],
-      readFile: new Map<string, any>(),
       assetChanged: false,
+      assets: [],
+      input: [],
+      inputAry: [],
+      inputObj: {},
+      permsHash: '',
+      readFile: new Map<string, any>(),
+      srcDir: null,
     } as ManifestInputPluginCache,
   } = {} as {
     dynamicImportWrapper?: DynamicImportWrapperOptions | false
@@ -140,13 +144,33 @@ export function manifestInput(
       if (!cache.manifest) {
         /* ----------- LOAD AND PROCESS MANIFEST ----------- */
 
-        if (typeof options.input !== 'string') {
+        let inputManifestPath: string | undefined
+        if (Array.isArray(options.input)) {
+          const manifestIndex = options.input.findIndex(
+            isJsonFilePath,
+          )
+          inputManifestPath = options.input[manifestIndex]
+          cache.inputAry = [
+            ...options.input.slice(0, manifestIndex),
+            ...options.input.slice(manifestIndex + 1),
+          ]
+        } else if (typeof options.input === 'object') {
+          inputManifestPath = options.input.manifest
+          cache.inputObj = cloneObject(options.input)
+          delete cache.inputObj['manifest']
+        } else {
+          inputManifestPath = options.input
+        }
+
+        if (!isJsonFilePath(inputManifestPath)) {
           throw new TypeError(
             'RollupOptions.input must be a single Chrome extension manifest.',
           )
         }
 
-        const configResult = explorer.load(options.input) as {
+        const configResult = explorer.load(
+          inputManifestPath,
+        ) as {
           filepath: string
           config: ChromeExtensionManifest
           isEmpty?: true
@@ -168,7 +192,7 @@ export function manifestInput(
         )
 
         // Cache derived inputs
-        cache.input = [...js, ...html]
+        cache.input = [...cache.inputAry, ...js, ...html]
         cache.assets = [
           // Dedupe assets
           ...new Set([...css, ...img, ...others]),
@@ -191,7 +215,7 @@ export function manifestInput(
         ...options,
         input: cache.input.reduce(
           reduceToRecord(cache.srcDir),
-          {},
+          cache.inputObj,
         ),
       }
     },
