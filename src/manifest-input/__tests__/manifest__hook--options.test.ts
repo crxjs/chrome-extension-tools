@@ -52,6 +52,17 @@ const options: RollupOptions = {
   input: manifestJson,
 }
 
+const expectedInputResult = {
+  background: getExtPath('basic/background.js'),
+  content: getExtPath('basic/content.js'),
+  'devtools/devtools': getExtPath(
+    'basic/devtools/devtools.html',
+  ),
+  index: getExtPath('basic/index.html'),
+  options: getExtPath('basic/options.html'),
+  'popup/popup': getExtPath('basic/popup/popup.html'),
+}
+
 beforeEach(() => {
   jest.clearAllMocks()
 
@@ -104,20 +115,7 @@ test('handles input array', () => {
     filepath: manifestJson,
   })
 
-  expect(result?.input).toEqual({
-    background:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js',
-    content:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js',
-    'devtools/devtools':
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools.html',
-    index:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/index.html',
-    options:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html',
-    'popup/popup':
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html',
-  })
+  expect(result?.input).toEqual(expectedInputResult)
 })
 
 test('handles input object', () => {
@@ -136,20 +134,7 @@ test('handles input object', () => {
     filepath: manifestJson,
   })
 
-  expect(result?.input).toEqual({
-    background:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/background.js',
-    content:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js',
-    'devtools/devtools':
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/devtools/devtools.html',
-    index:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/index.html',
-    options:
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/options.html',
-    'popup/popup':
-      '/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/popup/popup.html',
-  })
+  expect(result?.input).toEqual(expectedInputResult)
 })
 
 test('loads manifest via cosmicConfig', () => {
