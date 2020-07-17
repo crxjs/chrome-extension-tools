@@ -2,7 +2,7 @@
   "name": "basic",
   "description": "basic chrome extension",
   "manifest_version": 2,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "icons": {
     "16": "images/icon-main-16.png",
     "48": "images/icon-main-48.png",

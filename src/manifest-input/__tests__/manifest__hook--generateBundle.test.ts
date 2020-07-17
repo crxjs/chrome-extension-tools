@@ -41,6 +41,8 @@ beforeEach(async () => {
     input: [],
     readFile: new Map(),
     assetChanged: false,
+    inputAry: [],
+    inputObj: {},
   }
   plugin = manifestInput({ cache, verbose: false })
 
@@ -101,6 +103,8 @@ test('Warns permissions for verbose true', async () => {
       input: [],
       readFile: new Map(),
       assetChanged: false,
+      inputObj: {},
+      inputAry: [],
     },
   })
   const opts = plugin.options.call(minContext, options)
@@ -275,7 +279,6 @@ test('Warns if new permissions are detected', async () => {
 })
 
 test('Throws if cache.manifest is falsey', async () => {
-
   delete cache.manifest
 
   const bundle: OutputBundle = JSON.parse(bundleJson)
@@ -290,8 +293,6 @@ test('Throws if cache.manifest is falsey', async () => {
       false,
     )
   } catch (error) {
-    expect(error).toEqual(
-      new TypeError(errorMessage),
-    )
+    expect(error).toEqual(new TypeError(errorMessage))
   }
 })
