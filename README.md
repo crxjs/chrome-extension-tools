@@ -65,8 +65,6 @@ Create a `rollup.config.js` file in your project root.
 ```javascript
 // rollup.config.js
 
-import { rollup } from 'rollup'
-
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 
