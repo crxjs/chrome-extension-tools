@@ -11,12 +11,5 @@
       "url": "/manifest.schema.json"
     }
   ],
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "jestrunner.jestPath": "${workspaceFolder}/node_modules/jest/bin/jest.js",
-  "jestrunner.debugOptions": {
-    "args": ["--no-cache"],
-    "sourcemaps": "inline",
-    "disableOptimisticBPs": true,
-    "runtimeExecutable": "/home/jack/.nvm/versions/node/v13.14.0/bin/node"
-  }
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
