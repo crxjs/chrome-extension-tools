@@ -34,7 +34,7 @@ devDependencies:
   '@typescript-eslint/parser': 2.21.0_eslint@6.8.0+typescript@3.8.3
   eslint: 6.8.0
   jest: 25.1.0
-  jest-chrome: 0.6.0_jest@25.1.0
+  jest-chrome: 0.7.0_jest@25.1.0
   jest-html-reporters: 1.2.1
   npm-run-all: 4.1.5
   read-pkg-up: 7.0.1
@@ -2569,7 +2569,7 @@ packages:
       node: '>= 8.3'
     resolution:
       integrity: sha512-bdL1aHjIVy3HaBO3eEQeemGttsq1BDlHgWcOjEOIAcga7OOEGWHD2WSu8HhL7I1F0mFFyci8VKU4tRNk+qtwDA==
-  /jest-chrome/0.6.0_jest@25.1.0:
+  /jest-chrome/0.7.0_jest@25.1.0:
     dependencies:
       '@types/chrome': 0.0.114
       jest: 25.1.0
@@ -2577,7 +2577,7 @@ packages:
     peerDependencies:
       jest: ^24.9.0
     resolution:
-      integrity: sha512-qrvxU7MUJHH9ApN5iFejh0+DtsdRnkQefxaDZMfHuo39M/+y3mtp1qE2fjn9IYpO2OqkXuEYUjZwqAWos8QVwQ==
+      integrity: sha512-afOzmTh3Nzr1FDKU/nsfIi/OmyScl6Pd6+jdqaBoRNwdGdYnMEWgZKW73KesdcywnLBEHRCKO4ftY+VTbqgPww==
   /jest-cli/25.1.0:
     dependencies:
       '@jest/core': 25.1.0
@@ -5044,7 +5044,7 @@ specifiers:
   fs-extra: ^8.1.0
   glob: ^7.1.6
   jest: ^25.1.0
-  jest-chrome: ^0.6.0
+  jest-chrome: 0.7.0
   jest-html-reporters: ^1.2.1
   lodash.difference: ^4.5.0
   lodash.flatten: ^4.4.0
