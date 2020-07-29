@@ -246,7 +246,7 @@
         "ast": {
           "type": "Program",
           "start": 0,
-          "end": 114,
+          "end": 116,
           "body": [
             {
               "type": "ImportDeclaration",
@@ -354,38 +354,38 @@
             },
             {
               "type": "ExpressionStatement",
-              "start": 81,
-              "end": 112,
+              "start": 83,
+              "end": 114,
               "expression": {
                 "type": "CallExpression",
-                "start": 81,
-                "end": 112,
+                "start": 83,
+                "end": 114,
                 "callee": {
                   "type": "MemberExpression",
-                  "start": 81,
-                  "end": 110,
+                  "start": 83,
+                  "end": 112,
                   "object": {
                     "type": "MemberExpression",
-                    "start": 81,
-                    "end": 100,
+                    "start": 83,
+                    "end": 102,
                     "object": {
                       "type": "Identifier",
-                      "start": 81,
-                      "end": 87,
+                      "start": 83,
+                      "end": 89,
                       "name": "chrome"
                     },
                     "property": {
                       "type": "Identifier",
-                      "start": 88,
-                      "end": 100,
+                      "start": 90,
+                      "end": 102,
                       "name": "contextMenus"
                     },
                     "computed": false
                   },
                   "property": {
                     "type": "Identifier",
-                    "start": 101,
-                    "end": 110,
+                    "start": 103,
+                    "end": 112,
                     "name": "removeAll"
                   },
                   "computed": false
@@ -396,14 +396,14 @@
           ],
           "sourceType": "module"
         },
-        "code": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()\r\n",
+        "code": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\n\r\nchrome.contextMenus.removeAll()\r\n",
         "customTransformCache": false,
         "dependencies": [
           "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/imported.js"
         ],
         "id": "/media/jack/Storage/Documents/ExtendChrome/rollup-plugin-chrome-extension/__fixtures__/extensions/basic/content.js",
         "moduleSideEffects": true,
-        "originalCode": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\nchrome.contextMenus.removeAll()\r\n",
+        "originalCode": "import { x } from './imported'\r\n\r\nconsole.log(x)\r\n\r\nconsole.log('content.js')\r\n\r\n\r\nchrome.contextMenus.removeAll()\r\n",
         "originalSourcemap": null,
         "resolvedIds": {
           "./imported": {
