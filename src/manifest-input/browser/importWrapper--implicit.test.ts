@@ -19,7 +19,12 @@ test('delays events before delay resolves', async () => {
   }
 
   chrome.alarms.onAlarm.addListener(listener)
-  chrome.alarms.onAlarm.callListeners(alarm)
+
+  const [listenerWrapper] = [...chrome.alarms.onAlarm.getListeners()]
+
+  // Should return false if it does not receive 3rd arg
+  const isAsyncMessage = listenerWrapper(alarm)
+  expect(isAsyncMessage).toBe(false)
 
   expect(chrome.alarms.onAlarm.hasListener(listener)).toBe(true)
   expect(listener).not.toBeCalled()

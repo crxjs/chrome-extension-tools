@@ -1,4 +1,4 @@
-import { ChromeEvent, LastError } from './types'
+import { ChromeEvent } from './types'
 
 export function captureEvents(events: ChromeEvent[]) {
   const captured = events.map(captureEvent)
@@ -6,25 +6,73 @@ export function captureEvents(events: ChromeEvent[]) {
   return () => captured.forEach((t) => t())
 
   function captureEvent(event: ChromeEvent) {
-    let capture = true
+    let isCapturePhase = true
 
     const callbacks = new Map<Function, any[]>()
-    const events = new Set<any[]>()
+    const eventArgs = new Set<any[]>()
 
-    if (event.constructor.name !== 'WebRequestEvent') {
-      event.addListener(handleEvent)
-    }
+    // This is the only listener for the native event
+    event.addListener(handleEvent)
 
-    function handleEvent(...args: any[]) {
-      const error = chrome.runtime.lastError
+    function handleEvent(...args: any[]): boolean {
+      if (isCapturePhase) {
+        // This is before dynamic import completes
+        eventArgs.add(args)
 
-      if (capture) {
-        events.add([error, ...args])
+        if (typeof args[2] === 'function') {
+          // During capture phase all messages are async
+          return true
+        } else {
+          // Sync messages or some other event
+          return false
+        }
       } else {
-        callListeners(error, ...args)
+        // The callbacks determine the listener return value
+        return callListeners(...args)
       }
     }
 
+    // Called when dynamic import is complete
+    //  and when subsequent events fire
+    function callListeners(...args: any[]): boolean {
+      let isAsyncCallback = false
+      callbacks.forEach((options, cb) => {
+        // A callback error should not affect the other callbacks
+        try {
+          isAsyncCallback = cb(...args) || isAsyncCallback
+        } catch (error) {
+          console.error(error)
+        }
+      })
+
+      if (!isAsyncCallback && typeof args[2] === 'function') {
+        // We made this an async message callback during capture phase
+        //   when the function handleEvent returned true
+        //   so we are responsible to call sendResponse
+        // If the callbacks are sync message callbacks
+        //   the sendMessage callback on the other side
+        //   resolves with no arguments (this is the same behavior)
+        args[2]()
+      }
+
+      // Support events after import is complete
+      return isAsyncCallback
+    }
+
+    // This function will trigger this Event with our stored args
+    function triggerEvents() {
+      // Fire each event for this Event
+      eventArgs.forEach((args) => {
+        callListeners(...args)
+      })
+
+      // Dynamic import is complete
+      isCapturePhase = false
+      // Don't need these anymore
+      eventArgs.clear()
+    }
+
+    // All future listeners are handled by our code
     event.addListener = function addListener(cb: any, ...options) {
       callbacks.set(cb, options)
     }
@@ -43,21 +91,6 @@ export function captureEvents(events: ChromeEvent[]) {
 
     event.__isCapturedEvent = true
 
-    function callListeners(error?: LastError, ...args: any[]) {
-      callbacks.forEach((options, cb) => {
-        if (error) chrome.runtime.lastError = error
-        cb(...args)
-        if (error) delete chrome.runtime.lastError
-      })
-    }
-
-    return () => {
-      events.forEach((args) => {
-        callListeners(...args)
-      })
-
-      capture = false
-      events.clear()
-    }
+    return triggerEvents
   }
 }
