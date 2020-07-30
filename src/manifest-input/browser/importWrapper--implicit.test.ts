@@ -1,10 +1,12 @@
 import { chrome } from 'jest-chrome'
 import { defer } from './defer'
-Object.assign(global, { chrome })
 
 jest.mock('./placeholders')
+// Use a virtual module for the dynamic import
 jest.mock('import/path', () => {}, { virtual: true })
 jest.useFakeTimers()
+
+Object.assign(global, { chrome })
 
 require('./importWrapper--implicit')
 
@@ -17,8 +19,14 @@ test('delays events before delay resolves', async () => {
   }
 
   chrome.alarms.onAlarm.addListener(listener)
-  chrome.alarms.onAlarm.callListeners(alarm)
 
+  const [listenerWrapper] = [...chrome.alarms.onAlarm.getListeners()]
+
+  // Should return false if it does not receive 3rd arg
+  const isAsyncMessage = listenerWrapper(alarm)
+  expect(isAsyncMessage).toBe(false)
+
+  expect(chrome.alarms.onAlarm.hasListener(listener)).toBe(true)
   expect(listener).not.toBeCalled()
 
   jest.advanceTimersToNextTimer()
@@ -35,6 +43,27 @@ test('captures all events', () => {
   expect(chrome.extension.onRequest.__isCapturedEvent).toBeUndefined()
   // @ts-ignore
   expect(chrome.extension.onRequestExternal.__isCapturedEvent).toBeUndefined()
+
+  /* -------------- INCOMPATIBLE EVENTS -------------- */
+
+  // @ts-ignore
+  expect(chrome.webRequest.onAuthRequired.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onBeforeRedirect.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onBeforeRequest.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onBeforeSendHeaders.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onCompleted.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onErrorOccurred.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onHeadersReceived.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onResponseStarted.__isCapturedEvent).toBeUndefined()
+  // @ts-ignore
+  expect(chrome.webRequest.onSendHeaders.__isCapturedEvent).toBeUndefined()
 
   /* ------------------ VALID EVENTS ----------------- */
 
@@ -307,24 +336,6 @@ test('captures all events', () => {
   expect(chrome.webNavigation.onReferenceFragmentUpdated.__isCapturedEvent).toBe(true)
   // @ts-ignore
   expect(chrome.webNavigation.onTabReplaced.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onAuthRequired.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onBeforeRedirect.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onBeforeRequest.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onBeforeSendHeaders.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onCompleted.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onErrorOccurred.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onHeadersReceived.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onResponseStarted.__isCapturedEvent).toBe(true)
-  // @ts-ignore
-  expect(chrome.webRequest.onSendHeaders.__isCapturedEvent).toBe(true)
   // @ts-ignore
   expect(chrome.webstore.onDownloadProgress.__isCapturedEvent).toBe(true)
   // @ts-ignore
