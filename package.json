@@ -30,6 +30,7 @@
     "ajv": "^6.11.0",
     "array-flat-polyfill": "^1.0.1",
     "cheerio": "^1.0.0-rc.3",
+    "convert-source-map": "^1.7.0",
     "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
@@ -38,7 +39,8 @@
     "lodash.get": "^4.4.2",
     "mem": "^6.0.1",
     "prettier": "^1.19.1",
-    "slash": "^3.0.0"
+    "slash": "^3.0.0",
+    "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.2",

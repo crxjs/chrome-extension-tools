@@ -2,6 +2,7 @@ dependencies:
   ajv: 6.12.5
   array-flat-polyfill: 1.0.1
   cheerio: 1.0.0-rc.3
+  convert-source-map: 1.7.0
   cosmiconfig: 6.0.0
   fs-extra: 8.1.0
   glob: 7.1.6
@@ -11,6 +12,7 @@ dependencies:
   mem: 6.1.1
   prettier: 1.19.1
   slash: 3.0.0
+  webextension-polyfill: 0.6.0
 devDependencies:
   '@rollup/plugin-commonjs': 11.1.0_rollup@1.32.1
   '@rollup/plugin-json': 4.1.0_rollup@1.32.1
@@ -1497,7 +1499,6 @@ packages:
   /convert-source-map/1.7.0:
     dependencies:
       safe-buffer: 5.1.2
-    dev: true
     resolution:
       integrity: sha512-4FJkXzKXEDB1snCFZlLP4gpC3JILicCpGbzG9f9G7tGqGCzETQ2hWPrcinA9oU4wtf2biUaEH5065UnMeR33oA==
   /copy-descriptor/0.1.1:
@@ -4345,7 +4346,6 @@ packages:
     resolution:
       integrity: sha512-trsQc+xYYXZ3urjOiJOuCOa5N3jAZ3eiSpQB5hIT8zGlL2QfnHLJ2r7GMkBGuIausdJN1OneaI6gQlsqNHHmZQ==
   /safe-buffer/5.1.2:
-    dev: true
     resolution:
       integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
   /safe-buffer/5.2.1:
@@ -5125,6 +5125,10 @@ packages:
     dev: true
     resolution:
       integrity: sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
+  /webextension-polyfill/0.6.0:
+    dev: false
+    resolution:
+      integrity: sha512-PlYwiX8e4bNZrEeBFxbFFsLtm0SMPxJliLTGdNCA0Bq2XkWrAn2ejUd+89vZm+8BnfFB1BclJyCz3iKsm2atNg==
   /webidl-conversions/4.0.2:
     dev: true
     resolution:
@@ -5286,6 +5290,7 @@ specifiers:
   ajv: ^6.11.0
   array-flat-polyfill: ^1.0.1
   cheerio: ^1.0.0-rc.3
+  convert-source-map: ^1.7.0
   cosmiconfig: ^6.0.0
   eslint: ^6.8.0
   fs-extra: ^8.1.0
@@ -5306,3 +5311,4 @@ specifiers:
   ts-jest: ^25.2.0
   tslib: ^1.10.0
   typescript: ^3.7.5
+  webextension-polyfill: ^0.6.0
