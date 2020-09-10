@@ -32,6 +32,7 @@ export type ChromeExtensionPlugin = Pick<
 export { simpleReloader } from './plugin-reloader-simple/index'
 
 export interface ChromeExtensionOptions {
+  browserPolyfill?: boolean
   dynamicImportWrapper?: DynamicImportWrapperOptions
   verbose?: boolean
   pkg?: {
