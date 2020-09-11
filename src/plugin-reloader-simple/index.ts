@@ -139,10 +139,10 @@ export const simpleReloader = (
 
           /* ---------------- CONTENT SCRIPTS ---------------- */
 
-          const { content_scripts: ctScripts = [] } = manifest
+          const { content_scripts: ctScripts } = manifest
 
           if (cache.ctScriptPath) {
-            manifest.content_scripts = ctScripts.map(
+            manifest.content_scripts = ctScripts?.map(
               ({ js = [], ...rest }) => ({
                 js: [cache.ctScriptPath!, ...js],
                 ...rest,
