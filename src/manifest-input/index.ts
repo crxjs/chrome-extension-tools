@@ -474,17 +474,9 @@ export function manifestInput(
             browserPolyfillPath,
             executeScriptPolyfillPath,
           )
-          console.log(
-            '🚀: generateBundle -> manifestBody.content_scripts',
-            manifestBody.content_scripts,
-          )
           manifestBody.content_scripts?.forEach((script) => {
             script.js?.unshift(browserPolyfillPath)
           })
-          console.log(
-            '🚀: generateBundle -> manifestBody.content_scripts',
-            manifestBody.content_scripts,
-          )
         }
 
         /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
