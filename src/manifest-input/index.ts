@@ -1,3 +1,4 @@
+import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
 import { code as contentScriptWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
@@ -451,17 +452,39 @@ export function manifestInput(
         /* ------------- EMIT BROWSER POLYFILL ------------- */
 
         if (browserPolyfillSrc) {
-          const assetId = this.emitFile({
+          const bpId = this.emitFile({
             type: 'asset',
             source: browserPolyfillSrc,
             name: 'browser-polyfill.js',
           })
 
-          const polyfillPath = this.getFileName(assetId)
-          manifestBody.background?.scripts?.unshift(polyfillPath)
-          manifestBody.content_scripts?.forEach((script) => {
-            script.js?.unshift(polyfillPath)
+          const browserPolyfillPath = this.getFileName(bpId)
+          const exId = this.emitFile({
+            type: 'asset',
+            source: executeScriptPolyfill.replace(
+              '%BROWSER_POLYFILL_PATH%',
+              JSON.stringify(browserPolyfillPath),
+            ),
+            name: 'browser-polyfill.js',
           })
+          const executeScriptPolyfillPath = this.getFileName(
+            exId,
+          )
+          manifestBody.background?.scripts?.unshift(
+            browserPolyfillPath,
+            executeScriptPolyfillPath,
+          )
+          console.log(
+            '🚀: generateBundle -> manifestBody.content_scripts',
+            manifestBody.content_scripts,
+          )
+          manifestBody.content_scripts?.forEach((script) => {
+            script.js?.unshift(browserPolyfillPath)
+          })
+          console.log(
+            '🚀: generateBundle -> manifestBody.content_scripts',
+            manifestBody.content_scripts,
+          )
         }
 
         /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
