@@ -1,3 +1,4 @@
+import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
 import { code as contentScriptWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
@@ -75,6 +76,7 @@ const npmPkgDetails =
 
 export function manifestInput(
   {
+    browserPolyfill = false,
     dynamicImportWrapper = {},
     pkg = npmPkgDetails,
     publicKey,
@@ -90,6 +92,7 @@ export function manifestInput(
       srcDir: null,
     } as ManifestInputPluginCache,
   } = {} as {
+    browserPolyfill?: boolean
     dynamicImportWrapper?: DynamicImportWrapperOptions | false
     pkg?: {
       description: string
@@ -115,6 +118,20 @@ export function manifestInput(
   let manifestPath: string
 
   const manifestName = 'manifest.json'
+
+  let browserPolyfillSrc: string | undefined
+  if (browserPolyfill) {
+    const convert = require('convert-source-map')
+    const polyfillPath = require.resolve('webextension-polyfill')
+    console.log('🚀: polyfillPath', polyfillPath)
+    const src = fs.readFileSync(polyfillPath, 'utf-8')
+    const map = fs.readJsonSync(polyfillPath + '.map')
+
+    browserPolyfillSrc = [
+      convert.removeMapFileComments(src),
+      convert.fromObject(map).toComment(),
+    ].join('\n')
+  }
 
   /* ------------ HOOKS CLOSURES END ------------ */
 
@@ -358,15 +375,16 @@ export function manifestInput(
 
           // Setup content script import wrapper
           manifestBody.content_scripts = cts.map(
-            ({ js, ...rest }) =>
-              typeof js === 'undefined'
+            ({ js, ...rest }) => {
+              return typeof js === 'undefined'
                 ? rest
                 : {
                     js: js
                       .map((p) => p.replace(/\.ts$/, '.js'))
                       .map(memoizedEmitter),
                     ...rest,
-                  },
+                  }
+            },
           )
 
           // make all imports & dynamic imports web_acc_res
@@ -430,6 +448,44 @@ export function manifestInput(
         }
 
         /* ---------- STABLE EXTENSION ID END --------- */
+
+        /* ------------- EMIT BROWSER POLYFILL ------------- */
+
+        if (browserPolyfillSrc) {
+          const bpId = this.emitFile({
+            type: 'asset',
+            source: browserPolyfillSrc,
+            name: 'browser-polyfill.js',
+          })
+
+          const browserPolyfillPath = this.getFileName(bpId)
+          const exId = this.emitFile({
+            type: 'asset',
+            source: executeScriptPolyfill.replace(
+              '%BROWSER_POLYFILL_PATH%',
+              JSON.stringify(browserPolyfillPath),
+            ),
+            name: 'browser-polyfill.js',
+          })
+          const executeScriptPolyfillPath = this.getFileName(
+            exId,
+          )
+          manifestBody.background?.scripts?.unshift(
+            browserPolyfillPath,
+            executeScriptPolyfillPath,
+          )
+          console.log(
+            '🚀: generateBundle -> manifestBody.content_scripts',
+            manifestBody.content_scripts,
+          )
+          manifestBody.content_scripts?.forEach((script) => {
+            script.js?.unshift(browserPolyfillPath)
+          })
+          console.log(
+            '🚀: generateBundle -> manifestBody.content_scripts',
+            manifestBody.content_scripts,
+          )
+        }
 
         /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
 
