@@ -10,31 +10,63 @@ import {
 // Log load message to browser dev console
 console.log(loadMessagePlaceholder.slice(1, -1))
 
+const markerId = 'rollup-plugin-chrome-extension-simple-reloader'
+
+const addMarker = `{
+  const tag = document.createElement('meta');
+  tag.id = '${markerId}';
+  document.head.append(tag);
+}`
+
+const checkMarker = `
+!!document.head.querySelector('#${markerId}')
+`
+
 // Modify chrome.tabs.executeScript to inject reloader
 const _executeScript = chrome.tabs.executeScript
-chrome.tabs.executeScript = (...args: any): void => {
-  const tabId = typeof args[0] === 'number' ? args[0] : null
+const withP = (...args: [any, any?]): Promise<any[]> =>
+  new Promise((resolve, reject) => {
+    _executeScript(...args, (results) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError.message)
+      } else {
+        resolve(results)
+      }
+    })
+  })
 
-  // execute reloader
-  const reloaderArgs = (tabId === null
-    ? ([] as any[])
-    : ([tabId] as any[])
-  ).concat([
-    // TODO: convert to file to get replacements right
-    { file: JSON.parse(ctScriptPathPlaceholder) },
-    () => {
-      // execute original script
-      _executeScript(...(args as [any, any, any]))
-    },
-  ])
+chrome.tabs.executeScript = (...args: any[]): void => {
+  ;(async () => {
+    const tabId = typeof args[0] === 'number' ? args[0] : null
+    const argsBase = (tabId === null ? [] : [tabId]) as any[]
 
-  _executeScript(...(reloaderArgs as [any, any, any]))
+    const [done] = await withP(
+      ...(argsBase.concat({ code: checkMarker }) as [any, any]),
+    )
+
+    // Don't add reloader if it's already there
+    if (!done) {
+      await withP(
+        ...(argsBase.concat({ code: addMarker }) as [any, any]),
+      )
+
+      // execute reloader
+      const reloaderArgs = argsBase.concat([
+        // TODO: convert to file to get replacements right
+        { file: JSON.parse(ctScriptPathPlaceholder) },
+      ]) as [any, any]
+
+      await withP(...reloaderArgs)
+    }
+
+    _executeScript(...(args as [any, any, any]))
+  })()
 }
 
 // Modify chrome.runtime.reload to unregister sw's
 const _runtimeReload = chrome.runtime.reload
 chrome.runtime.reload = () => {
-  (async () => {
+  ;(async () => {
     await unregisterServiceWorkers()
     _runtimeReload()
   })()
