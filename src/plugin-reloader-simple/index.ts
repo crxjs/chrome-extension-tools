@@ -10,6 +10,7 @@ import {
   timestampPathPlaceholder,
   loadMessagePlaceholder,
   timestampFilename,
+  ctScriptPathPlaceholder,
 } from './CONSTANTS'
 
 export type SimpleReloaderPlugin = Pick<
@@ -87,6 +88,14 @@ export const simpleReloader = (
         true,
       )
 
+      cache.ctScriptPath = emit(
+        contentScriptReloader,
+        ctClientCode.replace(
+          loadMessagePlaceholder,
+          JSON.stringify(cache.loadMessage),
+        ),
+      )
+
       cache.bgScriptPath = emit(
         backgroundPageReloader,
         bgClientCode
@@ -94,15 +103,11 @@ export const simpleReloader = (
           .replace(
             loadMessagePlaceholder,
             JSON.stringify(cache.loadMessage),
+          )
+          .replace(
+            ctScriptPathPlaceholder,
+            JSON.stringify(cache.ctScriptPath),
           ),
-      )
-
-      cache.ctScriptPath = emit(
-        contentScriptReloader,
-        ctClientCode.replace(
-          loadMessagePlaceholder,
-          JSON.stringify(cache.loadMessage),
-        ),
       )
 
       // Update the exported cache
