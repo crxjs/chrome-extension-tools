@@ -4,3 +4,4 @@ export const timestampFilename = 'timestamp.json'
 
 export const timestampPathPlaceholder = '%TIMESTAMP_PATH%'
 export const loadMessagePlaceholder = '%LOAD_MESSAGE%'
+export const ctScriptPathPlaceholder = '%CONTENT_SCRIPT_PATH%'

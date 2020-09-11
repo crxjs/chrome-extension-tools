@@ -2,12 +2,43 @@
 /* globals chrome */
 
 import {
+  ctScriptPathPlaceholder,
   loadMessagePlaceholder,
   timestampPathPlaceholder,
 } from '../CONSTANTS'
 
 // Log load message to browser dev console
 console.log(loadMessagePlaceholder.slice(1, -1))
+
+// Modify chrome.tabs.executeScript to inject reloader
+const _executeScript = chrome.tabs.executeScript
+chrome.tabs.executeScript = (...args: any): void => {
+  const tabId = typeof args[0] === 'number' ? args[0] : null
+
+  // execute reloader
+  const reloaderArgs = (tabId === null
+    ? ([] as any[])
+    : ([tabId] as any[])
+  ).concat([
+    // TODO: convert to file to get replacements right
+    { file: JSON.parse(ctScriptPathPlaceholder) },
+    () => {
+      // execute original script
+      _executeScript(...(args as [any, any, any]))
+    },
+  ])
+
+  _executeScript(...(reloaderArgs as [any, any, any]))
+}
+
+// Modify chrome.runtime.reload to unregister sw's
+const _runtimeReload = chrome.runtime.reload
+chrome.runtime.reload = () => {
+  (async () => {
+    await unregisterServiceWorkers()
+    _runtimeReload()
+  })()
+}
 
 let timestamp: number | undefined
 
@@ -48,3 +79,12 @@ const id = setInterval(async () => {
     }
   }
 }, 1000)
+
+async function unregisterServiceWorkers() {
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations()
+    await Promise.all(registrations.map((r) => r.unregister()))
+  } catch (error) {
+    console.error(error)
+  }
+}
