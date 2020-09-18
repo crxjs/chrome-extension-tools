@@ -64,13 +64,13 @@ chrome.tabs.executeScript = (...args: any[]): void => {
 }
 
 // Modify chrome.runtime.reload to unregister sw's
-const _runtimeReload = chrome.runtime.reload
-chrome.runtime.reload = () => {
-  ;(async () => {
-    await unregisterServiceWorkers()
-    _runtimeReload()
-  })()
-}
+// const _runtimeReload = chrome.runtime.reload
+// chrome.runtime.reload = () => {
+//   ;(async () => {
+//     await unregisterServiceWorkers()
+//     _runtimeReload()
+//   })()
+// }
 
 let timestamp: number | undefined
 
@@ -112,11 +112,11 @@ const id = setInterval(async () => {
   }
 }, 1000)
 
-async function unregisterServiceWorkers() {
-  try {
-    const registrations = await navigator.serviceWorker.getRegistrations()
-    await Promise.all(registrations.map((r) => r.unregister()))
-  } catch (error) {
-    console.error(error)
-  }
-}
+// async function unregisterServiceWorkers() {
+//   try {
+//     const registrations = await navigator.serviceWorker.getRegistrations()
+//     await Promise.all(registrations.map((r) => r.unregister()))
+//   } catch (error) {
+//     console.error(error)
+//   }
+// }
