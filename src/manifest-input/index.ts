@@ -92,7 +92,11 @@ export function manifestInput(
       srcDir: null,
     } as ManifestInputPluginCache,
   } = {} as {
-    browserPolyfill?: boolean
+    browserPolyfill?:
+      | boolean
+      | {
+          executeScript: boolean
+        }
     dynamicImportWrapper?: DynamicImportWrapperOptions | false
     pkg?: {
       description: string
@@ -123,7 +127,6 @@ export function manifestInput(
   if (browserPolyfill) {
     const convert = require('convert-source-map')
     const polyfillPath = require.resolve('webextension-polyfill')
-    console.log('🚀: polyfillPath', polyfillPath)
     const src = fs.readFileSync(polyfillPath, 'utf-8')
     const map = fs.readJsonSync(polyfillPath + '.map')
 
@@ -459,20 +462,32 @@ export function manifestInput(
           })
 
           const browserPolyfillPath = this.getFileName(bpId)
-          const exId = this.emitFile({
-            type: 'asset',
-            source: executeScriptPolyfill.replace(
-              '%BROWSER_POLYFILL_PATH%',
-              JSON.stringify(browserPolyfillPath),
-            ),
-            name: 'browser-polyfill.js',
-          })
-          const executeScriptPolyfillPath = this.getFileName(
-            exId,
-          )
+
+          if (
+            typeof browserPolyfill === 'object'
+              ? browserPolyfill.executeScript
+              : browserPolyfill
+          ) {
+            const exId = this.emitFile({
+              type: 'asset',
+              source: executeScriptPolyfill.replace(
+                '%BROWSER_POLYFILL_PATH%',
+                JSON.stringify(browserPolyfillPath),
+              ),
+              name: 'browser-polyfill-for-execute-script.js',
+            })
+
+            const executeScriptPolyfillPath = this.getFileName(
+              exId,
+            )
+
+            manifestBody.background?.scripts?.unshift(
+              executeScriptPolyfillPath,
+            )
+          }
+
           manifestBody.background?.scripts?.unshift(
             browserPolyfillPath,
-            executeScriptPolyfillPath,
           )
           manifestBody.content_scripts?.forEach((script) => {
             script.js?.unshift(browserPolyfillPath)

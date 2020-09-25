@@ -1,4 +1,4 @@
-const checkPolyfilled = `typeof browser !== undefined`
+const checkPolyfilled = 'typeof browser !== "undefined"'
 
 const _executeScript = chrome.tabs.executeScript
 const withP = (...args: [any, any?]): Promise<any[]> =>
