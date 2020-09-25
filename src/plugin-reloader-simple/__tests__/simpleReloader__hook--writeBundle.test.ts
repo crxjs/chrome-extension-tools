@@ -1,11 +1,7 @@
 import { outputJson } from 'fs-extra'
 import { join } from 'path'
 import { OutputBundle } from 'rollup'
-import {
-  simpleReloader,
-  SimpleReloaderPlugin,
-  _internalCache,
-} from '..'
+import { simpleReloader, SimpleReloaderPlugin } from '..'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 
@@ -28,7 +24,7 @@ beforeEach(() => {
   process.env.ROLLUP_WATCH = 'true'
 
   bundle = cloneObject(originalBundle)
-  plugin = simpleReloader({ outputDir, timestampPath })!
+  plugin = simpleReloader({}, { outputDir, timestampPath })!
 })
 
 test('Writes timestamp file', async () => {

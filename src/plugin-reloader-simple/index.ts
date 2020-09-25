@@ -11,12 +11,19 @@ import {
   loadMessagePlaceholder,
   timestampFilename,
   ctScriptPathPlaceholder,
+  executeScriptPlaceholder,
+  unregisterServiceWorkersPlaceholder,
 } from './CONSTANTS'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
   'name' | 'generateBundle' | 'writeBundle'
 >
+
+export interface SimpleReloaderOptions {
+  executeScript?: boolean
+  unregisterServiceWorkers?: boolean
+}
 
 export interface SimpleReloaderCache {
   bgScriptPath?: string
@@ -30,6 +37,10 @@ export interface SimpleReloaderCache {
 export const _internalCache: SimpleReloaderCache = {}
 
 export const simpleReloader = (
+  {
+    executeScript = true,
+    unregisterServiceWorkers = true,
+  } = {} as SimpleReloaderOptions,
   cache = {} as SimpleReloaderCache,
 ): SimpleReloaderPlugin | undefined => {
   if (!process.env.ROLLUP_WATCH) {
@@ -107,6 +118,14 @@ export const simpleReloader = (
           .replace(
             ctScriptPathPlaceholder,
             JSON.stringify(cache.ctScriptPath),
+          )
+          .replace(
+            executeScriptPlaceholder,
+            JSON.stringify(executeScript),
+          )
+          .replace(
+            unregisterServiceWorkersPlaceholder,
+            JSON.stringify(unregisterServiceWorkers),
           ),
       )
 
