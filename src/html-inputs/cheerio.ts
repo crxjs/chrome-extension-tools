@@ -21,7 +21,7 @@ export const getRelativePath = (filePath: string) => (
 
 /* -------------------- SCRIPTS -------------------- */
 
-export const getScriptElems = ($: CheerioStatic) =>
+export const getScriptElems = ($: cheerio.Root) =>
   $('script')
     .not('[data-rollup-asset]')
     .not('[src^="http:"]')
@@ -31,7 +31,7 @@ export const getScriptElems = ($: CheerioStatic) =>
 
 // Mutative action
 export const mutateScriptElems = (
-  $: CheerioStatic & {
+  $: cheerio.Root & {
     filePath: string
   },
 ) => {
@@ -50,11 +50,11 @@ export const mutateScriptElems = (
   return $
 }
 
-export const getScripts = ($: CheerioStatic) =>
+export const getScripts = ($: cheerio.Root) =>
   getScriptElems($).toArray()
 
 export const getScriptSrc = (
-  $: CheerioStatic & {
+  $: cheerio.Root & {
     filePath: string
   },
 ) =>
@@ -65,7 +65,7 @@ export const getScriptSrc = (
 
 /* ----------------- ASSET SCRIPTS ----------------- */
 
-const getAssets = ($: CheerioStatic) =>
+const getAssets = ($: cheerio.Root) =>
   $('script')
     .filter('[data-rollup-asset="true"]')
     .not('[src^="http:"]')
@@ -75,7 +75,7 @@ const getAssets = ($: CheerioStatic) =>
     .toArray()
 
 export const getJsAssets = (
-  $: CheerioStatic & {
+  $: cheerio.Root & {
     filePath: string
   },
 ) =>
@@ -86,7 +86,7 @@ export const getJsAssets = (
 
 /* -------------------- css ------------------- */
 
-const getCss = ($: CheerioStatic) =>
+const getCss = ($: cheerio.Root) =>
   $('link')
     .filter('[rel="stylesheet"]')
     .not('[href^="http:"]')
@@ -96,7 +96,7 @@ const getCss = ($: CheerioStatic) =>
     .toArray()
 
 export const getCssHrefs = (
-  $: CheerioStatic & {
+  $: cheerio.Root & {
     filePath: string
   },
 ) =>
@@ -107,7 +107,7 @@ export const getCssHrefs = (
 
 /* -------------------- img ------------------- */
 
-const getImgs = ($: CheerioStatic) =>
+const getImgs = ($: cheerio.Root) =>
   $('img')
     .not('[src^="http://"]')
     .not('[src^="https://"]')
@@ -115,7 +115,7 @@ const getImgs = ($: CheerioStatic) =>
     .not('[src^="/"]')
     .toArray()
 
-const getFavicons = ($: CheerioStatic) =>
+const getFavicons = ($: cheerio.Root) =>
   $('link[rel="icon"]')
     .not('[href^="http:"]')
     .not('[href^="https:"]')
@@ -124,7 +124,7 @@ const getFavicons = ($: CheerioStatic) =>
     .toArray()
 
 export const getImgSrcs = (
-  $: CheerioStatic & {
+  $: cheerio.Root & {
     filePath: string
   },
 ) => {

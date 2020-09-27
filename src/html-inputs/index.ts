@@ -14,8 +14,8 @@ import {
   mutateScriptElems,
 } from './cheerio'
 
-/** CheerioStatic objects with a file path */
-export type CheerioFile = CheerioStatic & {
+/** cheerio.Root objects with a file path */
+export type CheerioFile = cheerio.Root & {
   filePath: string
 }
 
