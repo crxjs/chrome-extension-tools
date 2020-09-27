@@ -251,3 +251,19 @@ test('on second run and not cache.manifest, loads manifest from file system', as
   expect(cache.manifest).not.toEqual(manifest)
   expect(cache.manifest).toEqual(await readJSON(manifestJson))
 })
+
+test('should throw if options_ui and options_page both exist', () => {
+  const call = () => {
+    plugin.options.call(context, {
+      input: getExtPath(
+        'both-option-types-manifest/manifest.json',
+      ),
+    })
+  }
+
+  const error = new Error(
+    'options_ui and options_page cannot both be defined in manifest.json.',
+  )
+
+  expect(call).toThrow(error)
+})

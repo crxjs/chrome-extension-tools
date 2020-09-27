@@ -1,6 +1,6 @@
 {
-  "name": "basic",
-  "description": "basic chrome extension",
+  "name": "options-ui",
+  "description": "basic chrome extension with options ui",
   "manifest_version": 2,
   "version": "1.0.0",
   "icons": {
