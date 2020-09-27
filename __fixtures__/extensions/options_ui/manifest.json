@@ -39,7 +39,10 @@
       ]
     }
   ],
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
   "browser_action": {
     "default_icon": {
       "16": "images/icon-main-16.png"

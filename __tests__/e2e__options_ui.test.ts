@@ -4,7 +4,7 @@ import { isAsset, isChunk } from '../src/helpers'
 import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, getExtPath } from '../__fixtures__/utils'
 
-const { default: config } = require(getExtPath('basic/rollup.config.js'))
+const { default: config } = require(getExtPath('options_ui/rollup.config.js'))
 
 let bundle: RollupBuild
 let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
@@ -18,7 +18,7 @@ beforeAll(async () => {
     })
 
     if (!process.env.JEST_WATCH) {
-      await writeJSON(getExtPath('basic-build.json'), bundle, {
+      await writeJSON(getExtPath('options_ui-build.json'), bundle, {
         spaces: 2,
       })
     }
