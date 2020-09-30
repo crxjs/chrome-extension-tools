@@ -1,33 +1,38 @@
-import { outputJson } from 'fs-extra'
 import { join } from 'path'
 import { OutputBundle } from 'rollup'
-import { simpleReloader, SimpleReloaderPlugin } from '..'
+import { simpleReloader } from '..'
+import { buildCRX } from '../../../__fixtures__/build-basic-crx'
+import { inversePromise } from '../../../__fixtures__/inversePromise'
 import { context } from '../../../__fixtures__/plugin-context'
+import { getExtPath } from '../../../__fixtures__/utils'
 import { cloneObject } from '../../manifest-input/cloneObject'
 
-jest.mock('fs-extra', () => ({
-  outputJson: jest.fn(() => Promise.resolve()),
-}))
-
-const mockOutputJson = outputJson as jest.MockedFunction<
-  typeof outputJson
->
+const fsExtra = require('fs-extra')
+const mockOutputJson = jest.spyOn(fsExtra, 'outputJson')
+mockOutputJson.mockImplementation(() => Promise.resolve())
 
 const outputDir = 'outputDir'
 const timestampPath = 'timestampPath'
 
-const originalBundle: OutputBundle = require('../../../__fixtures__/extensions/basic-bundle.json')
+const bundlePromise = inversePromise<OutputBundle>()
+beforeAll(
+  buildCRX(getExtPath('basic/rollup.config.js'), (result) => {
+    bundlePromise.resolve(result.bundle)
+  }),
+  10000,
+)
 
-let bundle: OutputBundle
-let plugin: SimpleReloaderPlugin
 beforeEach(() => {
   process.env.ROLLUP_WATCH = 'true'
-
-  bundle = cloneObject(originalBundle)
-  plugin = simpleReloader({}, { outputDir, timestampPath })!
 })
 
 test('Writes timestamp file', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader(
+    {},
+    { outputDir, timestampPath },
+  )!
+
   await plugin.writeBundle.call(context, bundle)
 
   expect(mockOutputJson).toBeCalledWith(
@@ -37,6 +42,12 @@ test('Writes timestamp file', async () => {
 })
 
 test('Handles write errors with message prop', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader(
+    {},
+    { outputDir, timestampPath },
+  )!
+
   const message = 'ERROR!'
 
   mockOutputJson.mockImplementation(() =>
@@ -54,6 +65,12 @@ test('Handles write errors with message prop', async () => {
 })
 
 test('Handles other write errors', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader(
+    {},
+    { outputDir, timestampPath },
+  )!
+
   const message = 'ERROR!'
 
   mockOutputJson.mockImplementation(() =>

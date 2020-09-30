@@ -1,4 +1,3 @@
-import { readFileSync } from 'fs-extra'
 import {
   OutputBundle,
   RollupOptions,
@@ -11,10 +10,13 @@ import {
   ManifestInputPluginCache,
 } from '..'
 import { manifestJson } from '../../../__fixtures__/basic-paths'
+import { buildCRX } from '../../../__fixtures__/build-basic-crx'
+import { inversePromise } from '../../../__fixtures__/inversePromise'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
+import { cloneObject } from '../cloneObject'
 
 const validate = require('../manifest-parser/validate')
 jest.spyOn(validate, 'validateManifest')
@@ -26,9 +28,12 @@ const options: RollupOptions = {
   input: manifestJson,
 }
 
-const bundleJson = readFileSync(
-  getExtPath('basic-bundle.json'),
-  'utf8',
+const bundlePromise = inversePromise<OutputBundle>()
+beforeAll(
+  buildCRX(getExtPath('basic/rollup.config.js'), (result) => {
+    bundlePromise.resolve(result.bundle)
+  }),
+  10000,
 )
 
 let cache: ManifestInputPluginCache
@@ -53,7 +58,7 @@ beforeEach(async () => {
 })
 
 test('derives permissions from chunks', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -80,7 +85,7 @@ test('derives permissions from chunks', async () => {
 })
 
 test('does not warn permissions for verbose false', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -93,7 +98,7 @@ test('does not warn permissions for verbose false', async () => {
 })
 
 test('Warns permissions for verbose true', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   const plugin = manifestInput({
     cache: {
@@ -115,7 +120,7 @@ test('Warns permissions for verbose true', async () => {
 })
 
 test('calls combinePerms', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -128,7 +133,7 @@ test('calls combinePerms', async () => {
 })
 
 test('includes content script imports in web_accessible_resources', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -157,7 +162,7 @@ test('includes content script imports in web_accessible_resources', async () => 
 })
 
 test('emits dynamic import wrappers once per file', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -190,7 +195,7 @@ test('sets public key', async () => {
 
   plugin = manifestInput({ cache, publicKey, verbose: false })
 
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -211,7 +216,7 @@ test('sets public key', async () => {
 })
 
 test('validates manifest', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -224,7 +229,7 @@ test('validates manifest', async () => {
 })
 
 test('emits manifest via this.emitFile', async () => {
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -244,7 +249,7 @@ test('Sets cache.assetChanged to false if cache.permsHash is truthy', async () =
   cache.assetChanged = true
   cache.permsHash = JSON.stringify('asdk')
 
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -266,7 +271,7 @@ test('Warns if new permissions are detected', async () => {
 
   jest.clearAllMocks()
 
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   await plugin.generateBundle.call(
     context,
@@ -281,7 +286,7 @@ test('Warns if new permissions are detected', async () => {
 test('Throws if cache.manifest is falsey', async () => {
   delete cache.manifest
 
-  const bundle: OutputBundle = JSON.parse(bundleJson)
+  const bundle = cloneObject(await bundlePromise)
 
   const errorMessage = 'cache.manifest is undefined'
 

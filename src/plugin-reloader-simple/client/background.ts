@@ -39,6 +39,8 @@ if (options.executeScript) {
   const _executeScript = chrome.tabs.executeScript
   const withP = (...args: [any, any?]): Promise<any[]> =>
     new Promise((resolve, reject) => {
+      // eslint-disable-next-line
+      // @ts-ignore
       _executeScript(...args, (results) => {
         if (chrome.runtime.lastError) {
           reject(chrome.runtime.lastError.message)

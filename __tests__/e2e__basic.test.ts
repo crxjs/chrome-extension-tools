@@ -1,36 +1,18 @@
-import { writeJSON } from 'fs-extra'
-import { OutputAsset, OutputChunk, rollup, RollupBuild } from 'rollup'
+import { OutputAsset, OutputChunk } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { ChromeExtensionManifest } from '../src/manifest'
+import { buildCRX } from '../__fixtures__/build-basic-crx'
 import { byFileName, getExtPath } from '../__fixtures__/utils'
 
-const { default: config } = require(getExtPath('basic/rollup.config.js'))
-
-let bundle: RollupBuild
 let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
-let ready: Promise<void>
-beforeAll(async () => {
-  try {
-    bundle = await rollup(config)
+beforeAll(
+  buildCRX(getExtPath('basic/rollup.config.js'), (result) => {
+    output = result.output.output
+  }),
+  10000,
+)
 
-    ready = bundle.generate(config.output).then(({ output: o }) => {
-      output = o
-    })
-
-    if (!process.env.JEST_WATCH) {
-      await writeJSON(getExtPath('basic-build.json'), bundle, {
-        spaces: 2,
-      })
-    }
-  } catch (error) {
-    console.error(error)
-  }
-}, 10000)
-
-test('bundles chunks', async () => {
-  expect(ready).toBeInstanceOf(Promise)
-  await ready
-
+test('bundles chunks', () => {
   // Chunks
   const chunks = output.filter(isChunk)
   expect(chunks.length).toBe(10)
@@ -48,10 +30,7 @@ test('bundles chunks', async () => {
 
 test(
   'bundles assets',
-  async () => {
-    expect(ready).toBeDefined()
-    await ready
-
+  () => {
     // Assets
     const assets = output.filter(isAsset)
     expect(assets.length).toBe(19)
@@ -79,10 +58,7 @@ test(
   5 * 60 * 1000,
 )
 
-test('Includes content script imports in web_accessible_resources', async () => {
-  expect(ready).toBeDefined()
-  await ready
-
+test('Includes content script imports in web_accessible_resources', () => {
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
   const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
@@ -92,10 +68,7 @@ test('Includes content script imports in web_accessible_resources', async () => 
   })
 })
 
-test('Includes content_security_policy untouched', async () => {
-  expect(ready).toBeDefined()
-  await ready
-
+test('Includes content_security_policy untouched', () => {
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
   const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
@@ -105,4 +78,5 @@ test('Includes content_security_policy untouched', async () => {
   })
 })
 
+// TODO: emit assets shared by manifest and html files one time only
 test.todo('Emits assets in both manifest and html files once')
