@@ -78,6 +78,7 @@ export function manifestInput(
   {
     browserPolyfill = false,
     dynamicImportWrapper = {},
+    extendManifest = {},
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
@@ -98,6 +99,11 @@ export function manifestInput(
           executeScript: boolean
         }
     dynamicImportWrapper?: DynamicImportWrapperOptions | false
+    extendManifest?:
+      | Partial<ChromeExtensionManifest>
+      | ((
+          manifest: ChromeExtensionManifest,
+        ) => ChromeExtensionManifest)
     pkg?: {
       description: string
       name: string
@@ -211,7 +217,17 @@ export function manifestInput(
         }
 
         manifestPath = configResult.filepath
-        cache.manifest = configResult.config
+
+        if (typeof extendManifest === 'function') {
+          cache.manifest = extendManifest(configResult.config)
+        } else if (typeof extendManifest === 'object') {
+          cache.manifest = {
+            ...configResult.config,
+            ...extendManifest,
+          }
+        } else {
+          cache.manifest = configResult.config
+        }
 
         cache.srcDir = path.dirname(manifestPath)
 

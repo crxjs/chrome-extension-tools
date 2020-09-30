@@ -12,6 +12,7 @@ import {
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
+import { ChromeExtensionManifest } from './manifest'
 
 export type ChromeExtensionPlugin = Pick<
   Required<Plugin>,
@@ -34,13 +35,18 @@ export { simpleReloader } from './plugin-reloader-simple/index'
 export interface ChromeExtensionOptions {
   browserPolyfill?: boolean
   dynamicImportWrapper?: DynamicImportWrapperOptions
-  verbose?: boolean
+  extendManifest?:
+    | Partial<ChromeExtensionManifest>
+    | ((
+        manifest: ChromeExtensionManifest,
+      ) => ChromeExtensionManifest)
   pkg?: {
     description: string
     name: string
     version: string
   }
   publicKey?: string
+  verbose?: boolean
 }
 
 export const chromeExtension = (
