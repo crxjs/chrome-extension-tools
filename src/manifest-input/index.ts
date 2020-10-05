@@ -79,6 +79,7 @@ export function manifestInput(
     browserPolyfill = false,
     dynamicImportWrapper = {},
     extendManifest = {},
+    firstClassManifest = true,
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
@@ -104,6 +105,7 @@ export function manifestInput(
       | ((
           manifest: ChromeExtensionManifest,
         ) => ChromeExtensionManifest)
+    firstClassManifest?: boolean
     pkg?: {
       description: string
       name: string
@@ -231,38 +233,41 @@ export function manifestInput(
 
         cache.srcDir = path.dirname(manifestPath)
 
-        // Derive entry paths from manifest
-        const { js, html, css, img, others } = deriveFiles(
-          cache.manifest,
-          cache.srcDir,
-        )
+        if (firstClassManifest) {
+          // Derive entry paths from manifest
+          const { js, html, css, img, others } = deriveFiles(
+            cache.manifest,
+            cache.srcDir,
+          )
 
-        // Cache derived inputs
-        cache.input = [...cache.inputAry, ...js, ...html]
-        cache.assets = [
-          // Dedupe assets
-          ...new Set([...css, ...img, ...others]),
-        ]
+          // Cache derived inputs
+          cache.input = [...cache.inputAry, ...js, ...html]
+          cache.assets = [
+            // Dedupe assets
+            ...new Set([...css, ...img, ...others]),
+          ]
+        }
 
         /* --------------- END LOAD MANIFEST --------------- */
       }
 
-      if (cache.input.length === 0) {
+      const finalInput = cache.input.reduce(
+        reduceToRecord(cache.srcDir),
+        cache.inputObj,
+      )
+
+      if (Object.keys(finalInput).length === 0) {
         throw new Error(
-          'The manifest must have at least one script or HTML file.',
+          'The manifest must have at least one script or HTML file. If you are not loading files from the manifest, use options.firstClassManifest = false',
         )
       }
-
       // TODO: consider using this.emitFile in buildStart instead
       //  - the input record is unusual, but would this be more unusual?
       //  - would need to put something here, can't return an empty input
       //    - maybe a dummy file to remove in generateBundle?
       return {
         ...options,
-        input: cache.input.reduce(
-          reduceToRecord(cache.srcDir),
-          cache.inputObj,
-        ),
+        input: finalInput,
       }
     },
 

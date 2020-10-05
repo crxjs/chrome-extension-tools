@@ -40,6 +40,7 @@ export interface ChromeExtensionOptions {
     | ((
         manifest: ChromeExtensionManifest,
       ) => ChromeExtensionManifest)
+  firstClassManifest?: boolean
   pkg?: {
     description: string
     name: string
