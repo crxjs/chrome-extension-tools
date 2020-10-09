@@ -180,6 +180,16 @@ export function manifestInput(
           throw new Error(`${options.input} is an empty file.`)
         }
 
+        const { options_page, options_ui } = configResult.config
+        if (
+          options_page !== undefined &&
+          options_ui !== undefined
+        ) {
+          throw new Error(
+            'options_ui and options_page cannot both be defined in manifest.json.',
+          )
+        }
+
         manifestPath = configResult.filepath
         cache.manifest = configResult.config
 
