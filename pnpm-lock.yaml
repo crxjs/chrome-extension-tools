@@ -20,7 +20,7 @@ devDependencies:
   '@sucrase/jest-plugin': 2.0.0
   '@testing-library/dom': 6.16.0
   '@testing-library/jest-dom': 5.11.4
-  '@types/cheerio': 0.22.16
+  '@types/cheerio': 0.22.22
   '@types/chrome': 0.0.93
   '@types/fs-extra': 8.1.1
   '@types/glob': 7.1.3
@@ -697,12 +697,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-Pzh9O3sTK8V6I1olsXpCfj2k/ygO2q1X0vhhnDrEQyYLHZesWz+zMZMVcwXLCYf0U36EtmyYaFGPfXlTtDHe3A==
-  /@types/cheerio/0.22.16:
+  /@types/cheerio/0.22.22:
     dependencies:
-      '@types/node': 13.13.21
+      '@types/node': 13.13.25
     dev: true
     resolution:
-      integrity: sha512-bSbnU/D4yzFdzLpp3+rcDj0aQQMIRUBNJU7azPxdqMpnexjUSvGJyDuOBQBHeOZh1mMKgsJm6Dy+LLh80Ew4tQ==
+      integrity: sha512-05DYX4zU96IBfZFY+t3Mh88nlwSMtmmzSYaQkKN48T495VV1dkHSah6qYyDTN5ngaS0i0VonH37m+RuzSM0YiA==
   /@types/chrome/0.0.114:
     dependencies:
       '@types/filesystem': 0.0.29
@@ -822,6 +822,10 @@ packages:
   /@types/node/13.13.21:
     resolution:
       integrity: sha512-tlFWakSzBITITJSxHV4hg4KvrhR/7h3xbJdSFbYJBVzKubrASbnnIFuSgolUh7qKGo/ZeJPKUfbZ0WS6Jp14DQ==
+  /@types/node/13.13.25:
+    dev: true
+    resolution:
+      integrity: sha512-6ZMK4xRcF2XrPdKmPYQxZkdHKV18xKgUFVvhIgw2iwaaO6weleLPHLBGPZmLhjo+m1N+MZXRAoBEBCCVqgO2zQ==
   /@types/normalize-package-data/2.4.0:
     dev: true
     resolution:
@@ -5267,7 +5271,7 @@ specifiers:
   '@sucrase/jest-plugin': ^2.0.0
   '@testing-library/dom': ^6.12.2
   '@testing-library/jest-dom': ^5.1.1
-  '@types/cheerio': 0.22.16
+  '@types/cheerio': 0.22.22
   '@types/chrome': ^0.0.93
   '@types/fs-extra': ^8.0.1
   '@types/glob': ^7.1.1
