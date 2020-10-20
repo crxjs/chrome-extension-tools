@@ -103,7 +103,7 @@ Your extension build will be in the `dist` folder. It has
 everything it needs: manifest, scripts, and assets (images, css,
 etc...).
 
-Install it in Chrome to test drive your extension! 🚗
+Load it in Chrome `chrome://extensions/` to test drive your extension! 🚗
 
 ## Features <a name = "features"></a>
 
@@ -111,9 +111,9 @@ Install it in Chrome to test drive your extension! 🚗
 <div style="padding-left: 30px; padding-bottom: 10px;">
 
 <details>
-<summary>Why does the rollup.config.js only need the manifest.json as an entry point?</summary>
+<summary>Why does the rollup.config.js only need the manifest as an entry point?</summary>
 <br>
-WOP: RP-CE parses your manifest, grabbing your background page, content scripts, option page and popup page
+`rollup-plugin-chrome-extension` parses your manifest and bundles the scripts in your background page, content scripts, option page and popup page
 </details>
 
 <details>
@@ -122,18 +122,17 @@ WOP: RP-CE parses your manifest, grabbing your background page, content scripts,
 `rollup-plugin-chrome-extension` uses the JS or even TS files in
 your HTML files as entry points. Shared code is split out into
 chunks automatically, so libraries like React and Lodash aren't
-bundled into your extension multiple times. If you have a CSS file in your html files, they will need to be bundled using another plugin.
+bundled into your extension multiple times.
 </details>
 
 <details>
-<summary>What about the assets in the manifest?</summary>
+<summary>What happens with the assets? Like images, icons or css files?</summary>
 <br>
-All assets in the manifest (images, icons, and even CSS files) are automatically copied into the output folder. Even the images in your HTML files get copied over. WOP NOTE: This only includes assets in the html. If you have any css files a javascript, you will need an additional plugin.
-
+All assets in the manifest (images, icons, and even CSS files) are automatically copied into the output folder. Even the images in your HTML files get copied over. NOTE: This only includes assets in the html. If you import a css file in a javascript file, you will need an additional plugin. 
 </details>
 
 <details>
-<summary>Do you include any Manifest validation?</summary>
+<summary>Is the Manifest validated?</summary>
 <br>
 `rollup-plugin-chrome-extension` validates your output manifest, 
 so you discover mistakes when you build, not in a cryptic Chrome
@@ -141,10 +140,10 @@ alert later.
 </details>
 
 <details>
-<summary>Does it include any help with permissions?</summary>
+<summary>Does it detect permissions automatically?</summary>
 <br>
 `rollup-plugin-chrome-extension` statically analyzes your bundled
-code to detect required permissions to declare in the manifest.
+code, detects any required permissions and adds them to the manifest in the `dist` folder.
 Any permissions in the source manifest are always included.
 
 </details>
@@ -158,8 +157,7 @@ out automatically from your `package.json`, if you use an npm
 script to run Rollup. Just manage your version number in
 `package.json` and it will reflect in your extension build.
 
-Don't worry, any value in your source manifest will override that
-value from `package.json`! 😉
+Don't worry, any value in your source manifest will take over! 😉
 </details>
 
 </div>
@@ -169,21 +167,20 @@ value from `package.json`! 😉
 <div style="padding-left: 30px; padding-bottom: 10px;">
 
 <details>
-<summary>Does this mean I don't have to refresh my extension?</summary>
+<summary>Does this mean I don't have to manually reload my extension during development?</summary>
 <br>
-WOP: Remembering to reload your Chrome extension every time you change your code
-can be a pain, and if you forget to reload, you're left
-wondering, "Why isn't this working?"
+Improve your development experience with our reloader! You won't have to reload your Chrome extension every time you make a change
+to your code. We know what a pain it can be to forget and wonder, "Why isn't this working? 😟". 
 </details>
 
 <details>
-<summary>Does it also refresh the pages I am injecting content scripts?</summary>
+<summary>Does it also reload the pages I am injecting content scripts?</summary>
 <br>
 Ever got the error `"Extension context invalidated"` in your
 content script? That happens when the extension reloads but the
 content script doesn't. Our reloader makes sure that doesn't
 happen by reloading your content scripts when it reloads your
-extension.
+extension automatically.
 </details>
 
 <details>
@@ -202,15 +199,13 @@ Rollup produces a new build.
 
 #### Includes chrome extension API types
 
-If you use
-[`@rollup/plugin-typescript`](https://www.npmjs.com/package/@rollup/plugin-typescript)
-in your plugins, you can write your Chrome extension in
-TypeScript. That's right, the scripts in your manifest and in
+If you use the
+[`@rollup/plugin-typescript`](https://www.npmjs.com/package/@rollup/plugin-typescript), you can write your Chrome extension in
+TypeScript. That's right, it bundles the scripts in your manifest and in
 your HTML script tags.
 
 TypeScript definitions are included, so no need to install an
 additional `@types` library!
-
 
 ---
 
@@ -224,7 +219,7 @@ code splitting features.
 
 ---
 
-### ⭐️ Plugins Take It To The Next Level <a name = ""></a>
+### ⭐️ Plugins Take It To The Next Level <a name = "plugins"></a>
 
 Take advantage of other great Rollup plugins to do awesome things
 with your Chrome extensions!
@@ -237,6 +232,8 @@ Some of our favorites are:
   [`rollup-plugin-postcss`](https://www.npmjs.com/package/rollup-plugin-postcss)
 - Zip your extension when you build with
   [`rollup-plugin-zip`](https://www.npmjs.com/package/rollup-plugin-zip).
+- Copy any assets not included in the manifest.json
+  [`rollup-plugin-copy`](https://github.com/vladshcherbin/rollup-plugin-copy).
 
 Two of our own plugins:
 
@@ -245,3 +242,5 @@ Two of our own plugins:
   [`rollup-plugin-bundle-imports`](https://www.npmjs.com/package/rollup-plugin-bundle-imports)
 - Empty your output folder before a new build with
   [`rollup-plugin-empty-dir`](https://www.npmjs.com/package/rollup-plugin-empty-dir)
+
+### ⭐️ Outputs a Chrome Web Store friendly bundle <a name = ""></a>
