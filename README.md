@@ -43,20 +43,9 @@ be bundled or copied to the output folder.
 
 ## Getting started <a name = "getting_started"></a>
 
-### Installation
+### Chrome Extension Boilerplates
 
-```sh
-$ npm i rollup rollup-plugin-chrome-extension@latest -D
-```
-
-Install the plugins
-[Node Resolve](https://www.npmjs.com/package/@rollup/plugin-node-resolve)
-and [CommonJS](https://github.com/rollup/@rollup/plugin-commonjs)
-if you plan to use npm modules.
-
-```sh
-$ npm i @rollup/plugin-node-resolve @rollup/plugin-commonjs -D
-```
+[Javascript-boilerplate](https://github.com/extend-chrome/javascript-boilerplate)
 
 ## Usage <a name = "usage"></a>
 
@@ -118,12 +107,51 @@ Install it in Chrome to test drive your extension! 🚗
 
 ## Features <a name = "features"></a>
 
-### Worry Less About Your Manifest <a name = "features-manifest"></a>
+###  ⭐️ It's all in the Manifest <a name = "features-manifest"></a>
+<div style="padding-left: 30px; padding-bottom: 10px;">
 
-`rollup-plugin-chrome-extension` validates your output manifest,
+<details>
+<summary>Why does the rollup.config.js only need the manifest.json as an entry point?</summary>
+<br>
+WOP: RP-CE parses your manifest, grabbing your background page, content scripts, option page and popup page
+</details>
+
+<details>
+<summary>Does that include the scripts in the Options page and Popup page?</summary>
+<br>
+`rollup-plugin-chrome-extension` uses the JS or even TS files in
+your HTML files as entry points. Shared code is split out into
+chunks automatically, so libraries like React and Lodash aren't
+bundled into your extension multiple times. If you have a CSS file in your html files, they will need to be bundled using another plugin.
+</details>
+
+<details>
+<summary>What about the assets in the manifest?</summary>
+<br>
+All assets in the manifest (images, icons, and even CSS files) are automatically copied into the output folder. Even the images in your HTML files get copied over. WOP NOTE: This only includes assets in the html. If you have any css files a javascript, you will need an additional plugin.
+
+</details>
+
+<details>
+<summary>Do you include any Manifest validation?</summary>
+<br>
+`rollup-plugin-chrome-extension` validates your output manifest, 
 so you discover mistakes when you build, not in a cryptic Chrome
 alert later.
+</details>
 
+<details>
+<summary>Does it include any help with permissions?</summary>
+<br>
+`rollup-plugin-chrome-extension` statically analyzes your bundled
+code to detect required permissions to declare in the manifest.
+Any permissions in the source manifest are always included.
+
+</details>
+
+<details>
+<summary>Do I have to copy/paste the package.json fields to the Manifest?</summary>
+<br>
 You can omit `manifest_version`, `version`, `name`, and
 `description` from your source `manifest.json`. We'll fill them
 out automatically from your `package.json`, if you use an npm
@@ -132,25 +160,47 @@ script to run Rollup. Just manage your version number in
 
 Don't worry, any value in your source manifest will override that
 value from `package.json`! 😉
+</details>
 
-### Reload Your Extension Automatically <a name = "features-reloader"></a>
+</div>
 
-Reloading your Chrome extension every time you change your code
+###  ⭐️ Reload Your Extension Automatically <a name = "features-reloader"></a>
+
+<div style="padding-left: 30px; padding-bottom: 10px;">
+
+<details>
+<summary>Does this mean I don't have to refresh my extension?</summary>
+<br>
+WOP: Remembering to reload your Chrome extension every time you change your code
 can be a pain, and if you forget to reload, you're left
 wondering, "Why isn't this working?"
+</details>
 
-If you include the helper plugin `simpleReloader` in your config,
-when Rollup is in watch mode your background page will include an
-auto-reloader script. This will reload your extension every time
-Rollup produces a new build.
-
+<details>
+<summary>Does it also refresh the pages I am injecting content scripts?</summary>
+<br>
 Ever got the error `"Extension context invalidated"` in your
 content script? That happens when the extension reloads but the
 content script doesn't. Our reloader makes sure that doesn't
 happen by reloading your content scripts when it reloads your
 extension.
+</details>
 
-### Write Chrome Extensions In TypeScript <a name = "typescript"></a>
+<details>
+<summary>How do I enable the reloader?</summary>
+<br>
+If you include the helper plugin `simpleReloader` in your config,
+when Rollup is in watch mode your background page will include an
+auto-reloader script. This will reload your extension every time
+Rollup produces a new build.
+</details>
+
+
+</div>
+
+### ⭐️ Write Chrome Extensions In TypeScript <a name = "typescript"></a>
+
+#### Includes chrome extension API types
 
 If you use
 [`@rollup/plugin-typescript`](https://www.npmjs.com/package/@rollup/plugin-typescript)
@@ -161,28 +211,10 @@ your HTML script tags.
 TypeScript definitions are included, so no need to install an
 additional `@types` library!
 
-### Manage Your Assets With Ease <a name = "features-assets"></a>
 
-Your `manifest.json` doesn't only contain script files. There are
-images, icons, and even CSS files. We've got you covered. These
-assets are automatically copied into the output folder. Even the
-images in your HTML files get copied over.
+---
 
-### Bundle Everything In Your HTML Files <a name = "features-html"></a>
-
-What about your Options and Popup pages?
-`rollup-plugin-chrome-extension` uses the JS or even TS files in
-your HTML files as entry points. Shared code is split out into
-chunks automatically, so libraries like React and Lodash aren't
-bundled into your extension multiple times.
-
-### Derive Permissions Automatically <a name = "features-permissions"></a>
-
-`rollup-plugin-chrome-extension` statically analyzes your bundled
-code to detect required permissions to declare in the manifest.
-Any permissions in the source manifest are always included.
-
-### Use ES2015 Modules In Your Scripts <a name = "features-modules"></a>
+### ⭐️ Use ES2015 Modules In Your Scripts <a name = "features-modules"></a>
 
 Chrome extensions don't support modules in background and content
 scripts. We've developed a
@@ -190,7 +222,9 @@ scripts. We've developed a
 extension scripts, so you can take advantage of Rollup's great
 code splitting features.
 
-### Plugins Take It To The Next Level <a name = ""></a>
+---
+
+### ⭐️ Plugins Take It To The Next Level <a name = ""></a>
 
 Take advantage of other great Rollup plugins to do awesome things
 with your Chrome extensions!
