@@ -103,17 +103,20 @@ Your extension build will be in the `dist` folder. It has
 everything it needs: manifest, scripts, and assets (images, css,
 etc...).
 
-Load it in Chrome `chrome://extensions/` to test drive your extension! 🚗
+Load it in Chrome `chrome://extensions/` to test drive your
+extension! 🚗
 
 ## Features <a name = "features"></a>
 
-###  ⭐️ It's all in the Manifest <a name = "features-manifest"></a>
+### ⭐️ It's all in the Manifest <a name = "features-manifest"></a>
+
 <div style="padding-left: 30px; padding-bottom: 10px;">
 
 <details>
-<summary>Why does the rollup.config.js only need the manifest as an entry point?</summary>
+<summary>Why does the `rollup.config.js` only need the manifest as an entry point?</summary>
 <br>
-`rollup-plugin-chrome-extension` parses your manifest and bundles the scripts in your background page, content scripts, option page and popup page
+`rollup-plugin-chrome-extension` parses your manifest and bundles 
+the scripts in your background page, content scripts, option page and popup page
 </details>
 
 <details>
@@ -128,7 +131,12 @@ bundled into your extension multiple times.
 <details>
 <summary>What happens with the assets? Like images, icons or css files?</summary>
 <br>
-All assets in the manifest (images, icons, and even CSS files) are automatically copied into the output folder. Even the images in your HTML files get copied over. NOTE: This only includes assets in the html. If you import a css file in a javascript file, you will need an additional plugin. 
+All assets in the manifest (images, icons, and even CSS files) are 
+automatically copied into the output folder. Even the images in your HTML 
+files get copied over.
+NOTE: This only includes assets in the html itself. 
+If you import images or CSS in a JavaScript file, you will need an 
+additional plugin. 
 </details>
 
 <details>
@@ -143,9 +151,9 @@ alert later.
 <summary>Does it detect permissions automatically?</summary>
 <br>
 `rollup-plugin-chrome-extension` statically analyzes your bundled
-code, detects any required permissions and adds them to the manifest in the `dist` folder.
-Any permissions in the source manifest are always included.
-
+code, detects any required permissions and adds them to the manifest 
+in the `dist` folder. Any permissions in the source manifest are always 
+included.
 </details>
 
 <details>
@@ -158,19 +166,22 @@ script to run Rollup. Just manage your version number in
 `package.json` and it will reflect in your extension build.
 
 Don't worry, any value in your source manifest will take over! 😉
+
 </details>
 
 </div>
 
-###  ⭐️ Reload Your Extension Automatically <a name = "features-reloader"></a>
+### ⭐️ Reload Your Extension Automatically <a name = "features-reloader"></a>
 
 <div style="padding-left: 30px; padding-bottom: 10px;">
 
 <details>
 <summary>Does this mean I don't have to manually reload my extension during development?</summary>
 <br>
-Improve your development experience with our reloader! You won't have to reload your Chrome extension every time you make a change
-to your code. We know what a pain it can be to forget and wonder, "Why isn't this working? 😟". 
+Improve your development experience with our reloader!
+You won't have to reload your Chrome extension every time you make a change
+to your code. We know what a pain it can be to forget and wonder, 
+"Why isn't this change working? 😟". 
 </details>
 
 <details>
@@ -192,7 +203,6 @@ auto-reloader script. This will reload your extension every time
 Rollup produces a new build.
 </details>
 
-
 </div>
 
 ### ⭐️ Write Chrome Extensions In TypeScript <a name = "typescript"></a>
@@ -200,9 +210,10 @@ Rollup produces a new build.
 #### Includes chrome extension API types
 
 If you use the
-[`@rollup/plugin-typescript`](https://www.npmjs.com/package/@rollup/plugin-typescript), you can write your Chrome extension in
-TypeScript. That's right, it bundles the scripts in your manifest and in
-your HTML script tags.
+[`@rollup/plugin-typescript`](https://www.npmjs.com/package/@rollup/plugin-typescript),
+you can write your Chrome extension in TypeScript. That's right,
+it bundles the scripts in your manifest and in your HTML script
+tags.
 
 TypeScript definitions are included, so no need to install an
 additional `@types` library!
@@ -244,3 +255,39 @@ Two of our own plugins:
   [`rollup-plugin-empty-dir`](https://www.npmjs.com/package/rollup-plugin-empty-dir)
 
 ### ⭐️ Outputs a Chrome Web Store friendly bundle <a name = ""></a>
+
+<!-- START TUFD -->
+
+Every time you publish your Chrome extension to the Web Store,
+your extension will be reviewed by a robot and then a human to
+make sure it meets their guidelines. Even if you pass when you
+first publish, your extension may be flagged at any time.
+`rollup-plugin-chrome-extension` helps you put your best foot
+forward.
+
+Wrong permissions are the number one reason that Chrome
+extensions are rejected from the Chrome Web Store.
+`rollup-plugin-chrome-extension` can detect most of the commonly
+used permissions in your code automatically, so you only need to
+add a permission manually if you absolutely know that you need
+it.
+
+Imagine the person who reviews the code you submit. Common
+bundling options like webpack and Parcel produce code that is
+really hard to read. Rollup produces code that is easy to read!
+When you submit your extension for review, you want to avoid
+misunderstandings.
+
+Rollup produces a nice clean bundle using code splitting, ES
+modules, and tree-shaking. If you don't use some piece of code,
+Rollup removes it. If you use a module in more than once place,
+Rollup splits it out into a chunk, so that it's only in your
+extension once.
+
+All of this means a smaller Chrome extension. We've seen Chrome
+extensions go from over 8Mb to less than 1Mb just by switching
+from `create-react-app` to Rollup. A smaller bundle means less
+code to review, and less room for error during the review
+process.
+
+<!-- END TUFD -->
