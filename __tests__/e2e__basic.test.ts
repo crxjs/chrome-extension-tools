@@ -5,14 +5,23 @@ import { buildCRX } from '../__fixtures__/build-basic-crx'
 import { byFileName, getExtPath } from '../__fixtures__/utils'
 
 let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
+let CRXBuildError: string | undefined
 beforeAll(
-  buildCRX(getExtPath('basic/rollup.config.js'), (result) => {
-    output = result.output.output
+  buildCRX(getExtPath('basic/rollup.config.js'), (error, result) => {
+    if (error) {
+      CRXBuildError = error.message
+    } else if (result && result.output.output) {
+      output = result.output.output
+    } else {
+      CRXBuildError = 'Could not build CRX'
+    }
   }),
   10000,
 )
 
 test('bundles chunks', () => {
+  expect(CRXBuildError).toBeUndefined()
+
   // Chunks
   const chunks = output.filter(isChunk)
   expect(chunks.length).toBe(10)
@@ -28,37 +37,37 @@ test('bundles chunks', () => {
   expect(output.find(byFileName('devtools/devtools2.js'))).toBeDefined()
 })
 
-test(
-  'bundles assets',
-  () => {
-    // Assets
-    const assets = output.filter(isAsset)
-    expect(assets.length).toBe(19)
+test('bundles assets', () => {
+  expect(CRXBuildError).toBeUndefined()
 
-    // 17 assets + 2 wrapper scripts
-    expect(output.find(byFileName('asset.js'))).toBeDefined()
-    expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
-    expect(output.find(byFileName('devtools/devtools.html'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
-    expect(output.find(byFileName('images/favicon.ico'))).toBeDefined()
-    expect(output.find(byFileName('images/favicon.png'))).toBeDefined()
-    expect(output.find(byFileName('options.html'))).toBeDefined()
-    expect(output.find(byFileName('options.css'))).toBeDefined()
-    expect(output.find(byFileName('content.css'))).toBeDefined()
-    expect(output.find(byFileName('options.png'))).toBeDefined()
-    expect(output.find(byFileName('options.jpg'))).toBeDefined()
-    expect(output.find(byFileName('manifest.json'))).toBeDefined()
+  // Assets
+  const assets = output.filter(isAsset)
+  expect(assets.length).toBe(19)
 
-    expect(output.find(byFileName('fonts/NotoSans-Light.ttf'))).toBeDefined()
-    expect(output.find(byFileName('fonts/NotoSans-Black.ttf'))).toBeDefined()
-    expect(output.find(byFileName('fonts/Missaali-Regular.otf'))).toBeDefined()
-  },
-  5 * 60 * 1000,
-)
+  // 17 assets + 2 wrapper scripts
+  expect(output.find(byFileName('asset.js'))).toBeDefined()
+  expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
+  expect(output.find(byFileName('devtools/devtools.html'))).toBeDefined()
+  expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
+  expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
+  expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
+  expect(output.find(byFileName('images/favicon.ico'))).toBeDefined()
+  expect(output.find(byFileName('images/favicon.png'))).toBeDefined()
+  expect(output.find(byFileName('options.html'))).toBeDefined()
+  expect(output.find(byFileName('options.css'))).toBeDefined()
+  expect(output.find(byFileName('content.css'))).toBeDefined()
+  expect(output.find(byFileName('options.png'))).toBeDefined()
+  expect(output.find(byFileName('options.jpg'))).toBeDefined()
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+
+  expect(output.find(byFileName('fonts/NotoSans-Light.ttf'))).toBeDefined()
+  expect(output.find(byFileName('fonts/NotoSans-Black.ttf'))).toBeDefined()
+  expect(output.find(byFileName('fonts/Missaali-Regular.otf'))).toBeDefined()
+})
 
 test('Includes content script imports in web_accessible_resources', () => {
+  expect(CRXBuildError).toBeUndefined()
+
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
   const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
@@ -69,6 +78,8 @@ test('Includes content script imports in web_accessible_resources', () => {
 })
 
 test('Includes content_security_policy untouched', () => {
+  expect(CRXBuildError).toBeUndefined()
+
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
   const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)

@@ -30,9 +30,18 @@ const options: RollupOptions = {
 
 const bundlePromise = inversePromise<OutputBundle>()
 beforeAll(
-  buildCRX(getExtPath('basic/rollup.config.js'), (result) => {
-    bundlePromise.resolve(result.bundle)
-  }),
+  buildCRX(
+    getExtPath('basic/rollup.config.js'),
+    (error, result) => {
+      if (error) {
+        bundlePromise.reject(error)
+      } else if (result) {
+        bundlePromise.resolve(result.bundle)
+      } else {
+        bundlePromise.reject(new Error('Could not build CRX'))
+      }
+    },
+  ),
   10000,
 )
 

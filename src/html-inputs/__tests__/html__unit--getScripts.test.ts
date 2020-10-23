@@ -1,7 +1,10 @@
-import { optionsHtml } from '../../../__fixtures__/basic-paths'
+import {
+  basicRoot,
+  optionsHtml,
+} from '../../../__fixtures__/basic-paths'
 import { getScriptSrc, loadHtml } from '../cheerio'
 
-const html$ = loadHtml(optionsHtml)
+const html$ = loadHtml(basicRoot)(optionsHtml)
 
 test('scrapes correct script tags', () => {
   const result = getScriptSrc(html$)

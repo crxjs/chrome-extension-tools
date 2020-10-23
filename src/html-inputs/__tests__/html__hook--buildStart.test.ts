@@ -3,6 +3,7 @@ import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
+  basicRoot,
   faviconIco,
   faviconPng,
   optionsCss,
@@ -53,7 +54,7 @@ beforeEach(() => {
   ]
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
-  cache.html$ = cache.html.map(loadHtml)
+  cache.html$ = cache.html.map(loadHtml(basicRoot))
   cache.css = [optionsCss]
   cache.img = [optionsPng, optionsJpg, faviconIco, faviconPng]
   cache.scripts = [assetJs]

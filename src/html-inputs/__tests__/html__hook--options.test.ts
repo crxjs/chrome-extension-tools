@@ -5,6 +5,7 @@ import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
+  basicRoot,
   faviconIco,
   faviconPng,
   optionsCss,
@@ -83,15 +84,21 @@ test('returns options.input as input record', () => {
 
 test('calls loadHtml', () => {
   const spy = jest.spyOn(cheerio, 'loadHtml')
+  const closureMock = jest.fn(cheerio.loadHtml(basicRoot))
+  spy.mockImplementation(() => closureMock)
+
+  jest.clearAllMocks()
 
   plugin.options.call(context, options)
 
-  expect(spy).toBeCalledTimes(2)
-  expect(spy).toBeCalledWith(optionsHtml, 0, [
+  expect(spy).toBeCalledTimes(1)
+
+  expect(closureMock).toBeCalledTimes(2)
+  expect(closureMock).toBeCalledWith(optionsHtml, 0, [
     optionsHtml,
     popupHtml,
   ])
-  expect(spy).toBeCalledWith(popupHtml, 1, [
+  expect(closureMock).toBeCalledWith(popupHtml, 1, [
     optionsHtml,
     popupHtml,
   ])

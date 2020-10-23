@@ -2,10 +2,7 @@ import { OutputBundle } from 'rollup'
 import { RollupOptions } from 'rollup'
 import { chromeExtension } from '..'
 import { buildCRX } from '../../__fixtures__/build-basic-crx'
-import {
-  InversePromise,
-  inversePromise,
-} from '../../__fixtures__/inversePromise'
+import { inversePromise } from '../../__fixtures__/inversePromise'
 import { context as minimal } from '../../__fixtures__/minimal-plugin-context'
 import { context } from '../../__fixtures__/plugin-context'
 import { getExtPath } from '../../__fixtures__/utils'
@@ -14,11 +11,20 @@ const config: RollupOptions = {
   input: getExtPath('basic/manifest.json'),
 }
 
-const bundlePromise: InversePromise<OutputBundle> = inversePromise()
+const bundlePromise = inversePromise<OutputBundle>()
 beforeAll(
-  buildCRX(getExtPath('basic/rollup.config.js'), (result) => {
-    bundlePromise.resolve(result.bundle)
-  }),
+  buildCRX(
+    getExtPath('basic/rollup.config.js'),
+    (error, result) => {
+      if (error) {
+        bundlePromise.reject(error)
+      } else if (result) {
+        bundlePromise.resolve(result.bundle)
+      } else {
+        bundlePromise.reject(new Error('Could not build CRX'))
+      }
+    },
+  ),
   10000,
 )
 

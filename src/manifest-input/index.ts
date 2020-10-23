@@ -489,7 +489,7 @@ export function manifestInput(
           const bpId = this.emitFile({
             type: 'asset',
             source: browserPolyfillSrc,
-            name: 'browser-polyfill.js',
+            fileName: 'assets/browser-polyfill.js',
           })
 
           const browserPolyfillPath = this.getFileName(bpId)
@@ -505,7 +505,8 @@ export function manifestInput(
                 '%BROWSER_POLYFILL_PATH%',
                 JSON.stringify(browserPolyfillPath),
               ),
-              name: 'browser-polyfill-for-execute-script.js',
+              fileName:
+                'assets/browser-polyfill-executeScript.js',
             })
 
             const executeScriptPolyfillPath = this.getFileName(

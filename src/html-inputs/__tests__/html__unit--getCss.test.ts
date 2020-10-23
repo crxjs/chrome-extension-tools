@@ -1,7 +1,7 @@
 import { loadHtml, getCssHrefs } from '../cheerio'
-import { optionsHtml } from '../../../__fixtures__/basic-paths'
+import { basicRoot, optionsHtml } from '../../../__fixtures__/basic-paths'
 
-const html$ = loadHtml(optionsHtml)
+const html$ = loadHtml(basicRoot)(optionsHtml)
 
 test('scrapes correct stylesheets', () => {
   const result = getCssHrefs(html$)

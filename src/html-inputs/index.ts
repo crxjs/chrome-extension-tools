@@ -12,12 +12,10 @@ import {
   getScriptSrc,
   loadHtml,
   mutateScriptElems,
+  CheerioFile,
 } from './cheerio'
 
-/** cheerio.Root objects with a file path */
-export type CheerioFile = cheerio.Root & {
-  filePath: string
-}
+export { CheerioFile } from './cheerio'
 
 export interface HtmlInputsOptions {
   /** This will change between builds, so cannot destructure */
@@ -78,6 +76,14 @@ export default function htmlInputs(
     /* ============================================ */
 
     options(options) {
+      const { srcDir } = htmlInputsOptions
+
+      if (srcDir) {
+        cache.srcDir = srcDir
+      } else {
+        throw new TypeError('options.srcDir not initialized')
+      }
+
       // Skip if cache.input exists
       // cache is dumped in watchChange hook
 
@@ -108,7 +114,7 @@ export default function htmlInputs(
       // If the cache has been dumped, reload from files
       if (cache.html$.length === 0) {
         // This is all done once
-        cache.html$ = cache.html.map(loadHtml)
+        cache.html$ = cache.html.map(loadHtml(srcDir))
 
         cache.js = flatten(cache.html$.map(getScriptSrc))
         cache.css = flatten(cache.html$.map(getCssHrefs))
