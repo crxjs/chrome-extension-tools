@@ -29,6 +29,7 @@ export const notoSansLight = getExtPath(
 )
 
 // Options assets
+export const basicRoot = getExtPath('basic')
 export const optionsHtml = getExtPath('basic/options.html')
 export const optionsCss = getExtPath('basic/options.css')
 export const optionsPng = getExtPath('basic/options.png')

@@ -27,6 +27,7 @@ devDependencies:
   '@types/fs-extra': 8.1.1
   '@types/glob': 7.1.3
   '@types/jest': 25.2.3
+  '@types/jest-in-case': 1.0.3
   '@types/lodash.difference': 4.5.6
   '@types/lodash.flatten': 4.4.6
   '@types/lodash.get': 4.4.6
@@ -38,6 +39,7 @@ devDependencies:
   jest: 25.5.4
   jest-chrome: 0.7.0_jest@25.5.4
   jest-html-reporters: 1.2.1
+  jest-in-case: 1.0.2
   npm-run-all: 4.1.5
   read-pkg-up: 7.0.1
   rollup: 1.32.1
@@ -784,6 +786,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-P/W9yOX/3oPZSpaYOCQzGqgCQRXn0FFO/V8bWrCQs+wLmvVVxk6CRBXALEvNs9OHIatlnlFokfhuDo2ug01ciw==
+  /@types/jest-in-case/1.0.3:
+    dependencies:
+      '@types/jest': 25.2.3
+      '@types/node': 13.13.28
+    dev: true
+    resolution:
+      integrity: sha512-M+bKsCA/oF3Bw9qSZyWHsK8sfqFtZsNXe0xV1gTK3ahFCgaqzjJkAFp84Wd8md+EshGbR9Bb6nCmu4FAiuImZw==
   /@types/jest/25.2.3:
     dependencies:
       jest-diff: 25.5.0
@@ -828,6 +837,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-6ZMK4xRcF2XrPdKmPYQxZkdHKV18xKgUFVvhIgw2iwaaO6weleLPHLBGPZmLhjo+m1N+MZXRAoBEBCCVqgO2zQ==
+  /@types/node/13.13.28:
+    dev: true
+    resolution:
+      integrity: sha512-EM/qFeRH8ZCD+TlsaIPULyyFm9vOhFIvgskY2JmHbEsWsOPgN+rtjSXrcHGgJpob4Nu17VfO95FKewr0XY7iOQ==
   /@types/normalize-package-data/2.4.0:
     dev: true
     resolution:
@@ -2958,6 +2971,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-Ea2zxV7Hhg3pE6cZ+70pS5PkiBywKG8pLuyBc9/JgR6ifnKm2U3t6kvAPX9UNID6YwsPBZjD9sANZ0p49rN4pA==
+  /jest-in-case/1.0.2:
+    dev: true
+    engines:
+      node: '>=4'
+    resolution:
+      integrity: sha1-VnRLWvMyIr0KurcM+Rnx0XCrdcw=
   /jest-jasmine2/25.5.4:
     dependencies:
       '@babel/traverse': 7.11.5
@@ -5280,6 +5299,7 @@ specifiers:
   '@types/fs-extra': ^8.0.1
   '@types/glob': ^7.1.1
   '@types/jest': ^25.1.2
+  '@types/jest-in-case': ^1.0.3
   '@types/lodash.difference': ^4.5.6
   '@types/lodash.flatten': ^4.4.6
   '@types/lodash.get': ^4.4.6
@@ -5298,6 +5318,7 @@ specifiers:
   jest: ^25.1.0
   jest-chrome: 0.7.0
   jest-html-reporters: ^1.2.1
+  jest-in-case: ^1.0.2
   lodash.difference: ^4.5.0
   lodash.flatten: ^4.4.0
   lodash.get: ^4.4.2

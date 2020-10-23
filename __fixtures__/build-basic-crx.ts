@@ -9,11 +9,14 @@ import { InversePromise, inversePromise } from './inversePromise'
 
 export function buildCRX(
   configPath: string,
-  cb: (result: {
-    build: RollupBuild
-    bundle: OutputBundle
-    output: RollupOutput
-  }) => void,
+  cb: (
+    error?: any,
+    result?: {
+      build: RollupBuild
+      bundle: OutputBundle
+      output: RollupOutput
+    },
+  ) => void,
 ) {
   const { default: config } = require(configPath)
 
@@ -30,9 +33,9 @@ export function buildCRX(
       const build = await rollup(config)
       const output = await build.generate(config.output)
 
-      cb({ build, bundle: await bundle, output })
+      cb(undefined, { build, bundle: await bundle, output })
     } catch (error) {
-      console.error(error)
+      cb(error)
     }
   }
 }
