@@ -24,7 +24,8 @@ import {
   getExtPath,
   getRelative,
 } from '../../../__fixtures__/utils'
-import htmlInputs, { HtmlInputsPluginCache } from '../index'
+import { HtmlInputsPluginCache } from '../../plugin-options'
+import htmlInputs from '../index'
 
 const cheerio = require('../cheerio')
 
@@ -266,5 +267,63 @@ test('Handles option.input as string', () => {
       options3: '__fixtures__/extensions/basic/options3.ts',
       options4: '__fixtures__/extensions/basic/options4.tsx',
     },
+  })
+})
+
+test('Handles options.browserPolyfill as true', () => {
+  const plugin = htmlInputs(
+    { srcDir, browserPolyfill: true },
+    cache,
+  )
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($) => {
+    const head = $('head > script')
+    expect(head.first().attr('src')).toBe(
+      '/assets/browser-polyfill.js',
+    )
+    expect(head.next().attr('src')).toBe(
+      '/assets/browser-polyfill-executeScript.js',
+    )
+  })
+})
+
+test('Handles options.browserPolyfill.executeScript as true', () => {
+  const plugin = htmlInputs(
+    { srcDir, browserPolyfill: { executeScript: true } },
+    cache,
+  )
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($) => {
+    const head = $('head > script')
+
+    expect(head.next().attr('src')).toBe(
+      '/assets/browser-polyfill-executeScript.js',
+    )
+  })
+})
+
+test('Handles options.browserPolyfill.executeScript as false', () => {
+  const plugin = htmlInputs(
+    { srcDir, browserPolyfill: { executeScript: false } },
+    cache,
+  )
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($) => {
+    const head = $('head > script')
+
+    expect(head.first().attr('src')).toBe(
+      '/assets/browser-polyfill.js',
+    )
+    expect(
+      head.is(
+        'script[src="/assets/browser-polyfill-executeScript.js"]',
+      ),
+    ).toBe(false)
   })
 })

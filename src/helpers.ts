@@ -1,6 +1,4 @@
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
-import prettier from 'prettier'
-import { CheerioFile } from './html-inputs'
 import { ChromeExtensionManifest } from './manifest'
 
 export const not = <T>(fn: (x: T) => boolean) => (x: T) => !fn(x)
@@ -24,9 +22,6 @@ export function isString(x: any): x is string {
 export function isJsonFilePath(x: any): x is string {
   return isString(x) && x.endsWith('json')
 }
-
-export const formatHtml = ($: CheerioFile) =>
-  prettier.format($.html(), { parser: 'html' })
 
 /**
  * Update the manifest source in the output bundle

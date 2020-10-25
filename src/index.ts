@@ -1,54 +1,15 @@
-import { Plugin } from 'rollup'
-import htmlInputs, {
-  HtmlInputsPlugin,
-} from './html-inputs/index'
-import manifestInput, {
-  ManifestInputPlugin,
-} from './manifest-input/index'
-import {
-  validateNames as v,
-  ValidateNamesPlugin,
-} from './validate-names/index'
+import htmlInputs from './html-inputs/index'
+import manifestInput from './manifest-input/index'
+import { validateNames as v } from './validate-names/index'
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
-import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
-import { ChromeExtensionManifest } from './manifest'
 
-export type ChromeExtensionPlugin = Pick<
-  Required<Plugin>,
-  | 'name'
-  | 'options'
-  | 'buildStart'
-  | 'watchChange'
-  | 'generateBundle'
-> & {
-  // For testing
-  _plugins: {
-    manifest: ManifestInputPlugin
-    html: HtmlInputsPlugin
-    validate: ValidateNamesPlugin
-  }
-}
+import {
+  ChromeExtensionOptions,
+  ChromeExtensionPlugin,
+} from './plugin-options'
 
 export { simpleReloader } from './plugin-reloader-simple/index'
-
-export interface ChromeExtensionOptions {
-  browserPolyfill?: boolean
-  dynamicImportWrapper?: DynamicImportWrapperOptions
-  extendManifest?:
-    | Partial<ChromeExtensionManifest>
-    | ((
-        manifest: ChromeExtensionManifest,
-      ) => ChromeExtensionManifest)
-  firstClassManifest?: boolean
-  pkg?: {
-    description: string
-    name: string
-    version: string
-  }
-  publicKey?: string
-  verbose?: boolean
-}
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,

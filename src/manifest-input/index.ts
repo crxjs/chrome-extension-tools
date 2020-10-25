@@ -4,15 +4,13 @@ import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import memoize from 'mem'
 import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
+import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
+
 import { isChunk, isJsonFilePath } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
 import { cloneObject } from './cloneObject'
-import {
-  DynamicImportWrapperOptions,
-  prepImportWrapperScript,
-} from './dynamicImportWrapper'
+import { prepImportWrapperScript } from './dynamicImportWrapper'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
@@ -23,30 +21,14 @@ import {
   ValidationErrorsArray,
 } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
+import {
+  ManifestInputPlugin,
+  ManifestInputPluginCache,
+  ManifestInputPluginOptions,
+} from '../plugin-options'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
-}
-
-export interface ManifestInputPluginCache {
-  assets: string[]
-  input: string[]
-  inputAry: string[]
-  inputObj: Record<string, string>
-  permsHash: string
-  srcDir: string | null
-  /** for memoized fs.readFile */
-  readFile: Map<string, any>
-  manifest?: ChromeExtensionManifest
-  assetChanged: boolean
-}
-
-export type ManifestInputPlugin = Pick<
-  PluginHooks,
-  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
-> & {
-  name: string
-  srcDir: string | null
 }
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -93,28 +75,7 @@ export function manifestInput(
       readFile: new Map<string, any>(),
       srcDir: null,
     } as ManifestInputPluginCache,
-  } = {} as {
-    browserPolyfill?:
-      | boolean
-      | {
-          executeScript: boolean
-        }
-    dynamicImportWrapper?: DynamicImportWrapperOptions | false
-    extendManifest?:
-      | Partial<ChromeExtensionManifest>
-      | ((
-          manifest: ChromeExtensionManifest,
-        ) => ChromeExtensionManifest)
-    firstClassManifest?: boolean
-    pkg?: {
-      description: string
-      name: string
-      version: string
-    }
-    publicKey?: string
-    verbose?: boolean
-    cache?: ManifestInputPluginCache
-  },
+  } = {} as ManifestInputPluginOptions,
 ): ManifestInputPlugin {
   const readAssetAsBuffer = memoize(
     (filepath: string) => {
@@ -158,6 +119,8 @@ export function manifestInput(
   /* --------------- plugin object -------------- */
   return {
     name,
+
+    browserPolyfill,
 
     get srcDir() {
       return cache.srcDir

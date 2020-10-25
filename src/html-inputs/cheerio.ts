@@ -1,7 +1,10 @@
 import cheerio from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
+import prettier from 'prettier'
+
 import { isString } from '../helpers'
+import { HtmlInputsOptions } from '../plugin-options'
 
 export type HtmlFilePathData = {
   filePath: string
@@ -10,6 +13,9 @@ export type HtmlFilePathData = {
 
 /** cheerio.Root objects with a file path */
 export type CheerioFile = cheerio.Root & HtmlFilePathData
+
+export const formatHtml = ($: CheerioFile) =>
+  prettier.format($.html(), { parser: 'html' })
 
 export const loadHtml = (rootPath: string) => (
   filePath: string,
@@ -47,7 +53,11 @@ export const getScriptElems = ($: cheerio.Root) =>
     .not('[src^="/"]')
 
 // Mutative action
-export const mutateScriptElems = ($: CheerioFile) => {
+export const mutateScriptElems = ({
+  browserPolyfill,
+}: Pick<HtmlInputsOptions, 'browserPolyfill'>) => (
+  $: CheerioFile,
+) => {
   getScriptElems($)
     .attr('type', 'module')
     .attr('src', (i, value) => {
@@ -59,6 +69,23 @@ export const mutateScriptElems = ($: CheerioFile) => {
 
       return replaced
     })
+
+  if (browserPolyfill) {
+    const head = $('head')
+    if (
+      browserPolyfill === true ||
+      (typeof browserPolyfill === 'object' &&
+        browserPolyfill.executeScript)
+    ) {
+      head.prepend(
+        '<script src="/assets/browser-polyfill-executeScript.js"></script>',
+      )
+    }
+
+    head.prepend(
+      '<script src="/assets/browser-polyfill.js"></script>',
+    )
+  }
 
   return $
 }

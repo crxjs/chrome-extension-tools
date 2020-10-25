@@ -18,7 +18,7 @@ devDependencies:
   '@rollup/plugin-json': 4.1.0_rollup@1.32.1
   '@rollup/plugin-node-resolve': 7.1.3_rollup@1.32.1
   '@rollup/plugin-sucrase': 3.1.0_rollup@1.32.1
-  '@rollup/plugin-typescript': 3.1.1_da091aa6f86e7752d4096a368af87db5
+  '@rollup/plugin-typescript': 6.0.0_da091aa6f86e7752d4096a368af87db5
   '@sucrase/jest-plugin': 2.0.0
   '@testing-library/dom': 6.16.0
   '@testing-library/jest-dom': 5.11.4
@@ -596,10 +596,10 @@ packages:
       rollup: ^1.20.0 || ^2.0.0
     resolution:
       integrity: sha512-PZ70LDNgIj8rL+3pKwKwTBOQ2c9JofXeLbWz+2V4/nCt4LqwYTNqxJJf1riTJsVARVzJdA0woIzUzjKZvL8TfA==
-  /@rollup/plugin-typescript/3.1.1_da091aa6f86e7752d4096a368af87db5:
+  /@rollup/plugin-typescript/6.0.0_da091aa6f86e7752d4096a368af87db5:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@1.32.1
-      resolve: 1.17.0
+      resolve: 1.18.1
       rollup: 1.32.1
       tslib: 1.13.0
       typescript: 3.9.7
@@ -607,11 +607,11 @@ packages:
     engines:
       node: '>=8.0.0'
     peerDependencies:
-      rollup: ^1.20.0
+      rollup: ^2.14.0
       tslib: '*'
-      typescript: '>=2.1.0'
+      typescript: '>=3.4.0'
     resolution:
-      integrity: sha512-VPY1MbzIJT+obpav9Kns4MlipVJ1FuefwzO4s1uCVXAzVWya+bhhNauOmmqR/hy1zj7tePfh3t9iBN+HbIzyRA==
+      integrity: sha512-Y5U2L4eaF3wUSgCZRMdvNmuzWkKMyN3OwvhAdbzAi5sUqedaBk/XbzO4T7RlViDJ78MOPhwAIv2FtId/jhMtbg==
   /@rollup/pluginutils/3.1.0_rollup@1.32.1:
     dependencies:
       '@types/estree': 0.0.39
@@ -2563,6 +2563,12 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==
+  /is-core-module/2.0.0:
+    dependencies:
+      has: 1.0.3
+    dev: true
+    resolution:
+      integrity: sha512-jq1AH6C8MuteOoBPwkxHafmByhL9j5q4OaPGdbuD+ZtQJVzH+i6E3BJDQcBA09k57i2Hh2yQbEG8yObZ0jdlWw==
   /is-data-descriptor/0.1.4:
     dependencies:
       kind-of: 3.2.2
@@ -4268,6 +4274,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==
+  /resolve/1.18.1:
+    dependencies:
+      is-core-module: 2.0.0
+      path-parse: 1.0.6
+    dev: true
+    resolution:
+      integrity: sha512-lDfCPaMKfOJXjy0dPayzPdF1phampNWr3qFCjAu+rw/qbQmr5jWH5xN2hwh9QKfw9E5v4hwV7A+jrCmL8yjjqA==
   /restore-cursor/3.1.0:
     dependencies:
       onetime: 5.1.2
@@ -5290,7 +5303,7 @@ specifiers:
   '@rollup/plugin-json': ^4.0.2
   '@rollup/plugin-node-resolve': ^7.1.1
   '@rollup/plugin-sucrase': ^3.0.0
-  '@rollup/plugin-typescript': ^3.0.0
+  '@rollup/plugin-typescript': ^6.0.0
   '@sucrase/jest-plugin': ^2.0.0
   '@testing-library/dom': ^6.12.2
   '@testing-library/jest-dom': ^5.1.1

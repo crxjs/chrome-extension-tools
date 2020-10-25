@@ -1,50 +1,25 @@
 import 'array-flat-polyfill'
+
 import { readFile } from 'fs-extra'
 import flatten from 'lodash.flatten'
 import { relative } from 'path'
-import { Plugin } from 'rollup'
-import { formatHtml, not } from '../helpers'
+
+import { not } from '../helpers'
 import { reduceToRecord } from '../manifest-input/reduceToRecord'
 import {
+  HtmlInputsOptions,
+  HtmlInputsPluginCache,
+  HtmlInputsPlugin,
+} from '../plugin-options'
+import {
+  formatHtml,
   getCssHrefs,
   getImgSrcs,
   getJsAssets,
   getScriptSrc,
   loadHtml,
   mutateScriptElems,
-  CheerioFile,
 } from './cheerio'
-
-export { CheerioFile } from './cheerio'
-
-export interface HtmlInputsOptions {
-  /** This will change between builds, so cannot destructure */
-  readonly srcDir: string | null
-}
-
-export interface HtmlInputsPluginCache {
-  /** Scripts that should not be bundled */
-  scripts: string[]
-  /** Scripts that should be bundled */
-  js: string[]
-  /** Absolute paths for HTML files to emit */
-  html: string[]
-  /** Html files as Cheerio objects */
-  html$: CheerioFile[]
-  /** Image files to emit */
-  img: string[]
-  /** Stylesheets to emit */
-  css: string[]
-  /** Cache of last options.input, will have other scripts */
-  input: string[]
-  /** Source dir for calculating relative paths */
-  srcDir?: string
-}
-
-export type HtmlInputsPlugin = Pick<
-  Required<Plugin>,
-  'name' | 'options' | 'buildStart' | 'watchChange'
-> & { cache: HtmlInputsPluginCache }
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 
@@ -76,6 +51,7 @@ export default function htmlInputs(
     /* ============================================ */
 
     options(options) {
+      // srcDir may be initialized by another plugin
       const { srcDir } = htmlInputsOptions
 
       if (srcDir) {
@@ -125,7 +101,7 @@ export default function htmlInputs(
         cache.input = input.filter(not(isHtml)).concat(cache.js)
 
         // Prepare cache.html$ for asset emission
-        cache.html$.forEach(mutateScriptElems)
+        cache.html$.forEach(mutateScriptElems(htmlInputsOptions))
 
         if (cache.input.length === 0) {
           throw new Error(
