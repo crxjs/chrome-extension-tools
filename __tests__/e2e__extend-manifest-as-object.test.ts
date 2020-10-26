@@ -1,28 +1,17 @@
-import { OutputAsset, OutputChunk, rollup, RollupBuild } from 'rollup'
+import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { byFileName, getExtPath } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
-const { default: config } = require(getExtPath('extend-manifest-as-object/rollup.config.js'))
-
-let bundle: RollupBuild
-let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
-let ready: Promise<void>
+let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  try {
-    bundle = await rollup(config)
-
-    ready = bundle.generate(config.output).then(({ output: o }) => {
-      output = o
-    })
-  } catch (error) {
-    console.error(error)
-  }
+  const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
+  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  return outputPromise
 }, 10000)
 
 test('bundles chunks', async () => {
-  expect(ready).toBeInstanceOf(Promise)
-  await ready
+  const { output } = await outputPromise
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -36,8 +25,7 @@ test('bundles chunks', async () => {
 test(
   'bundles assets',
   async () => {
-    expect(ready).toBeDefined()
-    await ready
+    const { output } = await outputPromise
 
     // Assets
     const assets = output.filter(isAsset)
@@ -53,8 +41,7 @@ test(
 )
 
 test('extends the manifest', async () => {
-  expect(ready).toBeDefined()
-  await ready
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifest = JSON.parse(manifestAsset.source as string) as ChromeExtensionManifest

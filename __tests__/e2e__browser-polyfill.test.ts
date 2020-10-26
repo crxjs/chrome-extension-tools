@@ -1,29 +1,18 @@
-import { OutputAsset, OutputChunk } from 'rollup'
-// import cheerio from 'cheerio'
-// import cases from 'jest-in-case'
-
+import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { buildCRX } from '../__fixtures__/build-basic-crx'
-import { byFileName, getExtPath } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
-let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
-let CRXBuildError: string | undefined
-beforeAll(
-  buildCRX(getExtPath('browser-polyfill/rollup.config.js'), (error, result) => {
-    if (error) {
-      CRXBuildError = error.message
-    } else if (result && result.output.output) {
-      output = result.output.output
-    } else {
-      CRXBuildError = 'Could not build CRX'
-    }
-  }),
-  10000,
-)
+const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
-test('bundles chunks', () => {
-  expect(CRXBuildError).toBeUndefined()
+let outputPromise: Promise<RollupOutput>
+beforeAll(async () => {
+  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  return outputPromise
+}, 10000)
+
+test('bundles chunks', async () => {
+  const { output } = await outputPromise
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -36,8 +25,8 @@ test('bundles chunks', () => {
   expect(output.find(byFileName('popup/popup.js'))).toBeDefined()
 })
 
-test('bundles assets', () => {
-  expect(CRXBuildError).toBeUndefined()
+test('bundles assets', async () => {
+  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)
@@ -59,8 +48,8 @@ test('bundles assets', () => {
   expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
 })
 
-test('includes browser polyfill in manifest.json', () => {
-  expect(CRXBuildError).toBeUndefined()
+test('includes browser polyfill in manifest.json', async () => {
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string

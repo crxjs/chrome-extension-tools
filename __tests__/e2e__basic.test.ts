@@ -1,26 +1,20 @@
-import { OutputAsset, OutputChunk } from 'rollup'
+import { rollup } from 'rollup'
+import { RollupOutput } from 'rollup'
+import { RollupOptions } from 'rollup'
+import { OutputAsset } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { buildCRX } from '../__fixtures__/build-basic-crx'
-import { byFileName, getExtPath } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
-let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
-let CRXBuildError: string | undefined
-beforeAll(
-  buildCRX(getExtPath('basic/rollup.config.js'), (error, result) => {
-    if (error) {
-      CRXBuildError = error.message
-    } else if (result && result.output.output) {
-      output = result.output.output
-    } else {
-      CRXBuildError = 'Could not build CRX'
-    }
-  }),
-  10000,
-)
+let outputPromise: Promise<RollupOutput>
+beforeAll(async () => {
+  const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
+  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  return outputPromise
+}, 10000)
 
-test('bundles chunks', () => {
-  expect(CRXBuildError).toBeUndefined()
+test('bundles chunks', async () => {
+  const { output } = await outputPromise
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -37,8 +31,8 @@ test('bundles chunks', () => {
   expect(output.find(byFileName('devtools/devtools2.js'))).toBeDefined()
 })
 
-test('bundles assets', () => {
-  expect(CRXBuildError).toBeUndefined()
+test('bundles assets', async () => {
+  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)
@@ -65,8 +59,8 @@ test('bundles assets', () => {
   expect(output.find(byFileName('fonts/Missaali-Regular.otf'))).toBeDefined()
 })
 
-test('Includes content script imports in web_accessible_resources', () => {
-  expect(CRXBuildError).toBeUndefined()
+test('Includes content script imports in web_accessible_resources', async () => {
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
@@ -77,8 +71,8 @@ test('Includes content script imports in web_accessible_resources', () => {
   })
 })
 
-test('Includes content_security_policy untouched', () => {
-  expect(CRXBuildError).toBeUndefined()
+test('Includes content_security_policy untouched', async () => {
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string

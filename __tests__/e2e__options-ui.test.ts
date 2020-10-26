@@ -1,39 +1,22 @@
-import { writeJSON } from 'fs-extra'
-import { OutputAsset, OutputChunk, rollup, RollupBuild } from 'rollup'
+import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { byFileName, getExtPath } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
-const { default: config } = require(getExtPath('options-ui/rollup.config.js'))
-
-let bundle: RollupBuild
-let output: [OutputChunk, ...(OutputChunk | OutputAsset)[]]
-let ready: Promise<void>
+let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  try {
-    bundle = await rollup(config)
-
-    ready = bundle.generate(config.output).then(({ output: o }) => {
-      output = o
-    })
-
-    if (!process.env.JEST_WATCH) {
-      await writeJSON(getExtPath('options-ui-build.json'), bundle, {
-        spaces: 2,
-      })
-    }
-  } catch (error) {
-    console.error(error)
-  }
+  const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
+  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  return outputPromise
 }, 10000)
 
 test('bundles chunks', async () => {
-  expect(ready).toBeInstanceOf(Promise)
-  await ready
+  const { output } = await outputPromise
 
   // Chunks
   const chunks = output.filter(isChunk)
   expect(chunks.length).toBe(10)
+  
   // 9 chunks + one shared import (imported.js)
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
@@ -49,8 +32,7 @@ test('bundles chunks', async () => {
 test(
   'bundles assets',
   async () => {
-    expect(ready).toBeDefined()
-    await ready
+    const { output } = await outputPromise
 
     // Assets
     const assets = output.filter(isAsset)
@@ -80,8 +62,7 @@ test(
 )
 
 test('Includes content script imports in web_accessible_resources', async () => {
-  expect(ready).toBeDefined()
-  await ready
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
@@ -93,8 +74,7 @@ test('Includes content script imports in web_accessible_resources', async () => 
 })
 
 test('Includes content_security_policy untouched', async () => {
-  expect(ready).toBeDefined()
-  await ready
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string

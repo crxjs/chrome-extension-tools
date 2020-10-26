@@ -1,8 +1,32 @@
-import { resolve } from 'path'
+import { resolve, join } from 'path'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
+
+export const getTestName = (filename: string): string => {
+  const result = filename
+    .split('__')
+    .pop()
+    ?.split('.')
+    ?.shift()
+
+  if (typeof result === 'string') {
+    return result
+  } else {
+    throw new TypeError(`Invalid filename: ${filename}`)
+  }
+}
 
 export const getExtPath = (path: string): string =>
   resolve(__dirname, 'extensions', path)
+
+export const requireExtFile = <T>(
+  currentFilename: string,
+  targetFilename: string,
+): T => {
+  const testName = getTestName(currentFilename)
+
+  return require(getExtPath(join(testName, targetFilename)))
+    .default
+}
 
 /**  Make relative to project root */
 export const getRelative = (p: string): string =>
