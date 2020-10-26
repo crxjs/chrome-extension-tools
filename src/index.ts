@@ -68,6 +68,14 @@ export const chromeExtension = (
       ])
     },
 
+    async resolveId(source, importer) {
+      return manifest.resolveId.call(this, source, importer)
+    },
+
+    async load(id) {
+      return manifest.load.call(this, id)
+    },
+
     watchChange(id) {
       manifest.watchChange.call(this, id)
       html.watchChange.call(this, id)

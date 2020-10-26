@@ -37,6 +37,9 @@ export const explorer = cosmiconfigSync('manifest', {
 
 const name = 'manifest-input'
 
+export const stubChunkName =
+  'stub__empty-chrome-extension-manifest'
+
 const npmPkgDetails =
   process.env.npm_package_name &&
   process.env.npm_package_version &&
@@ -220,14 +223,9 @@ export function manifestInput(
       )
 
       if (Object.keys(finalInput).length === 0) {
-        throw new Error(
-          'The manifest must have at least one script or HTML file. If you are not loading files from the manifest, use options.firstClassManifest = false',
-        )
+        finalInput[stubChunkName] = stubChunkName
       }
-      // TODO: consider using this.emitFile in buildStart instead
-      //  - the input record is unusual, but would this be more unusual?
-      //  - would need to put something here, can't return an empty input
-      //    - maybe a dummy file to remove in generateBundle?
+
       return {
         ...options,
         input: finalInput,
@@ -262,6 +260,22 @@ export function manifestInput(
       })
     },
 
+    resolveId(source) {
+      if (source === stubChunkName) {
+        return source
+      }
+
+      return null
+    },
+
+    load(id) {
+      if (id === stubChunkName) {
+        return { code: `console.log(${stubChunkName})` }
+      }
+
+      return null
+    },
+
     watchChange(id) {
       if (id.endsWith(manifestName)) {
         // Dump cache.manifest if manifest changes
@@ -278,7 +292,21 @@ export function manifestInput(
     /* ============================================ */
 
     generateBundle(options, bundle) {
-      /* ---------- DERIVE PERMISIONS START --------- */
+      /* ----------------- CLEAN UP STUB ----------------- */
+
+      delete bundle[stubChunkName + '.js']
+
+      /* ----------- ADD IIFE JSON PATH CHUNKS ----------- */
+
+      // TODO: emit iifes
+
+      if (Object.keys(bundle).length === 0) {
+        throw new Error(
+          'The manifest must have at least one asset (html or css) or script file.',
+        )
+      }
+
+      /* ---------- DERIVE PERMISSIONS START --------- */
 
       // Get module ids for all chunks
       let permissions: string[]
@@ -297,7 +325,7 @@ export function manifestInput(
 
         const permsHash = JSON.stringify(permissions)
 
-        if (verbose) {
+        if (verbose && permissions.length) {
           if (!cache.permsHash) {
             this.warn(
               `Detected permissions: ${permissions.toString()}`,

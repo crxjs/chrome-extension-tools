@@ -33,6 +33,8 @@ export type ChromeExtensionPlugin = Pick<
   | 'name'
   | 'options'
   | 'buildStart'
+  | 'resolveId'
+  | 'load'
   | 'watchChange'
   | 'generateBundle'
 > & {
@@ -66,7 +68,12 @@ export interface ManifestInputPluginCache {
 
 export type ManifestInputPlugin = Pick<
   PluginHooks,
-  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
+  | 'options'
+  | 'buildStart'
+  | 'resolveId'
+  | 'load'
+  | 'watchChange'
+  | 'generateBundle'
 > & {
   name: string
   srcDir: string | null
