@@ -10,6 +10,7 @@ export default {
   output: {
     dir: getExtPath('basic-dist'),
     format: 'esm',
+    sourcemap: false,
   },
   plugins: [
     chromeExtension({ verbose: false }),

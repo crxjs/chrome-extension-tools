@@ -11,7 +11,13 @@ export default {
     format: 'esm',
   },
   plugins: [
-    chromeExtension({ verbose: false }),
+    chromeExtension({
+      verbose: false,
+      iifeJsonPaths: [
+        '$.background.scripts[*]',
+        '$.content_scripts[*].js',
+      ],
+    }),
     resolve(),
     commonjs(),
   ],
