@@ -1,15 +1,12 @@
 import { RollupOptions } from 'rollup'
-import {
-  manifestInput,
-  ManifestInputPlugin,
-  ManifestInputPluginCache,
-} from '..'
+import { manifestInput } from '..'
 import {
   contentCss,
   manifestJson,
 } from '../../../__fixtures__/basic-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
+import { ManifestInputPluginCache, ManifestInputPlugin } from '../../plugin-options'
 
 const options: RollupOptions = {
   input: manifestJson,

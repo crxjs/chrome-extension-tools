@@ -21,11 +21,8 @@ import {
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
-import {
-  explorer,
-  manifestInput,
-  ManifestInputPluginCache,
-} from '../index'
+import { ManifestInputPluginCache } from '../../plugin-options'
+import { explorer, manifestInput } from '../index'
 
 jest.spyOn(explorer, 'load')
 

@@ -19,7 +19,8 @@ import {
 } from '../../../__fixtures__/basic-paths'
 import { context } from '../../../__fixtures__/plugin-context'
 import { loadHtml } from '../cheerio'
-import htmlInputs, { HtmlInputsPluginCache } from '../index'
+import htmlInputs from '..'
+import { HtmlInputsPluginCache } from '../../plugin-options'
 
 const srcDir = join(
   process.cwd(),

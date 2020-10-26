@@ -1,2 +1,2 @@
-const message = 'devtools.ts'
-console.log(message)
+const message1 = 'devtools.ts'
+console.log(message1)

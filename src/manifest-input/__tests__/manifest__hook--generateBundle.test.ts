@@ -4,11 +4,7 @@ import {
   EmittedFile,
   EmittedAsset,
 } from 'rollup'
-import {
-  manifestInput,
-  ManifestInputPlugin,
-  ManifestInputPluginCache,
-} from '..'
+import { manifestInput } from '..'
 import { manifestJson } from '../../../__fixtures__/basic-paths'
 import { buildCRX } from '../../../__fixtures__/build-basic-crx'
 import { inversePromise } from '../../../__fixtures__/inversePromise'
@@ -16,6 +12,7 @@ import { context as minContext } from '../../../__fixtures__/minimal-plugin-cont
 import { context } from '../../../__fixtures__/plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
+import { ManifestInputPluginCache, ManifestInputPlugin } from '../../plugin-options'
 import { cloneObject } from '../cloneObject'
 
 const validate = require('../manifest-parser/validate')

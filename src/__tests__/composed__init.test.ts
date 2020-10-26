@@ -1,5 +1,6 @@
 import { Plugin } from 'rollup'
-import { chromeExtension, ChromeExtensionPlugin } from '..'
+import { chromeExtension } from '..'
+import { ChromeExtensionPlugin } from '../plugin-options'
 
 test('returns correct object', () => {
   const plugin = chromeExtension()
