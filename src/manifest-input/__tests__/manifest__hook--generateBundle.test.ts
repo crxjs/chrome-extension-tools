@@ -1,18 +1,21 @@
+import { OutputBundle } from 'rollup'
 import {
-  OutputBundle,
-  RollupOptions,
-  EmittedFile,
   EmittedAsset,
+  EmittedFile,
+  rollup,
+  RollupOptions,
+  RollupOutput,
 } from 'rollup'
 import { manifestInput } from '..'
 import { manifestJson } from '../../../__fixtures__/basic-paths'
-import { buildCRX } from '../../../__fixtures__/build-basic-crx'
-import { inversePromise } from '../../../__fixtures__/inversePromise'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
-import { getExtPath } from '../../../__fixtures__/utils'
+import { requireExtFile } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
-import { ManifestInputPluginCache, ManifestInputPlugin } from '../../plugin-options'
+import {
+  ManifestInputPlugin,
+  ManifestInputPluginCache,
+} from '../../plugin-options'
 import { cloneObject } from '../cloneObject'
 
 const validate = require('../manifest-parser/validate')
@@ -21,27 +24,35 @@ jest.spyOn(validate, 'validateManifest')
 const combine = require('../manifest-parser/combine')
 jest.spyOn(combine, 'combinePerms')
 
-const options: RollupOptions = {
-  input: manifestJson,
-}
+/* --------- DON'T LET ROLLUP PLUGINS WARN --------- */
 
-const bundlePromise = inversePromise<OutputBundle>()
-beforeAll(
-  buildCRX(
-    getExtPath('basic/rollup.config.js'),
-    (error, result) => {
-      if (error) {
-        bundlePromise.reject(error)
-      } else if (result) {
-        bundlePromise.resolve(result.bundle)
-      } else {
-        bundlePromise.reject(new Error('Could not build CRX'))
-      }
+beforeAll(() => {
+  console.warn = jest.fn()
+})
+
+let bundlePromise: Promise<OutputBundle>
+let outputPromise: Promise<RollupOutput>
+beforeAll(async () => {
+  const config = requireExtFile<RollupOptions>(
+    'basic',
+    'rollup.config.js',
+  )
+
+  config.plugins!.push({
+    name: 'save-bundle',
+    generateBundle(o, b) {
+      bundlePromise = Promise.resolve(b)
     },
-  ),
-  10000,
-)
+  })
 
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
+
+  return outputPromise
+}, 10000)
+
+const options: RollupOptions = { input: manifestJson }
 let cache: ManifestInputPluginCache
 let plugin: ManifestInputPlugin
 beforeEach(async () => {
