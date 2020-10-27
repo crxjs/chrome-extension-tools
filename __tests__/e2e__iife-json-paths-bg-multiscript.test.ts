@@ -1,8 +1,6 @@
-import { byFileName, requireExtFile } from '../__fixtures__/utils'
-import { rollup, RollupOutput, OutputAsset } from 'rollup'
+import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { OutputChunk } from 'rollup'
-import { RollupOptions } from 'rollup'
+import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
@@ -15,22 +13,22 @@ beforeAll(async () => {
 test('bundles multiple background scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const background1Js = output.find(byFileName('background1.js')) as OutputChunk
-  const background2Js = output.find(byFileName('background2.js')) as OutputChunk
+  const background1Js = output.find(byFileName('background1.js')) as OutputAsset
+  const background2Js = output.find(byFileName('background2.js')) as OutputAsset
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(background1Js).toBeDefined()
   expect(background1Js).toMatchObject({
-    code: expect.any(String),
+    source: expect.any(String),
     fileName: 'background1.js',
-    type: 'chunk',
+    type: 'asset',
   })
 
   expect(background2Js).toBeDefined()
   expect(background2Js).toMatchObject({
-    code: expect.any(String),
+    source: expect.any(String),
     fileName: 'background2.js',
-    type: 'chunk',
+    type: 'asset',
   })
 
   expect(manifestJson).toBeDefined()
@@ -42,10 +40,8 @@ test('bundles multiple background scripts as iife', async () => {
 
   const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
 
-  expect(manifest.background).toBeUndefined()
-  expect(manifest.content_scripts?.[0]).toMatchObject({
-    js: ['content.js'],
-  })
+  expect(manifest.background?.scripts).toEqual(['background1.js', 'background2.js'])
+  expect(manifest.content_scripts).toBeUndefined()
   expect(manifest.web_accessible_resources).toBeUndefined()
 
   // TODO: test that contentJs.code is an iife

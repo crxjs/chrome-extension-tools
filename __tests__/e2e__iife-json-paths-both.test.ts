@@ -15,22 +15,25 @@ beforeAll(async () => {
 test('bundles both background and content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const backgroundJs = output.find(byFileName('background.js')) as OutputChunk
-  const contentJs = output.find(byFileName('content.js')) as OutputChunk
+  const backgroundJs = output.find(byFileName('background/background.js')) as OutputAsset
+  const contentJs = output.find(byFileName('content/content.js')) as OutputAsset
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
+
+  // TODO: remove chunks that only are used by iife entries
+  // expect(output.length).toBe(3)
 
   expect(backgroundJs).toBeDefined()
   expect(backgroundJs).toMatchObject({
-    code: expect.any(String),
-    fileName: 'background.js',
-    type: 'chunk',
+    source: expect.any(String),
+    fileName: 'background/background.js',
+    type: 'asset',
   })
 
   expect(contentJs).toBeDefined()
   expect(contentJs).toMatchObject({
-    code: expect.any(String),
-    fileName: 'content.js',
-    type: 'chunk',
+    source: expect.any(String),
+    fileName: 'content/content.js',
+    type: 'asset',
   })
 
   expect(manifestJson).toBeDefined()
@@ -42,9 +45,9 @@ test('bundles both background and content scripts as iife', async () => {
 
   const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
 
-  expect(manifest.background).toBeUndefined()
+  expect(manifest.background?.scripts).toEqual(['background/background.js'])
   expect(manifest.content_scripts?.[0]).toMatchObject({
-    js: ['content.js'],
+    js: ['content/content.js'],
   })
   expect(manifest.web_accessible_resources).toBeUndefined()
 

@@ -15,22 +15,22 @@ beforeAll(async () => {
 test('bundles multiple content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const content1Js = output.find(byFileName('content1.js')) as OutputChunk
-  const content2Js = output.find(byFileName('content2.js')) as OutputChunk
+  const content1Js = output.find(byFileName('content1.js')) as OutputAsset
+  const content2Js = output.find(byFileName('content2.js')) as OutputAsset
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(content1Js).toBeDefined()
   expect(content1Js).toMatchObject({
-    code: expect.any(String),
+    source: expect.any(String),
     fileName: 'content1.js',
-    type: 'chunk',
+    type: 'asset',
   })
 
   expect(content2Js).toBeDefined()
   expect(content2Js).toMatchObject({
-    code: expect.any(String),
+    source: expect.any(String),
     fileName: 'content2.js',
-    type: 'chunk',
+    type: 'asset',
   })
 
   expect(manifestJson).toBeDefined()
@@ -44,7 +44,7 @@ test('bundles multiple content scripts as iife', async () => {
 
   expect(manifest.background).toBeUndefined()
   expect(manifest.content_scripts?.[0]).toMatchObject({
-    js: ['content.js'],
+    js: ['content1.js', 'content2.js'],
   })
   expect(manifest.web_accessible_resources).toBeUndefined()
 

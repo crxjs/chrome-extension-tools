@@ -13,6 +13,8 @@ export default {
   plugins: [
     chromeExtension({
       verbose: false,
+      contentScriptWrapper: false,
+      dynamicImportWrapper: false,
       iifeJsonPaths: ['$.background.scripts'],
     }),
     resolve(),

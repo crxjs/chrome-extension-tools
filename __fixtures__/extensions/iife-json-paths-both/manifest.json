@@ -4,11 +4,11 @@
   "manifest_version": 2,
   "version": "1.0.0",
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background/background.js"]
   },
   "content_scripts": [
     {
-      "js": ["content.js"],
+      "js": ["content/content.js"],
       "matches": ["https://www.google.com/*"]
     }
   ]

@@ -15,14 +15,14 @@ beforeAll(async () => {
 test('bundles a single background script as iife', async () => {
   const { output } = await outputPromise
 
-  const backgroundJs = output.find(byFileName('background.js')) as OutputChunk
+  const backgroundJs = output.find(byFileName('background.js')) as OutputAsset
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(backgroundJs).toBeDefined()
   expect(backgroundJs).toMatchObject({
-    code: expect.any(String),
+    source: expect.any(String),
     fileName: 'background.js',
-    type: 'chunk',
+    type: 'asset',
   })
 
   expect(manifestJson).toBeDefined()
