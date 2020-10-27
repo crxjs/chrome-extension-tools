@@ -4,12 +4,6 @@ import { requireExtFile } from '../__fixtures__/utils'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
-// const manifestJson = getExtPath('invalid-manifest/manifest.json')
-// const background = getExtPath('invalid-manifest/background.js')
-beforeAll(() => {
-  console.warn = jest.fn()
-})
-
 test('warns and throws if the manifest is invalid', async () => {
   try {
     const bundle = await rollup(config)

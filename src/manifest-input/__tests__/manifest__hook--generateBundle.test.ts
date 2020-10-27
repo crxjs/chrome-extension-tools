@@ -24,12 +24,6 @@ jest.spyOn(validate, 'validateManifest')
 const combine = require('../manifest-parser/combine')
 jest.spyOn(combine, 'combinePerms')
 
-/* --------- DON'T LET ROLLUP PLUGINS WARN --------- */
-
-beforeAll(() => {
-  console.warn = jest.fn()
-})
-
 let bundlePromise: Promise<OutputBundle>
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {

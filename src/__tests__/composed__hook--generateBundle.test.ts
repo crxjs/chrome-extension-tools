@@ -9,12 +9,6 @@ import { context as minimal } from '../../__fixtures__/minimal-plugin-context'
 import { context } from '../../__fixtures__/plugin-context'
 import { requireExtFile } from '../../__fixtures__/utils'
 
-/* --------- DON'T LET ROLLUP PLUGINS WARN --------- */
-
-beforeAll(() => {
-  console.warn = jest.fn()
-})
-
 /* ------------------ SETUP TESTS ------------------ */
 
 const config = requireExtFile<RollupOptions>(
