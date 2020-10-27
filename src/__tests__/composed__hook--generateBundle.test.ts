@@ -1,32 +1,43 @@
-import { OutputBundle } from 'rollup'
-import { RollupOptions } from 'rollup'
+import {
+  OutputBundle,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
 import { chromeExtension } from '..'
-import { buildCRX } from '../../__fixtures__/build-basic-crx'
-import { inversePromise } from '../../__fixtures__/inversePromise'
 import { context as minimal } from '../../__fixtures__/minimal-plugin-context'
 import { context } from '../../__fixtures__/plugin-context'
-import { getExtPath } from '../../__fixtures__/utils'
+import { requireExtFile } from '../../__fixtures__/utils'
 
-const config: RollupOptions = {
-  input: getExtPath('basic/manifest.json'),
-}
+/* --------- DON'T LET ROLLUP PLUGINS WARN --------- */
 
-const bundlePromise = inversePromise<OutputBundle>()
-beforeAll(
-  buildCRX(
-    getExtPath('basic/rollup.config.js'),
-    (error, result) => {
-      if (error) {
-        bundlePromise.reject(error)
-      } else if (result) {
-        bundlePromise.resolve(result.bundle)
-      } else {
-        bundlePromise.reject(new Error('Could not build CRX'))
-      }
-    },
-  ),
-  10000,
+beforeAll(() => {
+  console.warn = jest.fn()
+})
+
+/* ------------------ SETUP TESTS ------------------ */
+
+const config = requireExtFile<RollupOptions>(
+  'basic',
+  'rollup.config.js',
 )
+
+let bundlePromise: Promise<OutputBundle>
+let outputPromise: Promise<RollupOutput>
+beforeAll(async () => {
+  config.plugins!.push({
+    name: 'save-bundle',
+    generateBundle(o, b) {
+      bundlePromise = Promise.resolve(b)
+    },
+  })
+
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
+
+  return outputPromise
+}, 10000)
 
 const { _plugins, ...plugin } = chromeExtension({
   verbose: false,
