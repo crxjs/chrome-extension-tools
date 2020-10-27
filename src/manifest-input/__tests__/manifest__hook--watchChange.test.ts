@@ -17,6 +17,7 @@ let plugin: ManifestInputPlugin
 beforeEach(async () => {
   cache = {
     assets: [],
+    iife: {},
     permsHash: '',
     srcDir: null,
     input: [],

@@ -6,6 +6,7 @@ dependencies:
   cosmiconfig: 6.0.0
   fs-extra: 8.1.0
   glob: 7.1.6
+  jsonpath-plus: 4.0.0
   lodash.difference: 4.5.0
   lodash.flatten: 4.4.0
   lodash.get: 4.4.2
@@ -3342,6 +3343,12 @@ packages:
       graceful-fs: 4.2.4
     resolution:
       integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=
+  /jsonpath-plus/4.0.0:
+    dev: false
+    engines:
+      node: '>=10.0'
+    resolution:
+      integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==
   /jsprim/1.4.1:
     dependencies:
       assert-plus: 1.0.0
@@ -5332,6 +5339,7 @@ specifiers:
   jest-chrome: 0.7.0
   jest-html-reporters: ^1.2.1
   jest-in-case: ^1.0.2
+  jsonpath-plus: ^4.0.0
   lodash.difference: ^4.5.0
   lodash.flatten: ^4.4.0
   lodash.get: ^4.4.2

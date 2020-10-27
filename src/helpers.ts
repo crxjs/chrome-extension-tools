@@ -6,7 +6,7 @@ export const not = <T>(fn: (x: T) => boolean) => (x: T) => !fn(x)
 export function isChunk(
   x: OutputChunk | OutputAsset,
 ): x is OutputChunk {
-  return x.type === 'chunk'
+  return x && x.type === 'chunk'
 }
 
 export function isAsset(

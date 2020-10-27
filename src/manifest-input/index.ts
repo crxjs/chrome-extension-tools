@@ -1,14 +1,20 @@
+import { code as ctWrapperScript } from 'code ./browser/contentScriptWrapper.ts'
 import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
-import { code as contentScriptWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
+import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
-import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk } from 'rollup'
+import path, { basename, join, relative } from 'path'
+import { rollup } from 'rollup'
+import { EmittedAsset, OutputChunk, Plugin } from 'rollup'
 import slash from 'slash'
-
 import { isChunk, isJsonFilePath } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
+import {
+  ManifestInputPlugin,
+  ManifestInputPluginCache,
+  ManifestInputPluginOptions,
+} from '../plugin-options'
 import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import { combinePerms } from './manifest-parser/combine'
@@ -21,11 +27,6 @@ import {
   ValidationErrorsArray,
 } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import {
-  ManifestInputPlugin,
-  ManifestInputPluginCache,
-  ManifestInputPluginOptions,
-} from '../plugin-options'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
@@ -62,15 +63,18 @@ const npmPkgDetails =
 export function manifestInput(
   {
     browserPolyfill = false,
+    contentScriptWrapper = true,
     dynamicImportWrapper = {},
     extendManifest = {},
     firstClassManifest = true,
+    iifeJsonPaths = [],
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
     cache = {
       assetChanged: false,
       assets: [],
+      iife: {},
       input: [],
       inputAry: [],
       inputObj: {},
@@ -200,6 +204,24 @@ export function manifestInput(
         cache.srcDir = path.dirname(manifestPath)
 
         if (firstClassManifest) {
+          cache.iife = iifeJsonPaths
+            .map((jsonPath) => {
+              const result = JSONPath({
+                path: jsonPath,
+                json: cache.manifest!,
+              })
+
+              return result
+            })
+            .flat(Infinity)
+            .reduce(
+              (r, key) => ({
+                ...r,
+                [key]: join(cache.srcDir!, key),
+              }),
+              {},
+            )
+
           // Derive entry paths from manifest
           const { js, html, css, img, others } = deriveFiles(
             cache.manifest,
@@ -208,6 +230,7 @@ export function manifestInput(
 
           // Cache derived inputs
           cache.input = [...cache.inputAry, ...js, ...html]
+
           cache.assets = [
             // Dedupe assets
             ...new Set([...css, ...img, ...others]),
@@ -226,10 +249,7 @@ export function manifestInput(
         finalInput[stubChunkName] = stubChunkName
       }
 
-      return {
-        ...options,
-        input: finalInput,
-      }
+      return { ...options, input: finalInput }
     },
 
     /* ============================================ */
@@ -291,14 +311,71 @@ export function manifestInput(
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    generateBundle(options, bundle) {
+    async generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
       delete bundle[stubChunkName + '.js']
 
       /* ----------- ADD IIFE JSON PATH CHUNKS ----------- */
 
-      // TODO: emit iifes
+      await Promise.all(
+        Object.keys(cache.iife).map(async (key) => {
+          const chunk = bundle[key]
+
+          if (isChunk(chunk)) {
+            // TODO: remove chunks that only are used by iife entries
+            // get entry build using existing bundle
+            const build = await rollup({
+              input: key,
+              // don't need to do anything else
+              plugins: [
+                {
+                  name: 'esm-input-to-iife',
+                  resolveId(source, importer) {
+                    if (typeof importer === 'undefined') {
+                      return source
+                    } else {
+                      const dirname = path.dirname(importer)
+                      const resolved = path.join(dirname, source)
+
+                      return resolved
+                    }
+                  },
+                  load(id) {
+                    const chunk = bundle[id]
+
+                    if (isChunk(chunk)) {
+                      return {
+                        code: chunk.code,
+                        map: chunk.map,
+                      }
+                    } else {
+                      throw new Error(`Could not load: ${id}`)
+                    }
+                  },
+                } as Plugin,
+              ],
+            })
+
+            // convert bundle to iife format
+            const {
+              output: [output],
+            } = await build.generate({
+              ...options,
+              format: 'iife',
+            })
+
+            // replace entry file with iife chunk
+            delete bundle[key]
+
+            this.emitFile({
+              type: 'asset',
+              fileName: key,
+              source: output.code,
+            })
+          }
+        }),
+      )
 
       if (Object.keys(bundle).length === 0) {
         throw new Error(
@@ -377,10 +454,10 @@ export function manifestInput(
           [] as string[],
         )
 
-        if (contentScripts.length) {
+        if (contentScriptWrapper && contentScripts.length) {
           const memoizedEmitter = memoize(
             (scriptPath: string) => {
-              const source = contentScriptWrapper.replace(
+              const source = ctWrapperScript.replace(
                 '%PATH%',
                 // Fix path slashes to support Windows
                 JSON.stringify(

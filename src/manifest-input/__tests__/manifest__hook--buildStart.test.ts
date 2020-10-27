@@ -30,6 +30,7 @@ beforeEach(() => {
     assets: [],
     permsHash: '',
     srcDir: null,
+    iife: {},
     input: [],
     readFile: new Map(),
     assetChanged: false,

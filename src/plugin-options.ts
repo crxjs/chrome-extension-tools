@@ -12,6 +12,7 @@ export interface ChromeExtensionOptions {
     | {
         executeScript: boolean
       }
+  contentScriptWrapper?: boolean
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
   extendManifest?:
     | Partial<ChromeExtensionManifest>
@@ -19,6 +20,7 @@ export interface ChromeExtensionOptions {
         manifest: ChromeExtensionManifest,
       ) => ChromeExtensionManifest)
   firstClassManifest?: boolean
+  iifeJsonPaths?: string[]
   pkg?: {
     description: string
     name: string
@@ -30,13 +32,7 @@ export interface ChromeExtensionOptions {
 
 export type ChromeExtensionPlugin = Pick<
   Required<Plugin>,
-  | 'name'
-  | 'options'
-  | 'buildStart'
-  | 'resolveId'
-  | 'load'
-  | 'watchChange'
-  | 'generateBundle'
+  'name' | ManifestInputPluginHooks | HtmlInputsPluginHooks
 > & {
   // For testing
   _plugins: {
@@ -55,6 +51,7 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
+  iife: Record<string, string>
   input: string[]
   inputAry: string[]
   inputObj: Record<string, string>
@@ -66,14 +63,17 @@ export interface ManifestInputPluginCache {
   assetChanged: boolean
 }
 
-export type ManifestInputPlugin = Pick<
-  PluginHooks,
+type ManifestInputPluginHooks =
   | 'options'
   | 'buildStart'
   | 'resolveId'
   | 'load'
   | 'watchChange'
   | 'generateBundle'
+
+export type ManifestInputPlugin = Pick<
+  PluginHooks,
+  ManifestInputPluginHooks
 > & {
   name: string
   srcDir: string | null
@@ -107,7 +107,13 @@ export interface HtmlInputsPluginCache {
   srcDir?: string
 }
 
+type HtmlInputsPluginHooks =
+  | 'name'
+  | 'options'
+  | 'buildStart'
+  | 'watchChange'
+
 export type HtmlInputsPlugin = Pick<
   Required<Plugin>,
-  'name' | 'options' | 'buildStart' | 'watchChange'
+  HtmlInputsPluginHooks
 > & { cache: HtmlInputsPluginCache }
