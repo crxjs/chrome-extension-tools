@@ -38,6 +38,8 @@ test('bundles multiple content scripts as iife', async () => {
     type: 'asset',
   })
 
+  expect(output.length).toBe(3)
+
   const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
 
   expect(manifest.background).toBeUndefined()

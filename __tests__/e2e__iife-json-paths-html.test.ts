@@ -11,24 +11,42 @@ beforeAll(async () => {
   return outputPromise
 }, 10000)
 
-test('bundles multiple content scripts as iife', async () => {
+test('bundles both background and content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const content1Js = output.find(byFileName('content1.js')) as OutputAsset
-  const content2Js = output.find(byFileName('content2.js')) as OutputAsset
+  const backgroundJs = output.find(byFileName('background/background.js')) as OutputAsset
+  const contentJs = output.find(byFileName('content/content.js')) as OutputAsset
+  const optionsJs = output.find(byFileName('options/options.js')) as OutputAsset
+  const optionsHtml = output.find(byFileName('options/options.html')) as OutputAsset
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
-  expect(content1Js).toBeDefined()
-  expect(content1Js).toMatchObject({
+  expect(output.length).toBe(5)
+
+  expect(backgroundJs).toBeDefined()
+  expect(backgroundJs).toMatchObject({
     source: expect.any(String),
-    fileName: 'content1.js',
+    fileName: 'background/background.js',
     type: 'asset',
   })
 
-  expect(content2Js).toBeDefined()
-  expect(content2Js).toMatchObject({
+  expect(contentJs).toBeDefined()
+  expect(contentJs).toMatchObject({
     source: expect.any(String),
-    fileName: 'content2.js',
+    fileName: 'content/content.js',
+    type: 'asset',
+  })
+  
+  expect(optionsJs).toBeDefined()
+  expect(optionsJs).toMatchObject({
+    source: expect.any(String),
+    fileName: 'options/options.js',
+    type: 'asset',
+  })
+
+  expect(optionsHtml).toBeDefined()
+  expect(optionsHtml).toMatchObject({
+    source: expect.any(String),
+    fileName: 'options/options.html',
     type: 'asset',
   })
 
@@ -39,13 +57,11 @@ test('bundles multiple content scripts as iife', async () => {
     type: 'asset',
   })
 
-  expect(output.length).toBe(3)
-
   const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
 
-  expect(manifest.background).toBeUndefined()
+  expect(manifest.background?.scripts).toEqual(['background/background.js'])
   expect(manifest.content_scripts?.[0]).toMatchObject({
-    js: ['content1.js', 'content2.js'],
+    js: ['content/content.js'],
   })
   expect(manifest.web_accessible_resources).toBeUndefined()
 

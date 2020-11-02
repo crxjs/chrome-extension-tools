@@ -1,4 +1,4 @@
-import { x } from './imported'
+import { x } from '../shared/imported1'
 
 console.log(x)
 

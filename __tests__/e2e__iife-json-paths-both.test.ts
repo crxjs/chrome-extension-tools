@@ -19,7 +19,7 @@ test('bundles both background and content scripts as iife', async () => {
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   // TODO: remove chunks that only are used by iife entries
-  // expect(output.length).toBe(3)
+  expect(output.length).toBe(3)
 
   expect(backgroundJs).toBeDefined()
   expect(backgroundJs).toMatchObject({

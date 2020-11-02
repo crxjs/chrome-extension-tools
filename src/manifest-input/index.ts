@@ -5,8 +5,7 @@ import fs from 'fs-extra'
 import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
 import path, { basename, join, relative } from 'path'
-import { rollup } from 'rollup'
-import { EmittedAsset, OutputChunk, Plugin } from 'rollup'
+import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import { isChunk, isJsonFilePath } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
@@ -27,6 +26,7 @@ import {
   ValidationErrorsArray,
 } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
+import { rollupScripts } from './rollupScripts'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
@@ -311,77 +311,10 @@ export function manifestInput(
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    async generateBundle(options, bundle) {
+    async generateBundle(options, bundle, isWrite) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
       delete bundle[stubChunkName + '.js']
-
-      /* ----------- ADD IIFE JSON PATH CHUNKS ----------- */
-
-      await Promise.all(
-        Object.keys(cache.iife).map(async (key) => {
-          const chunk = bundle[key]
-
-          if (isChunk(chunk)) {
-            // TODO: remove chunks that only are used by iife entries
-            // get entry build using existing bundle
-            const build = await rollup({
-              input: key,
-              // don't need to do anything else
-              plugins: [
-                {
-                  name: 'esm-input-to-iife',
-                  resolveId(source, importer) {
-                    if (typeof importer === 'undefined') {
-                      return source
-                    } else {
-                      const dirname = path.dirname(importer)
-                      const resolved = path.join(dirname, source)
-
-                      return resolved
-                    }
-                  },
-                  load(id) {
-                    const chunk = bundle[id]
-
-                    if (isChunk(chunk)) {
-                      return {
-                        code: chunk.code,
-                        map: chunk.map,
-                      }
-                    } else {
-                      throw new Error(`Could not load: ${id}`)
-                    }
-                  },
-                } as Plugin,
-              ],
-            })
-
-            // convert bundle to iife format
-            const {
-              output: [output],
-            } = await build.generate({
-              ...options,
-              format: 'iife',
-            })
-
-            // replace entry file with iife chunk
-            delete bundle[key]
-
-            this.emitFile({
-              type: 'asset',
-              fileName: key,
-              source: output.code,
-            })
-          }
-        }),
-      )
-
-      if (Object.keys(bundle).length === 0) {
-        throw new Error(
-          'The manifest must have at least one asset (html or css) or script file.',
-        )
-      }
 
       /* ---------- DERIVE PERMISSIONS START --------- */
 
@@ -417,7 +350,22 @@ export function manifestInput(
         cache.permsHash = permsHash
       }
 
-      /* ---------- DERIVE PERMISSIONS END ---------- */
+      /* ----------- ADD IIFE JSON PATH CHUNKS ----------- */
+
+      if (iifeJsonPaths.length) {
+        await rollupScripts(cache).call(
+          this,
+          options,
+          bundle,
+          isWrite,
+        )
+      }
+
+      if (Object.keys(bundle).length === 0) {
+        throw new Error(
+          'The manifest must have at least one asset (html or css) or script file.',
+        )
+      }
 
       try {
         // Clone cache.manifest
