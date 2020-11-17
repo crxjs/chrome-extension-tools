@@ -2,6 +2,7 @@ import { byFileName, requireExtFile } from '../__fixtures__/utils'
 import { rollup, RollupOutput, OutputAsset } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
 import { RollupOptions } from 'rollup'
+import { OutputChunk } from 'rollup'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
@@ -14,14 +15,14 @@ beforeAll(async () => {
 test('bundles a single background script as iife', async () => {
   const { output } = await outputPromise
 
-  const backgroundJs = output.find(byFileName('background.js')) as OutputAsset
+  const backgroundJs = output.find(byFileName('background.js')) as OutputChunk
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(backgroundJs).toBeDefined()
   expect(backgroundJs).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'background.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(manifestJson).toBeDefined()

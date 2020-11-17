@@ -3,6 +3,7 @@ import { ValidateNamesPlugin } from './validate-names/index'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
 import { ChromeExtensionManifest } from './manifest'
 import { CheerioFile } from './html-inputs/cheerio'
+import { ModuleFormat } from 'rollup'
 
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
@@ -13,6 +14,7 @@ export interface ChromeExtensionOptions {
         executeScript: boolean
       }
   contentScriptWrapper?: boolean
+  crossBrowser?: boolean
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
   extendManifest?:
     | Partial<ChromeExtensionManifest>
@@ -51,7 +53,7 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
-  iife: Record<string, string>
+  iife: string[]
   input: string[]
   inputAry: string[]
   inputObj: Record<string, string>
@@ -78,6 +80,10 @@ export type ManifestInputPlugin = Pick<
   name: string
   srcDir: string | null
   browserPolyfill?: ChromeExtensionOptions['browserPolyfill']
+  crossBrowser?: ChromeExtensionOptions['crossBrowser']
+  formatMap?: Partial<
+    Record<ModuleFormat, string[] | Record<string, string>>
+  >
 }
 
 /* ----------- HTML INPUTS PLUGIN OPTIONS ---------- */

@@ -1,10 +1,9 @@
 import { code as ctWrapperScript } from 'code ./browser/contentScriptWrapper.ts'
-import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
-import path, { basename, join, relative } from 'path'
+import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import { isChunk, isJsonFilePath } from '../helpers'
@@ -26,7 +25,6 @@ import {
   ValidationErrorsArray,
 } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import { rollupScripts } from './rollupScripts'
 
 export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
@@ -64,6 +62,7 @@ export function manifestInput(
   {
     browserPolyfill = false,
     contentScriptWrapper = true,
+    crossBrowser = false,
     dynamicImportWrapper = {},
     extendManifest = {},
     firstClassManifest = true,
@@ -74,7 +73,7 @@ export function manifestInput(
     cache = {
       assetChanged: false,
       assets: [],
-      iife: {},
+      iife: [],
       input: [],
       inputAry: [],
       inputObj: {},
@@ -99,19 +98,6 @@ export function manifestInput(
 
   const manifestName = 'manifest.json'
 
-  let browserPolyfillSrc: string | undefined
-  if (browserPolyfill) {
-    const convert = require('convert-source-map')
-    const polyfillPath = require.resolve('webextension-polyfill')
-    const src = fs.readFileSync(polyfillPath, 'utf-8')
-    const map = fs.readJsonSync(polyfillPath + '.map')
-
-    browserPolyfillSrc = [
-      convert.removeMapFileComments(src),
-      convert.fromObject(map).toComment(),
-    ].join('\n')
-  }
-
   /* ------------ HOOKS CLOSURES END ------------ */
 
   /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
@@ -128,9 +114,14 @@ export function manifestInput(
     name,
 
     browserPolyfill,
+    crossBrowser,
 
     get srcDir() {
       return cache.srcDir
+    },
+
+    get formatMap() {
+      return { iife: cache.iife }
     },
 
     /* ============================================ */
@@ -214,13 +205,6 @@ export function manifestInput(
               return result
             })
             .flat(Infinity)
-            .reduce(
-              (r, key) => ({
-                ...r,
-                [key]: join(cache.srcDir!, key),
-              }),
-              {},
-            )
 
           // Derive entry paths from manifest
           const { js, html, css, img, others } = deriveFiles(
@@ -311,7 +295,7 @@ export function manifestInput(
     /*                GENERATEBUNDLE                */
     /* ============================================ */
 
-    async generateBundle(options, bundle, isWrite) {
+    generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
       delete bundle[stubChunkName + '.js']
@@ -348,17 +332,6 @@ export function manifestInput(
         }
 
         cache.permsHash = permsHash
-      }
-
-      /* ----------- ADD IIFE JSON PATH CHUNKS ----------- */
-
-      if (iifeJsonPaths.length) {
-        await rollupScripts(cache).call(
-          this,
-          options,
-          bundle,
-          isWrite,
-        )
       }
 
       if (Object.keys(bundle).length === 0) {
@@ -498,49 +471,6 @@ export function manifestInput(
         }
 
         /* ---------- STABLE EXTENSION ID END --------- */
-
-        /* ------------- EMIT BROWSER POLYFILL ------------- */
-
-        if (browserPolyfillSrc) {
-          const bpId = this.emitFile({
-            type: 'asset',
-            source: browserPolyfillSrc,
-            fileName: 'assets/browser-polyfill.js',
-          })
-
-          const browserPolyfillPath = this.getFileName(bpId)
-
-          if (
-            typeof browserPolyfill === 'object'
-              ? browserPolyfill.executeScript
-              : browserPolyfill
-          ) {
-            const exId = this.emitFile({
-              type: 'asset',
-              source: executeScriptPolyfill.replace(
-                '%BROWSER_POLYFILL_PATH%',
-                JSON.stringify(browserPolyfillPath),
-              ),
-              fileName:
-                'assets/browser-polyfill-executeScript.js',
-            })
-
-            const executeScriptPolyfillPath = this.getFileName(
-              exId,
-            )
-
-            manifestBody.background?.scripts?.unshift(
-              executeScriptPolyfillPath,
-            )
-          }
-
-          manifestBody.background?.scripts?.unshift(
-            browserPolyfillPath,
-          )
-          manifestBody.content_scripts?.forEach((script) => {
-            script.js?.unshift(browserPolyfillPath)
-          })
-        }
 
         /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
 

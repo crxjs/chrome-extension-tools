@@ -1,3 +1,4 @@
+import { OutputChunk } from 'rollup'
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
@@ -13,22 +14,22 @@ beforeAll(async () => {
 test('bundles multiple background scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const background1Js = output.find(byFileName('background1.js')) as OutputAsset
-  const background2Js = output.find(byFileName('background2.js')) as OutputAsset
+  const background1Js = output.find(byFileName('background1.js')) as OutputChunk
+  const background2Js = output.find(byFileName('background2.js')) as OutputChunk
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(background1Js).toBeDefined()
   expect(background1Js).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'background1.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(background2Js).toBeDefined()
   expect(background2Js).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'background2.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(manifestJson).toBeDefined()

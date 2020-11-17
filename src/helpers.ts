@@ -1,3 +1,4 @@
+import { OutputOptions } from 'rollup'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 import { ChromeExtensionManifest } from './manifest'
 
@@ -9,9 +10,18 @@ export function isChunk(
   return x && x.type === 'chunk'
 }
 
+export function isOutputOptions(x: any): x is OutputOptions {
+  return (
+    typeof x === 'object' &&
+    !Array.isArray(x) &&
+    typeof x.format === 'string' &&
+    ['iife', 'es'].includes(x.format)
+  )
+}
+
 export function isAsset(
   x: OutputChunk | OutputAsset,
-): x is OutputChunk {
+): x is OutputAsset {
   return x.type === 'asset'
 }
 

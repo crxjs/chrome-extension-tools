@@ -2,6 +2,7 @@ import { byFileName, requireExtFile } from '../__fixtures__/utils'
 import { rollup, RollupOutput, OutputAsset } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
 import { RollupOptions } from 'rollup'
+import { OutputChunk } from 'rollup'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
@@ -14,8 +15,8 @@ beforeAll(async () => {
 test('bundles both background and content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const backgroundJs = output.find(byFileName('background/background.js')) as OutputAsset
-  const contentJs = output.find(byFileName('content/content.js')) as OutputAsset
+  const backgroundJs = output.find(byFileName('background/background.js')) as OutputChunk
+  const contentJs = output.find(byFileName('content/content.js')) as OutputChunk
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   // TODO: remove chunks that only are used by iife entries
@@ -23,16 +24,16 @@ test('bundles both background and content scripts as iife', async () => {
 
   expect(backgroundJs).toBeDefined()
   expect(backgroundJs).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'background/background.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(contentJs).toBeDefined()
   expect(contentJs).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'content/content.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(manifestJson).toBeDefined()

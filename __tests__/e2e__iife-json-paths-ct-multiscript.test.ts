@@ -2,6 +2,7 @@ import { byFileName, requireExtFile } from '../__fixtures__/utils'
 import { rollup, RollupOutput, OutputAsset } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
 import { RollupOptions } from 'rollup'
+import { OutputChunk } from 'rollup'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
@@ -14,22 +15,22 @@ beforeAll(async () => {
 test('bundles multiple content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const content1Js = output.find(byFileName('content1.js')) as OutputAsset
-  const content2Js = output.find(byFileName('content2.js')) as OutputAsset
+  const content1Js = output.find(byFileName('content1.js')) as OutputChunk
+  const content2Js = output.find(byFileName('content2.js')) as OutputChunk
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(content1Js).toBeDefined()
   expect(content1Js).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'content1.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(content2Js).toBeDefined()
   expect(content2Js).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'content2.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(manifestJson).toBeDefined()

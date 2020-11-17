@@ -1,3 +1,4 @@
+import { OutputChunk } from 'rollup'
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
@@ -13,14 +14,14 @@ beforeAll(async () => {
 test('bundles a single content script as iife', async () => {
   const { output } = await outputPromise
 
-  const contentJs = output.find(byFileName('content.js')) as OutputAsset
+  const contentJs = output.find(byFileName('content.js')) as OutputChunk
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
   expect(contentJs).toBeDefined()
   expect(contentJs).toMatchObject({
-    source: expect.any(String),
+    code: expect.any(String),
     fileName: 'content.js',
-    type: 'asset',
+    type: 'chunk',
   })
 
   expect(manifestJson).toBeDefined()
