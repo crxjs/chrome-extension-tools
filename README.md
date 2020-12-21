@@ -45,7 +45,36 @@ be bundled or copied to the output folder.
 
 ### Chrome Extension Boilerplates
 
-[Javascript-boilerplate](https://github.com/extend-chrome/javascript-boilerplate)
+We have TypeScript and JavaScript boilerplates available.
+
+Get started fast with the
+[JavaScript React boilerplate](https://github.com/extend-chrome/js-react-boilerplate):
+
+```
+git clone https://github.com/extend-chrome/js-react-boilerplate.git
+```
+
+Or use the [TypeScript React boilerplate]() if you're feeling
+fancy:
+
+```
+git clone https://github.com/extend-chrome/ts-react-boilerplate.git
+```
+
+### I want to do it myself
+
+```sh
+$ npm i rollup rollup-plugin-chrome-extension@latest -D
+```
+
+Install the plugins
+[Node Resolve](https://www.npmjs.com/package/@rollup/plugin-node-resolve)
+and [CommonJS](https://github.com/rollup/@rollup/plugin-commonjs)
+if you plan to use npm modules.
+
+```sh
+$ npm i @rollup/plugin-node-resolve @rollup/plugin-commonjs -D
+```
 
 ## Usage <a name = "usage"></a>
 
@@ -87,7 +116,7 @@ Add these scripts to your `package.json` file.
 {
   "scripts": {
     "build": "rollup -c",
-    "watch": "rollup -c -w"
+    "start": "rollup -c -w"
   }
 }
 ```
@@ -207,7 +236,7 @@ Rollup produces a new build.
 
 ### ⭐️ Write Chrome Extensions In TypeScript <a name = "typescript"></a>
 
-#### Includes chrome extension API types
+#### Includes Chrome extension API types
 
 If you use the
 [`@rollup/plugin-typescript`](https://www.npmjs.com/package/@rollup/plugin-typescript),
