@@ -230,6 +230,21 @@ code splitting features.
 
 ---
 
+### ⭐️ Use Promises like it's 2021 <a name = "features-browser-polyfill"></a>
+
+Add the excellent [promisified Browser API polyfill](https://github.com/mozilla/webextension-polyfill) by Mozilla to your
+Chrome extension with one easy option:
+
+```javascript
+chromeExtension({ browserPolyfill: true })
+```
+
+Don't forget to
+[install types](https://www.npmjs.com/package/@types/firefox-webext-browser)
+if you want Intellisense to work!
+
+---
+
 ### ⭐️ Plugins Take It To The Next Level <a name = "plugins"></a>
 
 Take advantage of other great Rollup plugins to do awesome things
