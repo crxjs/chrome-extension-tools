@@ -36,7 +36,7 @@ const cache: ManifestInputPluginCache = {
   assets: [],
   permsHash: '',
   srcDir: null,
-  iife: {},
+  iife: [],
   input: [],
   readFile: new Map(),
   assetChanged: false,

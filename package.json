@@ -24,7 +24,8 @@
     "start": "rollup -c -w",
     "test": "jest",
     "test:ci": "jest --runInBand --coverage",
-    "test:precommit": "jest --changedSince=master"
+    "test:precommit": "jest --changedSince=master",
+    "check:typescript": "tsc --noEmit"
   },
   "dependencies": {
     "ajv": "^6.11.0",
