@@ -5,6 +5,7 @@ import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
+  basicRoot,
   faviconIco,
   faviconPng,
   optionsCss,
@@ -23,7 +24,8 @@ import {
   getExtPath,
   getRelative,
 } from '../../../__fixtures__/utils'
-import htmlInputs, { HtmlInputsPluginCache } from '../index'
+import { HtmlInputsPluginCache } from '../../plugin-options'
+import htmlInputs from '../index'
 
 const cheerio = require('../cheerio')
 
@@ -83,15 +85,21 @@ test('returns options.input as input record', () => {
 
 test('calls loadHtml', () => {
   const spy = jest.spyOn(cheerio, 'loadHtml')
+  const closureMock = jest.fn(cheerio.loadHtml(basicRoot))
+  spy.mockImplementation(() => closureMock)
+
+  jest.clearAllMocks()
 
   plugin.options.call(context, options)
 
-  expect(spy).toBeCalledTimes(2)
-  expect(spy).toBeCalledWith(optionsHtml, 0, [
+  expect(spy).toBeCalledTimes(1)
+
+  expect(closureMock).toBeCalledTimes(2)
+  expect(closureMock).toBeCalledWith(optionsHtml, 0, [
     optionsHtml,
     popupHtml,
   ])
-  expect(spy).toBeCalledWith(popupHtml, 1, [
+  expect(closureMock).toBeCalledWith(popupHtml, 1, [
     optionsHtml,
     popupHtml,
   ])
@@ -259,5 +267,63 @@ test('Handles option.input as string', () => {
       options3: '__fixtures__/extensions/basic/options3.ts',
       options4: '__fixtures__/extensions/basic/options4.tsx',
     },
+  })
+})
+
+test('Handles options.browserPolyfill as true', () => {
+  const plugin = htmlInputs(
+    { srcDir, browserPolyfill: true },
+    cache,
+  )
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($) => {
+    const head = $('head > script')
+    expect(head.first().attr('src')).toBe(
+      '/assets/browser-polyfill.js',
+    )
+    expect(head.next().attr('src')).toBe(
+      '/assets/browser-polyfill-executeScript.js',
+    )
+  })
+})
+
+test('Handles options.browserPolyfill.executeScript as true', () => {
+  const plugin = htmlInputs(
+    { srcDir, browserPolyfill: { executeScript: true } },
+    cache,
+  )
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($) => {
+    const head = $('head > script')
+
+    expect(head.next().attr('src')).toBe(
+      '/assets/browser-polyfill-executeScript.js',
+    )
+  })
+})
+
+test('Handles options.browserPolyfill.executeScript as false', () => {
+  const plugin = htmlInputs(
+    { srcDir, browserPolyfill: { executeScript: false } },
+    cache,
+  )
+
+  plugin.options.call(context, options)
+
+  cache.html$.forEach(($) => {
+    const head = $('head > script')
+
+    expect(head.first().attr('src')).toBe(
+      '/assets/browser-polyfill.js',
+    )
+    expect(
+      head.is(
+        'script[src="/assets/browser-polyfill-executeScript.js"]',
+      ),
+    ).toBe(false)
   })
 })

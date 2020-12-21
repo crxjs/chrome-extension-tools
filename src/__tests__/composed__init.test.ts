@@ -1,5 +1,6 @@
 import { Plugin } from 'rollup'
-import { chromeExtension, ChromeExtensionPlugin } from '..'
+import { chromeExtension } from '..'
+import { ChromeExtensionPlugin } from '../plugin-options'
 
 test('returns correct object', () => {
   const plugin = chromeExtension()
@@ -21,6 +22,8 @@ test('returns correct object', () => {
 
     options: expect.any(Function),
     buildStart: expect.any(Function),
+    resolveId: expect.any(Function),
+    load: expect.any(Function),
     watchChange: expect.any(Function),
     generateBundle: expect.any(Function),
   })

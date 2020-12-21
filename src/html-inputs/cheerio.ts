@@ -1,20 +1,43 @@
 import cheerio from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
-import { isString } from '../helpers'
+import prettier from 'prettier'
 
-export const loadHtml = (filePath: string) => {
+import { isString } from '../helpers'
+import { HtmlInputsOptions } from '../plugin-options'
+
+export type HtmlFilePathData = {
+  filePath: string
+  rootPath: string
+}
+
+/** cheerio.Root objects with a file path */
+export type CheerioFile = cheerio.Root & HtmlFilePathData
+
+export const formatHtml = ($: CheerioFile) =>
+  prettier.format($.html(), { parser: 'html' })
+
+export const loadHtml = (rootPath: string) => (
+  filePath: string,
+): CheerioFile => {
   const htmlCode = fs.readFileSync(filePath, 'utf8')
   const $ = cheerio.load(htmlCode)
 
-  return Object.assign($, { filePath })
+  return Object.assign($, { filePath, rootPath })
 }
 
-export const getRelativePath = (filePath: string) => (
-  p: string,
-) => {
-  const fileDir = path.dirname(filePath)
-  const relDir = path.relative(process.cwd(), fileDir)
+export const getRelativePath = ({
+  filePath,
+  rootPath,
+}: HtmlFilePathData) => (p: string) => {
+  const htmlFileDir = path.dirname(filePath)
+
+  let relDir: string
+  if (p.startsWith('/')) {
+    relDir = path.relative(process.cwd(), rootPath)
+  } else {
+    relDir = path.relative(process.cwd(), htmlFileDir)
+  }
 
   return path.join(relDir, p)
 }
@@ -30,10 +53,10 @@ export const getScriptElems = ($: cheerio.Root) =>
     .not('[src^="/"]')
 
 // Mutative action
-export const mutateScriptElems = (
-  $: cheerio.Root & {
-    filePath: string
-  },
+export const mutateScriptElems = ({
+  browserPolyfill,
+}: Pick<HtmlInputsOptions, 'browserPolyfill'>) => (
+  $: CheerioFile,
 ) => {
   getScriptElems($)
     .attr('type', 'module')
@@ -47,21 +70,34 @@ export const mutateScriptElems = (
       return replaced
     })
 
+  if (browserPolyfill) {
+    const head = $('head')
+    if (
+      browserPolyfill === true ||
+      (typeof browserPolyfill === 'object' &&
+        browserPolyfill.executeScript)
+    ) {
+      head.prepend(
+        '<script src="/assets/browser-polyfill-executeScript.js"></script>',
+      )
+    }
+
+    head.prepend(
+      '<script src="/assets/browser-polyfill.js"></script>',
+    )
+  }
+
   return $
 }
 
 export const getScripts = ($: cheerio.Root) =>
   getScriptElems($).toArray()
 
-export const getScriptSrc = (
-  $: cheerio.Root & {
-    filePath: string
-  },
-) =>
+export const getScriptSrc = ($: CheerioFile) =>
   getScripts($)
     .map((elem) => $(elem).attr('src'))
     .filter(isString)
-    .map(getRelativePath($.filePath))
+    .map(getRelativePath($))
 
 /* ----------------- ASSET SCRIPTS ----------------- */
 
@@ -74,15 +110,11 @@ const getAssets = ($: cheerio.Root) =>
     .not('[src^="/"]')
     .toArray()
 
-export const getJsAssets = (
-  $: cheerio.Root & {
-    filePath: string
-  },
-) =>
+export const getJsAssets = ($: CheerioFile) =>
   getAssets($)
     .map((elem) => $(elem).attr('src'))
     .filter(isString)
-    .map(getRelativePath($.filePath))
+    .map(getRelativePath($))
 
 /* -------------------- css ------------------- */
 
@@ -95,15 +127,11 @@ const getCss = ($: cheerio.Root) =>
     .not('[href^="/"]')
     .toArray()
 
-export const getCssHrefs = (
-  $: cheerio.Root & {
-    filePath: string
-  },
-) =>
+export const getCssHrefs = ($: CheerioFile) =>
   getCss($)
     .map((elem) => $(elem).attr('href'))
     .filter(isString)
-    .map(getRelativePath($.filePath))
+    .map(getRelativePath($))
 
 /* -------------------- img ------------------- */
 
@@ -112,7 +140,6 @@ const getImgs = ($: cheerio.Root) =>
     .not('[src^="http://"]')
     .not('[src^="https://"]')
     .not('[src^="data:"]')
-    .not('[src^="/"]')
     .toArray()
 
 const getFavicons = ($: cheerio.Root) =>
@@ -120,18 +147,13 @@ const getFavicons = ($: cheerio.Root) =>
     .not('[href^="http:"]')
     .not('[href^="https:"]')
     .not('[href^="data:"]')
-    .not('[href^="/"]')
     .toArray()
 
-export const getImgSrcs = (
-  $: cheerio.Root & {
-    filePath: string
-  },
-) => {
+export const getImgSrcs = ($: CheerioFile) => {
   return [
     ...getImgs($).map((elem) => $(elem).attr('src')),
     ...getFavicons($).map((elem) => $(elem).attr('href')),
   ]
     .filter(isString)
-    .map(getRelativePath($.filePath))
+    .map(getRelativePath($))
 }

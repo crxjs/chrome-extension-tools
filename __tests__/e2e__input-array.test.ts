@@ -1,19 +1,16 @@
-import { OutputAsset, OutputChunk, rollup, RollupBuild } from 'rollup'
+import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { byFileName, getExtPath } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
-const { default: config } = require(getExtPath('input-array/rollup.config.js'))
+let outputPromise: Promise<RollupOutput>
+beforeAll(async () => {
+  const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
+  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  return outputPromise
+}, 10000)
 
 test('Handles config with input array', async () => {
-  let bundle: RollupBuild
-  try {
-    bundle = await rollup(config)
-  } catch (error) {
-    error.message = `Could not bundle a Rollup config with an input array!\n\nRollup Error: "${error.message}"`
-    throw error
-  }
-
-  const { output } = await bundle.generate(config.output)
+  const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string

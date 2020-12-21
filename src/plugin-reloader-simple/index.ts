@@ -10,12 +10,20 @@ import {
   timestampPathPlaceholder,
   loadMessagePlaceholder,
   timestampFilename,
+  ctScriptPathPlaceholder,
+  executeScriptPlaceholder,
+  unregisterServiceWorkersPlaceholder,
 } from './CONSTANTS'
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
   'name' | 'generateBundle' | 'writeBundle'
 >
+
+export interface SimpleReloaderOptions {
+  executeScript?: boolean
+  unregisterServiceWorkers?: boolean
+}
 
 export interface SimpleReloaderCache {
   bgScriptPath?: string
@@ -29,6 +37,10 @@ export interface SimpleReloaderCache {
 export const _internalCache: SimpleReloaderCache = {}
 
 export const simpleReloader = (
+  {
+    executeScript = true,
+    unregisterServiceWorkers = true,
+  } = {} as SimpleReloaderOptions,
   cache = {} as SimpleReloaderCache,
 ): SimpleReloaderPlugin | undefined => {
   if (!process.env.ROLLUP_WATCH) {
@@ -87,6 +99,14 @@ export const simpleReloader = (
         true,
       )
 
+      cache.ctScriptPath = emit(
+        contentScriptReloader,
+        ctClientCode.replace(
+          loadMessagePlaceholder,
+          JSON.stringify(cache.loadMessage),
+        ),
+      )
+
       cache.bgScriptPath = emit(
         backgroundPageReloader,
         bgClientCode
@@ -94,15 +114,19 @@ export const simpleReloader = (
           .replace(
             loadMessagePlaceholder,
             JSON.stringify(cache.loadMessage),
+          )
+          .replace(
+            ctScriptPathPlaceholder,
+            JSON.stringify(cache.ctScriptPath),
+          )
+          .replace(
+            executeScriptPlaceholder,
+            JSON.stringify(executeScript),
+          )
+          .replace(
+            unregisterServiceWorkersPlaceholder,
+            JSON.stringify(unregisterServiceWorkers),
           ),
-      )
-
-      cache.ctScriptPath = emit(
-        contentScriptReloader,
-        ctClientCode.replace(
-          loadMessagePlaceholder,
-          JSON.stringify(cache.loadMessage),
-        ),
       )
 
       // Update the exported cache
@@ -139,10 +163,10 @@ export const simpleReloader = (
 
           /* ---------------- CONTENT SCRIPTS ---------------- */
 
-          const { content_scripts: ctScripts = [] } = manifest
+          const { content_scripts: ctScripts } = manifest
 
           if (cache.ctScriptPath) {
-            manifest.content_scripts = ctScripts.map(
+            manifest.content_scripts = ctScripts?.map(
               ({ js = [], ...rest }) => ({
                 js: [cache.ctScriptPath!, ...js],
                 ...rest,

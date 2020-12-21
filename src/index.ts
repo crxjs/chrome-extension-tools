@@ -1,46 +1,17 @@
-import { Plugin } from 'rollup'
-import htmlInputs, {
-  HtmlInputsPlugin,
-} from './html-inputs/index'
-import manifestInput, {
-  ManifestInputPlugin,
-} from './manifest-input/index'
-import {
-  validateNames as v,
-  ValidateNamesPlugin,
-} from './validate-names/index'
+import htmlInputs from './html-inputs'
+import manifestInput from './manifest-input'
+import { browserPolyfill as b } from './browser-polyfill'
+import { validateNames as v } from './validate-names'
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
-import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
 
-export type ChromeExtensionPlugin = Pick<
-  Required<Plugin>,
-  | 'name'
-  | 'options'
-  | 'buildStart'
-  | 'watchChange'
-  | 'generateBundle'
-> & {
-  // For testing
-  _plugins: {
-    manifest: ManifestInputPlugin
-    html: HtmlInputsPlugin
-    validate: ValidateNamesPlugin
-  }
-}
+import {
+  ChromeExtensionOptions,
+  ChromeExtensionPlugin,
+} from './plugin-options'
+import { mixedFormat as m } from './mixed-format'
 
-export { simpleReloader } from './plugin-reloader-simple/index'
-
-export interface ChromeExtensionOptions {
-  dynamicImportWrapper?: DynamicImportWrapperOptions
-  verbose?: boolean
-  pkg?: {
-    description: string
-    name: string
-    version: string
-  }
-  publicKey?: string
-}
+export { simpleReloader } from './plugin-reloader-simple'
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
@@ -57,6 +28,8 @@ export const chromeExtension = (
   const manifest = manifestInput(options)
   const html = htmlInputs(manifest)
   const validate = v()
+  const browser = b(manifest)
+  const mixedFormat = m(manifest)
 
   /* ----------------- RETURN PLUGIN ----------------- */
 
@@ -99,6 +72,14 @@ export const chromeExtension = (
       ])
     },
 
+    async resolveId(source, importer) {
+      return manifest.resolveId.call(this, source, importer)
+    },
+
+    async load(id) {
+      return manifest.load.call(this, id)
+    },
+
     watchChange(id) {
       manifest.watchChange.call(this, id)
       html.watchChange.call(this, id)
@@ -107,6 +88,8 @@ export const chromeExtension = (
     async generateBundle(...args) {
       await manifest.generateBundle.call(this, ...args)
       await validate.generateBundle.call(this, ...args)
+      await browser.generateBundle.call(this, ...args)
+      await mixedFormat.generateBundle.call(this, ...args)
     },
   }
 }

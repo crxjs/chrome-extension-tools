@@ -2,21 +2,24 @@ dependencies:
   ajv: 6.12.5
   array-flat-polyfill: 1.0.1
   cheerio: 1.0.0-rc.3
+  convert-source-map: 1.7.0
   cosmiconfig: 6.0.0
   fs-extra: 8.1.0
   glob: 7.1.6
+  jsonpath-plus: 4.0.0
   lodash.difference: 4.5.0
   lodash.flatten: 4.4.0
   lodash.get: 4.4.2
   mem: 6.1.1
   prettier: 1.19.1
   slash: 3.0.0
+  webextension-polyfill: 0.6.0
 devDependencies:
   '@rollup/plugin-commonjs': 11.1.0_rollup@1.32.1
   '@rollup/plugin-json': 4.1.0_rollup@1.32.1
   '@rollup/plugin-node-resolve': 7.1.3_rollup@1.32.1
   '@rollup/plugin-sucrase': 3.1.0_rollup@1.32.1
-  '@rollup/plugin-typescript': 3.1.1_da091aa6f86e7752d4096a368af87db5
+  '@rollup/plugin-typescript': 6.0.0_da091aa6f86e7752d4096a368af87db5
   '@sucrase/jest-plugin': 2.0.0
   '@testing-library/dom': 6.16.0
   '@testing-library/jest-dom': 5.11.4
@@ -25,6 +28,7 @@ devDependencies:
   '@types/fs-extra': 8.1.1
   '@types/glob': 7.1.3
   '@types/jest': 25.2.3
+  '@types/jest-in-case': 1.0.3
   '@types/lodash.difference': 4.5.6
   '@types/lodash.flatten': 4.4.6
   '@types/lodash.get': 4.4.6
@@ -36,6 +40,7 @@ devDependencies:
   jest: 25.5.4
   jest-chrome: 0.7.0_jest@25.5.4
   jest-html-reporters: 1.2.1
+  jest-in-case: 1.0.2
   npm-run-all: 4.1.5
   read-pkg-up: 7.0.1
   rollup: 1.32.1
@@ -592,10 +597,10 @@ packages:
       rollup: ^1.20.0 || ^2.0.0
     resolution:
       integrity: sha512-PZ70LDNgIj8rL+3pKwKwTBOQ2c9JofXeLbWz+2V4/nCt4LqwYTNqxJJf1riTJsVARVzJdA0woIzUzjKZvL8TfA==
-  /@rollup/plugin-typescript/3.1.1_da091aa6f86e7752d4096a368af87db5:
+  /@rollup/plugin-typescript/6.0.0_da091aa6f86e7752d4096a368af87db5:
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@1.32.1
-      resolve: 1.17.0
+      resolve: 1.18.1
       rollup: 1.32.1
       tslib: 1.13.0
       typescript: 3.9.7
@@ -603,11 +608,11 @@ packages:
     engines:
       node: '>=8.0.0'
     peerDependencies:
-      rollup: ^1.20.0
+      rollup: ^2.14.0
       tslib: '*'
-      typescript: '>=2.1.0'
+      typescript: '>=3.4.0'
     resolution:
-      integrity: sha512-VPY1MbzIJT+obpav9Kns4MlipVJ1FuefwzO4s1uCVXAzVWya+bhhNauOmmqR/hy1zj7tePfh3t9iBN+HbIzyRA==
+      integrity: sha512-Y5U2L4eaF3wUSgCZRMdvNmuzWkKMyN3OwvhAdbzAi5sUqedaBk/XbzO4T7RlViDJ78MOPhwAIv2FtId/jhMtbg==
   /@rollup/pluginutils/3.1.0_rollup@1.32.1:
     dependencies:
       '@types/estree': 0.0.39
@@ -782,6 +787,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-P/W9yOX/3oPZSpaYOCQzGqgCQRXn0FFO/V8bWrCQs+wLmvVVxk6CRBXALEvNs9OHIatlnlFokfhuDo2ug01ciw==
+  /@types/jest-in-case/1.0.3:
+    dependencies:
+      '@types/jest': 25.2.3
+      '@types/node': 13.13.28
+    dev: true
+    resolution:
+      integrity: sha512-M+bKsCA/oF3Bw9qSZyWHsK8sfqFtZsNXe0xV1gTK3ahFCgaqzjJkAFp84Wd8md+EshGbR9Bb6nCmu4FAiuImZw==
   /@types/jest/25.2.3:
     dependencies:
       jest-diff: 25.5.0
@@ -826,6 +838,10 @@ packages:
     dev: true
     resolution:
       integrity: sha512-6ZMK4xRcF2XrPdKmPYQxZkdHKV18xKgUFVvhIgw2iwaaO6weleLPHLBGPZmLhjo+m1N+MZXRAoBEBCCVqgO2zQ==
+  /@types/node/13.13.28:
+    dev: true
+    resolution:
+      integrity: sha512-EM/qFeRH8ZCD+TlsaIPULyyFm9vOhFIvgskY2JmHbEsWsOPgN+rtjSXrcHGgJpob4Nu17VfO95FKewr0XY7iOQ==
   /@types/normalize-package-data/2.4.0:
     dev: true
     resolution:
@@ -1497,7 +1513,6 @@ packages:
   /convert-source-map/1.7.0:
     dependencies:
       safe-buffer: 5.1.2
-    dev: true
     resolution:
       integrity: sha512-4FJkXzKXEDB1snCFZlLP4gpC3JILicCpGbzG9f9G7tGqGCzETQ2hWPrcinA9oU4wtf2biUaEH5065UnMeR33oA==
   /copy-descriptor/0.1.1:
@@ -2549,6 +2564,12 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-YfJT7rkpQB0updsdHLGWrvhBJfcfzNNawYDNIyQXJz0IViGf75O8EBPKSdvw2rF+LGCsX4FZ8tcr3b19LcZq4w==
+  /is-core-module/2.0.0:
+    dependencies:
+      has: 1.0.3
+    dev: true
+    resolution:
+      integrity: sha512-jq1AH6C8MuteOoBPwkxHafmByhL9j5q4OaPGdbuD+ZtQJVzH+i6E3BJDQcBA09k57i2Hh2yQbEG8yObZ0jdlWw==
   /is-data-descriptor/0.1.4:
     dependencies:
       kind-of: 3.2.2
@@ -2957,6 +2978,12 @@ packages:
     dev: true
     resolution:
       integrity: sha512-Ea2zxV7Hhg3pE6cZ+70pS5PkiBywKG8pLuyBc9/JgR6ifnKm2U3t6kvAPX9UNID6YwsPBZjD9sANZ0p49rN4pA==
+  /jest-in-case/1.0.2:
+    dev: true
+    engines:
+      node: '>=4'
+    resolution:
+      integrity: sha1-VnRLWvMyIr0KurcM+Rnx0XCrdcw=
   /jest-jasmine2/25.5.4:
     dependencies:
       '@babel/traverse': 7.11.5
@@ -3316,6 +3343,12 @@ packages:
       graceful-fs: 4.2.4
     resolution:
       integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=
+  /jsonpath-plus/4.0.0:
+    dev: false
+    engines:
+      node: '>=10.0'
+    resolution:
+      integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==
   /jsprim/1.4.1:
     dependencies:
       assert-plus: 1.0.0
@@ -4248,6 +4281,13 @@ packages:
     dev: true
     resolution:
       integrity: sha512-ic+7JYiV8Vi2yzQGFWOkiZD5Z9z7O2Zhm9XMaTxdJExKasieFCr+yXZ/WmXsckHiKl12ar0y6XiXDx3m4RHn1w==
+  /resolve/1.18.1:
+    dependencies:
+      is-core-module: 2.0.0
+      path-parse: 1.0.6
+    dev: true
+    resolution:
+      integrity: sha512-lDfCPaMKfOJXjy0dPayzPdF1phampNWr3qFCjAu+rw/qbQmr5jWH5xN2hwh9QKfw9E5v4hwV7A+jrCmL8yjjqA==
   /restore-cursor/3.1.0:
     dependencies:
       onetime: 5.1.2
@@ -4345,7 +4385,6 @@ packages:
     resolution:
       integrity: sha512-trsQc+xYYXZ3urjOiJOuCOa5N3jAZ3eiSpQB5hIT8zGlL2QfnHLJ2r7GMkBGuIausdJN1OneaI6gQlsqNHHmZQ==
   /safe-buffer/5.1.2:
-    dev: true
     resolution:
       integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
   /safe-buffer/5.2.1:
@@ -5125,6 +5164,10 @@ packages:
     dev: true
     resolution:
       integrity: sha1-L3+bj9ENZ3JisYqITijRlhjgKPs=
+  /webextension-polyfill/0.6.0:
+    dev: false
+    resolution:
+      integrity: sha512-PlYwiX8e4bNZrEeBFxbFFsLtm0SMPxJliLTGdNCA0Bq2XkWrAn2ejUd+89vZm+8BnfFB1BclJyCz3iKsm2atNg==
   /webidl-conversions/4.0.2:
     dev: true
     resolution:
@@ -5267,7 +5310,7 @@ specifiers:
   '@rollup/plugin-json': ^4.0.2
   '@rollup/plugin-node-resolve': ^7.1.1
   '@rollup/plugin-sucrase': ^3.0.0
-  '@rollup/plugin-typescript': ^3.0.0
+  '@rollup/plugin-typescript': ^6.0.0
   '@sucrase/jest-plugin': ^2.0.0
   '@testing-library/dom': ^6.12.2
   '@testing-library/jest-dom': ^5.1.1
@@ -5276,6 +5319,7 @@ specifiers:
   '@types/fs-extra': ^8.0.1
   '@types/glob': ^7.1.1
   '@types/jest': ^25.1.2
+  '@types/jest-in-case': ^1.0.3
   '@types/lodash.difference': ^4.5.6
   '@types/lodash.flatten': ^4.4.6
   '@types/lodash.get': ^4.4.6
@@ -5286,6 +5330,7 @@ specifiers:
   ajv: ^6.11.0
   array-flat-polyfill: ^1.0.1
   cheerio: ^1.0.0-rc.3
+  convert-source-map: ^1.7.0
   cosmiconfig: ^6.0.0
   eslint: ^6.8.0
   fs-extra: ^8.1.0
@@ -5293,6 +5338,8 @@ specifiers:
   jest: ^25.1.0
   jest-chrome: 0.7.0
   jest-html-reporters: ^1.2.1
+  jest-in-case: ^1.0.2
+  jsonpath-plus: ^4.0.0
   lodash.difference: ^4.5.0
   lodash.flatten: ^4.4.0
   lodash.get: ^4.4.2
@@ -5306,3 +5353,4 @@ specifiers:
   ts-jest: ^25.2.0
   tslib: ^1.10.0
   typescript: ^3.7.5
+  webextension-polyfill: ^0.6.0

@@ -1,0 +1,32 @@
+{
+  "name": "browser polyfill",
+  "description": "chrome extension with browser polyfill",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "icons": {
+    "16": "images/icon-main-16.png",
+    "48": "images/icon-main-48.png",
+    "128": "images/icon-main-128.png"
+  },
+  "background": {
+    "scripts": ["scripts/background.js"]
+  },
+  "content_scripts": [
+    {
+      "js": ["scripts/content.js"],
+      "matches": ["https://www.google.com/*"]
+    },
+    {
+      "js": ["scripts/content.js"],
+      "css": ["scripts/content.css"],
+      "matches": ["https://www.yahoo.com/*"]
+    }
+  ],
+  "options_page": "options/options.html",
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon-main-16.png"
+    },
+    "default_popup": "popup/popup.html"
+  }
+}

@@ -11,6 +11,7 @@ sometimes you need more.
 - [Manifest](#manifest)
   - [permissions](#options-permissions)
 - [Options](#options)
+  - [browserPolyfill](#options-browser-polyfill)
   - [dynamicImportWrapper](#options-dynamic-import-wrapper)
   - [pkg](#options-pkg)
   - [publicKey](#options-public-key)
@@ -152,6 +153,25 @@ file). Relative paths may not lead outside of the source folder.
 
 You can use an options object with any of the following
 properties. Everything is optional.
+
+### `[browserPolyfill]` <a name = "options-browser-polyfill"></a>
+
+| Type      |
+| --------- |
+| `boolean` |
+
+Add the excellent [promisified Browser API]() by Mozilla to your
+Chrome extension with one easy option:
+
+```javascript
+chromeExtension({
+  browserPolyfill: true,
+})
+```
+
+Don't forget to
+[install types](https://www.npmjs.com/package/@types/firefox-webext-browser)
+if you want Intellisense to work!
 
 ### `[dynamicImportWrapper]` <a name = "options-dynamic-import-wrapper"></a>
 

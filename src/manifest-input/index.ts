@@ -1,17 +1,20 @@
-import { code as contentScriptWrapper } from 'code ./browser/contentScriptWrapper.ts'
+import { code as ctWrapperScript } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
+import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
 import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk, PluginHooks } from 'rollup'
+import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import { isChunk, isJsonFilePath } from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
-import { cloneObject } from './cloneObject'
 import {
-  DynamicImportWrapperOptions,
-  prepImportWrapperScript,
-} from './dynamicImportWrapper'
+  ManifestInputPlugin,
+  ManifestInputPluginCache,
+  ManifestInputPluginOptions,
+} from '../plugin-options'
+import { cloneObject } from './cloneObject'
+import { prepImportWrapperScript } from './dynamicImportWrapper'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
@@ -27,32 +30,14 @@ export function dedupe<T>(x: T[]): T[] {
   return [...new Set(x)]
 }
 
-export interface ManifestInputPluginCache {
-  assets: string[]
-  input: string[]
-  inputAry: string[]
-  inputObj: Record<string, string>
-  permsHash: string
-  srcDir: string | null
-  /** for memoized fs.readFile */
-  readFile: Map<string, any>
-  manifest?: ChromeExtensionManifest
-  assetChanged: boolean
-}
-
-export type ManifestInputPlugin = Pick<
-  PluginHooks,
-  'options' | 'buildStart' | 'watchChange' | 'generateBundle'
-> & {
-  name: string
-  srcDir: string | null
-}
-
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
 })
 
 const name = 'manifest-input'
+
+export const stubChunkName =
+  'stub__empty-chrome-extension-manifest'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -75,13 +60,20 @@ const npmPkgDetails =
 
 export function manifestInput(
   {
+    browserPolyfill = false,
+    contentScriptWrapper = true,
+    crossBrowser = false,
     dynamicImportWrapper = {},
+    extendManifest = {},
+    firstClassManifest = true,
+    iifeJsonPaths = [],
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
     cache = {
       assetChanged: false,
       assets: [],
+      iife: [],
       input: [],
       inputAry: [],
       inputObj: {},
@@ -89,17 +81,7 @@ export function manifestInput(
       readFile: new Map<string, any>(),
       srcDir: null,
     } as ManifestInputPluginCache,
-  } = {} as {
-    dynamicImportWrapper?: DynamicImportWrapperOptions | false
-    pkg?: {
-      description: string
-      name: string
-      version: string
-    }
-    publicKey?: string
-    verbose?: boolean
-    cache?: ManifestInputPluginCache
-  },
+  } = {} as ManifestInputPluginOptions,
 ): ManifestInputPlugin {
   const readAssetAsBuffer = memoize(
     (filepath: string) => {
@@ -131,8 +113,15 @@ export function manifestInput(
   return {
     name,
 
+    browserPolyfill,
+    crossBrowser,
+
     get srcDir() {
       return cache.srcDir
+    },
+
+    get formatMap() {
+      return { iife: cache.iife }
     },
 
     /* ============================================ */
@@ -191,43 +180,60 @@ export function manifestInput(
         }
 
         manifestPath = configResult.filepath
-        cache.manifest = configResult.config
+
+        if (typeof extendManifest === 'function') {
+          cache.manifest = extendManifest(configResult.config)
+        } else if (typeof extendManifest === 'object') {
+          cache.manifest = {
+            ...configResult.config,
+            ...extendManifest,
+          }
+        } else {
+          cache.manifest = configResult.config
+        }
 
         cache.srcDir = path.dirname(manifestPath)
 
-        // Derive entry paths from manifest
-        const { js, html, css, img, others } = deriveFiles(
-          cache.manifest,
-          cache.srcDir,
-        )
+        if (firstClassManifest) {
+          cache.iife = iifeJsonPaths
+            .map((jsonPath) => {
+              const result = JSONPath({
+                path: jsonPath,
+                json: cache.manifest!,
+              })
 
-        // Cache derived inputs
-        cache.input = [...cache.inputAry, ...js, ...html]
-        cache.assets = [
-          // Dedupe assets
-          ...new Set([...css, ...img, ...others]),
-        ]
+              return result
+            })
+            .flat(Infinity)
+
+          // Derive entry paths from manifest
+          const { js, html, css, img, others } = deriveFiles(
+            cache.manifest,
+            cache.srcDir,
+          )
+
+          // Cache derived inputs
+          cache.input = [...cache.inputAry, ...js, ...html]
+
+          cache.assets = [
+            // Dedupe assets
+            ...new Set([...css, ...img, ...others]),
+          ]
+        }
 
         /* --------------- END LOAD MANIFEST --------------- */
       }
 
-      if (cache.input.length === 0) {
-        throw new Error(
-          'The manifest must have at least one script or HTML file.',
-        )
+      const finalInput = cache.input.reduce(
+        reduceToRecord(cache.srcDir),
+        cache.inputObj,
+      )
+
+      if (Object.keys(finalInput).length === 0) {
+        finalInput[stubChunkName] = stubChunkName
       }
 
-      // TODO: consider using this.emitFile in buildStart instead
-      //  - the input record is unusual, but would this be more unusual?
-      //  - would need to put something here, can't return an empty input
-      //    - maybe a dummy file to remove in generateBundle?
-      return {
-        ...options,
-        input: cache.input.reduce(
-          reduceToRecord(cache.srcDir),
-          cache.inputObj,
-        ),
-      }
+      return { ...options, input: finalInput }
     },
 
     /* ============================================ */
@@ -258,6 +264,22 @@ export function manifestInput(
       })
     },
 
+    resolveId(source) {
+      if (source === stubChunkName) {
+        return source
+      }
+
+      return null
+    },
+
+    load(id) {
+      if (id === stubChunkName) {
+        return { code: `console.log(${stubChunkName})` }
+      }
+
+      return null
+    },
+
     watchChange(id) {
       if (id.endsWith(manifestName)) {
         // Dump cache.manifest if manifest changes
@@ -274,7 +296,11 @@ export function manifestInput(
     /* ============================================ */
 
     generateBundle(options, bundle) {
-      /* ---------- DERIVE PERMISIONS START --------- */
+      /* ----------------- CLEAN UP STUB ----------------- */
+
+      delete bundle[stubChunkName + '.js']
+
+      /* ---------- DERIVE PERMISSIONS START --------- */
 
       // Get module ids for all chunks
       let permissions: string[]
@@ -293,7 +319,7 @@ export function manifestInput(
 
         const permsHash = JSON.stringify(permissions)
 
-        if (verbose) {
+        if (verbose && permissions.length) {
           if (!cache.permsHash) {
             this.warn(
               `Detected permissions: ${permissions.toString()}`,
@@ -308,7 +334,11 @@ export function manifestInput(
         cache.permsHash = permsHash
       }
 
-      /* ---------- DERIVE PERMISSIONS END ---------- */
+      if (Object.keys(bundle).length === 0) {
+        throw new Error(
+          'The manifest must have at least one asset (html or css) or script file.',
+        )
+      }
 
       try {
         // Clone cache.manifest
@@ -345,10 +375,10 @@ export function manifestInput(
           [] as string[],
         )
 
-        if (contentScripts.length) {
+        if (contentScriptWrapper && contentScripts.length) {
           const memoizedEmitter = memoize(
             (scriptPath: string) => {
-              const source = contentScriptWrapper.replace(
+              const source = ctWrapperScript.replace(
                 '%PATH%',
                 // Fix path slashes to support Windows
                 JSON.stringify(
@@ -368,15 +398,16 @@ export function manifestInput(
 
           // Setup content script import wrapper
           manifestBody.content_scripts = cts.map(
-            ({ js, ...rest }) =>
-              typeof js === 'undefined'
+            ({ js, ...rest }) => {
+              return typeof js === 'undefined'
                 ? rest
                 : {
                     js: js
                       .map((p) => p.replace(/\.ts$/, '.js'))
                       .map(memoizedEmitter),
                     ...rest,
-                  },
+                  }
+            },
           )
 
           // make all imports & dynamic imports web_acc_res

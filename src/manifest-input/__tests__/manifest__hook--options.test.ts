@@ -21,11 +21,9 @@ import {
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
-import {
-  explorer,
-  manifestInput,
-  ManifestInputPluginCache,
-} from '../index'
+import { ManifestInputPluginCache } from '../../plugin-options'
+import { cloneObject } from '../cloneObject'
+import { explorer, manifestInput } from '../index'
 
 jest.spyOn(explorer, 'load')
 
@@ -38,6 +36,7 @@ const cache: ManifestInputPluginCache = {
   assets: [],
   permsHash: '',
   srcDir: null,
+  iife: [],
   input: [],
   readFile: new Map(),
   assetChanged: false,
@@ -51,6 +50,8 @@ const plugin = manifestInput({ cache })
 const options: RollupOptions = {
   input: manifestJson,
 }
+
+const clonedOptions = cloneObject(options)
 
 const expectedInputResult = {
   background: getExtPath('basic/background.js'),
@@ -83,6 +84,12 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await writeJSON(manifestJson, manifest, { spaces: 2 })
+})
+
+test('does not mutate the options object', () => {
+  plugin.options.call(context, options)
+
+  expect(options).toEqual(clonedOptions)
 })
 
 test('throws if input does not contain a manifest', () => {
@@ -267,3 +274,5 @@ test('should throw if options_ui and options_page both exist', () => {
 
   expect(call).toThrow(error)
 })
+
+test.todo('populates cache.iife')

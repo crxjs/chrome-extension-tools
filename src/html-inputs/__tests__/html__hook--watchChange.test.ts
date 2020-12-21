@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { context } from '../../../__fixtures__/plugin-context'
-import htmlInputs, { HtmlInputsPluginCache } from '../index'
+import htmlInputs from '../index'
 import {
   assetJs,
   backgroundJs,
@@ -18,6 +18,7 @@ import {
   faviconIco,
 } from '../../../__fixtures__/basic-paths'
 import { loadHtml } from '../cheerio'
+import { HtmlInputsPluginCache } from '../../plugin-options'
 
 const srcDir = join(
   process.cwd(),
@@ -47,7 +48,7 @@ beforeEach(() => {
   ]
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
-  cache.html$ = cache.html.map(loadHtml)
+  cache.html$ = cache.html.map(loadHtml(srcDir))
   cache.css = [optionsCss]
   cache.img = [optionsPng, optionsJpg, faviconPng, faviconIco]
   cache.scripts = [assetJs]

@@ -1,11 +1,18 @@
 import 'array-flat-polyfill'
+
 import { readFile } from 'fs-extra'
 import flatten from 'lodash.flatten'
 import { relative } from 'path'
-import { Plugin } from 'rollup'
-import { formatHtml, not } from '../helpers'
+
+import { not } from '../helpers'
 import { reduceToRecord } from '../manifest-input/reduceToRecord'
 import {
+  HtmlInputsOptions,
+  HtmlInputsPluginCache,
+  HtmlInputsPlugin,
+} from '../plugin-options'
+import {
+  formatHtml,
   getCssHrefs,
   getImgSrcs,
   getJsAssets,
@@ -13,40 +20,6 @@ import {
   loadHtml,
   mutateScriptElems,
 } from './cheerio'
-
-/** cheerio.Root objects with a file path */
-export type CheerioFile = cheerio.Root & {
-  filePath: string
-}
-
-export interface HtmlInputsOptions {
-  /** This will change between builds, so cannot destructure */
-  readonly srcDir: string | null
-}
-
-export interface HtmlInputsPluginCache {
-  /** Scripts that should not be bundled */
-  scripts: string[]
-  /** Scripts that should be bundled */
-  js: string[]
-  /** Absolute paths for HTML files to emit */
-  html: string[]
-  /** Html files as Cheerio objects */
-  html$: CheerioFile[]
-  /** Image files to emit */
-  img: string[]
-  /** Stylesheets to emit */
-  css: string[]
-  /** Cache of last options.input, will have other scripts */
-  input: string[]
-  /** Source dir for calculating relative paths */
-  srcDir?: string
-}
-
-export type HtmlInputsPlugin = Pick<
-  Required<Plugin>,
-  'name' | 'options' | 'buildStart' | 'watchChange'
-> & { cache: HtmlInputsPluginCache }
 
 const isHtml = (path: string) => /\.html?$/.test(path)
 
@@ -78,6 +51,15 @@ export default function htmlInputs(
     /* ============================================ */
 
     options(options) {
+      // srcDir may be initialized by another plugin
+      const { srcDir } = htmlInputsOptions
+
+      if (srcDir) {
+        cache.srcDir = srcDir
+      } else {
+        throw new TypeError('options.srcDir not initialized')
+      }
+
       // Skip if cache.input exists
       // cache is dumped in watchChange hook
 
@@ -108,7 +90,7 @@ export default function htmlInputs(
       // If the cache has been dumped, reload from files
       if (cache.html$.length === 0) {
         // This is all done once
-        cache.html$ = cache.html.map(loadHtml)
+        cache.html$ = cache.html.map(loadHtml(srcDir))
 
         cache.js = flatten(cache.html$.map(getScriptSrc))
         cache.css = flatten(cache.html$.map(getCssHrefs))
@@ -119,7 +101,7 @@ export default function htmlInputs(
         cache.input = input.filter(not(isHtml)).concat(cache.js)
 
         // Prepare cache.html$ for asset emission
-        cache.html$.forEach(mutateScriptElems)
+        cache.html$.forEach(mutateScriptElems(htmlInputsOptions))
 
         if (cache.input.length === 0) {
           throw new Error(

@@ -1,12 +1,19 @@
-import { optionsHtml } from '../../../__fixtures__/basic-paths'
-import { mutateScriptElems, loadHtml, getScripts } from '../cheerio'
+import {
+  basicRoot,
+  optionsHtml,
+} from '../../../__fixtures__/basic-paths'
+import {
+  mutateScriptElems,
+  loadHtml,
+  getScripts,
+} from '../cheerio'
 
-const html$ = loadHtml(optionsHtml)
+const html$ = loadHtml(basicRoot)(optionsHtml)
 
 test('maps script tags to js and type module', () => {
   expect.assertions(8)
-  
-  const mapped = mutateScriptElems(html$)
+
+  const mapped = mutateScriptElems({})(html$)
 
   const results = getScripts(mapped)
 

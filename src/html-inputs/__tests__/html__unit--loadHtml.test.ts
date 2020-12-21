@@ -1,4 +1,4 @@
-import { optionsHtml } from '../../../__fixtures__/basic-paths'
+import { basicRoot, optionsHtml } from '../../../__fixtures__/basic-paths'
 import { loadHtml } from '../cheerio'
 
 const fs = require('fs-extra')
@@ -13,7 +13,7 @@ beforeEach(() => {
 
 const filePath = optionsHtml
 test('calls readFileSync', () => {
-  const result = loadHtml(filePath)
+  const result = loadHtml(basicRoot)(filePath)
 
   expect(result).toBeInstanceOf(Function)
   expect(result).toHaveProperty('filePath', filePath)
@@ -24,7 +24,7 @@ test('calls readFileSync', () => {
 test('calls cheerio.load', () => {
   const htmlCode = fs.readFileSync(filePath, 'utf8')
 
-  loadHtml(filePath)
+  loadHtml(basicRoot)(filePath)
 
   expect(cheerio.load).toBeCalledWith(htmlCode)
 })

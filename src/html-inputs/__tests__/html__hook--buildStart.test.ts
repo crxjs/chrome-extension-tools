@@ -3,6 +3,7 @@ import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
+  basicRoot,
   faviconIco,
   faviconPng,
   optionsCss,
@@ -18,7 +19,8 @@ import {
 } from '../../../__fixtures__/basic-paths'
 import { context } from '../../../__fixtures__/plugin-context'
 import { loadHtml } from '../cheerio'
-import htmlInputs, { HtmlInputsPluginCache } from '../index'
+import htmlInputs from '..'
+import { HtmlInputsPluginCache } from '../../plugin-options'
 
 const srcDir = join(
   process.cwd(),
@@ -53,7 +55,7 @@ beforeEach(() => {
   ]
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
-  cache.html$ = cache.html.map(loadHtml)
+  cache.html$ = cache.html.map(loadHtml(basicRoot))
   cache.css = [optionsCss]
   cache.img = [optionsPng, optionsJpg, faviconIco, faviconPng]
   cache.scripts = [assetJs]

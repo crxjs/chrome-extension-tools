@@ -1,18 +1,16 @@
 import {
-  InputOptions,
-  OutputBundle,
   EmittedFile,
+  InputOptions,
   OutputAsset,
+  OutputBundle,
 } from 'rollup'
-
-import {
-  simpleReloader,
-  _internalCache,
-  SimpleReloaderPlugin,
-} from '..'
+import { simpleReloader, _internalCache } from '..'
+import { buildCRX } from '../../../__fixtures__/build-basic-crx'
+import { inversePromise } from '../../../__fixtures__/inversePromise'
 import { context } from '../../../__fixtures__/plugin-context'
-import { cloneObject } from '../../manifest-input/cloneObject'
+import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
+import { cloneObject } from '../../manifest-input/cloneObject'
 import {
   backgroundPageReloader,
   contentScriptReloader,
@@ -23,22 +21,35 @@ context.getFileName.mockImplementation(() => 'mock-file-name')
 
 // Options is not used, but needed for TS
 const options: InputOptions = {}
-const originalBundle: OutputBundle = require('../../../__fixtures__/extensions/basic-bundle.json')
+const bundlePromise = inversePromise<OutputBundle>()
+beforeAll(
+  buildCRX(
+    getExtPath('basic/rollup.config.js'),
+    (error, result) => {
+      if (error) {
+        bundlePromise.reject(error)
+      } else if (result) {
+        bundlePromise.resolve(result.bundle)
+      } else {
+        bundlePromise.reject(new Error('Could not build CRX'))
+      }
+    },
+  ),
+  10000,
+)
 
 const contentJs = expect.stringMatching(/assets\/content.+?\.js/)
 
-let bundle: OutputBundle
-let plugin: SimpleReloaderPlugin
 beforeEach(() => {
   process.env.ROLLUP_WATCH = 'true'
-
-  bundle = cloneObject(originalBundle)
-  plugin = simpleReloader()!
 })
 
 afterEach(jest.clearAllMocks)
 
 test('emit assets', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   await plugin.generateBundle.call(
     context,
     options,
@@ -68,6 +79,9 @@ test('emit assets', async () => {
 })
 
 test('updates manifest in bundle', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   const manifestObj = bundle['manifest.json'] as OutputAsset
   const manifestClone = cloneObject(manifestObj)
 
@@ -103,6 +117,9 @@ test('updates manifest in bundle', async () => {
 })
 
 test('set manifest description', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -120,6 +137,9 @@ test('set manifest description', async () => {
 })
 
 test('add reloader script to background', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -139,6 +159,9 @@ test('add reloader script to background', async () => {
 })
 
 test('set background script to persistent', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -156,6 +179,9 @@ test('set background script to persistent', async () => {
 })
 
 test('add reloader script to content scripts', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
   await plugin.generateBundle.call(
@@ -182,6 +208,9 @@ test('add reloader script to content scripts', async () => {
 })
 
 test('Errors if manifest is not in the bundle', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   expect.assertions(2)
 
   delete bundle['manifest.json']
@@ -203,6 +232,9 @@ test('Errors if manifest is not in the bundle', async () => {
 })
 
 test('Errors if cache.bgScriptPath is undefined', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   expect.assertions(1)
 
   // @ts-ignore
@@ -225,6 +257,9 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
 })
 
 test('Errors if cache.ctScriptPath is undefined', async () => {
+  const bundle = cloneObject(await bundlePromise)
+  const plugin = simpleReloader()!
+
   expect.assertions(1)
 
   // @ts-ignore

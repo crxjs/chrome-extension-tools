@@ -1,23 +1,47 @@
-import { RollupOptions, OutputBundle } from 'rollup'
+import {
+  OutputBundle,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
 import { chromeExtension } from '..'
 import { context as minimal } from '../../__fixtures__/minimal-plugin-context'
 import { context } from '../../__fixtures__/plugin-context'
-import { getExtPath } from '../../__fixtures__/utils'
+import { requireExtFile } from '../../__fixtures__/utils'
 
-const config: RollupOptions = {
-  input: getExtPath('basic/manifest.json'),
-}
+/* ------------------ SETUP TESTS ------------------ */
 
-const bundle: OutputBundle = require(getExtPath(
-  'basic-bundle.json',
-))
+const config = requireExtFile<RollupOptions>(
+  'basic',
+  'rollup.config.js',
+)
 
-const { _plugins, ...plugin } = chromeExtension({ verbose: false })
+let bundlePromise: Promise<OutputBundle>
+let outputPromise: Promise<RollupOutput>
+beforeAll(async () => {
+  config.plugins!.push({
+    name: 'save-bundle',
+    generateBundle(o, b) {
+      bundlePromise = Promise.resolve(b)
+    },
+  })
+
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
+
+  return outputPromise
+}, 10000)
+
+const { _plugins, ...plugin } = chromeExtension({
+  verbose: false,
+})
 
 jest.spyOn(_plugins.manifest, 'generateBundle')
 jest.spyOn(_plugins.validate, 'generateBundle')
 
 test('calls manifest, and validate hooks', async () => {
+  const bundle = await bundlePromise
   const options = plugin.options.call(minimal, config) || config
   await plugin.buildStart.call(context, options)
   await plugin.generateBundle.call(

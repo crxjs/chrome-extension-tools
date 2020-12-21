@@ -5,15 +5,17 @@ module.exports = {
     '!src/simple-reloader/client/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
+  globals: {
+    'ts-jest': {
+      packageJson: 'package.json',
+    },
+  },
   moduleNameMapper: {
     'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
   },
   modulePathIgnorePatterns: ['~~.+', '__fixtures__', 'client'],
   preset: 'ts-jest',
-  reporters: [
-    'default',
-    // 'jest-html-reporters'
-  ],
+  reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
   transform: {
     // Use Sucrase to convert ES6 modules in JS files
@@ -22,9 +24,4 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!lodash-es/.*)',
   ],
-  globals: {
-    'ts-jest': {
-      packageJson: 'package.json',
-    },
-  },
 }
