@@ -268,9 +268,9 @@ Chrome extension with one easy option:
 chromeExtension({ browserPolyfill: true })
 ```
 
-Don't forget to
-[install types](https://www.npmjs.com/package/@types/firefox-webext-browser)
-if you want Intellisense to work!
+This option adds `browser` to the global scope, so you don't need to import anything.
+
+[Install this type package](https://www.npmjs.com/package/@types/firefox-webext-browser) to get Intellisense. It's automatically updated on a regular basis.
 
 ---
 
