@@ -12,6 +12,7 @@ dependencies:
   lodash.get: 4.4.2
   mem: 6.1.1
   prettier: 1.19.1
+  rollup: 1.32.1
   slash: 3.0.0
   webextension-polyfill: 0.6.0
 devDependencies:
@@ -43,12 +44,11 @@ devDependencies:
   jest-in-case: 1.0.2
   npm-run-all: 4.1.5
   read-pkg-up: 7.0.1
-  rollup: 1.32.1
   rollup-plugin-bundle-imports: 1.4.5
   ts-jest: 25.5.1_jest@25.5.4+typescript@3.9.7
   tslib: 1.13.0
   typescript: 3.9.7
-lockfileVersion: 5.1
+lockfileVersion: 5.2
 packages:
   /@babel/code-frame/7.10.4:
     dependencies:
@@ -383,7 +383,7 @@ packages:
       jest-haste-map: 25.5.1
       jest-message-util: 25.5.0
       jest-regex-util: 25.2.6
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
       jest-resolve-dependencies: 25.5.4
       jest-runner: 25.5.4
       jest-runtime: 25.5.4
@@ -452,7 +452,7 @@ packages:
       istanbul-lib-source-maps: 4.0.0
       istanbul-reports: 3.0.2
       jest-haste-map: 25.5.1
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
       jest-util: 25.5.0
       jest-worker: 25.5.0
       slash: 3.0.0
@@ -734,7 +734,6 @@ packages:
     resolution:
       integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
   /@types/estree/0.0.45:
-    dev: true
     resolution:
       integrity: sha512-jnqIUKDUqJbDIUxm0Uj7bnlMnRm1T/eZ9N+AVMqhPgzrba2GhGG5o/jCTwmdPK709nEZsGoMzXEDUjcXHa3W0g==
   /@types/filesystem/0.0.29:
@@ -1000,7 +999,6 @@ packages:
     resolution:
       integrity: sha512-ZVA9k326Nwrj3Cj9jlh3wGFutC2ZornPNARZwsNYqQYgN0EsV2d53w5RN/co65Ohn4sUAUtb1rSUAOD6XN9idA==
   /acorn/7.4.0:
-    dev: true
     engines:
       node: '>=0.4.0'
     hasBin: true
@@ -2879,7 +2877,7 @@ packages:
       jest-get-type: 25.2.6
       jest-jasmine2: 25.5.4
       jest-regex-util: 25.2.6
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
       jest-util: 25.5.0
       jest-validate: 25.5.0
       micromatch: 4.0.2
@@ -3053,7 +3051,7 @@ packages:
       integrity: sha512-eXWuTV8mKzp/ovHc5+3USJMYsTBhyQ+5A1Mak35dey/RG8GlM4YWVylZuGgVXinaW6tpvk/RSecmF37FKUlpXA==
   /jest-pnp-resolver/1.2.2_jest-resolve@25.5.1:
     dependencies:
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
     dev: true
     engines:
       node: '>=6'
@@ -3080,7 +3078,7 @@ packages:
       node: '>= 8.3'
     resolution:
       integrity: sha512-yFmbPd+DAQjJQg88HveObcGBA32nqNZ02fjYmtL16t1xw9bAttSn5UGRRhzMHIQbsep7znWvAvnD4kDqOFM0Uw==
-  /jest-resolve/25.5.1_jest-resolve@25.5.1:
+  /jest-resolve/25.5.1:
     dependencies:
       '@jest/types': 25.5.0
       browser-resolve: 1.11.3
@@ -3094,8 +3092,6 @@ packages:
     dev: true
     engines:
       node: '>= 8.3'
-    peerDependencies:
-      jest-resolve: '*'
     resolution:
       integrity: sha512-Hc09hYch5aWdtejsUZhA+vSzcotf7fajSlPA6EZPE1RmPBAD39XtJhvHWFStid58iit4IPDLI/Da4cwdDmAHiQ==
   /jest-runner/25.5.4:
@@ -3113,7 +3109,7 @@ packages:
       jest-jasmine2: 25.5.4
       jest-leak-detector: 25.5.0
       jest-message-util: 25.5.0
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
       jest-runtime: 25.5.4
       jest-util: 25.5.0
       jest-worker: 25.5.0
@@ -3144,7 +3140,7 @@ packages:
       jest-message-util: 25.5.0
       jest-mock: 25.5.0
       jest-regex-util: 25.2.6
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
       jest-snapshot: 25.5.1
       jest-util: 25.5.0
       jest-validate: 25.5.0
@@ -3178,7 +3174,7 @@ packages:
       jest-get-type: 25.2.6
       jest-matcher-utils: 25.5.0
       jest-message-util: 25.5.0
-      jest-resolve: 25.5.1_jest-resolve@25.5.1
+      jest-resolve: 25.5.1
       make-dir: 3.1.0
       natural-compare: 1.4.0
       pretty-format: 25.5.0
@@ -4360,7 +4356,6 @@ packages:
       '@types/estree': 0.0.45
       '@types/node': 13.13.21
       acorn: 7.4.0
-    dev: true
     hasBin: true
     resolution:
       integrity: sha512-/2HA0Ec70TvQnXdzynFffkjA6XN+1e2pEv/uKS5Ulca40g2L7KuOE3riasHoNVHOsFD5KKZgDsMk1CP3Tw9s+A==
