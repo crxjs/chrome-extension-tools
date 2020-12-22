@@ -62,7 +62,7 @@ export function manifestInput(
   {
     browserPolyfill = false,
     contentScriptWrapper = true,
-    // crossBrowser = false,
+    crossBrowser = false,
     dynamicImportWrapper = {},
     extendManifest = {},
     firstClassManifest = true,
@@ -114,7 +114,7 @@ export function manifestInput(
     name,
 
     browserPolyfill,
-    // crossBrowser,
+    crossBrowser,
 
     get srcDir() {
       return cache.srcDir

@@ -15,7 +15,7 @@ export interface ChromeExtensionOptions {
       }
   contentScriptWrapper?: boolean
   // TODO: use this option with iifeJsonPaths to enable a preset to support Firefox builds
-  // crossBrowser?: boolean
+  crossBrowser?: boolean
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
   extendManifest?:
     | Partial<ChromeExtensionManifest>
