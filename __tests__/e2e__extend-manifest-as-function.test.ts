@@ -8,7 +8,7 @@ beforeAll(async () => {
   const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 10000)
+}, 15000)
 
 const manifestJson = require(getExtPath('extend-manifest-as-function/manifest.json'))
 

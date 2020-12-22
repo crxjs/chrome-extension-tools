@@ -36,4 +36,4 @@ test('warns and throws if the manifest is invalid', async () => {
       ),
     )
   }
-}, 10000)
+}, 15000)

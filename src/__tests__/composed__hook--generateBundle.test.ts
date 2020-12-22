@@ -31,7 +31,7 @@ beforeAll(async () => {
   )
 
   return outputPromise
-}, 10000)
+}, 15000)
 
 const { _plugins, ...plugin } = chromeExtension({
   verbose: false,

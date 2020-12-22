@@ -15,6 +15,9 @@
     "types",
     "manifest.schema.json"
   ],
+  "np": {
+    "testScript": "test:ci"
+  },
   "scripts": {
     "build": "rollup -c",
     "build:types": "tsc -p tsconfigs/tsconfig-types.json",

@@ -10,7 +10,7 @@ let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 10000)
+}, 15000)
 
 test('bundles a single background script as iife', async () => {
   const { output } = await outputPromise

@@ -8,7 +8,7 @@ beforeAll(async () => {
   const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 10000)
+}, 15000)
 
 test('bundles chunks', async () => {
   const { output } = await outputPromise
