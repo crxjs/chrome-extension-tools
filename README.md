@@ -54,7 +54,7 @@ Get started fast with the
 git clone https://github.com/extend-chrome/js-react-boilerplate.git
 ```
 
-Or use the [TypeScript React boilerplate]() if you're feeling
+Or use the [TypeScript React boilerplate](https://github.com/extend-chrome/ts-react-boilerplate) if you're feeling
 fancy:
 
 ```
