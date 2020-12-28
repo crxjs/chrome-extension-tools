@@ -31,8 +31,11 @@ export async function regenerateBundle(
     return {}
   }
 
-  const { format } = output
+  const { format, chunkFileNames: cfn = '' } = output
+  
+  const chunkFileNames = path.join(path.dirname(cfn), '[name].js')
 
+  // Transform input array to input object
   const inputValue = Array.isArray(input)
     ? input.reduce((r, x) => {
         const { dir, name } = path.parse(x)
@@ -48,6 +51,7 @@ export async function regenerateBundle(
   let _b: OutputBundle
   await build.generate({
     format,
+    chunkFileNames,
     plugins: [
       {
         name: 'get-bundle',

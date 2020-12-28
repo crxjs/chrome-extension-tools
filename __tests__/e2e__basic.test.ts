@@ -1,10 +1,14 @@
-import { rollup } from 'rollup'
-import { RollupOutput } from 'rollup'
-import { RollupOptions } from 'rollup'
-import { OutputAsset } from 'rollup'
+import flatten from 'lodash.flatten'
+import path from 'path'
+import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
+import { getScriptSrc, loadHtml } from '../src/html-inputs/cheerio'
 import { ChromeExtensionManifest } from '../src/manifest'
-import { byFileName, requireExtFile } from '../__fixtures__/utils'
+import { deriveFiles } from '../src/manifest-input/manifest-parser'
+import { byFileName, getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
+
+const testName = getTestName(__filename)
+const extPath = getExtPath(testName)
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
@@ -29,6 +33,10 @@ test('bundles chunks', async () => {
   expect(output.find(byFileName('popup/popup.js'))).toBeDefined()
   expect(output.find(byFileName('devtools/devtools1.js'))).toBeDefined()
   expect(output.find(byFileName('devtools/devtools2.js'))).toBeDefined()
+
+  const imported = output.find(({ fileName }) => fileName.includes('imported'))
+  // Chunk name should not be double hashed
+  expect(imported?.fileName).toMatch(/^imported-[a-z1-9]+?\.js$/)
 })
 
 test('bundles assets', async () => {
@@ -81,6 +89,30 @@ test('Includes content_security_policy untouched', async () => {
   expect(manifest).toMatchObject({
     content_security_policy: "script-src 'self'; object-src 'self'",
   })
+})
+
+test('chunks in output match chunks in manifest', async () => {
+  const { output } = await outputPromise
+
+  const assets = output.filter(isAsset)
+  const manifestJson = assets.find(byFileName('manifest.json'))!
+  const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
+
+  // Get scripts in manifest
+  const { js, html } = deriveFiles(manifest, extPath)
+  const html$ = html.map(loadHtml(extPath))
+  const htmlJs = flatten(html$.map(getScriptSrc)).map((x) => {
+    const { name, dir } = path.parse(x)
+
+    return path.join(dir, `${name}.js`)
+  })
+
+  js.concat(htmlJs)
+    .map((x) => path.relative(extPath, x))
+    .forEach((script) => {
+      const chunk = output.find(byFileName(script))
+      expect(chunk).toBeDefined()
+    })
 })
 
 // TODO: emit assets shared by manifest and html files one time only
