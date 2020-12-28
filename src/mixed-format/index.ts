@@ -16,7 +16,7 @@ export function mixedFormat(
     name: 'mixed-format',
     async generateBundle(
       this: PluginContext,
-      { format }: OutputOptions,
+      { format, chunkFileNames }: OutputOptions,
       bundle: OutputBundle,
     ): Promise<void> {
       const { formatMap } = options // this might not be defined upon init
@@ -60,6 +60,7 @@ export function mixedFormat(
                 input,
                 output: {
                   format: f,
+                  chunkFileNames,
                 },
               },
               bundle,
@@ -75,7 +76,7 @@ export function mixedFormat(
           input: Object.entries(bundle)
             .filter(([, file]) => isChunk(file) && file.isEntry)
             .map(([key]) => key),
-          output: { format },
+          output: { format, chunkFileNames },
         },
         bundle,
       )

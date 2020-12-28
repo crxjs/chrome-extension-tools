@@ -89,6 +89,7 @@ export const chromeExtension = (
       await manifest.generateBundle.call(this, ...args)
       await validate.generateBundle.call(this, ...args)
       await browser.generateBundle.call(this, ...args)
+      // TODO: should skip this if not needed
       await mixedFormat.generateBundle.call(this, ...args)
     },
   }
