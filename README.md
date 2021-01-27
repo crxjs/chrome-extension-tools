@@ -8,18 +8,18 @@
 
 <div align="center">
 
-[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg?style=flat-square&logo=npm)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
-[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg?style=flat-square&logo=github)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
-[![CircleCI](https://img.shields.io/circleci/build/github/extend-chrome/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba&style=flat-square&logo=circleci)](https://circleci.com/gh/extend-chrome/rollup-plugin-chrome-extension)
-[![Codecov](https://img.shields.io/codecov/c/github/extend-chrome/rollup-plugin-chrome-extension?style=flat-square&logo=codecov)](https://codecov.io/gh/extend-chrome/rollup-plugin-chrome-extension)
-[![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational?style=flat-square&logo=typescript)](#typescript)
+[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
+[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
+[![CircleCI](https://img.shields.io/circleci/build/github/extend-chrome/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba)](https://circleci.com/gh/extend-chrome/rollup-plugin-chrome-extension)
+[![Codecov](https://img.shields.io/codecov/c/github/extend-chrome/rollup-plugin-chrome-extension)](https://codecov.io/gh/extend-chrome/rollup-plugin-chrome-extension)
+[![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
 </div>
 
 <div align="center">
 
-[![Chrome Extension Tutorials on YouTube](https://img.shields.io/badge/Chrome%20Extension%20Tutorials-YouTube-c4302b.svg?style=flat-square&logo=youtube)](https://www.youtube.com/channel/UCVj3dGw75v8aHFYD6CL1tFg)
-[![ko-fi](https://img.shields.io/badge/Buy%20us%20a%20tea-ko--fi-29ABE0?style=flat-square&logo=ko-fi)](https://ko-fi.com/jacksteam)
+[![Chrome Extension Tutorials on YouTube](https://img.shields.io/badge/Chrome%20Extension%20Tutorials-YouTube-c4302b.svg)](https://www.youtube.com/channel/UCVj3dGw75v8aHFYD6CL1tFg)
+[![ko-fi](https://img.shields.io/badge/Buy%20us%20a%20tea-ko--fi-29ABE0)](https://ko-fi.com/jacksteam)
 
 </div>
 
