@@ -1,14 +1,7 @@
-import {
-  EmittedFile,
-  InputOptions,
-  OutputAsset,
-  OutputBundle,
-} from 'rollup'
+import { EmittedFile, OutputAsset } from 'rollup'
 import { simpleReloader, _internalCache } from '..'
 import { buildCRX } from '../../../__fixtures__/build-basic-crx'
-import { inversePromise } from '../../../__fixtures__/inversePromise'
 import { context } from '../../../__fixtures__/plugin-context'
-import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import {
@@ -19,24 +12,7 @@ import {
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
 
-// Options is not used, but needed for TS
-const options: InputOptions = {}
-const bundlePromise = inversePromise<OutputBundle>()
-beforeAll(
-  buildCRX(
-    getExtPath('basic/rollup.config.js'),
-    (error, result) => {
-      if (error) {
-        bundlePromise.reject(error)
-      } else if (result) {
-        bundlePromise.resolve(result.bundle)
-      } else {
-        bundlePromise.reject(new Error('Could not build CRX'))
-      }
-    },
-  ),
-  10000,
-)
+const buildPromise = buildCRX()
 
 const contentJs = expect.stringMatching(/assets\/content.+?\.js/)
 
@@ -47,15 +23,10 @@ beforeEach(() => {
 afterEach(jest.clearAllMocks)
 
 test('emit assets', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
+  await plugin.generateBundle.call(context, {}, bundle, false)
 
   expect(context.emitFile).toBeCalledTimes(3)
 
@@ -79,7 +50,7 @@ test('emit assets', async () => {
 })
 
 test('updates manifest in bundle', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
@@ -87,12 +58,7 @@ test('updates manifest in bundle', async () => {
 
   expect(manifestObj).toEqual(manifestClone)
 
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
+  await plugin.generateBundle.call(context, {}, bundle, false)
 
   expect(manifestObj).toBe(bundle['manifest.json'])
   expect(manifestObj).not.toEqual(manifestClone)
@@ -117,17 +83,12 @@ test('updates manifest in bundle', async () => {
 })
 
 test('set manifest description', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
+  await plugin.generateBundle.call(context, {}, bundle, false)
 
   const manifest: ChromeExtensionManifest = JSON.parse(
     manifestObj.source as string,
@@ -137,17 +98,12 @@ test('set manifest description', async () => {
 })
 
 test('add reloader script to background', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
+  await plugin.generateBundle.call(context, {}, bundle, false)
 
   const manifest: ChromeExtensionManifest = JSON.parse(
     manifestObj.source as string,
@@ -159,17 +115,12 @@ test('add reloader script to background', async () => {
 })
 
 test('set background script to persistent', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
+  await plugin.generateBundle.call(context, {}, bundle, false)
 
   const manifest: ChromeExtensionManifest = JSON.parse(
     manifestObj.source as string,
@@ -179,17 +130,12 @@ test('set background script to persistent', async () => {
 })
 
 test('add reloader script to content scripts', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
+  await plugin.generateBundle.call(context, {}, bundle, false)
 
   const manifest: ChromeExtensionManifest = JSON.parse(
     manifestObj.source as string,
@@ -208,7 +154,7 @@ test('add reloader script to content scripts', async () => {
 })
 
 test('Errors if manifest is not in the bundle', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   expect.assertions(2)
@@ -219,12 +165,7 @@ test('Errors if manifest is not in the bundle', async () => {
     'No manifest.json in the rollup output bundle.'
 
   try {
-    await plugin.generateBundle.call(
-      context,
-      options,
-      bundle,
-      false,
-    )
+    await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
     expect(error).toEqual(new Error(errorMessage))
     expect(context.error).toBeCalledWith(errorMessage)
@@ -232,7 +173,7 @@ test('Errors if manifest is not in the bundle', async () => {
 })
 
 test('Errors if cache.bgScriptPath is undefined', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   expect.assertions(1)
@@ -243,12 +184,7 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
   })
 
   try {
-    await plugin.generateBundle.call(
-      context,
-      options,
-      bundle,
-      false,
-    )
+    await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
     expect(context.error).toBeCalledWith(
       'cache.bgScriptPath is undefined',
@@ -257,7 +193,7 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
 })
 
 test('Errors if cache.ctScriptPath is undefined', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
   expect.assertions(1)
@@ -268,12 +204,7 @@ test('Errors if cache.ctScriptPath is undefined', async () => {
   })
 
   try {
-    await plugin.generateBundle.call(
-      context,
-      options,
-      bundle,
-      false,
-    )
+    await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
     expect(context.error).toBeCalledWith(
       'cache.ctScriptPath is undefined',

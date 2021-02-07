@@ -1,10 +1,7 @@
 import { join } from 'path'
-import { OutputBundle } from 'rollup'
 import { simpleReloader } from '..'
 import { buildCRX } from '../../../__fixtures__/build-basic-crx'
-import { inversePromise } from '../../../__fixtures__/inversePromise'
 import { context } from '../../../__fixtures__/plugin-context'
-import { getExtPath } from '../../../__fixtures__/utils'
 import { cloneObject } from '../../manifest-input/cloneObject'
 
 const fsExtra = require('fs-extra')
@@ -14,29 +11,14 @@ mockOutputJson.mockImplementation(() => Promise.resolve())
 const outputDir = 'outputDir'
 const timestampPath = 'timestampPath'
 
-const bundlePromise = inversePromise<OutputBundle>()
-beforeAll(
-  buildCRX(
-    getExtPath('basic/rollup.config.js'),
-    (error, result) => {
-      if (error) {
-        bundlePromise.reject(error)
-      } else if (result) {
-        bundlePromise.resolve(result.bundle)
-      } else {
-        bundlePromise.reject(new Error('Could not build CRX'))
-      }
-    },
-  ),
-  10000,
-)
+const buildPromise = buildCRX()
 
 beforeEach(() => {
   process.env.ROLLUP_WATCH = 'true'
 })
 
 test('Writes timestamp file', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader(
     {},
     { outputDir, timestampPath },
@@ -51,7 +33,7 @@ test('Writes timestamp file', async () => {
 })
 
 test('Handles write errors with message prop', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader(
     {},
     { outputDir, timestampPath },
@@ -74,7 +56,7 @@ test('Handles write errors with message prop', async () => {
 })
 
 test('Handles other write errors', async () => {
-  const bundle = cloneObject(await bundlePromise)
+  const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader(
     {},
     { outputDir, timestampPath },
