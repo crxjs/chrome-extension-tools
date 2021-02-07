@@ -14,7 +14,9 @@ export const resolveFromBundle = (
       const dirname = path.dirname(importer)
       const resolved = path.join(dirname, source)
 
-      return resolved
+      // if it's not in the bundle,
+      //   tell Rollup not to try to resolve it
+      return resolved in bundle ? resolved : false
     }
   },
   load(id) {
@@ -26,7 +28,10 @@ export const resolveFromBundle = (
         map: chunk.map,
       }
     } else {
-      throw new Error(`Could not load: ${id}`)
+      // anything not in the bundle is external
+      //  this doesn't make sense for a chrome extension,
+      //    but we should let Rollup handle it
+      return null
     }
   },
 })
