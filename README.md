@@ -9,7 +9,7 @@
 <div align="center">
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
-[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
+[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
 [![CircleCI](https://img.shields.io/circleci/build/github/extend-chrome/rollup-plugin-chrome-extension?token=31f554b1e0c742c0ed5ccab825000c78e65791ba)](https://circleci.com/gh/extend-chrome/rollup-plugin-chrome-extension)
 [![Codecov](https://img.shields.io/codecov/c/github/extend-chrome/rollup-plugin-chrome-extension)](https://codecov.io/gh/extend-chrome/rollup-plugin-chrome-extension)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
@@ -54,11 +54,17 @@ Get started fast with the
 git clone https://github.com/extend-chrome/js-react-boilerplate.git
 ```
 
-Or use the [TypeScript React boilerplate]() if you're feeling
+Or use the [TypeScript React boilerplate](https://github.com/extend-chrome/ts-react-boilerplate) if you're feeling
 fancy:
 
 ```
 git clone https://github.com/extend-chrome/ts-react-boilerplate.git
+```
+
+Special thanks to [@kyrelldixon](https://www.kyrelldixon.com/) for this [Svelte and Tailwind CSS boilerplate with optional TypeScript support](https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate):
+
+```
+git clone https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate.git
 ```
 
 ### I want to do it myself

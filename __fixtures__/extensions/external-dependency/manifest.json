@@ -1,0 +1,15 @@
+{
+  "name": "external-libs",
+  "description": "handle external dependencies gracefully",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "background": {
+    "scripts": ["background/background.js"]
+  },
+  "content_scripts": [
+    {
+      "js": ["content/content.js"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ]
+}

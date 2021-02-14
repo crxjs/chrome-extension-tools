@@ -5,37 +5,58 @@ import {
   RollupBuild,
   RollupOutput,
 } from 'rollup'
-import { InversePromise, inversePromise } from './inversePromise'
+import { getExtPath } from './utils'
+
+type RollupBuildData = {
+  build: RollupBuild
+  bundle: OutputBundle
+  output: RollupOutput
+}
 
 export function buildCRX(
-  configPath: string,
-  cb: (
-    error?: any,
-    result?: {
-      build: RollupBuild
-      bundle: OutputBundle
-      output: RollupOutput
-    },
-  ) => void,
-) {
-  const { default: config } = require(configPath)
+  crxPath = 'basic/rollup.config.js',
+): ReturnType<typeof innerBuildCRX> {
+  return new Promise((resolve, reject) => {
+    beforeAll(async () => {
+      try {
+        const buildPromise = await innerBuildCRX(crxPath)
 
-  return async () => {
-    try {
-      const bundle: InversePromise<OutputBundle> = inversePromise()
+        resolve(buildPromise)
+      } catch (error) {
+        reject(error)
+      }
+    }, 15000)
+  })
+}
+
+/** Builds the basic example crx by default */
+export async function innerBuildCRX(
+  crxPath: string,
+): Promise<RollupBuildData> {
+  const extPath = getExtPath(crxPath)
+  const config = require(extPath).default
+
+  if (typeof config.output === 'undefined')
+    throw new TypeError('Rollup config must have output')
+
+  const bundlePromise: Promise<OutputBundle> = new Promise(
+    (resolve) => {
+      config.plugins = config.plugins || []
       config.plugins.push({
         name: 'save-bundle-plugin',
         generateBundle(o, b) {
-          return bundle.resolve(b)
+          resolve(b)
         },
       } as Pick<PluginHooks, 'generateBundle'> & { name: string })
+    },
+  )
 
-      const build = await rollup(config)
-      const output = await build.generate(config.output)
+  const build = await rollup(config)
+  const output = await build.generate(
+    Array.isArray(config.output)
+      ? config.output[0]
+      : config.output,
+  )
 
-      cb(undefined, { build, bundle: await bundle, output })
-    } catch (error) {
-      cb(error)
-    }
-  }
+  return { build, bundle: await bundlePromise, output }
 }
