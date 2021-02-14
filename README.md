@@ -166,7 +166,7 @@ bundled into your extension multiple times.
 <details>
 <summary>What happens with the assets? Like images, icons or css files?</summary>
 <br>
-All assets in the manifest (images, icons, and even CSS files) are 
+All assets declared in the manifest (including files in `web_accessible_resources`, any image, icon, font, and even CSS files) are 
 automatically copied into the output folder. Even the images in your HTML 
 files get copied over.
 NOTE: This only includes assets in the html itself. 
