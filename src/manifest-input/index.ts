@@ -403,7 +403,7 @@ export function manifestInput(
                 ? rest
                 : {
                     js: js
-                      .map((p) => p.replace(/\.ts$/, '.js'))
+                      .map((p) => p.replace(/\.tsx?$/, '.js'))
                       .map(memoizedEmitter),
                     ...rest,
                   }
