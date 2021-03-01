@@ -3,7 +3,7 @@ import { manifestInput } from '..'
 import {
   contentCss,
   manifestJson,
-} from '../../../__fixtures__/basic-paths'
+} from '../../../__fixtures__/kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import {

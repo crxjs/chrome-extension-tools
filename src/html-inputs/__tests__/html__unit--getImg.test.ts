@@ -1,19 +1,19 @@
 import {
-  basicRoot,
+  kitchenSinkRoot,
   optionsHtml,
-} from '../../../__fixtures__/basic-paths'
+} from '../../../__fixtures__/kitchen-sink-paths'
 import { getImgSrcs, loadHtml } from '../cheerio'
 
-const html$ = loadHtml(basicRoot)(optionsHtml)
+const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
 
 test('scrapes correct img tags and favicons', () => {
   const result = getImgSrcs(html$)
 
   expect(result).toEqual(
     expect.arrayContaining([
-      '__fixtures__/extensions/basic/options.png',
-      '__fixtures__/extensions/basic/options.jpg',
-      '__fixtures__/extensions/basic/images/favicon.png',
+      '__fixtures__/extensions/kitchen-sink/options.png',
+      '__fixtures__/extensions/kitchen-sink/options.jpg',
+      '__fixtures__/extensions/kitchen-sink/images/favicon.png',
     ]),
   )
 })

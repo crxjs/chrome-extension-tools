@@ -111,10 +111,10 @@ test('returns plugin with srcDir getter', () => {
 
   // Rollup config
   const options: RollupOptions = {
-    input: getExtPath('basic/manifest.json'),
+    input: getExtPath('kitchen-sink/manifest.json'),
   }
 
   plugin.options.call(context, options)
 
-  expect(plugin.srcDir).toBe(getExtPath('basic'))
+  expect(plugin.srcDir).toBe(getExtPath('kitchen-sink'))
 })

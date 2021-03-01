@@ -12,7 +12,7 @@ _plugins.html.options = jest.fn(_plugins.html.options)
 
 // Rollup config
 const config: RollupOptions = {
-  input: getExtPath('basic/manifest.json'),
+  input: getExtPath('kitchen-sink/manifest.json'),
 }
 
 // Call options hook once
@@ -21,8 +21,8 @@ const result = options.call(context, config)
 test('matches expected output', () => {
   expect(result).toMatchObject({
     input: {
-      background: getExtPath('basic/background.js'),
-      content: getExtPath('basic/content.js'),
+      background: getExtPath('kitchen-sink/background.js'),
+      content: getExtPath('kitchen-sink/content.js'),
     },
   })
 })

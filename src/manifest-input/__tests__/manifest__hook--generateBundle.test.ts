@@ -7,7 +7,7 @@ import {
   RollupOutput,
 } from 'rollup'
 import { manifestInput } from '..'
-import { manifestJson } from '../../../__fixtures__/basic-paths'
+import { manifestJson } from '../../../__fixtures__/kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import { requireExtFile } from '../../../__fixtures__/utils'
@@ -28,7 +28,7 @@ let bundlePromise: Promise<OutputBundle>
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
   const config = requireExtFile<RollupOptions>(
-    'basic',
+    'kitchen-sink',
     'rollup.config.js',
   )
 

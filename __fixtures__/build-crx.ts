@@ -14,7 +14,7 @@ type RollupBuildData = {
 }
 
 export function buildCRX(
-  crxPath = 'basic/rollup.config.js',
+  crxPath = 'kitchen-sink/rollup.config.js',
 ): ReturnType<typeof innerBuildCRX> {
   return new Promise((resolve, reject) => {
     beforeAll(async () => {
@@ -29,7 +29,7 @@ export function buildCRX(
   })
 }
 
-/** Builds the basic example crx by default */
+/** Builds the kitchen-sink example crx by default */
 export async function innerBuildCRX(
   crxPath: string,
 ): Promise<RollupBuildData> {

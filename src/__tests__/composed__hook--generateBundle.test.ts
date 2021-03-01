@@ -12,7 +12,7 @@ import { requireExtFile } from '../../__fixtures__/utils'
 /* ------------------ SETUP TESTS ------------------ */
 
 const config = requireExtFile<RollupOptions>(
-  'basic',
+  'kitchen-sink',
   'rollup.config.js',
 )
 

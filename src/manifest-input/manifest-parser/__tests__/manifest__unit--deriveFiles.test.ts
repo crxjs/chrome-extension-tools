@@ -11,7 +11,7 @@ import {
   icon16,
   icon128,
   icon48,
-} from '../../../../__fixtures__/basic-paths'
+} from '../../../../__fixtures__/kitchen-sink-paths'
 
 const manifest = require(manifestJson)
 

@@ -1,4 +1,4 @@
-import { basicRoot, optionsHtml } from '../../../__fixtures__/basic-paths'
+import { kitchenSinkRoot, optionsHtml } from '../../../__fixtures__/kitchen-sink-paths'
 import { loadHtml } from '../cheerio'
 
 const fs = require('fs-extra')
@@ -13,7 +13,7 @@ beforeEach(() => {
 
 const filePath = optionsHtml
 test('calls readFileSync', () => {
-  const result = loadHtml(basicRoot)(filePath)
+  const result = loadHtml(kitchenSinkRoot)(filePath)
 
   expect(result).toBeInstanceOf(Function)
   expect(result).toHaveProperty('filePath', filePath)
@@ -24,7 +24,7 @@ test('calls readFileSync', () => {
 test('calls cheerio.load', () => {
   const htmlCode = fs.readFileSync(filePath, 'utf8')
 
-  loadHtml(basicRoot)(filePath)
+  loadHtml(kitchenSinkRoot)(filePath)
 
   expect(cheerio.load).toBeCalledWith(htmlCode)
 })

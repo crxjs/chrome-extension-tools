@@ -5,7 +5,7 @@ import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
-  basicRoot,
+  kitchenSinkRoot,
   faviconIco,
   faviconPng,
   optionsCss,
@@ -18,7 +18,7 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
-} from '../../../__fixtures__/basic-paths'
+} from '../../../__fixtures__/kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import {
   getExtPath,
@@ -31,7 +31,7 @@ const cheerio = require('../cheerio')
 
 const srcDir = join(
   process.cwd(),
-  '__fixtures__/extensions/basic',
+  '__fixtures__/extensions/kitchen-sink',
 )
 const cache: HtmlInputsPluginCache = {
   css: [],
@@ -71,12 +71,12 @@ test('returns options.input as input record', () => {
 
   expect(result).toMatchObject({
     input: {
-      options1: '__fixtures__/extensions/basic/options1.js',
-      options2: '__fixtures__/extensions/basic/options2.jsx',
-      options3: '__fixtures__/extensions/basic/options3.ts',
-      options4: '__fixtures__/extensions/basic/options4.tsx',
+      options1: '__fixtures__/extensions/kitchen-sink/options1.js',
+      options2: '__fixtures__/extensions/kitchen-sink/options2.jsx',
+      options3: '__fixtures__/extensions/kitchen-sink/options3.ts',
+      options4: '__fixtures__/extensions/kitchen-sink/options4.tsx',
       'popup/popup':
-        '__fixtures__/extensions/basic/popup/popup.js',
+        '__fixtures__/extensions/kitchen-sink/popup/popup.js',
       // External script paths won't be touched
       background: backgroundJs,
     },
@@ -85,7 +85,7 @@ test('returns options.input as input record', () => {
 
 test('calls loadHtml', () => {
   const spy = jest.spyOn(cheerio, 'loadHtml')
-  const closureMock = jest.fn(cheerio.loadHtml(basicRoot))
+  const closureMock = jest.fn(cheerio.loadHtml(kitchenSinkRoot))
   spy.mockImplementation(() => closureMock)
 
   jest.clearAllMocks()
@@ -155,22 +155,22 @@ test('always parse HTML files', () => {
   expect(result).toEqual({
     input: {
       background: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/background\.js$/,
+        /__fixtures__\/extensions\/kitchen-sink\/background\.js$/,
       ),
       options1: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options1\.js$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options1\.js$/,
       ),
       options2: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options2\.jsx$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options2\.jsx$/,
       ),
       options3: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options3\.ts$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options3\.ts$/,
       ),
       options4: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options4\.tsx$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options4\.tsx$/,
       ),
       'popup/popup': expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/popup\/popup\.js$/,
+        /__fixtures__\/extensions\/kitchen-sink\/popup\/popup\.js$/,
       ),
     },
   })
@@ -179,11 +179,11 @@ test('always parse HTML files', () => {
 test('modifies html source', async () => {
   const files = await Promise.all([
     await readFile(
-      getExtPath('basic/options-result.html'),
+      getExtPath('kitchen-sink/options-result.html'),
       'utf8',
     ),
     await readFile(
-      getExtPath('basic/popup-result.html'),
+      getExtPath('kitchen-sink/popup-result.html'),
       'utf8',
     ),
   ])
@@ -211,22 +211,22 @@ test.skip('if cache.input exists, skip parsing html files', () => {
   expect(result).toEqual({
     input: {
       background: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/background\.js$/,
+        /__fixtures__\/extensions\/kitchen-sink\/background\.js$/,
       ),
       options1: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options1\.js$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options1\.js$/,
       ),
       options2: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options2\.jsx$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options2\.jsx$/,
       ),
       options3: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options3\.ts$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options3\.ts$/,
       ),
       options4: expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/options4\.tsx$/,
+        /__fixtures__\/extensions\/kitchen-sink\/options4\.tsx$/,
       ),
       'popup/popup': expect.stringMatching(
-        /__fixtures__\/extensions\/basic\/popup\/popup\.js$/,
+        /__fixtures__\/extensions\/kitchen-sink\/popup\/popup\.js$/,
       ),
     },
   })
@@ -262,10 +262,10 @@ test('Handles option.input as string', () => {
 
   expect(result).toMatchObject({
     input: {
-      options1: '__fixtures__/extensions/basic/options1.js',
-      options2: '__fixtures__/extensions/basic/options2.jsx',
-      options3: '__fixtures__/extensions/basic/options3.ts',
-      options4: '__fixtures__/extensions/basic/options4.tsx',
+      options1: '__fixtures__/extensions/kitchen-sink/options1.js',
+      options2: '__fixtures__/extensions/kitchen-sink/options2.jsx',
+      options3: '__fixtures__/extensions/kitchen-sink/options3.ts',
+      options4: '__fixtures__/extensions/kitchen-sink/options4.tsx',
     },
   })
 })

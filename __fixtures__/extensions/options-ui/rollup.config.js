@@ -6,9 +6,9 @@ import { chromeExtension } from '../../../src/index'
 import { getExtPath } from '../../utils'
 
 export default {
-  input: getExtPath('basic/manifest.json'),
+  input: getExtPath('kitchen-sink/manifest.json'),
   output: {
-    dir: getExtPath('basic-dist'),
+    dir: getExtPath('kitchen-sink-dist'),
     format: 'esm',
   },
   plugins: [
