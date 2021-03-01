@@ -70,7 +70,7 @@ git clone https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate.g
 ### I want to do it myself
 
 ```sh
-$ npm i rollup rollup-plugin-chrome-extension@latest -D
+npm i rollup rollup-plugin-chrome-extension@latest -D
 ```
 
 Install the plugins
@@ -79,7 +79,7 @@ and [CommonJS](https://github.com/rollup/@rollup/plugin-commonjs)
 if you plan to use npm modules.
 
 ```sh
-$ npm i @rollup/plugin-node-resolve @rollup/plugin-commonjs -D
+npm i @rollup/plugin-node-resolve @rollup/plugin-commonjs -D
 ```
 
 ## Usage <a name = "usage"></a>
@@ -131,7 +131,7 @@ Put your Chrome extension source code in a folder named `src` in
 the root of your project and build with the following command:
 
 ```sh
-$ npm run build
+npm run build
 ```
 
 Your extension build will be in the `dist` folder. It has
