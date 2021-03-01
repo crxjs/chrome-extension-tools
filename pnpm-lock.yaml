@@ -6,6 +6,7 @@ dependencies:
   cosmiconfig: 6.0.0
   fs-extra: 8.1.0
   glob: 7.1.6
+  jest-circus: 26.6.3
   jsonpath-plus: 4.0.0
   lodash.difference: 4.5.0
   lodash.flatten: 4.4.0
