@@ -3,12 +3,14 @@ import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import { chromeExtension } from '../../../src/index'
-import { getExtPath } from '../../utils'
+import { getCrxName, getExtPath } from '../../utils'
+
+const crxName = getCrxName(__filename)
 
 export default {
-  input: getExtPath('kitchen-sink/manifest.json'),
+  input: getExtPath(`${crxName}/manifest.json`),
   output: {
-    dir: getExtPath('kitchen-sink-dist'),
+    dir: getExtPath(`${crxName}-dist`),
     format: 'esm',
     sourcemap: false,
   },

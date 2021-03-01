@@ -1,4 +1,4 @@
-import { resolve, join } from 'path'
+import { resolve, join, sep } from 'path'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 
 export const getTestName = (filename: string): string => {
@@ -13,6 +13,12 @@ export const getTestName = (filename: string): string => {
   } else {
     throw new TypeError(`Invalid filename: ${filename}`)
   }
+}
+
+export const getCrxName = (filepath: string): string => {
+  const [, crxName, crxParent] = filepath.split(sep).reverse()
+  if (crxParent === 'extensions') return crxName
+  throw new Error(`This is not a CRX fixture: ${filepath}`)
 }
 
 export const getExtPath = (path: string): string =>
