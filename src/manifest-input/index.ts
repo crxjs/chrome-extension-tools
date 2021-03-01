@@ -6,7 +6,11 @@ import memoize from 'mem'
 import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
-import { isChunk, isJsonFilePath } from '../helpers'
+import {
+  isChunk,
+  isJsonFilePath,
+  normalizeFilename,
+} from '../helpers'
 import { ChromeExtensionManifest } from '../manifest'
 import {
   ManifestInputPlugin,
@@ -403,7 +407,7 @@ export function manifestInput(
                 ? rest
                 : {
                     js: js
-                      .map((p) => p.replace(/\.ts$/, '.js'))
+                      .map(normalizeFilename)
                       .map(memoizedEmitter),
                     ...rest,
                   }
@@ -438,8 +442,7 @@ export function manifestInput(
         if (bgs.length && wrapperScript.length) {
           // background exists because bgs has scripts
           manifestBody.background!.scripts = bgs
-            // SMELL: is this replace necessary? are we doing somewhere else?
-            .map((p) => p.replace(/\.ts$/, '.js'))
+            .map(normalizeFilename)
             .map((scriptPath: string) => {
               // Loader script exists because of type guard above
               const source =

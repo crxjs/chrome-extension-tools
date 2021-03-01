@@ -33,6 +33,9 @@ export function isJsonFilePath(x: any): x is string {
   return isString(x) && x.endsWith('json')
 }
 
+export const normalizeFilename = (p: string) =>
+  p.replace(/\.[tj]sx?$/, '.js')
+
 /**
  * Update the manifest source in the output bundle
  */
