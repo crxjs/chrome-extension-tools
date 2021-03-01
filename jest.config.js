@@ -24,4 +24,5 @@ module.exports = {
   transformIgnorePatterns: [
     '<rootDir>/node_modules/(?!lodash-es/.*)',
   ],
+  testRunner: 'jest-circus/runner',
 }
