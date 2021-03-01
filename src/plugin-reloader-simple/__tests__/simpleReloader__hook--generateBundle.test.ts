@@ -1,6 +1,6 @@
 import { EmittedFile, OutputAsset } from 'rollup'
 import { simpleReloader, _internalCache } from '..'
-import { buildCRX } from '../../../__fixtures__/build-basic-crx'
+import { buildCRX } from '../../../__fixtures__/build-crx'
 import { context } from '../../../__fixtures__/plugin-context'
 import { ChromeExtensionManifest } from '../../manifest'
 import { cloneObject } from '../../manifest-input/cloneObject'

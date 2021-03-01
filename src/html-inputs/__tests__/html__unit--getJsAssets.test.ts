@@ -1,15 +1,15 @@
 import {
-  basicRoot,
+  kitchenSinkRoot,
   optionsHtml,
-} from '../../../__fixtures__/basic-paths'
+} from '../../../__fixtures__/kitchen-sink-paths'
 import { getJsAssets, loadHtml } from '../cheerio'
 
-const html$ = loadHtml(basicRoot)(optionsHtml)
+const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
 
 test('scrapes correct asset scripts', () => {
   const result = getJsAssets(html$)
 
   expect(result).toEqual([
-    '__fixtures__/extensions/basic/asset.js',
+    '__fixtures__/extensions/kitchen-sink/asset.js',
   ])
 })

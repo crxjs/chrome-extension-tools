@@ -3,7 +3,7 @@ import { InputOptions } from 'rollup'
 import {
   assetJs,
   backgroundJs,
-  basicRoot,
+  kitchenSinkRoot,
   faviconIco,
   faviconPng,
   optionsCss,
@@ -16,7 +16,7 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
-} from '../../../__fixtures__/basic-paths'
+} from '../../../__fixtures__/kitchen-sink-paths'
 import { context } from '../../../__fixtures__/plugin-context'
 import { loadHtml } from '../cheerio'
 import htmlInputs from '..'
@@ -24,7 +24,7 @@ import { HtmlInputsPluginCache } from '../../plugin-options'
 
 const srcDir = join(
   process.cwd(),
-  '__fixtures__/extensions/basic',
+  '__fixtures__/extensions/kitchen-sink',
 )
 const cache: HtmlInputsPluginCache = {
   css: [],
@@ -55,7 +55,7 @@ beforeEach(() => {
   ]
   cache.input = [optionsHtml, popupHtml, backgroundJs]
   cache.html = [optionsHtml, popupHtml]
-  cache.html$ = cache.html.map(loadHtml(basicRoot))
+  cache.html$ = cache.html.map(loadHtml(kitchenSinkRoot))
   cache.css = [optionsCss]
   cache.img = [optionsPng, optionsJpg, faviconIco, faviconPng]
   cache.scripts = [assetJs]

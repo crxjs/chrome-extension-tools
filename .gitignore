@@ -4,7 +4,7 @@ examples/
 **/lib
 types/
 !types/index.d.ts
-__fixtures__/extensions/basic-dist
+__fixtures__/extensions/kitchen-sink-dist
 coverage
 jest_html_reporters.html
 package-lock.json

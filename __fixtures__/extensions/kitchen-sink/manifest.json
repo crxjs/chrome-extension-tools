@@ -1,6 +1,6 @@
 {
-  "name": "basic",
-  "description": "basic chrome extension",
+  "name": "kitchen-sink",
+  "description": "kitchen-sink chrome extension",
   "manifest_version": 2,
   "version": "1.0.0",
   "icons": {

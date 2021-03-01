@@ -1,6 +1,6 @@
 import { join } from 'path'
 import { simpleReloader } from '..'
-import { buildCRX } from '../../../__fixtures__/build-basic-crx'
+import { buildCRX } from '../../../__fixtures__/build-crx'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 

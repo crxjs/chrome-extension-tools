@@ -17,7 +17,7 @@ import {
   optionsJpg,
   popupHtml,
   srcDir,
-} from '../../../__fixtures__/basic-paths'
+} from '../../../__fixtures__/kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ChromeExtensionManifest } from '../../manifest'
@@ -54,14 +54,14 @@ const options: RollupOptions = {
 const clonedOptions = cloneObject(options)
 
 const expectedInputResult = {
-  background: getExtPath('basic/background.js'),
-  content: getExtPath('basic/content.js'),
+  background: getExtPath('kitchen-sink/background.js'),
+  content: getExtPath('kitchen-sink/content.js'),
   'devtools/devtools': getExtPath(
-    'basic/devtools/devtools.html',
+    'kitchen-sink/devtools/devtools.html',
   ),
-  index: getExtPath('basic/index.html'),
-  options: getExtPath('basic/options.html'),
-  'popup/popup': getExtPath('basic/popup/popup.html'),
+  index: getExtPath('kitchen-sink/index.html'),
+  options: getExtPath('kitchen-sink/options.html'),
+  'popup/popup': getExtPath('kitchen-sink/popup/popup.html'),
 }
 
 beforeEach(() => {
@@ -194,7 +194,7 @@ test('calls deriveFiles', () => {
 
 test('does nothing if cache.manifest exists', () => {
   cache.manifest = {} as ChromeExtensionManifest
-  cache.srcDir = getExtPath('basic')
+  cache.srcDir = getExtPath('kitchen-sink')
   // bypass no scripts error
   cache.input = ['x']
 
