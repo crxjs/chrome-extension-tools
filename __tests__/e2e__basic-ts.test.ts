@@ -53,5 +53,8 @@ test('chunks in output match chunks in manifest', async () => {
   js.map((x) => path.relative(extPath, x)).forEach((script) => {
     const chunk = output.find(byFileName(script))
     expect(chunk).toBeDefined()
+    if (chunk?.type === 'chunk') {
+      expect(typeof chunk?.map?.toUrl()).toBe('string')
+    }
   })
 })

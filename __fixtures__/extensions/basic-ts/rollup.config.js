@@ -33,6 +33,7 @@ export default {
     dir: getExtPath(`${crxName}-dist`),
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
+    sourcemap: 'inline',
   },
   plugins: [
     chromeExtension(),

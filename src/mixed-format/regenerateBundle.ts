@@ -31,7 +31,7 @@ export async function regenerateBundle(
     return {}
   }
 
-  const { format, chunkFileNames: cfn = '' } = output
+  const { format, chunkFileNames: cfn = '', sourcemap } = output
   
   const chunkFileNames = path.join(path.dirname(cfn), '[name].js')
 
@@ -51,6 +51,7 @@ export async function regenerateBundle(
   let _b: OutputBundle
   await build.generate({
     format,
+    sourcemap,
     chunkFileNames,
     plugins: [
       {
