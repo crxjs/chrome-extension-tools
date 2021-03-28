@@ -189,6 +189,17 @@ for JS files.
 know what you're doing, because code splitting won't work if
 `dynamicImportWrapper === false`.
 
+### Why do we need to use dynamic import in scripts?
+Two things are going on here:
+This Rollup plugin leverages two Rollup features to parse the manifest into inputs:
+*   It adds multiple parsed files to options.input
+*   It uses options.output.dir to support multiple output files.
+This means that [Rollup will use code-splitting](https://github.com/rollup/rollup/issues/2756#issuecomment-476242982). This is great because it makes a smaller bundle with no overlapping code, but we need a way to load those chunks into our content and background scripts.
+After some experimentation, I found that ES modules are the best format for web extensions, but they don’t support ES modules in background or content scripts out of the box. 
+
+The solution is to use [dynamic imports](https://stackoverflow.com/a/53033388/4842857) in extension scripts. All Chromium browsers and Firefox 89+ (coming May 2021) support this.
+
+
 #### `[dynamicImportWrapper.wakeEvents]`
 
 | Type       |
