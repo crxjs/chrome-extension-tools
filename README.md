@@ -257,14 +257,20 @@ additional `@types` library!
 
 ### ⭐️ Use ES2015 Modules In Your Scripts <a name = "features-modules"></a>
 
-Chrome extensions don't support modules in background and content
-scripts. We've developed a
-[module loader](#dynamic-import-wrapper) specifically for Chrome
-extension scripts, so you can take advantage of Rollup's great
-code splitting features.
+Chrome extensions don't support modules in background and content scripts. We've developed a [module loader](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/API.md#dynamicimportwrapper) specifically for Chrome extension scripts, so you can take advantage of Rollup's great code splitting features.
+
+### ⭐️ How does the dynamic import wrapper work?
+TLDR; RPCE parses the manifest and replaces any script path with an IIFE wrapper that loads the script using a [dynamic import statement](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports).
+
+> See [Why do we need to use dynamic import in scripts?](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/API.md#why-do-we-need-to-use-dynamic-import-in-scripts) for the reasons we need dynamic imports.
+Content scripts are pretty straight forward, and the wrapper they use is just an IIFE that loads the script and logs any import errors.
+Background pages need a special wrapper because [wake events](https://developer.chrome.com/docs/extensions/mv2/background_pages/) (onInstalled, onMessage, etc...) fire before the import completes. We make sure we don’t miss any events by capturing all events that occur before the import promise resolves and then re-dispatch them after the import completes.
 
 ---
+### ⭐️ What About FireFox Support?
+Until v89, [Firefox did not support dynamic imports in web extensions](https://bugzilla.mozilla.org/show_bug.cgi?id=1536094), so any scripts needed to be in another format, like IIFE. The suggested solution was to run Parcel on the Rollup output, but this won’t be necessary once **Firefox v89** is [released](https://wiki.mozilla.org/Release_Management/Release_owners).
 
+---
 ### ⭐️ Use Promises like it's 2021 <a name = "features-browser-polyfill"></a>
 
 Add the excellent [promisified Browser API polyfill](https://github.com/mozilla/webextension-polyfill) by Mozilla to your
