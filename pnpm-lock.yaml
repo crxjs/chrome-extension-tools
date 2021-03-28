@@ -1862,6 +1862,10 @@ packages:
   /@types/estree/0.0.46:
     resolution:
       integrity: sha512-laIjwTQaD+5DukBZaygQ79K1Z0jb1bPEMRrkXSLjtCcZm+abyp5YbrqpSLzD42FwWW6gK/aS4NYpJ804nG2brg==
+  /@types/estree/0.0.47:
+    dev: true
+    resolution:
+      integrity: sha512-c5ciR06jK8u9BstrmJyO97m+klJrrhCf9u3rLu3DEAJBirxRqSCvDQoYKmxuYwQI5SZChAWu+tq9oVlGRuzPAg==
   /@types/filesystem/0.0.29:
     dependencies:
       '@types/filewriter': 0.0.28
@@ -4154,7 +4158,7 @@ packages:
       integrity: sha1-DFLlS8yjkbssSUsh6GJtczbG45c=
   /is-reference/1.2.1:
     dependencies:
-      '@types/estree': 0.0.46
+      '@types/estree': 0.0.47
     dev: true
     resolution:
       integrity: sha512-U82MsXXiFIrjCK4otLT+o2NA2Cd2g5MLoOVXUZjIOhLurrRxpEXzI8O0KZHr3IjLvlAH1kTPYSuqer5T9ZVBKQ==
@@ -7469,7 +7473,7 @@ specifiers:
   '@babel/preset-react': ^7.12.13
   '@rollup/plugin-alias': ^3.1.2
   '@rollup/plugin-babel': ^5.3.0
-  '@rollup/plugin-commonjs': ^11.0.2
+  '@rollup/plugin-commonjs': ^11
   '@rollup/plugin-json': ^4.0.2
   '@rollup/plugin-node-resolve': ^7.1.1
   '@rollup/plugin-sucrase': ^3.0.0
