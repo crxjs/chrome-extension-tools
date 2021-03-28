@@ -257,7 +257,7 @@ additional `@types` library!
 
 ### ⭐️ Use ES2015 Modules In Your Scripts <a name = "features-modules"></a>
 
-Chrome extensions don't support modules in background and content scripts. We've developed a [module loader](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/API.md#dynamicimportwrapper) specifically for Chrome extension scripts, so you can take advantage of Rollup's great code splitting features.
+Chrome extensions don't support modules in background and content scripts. We've developed a [module loader](https://github.com/extend-chrome/rollup-plugin-chrome-extension/blob/master/API.md#options-dynamic-import-wrapper) specifically for Chrome extension scripts, so you can take advantage of Rollup's great code splitting features.
 
 ### ⭐️ How does the dynamic import wrapper work?
 TLDR; RPCE parses the manifest and replaces any script path with an IIFE wrapper that loads the script using a [dynamic import statement](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports).
