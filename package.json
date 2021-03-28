@@ -16,16 +16,17 @@
     "manifest.schema.json"
   ],
   "scripts": {
-    "build": "rollup -c",
     "build:types": "tsc -p tsconfigs/tsconfig-types.json",
-    "check:typescript": "tsc --noEmit",
-    "lint": "tslint",
-    "prepublishOnly": "run-p build build:types",
+    "build": "rollup -c",
+    "lint:eslint": "eslint . --ext js --ext ts --ext tsx",
+    "lint:types": "tsc --noEmit",
+    "lint": "run-s lint:*",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
+    "prepublishOnly": "run-p build build:types",
     "start": "rollup -c -w",
-    "test": "jest",
-    "test:ci": "jest --runInBand --coverage",
-    "test:precommit": "jest --changedSince=master"
+    "test:ci": "run-s lint test:coverage",
+    "test:coverage": "jest --runInBand --coverage",
+    "test": "jest"
   },
   "dependencies": {
     "ajv": "^6.11.0",
