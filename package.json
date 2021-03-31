@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-chrome-extension",
-  "version": "3.5.5",
+  "version": "3.5.6",
   "description": "Build Chrome Extensions with this Rollup plugin.",
   "repository": {
     "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension.git"
