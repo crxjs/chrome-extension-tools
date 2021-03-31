@@ -408,7 +408,8 @@ export function manifestInput(
                 : {
                     js: js
                       .map(normalizeFilename)
-                      .map(memoizedEmitter),
+                      .map(memoizedEmitter)
+                      .map((p) => slash(p)),
                     ...rest,
                   }
             },
@@ -431,7 +432,7 @@ export function manifestInput(
             ...imports,
             // Need to be web accessible b/c of import
             ...contentScripts,
-          ])
+          ]).map((p) => slash(p))
         }
 
         /* ----------- END SETUP CONTENT SCRIPTS ----------- */
@@ -463,6 +464,7 @@ export function manifestInput(
 
               return this.getFileName(assetId)
             })
+            .map((p) => slash(p))
         }
 
         /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
