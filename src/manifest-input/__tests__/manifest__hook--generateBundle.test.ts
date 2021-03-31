@@ -314,3 +314,77 @@ test('Throws if cache.manifest is falsey', async () => {
     expect(error).toEqual(new TypeError(errorMessage))
   }
 })
+
+test('emits correct paths on Windows', async () => {
+  context.getFileName.mockImplementation(
+    (id) => `sample\\file-path-${id}.js`,
+  )
+
+  const bundle = cloneObject(await bundlePromise)
+
+  await plugin.generateBundle.call(
+    context,
+    options,
+    bundle,
+    false,
+  )
+
+  expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
+    type: 'asset',
+    fileName: 'manifest.json',
+    source: JSON.stringify(
+      {
+        manifest_version: 2,
+        name: 'kitchen-sink',
+        version: '1.0.0',
+        description: 'kitchen-sink chrome extension',
+        icons: {
+          '16': 'images/icon-main-16.png',
+          '48': 'images/icon-main-48.png',
+          '128': 'images/icon-main-128.png',
+        },
+        devtools_page: 'devtools/devtools.html',
+        background: {
+          scripts: ['sample/file-path-background.js.js'],
+        },
+        permissions: [
+          'storage',
+          'contextMenus',
+          'bookmarks',
+          'cookies',
+          'webRequest',
+          'webRequestBlocking',
+        ],
+        content_scripts: [
+          {
+            js: ['sample/file-path-content.js.js'],
+            matches: ['https://www.google.com/*'],
+          },
+          {
+            js: ['sample/file-path-content.js.js'],
+            css: ['content.css'],
+            matches: ['https://www.yahoo.com/*'],
+          },
+        ],
+        options_page: 'options.html',
+        browser_action: {
+          default_icon: {
+            '16': 'images/icon-main-16.png',
+          },
+          default_popup: 'popup/popup.html',
+        },
+        web_accessible_resources: [
+          'options.jpg',
+          'fonts/*.ttf',
+          'fonts/*.otf',
+          'imported-c14c3b91.js',
+          'content.js',
+        ],
+        content_security_policy:
+          "script-src 'self'; object-src 'self'",
+      },
+      undefined,
+      2,
+    ),
+  })
+})

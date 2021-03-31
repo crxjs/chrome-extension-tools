@@ -71,7 +71,7 @@ export const context: MockPluginContext = {
   /** @deprecated Use `this.getFileName` instead */
   // @ts-ignore
   getChunkFileName: null,
-  getFileName: jest.fn(),
+  getFileName: jest.fn((id) => `sample/file-path-${id}.js`),
   getModuleInfo: jest.fn(),
   /** @deprecated Use `this.resolve` instead */
   // @ts-ignore
