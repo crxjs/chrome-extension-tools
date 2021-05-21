@@ -9,7 +9,7 @@
  * @returns {T[]} The matched values from the parent object
  */
 export function getDeepMatches<T>(object: any, pred: (x: any) => boolean, excludeKeys: string[]): T[] {
-  const keys = typeof object === 'object' ? Object.keys(object) : []
+  const keys = typeof object === 'object' && object ? Object.keys(object) : []
 
   return keys.length
     ? keys
