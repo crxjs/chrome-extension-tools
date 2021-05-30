@@ -31,7 +31,7 @@
   "dependencies": {
     "ajv": "^6.11.0",
     "array-flat-polyfill": "^1.0.1",
-    "cheerio": "^1.0.0-rc.3",
+    "cheerio": "1.0.0-rc.3",
     "convert-source-map": "^1.7.0",
     "cosmiconfig": "^6.0.0",
     "fs-extra": "^8.1.0",
