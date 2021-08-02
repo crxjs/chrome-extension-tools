@@ -13,6 +13,9 @@ const timestampPath = 'timestampPath'
 
 const buildPromise = buildCRX()
 
+beforeAll(jest.useFakeTimers)
+afterEach(jest.clearAllMocks)
+
 beforeEach(() => {
   process.env.ROLLUP_WATCH = 'true'
 })
@@ -20,7 +23,7 @@ beforeEach(() => {
 test('Writes timestamp file', async () => {
   const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader(
-    {},
+    { reloadDelay: 0 },
     { outputDir, timestampPath },
   )!
 
@@ -32,10 +35,31 @@ test('Writes timestamp file', async () => {
   )
 })
 
+test('Delays prescribed amount', async () => {
+  const { bundle } = cloneObject(await buildPromise)
+  const plugin = simpleReloader(
+    { reloadDelay: 100 },
+    { outputDir, timestampPath },
+  )!
+
+  const promise = plugin.writeBundle.call(context, bundle)
+
+  expect(mockOutputJson).not.toBeCalled()
+
+  jest.advanceTimersToNextTimer()
+
+  await promise
+
+  expect(mockOutputJson).toBeCalledWith(
+    join(outputDir, timestampPath),
+    expect.any(Number),
+  )
+})
+
 test('Handles write errors with message prop', async () => {
   const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader(
-    {},
+    { reloadDelay: 0 },
     { outputDir, timestampPath },
   )!
 
@@ -58,7 +82,7 @@ test('Handles write errors with message prop', async () => {
 test('Handles other write errors', async () => {
   const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader(
-    {},
+    { reloadDelay: 0 },
     { outputDir, timestampPath },
   )!
 

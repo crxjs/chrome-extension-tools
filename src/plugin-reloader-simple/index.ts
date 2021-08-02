@@ -196,7 +196,7 @@ export const simpleReloader = (
     /* -------------- WRITE TIMESTAMP FILE ------------- */
     async writeBundle() {
       // Sometimes Chrome says the manifest isn't valid, so we need to wait a bit
-      await delay(reloadDelay)
+      reloadDelay > 0 && (await delay(reloadDelay))
 
       try {
         await outputJson(
@@ -204,10 +204,7 @@ export const simpleReloader = (
           Date.now(),
         )
       } catch (err) {
-        if (
-          err instanceof Error &&
-          typeof err.message === 'string'
-        ) {
+        if (isErrorLike(err)) {
           this.error(
             `Unable to update timestamp file:\n\t${err.message}`,
           )
@@ -217,4 +214,11 @@ export const simpleReloader = (
       }
     },
   }
+}
+
+interface ErrorLike {
+  message: string
+}
+function isErrorLike(x: unknown): x is ErrorLike {
+  return typeof x === 'object' && x !== null && 'message' in x
 }
