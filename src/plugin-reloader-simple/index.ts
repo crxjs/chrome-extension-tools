@@ -7,13 +7,16 @@ import { updateManifest } from '../helpers'
 import {
   backgroundPageReloader,
   contentScriptReloader,
-  timestampPathPlaceholder,
-  loadMessagePlaceholder,
-  timestampFilename,
   ctScriptPathPlaceholder,
   executeScriptPlaceholder,
+  loadMessagePlaceholder,
+  timestampFilename,
+  timestampPathPlaceholder,
   unregisterServiceWorkersPlaceholder,
 } from './CONSTANTS'
+
+const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
@@ -23,6 +26,7 @@ export type SimpleReloaderPlugin = Pick<
 export interface SimpleReloaderOptions {
   executeScript?: boolean
   unregisterServiceWorkers?: boolean
+  reloadDelay?: number
 }
 
 export interface SimpleReloaderCache {
@@ -40,6 +44,7 @@ export const simpleReloader = (
   {
     executeScript = true,
     unregisterServiceWorkers = true,
+    reloadDelay = 100,
   } = {} as SimpleReloaderOptions,
   cache = {} as SimpleReloaderCache,
 ): SimpleReloaderPlugin | undefined => {
@@ -190,13 +195,19 @@ export const simpleReloader = (
 
     /* -------------- WRITE TIMESTAMP FILE ------------- */
     async writeBundle() {
+      // Sometimes Chrome says the manifest isn't valid, so we need to wait a bit
+      await delay(reloadDelay)
+
       try {
         await outputJson(
           join(cache.outputDir!, cache.timestampPath!),
           Date.now(),
         )
       } catch (err) {
-        if (typeof err.message === 'string') {
+        if (
+          err instanceof Error &&
+          typeof err.message === 'string'
+        ) {
           this.error(
             `Unable to update timestamp file:\n\t${err.message}`,
           )
