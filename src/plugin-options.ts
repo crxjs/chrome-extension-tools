@@ -1,9 +1,7 @@
-import { Plugin, PluginHooks } from 'rollup'
-import { ValidateNamesPlugin } from './validate-names/index'
-import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
-import { ChromeExtensionManifest } from './manifest'
+import { ModuleFormat, Plugin, PluginHooks } from 'rollup'
 import { CheerioFile } from './html-inputs/cheerio'
-import { ModuleFormat } from 'rollup'
+import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
+import { ValidateNamesPlugin } from './validate-names/index'
 
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
@@ -18,10 +16,8 @@ export interface ChromeExtensionOptions {
   crossBrowser?: boolean
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
   extendManifest?:
-    | Partial<ChromeExtensionManifest>
-    | ((
-        manifest: ChromeExtensionManifest,
-      ) => ChromeExtensionManifest)
+    | Partial<chrome.runtime.Manifest>
+    | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
   firstClassManifest?: boolean
   iifeJsonPaths?: string[]
   pkg?: {
@@ -62,7 +58,7 @@ export interface ManifestInputPluginCache {
   srcDir: string | null
   /** for memoized fs.readFile */
   readFile: Map<string, any>
-  manifest?: ChromeExtensionManifest
+  manifest?: chrome.runtime.Manifest
   assetChanged: boolean
 }
 

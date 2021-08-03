@@ -1,8 +1,7 @@
+import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
 import fs from 'fs-extra'
 import { Plugin } from 'rollup'
 import { isAsset } from '../helpers'
-import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
-import { ChromeExtensionManifest } from '../manifest'
 import {
   ChromeExtensionPlugin,
   ManifestInputPlugin,
@@ -58,7 +57,7 @@ export function browserPolyfill({
       }
       const manifest = JSON.parse(
         manifestAsset.source as string,
-      ) as ChromeExtensionManifest
+      ) as chrome.runtime.ManifestV2
 
       /* ------------- EMIT BROWSER POLYFILL ------------- */
 
@@ -82,11 +81,13 @@ export function browserPolyfill({
 
         const executeScriptPolyfillPath = this.getFileName(exId)
 
+        // TODO: support this in MV3
         manifest.background?.scripts?.unshift(
           executeScriptPolyfillPath,
         )
       }
 
+      // TODO: support this in MV3
       manifest.background?.scripts?.unshift(browserPolyfillPath)
       manifest.content_scripts?.forEach((script) => {
         script.js?.unshift(browserPolyfillPath)

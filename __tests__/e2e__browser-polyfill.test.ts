@@ -1,6 +1,5 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
-import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
@@ -48,12 +47,13 @@ test('bundles assets', async () => {
   expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
 })
 
+// TODO: test browser polyfill in MV3 variant
 test('includes browser polyfill in manifest.json', async () => {
   const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(manifestSource)
 
   expect(manifest.background?.scripts?.[0]).toBe('assets/browser-polyfill.js')
   expect(manifest.background?.scripts?.[1]).toBe('assets/browser-polyfill-executeScript.js')

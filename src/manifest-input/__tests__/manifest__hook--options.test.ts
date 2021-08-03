@@ -1,4 +1,4 @@
-import { writeJSON, readJSON } from 'fs-extra'
+import { readJSON, writeJSON } from 'fs-extra'
 import { RollupOptions } from 'rollup'
 import {
   backgroundJs,
@@ -20,7 +20,6 @@ import {
 } from '../../../__fixtures__/kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
-import { ChromeExtensionManifest } from '../../manifest'
 import { ManifestInputPluginCache } from '../../plugin-options'
 import { cloneObject } from '../cloneObject'
 import { explorer, manifestInput } from '../index'
@@ -193,7 +192,7 @@ test('calls deriveFiles', () => {
 })
 
 test('does nothing if cache.manifest exists', () => {
-  cache.manifest = {} as ChromeExtensionManifest
+  cache.manifest = {} as chrome.runtime.Manifest
   cache.srcDir = getExtPath('kitchen-sink')
   // bypass no scripts error
   cache.input = ['x']

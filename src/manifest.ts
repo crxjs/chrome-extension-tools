@@ -1,0 +1,29 @@
+import { Unpacked } from './helpers'
+
+export type MV2 = chrome.runtime.ManifestV2 & {
+  manifest_version: 2
+}
+
+export type MV3 = chrome.runtime.ManifestV2 & {
+  manifest_version: 3
+}
+
+export type ContentScript = Unpacked<
+  chrome.runtime.ManifestV2['content_scripts']
+>
+
+export type WebAccessibleResource = Unpacked<
+  MV3['web_accessible_resources']
+>
+
+export function isMV2(
+  m: chrome.runtime.ManifestBase,
+): m is chrome.runtime.ManifestV2 {
+  return m.manifest_version === 2
+}
+
+export function isMV3(
+  m: chrome.runtime.ManifestBase,
+): m is chrome.runtime.ManifestV3 {
+  return m.manifest_version === 3
+}

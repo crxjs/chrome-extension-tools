@@ -4,10 +4,7 @@ import diff from 'lodash.difference'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
 import * as permissions from './permissions'
-import {
-  ChromeExtensionManifest,
-  ContentScript,
-} from '../../manifest'
+import { ContentScript } from '../../manifest'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */
@@ -27,9 +24,9 @@ export const derivePermissions = (
 // /* ============================================ */
 
 // export function deriveManifest(
-//   manifest: ChromeExtensionManifest, // manifest.json
+//   manifest: chrome.runtime.ManifestV2, // manifest.json
 //   ...permissions: string[] | string[][] // will be combined with manifest.permissions
-// ): ChromeExtensionManifest {
+// ): chrome.runtime.ManifestV2 {
 //   return validateManifest({
 //     // SMELL: Is this necessary?
 //     manifest_version: 2,
@@ -43,13 +40,18 @@ export const derivePermissions = (
 /* -------------------------------------------- */
 
 export function deriveFiles(
-  manifest: ChromeExtensionManifest,
+  manifest: chrome.runtime.Manifest,
   srcDir: string,
 ) {
+  if (manifest.manifest_version === 3) {
+    // TODO: support deriving files from MV3
+    throw new Error('MV3 is unsupported')
+  }
+
   const files = get(
     manifest,
     'web_accessible_resources',
-    [] as string[],
+    [] as Required<typeof manifest>['web_accessible_resources'],
   ).reduce((r, x) => {
     if (glob.hasMagic(x)) {
       const files = glob.sync(x, { cwd: srcDir })

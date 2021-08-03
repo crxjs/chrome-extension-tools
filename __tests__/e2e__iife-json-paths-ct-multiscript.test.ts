@@ -1,8 +1,5 @@
+import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
-import { rollup, RollupOutput, OutputAsset } from 'rollup'
-import { ChromeExtensionManifest } from '../src/manifest'
-import { RollupOptions } from 'rollup'
-import { OutputChunk } from 'rollup'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
@@ -42,7 +39,7 @@ test('bundles multiple content scripts as iife', async () => {
 
   expect(output.length).toBe(3)
 
-  const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
+  const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
 
   expect(manifest.background).toBeUndefined()
   expect(manifest.content_scripts?.[0]).toMatchObject({

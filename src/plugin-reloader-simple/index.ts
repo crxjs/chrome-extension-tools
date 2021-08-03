@@ -7,11 +7,11 @@ import { updateManifest } from '../helpers'
 import {
   backgroundPageReloader,
   contentScriptReloader,
-  timestampPathPlaceholder,
-  loadMessagePlaceholder,
-  timestampFilename,
   ctScriptPathPlaceholder,
   executeScriptPlaceholder,
+  loadMessagePlaceholder,
+  timestampFilename,
+  timestampPathPlaceholder,
   unregisterServiceWorkersPlaceholder,
 } from './CONSTANTS'
 
@@ -142,23 +142,29 @@ export const simpleReloader = (
 
           /* ---------------- BACKGROUND PAGE ---------------- */
 
-          if (!manifest.background) {
-            manifest.background = {}
-          }
-
-          manifest.background.persistent = true
-
-          const { scripts: bgScripts = [] } = manifest.background
-
-          if (cache.bgScriptPath) {
-            manifest.background.scripts = [
-              cache.bgScriptPath,
-              ...bgScripts,
-            ]
+          if (manifest.manifest_version === 3) {
+            this.error('Manifest Version 3 is unsupported')
           } else {
-            this.error(
-              `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
-            )
+            if (!manifest.background) {
+              manifest.background = {}
+            }
+
+            manifest.background.persistent = true
+
+            const {
+              scripts: bgScripts = [],
+            } = manifest.background
+
+            if (cache.bgScriptPath) {
+              manifest.background.scripts = [
+                cache.bgScriptPath,
+                ...bgScripts,
+              ]
+            } else {
+              this.error(
+                `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
+              )
+            }
           }
 
           /* ---------------- CONTENT SCRIPTS ---------------- */

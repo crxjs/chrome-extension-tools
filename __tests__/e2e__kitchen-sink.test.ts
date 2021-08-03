@@ -3,7 +3,6 @@ import path from 'path'
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
 import { getScriptSrc, loadHtml } from '../src/html-inputs/cheerio'
-import { ChromeExtensionManifest } from '../src/manifest'
 import { deriveFiles } from '../src/manifest-input/manifest-parser'
 import { byFileName, getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
 
@@ -72,7 +71,7 @@ test('Includes content script imports in web_accessible_resources', async () => 
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
+  const manifest: chrome.runtime.Manifest = JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     web_accessible_resources: expect.arrayContaining(['content.js', expect.stringMatching(/imported-.+?\.js/)]),
@@ -84,7 +83,7 @@ test('Includes content_security_policy untouched', async () => {
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
+  const manifest: chrome.runtime.Manifest = JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     content_security_policy: "script-src 'self'; object-src 'self'",
@@ -96,7 +95,7 @@ test('chunks in output match chunks in manifest', async () => {
 
   const assets = output.filter(isAsset)
   const manifestJson = assets.find(byFileName('manifest.json'))!
-  const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
+  const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
 
   // Get scripts in manifest
   const { js, html } = deriveFiles(manifest, extPath)

@@ -1,6 +1,4 @@
-import { OutputChunk } from 'rollup'
-import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { ChromeExtensionManifest } from '../src/manifest'
+import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
@@ -11,6 +9,7 @@ beforeAll(async () => {
   return outputPromise
 }, 15000)
 
+// SMELL: is this really necessary?
 test('bundles multiple background scripts as iife', async () => {
   const { output } = await outputPromise
 
@@ -41,7 +40,7 @@ test('bundles multiple background scripts as iife', async () => {
 
   expect(output.length).toBe(3)
 
-  const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(manifestJson.source as string)
 
   expect(manifest.background?.scripts).toEqual(['background1.js', 'background2.js'])
   expect(manifest.content_scripts).toBeUndefined()
