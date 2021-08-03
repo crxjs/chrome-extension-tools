@@ -1,15 +1,15 @@
 import { Unpacked } from './helpers'
 
-export type MV2 = chrome.runtime.ManifestV2 & {
+export type MV2 = chrome.runtime.Manifest & {
   manifest_version: 2
 }
 
-export type MV3 = chrome.runtime.ManifestV2 & {
+export type MV3 = chrome.runtime.Manifest & {
   manifest_version: 3
 }
 
 export type ContentScript = Unpacked<
-  chrome.runtime.ManifestV2['content_scripts']
+  chrome.runtime.Manifest['content_scripts']
 >
 
 export type WebAccessibleResource = Unpacked<
