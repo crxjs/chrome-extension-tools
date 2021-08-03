@@ -16,7 +16,7 @@
     {
       "type": "npm",
       "script": "dev:lint",
-      "problemMatcher": [],
+      "problemMatcher": ["$tsc-watch"],
       "label": "npm: dev:lint",
       "detail": "npm run lint:types -- --watch",
       "presentation": {
