@@ -50,6 +50,7 @@ if (options.executeScript) {
       })
     })
 
+  // @ts-expect-error FIXME: executeScript should return Promise<any[]>
   chrome.tabs.executeScript = (...args: any[]): void => {
     ;(async () => {
       const tabId = typeof args[0] === 'number' ? args[0] : null
