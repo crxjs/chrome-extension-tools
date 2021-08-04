@@ -197,7 +197,7 @@ test('Errors if cache.ctScriptPath is undefined', async () => {
 
   expect.assertions(1)
 
-  // @ts-ignore
+  // @ts-expect-error This can return undefined in the wild
   context.getFileName.mockImplementation((id) => {
     return id !== contentScriptReloader ? id : undefined
   })

@@ -28,8 +28,8 @@ test('delays events before delay resolves', async () => {
 })
 
 test('captures explicit events', () => {
-  // @ts-ignore
+  // @ts-expect-error We known what we're doing here
   expect(chrome.runtime.onMessage.__isCapturedEvent).toBe(true)
-  // @ts-ignore
+  // @ts-expect-error We known what we're doing here
   expect(chrome.runtime.onInstalled.__isCapturedEvent).toBe(true)
 })

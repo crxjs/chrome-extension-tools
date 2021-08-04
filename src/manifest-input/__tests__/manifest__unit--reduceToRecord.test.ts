@@ -12,7 +12,7 @@ test('Throws if srcDir is null', () => {
 
 test('Throws if srcDir is undefined', () => {
   try {
-    // @ts-ignore
+    // @ts-expect-error We're testing for JS users
     reduceToRecord()
   } catch (error) {
     expect(error).toEqual(

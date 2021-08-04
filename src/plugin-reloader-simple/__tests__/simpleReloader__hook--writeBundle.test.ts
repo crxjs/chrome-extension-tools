@@ -69,7 +69,7 @@ test('Handles write errors with message prop', async () => {
     Promise.reject({ message }),
   )
 
-  // @ts-ignore
+  // @ts-expect-error We don't actually want to throw in the test
   context.error.mockImplementationOnce(() => {})
 
   await plugin.writeBundle.call(context, bundle)
@@ -92,7 +92,7 @@ test('Handles other write errors', async () => {
     Promise.reject(message),
   )
 
-  // @ts-ignore
+  // @ts-expect-error We don't actually want to throw in the test
   context.error.mockImplementationOnce(() => {})
 
   await plugin.writeBundle.call(context, bundle)

@@ -9,7 +9,6 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -78,5 +77,8 @@ module.exports = {
         checksVoidReturn: false,
       },
     ],
+    '@typescript-eslint/no-unsafe-assignment': 0,
+    '@typescript-eslint/no-floating-promises': 0,
+    '@typescript-eslint/no-extra-semi': 0,
   },
 }

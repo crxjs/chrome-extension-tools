@@ -43,7 +43,7 @@ beforeAll(async () => {
   )
 
   return outputPromise
-}, 15000)
+}, 30000)
 
 const options: RollupOptions = { input: manifestJson }
 let cache: ManifestInputPluginCache

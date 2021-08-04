@@ -25,7 +25,7 @@ export function buildCRX(
       } catch (error) {
         reject(error)
       }
-    }, 15000)
+    }, 30000)
   })
 }
 

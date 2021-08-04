@@ -5,11 +5,6 @@ module.exports = {
     '!src/simple-reloader/client/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
-  globals: {
-    'ts-jest': {
-      packageJson: 'package.json',
-    },
-  },
   moduleNameMapper: {
     'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
   },
