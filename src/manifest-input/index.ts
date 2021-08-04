@@ -355,7 +355,9 @@ export function manifestInput(
       const manifestBody = validateManifest({
         manifest_version: 2,
         name: pkg.name,
-        version: [...pkg.version.matchAll(/\d+/g)].join('.'),
+        version: [...(pkg.version?.matchAll(/\d+/g) ?? [])].join(
+          '.',
+        ),
         description: pkg.description,
         ...clonedManifest,
         permissions: combinePerms(
