@@ -2,7 +2,6 @@ import path from 'path'
 
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
-import alias from '@rollup/plugin-alias'
 import babel from '@rollup/plugin-babel'
 
 import { getExtPath, getCrxName } from '../../utils'

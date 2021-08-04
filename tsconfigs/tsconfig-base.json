@@ -20,9 +20,6 @@
     "strict": true,
     "target": "es2017",
     "rootDir": "..",
-    "resolveJsonModule": true,
-    "paths": {
-      "$schema/*": ["../schema/*"]
-    }
+    "resolveJsonModule": true
   }
 }
