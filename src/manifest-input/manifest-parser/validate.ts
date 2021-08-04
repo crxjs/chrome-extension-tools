@@ -1,6 +1,6 @@
 import Ajv from 'ajv'
 import { JsonPointer } from 'json-ptr'
-import schema from '../../../manifest.schema.json'
+import schema from '../../../schema/manifest-strict.schema.json'
 import schemaMV2 from '../../../schema/manifest-v2.schema.json'
 import schemaMV3 from '../../../schema/manifest-v3.schema.json'
 

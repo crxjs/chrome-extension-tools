@@ -8,9 +8,9 @@
     }
   },
   "then": {
-    "$ref": "./schema/manifest-v3.schema.json"
+    "$ref": "./manifest-v3.schema.json"
   },
   "else": {
-    "$ref": "./schema/manifest-v2.schema.json"
+    "$ref": "./manifest-v2.schema.json"
   }
 }
