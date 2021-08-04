@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "jsx": "react",
     "lib": [
+      "DOM",
       "es2019",
       "es2020.bigint",
       "es2020.string",
