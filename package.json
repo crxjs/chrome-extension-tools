@@ -25,8 +25,7 @@
     "prepublishOnly": "run-p build build:types",
     "dev:build": "rollup -c -w",
     "dev:lint": "npm run lint:types -- --watch",
-    "test:ci": "run-s lint test:coverage",
-    "test:coverage": "jest --runInBand --coverage",
+    "test:coverage": "jest --runInBand",
     "test": "jest"
   },
   "dependencies": {
