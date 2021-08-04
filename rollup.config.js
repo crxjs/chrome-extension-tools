@@ -4,6 +4,8 @@
 import sucrase from '@rollup/plugin-sucrase'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import json from '@rollup/plugin-json'
+import alias from '@rollup/plugin-alias'
+import hq from 'alias-hq'
 
 const { dependencies } = require('./package.json')
 
@@ -15,6 +17,7 @@ const external = Object.keys(dependencies).concat(
 )
 
 const plugins = [
+  alias(hq.get('rollup', { format: 'object' })),
   json(),
   sucrase({
     transforms: ['typescript'],

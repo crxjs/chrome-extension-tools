@@ -4,8 +4,7 @@
     "declaration": true,
     "declarationDir": "../types",
     "emitDeclarationOnly": true,
-    "noEmit": false,
-    "rootDir": "../src"
+    "noEmit": false
   },
   "include": ["../src"],
   "exclude": [

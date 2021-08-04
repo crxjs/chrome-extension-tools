@@ -1,5 +1,4 @@
 {
-  // Root project config
   "extends": "./tsconfigs/tsconfig-base.json",
   "include": [
     "src/**/*",
@@ -9,8 +8,5 @@
     "examples/**/*.ts"
   ],
   "exclude": ["src/manifest-input/browser"],
-  // "references": [
-  //   { "path": "src/manifest-input/browser" }
-  // ]
   "typeAcquisition": { "enable": true }
 }
