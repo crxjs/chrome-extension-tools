@@ -23,7 +23,8 @@
     "lint": "run-s lint:*",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "prepublishOnly": "run-p build build:types",
-    "start": "rollup -c -w",
+    "dev:build": "rollup -c -w",
+    "dev:lint": "npm run lint:types -- --watch",
     "test:ci": "run-s lint test:coverage",
     "test:coverage": "jest --runInBand --coverage",
     "test": "jest"
@@ -61,7 +62,7 @@
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^5.1.1",
     "@types/cheerio": "0.22.22",
-    "@types/chrome": "^0.0.93",
+    "@types/chrome": "^0.0.152",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
     "@types/jest": "^25.1.2",

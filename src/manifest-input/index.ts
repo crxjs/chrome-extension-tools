@@ -11,7 +11,7 @@ import {
   isJsonFilePath,
   normalizeFilename,
 } from '../helpers'
-import { ChromeExtensionManifest } from '../manifest'
+import { isMV2, isMV3 } from '../manifest'
 import {
   ManifestInputPlugin,
   ManifestInputPluginCache,
@@ -165,7 +165,7 @@ export function manifestInput(
           inputManifestPath,
         ) as {
           filepath: string
-          config: ChromeExtensionManifest
+          config: chrome.runtime.Manifest
           isEmpty?: true
         }
 
@@ -191,7 +191,7 @@ export function manifestInput(
           cache.manifest = {
             ...configResult.config,
             ...extendManifest,
-          }
+          } as chrome.runtime.ManifestV2
         } else {
           cache.manifest = configResult.config
         }
@@ -352,7 +352,9 @@ export function manifestInput(
             `cache.manifest is ${typeof cache.manifest}`,
           )
 
-        const clonedManifest = cloneObject(cache.manifest)
+        const clonedManifest: Partial<chrome.runtime.Manifest> = cloneObject(
+          cache.manifest,
+        )
 
         const manifestBody = validateManifest({
           manifest_version: 2,
@@ -366,89 +368,59 @@ export function manifestInput(
           ),
         })
 
-        const {
-          content_scripts: cts = [],
-          web_accessible_resources: war = [],
-          background: { scripts: bgs = [] } = {},
-        } = manifestBody
+        if (isMV3(manifestBody)) {
+          // FIXME: fork flow here to support both MV2 and MV3
+          throw new Error('MV3 is unsupported')
+        } else if (isMV2(manifestBody)) {
+          const {
+            background: { scripts: bgs = [] } = {},
+            content_scripts: cts = [],
+            web_accessible_resources: war = [],
+          } = manifestBody
 
-        /* ------------- SETUP CONTENT SCRIPTS ------------- */
+          /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
 
-        const contentScripts = cts.reduce(
-          (r, { js = [] }) => [...r, ...js],
-          [] as string[],
-        )
+          // Emit background script wrappers
+          if (bgs.length && wrapperScript.length) {
+            // background exists because bgs has scripts
+            manifestBody.background!.scripts = bgs
+              .map(normalizeFilename)
+              .map((scriptPath: string) => {
+                // Loader script exists because of type guard above
+                const source =
+                  // Path to module being loaded
+                  wrapperScript.replace(
+                    '%PATH%',
+                    // Fix path slashes to support Windows
+                    JSON.stringify(
+                      slash(relative('assets', scriptPath)),
+                    ),
+                  )
 
-        if (contentScriptWrapper && contentScripts.length) {
-          const memoizedEmitter = memoize(
-            (scriptPath: string) => {
-              const source = ctWrapperScript.replace(
-                '%PATH%',
-                // Fix path slashes to support Windows
-                JSON.stringify(
-                  slash(relative('assets', scriptPath)),
-                ),
-              )
+                const assetId = this.emitFile({
+                  type: 'asset',
+                  source,
+                  name: basename(scriptPath),
+                })
 
-              const assetId = this.emitFile({
-                type: 'asset',
-                source,
-                name: basename(scriptPath),
+                return this.getFileName(assetId)
               })
+              .map((p) => slash(p))
+          }
 
-              return this.getFileName(assetId)
-            },
+          /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
+
+          /* ------------- SETUP CONTENT SCRIPTS ------------- */
+
+          const contentScripts = cts.reduce(
+            (r, { js = [] }) => [...r, ...js],
+            [] as string[],
           )
 
-          // Setup content script import wrapper
-          manifestBody.content_scripts = cts.map(
-            ({ js, ...rest }) => {
-              return typeof js === 'undefined'
-                ? rest
-                : {
-                    js: js
-                      .map(normalizeFilename)
-                      .map(memoizedEmitter)
-                      .map((p) => slash(p)),
-                    ...rest,
-                  }
-            },
-          )
-
-          // make all imports & dynamic imports web_acc_res
-          const imports = Object.values(bundle)
-            .filter((x): x is OutputChunk => x.type === 'chunk')
-            .reduce(
-              (r, { isEntry, fileName }) =>
-                // Get imported filenames
-                !isEntry ? [...r, fileName] : r,
-              [] as string[],
-            )
-
-          // SMELL: web accessible resources can be used for fingerprinting extensions
-          manifestBody.web_accessible_resources = dedupe([
-            ...war,
-            // FEATURE: filter out imports for background?
-            ...imports,
-            // Need to be web accessible b/c of import
-            ...contentScripts,
-          ]).map((p) => slash(p))
-        }
-
-        /* ----------- END SETUP CONTENT SCRIPTS ----------- */
-
-        /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
-
-        // Emit background script wrappers
-        if (bgs.length && wrapperScript.length) {
-          // background exists because bgs has scripts
-          manifestBody.background!.scripts = bgs
-            .map(normalizeFilename)
-            .map((scriptPath: string) => {
-              // Loader script exists because of type guard above
-              const source =
-                // Path to module being loaded
-                wrapperScript.replace(
+          if (contentScriptWrapper && contentScripts.length) {
+            const memoizedEmitter = memoize(
+              (scriptPath: string) => {
+                const source = ctWrapperScript.replace(
                   '%PATH%',
                   // Fix path slashes to support Windows
                   JSON.stringify(
@@ -456,18 +428,55 @@ export function manifestInput(
                   ),
                 )
 
-              const assetId = this.emitFile({
-                type: 'asset',
-                source,
-                name: basename(scriptPath),
-              })
+                const assetId = this.emitFile({
+                  type: 'asset',
+                  source,
+                  name: basename(scriptPath),
+                })
 
-              return this.getFileName(assetId)
-            })
-            .map((p) => slash(p))
+                return this.getFileName(assetId)
+              },
+            )
+
+            // Setup content script import wrapper
+            manifestBody.content_scripts = cts.map(
+              ({ js, ...rest }) => {
+                return typeof js === 'undefined'
+                  ? rest
+                  : {
+                      js: js
+                        .map(normalizeFilename)
+                        .map(memoizedEmitter)
+                        .map((p) => slash(p)),
+                      ...rest,
+                    }
+              },
+            )
+
+            // make all imports & dynamic imports web_acc_res
+            const imports = Object.values(bundle)
+              .filter(
+                (x): x is OutputChunk => x.type === 'chunk',
+              )
+              .reduce(
+                (r, { isEntry, fileName }) =>
+                  // Get imported filenames
+                  !isEntry ? [...r, fileName] : r,
+                [] as string[],
+              )
+
+            // SMELL: web accessible resources can be used for fingerprinting extensions
+            manifestBody.web_accessible_resources = dedupe([
+              ...war,
+              // FEATURE: filter out imports for background?
+              ...imports,
+              // Need to be web accessible b/c of import
+              ...contentScripts,
+            ]).map((p) => slash(p))
+          }
+
+          /* ----------- END SETUP CONTENT SCRIPTS ----------- */
         }
-
-        /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
 
         /* --------- STABLE EXTENSION ID BEGIN -------- */
 

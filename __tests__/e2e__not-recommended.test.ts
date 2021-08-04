@@ -1,7 +1,5 @@
+import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
-import { rollup, RollupOutput, OutputAsset } from 'rollup'
-import { ChromeExtensionManifest } from '../src/manifest'
-import { RollupOptions } from 'rollup'
 
 const config = requireExtFile<RollupOptions>(__filename, 'rollup.config.js')
 
@@ -34,7 +32,7 @@ test('Handles CSP in manifest.json', async () => {
 
   const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
 
-  const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
+  const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
 
   expect(manifest.content_security_policy).toBe("script-src 'self'; object-src 'self'")
 })

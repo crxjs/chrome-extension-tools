@@ -1,6 +1,7 @@
 import { OutputOptions } from 'rollup'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
-import { ChromeExtensionManifest } from './manifest'
+
+export type Unpacked<T> = T extends Array<infer R> ? R : never
 
 export const not = <T>(fn: (x: T) => boolean) => (x: T) => !fn(x)
 
@@ -39,10 +40,10 @@ export const normalizeFilename = (p: string) =>
 /**
  * Update the manifest source in the output bundle
  */
-export const updateManifest = (
-  updater: (
-    manifest: ChromeExtensionManifest,
-  ) => ChromeExtensionManifest,
+export const updateManifest = <
+  T extends chrome.runtime.ManifestBase
+>(
+  updater: (manifest: T) => T,
   bundle: OutputBundle,
   handleError?: (message: string) => void,
 ): OutputBundle => {
@@ -58,7 +59,7 @@ export const updateManifest = (
 
     const manifest = JSON.parse(
       manifestAsset.source as string,
-    ) as ChromeExtensionManifest
+    ) as T
 
     const result = updater(manifest)
 

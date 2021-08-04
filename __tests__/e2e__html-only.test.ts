@@ -1,5 +1,4 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
@@ -14,7 +13,7 @@ test.skip('Handles extension only html and no scripts at all', async () => {
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest = JSON.parse(manifestSource) as ChromeExtensionManifest
+  const manifest = JSON.parse(manifestSource) as chrome.runtime.Manifest
 
   expect(manifest).toBeDefined()
   expect(manifest.content_scripts).toBeUndefined()

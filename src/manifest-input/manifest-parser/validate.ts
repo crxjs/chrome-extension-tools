@@ -1,5 +1,4 @@
 import Ajv from 'ajv'
-import { ChromeExtensionManifest } from '../../manifest'
 import jsonSchema from './json-schema-draft-04.json'
 import manifestSchema from './schema-web-ext-manifest-v2.json'
 
@@ -37,9 +36,9 @@ export const ajv = new Ajv({
 
 const validator = ajv.compile(manifestSchema)
 
-export const validateManifest = (
-  manifest: ChromeExtensionManifest,
-) => {
+export function validateManifest<
+  T extends chrome.runtime.ManifestBase
+>(manifest: T): T {
   if (validator(manifest)) {
     return manifest
   }

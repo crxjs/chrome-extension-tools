@@ -1,5 +1,4 @@
 import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
@@ -9,12 +8,13 @@ beforeAll(async () => {
   return outputPromise
 }, 15000)
 
+// TODO: test input objects with MV3
 test('Handles config with input object', async () => {
   const { output } = await outputPromise
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest = JSON.parse(manifestSource) as ChromeExtensionManifest
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(manifestSource)
 
   expect(manifest).toBeDefined()
   expect(manifest.background).toBeDefined()

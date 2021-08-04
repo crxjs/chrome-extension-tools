@@ -2,7 +2,6 @@ import { EmittedFile, OutputAsset } from 'rollup'
 import { simpleReloader, _internalCache } from '..'
 import { buildCRX } from '../../../__fixtures__/build-crx'
 import { context } from '../../../__fixtures__/plugin-context'
-import { ChromeExtensionManifest } from '../../manifest'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import {
   backgroundPageReloader,
@@ -70,11 +69,11 @@ test('updates manifest in bundle', async () => {
     isAsset: true,
   })
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
   )
 
-  expect(manifest).toMatchObject<ChromeExtensionManifest>({
+  expect(manifest).toMatchObject<chrome.runtime.ManifestV2>({
     manifest_version: 2,
     name: expect.any(String),
     version: expect.any(String),
@@ -90,7 +89,7 @@ test('set manifest description', async () => {
 
   await plugin.generateBundle.call(context, {}, bundle, false)
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
   )
 
@@ -105,7 +104,7 @@ test('add reloader script to background', async () => {
 
   await plugin.generateBundle.call(context, {}, bundle, false)
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
   )
 
@@ -122,7 +121,7 @@ test('set background script to persistent', async () => {
 
   await plugin.generateBundle.call(context, {}, bundle, false)
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
   )
 
@@ -137,7 +136,7 @@ test('add reloader script to content scripts', async () => {
 
   await plugin.generateBundle.call(context, {}, bundle, false)
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
   )
 
@@ -178,7 +177,7 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
 
   expect.assertions(1)
 
-  // @ts-ignore
+  // @ts-expect-error This can return undefined in the wild
   context.getFileName.mockImplementation((id) => {
     return id !== backgroundPageReloader ? id : undefined
   })

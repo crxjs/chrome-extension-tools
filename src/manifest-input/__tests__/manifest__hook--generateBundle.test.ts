@@ -1,7 +1,7 @@
-import { OutputBundle } from 'rollup'
 import {
   EmittedAsset,
   EmittedFile,
+  OutputBundle,
   rollup,
   RollupOptions,
   RollupOutput,
@@ -11,7 +11,6 @@ import { manifestJson } from '../../../__fixtures__/kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import { requireExtFile } from '../../../__fixtures__/utils'
-import { ChromeExtensionManifest } from '../../manifest'
 import {
   ManifestInputPlugin,
   ManifestInputPluginCache,
@@ -83,7 +82,7 @@ test('derives permissions from chunks', async () => {
     ([{ fileName }]) => fileName === 'manifest.json',
   )!
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.Manifest = JSON.parse(
     (manifestFile as EmittedAsset).source as string,
   )
 
@@ -159,7 +158,7 @@ test('includes content script imports in web_accessible_resources', async () => 
     ([{ fileName }]) => fileName === 'manifest.json',
   )!
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.Manifest = JSON.parse(
     (manifestFile as EmittedAsset).source as string,
   )
 
@@ -221,7 +220,7 @@ test('sets public key', async () => {
     ([{ fileName }]) => fileName === 'manifest.json',
   )!
 
-  const manifest: ChromeExtensionManifest = JSON.parse(
+  const manifest: chrome.runtime.Manifest = JSON.parse(
     (manifestFile as EmittedAsset).source as string,
   )
 

@@ -1,7 +1,6 @@
 import path from 'path'
 import { rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
-import { ChromeExtensionManifest } from '../src/manifest'
 import { deriveFiles } from '../src/manifest-input/manifest-parser'
 import { byFileName, getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
 
@@ -46,7 +45,7 @@ test('chunks in output match chunks in manifest', async () => {
 
   const assets = output.filter(isAsset)
   const manifestJson = assets.find(byFileName('manifest.json'))!
-  const manifest = JSON.parse(manifestJson.source as string) as ChromeExtensionManifest
+  const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
 
   // Get scripts in manifest
   const { js } = deriveFiles(manifest, extPath)

@@ -1,6 +1,5 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'
-import { ChromeExtensionManifest } from '../src/manifest'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
@@ -16,7 +15,7 @@ test('bundles chunks', async () => {
   // Chunks
   const chunks = output.filter(isChunk)
   expect(chunks.length).toBe(10)
-  
+
   // 9 chunks + one shared import (imported.js)
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
@@ -66,7 +65,7 @@ test('Includes content script imports in web_accessible_resources', async () => 
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
+  const manifest: chrome.runtime.Manifest = JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     web_accessible_resources: expect.arrayContaining(['content.js', expect.stringMatching(/imported-.+?\.js/)]),
@@ -78,7 +77,7 @@ test('Includes content_security_policy untouched', async () => {
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: ChromeExtensionManifest = JSON.parse(manifestSource)
+  const manifest: chrome.runtime.Manifest = JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     content_security_policy: "script-src 'self'; object-src 'self'",

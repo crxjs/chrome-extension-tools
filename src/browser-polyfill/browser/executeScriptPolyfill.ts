@@ -13,6 +13,7 @@ const withP = (...args: [any, any?]): Promise<any[]> =>
     })
   })
 
+// @ts-expect-error FIXME: executeScript should return Promise<any[]>
 chrome.tabs.executeScript = (...args: any): void => {
   ;(async () => {
     const baseArgs = (typeof args[0] === 'number' ? [args[0]] : []) as any[]
