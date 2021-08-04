@@ -1,3 +1,5 @@
+const hq = require('alias-hq')
+
 module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -6,6 +8,7 @@ module.exports = {
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   moduleNameMapper: {
+    ...hq.get('jest'),
     'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
   },
   modulePathIgnorePatterns: ['~~.+', '__fixtures__', 'client'],
