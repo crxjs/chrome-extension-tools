@@ -24,10 +24,7 @@ import {
   deriveFiles,
   derivePermissions,
 } from './manifest-parser/index'
-import {
-  validateManifest,
-  ValidationErrorsArray,
-} from './manifest-parser/validate'
+import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 
 export function dedupe<T>(x: T[]): T[] {
@@ -344,83 +341,51 @@ export function manifestInput(
         )
       }
 
-      try {
-        // Clone cache.manifest
-        if (!cache.manifest)
-          // This is a programming error, so it should throw
-          throw new TypeError(
-            `cache.manifest is ${typeof cache.manifest}`,
-          )
-
-        const clonedManifest: Partial<chrome.runtime.Manifest> = cloneObject(
-          cache.manifest,
+      // Clone cache.manifest
+      if (!cache.manifest)
+        // This is a programming error, so it should throw
+        throw new TypeError(
+          `cache.manifest is ${typeof cache.manifest}`,
         )
 
-        const manifestBody = validateManifest({
-          manifest_version: 2,
-          name: pkg.name,
-          version: pkg.version,
-          description: pkg.description,
-          ...clonedManifest,
-          permissions: combinePerms(
-            permissions,
-            clonedManifest.permissions || [],
-          ),
-        })
+      const clonedManifest: Partial<chrome.runtime.Manifest> = cloneObject(
+        cache.manifest,
+      )
 
-        if (isMV3(manifestBody)) {
-          // FIXME: fork flow here to support both MV2 and MV3
-          throw new Error('MV3 is unsupported')
-        } else if (isMV2(manifestBody)) {
-          const {
-            background: { scripts: bgs = [] } = {},
-            content_scripts: cts = [],
-            web_accessible_resources: war = [],
-          } = manifestBody
+      const manifestBody = validateManifest({
+        manifest_version: 2,
+        name: pkg.name,
+        version: [...pkg.version.matchAll(/\d+/g)].join('.'),
+        description: pkg.description,
+        ...clonedManifest,
+        permissions: combinePerms(
+          permissions,
+          clonedManifest.permissions || [],
+        ),
+      })
 
-          /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
+      if (isMV3(manifestBody)) {
+        // FIXME: fork flow here to support both MV2 and MV3
+        throw new Error('MV3 is unsupported')
+      } else if (isMV2(manifestBody)) {
+        const {
+          background: { scripts: bgs = [] } = {},
+          content_scripts: cts = [],
+          web_accessible_resources: war = [],
+        } = manifestBody
 
-          // Emit background script wrappers
-          if (bgs.length && wrapperScript.length) {
-            // background exists because bgs has scripts
-            manifestBody.background!.scripts = bgs
-              .map(normalizeFilename)
-              .map((scriptPath: string) => {
-                // Loader script exists because of type guard above
-                const source =
-                  // Path to module being loaded
-                  wrapperScript.replace(
-                    '%PATH%',
-                    // Fix path slashes to support Windows
-                    JSON.stringify(
-                      slash(relative('assets', scriptPath)),
-                    ),
-                  )
+        /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
 
-                const assetId = this.emitFile({
-                  type: 'asset',
-                  source,
-                  name: basename(scriptPath),
-                })
-
-                return this.getFileName(assetId)
-              })
-              .map((p) => slash(p))
-          }
-
-          /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
-
-          /* ------------- SETUP CONTENT SCRIPTS ------------- */
-
-          const contentScripts = cts.reduce(
-            (r, { js = [] }) => [...r, ...js],
-            [] as string[],
-          )
-
-          if (contentScriptWrapper && contentScripts.length) {
-            const memoizedEmitter = memoize(
-              (scriptPath: string) => {
-                const source = ctWrapperScript.replace(
+        // Emit background script wrappers
+        if (bgs.length && wrapperScript.length) {
+          // background exists because bgs has scripts
+          manifestBody.background!.scripts = bgs
+            .map(normalizeFilename)
+            .map((scriptPath: string) => {
+              // Loader script exists because of type guard above
+              const source =
+                // Path to module being loaded
+                wrapperScript.replace(
                   '%PATH%',
                   // Fix path slashes to support Windows
                   JSON.stringify(
@@ -428,94 +393,105 @@ export function manifestInput(
                   ),
                 )
 
-                const assetId = this.emitFile({
-                  type: 'asset',
-                  source,
-                  name: basename(scriptPath),
-                })
+              const assetId = this.emitFile({
+                type: 'asset',
+                source,
+                name: basename(scriptPath),
+              })
 
-                return this.getFileName(assetId)
-              },
-            )
-
-            // Setup content script import wrapper
-            manifestBody.content_scripts = cts.map(
-              ({ js, ...rest }) => {
-                return typeof js === 'undefined'
-                  ? rest
-                  : {
-                      js: js
-                        .map(normalizeFilename)
-                        .map(memoizedEmitter)
-                        .map((p) => slash(p)),
-                      ...rest,
-                    }
-              },
-            )
-
-            // make all imports & dynamic imports web_acc_res
-            const imports = Object.values(bundle)
-              .filter(
-                (x): x is OutputChunk => x.type === 'chunk',
-              )
-              .reduce(
-                (r, { isEntry, fileName }) =>
-                  // Get imported filenames
-                  !isEntry ? [...r, fileName] : r,
-                [] as string[],
-              )
-
-            // SMELL: web accessible resources can be used for fingerprinting extensions
-            manifestBody.web_accessible_resources = dedupe([
-              ...war,
-              // FEATURE: filter out imports for background?
-              ...imports,
-              // Need to be web accessible b/c of import
-              ...contentScripts,
-            ]).map((p) => slash(p))
-          }
-
-          /* ----------- END SETUP CONTENT SCRIPTS ----------- */
+              return this.getFileName(assetId)
+            })
+            .map((p) => slash(p))
         }
 
-        /* --------- STABLE EXTENSION ID BEGIN -------- */
+        /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
 
-        if (publicKey) {
-          manifestBody.key = publicKey
-        }
+        /* ------------- SETUP CONTENT SCRIPTS ------------- */
 
-        /* ---------- STABLE EXTENSION ID END --------- */
-
-        /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
-
-        const manifestJson = JSON.stringify(
-          manifestBody,
-          null,
-          2,
+        const contentScripts = cts.reduce(
+          (r, { js = [] }) => [...r, ...js],
+          [] as string[],
         )
-          // SMELL: is this necessary?
-          .replace(/\.[jt]sx?"/g, '.js"')
 
-        // Emit manifest.json
-        this.emitFile({
-          type: 'asset',
-          fileName: manifestName,
-          source: manifestJson,
-        })
-      } catch (error) {
-        // Catch here because we need the validated result in scope
+        if (contentScriptWrapper && contentScripts.length) {
+          const memoizedEmitter = memoize(
+            (scriptPath: string) => {
+              const source = ctWrapperScript.replace(
+                '%PATH%',
+                // Fix path slashes to support Windows
+                JSON.stringify(
+                  slash(relative('assets', scriptPath)),
+                ),
+              )
 
-        if (error.name !== 'ValidationError') throw error
-        const errors = error.errors as ValidationErrorsArray
-        if (errors) {
-          errors.forEach((err) => {
-            // FIXME: make a better validation error message
-            // https://github.com/atlassian/better-ajv-errors
-            this.warn(JSON.stringify(err, undefined, 2))
-          })
+              const assetId = this.emitFile({
+                type: 'asset',
+                source,
+                name: basename(scriptPath),
+              })
+
+              return this.getFileName(assetId)
+            },
+          )
+
+          // Setup content script import wrapper
+          manifestBody.content_scripts = cts.map(
+            ({ js, ...rest }) => {
+              return typeof js === 'undefined'
+                ? rest
+                : {
+                    js: js
+                      .map(normalizeFilename)
+                      .map(memoizedEmitter)
+                      .map((p) => slash(p)),
+                    ...rest,
+                  }
+            },
+          )
+
+          // make all imports & dynamic imports web_acc_res
+          const imports = Object.values(bundle)
+            .filter((x): x is OutputChunk => x.type === 'chunk')
+            .reduce(
+              (r, { isEntry, fileName }) =>
+                // Get imported filenames
+                !isEntry ? [...r, fileName] : r,
+              [] as string[],
+            )
+
+          // SMELL: web accessible resources can be used for fingerprinting extensions
+          manifestBody.web_accessible_resources = dedupe([
+            ...war,
+            // FEATURE: filter out imports for background?
+            ...imports,
+            // Need to be web accessible b/c of import
+            ...contentScripts,
+          ]).map((p) => slash(p))
         }
-        this.error(error.message)
+
+        /* ----------- END SETUP CONTENT SCRIPTS ----------- */
       }
+
+      /* --------- STABLE EXTENSION ID BEGIN -------- */
+
+      if (publicKey) {
+        manifestBody.key = publicKey
+      }
+
+      /* ---------- STABLE EXTENSION ID END --------- */
+
+      /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
+
+      const manifestJson = JSON.stringify(manifestBody, null, 2)
+        // SMELL: is this necessary?
+        .replace(/\.[jt]sx?"/g, '.js"')
+
+      // Emit manifest.json
+      this.emitFile({
+        type: 'asset',
+        fileName: manifestName,
+        source: manifestJson,
+      })
 
       /* ------------ OUTPUT MANIFEST.JSON END ----------- */
     },
