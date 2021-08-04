@@ -14,11 +14,6 @@ const external = Object.keys(dependencies).concat(
   'path',
 )
 
-// Was used for typescript plugin
-// const {
-//   compilerOptions,
-// } = require('./tsconfigs/tsconfig-base.json')
-
 const plugins = [
   json(),
   sucrase({
