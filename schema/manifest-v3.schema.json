@@ -772,7 +772,8 @@
               "minLength": 32,
               "pattern": "^[a-z]+$",
               "type": "string"
-            }
+            },
+            "type": "array"
           },
           "use_dynamic_url": {
             "default": true,
