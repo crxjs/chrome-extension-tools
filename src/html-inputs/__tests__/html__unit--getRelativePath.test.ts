@@ -1,5 +1,5 @@
 import { getRelativePath } from '../cheerio'
-import { optionsHtml } from '../../../__fixtures__/kitchen-sink-paths'
+import { optionsHtml } from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { getExtPath } from '../../../__fixtures__/utils'
 
 test('returns correct path', () => {

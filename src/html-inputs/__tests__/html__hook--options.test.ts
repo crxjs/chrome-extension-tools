@@ -18,7 +18,7 @@ import {
   optionsTsx,
   popupHtml,
   popupJs,
-} from '../../../__fixtures__/kitchen-sink-paths'
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import {
   getExtPath,

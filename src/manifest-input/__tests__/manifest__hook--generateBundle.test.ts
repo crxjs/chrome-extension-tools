@@ -7,7 +7,7 @@ import {
   RollupOutput,
 } from 'rollup'
 import { manifestInput } from '..'
-import { manifestJson } from '../../../__fixtures__/kitchen-sink-paths'
+import { manifestJson } from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import { requireExtFile } from '../../../__fixtures__/utils'

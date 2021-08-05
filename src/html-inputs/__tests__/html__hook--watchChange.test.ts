@@ -16,7 +16,7 @@ import {
   popupJs,
   faviconPng,
   faviconIco,
-} from '../../../__fixtures__/kitchen-sink-paths'
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { loadHtml } from '../cheerio'
 import { HtmlInputsPluginCache } from '../../plugin-options'
 

@@ -17,7 +17,7 @@ import {
   optionsJpg,
   popupHtml,
   srcDir,
-} from '../../../__fixtures__/kitchen-sink-paths'
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ManifestInputPluginCache } from '../../plugin-options'
