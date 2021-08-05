@@ -3,5 +3,6 @@
     "page": "options.html",
     "open_in_tab": false
   },
-  "options_page": "options.html"
+  "options_page": "options.html",
+  "manifest_version": 2
 }

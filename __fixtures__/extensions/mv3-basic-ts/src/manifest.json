@@ -6,5 +6,8 @@
       "matches": ["https://*/*", "http://*/*"]
     }
   ],
-  "browser_action": { "default_popup": "pages/popup/index.html" }
+  "browser_action": {
+    "default_popup": "pages/popup/index.html"
+  },
+  "manifest_version": 2
 }

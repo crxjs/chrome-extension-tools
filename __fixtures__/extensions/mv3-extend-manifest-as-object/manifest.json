@@ -8,7 +8,5 @@
     "48": "images/icon-main-48.png",
     "128": "images/icon-main-128.png"
   },
-  "background": {
-    "scripts": ["background.js"]
-  }
+  "background": { "scripts": ["background.js"] }
 }

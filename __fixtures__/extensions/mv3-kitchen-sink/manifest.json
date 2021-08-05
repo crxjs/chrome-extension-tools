@@ -9,9 +9,7 @@
     "128": "images/icon-main-128.png"
   },
   "devtools_page": "devtools/devtools.html",
-  "background": {
-    "scripts": ["background.js"]
-  },
+  "background": { "scripts": ["background.js"] },
   "permissions": ["webRequest", "webRequestBlocking"],
   "content_scripts": [
     {
@@ -26,9 +24,7 @@
   ],
   "options_page": "options.html",
   "browser_action": {
-    "default_icon": {
-      "16": "images/icon-main-16.png"
-    },
+    "default_icon": { "16": "images/icon-main-16.png" },
     "default_popup": "popup/popup.html"
   },
   "web_accessible_resources": [
