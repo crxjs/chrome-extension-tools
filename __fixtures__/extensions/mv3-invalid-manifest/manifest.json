@@ -1,0 +1,7 @@
+{
+  "name": "invalid-manifest",
+  "description": "invalid-manifest chrome extension",
+  "manifest_version": "B",
+  "versionNumber": "0.1.0",
+  "background": { "scripts": ["background.js"] }
+}

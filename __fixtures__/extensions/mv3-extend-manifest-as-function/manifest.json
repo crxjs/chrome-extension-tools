@@ -1,0 +1,14 @@
+{
+  "name": "options.extendManifest as function",
+  "description": "test example for options.extendManifest as function",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "icons": {
+    "16": "images/icon-main-16.png",
+    "48": "images/icon-main-48.png",
+    "128": "images/icon-main-128.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

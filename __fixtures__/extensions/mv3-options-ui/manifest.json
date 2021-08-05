@@ -1,0 +1,58 @@
+{
+  "name": "options-ui",
+  "description": "basic chrome extension with options ui",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "icons": {
+    "16": "images/icon-main-16.png",
+    "48": "images/icon-main-48.png",
+    "128": "images/icon-main-128.png"
+  },
+  "devtools_page": "devtools/devtools.html",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking"
+  ],
+  "content_scripts": [
+    {
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "https://www.google.com/*"
+      ]
+    },
+    {
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "matches": [
+        "https://www.yahoo.com/*"
+      ]
+    }
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon-main-16.png"
+    },
+    "default_popup": "popup/popup.html"
+  },
+  "web_accessible_resources": [
+    "options.jpg",
+    "fonts/*.ttf",
+    "fonts/*.otf"
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'"
+}
