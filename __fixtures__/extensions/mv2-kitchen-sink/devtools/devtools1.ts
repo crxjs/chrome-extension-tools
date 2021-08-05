@@ -1,2 +1,2 @@
-const message = 'devtools.ts'
+export const message = 'devtools.ts'
 console.log(message)
