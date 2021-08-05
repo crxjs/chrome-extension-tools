@@ -1,19 +1,20 @@
+import { readJSONSync } from 'fs-extra'
 import { deriveFiles } from '..'
 import {
   backgroundJs,
-  contentJs,
-  manifestJson,
-  srcDir,
-  popupHtml,
-  optionsHtml,
-  devtoolsHtml,
   contentCss,
-  icon16,
+  contentJs,
+  devtoolsHtml,
   icon128,
+  icon16,
   icon48,
+  manifestJson,
+  optionsHtml,
+  popupHtml,
+  srcDir,
 } from '../../../../__fixtures__/kitchen-sink-paths'
 
-const manifest = require(manifestJson)
+const manifest = readJSONSync(manifestJson)
 
 test('gets correct scripts', () => {
   const result = deriveFiles(manifest, srcDir)
