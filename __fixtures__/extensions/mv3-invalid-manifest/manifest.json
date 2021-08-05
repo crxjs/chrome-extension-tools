@@ -3,7 +3,7 @@
     "service_worker": "service_worker.js"
   },
   "description": "invalid-manifest chrome extension",
-  "manifest_version": 3,
+  "manifest_version": "b",
   "name": "invalid-manifest",
   "versionNumber": "0.1.0"
 }

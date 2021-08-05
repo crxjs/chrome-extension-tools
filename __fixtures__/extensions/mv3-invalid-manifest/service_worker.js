@@ -1,3 +1,3 @@
-console.log('background.js')
+console.log('service_worker.js')
 
 chrome.storage.local.clear()

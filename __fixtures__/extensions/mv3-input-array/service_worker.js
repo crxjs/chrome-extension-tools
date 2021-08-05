@@ -1,4 +1,4 @@
-console.log('background.js')
+console.log('service_worker.js')
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.tabs.create({

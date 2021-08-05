@@ -3,7 +3,7 @@ import path from 'path'
 
 console.log(x)
 
-console.log('background.js')
+console.log('service_worker.js')
 
 chrome.storage.local.clear()
 
