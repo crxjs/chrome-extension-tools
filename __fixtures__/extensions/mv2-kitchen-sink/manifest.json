@@ -10,18 +10,33 @@
   },
   "devtools_page": "devtools/devtools.html",
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+      "background.js"
+    ]
   },
-  "permissions": ["webRequest", "webRequestBlocking"],
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking"
+  ],
   "content_scripts": [
     {
-      "js": ["content.js"],
-      "matches": ["https://www.google.com/*"]
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "https://www.google.com/*"
+      ]
     },
     {
-      "js": ["content.js"],
-      "css": ["content.css"],
-      "matches": ["https://www.yahoo.com/*"]
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "matches": [
+        "https://www.yahoo.com/*"
+      ]
     }
   ],
   "options_page": "options.html",
