@@ -11,7 +11,7 @@ import {
   isJsonFilePath,
   normalizeFilename,
 } from '../helpers'
-import { isMV2, isMV3 } from '../manifest'
+import { isMV2, isMV3 } from '../manifest-types'
 import {
   ManifestInputPlugin,
   ManifestInputPluginCache,

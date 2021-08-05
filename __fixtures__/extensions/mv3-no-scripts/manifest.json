@@ -1,0 +1,11 @@
+{
+  "action": {
+    "default_icon": {
+      "16": "images/icon-main-16.png"
+    }
+  },
+  "description": "no-scripts chrome extension",
+  "manifest_version": 3,
+  "name": "no-scripts",
+  "version": "0.1.0"
+}

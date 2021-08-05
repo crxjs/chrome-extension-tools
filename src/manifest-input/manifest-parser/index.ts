@@ -4,7 +4,7 @@ import diff from 'lodash.difference'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
 import * as permissions from './permissions'
-import { ContentScript } from '../../manifest'
+import { ContentScript } from '../../manifest-types'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */

@@ -1,0 +1,9 @@
+{
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "description": "input-object chrome extension",
+  "manifest_version": 3,
+  "name": "input-object",
+  "version": "0.1.0"
+}

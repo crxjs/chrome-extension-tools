@@ -1,4 +1,7 @@
-import { kitchenSinkRoot, optionsHtml } from '../../../__fixtures__/kitchen-sink-paths'
+import {
+  kitchenSinkRoot,
+  optionsHtml,
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { loadHtml } from '../cheerio'
 
 const fs = require('fs-extra')

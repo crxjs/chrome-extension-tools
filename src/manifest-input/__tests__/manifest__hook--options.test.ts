@@ -17,7 +17,7 @@ import {
   optionsJpg,
   popupHtml,
   srcDir,
-} from '../../../__fixtures__/kitchen-sink-paths'
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ManifestInputPluginCache } from '../../plugin-options'
@@ -52,15 +52,17 @@ const options: RollupOptions = {
 
 const clonedOptions = cloneObject(options)
 
+const crxName = 'mv2-kitchen-sink'
 const expectedInputResult = {
-  background: getExtPath('kitchen-sink/background.js'),
-  content: getExtPath('kitchen-sink/content.js'),
+  background: getExtPath(crxName, 'background.js'),
+  content: getExtPath(crxName, 'content.js'),
   'devtools/devtools': getExtPath(
-    'kitchen-sink/devtools/devtools.html',
+    crxName,
+    'devtools/devtools.html',
   ),
-  index: getExtPath('kitchen-sink/index.html'),
-  options: getExtPath('kitchen-sink/options.html'),
-  'popup/popup': getExtPath('kitchen-sink/popup/popup.html'),
+  index: getExtPath(crxName, 'index.html'),
+  options: getExtPath(crxName, 'options.html'),
+  'popup/popup': getExtPath(crxName, 'popup/popup.html'),
 }
 
 beforeEach(() => {
@@ -193,7 +195,7 @@ test('calls deriveFiles', () => {
 
 test('does nothing if cache.manifest exists', () => {
   cache.manifest = {} as chrome.runtime.Manifest
-  cache.srcDir = getExtPath('kitchen-sink')
+  cache.srcDir = getExtPath('mv2-kitchen-sink')
   // bypass no scripts error
   cache.input = ['x']
 
@@ -229,12 +231,15 @@ test('should throw if cosmiconfig cannot load manifest file', () => {
 test('should throw if manifest file is empty', () => {
   const call = () => {
     plugin.options.call(context, {
-      input: getExtPath('empty/manifest.json'),
+      input: getExtPath('mv2-empty', 'manifest.json'),
     })
   }
 
   const error = new Error(
-    `${getExtPath('empty/manifest.json')} is an empty file.`,
+    `${getExtPath(
+      'mv2-empty',
+      'manifest.json',
+    )} is an empty file.`,
   )
 
   expect(call).toThrow(error)
@@ -262,7 +267,7 @@ test('should throw if options_ui and options_page both exist', () => {
   const call = () => {
     plugin.options.call(context, {
       input: getExtPath(
-        'both-option-types-manifest/manifest.json',
+        'mv2-both-option-types-manifest/manifest.json',
       ),
     })
   }

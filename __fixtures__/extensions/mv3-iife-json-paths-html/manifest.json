@@ -1,0 +1,16 @@
+{
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["content/content.js"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ],
+  "description": "iife json paths example both",
+  "manifest_version": 3,
+  "name": "iife-json-paths-both",
+  "options_page": "options/options.html",
+  "version": "1.0.0"
+}

@@ -7,7 +7,7 @@ import {
   RollupOutput,
 } from 'rollup'
 import { manifestInput } from '..'
-import { manifestJson } from '../../../__fixtures__/kitchen-sink-paths'
+import { manifestJson } from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import { requireExtFile } from '../../../__fixtures__/utils'
@@ -26,10 +26,10 @@ jest.spyOn(combine, 'combinePerms')
 let bundlePromise: Promise<OutputBundle>
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  const config = requireExtFile<RollupOptions>(
-    'kitchen-sink',
+  const config = requireExtFile(
+    'mv2-kitchen-sink',
     'rollup.config.js',
-  )
+  ) as RollupOptions
 
   config.plugins!.push({
     name: 'save-bundle',
@@ -334,9 +334,9 @@ test('emits correct paths on Windows', async () => {
     source: JSON.stringify(
       {
         manifest_version: 2,
-        name: 'kitchen-sink',
+        name: 'mv2-kitchen-sink',
         version: '1.0.0',
-        description: 'kitchen-sink chrome extension',
+        description: 'mv2-kitchen-sink chrome extension',
         icons: {
           '16': 'images/icon-main-16.png',
           '48': 'images/icon-main-48.png',
@@ -376,7 +376,7 @@ test('emits correct paths on Windows', async () => {
           'options.jpg',
           'fonts/*.ttf',
           'fonts/*.otf',
-          'imported-c14c3b91.js',
+          'imported-280b0b77.js',
           'content.js',
         ],
         content_security_policy:

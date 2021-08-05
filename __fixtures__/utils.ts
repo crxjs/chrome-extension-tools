@@ -1,3 +1,4 @@
+import { readJsonSync } from 'fs-extra'
 import { resolve, join, sep } from 'path'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 
@@ -21,13 +22,30 @@ export const getCrxName = (filepath: string): string => {
   throw new Error(`This is not a CRX fixture: ${filepath}`)
 }
 
-export const getExtPath = (path: string): string =>
-  resolve(__dirname, 'extensions', path)
+export const getExtPath = (...args: string[]): string =>
+  resolve(__dirname, 'extensions', ...args)
 
-export const requireExtFile = <T>(
+export const getExtPathFromTestName = (
+  testname: string,
+  crxPath: string,
+) => {
+  const crxName = getTestName(testname)
+  const relPath = join(crxName, crxPath)
+  return getExtPath(relPath)
+}
+
+export const loadCrxJson = (
+  filename: string,
+  crxPath: string,
+) => {
+  const fullPath = getExtPathFromTestName(filename, crxPath)
+  return readJsonSync(fullPath)
+}
+
+export const requireExtFile = (
   currentFilename: string,
   targetFilename: string,
-): T => {
+) => {
   const testName = getTestName(currentFilename)
 
   return require(getExtPath(join(testName, targetFilename)))
