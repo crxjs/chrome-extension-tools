@@ -10,6 +10,6 @@ test('scrapes correct asset scripts', () => {
   const result = getJsAssets(html$)
 
   expect(result).toEqual([
-    '__fixtures__/extensions/kitchen-sink/asset.js',
+    '__fixtures__/extensions/mv2-kitchen-sink/asset.js',
   ])
 })

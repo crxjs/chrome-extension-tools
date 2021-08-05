@@ -11,6 +11,10 @@ export function isChunk(
   return x && x.type === 'chunk'
 }
 
+export function isErrorLike(x: unknown): x is Error {
+  return typeof x === 'object' && x !== null && 'message' in x
+}
+
 export function isOutputOptions(x: any): x is OutputOptions {
   return (
     typeof x === 'object' &&

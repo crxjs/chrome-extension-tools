@@ -1,56 +1,72 @@
 import { getExtPath } from './utils'
 
-export const srcDir = getExtPath('kitchen-sink')
-export const manifestJson = getExtPath('kitchen-sink/manifest.json')
-export const indexHtml = getExtPath('kitchen-sink/index.html')
+export const crxName = 'mv2-kitchen-sink'
+export const srcDir = getExtPath(crxName)
+export const manifestJson = getExtPath(crxName, 'manifest.json')
+export const indexHtml = getExtPath(crxName, 'index.html')
 
 // Icons
-export const icon16 = getExtPath('kitchen-sink/images/icon-main-16.png')
-export const icon48 = getExtPath('kitchen-sink/images/icon-main-48.png')
+export const icon16 = getExtPath(
+  crxName,
+  'images/icon-main-16.png',
+)
+export const icon48 = getExtPath(
+  crxName,
+  'images/icon-main-48.png',
+)
 export const icon128 = getExtPath(
-  'kitchen-sink/images/icon-main-128.png',
+  crxName,
+  'images/icon-main-128.png',
 )
 export const faviconIco = getExtPath(
-  'kitchen-sink/images/favicon.ico',
+  crxName,
+  'images/favicon.ico',
 )
 export const faviconPng = getExtPath(
-  'kitchen-sink/images/favicon.png',
+  crxName,
+  'images/favicon.png',
 )
 
 // Fonts
 export const notoSansBlack = getExtPath(
-  'kitchen-sink/fonts/NotoSans-Black.ttf',
+  crxName,
+  'fonts/NotoSans-Black.ttf',
 )
 export const missaaliOtf = getExtPath(
-  'kitchen-sink/fonts/Missaali-Regular.otf',
+  crxName,
+  'fonts/Missaali-Regular.otf',
 )
 export const notoSansLight = getExtPath(
-  'kitchen-sink/fonts/NotoSans-Light.ttf',
+  crxName,
+  'fonts/NotoSans-Light.ttf',
 )
 
 // Options assets
-export const kitchenSinkRoot = getExtPath('kitchen-sink')
-export const optionsHtml = getExtPath('kitchen-sink/options.html')
-export const optionsCss = getExtPath('kitchen-sink/options.css')
-export const optionsPng = getExtPath('kitchen-sink/options.png')
-export const optionsJpg = getExtPath('kitchen-sink/options.jpg')
-export const assetJs = getExtPath('kitchen-sink/asset.js')
+export const kitchenSinkRoot = getExtPath(crxName)
+export const optionsHtml = getExtPath(crxName, 'options.html')
+export const optionsCss = getExtPath(crxName, 'options.css')
+export const optionsPng = getExtPath(crxName, 'options.png')
+export const optionsJpg = getExtPath(crxName, 'options.jpg')
+export const assetJs = getExtPath(crxName, 'asset.js')
 
 // Options chunks
-export const optionsJs = getExtPath('kitchen-sink/options1.js')
-export const optionsJsx = getExtPath('kitchen-sink/options2.jsx')
-export const optionsTs = getExtPath('kitchen-sink/options3.ts')
-export const optionsTsx = getExtPath('kitchen-sink/options4.tsx')
+export const optionsJs = getExtPath(crxName, 'options1.js')
+export const optionsJsx = getExtPath(crxName, 'options2.jsx')
+export const optionsTs = getExtPath(crxName, 'options3.ts')
+export const optionsTsx = getExtPath(crxName, 'options4.tsx')
 
 // External script files
-export const backgroundJs = getExtPath('kitchen-sink/background.js')
-export const contentJs = getExtPath('kitchen-sink/content.js')
+export const backgroundJs = getExtPath(crxName, 'background.js')
+export const contentJs = getExtPath(crxName, 'content.js')
 
 // Popup subfolder
-export const popupHtml = getExtPath('kitchen-sink/popup/popup.html')
-export const popupJs = getExtPath('kitchen-sink/popup/popup.js')
+export const popupHtml = getExtPath(crxName, 'popup/popup.html')
+export const popupJs = getExtPath(crxName, 'popup/popup.js')
 
-export const contentCss = getExtPath('kitchen-sink/content.css')
+export const contentCss = getExtPath(crxName, 'content.css')
 
 // Devtools subfolder
-export const devtoolsHtml = getExtPath('kitchen-sink/devtools/devtools.html')
+export const devtoolsHtml = getExtPath(
+  crxName,
+  'devtools/devtools.html',
+)

@@ -11,8 +11,9 @@ _plugins.manifest.options = jest.fn(_plugins.manifest.options)
 _plugins.html.options = jest.fn(_plugins.html.options)
 
 // Rollup config
+const crxName = 'mv2-kitchen-sink'
 const config: RollupOptions = {
-  input: getExtPath('kitchen-sink/manifest.json'),
+  input: getExtPath(crxName, 'manifest.json'),
 }
 
 // Call options hook once
@@ -21,8 +22,8 @@ const result = options.call(context, config)
 test('matches expected output', () => {
   expect(result).toMatchObject({
     input: {
-      background: getExtPath('kitchen-sink/background.js'),
-      content: getExtPath('kitchen-sink/content.js'),
+      background: getExtPath(crxName, 'background.js'),
+      content: getExtPath(crxName, 'content.js'),
     },
   })
 })

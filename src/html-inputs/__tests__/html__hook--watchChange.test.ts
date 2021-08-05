@@ -22,7 +22,7 @@ import { HtmlInputsPluginCache } from '../../plugin-options'
 
 const srcDir = join(
   process.cwd(),
-  '__fixtures__/extensions/kitchen-sink',
+  '__fixtures__/extensions/mv2-kitchen-sink',
 )
 const cache: HtmlInputsPluginCache = {
   css: [],

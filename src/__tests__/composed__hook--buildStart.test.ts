@@ -5,7 +5,7 @@ import { context } from '../../__fixtures__/plugin-context'
 import { getExtPath } from '../../__fixtures__/utils'
 
 const config: RollupOptions = {
-  input: getExtPath('kitchen-sink/manifest.json'),
+  input: getExtPath('mv2-kitchen-sink/manifest.json'),
 }
 
 const { _plugins, ...plugin } = chromeExtension()
