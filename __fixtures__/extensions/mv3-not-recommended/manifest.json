@@ -1,14 +1,18 @@
 {
-  "name": "not-recommended",
-  "description": "not-recommended chrome extension",
-  "manifest_version": 2,
-  "version": "0.1.0",
-  "background": { "page": "background.html" },
+  "background": {
+    "page": "background.html"
+  },
   "content_scripts": [
     {
       "css": ["content.css"],
       "matches": ["https://www.google.com/*"]
     }
   ],
-  "content_security_policy": "script-src 'self'; object-src 'self'"
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "description": "not-recommended chrome extension",
+  "manifest_version": 3,
+  "name": "not-recommended",
+  "version": "0.1.0"
 }

@@ -1,12 +1,12 @@
 {
+  "action": {
+    "default_popup": "pages/popup/index.html"
+  },
   "content_scripts": [
     {
       "js": ["content/index.tsx"],
       "matches": ["https://*/*", "http://*/*"]
     }
   ],
-  "browser_action": {
-    "default_popup": "pages/popup/index.html"
-  },
-  "manifest_version": 2
+  "manifest_version": 3
 }

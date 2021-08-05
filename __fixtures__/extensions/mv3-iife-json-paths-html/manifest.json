@@ -1,14 +1,16 @@
 {
-  "name": "iife-json-paths-both",
-  "description": "iife json paths example both",
-  "manifest_version": 2,
-  "version": "1.0.0",
-  "background": { "scripts": ["background/background.js"] },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
   "content_scripts": [
     {
       "js": ["content/content.js"],
       "matches": ["https://www.google.com/*"]
     }
   ],
-  "options_page": "options/options.html"
+  "description": "iife json paths example both",
+  "manifest_version": 3,
+  "name": "iife-json-paths-both",
+  "options_page": "options/options.html",
+  "version": "1.0.0"
 }

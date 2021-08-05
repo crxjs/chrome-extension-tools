@@ -1,8 +1,8 @@
 {
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": false
-  },
+  "manifest_version": 3,
   "options_page": "options.html",
-  "manifest_version": 2
+  "options_ui": {
+    "open_in_tab": false,
+    "page": "options.html"
+  }
 }

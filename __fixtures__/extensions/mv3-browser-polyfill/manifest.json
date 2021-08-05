@@ -1,28 +1,32 @@
 {
-  "name": "browser polyfill",
-  "description": "chrome extension with browser polyfill",
-  "manifest_version": 2,
-  "version": "1.0.0",
-  "icons": {
-    "16": "images/icon-main-16.png",
-    "48": "images/icon-main-48.png",
-    "128": "images/icon-main-128.png"
+  "action": {
+    "default_icon": {
+      "16": "images/icon-main-16.png"
+    },
+    "default_popup": "popup/popup.html"
   },
-  "background": { "scripts": ["scripts/background.js"] },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
   "content_scripts": [
     {
       "js": ["scripts/content.js"],
       "matches": ["https://www.google.com/*"]
     },
     {
-      "js": ["scripts/content.js"],
       "css": ["scripts/content.css"],
+      "js": ["scripts/content.js"],
       "matches": ["https://www.yahoo.com/*"]
     }
   ],
+  "description": "chrome extension with browser polyfill",
+  "icons": {
+    "16": "images/icon-main-16.png",
+    "48": "images/icon-main-48.png",
+    "128": "images/icon-main-128.png"
+  },
+  "manifest_version": 3,
+  "name": "browser polyfill",
   "options_page": "options/options.html",
-  "browser_action": {
-    "default_icon": { "16": "images/icon-main-16.png" },
-    "default_popup": "popup/popup.html"
-  }
+  "version": "1.0.0"
 }
