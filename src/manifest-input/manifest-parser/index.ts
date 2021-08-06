@@ -39,12 +39,17 @@ export function deriveFilesMV3(
   manifest: chrome.runtime.ManifestV3,
   srcDir: string,
 ) {
+  const locales = isString(manifest.default_locale)
+    ? ['_locales/**/messages.json']
+    : []
+
   const files = get(
     manifest,
     'web_accessible_resources',
     [] as Required<typeof manifest>['web_accessible_resources'],
   )
     .flatMap(({ resources }) => resources)
+    .concat(locales)
     .reduce((r, x) => {
       if (glob.hasMagic(x)) {
         const files = glob.sync(x, { cwd: srcDir })
@@ -117,18 +122,24 @@ export function deriveFilesMV2(
   manifest: chrome.runtime.ManifestV2,
   srcDir: string,
 ) {
+  const locales = isString(manifest.default_locale)
+    ? ['_locales/**/messages.json']
+    : []
+
   const files = get(
     manifest,
     'web_accessible_resources',
     [] as Required<typeof manifest>['web_accessible_resources'],
-  ).reduce((r, x) => {
-    if (glob.hasMagic(x)) {
-      const files = glob.sync(x, { cwd: srcDir })
-      return [...r, ...files.map((f) => f.replace(srcDir, ''))]
-    } else {
-      return [...r, x]
-    }
-  }, [] as string[])
+  )
+    .concat(locales)
+    .reduce((r, x) => {
+      if (glob.hasMagic(x)) {
+        const files = glob.sync(x, { cwd: srcDir })
+        return [...r, ...files.map((f) => f.replace(srcDir, ''))]
+      } else {
+        return [...r, x]
+      }
+    }, [] as string[])
 
   const js = [
     ...files.filter((f) => /\.[jt]sx?$/.test(f)),

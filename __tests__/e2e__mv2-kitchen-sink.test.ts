@@ -43,7 +43,7 @@ test('bundles assets', async () => {
 
   // Assets
   const assets = output.filter(isAsset)
-  expect(assets.length).toBe(19)
+  expect(assets.length).toBe(21)
 
   // 17 assets + 2 wrapper scripts
   expect(output.find(byFileName('asset.js'))).toBeDefined()
@@ -64,6 +64,9 @@ test('bundles assets', async () => {
   expect(output.find(byFileName('fonts/NotoSans-Light.ttf'))).toBeDefined()
   expect(output.find(byFileName('fonts/NotoSans-Black.ttf'))).toBeDefined()
   expect(output.find(byFileName('fonts/Missaali-Regular.otf'))).toBeDefined()
+
+  expect(output.find(byFileName('_locales/en/messages.json'))).toBeDefined()
+  expect(output.find(byFileName('_locales/es/messages.json'))).toBeDefined()
 })
 
 test('Includes content script imports in web_accessible_resources', async () => {
