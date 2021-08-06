@@ -12,7 +12,6 @@ import {
   HtmlInputsPlugin,
 } from '../plugin-options'
 import {
-  formatHtml,
   getCssHrefs,
   getImgSrcs,
   getJsAssets,
@@ -157,7 +156,7 @@ export default function htmlInputs(
       })
 
       cache.html$.map(($) => {
-        const source = formatHtml($)
+        const source = $.html()
         const fileName = relative(srcDir, $.filePath)
 
         this.emitFile({

@@ -1,13 +1,14 @@
+import cheerio from 'cheerio'
 import { readFile } from 'fs-extra'
 import { join } from 'path'
-import prettier from 'prettier'
 import { InputOptions } from 'rollup'
+import { context } from '../../../__fixtures__/minimal-plugin-context'
 import {
   assetJs,
   backgroundJs,
-  kitchenSinkRoot,
   faviconIco,
   faviconPng,
+  kitchenSinkRoot,
   optionsCss,
   optionsHtml,
   optionsJpg,
@@ -19,7 +20,6 @@ import {
   popupHtml,
   popupJs,
 } from '../../../__fixtures__/mv2-kitchen-sink-paths'
-import { context } from '../../../__fixtures__/minimal-plugin-context'
 import {
   getExtPath,
   getRelative,
@@ -27,7 +27,7 @@ import {
 import { HtmlInputsPluginCache } from '../../plugin-options'
 import htmlInputs from '../index'
 
-const cheerio = require('../cheerio')
+const cheerioUtils = require('../cheerio')
 
 const srcDir = join(
   process.cwd(),
@@ -44,12 +44,6 @@ const cache: HtmlInputsPluginCache = {
 }
 
 const plugin = htmlInputs({ srcDir }, cache)
-
-let prettierOptions: prettier.Options
-beforeAll(async () => {
-  prettierOptions =
-    (await prettier.resolveConfig(process.cwd())) || {}
-})
 
 let options: InputOptions
 beforeEach(() => {
@@ -88,8 +82,10 @@ test('returns options.input as input record', () => {
 })
 
 test('calls loadHtml', () => {
-  const spy = jest.spyOn(cheerio, 'loadHtml')
-  const closureMock = jest.fn(cheerio.loadHtml(kitchenSinkRoot))
+  const spy = jest.spyOn(cheerioUtils, 'loadHtml')
+  const closureMock = jest.fn(
+    cheerioUtils.loadHtml(kitchenSinkRoot),
+  )
   spy.mockImplementation(() => closureMock)
 
   jest.clearAllMocks()
@@ -195,12 +191,8 @@ test('modifies html source', async () => {
   plugin.options.call(context, options)
 
   cache.html$.forEach(($, i) => {
-    const html = $.html()
-    const result = prettier.format(html, {
-      parser: 'html',
-      ...prettierOptions,
-    })
-    const expected = files[i]
+    const result = $.html()
+    const expected = cheerio.load(files[i]).html()
 
     expect(result).toBe(expected)
   })
