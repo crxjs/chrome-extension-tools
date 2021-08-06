@@ -70,3 +70,16 @@ export const devtoolsHtml = getExtPath(
   crxName,
   'devtools/devtools.html',
 )
+
+// Locales subfolder
+export const localesEnJson = getExtPath(
+  crxName,
+  '_locales/en/messages.json',
+)
+export const localesEsJson = getExtPath(
+  crxName,
+  '_locales/en/messages.json',
+)
+
+// Double underscore bug
+export const _textFile = getExtPath(crxName, '_war/test.txt')

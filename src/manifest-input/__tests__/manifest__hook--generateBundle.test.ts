@@ -187,17 +187,31 @@ test('emits dynamic import wrappers once per file', async () => {
 
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
-    fileName: 'manifest.json',
-    source: expect.any(String),
-  })
-  expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
-    type: 'asset',
     name: 'background.js',
     source: expect.any(String),
   })
   expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
     type: 'asset',
     name: 'content.js',
+    source: expect.any(String),
+  })
+})
+
+test('emits manifest via this.emitFile', async () => {
+  const bundle = cloneObject(await bundlePromise)
+
+  await plugin.generateBundle.call(
+    context,
+    options,
+    bundle,
+    false,
+  )
+
+  expect(context.emitFile).toBeCalledTimes(3)
+
+  expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
+    type: 'asset',
+    fileName: 'manifest.json',
     source: expect.any(String),
   })
 })
@@ -238,23 +252,6 @@ test('validates manifest', async () => {
   )
 
   expect(validate.validateManifest).toBeCalled()
-})
-
-test('emits manifest via this.emitFile', async () => {
-  const bundle = cloneObject(await bundlePromise)
-
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
-
-  expect(context.emitFile).toBeCalledWith<[EmittedFile]>({
-    type: 'asset',
-    fileName: 'manifest.json',
-    source: expect.any(String),
-  })
 })
 
 test('Sets cache.assetChanged to false if cache.permsHash is truthy', async () => {
@@ -342,6 +339,7 @@ test('emits correct paths on Windows', async () => {
           '48': 'images/icon-main-48.png',
           '128': 'images/icon-main-128.png',
         },
+        default_locale: 'en',
         devtools_page: 'devtools/devtools.html',
         background: {
           scripts: ['sample/file-path-background.js.js'],
@@ -386,4 +384,19 @@ test('emits correct paths on Windows', async () => {
       2,
     ),
   })
+})
+
+test('locales are included in bundle', async () => {
+  const bundle = cloneObject(await bundlePromise)
+
+  expect(bundle).toMatchObject({})
+
+  await plugin.generateBundle.call(
+    context,
+    options,
+    bundle,
+    false,
+  )
+
+  expect(bundle).toMatchObject({})
 })

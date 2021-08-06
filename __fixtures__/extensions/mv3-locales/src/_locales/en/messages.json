@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "MV3 with everything",
+    "description": "Chrome extension name"
+  },
+  "extDescription": {
+    "message": "MV3 Chrome Extension with all the options.",
+    "description": "Chrome extension description"
+  }
+}

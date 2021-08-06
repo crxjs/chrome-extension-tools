@@ -8,6 +8,8 @@ import {
   icon128,
   icon16,
   icon48,
+  localesEnJson,
+  localesEsJson,
   manifestJson,
   optionsHtml,
   popupHtml,
@@ -49,6 +51,13 @@ test('gets correct action img', () => {
   expect(result.img).toContain(icon16)
   expect(result.img).toContain(icon48)
   expect(result.img).toContain(icon128)
+})
+
+test('gets correct locales folder', () => {
+  const result = deriveFiles(manifest, srcDir)
+
+  expect(result.others).toContain(localesEnJson)
+  expect(result.others).toContain(localesEsJson)
 })
 
 test('does not emit duplicates', () => {

@@ -11,6 +11,8 @@ import {
   missaaliOtf,
   notoSansLight,
   notoSansBlack,
+  localesEnJson,
+  localesEsJson,
 } from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
@@ -49,7 +51,7 @@ jest.spyOn(fs, 'readFile')
 test('calls this.addWatchFile for manifest and assets', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(context.addWatchFile).toBeCalledTimes(9)
+  expect(context.addWatchFile).toBeCalledTimes(11)
   expect(context.addWatchFile).toBeCalledWith(manifestJson)
   expect(context.addWatchFile).toBeCalledWith(optionsJpg)
   expect(context.addWatchFile).toBeCalledWith(icon16)
@@ -59,12 +61,15 @@ test('calls this.addWatchFile for manifest and assets', async () => {
   expect(context.addWatchFile).toBeCalledWith(missaaliOtf)
   expect(context.addWatchFile).toBeCalledWith(notoSansBlack)
   expect(context.addWatchFile).toBeCalledWith(notoSansLight)
+  expect(context.addWatchFile).toBeCalledWith(notoSansLight)
+  expect(context.addWatchFile).toBeCalledWith(localesEnJson)
+  expect(context.addWatchFile).toBeCalledWith(localesEsJson)
 })
 
 test('calls readFile for assets', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(fs.readFile).toBeCalledTimes(8)
+  expect(fs.readFile).toBeCalledTimes(10)
   expect(fs.readFile).toBeCalledWith(optionsJpg)
   expect(fs.readFile).toBeCalledWith(icon16)
   expect(fs.readFile).toBeCalledWith(icon48)
@@ -73,6 +78,8 @@ test('calls readFile for assets', async () => {
   expect(fs.readFile).toBeCalledWith(missaaliOtf)
   expect(fs.readFile).toBeCalledWith(notoSansBlack)
   expect(fs.readFile).toBeCalledWith(notoSansLight)
+  expect(fs.readFile).toBeCalledWith(localesEnJson)
+  expect(fs.readFile).toBeCalledWith(localesEsJson)
 })
 
 test('readFile is memoized', async () => {
@@ -98,7 +105,7 @@ test('readFile only re-runs for changed files', async () => {
 test('emits each asset asset once', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(context.emitFile).toBeCalledTimes(8)
+  expect(context.emitFile).toBeCalledTimes(10)
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
     source: expect.any(Buffer),
@@ -140,6 +147,20 @@ test('emits each asset asset once', async () => {
     type: 'asset',
     source: expect.any(Buffer),
     fileName: notoSansBlack
+      .replace(srcDir, '')
+      .replace(/^\//, ''),
+  })
+  expect(context.emitFile).toBeCalledWith({
+    type: 'asset',
+    source: expect.any(Buffer),
+    fileName: localesEnJson
+      .replace(srcDir, '')
+      .replace(/^\//, ''),
+  })
+  expect(context.emitFile).toBeCalledWith({
+    type: 'asset',
+    source: expect.any(Buffer),
+    fileName: localesEsJson
       .replace(srcDir, '')
       .replace(/^\//, ''),
   })
