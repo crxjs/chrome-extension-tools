@@ -22,6 +22,7 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
+  "default_locale": "en",
   "description": "mv2-kitchen-sink chrome extension",
   "devtools_page": "devtools/devtools.html",
   "icons": {
@@ -30,7 +31,7 @@
     "128": "images/icon-main-128.png"
   },
   "manifest_version": 3,
-  "name": "mv2-kitchen-sink",
+  "name": "__MSG_extName__",
   "options_page": "options.html",
   "permissions": ["webRequest", "webRequestBlocking"],
   "version": "1.0.0",

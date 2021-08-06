@@ -8,6 +8,7 @@
     "48": "images/icon-main-48.png",
     "128": "images/icon-main-128.png"
   },
+  "default_locale": "en",
   "devtools_page": "devtools/devtools.html",
   "background": {
     "scripts": [
