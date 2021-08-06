@@ -1,3 +1,4 @@
+import { basename } from 'path'
 import { OutputAsset, OutputChunk, Plugin } from 'rollup'
 
 interface ManifestAsset extends OutputAsset {
@@ -17,14 +18,20 @@ export const validateNames = (): ValidateNamesPlugin => ({
       (x): x is OutputChunk => x.type === 'chunk',
     )
 
-    // Files cannot start with "_" in Chrome Extensions
-    // Loop through each file and check for "_" in filename
+    // Files cannot start with "_" in Chrome Extensions, but folders CAN start with "_"
+    // Rollup may output a helper file that starts with "_commonjsHelpers"
+    // Loop through each file and check for "_commonjsHelpers" in filename
     Object.keys(bundle)
-      .filter((fileName) => fileName.startsWith('_'))
+      .filter((fileName) =>
+        basename(fileName).startsWith('_commonjsHelpers'),
+      )
       .forEach((fileName) => {
         // Only replace first instance
         const regex = new RegExp(fileName)
-        const fixed = fileName.slice(1)
+        const [base, ...rest] = fileName.split('/').reverse()
+        const fixed = [base.slice(1), ...rest]
+          .reverse()
+          .join('/')
 
         // Fix manifest
         const manifest = bundle['manifest.json'] as ManifestAsset
