@@ -1,7 +1,6 @@
 import cheerio from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
-import prettier from 'prettier'
 
 import { isString } from '../helpers'
 import { HtmlInputsOptions } from '../plugin-options'
@@ -13,9 +12,6 @@ export type HtmlFilePathData = {
 
 /** cheerio.Root objects with a file path */
 export type CheerioFile = cheerio.Root & HtmlFilePathData
-
-export const formatHtml = ($: CheerioFile) =>
-  prettier.format($.html(), { parser: 'html' })
 
 export const loadHtml = (rootPath: string) => (
   filePath: string,

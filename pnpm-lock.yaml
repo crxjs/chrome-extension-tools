@@ -75,7 +75,6 @@ dependencies:
   lodash.flatten: 4.4.0
   lodash.get: 4.4.2
   mem: 6.1.1
-  prettier: 1.19.1
   rollup: 1.32.1
   slash: 3.0.0
   webextension-polyfill: 0.6.0
@@ -116,6 +115,7 @@ devDependencies:
   jest-html-reporters: 1.2.1
   jest-in-case: 1.0.2
   npm-run-all: 4.1.5
+  prettier: 1.19.1
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   read-pkg-up: 7.0.1
@@ -5357,7 +5357,7 @@ packages:
     resolution: {integrity: sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==}
     engines: {node: '>=4'}
     hasBin: true
-    dev: false
+    dev: true
 
   /pretty-format/24.9.0:
     resolution: {integrity: sha512-00ZMZUiHaJrNfk33guavqgvfJS30sLYf0f8+Srklv0AMPodGGHcoHgksZ3OThYnIvOd+8yMCn0YiEOogjlgsnA==}
