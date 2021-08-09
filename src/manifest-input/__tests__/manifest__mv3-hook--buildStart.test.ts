@@ -21,6 +21,24 @@ import {
   ManifestInputPlugin,
 } from '../../plugin-options'
 
+const assets = [
+  // options image
+  optionsJpg,
+  // icons
+  icon16,
+  icon48,
+  icon128,
+  // content script css
+  contentCss,
+  // web accessible resources
+  missaaliOtf,
+  notoSansLight,
+  notoSansBlack,
+  // locales
+  localesEsJson,
+  localesEnJson,
+]
+
 const options: RollupOptions = {
   input: manifestJson,
 }
@@ -51,38 +69,26 @@ jest.spyOn(fs, 'readFile')
 test('calls this.addWatchFile for manifest and assets', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(context.addWatchFile).toBeCalledTimes(11)
   expect(context.addWatchFile).toBeCalledWith(manifestJson)
-  expect(context.addWatchFile).toBeCalledWith(optionsJpg)
-  expect(context.addWatchFile).toBeCalledWith(icon16)
-  expect(context.addWatchFile).toBeCalledWith(icon48)
-  expect(context.addWatchFile).toBeCalledWith(icon128)
-  expect(context.addWatchFile).toBeCalledWith(contentCss)
-  expect(context.addWatchFile).toBeCalledWith(missaaliOtf)
-  expect(context.addWatchFile).toBeCalledWith(notoSansBlack)
-  expect(context.addWatchFile).toBeCalledWith(notoSansLight)
-  expect(context.addWatchFile).toBeCalledWith(notoSansLight)
-  expect(context.addWatchFile).toBeCalledWith(localesEnJson)
-  expect(context.addWatchFile).toBeCalledWith(localesEsJson)
+
+  assets.forEach((asset) => {
+    expect(context.addWatchFile).toBeCalledWith(asset)
+  })
+
+  expect(context.addWatchFile).toBeCalledTimes(11)
 })
 
 test('calls readFile for assets', async () => {
   await plugin.buildStart.call(context, options)
 
+  assets.forEach((asset) => {
+    expect(fs.readFile).toBeCalledWith(asset)
+  })
+
   expect(fs.readFile).toBeCalledTimes(10)
-  expect(fs.readFile).toBeCalledWith(optionsJpg)
-  expect(fs.readFile).toBeCalledWith(icon16)
-  expect(fs.readFile).toBeCalledWith(icon48)
-  expect(fs.readFile).toBeCalledWith(icon128)
-  expect(fs.readFile).toBeCalledWith(contentCss)
-  expect(fs.readFile).toBeCalledWith(missaaliOtf)
-  expect(fs.readFile).toBeCalledWith(notoSansBlack)
-  expect(fs.readFile).toBeCalledWith(notoSansLight)
-  expect(fs.readFile).toBeCalledWith(localesEnJson)
-  expect(fs.readFile).toBeCalledWith(localesEsJson)
 })
 
-test('readFile is memoized', async () => {
+test('readFile is memoized so duplicate assets are read once', async () => {
   await plugin.buildStart.call(context, options)
   fs.readFile.mockClear()
 
@@ -105,63 +111,27 @@ test('readFile only re-runs for changed files', async () => {
 test('emits each asset asset once', async () => {
   await plugin.buildStart.call(context, options)
 
-  expect(context.emitFile).toBeCalledTimes(10)
+  // Emits the manifest as a string
   expect(context.emitFile).toBeCalledWith({
     type: 'asset',
-    source: expect.any(Buffer),
-    fileName: optionsJpg.replace(srcDir, '').replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: icon16.replace(srcDir, '').replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: icon48.replace(srcDir, '').replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: icon128.replace(srcDir, '').replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: contentCss.replace(srcDir, '').replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: missaaliOtf.replace(srcDir, '').replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: notoSansLight
+    source: expect.any(String),
+    fileName: manifestJson
       .replace(srcDir, '')
       .replace(/^\//, ''),
   })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: notoSansBlack
-      .replace(srcDir, '')
-      .replace(/^\//, ''),
+
+  // Directly copies all other assets
+  assets.forEach((asset) => {
+    expect(context.emitFile).toBeCalledWith({
+      type: 'asset',
+      source: expect.any(Buffer),
+      fileName: asset.replace(srcDir, '').replace(/^\//, ''),
+    })
   })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: localesEnJson
-      .replace(srcDir, '')
-      .replace(/^\//, ''),
-  })
-  expect(context.emitFile).toBeCalledWith({
-    type: 'asset',
-    source: expect.any(Buffer),
-    fileName: localesEsJson
-      .replace(srcDir, '')
-      .replace(/^\//, ''),
-  })
+
+  expect(context.emitFile).toBeCalledTimes(11)
 })
+
+test.todo('emits dynamic import wrappers for content scripts')
+test.todo('adds chunks to web_accessible_resources')
+test.todo('emits correct paths on Windows')

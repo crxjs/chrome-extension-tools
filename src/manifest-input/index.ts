@@ -288,6 +288,19 @@ export function manifestInput(
       if (isMV2(cache.manifest)) return
 
       /* --------------- EMIT MV3 MANIFEST --------------- */
+
+      const manifestBody = cloneObject(cache.manifest!)
+      const manifestJson = JSON.stringify(manifestBody).replace(
+        /\.[jt]sx?"/g,
+        '.js"',
+      )
+
+      // Emit manifest.json
+      this.emitFile({
+        type: 'asset',
+        fileName: manifestName,
+        source: manifestJson,
+      })
     },
 
     resolveId(source) {
