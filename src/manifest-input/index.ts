@@ -40,8 +40,8 @@ const name = 'manifest-input'
 
 // We use a stub if the manifest has no scripts
 //   eg, a CSS only Chrome Extension
-export const stubChunkName =
-  'stub__empty-chrome-extension-manifest'
+export const stubChunkNameForCssOnlyCrx =
+  'stub__css-only-chrome-extension-manifest'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -237,7 +237,9 @@ export function manifestInput(
 
       // Use a stub if no js scripts
       if (Object.keys(finalInput).length === 0) {
-        finalInput[stubChunkName] = stubChunkName
+        finalInput[
+          stubChunkNameForCssOnlyCrx
+        ] = stubChunkNameForCssOnlyCrx
       }
 
       return { ...options, input: finalInput }
@@ -277,7 +279,7 @@ export function manifestInput(
     },
 
     resolveId(source) {
-      if (source === stubChunkName) {
+      if (source === stubChunkNameForCssOnlyCrx) {
         return source
       }
 
@@ -285,8 +287,10 @@ export function manifestInput(
     },
 
     load(id) {
-      if (id === stubChunkName) {
-        return { code: `console.log(${stubChunkName})` }
+      if (id === stubChunkNameForCssOnlyCrx) {
+        return {
+          code: `console.log(${stubChunkNameForCssOnlyCrx})`,
+        }
       }
 
       return null
@@ -310,7 +314,7 @@ export function manifestInput(
     generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
-      delete bundle[stubChunkName + '.js']
+      delete bundle[stubChunkNameForCssOnlyCrx + '.js']
 
       // We don't support completely empty bundles
       if (Object.keys(bundle).length === 0) {

@@ -1,5 +1,5 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { stubChunkName } from '../src/manifest-input'
+import { stubChunkNameForCssOnlyCrx } from '../src/manifest-input'
 import { byFileName, requireExtFile } from '../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
@@ -12,7 +12,7 @@ beforeAll(async () => {
 test('Handles extension with no scripts at all', async () => {
   const { output } = await outputPromise
 
-  const stubChunk = output.find(byFileName(stubChunkName))
+  const stubChunk = output.find(byFileName(stubChunkNameForCssOnlyCrx))
   expect(stubChunk).toBeUndefined()
 
   const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
