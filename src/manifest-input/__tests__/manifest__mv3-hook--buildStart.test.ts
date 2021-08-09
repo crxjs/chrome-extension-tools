@@ -13,7 +13,7 @@ import {
   notoSansBlack,
   localesEnJson,
   localesEsJson,
-} from '../../../__fixtures__/mv2-kitchen-sink-paths'
+} from '../../../__fixtures__/mv3-kitchen-sink-paths'
 import { context as minContext } from '../../../__fixtures__/minimal-plugin-context'
 import { context } from '../../../__fixtures__/plugin-context'
 import {

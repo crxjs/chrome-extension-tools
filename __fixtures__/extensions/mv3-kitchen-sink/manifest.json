@@ -23,7 +23,7 @@
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
   "default_locale": "en",
-  "description": "mv2-kitchen-sink chrome extension",
+  "description": "mv3-kitchen-sink chrome extension",
   "devtools_page": "devtools/devtools.html",
   "icons": {
     "16": "images/icon-main-16.png",
