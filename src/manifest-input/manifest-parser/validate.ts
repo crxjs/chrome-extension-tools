@@ -20,7 +20,8 @@ const validator = ajv.compile(schema)
 
 const setupPointer = (target: Record<string, unknown>) => (
   pointer: string,
-): string => JsonPointer.create(pointer).get(target) as string
+): string | Record<string, unknown> =>
+  JsonPointer.create(pointer).get(target) as string
 
 const getSchemaDataMV2 = setupPointer(schemaMV2)
 const getSchemaDataMV3 = setupPointer(schemaMV3)
@@ -56,10 +57,13 @@ export function validateManifest<
             .slice(1, -1)
             .concat('description')
             .join('/')}`
+          const context =
+            e.instancePath.length > 0
+              ? `"${getValue(e.instancePath)}"`
+              : 'Manifest'
+          const desc = getDesc(schemaPath) ?? e.message
 
-          return `- "${getValue(e.instancePath)}" ${getDesc(
-            schemaPath,
-          ) ?? e.message}`
+          return `- ${context} ${desc}`
         }) ?? []),
     ].join('\n'),
   )
