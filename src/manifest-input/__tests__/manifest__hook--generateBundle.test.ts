@@ -297,7 +297,7 @@ test('Throws if cache.manifest is falsey', async () => {
 
   const bundle = cloneObject(await bundlePromise)
 
-  const errorMessage = 'cache.manifest is undefined'
+  const errorMessage = 'manifest is undefined'
 
   try {
     await plugin.generateBundle.call(

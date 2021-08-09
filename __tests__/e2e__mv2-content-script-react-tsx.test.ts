@@ -30,12 +30,12 @@ test('bundles assets', async () => {
 
   // Assets
   const assets = output.filter(isAsset)
-  expect(assets.length).toBe(3)
-  // 1 dynamic import wrapper, an html file, and the manifest
   const manifestJson = assets.find(byFileName('manifest.json'))
-  expect(manifestJson).toBeDefined()
 
+  // 1 dynamic import wrapper, an html file, and the manifest
+  expect(manifestJson).toBeDefined()
   expect(assets.find(byFileName('pages/popup/index.html'))).toBeDefined()
+  expect(assets.length).toBe(3)
 })
 
 test('chunks in output match chunks in manifest', async () => {
