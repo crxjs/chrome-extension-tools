@@ -241,19 +241,6 @@ test('sets public key', async () => {
   expect(manifest.key).toBe(publicKey)
 })
 
-test('validates manifest', async () => {
-  const bundle = cloneObject(await bundlePromise)
-
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
-
-  expect(validate.validateManifest).toBeCalled()
-})
-
 test('Sets cache.assetChanged to false if cache.permsHash is truthy', async () => {
   cache.assetChanged = true
   cache.permsHash = JSON.stringify('asdk')

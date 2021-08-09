@@ -26,6 +26,9 @@ import { explorer, manifestInput } from '../index'
 
 jest.spyOn(explorer, 'load')
 
+const validate = require('../manifest-parser/validate')
+jest.spyOn(validate, 'validateManifest')
+
 const manifestParser = require('../manifest-parser/index')
 jest.spyOn(manifestParser, 'deriveFiles')
 
@@ -191,6 +194,12 @@ test('calls deriveFiles', () => {
     cache.manifest,
     cache.srcDir,
   )
+})
+
+test('validates manifest', async () => {
+  plugin.options.call(context, options)
+
+  expect(validate.validateManifest).toBeCalled()
 })
 
 test('does nothing if cache.manifest exists', () => {

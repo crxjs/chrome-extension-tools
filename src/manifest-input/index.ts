@@ -182,17 +182,29 @@ export function manifestInput(
 
         manifestPath = configResult.filepath
 
+        let extendedManifest: Partial<chrome.runtime.Manifest>
         if (typeof extendManifest === 'function') {
-          cache.manifest = extendManifest(configResult.config)
+          extendedManifest = extendManifest(configResult.config)
         } else if (typeof extendManifest === 'object') {
-          cache.manifest = {
+          extendedManifest = {
             ...configResult.config,
             ...extendManifest,
           } as chrome.runtime.Manifest
         } else {
-          cache.manifest = configResult.config
+          extendedManifest = configResult.config
         }
 
+        cache.manifest = validateManifest({
+          // MV2 is default
+          manifest_version: 2,
+          name: pkg.name,
+          // version must be all digits with up to three dots
+          version: [
+            ...(pkg.version?.matchAll(/\d+/g) ?? []),
+          ].join('.'),
+          description: pkg.description,
+          ...extendedManifest,
+        } as chrome.runtime.Manifest)
         cache.srcDir = path.dirname(manifestPath)
 
         // If the manifest is the source of truth for inputs
@@ -366,21 +378,15 @@ export function manifestInput(
 
       const clonedManifest = cloneObject(
         cache.manifest,
-      ) as Partial<chrome.runtime.Manifest>
+      ) as chrome.runtime.ManifestV2
 
-      const manifestBody = validateManifest({
-        manifest_version: 2,
-        name: pkg.name,
-        version: [...(pkg.version?.matchAll(/\d+/g) ?? [])].join(
-          '.',
-        ),
-        description: pkg.description,
+      const manifestBody = {
         ...clonedManifest,
         permissions: combinePerms(
           permissions,
           clonedManifest.permissions || [],
         ),
-      }) as chrome.runtime.ManifestV2
+      }
 
       const {
         background: { scripts: bgs = [] } = {},
@@ -493,9 +499,11 @@ export function manifestInput(
 
       /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
 
-      const manifestJson = JSON.stringify(manifestBody, null, 2)
-        // SMELL: is this necessary?
-        .replace(/\.[jt]sx?"/g, '.js"')
+      const manifestJson = JSON.stringify(
+        manifestBody,
+        null,
+        2,
+      ).replace(/\.[jt]sx?"/g, '.js"')
 
       // Emit manifest.json
       this.emitFile({
