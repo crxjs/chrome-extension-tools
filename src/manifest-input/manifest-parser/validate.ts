@@ -57,13 +57,15 @@ export function validateManifest<
             .slice(1, -1)
             .concat('description')
             .join('/')}`
-          const context =
-            e.instancePath.length > 0
-              ? `"${getValue(e.instancePath)}"`
-              : 'Manifest'
           const desc = getDesc(schemaPath) ?? e.message
 
-          return `- ${context} ${desc}`
+          if (e.instancePath.length === 0) {
+            return `- Manifest ${desc}`
+          }
+
+          return `- ${JSON.stringify(
+            getValue(e.instancePath),
+          )} at "${e.instancePath}" ${desc}`
         }) ?? []),
     ].join('\n'),
   )
