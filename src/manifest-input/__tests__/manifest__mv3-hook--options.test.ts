@@ -30,7 +30,7 @@ beforeEach(() => {
   delete cache.manifest
 })
 
-describe('MV3 background service worker', () => {
+describe('background service worker', () => {
   test('coerces background type to module', () => {
     plugin.options.call(context, {
       input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
@@ -41,7 +41,7 @@ describe('MV3 background service worker', () => {
     expect(result.background!.type).toBe('module')
   })
 
-  test('does not create one if none', () => {
+  test('does not create background if none', () => {
     plugin.options.call(context, {
       input: getExtPath(
         'mv3-content-script-only',
@@ -134,7 +134,77 @@ describe('content scripts and web_accessible_resource (WAR)', () => {
 })
 
 describe('multiple Rollup OutputOptions', () => {
-  test.todo('throws with multiple chunkFileNames values')
-  test.todo('allows same chunkFileNames value')
-  test.todo('sets default if no chunkFileNames value')
+  test('throws with multiple chunkFileNames values', () => {
+    const { default: options } = require(getExtPath(
+      'mv3-basic-js',
+      'rollup.config.js',
+    )) as { default: InputOptions & { output: OutputOptions } }
+
+    expect(() =>
+      plugin.options.call(context, {
+        ...options,
+        output: ['[name].js', '[hash].js'].map(
+          (chunkFileNames) => ({
+            ...options.output,
+            chunkFileNames,
+          }),
+        ),
+      }),
+    ).toThrowError(
+      new TypeError(
+        'Multiple output values for chunkFileNames are not supported',
+      ),
+    )
+  })
+
+  test('allows same chunkFileNames value', () => {
+    const { default: options } = require(getExtPath(
+      'mv3-basic-js',
+      'rollup.config.js',
+    )) as { default: InputOptions & { output: OutputOptions } }
+
+    options.output.chunkFileNames =
+      'chunks-[format]/[name]-[hash].js'
+
+    plugin.options.call(context, {
+      ...options,
+      output: [options.output, options.output],
+    })
+
+    const {
+      web_accessible_resources: [war1] = [
+        { resources: ['war is undefined'] },
+      ],
+    } = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(war1.resources).toEqual(['chunks-*/*-*.js'])
+  })
+
+  test('sets default if no chunkFileNames value', () => {
+    const { default: options } = require(getExtPath(
+      'mv3-basic-js',
+      'rollup.config.js',
+    )) as { default: InputOptions & { output: OutputOptions } }
+
+    delete options.output.chunkFileNames
+
+    const result = plugin.options.call(context, {
+      ...options,
+      output: [options.output, options.output],
+    }) as InputOptions & { output: OutputOptions[] }
+
+    result.output.forEach((output) => {
+      expect(output.chunkFileNames).toBe(
+        'chunks/[name]-[hash].js',
+      )
+    })
+
+    const {
+      web_accessible_resources: [war1] = [
+        { resources: ['war is undefined'] },
+      ],
+    } = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(war1.resources).toEqual(['chunks/*-*.js'])
+  })
 })
