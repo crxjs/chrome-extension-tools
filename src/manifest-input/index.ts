@@ -224,15 +224,18 @@ export function manifestInput(
             .flat(Infinity)
 
           // Derive entry paths from manifest
-          const { js, html, css, img, others } = deriveFiles(
-            fullManifest,
-            cache.srcDir,
-            {
-              contentScripts: true,
-            },
-          )
+          const {
+            js,
+            html,
+            css,
+            img,
+            others,
+            contentScripts,
+          } = deriveFiles(fullManifest, cache.srcDir, {
+            contentScripts: true,
+          })
 
-          // cache.contentScripts = contentScripts
+          cache.contentScripts = contentScripts
 
           // Cache derived inputs
           cache.input = [...cache.inputAry, ...js, ...html]

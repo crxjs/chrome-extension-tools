@@ -200,6 +200,17 @@ test('calls deriveFiles', () => {
   )
 })
 
+test('caches contentScript filenames', () => {
+  plugin.options.call(context, options)
+
+  expect(cache.contentScripts).toEqual(
+    expect.arrayContaining([
+      getExtPath('mv2-kitchen-sink', 'content.js'),
+    ]),
+  )
+  expect(cache.contentScripts.length).toBe(1)
+})
+
 test('validates manifest', async () => {
   plugin.options.call(context, options)
 
