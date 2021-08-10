@@ -277,7 +277,6 @@ export function manifestInput(
             const resources = [
               chunkFileNames
                 .split('/')
-                .slice(0, -1)
                 .join('/')
                 .replace('[format]', '*')
                 .replace('[name]', '*')

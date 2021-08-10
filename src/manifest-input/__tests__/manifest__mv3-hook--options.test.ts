@@ -1,3 +1,4 @@
+import { InputOptions, OutputOptions } from 'rollup'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
 import { ManifestInputPluginCache } from '../../plugin-options'
@@ -79,13 +80,57 @@ describe('content scripts and web_accessible_resource (WAR)', () => {
     )
   })
 
-  test.todo('creates minmatch pattern from chunkFileNames')
+  test('creates minmatch pattern from chunkFileNames', () => {
+    const { default: options } = require(getExtPath(
+      'mv3-basic-js',
+      'rollup.config.js',
+    )) as { default: InputOptions & { output: OutputOptions } }
 
-  test.todo('sets default if no chunkFileNames value')
+    options.output.chunkFileNames =
+      'chunks-[format]/[name]-[hash].js'
 
-  test.todo('adds imported modules to WAR')
+    plugin.options.call(context, options)
 
-  test.todo('does not modify WAR if no content scripts')
+    const {
+      web_accessible_resources: [war1] = [
+        { resources: ['war is undefined'] },
+      ],
+    } = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(war1.resources).toEqual(['chunks-*/*-*.js'])
+  })
+
+  test('sets default if no chunkFileNames value', () => {
+    const { default: options } = require(getExtPath(
+      'mv3-basic-js',
+      'rollup.config.js',
+    )) as { default: InputOptions & { output: OutputOptions } }
+
+    delete options.output.chunkFileNames
+
+    plugin.options.call(context, options)
+
+    const {
+      web_accessible_resources: [war1] = [
+        { resources: ['war is undefined'] },
+      ],
+    } = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(war1.resources).toEqual(['chunks/*-*.js'])
+  })
+
+  test('does not modify WAR if no content scripts', () => {
+    const { default: options } = require(getExtPath(
+      'mv3-background-only',
+      'rollup.config.js',
+    )) as { default: InputOptions & { output: OutputOptions } }
+
+    plugin.options.call(context, options)
+
+    expect(
+      cache.manifest!.web_accessible_resources,
+    ).toBeUndefined()
+  })
 })
 
 describe('multiple Rollup OutputOptions', () => {
