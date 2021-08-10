@@ -24,6 +24,7 @@ test('returns correct object', () => {
     buildStart: expect.any(Function),
     resolveId: expect.any(Function),
     load: expect.any(Function),
+    transform: expect.any(Function),
     watchChange: expect.any(Function),
     generateBundle: expect.any(Function),
   })

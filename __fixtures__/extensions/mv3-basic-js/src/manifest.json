@@ -1,13 +1,13 @@
 {
   "action": {
-    "default_popup": "pages/popup/index.html"
+    "default_popup": "popup.html"
   },
   "background": {
     "service_worker": "service_worker.js"
   },
   "content_scripts": [
     {
-      "js": ["content/index.js"],
+      "js": ["content.js"],
       "matches": ["https://a.com/*", "http://b.com/*"]
     }
   ],

@@ -78,6 +78,7 @@ export function manifestInput(
       assetChanged: false,
       assets: [],
       contentScripts: [],
+      contentScriptRefIds: {},
       iife: [],
       input: [],
       inputAry: [],
@@ -372,6 +373,8 @@ export function manifestInput(
     resolveId(source) {
       if (source === stubChunkNameForCssOnlyCrx) {
         return source
+      } else if (cache.contentScriptRefIds[source]) {
+        return source
       }
 
       return null
@@ -384,7 +387,34 @@ export function manifestInput(
         }
       }
 
-      return null
+      return cache.contentScriptRefIds[id] ?? null
+    },
+
+    // FIXME: test this against real usage
+    transform(code, id) {
+      if (
+        isMV2(cache.manifest) ||
+        !cache.contentScripts.includes(id)
+      )
+        return code
+
+      const [basename, ...rest] = id.split('/').reverse()
+      const chunkId = [
+        ...rest.reverse(),
+        `esm-${basename}`,
+      ].join('/')
+      const refId = this.emitFile({
+        id: chunkId,
+        type: 'chunk',
+      })
+
+      cache.contentScriptRefIds[chunkId] = code
+
+      return [
+        '// This is an import wrapper used to support ESM in content scripts.',
+        // TODO: add link to docs
+        `import(import.meta.ROLLUP_FILE_URL_${refId}).catch(console.error)`,
+      ].join('\n')
     },
 
     watchChange(id) {

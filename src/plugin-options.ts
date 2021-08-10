@@ -51,6 +51,7 @@ export interface ManifestInputPluginOptions
 export interface ManifestInputPluginCache {
   assets: string[]
   contentScripts: string[]
+  contentScriptRefIds: Record<string, string>
   iife: string[]
   input: string[]
   inputAry: string[]
@@ -68,6 +69,7 @@ type ManifestInputPluginHooks =
   | 'buildStart'
   | 'resolveId'
   | 'load'
+  | 'transform'
   | 'watchChange'
   | 'generateBundle'
 

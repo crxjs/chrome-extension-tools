@@ -37,6 +37,7 @@ const manifest = require(manifestJson)
 const cache: ManifestInputPluginCache = {
   assets: [],
   contentScripts: [],
+  contentScriptRefIds: {},
   permsHash: '',
   srcDir: null,
   iife: [],
@@ -208,7 +209,7 @@ test('caches contentScript filenames', () => {
       getExtPath('mv2-kitchen-sink', 'content.js'),
     ]),
   )
-  expect(cache.contentScripts.length).toBe(1)
+  expect(Object.keys(cache.contentScripts).length).toBe(1)
 })
 
 test('validates manifest', async () => {
