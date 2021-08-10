@@ -8,8 +8,12 @@
   "content_scripts": [
     {
       "js": ["content/index.js"],
-      "matches": ["https://*/*", "http://*/*"]
+      "matches": ["https://a.com/*", "http://b.com/*"]
     }
   ],
-  "manifest_version": 3
+  "host_permissions": ["https://c.com/*"],
+  "manifest_version": 3,
+  "name": "mv3-basic-js",
+  "version": "1.0.0",
+  "description": "Basic MV3 Chrome Extension"
 }

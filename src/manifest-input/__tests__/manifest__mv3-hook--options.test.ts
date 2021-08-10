@@ -29,26 +29,67 @@ beforeEach(() => {
   delete cache.manifest
 })
 
-test('coerces background.type to module', () => {
-  plugin.options.call(context, {
-    input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
+describe('MV3 background service worker', () => {
+  test('coerces background type to module', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background!.type).toBe('module')
   })
 
-  const result = cache.manifest as chrome.runtime.ManifestV3
+  test('does not create one if none', () => {
+    plugin.options.call(context, {
+      input: getExtPath(
+        'mv3-content-script-only',
+        'src',
+        'manifest.json',
+      ),
+    })
 
-  expect(result.background!.type).toBe('module')
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background).toBeUndefined()
+  })
 })
 
-test('does not create background property', () => {
-  plugin.options.call(context, {
-    input: getExtPath(
-      'mv3-content-script-only',
-      'src',
-      'manifest.json',
-    ),
+describe('content scripts and web_accessible_resource (WAR)', () => {
+  test('gets match patterns from manifest', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
+    })
+
+    const {
+      content_scripts: [script1] = [
+        { matches: ['script is undefined'] },
+      ],
+      host_permissions = ['host permissions is undefined'],
+      web_accessible_resources: [war1] = [
+        { matches: ['war is undefined'] },
+      ],
+    } = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(war1.matches).toEqual(
+      expect.arrayContaining(script1.matches!),
+    )
+    expect(war1.matches).toEqual(
+      expect.arrayContaining(host_permissions),
+    )
   })
 
-  const result = cache.manifest as chrome.runtime.ManifestV3
+  test.todo('creates minmatch pattern from chunkFileNames')
 
-  expect(result.background).toBeUndefined()
+  test.todo('sets default if no chunkFileNames value')
+
+  test.todo('adds imported modules to WAR')
+
+  test.todo('does not modify WAR if no content scripts')
+})
+
+describe('multiple Rollup OutputOptions', () => {
+  test.todo('throws with multiple chunkFileNames values')
+  test.todo('allows same chunkFileNames value')
+  test.todo('sets default if no chunkFileNames value')
 })

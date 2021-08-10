@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
 import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk } from 'rollup'
+import { EmittedAsset, OutputChunk, RollupOptions } from 'rollup'
 import slash from 'slash'
 import {
   isChunk,
@@ -133,10 +133,10 @@ export function manifestInput(
     /* ============================================ */
 
     options(options) {
+      /* ----------- LOAD AND PROCESS MANIFEST ----------- */
+
       // Do not reload manifest without changes
       if (!cache.manifest) {
-        /* ----------- LOAD AND PROCESS MANIFEST ----------- */
-
         let inputManifestPath: string | undefined
         if (Array.isArray(options.input)) {
           const manifestIndex = options.input.findIndex(
@@ -181,6 +181,7 @@ export function manifestInput(
         }
 
         manifestPath = configResult.filepath
+        cache.srcDir = path.dirname(manifestPath)
 
         let extendedManifest: Partial<chrome.runtime.Manifest>
         if (typeof extendManifest === 'function') {
@@ -206,12 +207,6 @@ export function manifestInput(
           ...extendedManifest,
         } as chrome.runtime.Manifest
 
-        if (fullManifest.background && isMV3(fullManifest))
-          fullManifest.background.type = 'module'
-
-        cache.manifest = validateManifest(fullManifest)
-        cache.srcDir = path.dirname(manifestPath)
-
         // If the manifest is the source of truth for inputs
         //   `false` means that all inputs must come from Rollup config
         if (firstClassManifest) {
@@ -229,7 +224,7 @@ export function manifestInput(
 
           // Derive entry paths from manifest
           const { js, html, css, img, others } = deriveFiles(
-            cache.manifest,
+            fullManifest,
             cache.srcDir,
           )
 
@@ -242,8 +237,66 @@ export function manifestInput(
           ]
         }
 
-        /* --------------- END LOAD MANIFEST --------------- */
+        if (isMV3(fullManifest)) {
+          if (fullManifest.background)
+            fullManifest.background.type = 'module'
+          if (fullManifest.content_scripts) {
+            const { output = {} } = options as RollupOptions
+            const {
+              chunkFileNames = 'chunks/[name]-[hash].js',
+            } = Array.isArray(output) ? output[0] : output
+
+            // Output could be an array
+            if (Array.isArray(output)) {
+              if (
+                // Should only be one value for chunkFileNames
+                output.reduce(
+                  (r, x) => r.add(x.chunkFileNames ?? 'no cfn'),
+                  new Set(),
+                ).size > 1
+              )
+                // We need to know chunkFileNames now, before the output stage
+                throw new TypeError(
+                  'Multiple output values for chunkFileNames are not supported',
+                )
+
+              // If chunkFileNames is undefined, use our default
+              output.forEach(
+                (x) => (x.chunkFileNames = chunkFileNames),
+              )
+            } else {
+              // If chunkFileNames is undefined, use our default
+              output.chunkFileNames = chunkFileNames
+            }
+
+            const allMatches = fullManifest.content_scripts
+              .flatMap(({ matches }) => matches ?? [])
+              .concat(fullManifest.host_permissions ?? [])
+
+            const matches = Array.from(new Set(allMatches))
+            const resources = [
+              chunkFileNames
+                .split('/')
+                .slice(0, -1)
+                .join('/')
+                .replace('[format]', '*')
+                .replace('[name]', '*')
+                .replace('[hash]', '*'),
+            ]
+
+            fullManifest.web_accessible_resources =
+              fullManifest.web_accessible_resources ?? []
+
+            fullManifest.web_accessible_resources.push({
+              resources,
+              matches,
+            })
+          }
+        }
+
+        cache.manifest = validateManifest(fullManifest)
       }
+      /* --------------- END LOAD MANIFEST --------------- */
 
       // Final `options.input` is an object
       //   this grants full compatibility with all Rollup options
