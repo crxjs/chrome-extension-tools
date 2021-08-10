@@ -189,12 +189,12 @@ export function manifestInput(
           extendedManifest = {
             ...configResult.config,
             ...extendManifest,
-          } as chrome.runtime.Manifest
+          } as Partial<chrome.runtime.Manifest>
         } else {
           extendedManifest = configResult.config
         }
 
-        cache.manifest = validateManifest({
+        const fullManifest = {
           // MV2 is default
           manifest_version: 2,
           name: pkg.name,
@@ -204,7 +204,12 @@ export function manifestInput(
           ].join('.'),
           description: pkg.description,
           ...extendedManifest,
-        } as chrome.runtime.Manifest)
+        } as chrome.runtime.Manifest
+
+        if (fullManifest.background && isMV3(fullManifest))
+          fullManifest.background.type = 'module'
+
+        cache.manifest = validateManifest(fullManifest)
         cache.srcDir = path.dirname(manifestPath)
 
         // If the manifest is the source of truth for inputs

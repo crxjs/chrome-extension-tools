@@ -289,3 +289,51 @@ test('should throw if options_ui and options_page both exist', () => {
 })
 
 test.todo('populates cache.iife')
+
+describe('MV3', () => {
+  test('coerces background.type to module', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background!.type).toBe('module')
+  })
+
+  test('does not create background property', () => {
+    plugin.options.call(context, {
+      input: getExtPath(
+        'mv3-content-script-only',
+        'src',
+        'manifest.json',
+      ),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background).toBeUndefined()
+  })
+})
+
+describe('MV2', () => {
+  test('does not modify background property', () => {
+    plugin.options.call(context, options)
+
+    const result = cache.manifest as chrome.runtime.ManifestV2
+
+    expect(result.background).toMatchObject({
+      scripts: ['background.js'],
+    })
+  })
+
+  test('does not create background property', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv2-html-only', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV2
+
+    expect(result.background).toBeUndefined()
+  })
+})
