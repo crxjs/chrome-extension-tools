@@ -77,6 +77,7 @@ export function manifestInput(
     cache = {
       assetChanged: false,
       assets: [],
+      contentScripts: [],
       iife: [],
       input: [],
       inputAry: [],
@@ -215,7 +216,7 @@ export function manifestInput(
             .map((jsonPath) => {
               const result = JSONPath({
                 path: jsonPath,
-                json: cache.manifest!,
+                json: fullManifest,
               })
 
               return result
@@ -226,7 +227,12 @@ export function manifestInput(
           const { js, html, css, img, others } = deriveFiles(
             fullManifest,
             cache.srcDir,
+            {
+              contentScripts: true,
+            },
           )
+
+          // cache.contentScripts = contentScripts
 
           // Cache derived inputs
           cache.input = [...cache.inputAry, ...js, ...html]

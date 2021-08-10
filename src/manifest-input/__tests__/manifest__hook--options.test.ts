@@ -36,6 +36,7 @@ const manifest = require(manifestJson)
 
 const cache: ManifestInputPluginCache = {
   assets: [],
+  contentScripts: [],
   permsHash: '',
   srcDir: null,
   iife: [],
@@ -193,6 +194,9 @@ test('calls deriveFiles', () => {
   expect(manifestParser.deriveFiles).toBeCalledWith(
     cache.manifest,
     cache.srcDir,
+    {
+      contentScripts: true,
+    },
   )
 })
 

@@ -51,6 +51,7 @@ let plugin: ManifestInputPlugin
 beforeEach(async () => {
   cache = {
     assets: [],
+    contentScripts: [],
     permsHash: '',
     srcDir: null,
     iife: [],
@@ -114,6 +115,7 @@ test('Warns permissions for verbose true', async () => {
   const plugin = manifestInput({
     cache: {
       assets: [],
+      contentScripts: [],
       permsHash: '',
       srcDir: null,
       iife: [],

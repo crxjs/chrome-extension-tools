@@ -46,7 +46,7 @@ test('chunks in output match chunks in manifest', async () => {
   const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
 
   // Get scripts in manifest
-  const { js } = deriveFiles(manifest, extPath)
+  const { js } = deriveFiles(manifest, extPath, { contentScripts: true })
 
   js.map((x) => path.relative(extPath, x)).forEach((script) => {
     const chunk = output.find(byFileName(script))

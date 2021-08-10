@@ -30,6 +30,7 @@ let plugin: ManifestInputPlugin
 beforeEach(() => {
   cache = {
     assets: [],
+    contentScripts: [],
     permsHash: '',
     srcDir: null,
     iife: [],

@@ -50,6 +50,7 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
+  contentScripts: string[]
   iife: string[]
   input: string[]
   inputAry: string[]
