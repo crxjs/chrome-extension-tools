@@ -28,10 +28,6 @@ import {
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 
-export function dedupe<T>(x: T[]): T[] {
-  return [...new Set(x)]
-}
-
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
 })
@@ -586,14 +582,15 @@ export function manifestInput(
             [] as string[],
           )
 
-        // SMELL: web accessible resources can be used for fingerprinting extensions
-        manifestBody.web_accessible_resources = dedupe([
-          ...war,
-          // FEATURE: filter out imports for background?
-          ...imports,
-          // Need to be web accessible b/c of import
-          ...contentScripts,
-        ]).map((p) => slash(p))
+        manifestBody.web_accessible_resources = Array.from(
+          new Set([
+            ...war,
+            // FEATURE: filter out imports for background?
+            ...imports,
+            // Need to be web accessible b/c of import
+            ...contentScripts,
+          ]),
+        ).map((p) => slash(p))
 
         /* ----------- END SETUP CONTENT SCRIPTS ----------- */
       }
