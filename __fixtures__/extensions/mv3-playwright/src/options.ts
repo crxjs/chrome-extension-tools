@@ -1,7 +1,13 @@
+import { first } from 'rxjs/operators'
 import { sendOptOk } from './messages'
+import { tabIds } from './storage'
 
-const h1 = document.createElement('h1')
-h1.innerText = 'Options script'
-document.body.append(h1)
+tabIds.valueStream
+  .pipe(first(({ id }) => typeof id !== 'undefined'))
+  .subscribe(({ id }) => {
+    const h1 = document.createElement('h1')
+    h1.innerText = `${id}`
+    document.body.append(h1)
 
-sendOptOk(undefined)
+    sendOptOk(undefined, { tabId: id })
+  })

@@ -1,4 +1,4 @@
-// import { remove } from 'fs-extra'
+import { remove } from 'fs-extra'
 import { chromium, ChromiumBrowserContext, Page } from 'playwright'
 import { InputOptions, OutputOptions, rollup } from 'rollup'
 import { getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
@@ -11,6 +11,9 @@ let browserContext: ChromiumBrowserContext
 let page: Page
 
 beforeAll(async () => {
+  // Clean up the last build
+  await remove(distDirPath)
+
   const config = requireExtFile(__filename, 'rollup.config.js') as InputOptions & { output: OutputOptions }
   const bundle = await rollup(config)
   await bundle.write(config.output)
@@ -22,9 +25,10 @@ beforeAll(async () => {
   })) as ChromiumBrowserContext
 }, 30000)
 
-// afterAll(() => remove(distDirPath))
 afterAll(async () => {
   await browserContext.close()
+  // MV3 service worker is unresponsive if this directory exists from a previous run
+  await remove(dataDirPath)
 })
 
 test('CRX loads and runs successfully', async () => {

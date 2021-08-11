@@ -4,16 +4,17 @@ console.log('content script')
 
 function addItem(message: string, error = false): void {
   console.log('🚀 ~ addItem ~ message', message)
-  const div = document.createElement('div')
+  const div = document.createElement('h1')
   div.innerText = message
   if (error) div.style.color = 'red'
-  document.body.append(div)
+  document.body.prepend(div)
 }
 
 addItem('Content script loaded')
 
 sendBgCheck(undefined)
-  .then(() => {
+  .then((tab) => {
+    console.log('🚀 ~ sendBgCheck ~ tab', tab)
     addItem('Background response')
   })
   .catch(() => {
