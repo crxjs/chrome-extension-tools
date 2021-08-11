@@ -7,7 +7,8 @@ import { manifestInput } from '../index'
 const cache: ManifestInputPluginCache = {
   assets: [],
   contentScripts: [],
-  contentScriptRefIds: {},
+  contentScriptCode: {},
+  contentScriptIds: {},
   permsHash: '',
   srcDir: null,
   iife: [],

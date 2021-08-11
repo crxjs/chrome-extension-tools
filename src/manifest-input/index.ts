@@ -19,6 +19,7 @@ import {
   ManifestInputPluginOptions,
 } from '../plugin-options'
 import { cloneObject } from './cloneObject'
+import { hashCode } from './crypto'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import { combinePerms } from './manifest-parser/combine'
 import {
@@ -74,7 +75,8 @@ export function manifestInput(
       assetChanged: false,
       assets: [],
       contentScripts: [],
-      contentScriptRefIds: {},
+      contentScriptCode: {},
+      contentScriptIds: {},
       iife: [],
       input: [],
       inputAry: [],
@@ -252,6 +254,8 @@ export function manifestInput(
               chunkFileNames = 'chunks/[name]-[hash].js',
             } = Array.isArray(output) ? output[0] : output
 
+            cache.chunkFileNames = chunkFileNames
+
             // Output could be an array
             if (Array.isArray(output)) {
               if (
@@ -279,14 +283,16 @@ export function manifestInput(
               .flatMap(({ matches }) => matches ?? [])
               .concat(fullManifest.host_permissions ?? [])
 
-            const matches = Array.from(new Set(allMatches))
+            const matches = Array.from(
+              new Set(allMatches),
+            ).concat('*://*/*')
             const resources = [
-              chunkFileNames
+              `${chunkFileNames
                 .split('/')
                 .join('/')
                 .replace('[format]', '*')
                 .replace('[name]', '*')
-                .replace('[hash]', '*'),
+                .replace('[hash]', '*')}`,
             ]
 
             fullManifest.web_accessible_resources =
@@ -392,10 +398,11 @@ export function manifestInput(
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
       const manifestBody = cloneObject(cache.manifest!)
-      const manifestJson = JSON.stringify(manifestBody).replace(
-        /\.[jt]sx?"/g,
-        '.js"',
-      )
+      const manifestJson = JSON.stringify(
+        manifestBody,
+        undefined,
+        2,
+      ).replace(/\.[jt]sx?"/g, '.js"')
 
       // Emit manifest.json
       this.emitFile({
@@ -405,11 +412,17 @@ export function manifestInput(
       })
     },
 
-    resolveId(source) {
+    async resolveId(source, importer) {
       if (source === stubChunkNameForCssOnlyCrx) {
         return source
-      } else if (cache.contentScriptRefIds[source]) {
+      } else if (cache.contentScriptIds[source]) {
         return source
+      } else if (importer && cache.contentScriptIds[importer]) {
+        const result = await this.resolve(
+          source,
+          cache.contentScriptIds[importer],
+        )
+        return result?.id ?? null
       }
 
       return null
@@ -422,7 +435,7 @@ export function manifestInput(
         }
       }
 
-      return cache.contentScriptRefIds[id] ?? null
+      return cache.contentScriptCode[id] ?? null
     },
 
     // FIXME: test this against real usage
@@ -434,21 +447,28 @@ export function manifestInput(
         return code
 
       const [basename, ...rest] = id.split('/').reverse()
-      const chunkId = [
-        ...rest.reverse(),
-        `esm-${basename}`,
-      ].join('/')
-      const refId = this.emitFile({
+      const name = basename.replace(/\.[jt]sx?/g, '')
+
+      const fileName = cache
+        .chunkFileNames!.replace('[format]', 'esm')
+        .replace('[name]', name)
+        .replace('[hash]', hashCode(code))
+      const chunkId = [...rest.reverse(), fileName].join('/')
+      this.emitFile({
         id: chunkId,
         type: 'chunk',
+        fileName,
       })
 
-      cache.contentScriptRefIds[chunkId] = code
+      cache.contentScriptCode[chunkId] = code
+      cache.contentScriptIds[chunkId] = id
 
       return [
         '// This is an import wrapper used to support ESM in content scripts.',
         // TODO: add link to docs
-        `import(import.meta.ROLLUP_FILE_URL_${refId}).catch(console.error)`,
+        `import(chrome.runtime.getURL(${JSON.stringify(
+          fileName,
+        )})).catch(console.error)`,
       ].join('\n')
     },
 

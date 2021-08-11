@@ -37,7 +37,8 @@ const manifest = require(manifestJson)
 const cache: ManifestInputPluginCache = {
   assets: [],
   contentScripts: [],
-  contentScriptRefIds: {},
+  contentScriptCode: {},
+  contentScriptIds: {},
   permsHash: '',
   srcDir: null,
   iife: [],

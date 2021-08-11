@@ -31,7 +31,8 @@ beforeEach(() => {
   cache = {
     assets: [],
     contentScripts: [],
-    contentScriptRefIds: {},
+    contentScriptCode: {},
+    contentScriptIds: {},
     permsHash: '',
     srcDir: null,
     iife: [],

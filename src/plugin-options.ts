@@ -66,8 +66,10 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
+  chunkFileNames?: string
   contentScripts: string[]
-  contentScriptRefIds: Record<string, string>
+  contentScriptCode: Record<string, string>
+  contentScriptIds: Record<string, string>
   iife: string[]
   input: string[]
   inputAry: string[]

@@ -21,7 +21,8 @@ beforeEach(async () => {
   cache = {
     assets: [],
     contentScripts: [],
-    contentScriptRefIds: {},
+    contentScriptCode: {},
+    contentScriptIds: {},
     iife: [],
     permsHash: '',
     srcDir: null,
