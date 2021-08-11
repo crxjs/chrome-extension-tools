@@ -10,12 +10,14 @@ function addItem(message: string, error = false): void {
   document.body.append(div)
 }
 
+addItem('Content script loaded')
+
 sendBgCheck(undefined)
   .then(() => {
-    addItem('Content script loaded')
+    addItem('Background response')
   })
   .catch(() => {
-    addItem('Content script unable to load', true)
+    addItem('Background did not respond', true)
   })
 
 bgOkStream.subscribe(() => {

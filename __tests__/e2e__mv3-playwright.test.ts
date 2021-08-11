@@ -23,15 +23,16 @@ beforeAll(async () => {
 }, 30000)
 
 // afterAll(() => remove(distDirPath))
-// afterAll(async () => {
-//   await browserContext.close()
-// })
+afterAll(async () => {
+  await browserContext.close()
+})
 
 test('CRX loads and runs successfully', async () => {
   page = await browserContext.newPage()
   await page.goto('https://google.com')
 
   await page.waitForSelector('text="Content script loaded"')
+  await page.waitForSelector('text="Background response"')
   await page.waitForSelector('text="Background OK"')
   await page.waitForSelector('text="Options page OK"')
 })
