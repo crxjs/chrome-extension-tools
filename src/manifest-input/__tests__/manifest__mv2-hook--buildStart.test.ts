@@ -30,6 +30,9 @@ let plugin: ManifestInputPlugin
 beforeEach(() => {
   cache = {
     assets: [],
+    contentScripts: [],
+    contentScriptCode: {},
+    contentScriptIds: {},
     permsHash: '',
     srcDir: null,
     iife: [],
@@ -161,6 +164,18 @@ test('emits each asset asset once', async () => {
     type: 'asset',
     source: expect.any(Buffer),
     fileName: localesEsJson
+      .replace(srcDir, '')
+      .replace(/^\//, ''),
+  })
+})
+
+test('does not emit MV2 manifest', async () => {
+  await plugin.buildStart.call(context, options)
+
+  expect(context.emitFile).not.toBeCalledWith({
+    type: 'asset',
+    source: expect.any(Buffer),
+    fileName: manifestJson
       .replace(srcDir, '')
       .replace(/^\//, ''),
   })

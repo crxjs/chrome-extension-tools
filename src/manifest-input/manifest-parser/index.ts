@@ -27,17 +27,19 @@ export const derivePermissions = (
 export function deriveFiles(
   manifest: chrome.runtime.Manifest,
   srcDir: string,
+  options: { contentScripts: boolean },
 ) {
   if (manifest.manifest_version === 3) {
-    return deriveFilesMV3(manifest, srcDir)
+    return deriveFilesMV3(manifest, srcDir, options)
   } else {
-    return deriveFilesMV2(manifest, srcDir)
+    return deriveFilesMV2(manifest, srcDir, options)
   }
 }
 
 export function deriveFilesMV3(
   manifest: chrome.runtime.ManifestV3,
   srcDir: string,
+  options: { contentScripts: boolean },
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -59,14 +61,16 @@ export function deriveFilesMV3(
       }
     }, [] as string[])
 
+  const contentScripts = get(
+    manifest,
+    'content_scripts',
+    [] as ContentScript[],
+  ).reduce((r, { js = [] }) => [...r, ...js], [] as string[])
+
   const js = [
     ...files.filter((f) => /\.[jt]sx?$/.test(f)),
     get(manifest, 'background.service_worker'),
-    ...get(
-      manifest,
-      'content_scripts',
-      [] as ContentScript[],
-    ).reduce((r, { js = [] }) => [...r, ...js], [] as string[]),
+    ...(options.contentScripts ? contentScripts : []),
   ]
 
   const html = [
@@ -101,10 +105,11 @@ export function deriveFilesMV3(
   ]
 
   // Files like fonts, things that are not expected
-  const others = diff(files, css, js, html, img)
+  const others = diff(files, css, contentScripts, js, html, img)
 
   return {
     css: validate(css),
+    contentScripts: validate(contentScripts),
     js: validate(js),
     html: validate(html),
     img: validate(img),
@@ -121,6 +126,7 @@ export function deriveFilesMV3(
 export function deriveFilesMV2(
   manifest: chrome.runtime.ManifestV2,
   srcDir: string,
+  options: { contentScripts: boolean },
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -141,14 +147,15 @@ export function deriveFilesMV2(
       }
     }, [] as string[])
 
+  const contentScripts = get(
+    manifest,
+    'content_scripts',
+    [] as ContentScript[],
+  ).reduce((r, { js = [] }) => [...r, ...js], [] as string[])
   const js = [
     ...files.filter((f) => /\.[jt]sx?$/.test(f)),
     ...get(manifest, 'background.scripts', [] as string[]),
-    ...get(
-      manifest,
-      'content_scripts',
-      [] as ContentScript[],
-    ).reduce((r, { js = [] }) => [...r, ...js], [] as string[]),
+    ...(options.contentScripts ? contentScripts : []),
   ]
 
   const html = [
@@ -202,10 +209,11 @@ export function deriveFilesMV2(
   ]
 
   // Files like fonts, things that are not expected
-  const others = diff(files, css, js, html, img)
+  const others = diff(files, css, contentScripts, js, html, img)
 
   return {
     css: validate(css),
+    contentScripts: validate(contentScripts),
     js: validate(js),
     html: validate(html),
     img: validate(img),

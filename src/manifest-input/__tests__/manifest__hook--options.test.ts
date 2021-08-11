@@ -26,6 +26,9 @@ import { explorer, manifestInput } from '../index'
 
 jest.spyOn(explorer, 'load')
 
+const validate = require('../manifest-parser/validate')
+jest.spyOn(validate, 'validateManifest')
+
 const manifestParser = require('../manifest-parser/index')
 jest.spyOn(manifestParser, 'deriveFiles')
 
@@ -33,6 +36,9 @@ const manifest = require(manifestJson)
 
 const cache: ManifestInputPluginCache = {
   assets: [],
+  contentScripts: [],
+  contentScriptCode: {},
+  contentScriptIds: {},
   permsHash: '',
   srcDir: null,
   iife: [],
@@ -190,7 +196,27 @@ test('calls deriveFiles', () => {
   expect(manifestParser.deriveFiles).toBeCalledWith(
     cache.manifest,
     cache.srcDir,
+    {
+      contentScripts: true,
+    },
   )
+})
+
+test('caches contentScript filenames', () => {
+  plugin.options.call(context, options)
+
+  expect(cache.contentScripts).toEqual(
+    expect.arrayContaining([
+      getExtPath('mv2-kitchen-sink', 'content.js'),
+    ]),
+  )
+  expect(Object.keys(cache.contentScripts).length).toBe(1)
+})
+
+test('validates manifest', async () => {
+  plugin.options.call(context, options)
+
+  expect(validate.validateManifest).toBeCalled()
 })
 
 test('does nothing if cache.manifest exists', () => {
@@ -280,3 +306,51 @@ test('should throw if options_ui and options_page both exist', () => {
 })
 
 test.todo('populates cache.iife')
+
+describe('MV3', () => {
+  test('coerces background.type to module', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background!.type).toBe('module')
+  })
+
+  test('does not create background property', () => {
+    plugin.options.call(context, {
+      input: getExtPath(
+        'mv3-content-script-only',
+        'src',
+        'manifest.json',
+      ),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background).toBeUndefined()
+  })
+})
+
+describe('MV2', () => {
+  test('does not modify background property', () => {
+    plugin.options.call(context, options)
+
+    const result = cache.manifest as chrome.runtime.ManifestV2
+
+    expect(result.background).toMatchObject({
+      scripts: ['background.js'],
+    })
+  })
+
+  test('does not create background property', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv2-html-only', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV2
+
+    expect(result.background).toBeUndefined()
+  })
+})

@@ -6,26 +6,42 @@ import { ValidateNamesPlugin } from './validate-names/index'
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
 export interface ChromeExtensionOptions {
+  /**
+   * @deprecated This is not supported for MV3, use this instead:
+   * ```js
+   * import browser from 'webextension-polyfill'
+   * ```
+   */
   browserPolyfill?:
     | boolean
     | {
         executeScript: boolean
       }
   contentScriptWrapper?: boolean
-  // TODO: use this option with iifeJsonPaths to enable a preset to support Firefox builds
+  /** @deprecated Not implemented yet */
   crossBrowser?: boolean
+  /** @deprecated Does nothing internally in MV3 */
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
   extendManifest?:
     | Partial<chrome.runtime.Manifest>
     | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
+  /** @deprecated Will not be supported in next major version */
   firstClassManifest?: boolean
+  /** @deprecated Not supported yet */
   iifeJsonPaths?: string[]
   pkg?: {
     description: string
     name: string
     version: string
   }
+  /**
+   * @deprecated Use `options.extendManifest.key`
+   * ```js
+   * chromeExtension({ extendManifest: { key: '...' } })
+   * ```
+   */
   publicKey?: string
+  /** @deprecated Does nothing internally in MV3 */
   verbose?: boolean
 }
 
@@ -50,6 +66,10 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
+  chunkFileNames?: string
+  contentScripts: string[]
+  contentScriptCode: Record<string, string>
+  contentScriptIds: Record<string, string>
   iife: string[]
   input: string[]
   inputAry: string[]
@@ -67,6 +87,7 @@ type ManifestInputPluginHooks =
   | 'buildStart'
   | 'resolveId'
   | 'load'
+  | 'transform'
   | 'watchChange'
   | 'generateBundle'
 

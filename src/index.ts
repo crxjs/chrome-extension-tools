@@ -80,6 +80,10 @@ export const chromeExtension = (
       return manifest.load.call(this, id)
     },
 
+    transform(source, id) {
+      return manifest.transform.call(this, source, id)
+    },
+
     watchChange(id) {
       manifest.watchChange.call(this, id)
       html.watchChange.call(this, id)

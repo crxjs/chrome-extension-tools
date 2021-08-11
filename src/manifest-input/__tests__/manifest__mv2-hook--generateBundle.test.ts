@@ -51,6 +51,9 @@ let plugin: ManifestInputPlugin
 beforeEach(async () => {
   cache = {
     assets: [],
+    contentScripts: [],
+    contentScriptCode: {},
+    contentScriptIds: {},
     permsHash: '',
     srcDir: null,
     iife: [],
@@ -114,6 +117,9 @@ test('Warns permissions for verbose true', async () => {
   const plugin = manifestInput({
     cache: {
       assets: [],
+      contentScripts: [],
+      contentScriptCode: {},
+      contentScriptIds: {},
       permsHash: '',
       srcDir: null,
       iife: [],
@@ -241,19 +247,6 @@ test('sets public key', async () => {
   expect(manifest.key).toBe(publicKey)
 })
 
-test('validates manifest', async () => {
-  const bundle = cloneObject(await bundlePromise)
-
-  await plugin.generateBundle.call(
-    context,
-    options,
-    bundle,
-    false,
-  )
-
-  expect(validate.validateManifest).toBeCalled()
-})
-
 test('Sets cache.assetChanged to false if cache.permsHash is truthy', async () => {
   cache.assetChanged = true
   cache.permsHash = JSON.stringify('asdk')
@@ -297,7 +290,7 @@ test('Throws if cache.manifest is falsey', async () => {
 
   const bundle = cloneObject(await bundlePromise)
 
-  const errorMessage = 'cache.manifest is undefined'
+  const errorMessage = 'manifest is undefined'
 
   try {
     await plugin.generateBundle.call(

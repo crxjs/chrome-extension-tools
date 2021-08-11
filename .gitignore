@@ -11,3 +11,5 @@ package-lock.json
 *.log
 TODO
 ___mv3-scripts
+**/chromium-data-dir/
+__fixtures__/extensions/**/dist/

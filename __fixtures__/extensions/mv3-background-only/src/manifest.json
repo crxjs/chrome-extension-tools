@@ -1,0 +1,9 @@
+{
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "manifest_version": 3,
+  "name": "mv3-background-only",
+  "version": "1.0.0",
+  "description": "Background Only MV3 Chrome Extension"
+}

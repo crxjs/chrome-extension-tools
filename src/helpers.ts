@@ -34,6 +34,18 @@ export function isString(x: any): x is string {
   return typeof x === 'string'
 }
 
+export function isUndefined(x: unknown): x is undefined {
+  return typeof x === 'undefined'
+}
+
+export function isNull(x: unknown): x is null {
+  return x === null
+}
+
+export function isPresent<T>(x: null | undefined | T): x is T {
+  return !isUndefined(x) && !isNull(x)
+}
+
 export function isJsonFilePath(x: any): x is string {
   return isString(x) && x.endsWith('json')
 }
