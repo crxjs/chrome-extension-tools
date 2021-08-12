@@ -46,10 +46,6 @@ export function isPresent<T>(x: null | undefined | T): x is T {
   return !isUndefined(x) && !isNull(x)
 }
 
-export function isJsonFilePath(x: any): x is string {
-  return isString(x) && x.endsWith('json')
-}
-
 export const normalizeFilename = (p: string) =>
   p.replace(/\.[tj]sx?$/, '.js')
 

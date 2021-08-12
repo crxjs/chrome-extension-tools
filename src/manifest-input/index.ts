@@ -4,11 +4,10 @@ import fs from 'fs-extra'
 import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
 import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk, RollupOptions } from 'rollup'
+import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import {
   isChunk,
-  isJsonFilePath,
   isPresent,
   normalizeFilename,
 } from '../helpers'
@@ -21,6 +20,7 @@ import {
 import { cloneObject } from './cloneObject'
 import { hashCode } from './crypto'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
+import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
@@ -28,9 +28,19 @@ import {
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
+import { updateManifestV3 } from './updateManifest'
+import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
+  loaders: {
+    '.ts': (filePath: string) => {
+      require('ts-node/register')
+      const result = require(filePath)
+
+      return result.default ?? result
+    },
+  },
 })
 
 const name = 'manifest-input'
@@ -137,29 +147,12 @@ export function manifestInput(
 
       // Do not reload manifest without changes
       if (!cache.manifest) {
-        let inputManifestPath: string | undefined
-        if (Array.isArray(options.input)) {
-          const manifestIndex = options.input.findIndex(
-            isJsonFilePath,
-          )
-          inputManifestPath = options.input[manifestIndex]
-          cache.inputAry = [
-            ...options.input.slice(0, manifestIndex),
-            ...options.input.slice(manifestIndex + 1),
-          ]
-        } else if (typeof options.input === 'object') {
-          inputManifestPath = options.input.manifest
-          cache.inputObj = cloneObject(options.input)
-          delete cache.inputObj['manifest']
-        } else {
-          inputManifestPath = options.input
-        }
+        const {
+          inputManifestPath,
+          ...cacheValues
+        } = getInputManifestPath(options)
 
-        if (!isJsonFilePath(inputManifestPath)) {
-          throw new TypeError(
-            'RollupOptions.input must be a single Chrome extension manifest.',
-          )
-        }
+        Object.assign(cache, cacheValues)
 
         const configResult = explorer.load(
           inputManifestPath,
@@ -245,65 +238,18 @@ export function manifestInput(
           ]
         }
 
+        let finalManifest: chrome.runtime.Manifest
         if (isMV3(fullManifest)) {
-          if (fullManifest.background)
-            fullManifest.background.type = 'module'
-          if (fullManifest.content_scripts) {
-            const { output = {} } = options as RollupOptions
-            const {
-              chunkFileNames = 'chunks/[name]-[hash].js',
-            } = Array.isArray(output) ? output[0] : output
-
-            cache.chunkFileNames = chunkFileNames
-
-            // Output could be an array
-            if (Array.isArray(output)) {
-              if (
-                // Should only be one value for chunkFileNames
-                output.reduce(
-                  (r, x) => r.add(x.chunkFileNames ?? 'no cfn'),
-                  new Set(),
-                ).size > 1
-              )
-                // We need to know chunkFileNames now, before the output stage
-                throw new TypeError(
-                  'Multiple output values for chunkFileNames are not supported',
-                )
-
-              // If chunkFileNames is undefined, use our default
-              output.forEach(
-                (x) => (x.chunkFileNames = chunkFileNames),
-              )
-            } else {
-              // If chunkFileNames is undefined, use our default
-              output.chunkFileNames = chunkFileNames
-            }
-
-            const allMatches = fullManifest.content_scripts
-              .flatMap(({ matches }) => matches ?? [])
-              .concat(fullManifest.host_permissions ?? [])
-
-            const matches = Array.from(new Set(allMatches))
-            const resources = [
-              `${chunkFileNames
-                .split('/')
-                .join('/')
-                .replace('[format]', '*')
-                .replace('[name]', '*')
-                .replace('[hash]', '*')}`,
-            ]
-
-            fullManifest.web_accessible_resources =
-              fullManifest.web_accessible_resources ?? []
-
-            fullManifest.web_accessible_resources.push({
-              resources,
-              matches,
-            })
-          }
+          finalManifest = updateManifestV3(
+            fullManifest,
+            options,
+            cache,
+          )
+        } else {
+          finalManifest = fullManifest
         }
 
-        cache.manifest = validateManifest(fullManifest)
+        cache.manifest = validateManifest(finalManifest)
       }
       /* --------------- END LOAD MANIFEST --------------- */
 
@@ -351,47 +297,21 @@ export function manifestInput(
         this.emitFile(asset)
       })
 
-      /* ------------ WARN DEPRECATED OPTIONS ------------ */
-
-      if (crossBrowser)
-        this.warn(
-          '`options.crossBrowser` is not implemented yet',
-        )
-
-      if (!firstClassManifest)
-        this.warn(
-          '`options.firstClassManifest` will be removed in version 5.0.0',
-        )
-
-      if (iifeJsonPaths.length)
-        this.warn(
-          '`options.iifeJsonPaths` is not implemented yet',
-        )
+      warnDeprecatedOptions.call(
+        this,
+        {
+          browserPolyfill,
+          crossBrowser,
+          dynamicImportWrapper,
+          firstClassManifest,
+          iifeJsonPaths,
+          publicKey,
+        },
+        cache,
+      )
 
       // MV2 manifest is handled in `generateBundle`
       if (isMV2(cache.manifest)) return
-
-      if (browserPolyfill)
-        this.warn(
-          [
-            '`options.browserPolyfill` is deprecated for MV3 and does nothing internally',
-            'See: https://extend-chrome.dev/rollup-plugin#mv3-faq',
-          ].join('\n'),
-        )
-
-      if (dynamicImportWrapper !== true)
-        this.warn(
-          '`options.dynamicImportWrapper` is not required for MV3',
-        )
-
-      if (publicKey)
-        this.warn(
-          [
-            '`options.publicKey` is deprecated for MV3,',
-            'please use `options.extendManifest` instead',
-            'see: https://extend-chrome.dev/rollup-plugin#mv3-faq',
-          ].join('\n'),
-        )
 
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
@@ -433,7 +353,8 @@ export function manifestInput(
         }
       }
 
-      return cache.contentScriptCode[id] ?? null
+      const code = cache.contentScriptCode[id]
+      return code ?? null
     },
 
     // FIXME: test this against real usage
@@ -450,7 +371,7 @@ export function manifestInput(
       const fileName = cache
         .chunkFileNames!.replace('[format]', 'esm')
         .replace('[name]', name)
-        .replace('[hash]', hashCode(code))
+        .replace('[hash]', hashCode(code, id))
       const chunkId = [...rest.reverse(), fileName].join('/')
       this.emitFile({
         id: chunkId,
