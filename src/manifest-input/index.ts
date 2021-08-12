@@ -379,7 +379,7 @@ export function manifestInput(
           ].join('\n'),
         )
 
-      if (dynamicImportWrapper)
+      if (dynamicImportWrapper !== true)
         this.warn(
           '`options.dynamicImportWrapper` is not required for MV3',
         )
