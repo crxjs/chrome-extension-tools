@@ -86,7 +86,7 @@
     },
     "match_pattern": {
       "format": "match-pattern",
-      "pattern": "^((\\*|http|https|file|ftp|chrome-extension):\\/\\/(\\*|(([^/*:]+:(d{1,5}|\\*)))|(\\*.[^\\/*:]+)|[^\\/*:]+)?(\\/.*))|<all_urls>$",
+      "pattern": "^((\\*|http|https|file|ftp|chrome-extension):\\/\\/(\\*|(([^/*:]+:(\\d{1,5}|\\*)))|(\\*.[^\\/*:]+)|[^\\/*:]+)?(\\/.*))|<all_urls>$",
       "type": "string"
     },
     "mime_type": {
