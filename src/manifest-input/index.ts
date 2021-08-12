@@ -4,7 +4,7 @@ import fs from 'fs-extra'
 import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
 import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk, RollupOptions } from 'rollup'
+import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import {
   isChunk,
@@ -28,6 +28,7 @@ import {
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
+import { updateManifestV3 } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -246,65 +247,18 @@ export function manifestInput(
           ]
         }
 
+        let finalManifest: chrome.runtime.Manifest
         if (isMV3(fullManifest)) {
-          if (fullManifest.background)
-            fullManifest.background.type = 'module'
-          if (fullManifest.content_scripts) {
-            const { output = {} } = options as RollupOptions
-            const {
-              chunkFileNames = 'chunks/[name]-[hash].js',
-            } = Array.isArray(output) ? output[0] : output
-
-            cache.chunkFileNames = chunkFileNames
-
-            // Output could be an array
-            if (Array.isArray(output)) {
-              if (
-                // Should only be one value for chunkFileNames
-                output.reduce(
-                  (r, x) => r.add(x.chunkFileNames ?? 'no cfn'),
-                  new Set(),
-                ).size > 1
-              )
-                // We need to know chunkFileNames now, before the output stage
-                throw new TypeError(
-                  'Multiple output values for chunkFileNames are not supported',
-                )
-
-              // If chunkFileNames is undefined, use our default
-              output.forEach(
-                (x) => (x.chunkFileNames = chunkFileNames),
-              )
-            } else {
-              // If chunkFileNames is undefined, use our default
-              output.chunkFileNames = chunkFileNames
-            }
-
-            const allMatches = fullManifest.content_scripts
-              .flatMap(({ matches }) => matches ?? [])
-              .concat(fullManifest.host_permissions ?? [])
-
-            const matches = Array.from(new Set(allMatches))
-            const resources = [
-              `${chunkFileNames
-                .split('/')
-                .join('/')
-                .replace('[format]', '*')
-                .replace('[name]', '*')
-                .replace('[hash]', '*')}`,
-            ]
-
-            fullManifest.web_accessible_resources =
-              fullManifest.web_accessible_resources ?? []
-
-            fullManifest.web_accessible_resources.push({
-              resources,
-              matches,
-            })
-          }
+          finalManifest = updateManifestV3(
+            fullManifest,
+            options,
+            cache,
+          )
+        } else {
+          finalManifest = fullManifest
         }
 
-        cache.manifest = validateManifest(fullManifest)
+        cache.manifest = validateManifest(finalManifest)
       }
       /* --------------- END LOAD MANIFEST --------------- */
 
