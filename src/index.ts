@@ -13,7 +13,7 @@ import { mixedFormat as m } from './mixed-format'
 
 export { simpleReloader } from './plugin-reloader-simple'
 
-export { ManifestV2, ManifestV3 } from './manifest-types'
+export type { ManifestV2, ManifestV3 } from './manifest-types'
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,

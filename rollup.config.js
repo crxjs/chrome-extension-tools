@@ -10,6 +10,7 @@ const { dependencies } = require('./package.json')
 const external = Object.keys(dependencies).concat(
   'path',
   'crypto',
+  'fs',
 )
 
 const plugins = [
