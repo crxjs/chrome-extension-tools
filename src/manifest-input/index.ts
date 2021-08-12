@@ -283,9 +283,7 @@ export function manifestInput(
               .flatMap(({ matches }) => matches ?? [])
               .concat(fullManifest.host_permissions ?? [])
 
-            const matches = Array.from(
-              new Set(allMatches),
-            ).concat('*://*/*')
+            const matches = Array.from(new Set(allMatches))
             const resources = [
               `${chunkFileNames
                 .split('/')
