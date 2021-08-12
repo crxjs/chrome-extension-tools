@@ -100,20 +100,25 @@ test('does not mutate the options object', () => {
 })
 
 test('throws if input does not contain a manifest', () => {
-  const errorMessage =
-    'RollupOptions.input must be a single Chrome extension manifest.'
-
   expect(() => {
     plugin.options.call(context, {
       input: ['not-a-manifest'],
     })
-  }).toThrow(new TypeError(errorMessage))
+  }).toThrow(
+    new TypeError(
+      'Could not find manifest in Rollup options.input: ["not-a-manifest"]',
+    ),
+  )
 
   expect(() => {
     plugin.options.call(context, {
       input: { wrong: 'not-a-manifest' },
     })
-  }).toThrow(new TypeError(errorMessage))
+  }).toThrow(
+    new TypeError(
+      'Could not find manifest in Rollup options.input: {"wrong":"not-a-manifest"}',
+    ),
+  )
 })
 
 test('handles input array', () => {
@@ -251,7 +256,9 @@ test('should throw if cosmiconfig cannot load manifest file', () => {
     })
   }
 
-  expect(call).toThrow(/^ENOENT: no such file or directory/)
+  expect(call).toThrow(
+    /^Could not load manifest: not-a-manifest\.json does not exist/,
+  )
 })
 
 test('should throw if manifest file is empty', () => {

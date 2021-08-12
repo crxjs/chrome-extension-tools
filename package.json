@@ -45,6 +45,7 @@
     "mem": "^6.0.1",
     "rollup": "^1.31.0",
     "slash": "^3.0.0",
+    "ts-node": "^10.2.0",
     "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {

@@ -8,7 +8,6 @@ import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import {
   isChunk,
-  isJsonFilePath,
   isPresent,
   normalizeFilename,
 } from '../helpers'
@@ -21,6 +20,7 @@ import {
 import { cloneObject } from './cloneObject'
 import { hashCode } from './crypto'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
+import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
@@ -33,6 +33,14 @@ import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
+  loaders: {
+    '.ts': (filePath: string) => {
+      require('ts-node/register')
+      const result = require(filePath)
+
+      return result.default ?? result
+    },
+  },
 })
 
 const name = 'manifest-input'
@@ -139,29 +147,12 @@ export function manifestInput(
 
       // Do not reload manifest without changes
       if (!cache.manifest) {
-        let inputManifestPath: string | undefined
-        if (Array.isArray(options.input)) {
-          const manifestIndex = options.input.findIndex(
-            isJsonFilePath,
-          )
-          inputManifestPath = options.input[manifestIndex]
-          cache.inputAry = [
-            ...options.input.slice(0, manifestIndex),
-            ...options.input.slice(manifestIndex + 1),
-          ]
-        } else if (typeof options.input === 'object') {
-          inputManifestPath = options.input.manifest
-          cache.inputObj = cloneObject(options.input)
-          delete cache.inputObj['manifest']
-        } else {
-          inputManifestPath = options.input
-        }
+        const {
+          inputManifestPath,
+          ...cacheValues
+        } = getInputManifestPath(options)
 
-        if (!isJsonFilePath(inputManifestPath)) {
-          throw new TypeError(
-            'RollupOptions.input must be a single Chrome extension manifest.',
-          )
-        }
+        Object.assign(cache, cacheValues)
 
         const configResult = explorer.load(
           inputManifestPath,
@@ -362,7 +353,8 @@ export function manifestInput(
         }
       }
 
-      return cache.contentScriptCode[id] ?? null
+      const code = cache.contentScriptCode[id]
+      return code ?? null
     },
 
     // FIXME: test this against real usage
@@ -379,7 +371,7 @@ export function manifestInput(
       const fileName = cache
         .chunkFileNames!.replace('[format]', 'esm')
         .replace('[name]', name)
-        .replace('[hash]', hashCode(code))
+        .replace('[hash]', hashCode(code, id))
       const chunkId = [...rest.reverse(), fileName].join('/')
       this.emitFile({
         id: chunkId,
