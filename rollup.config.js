@@ -8,10 +8,8 @@ import json from '@rollup/plugin-json'
 const { dependencies } = require('./package.json')
 
 const external = Object.keys(dependencies).concat(
-  'firebase/app',
-  'firebase/auth',
-  'firebase/functions',
   'path',
+  'crypto',
 )
 
 const plugins = [
