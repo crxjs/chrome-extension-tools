@@ -46,6 +46,7 @@ export function updateManifestV3(
     const allMatches = manifest.content_scripts
       .flatMap(({ matches }) => matches ?? [])
       .concat(manifest.host_permissions ?? [])
+      .map(convertMatchPatterns)
 
     const matches = Array.from(new Set(allMatches)).map(
       convertMatchPatterns,
