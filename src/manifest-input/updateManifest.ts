@@ -1,6 +1,7 @@
 import { RollupOptions } from 'rollup'
 import { ManifestInputPluginCache } from '../plugin-options'
 import { cloneObject } from './cloneObject'
+import { convertMatchPatterns } from './convertMatchPatterns'
 
 export function updateManifestV3(
   m: chrome.runtime.ManifestV3,
@@ -46,7 +47,9 @@ export function updateManifestV3(
       .flatMap(({ matches }) => matches ?? [])
       .concat(manifest.host_permissions ?? [])
 
-    const matches = Array.from(new Set(allMatches))
+    const matches = Array.from(new Set(allMatches)).map(
+      convertMatchPatterns,
+    )
     const resources = [
       `${chunkFileNames
         .split('/')
