@@ -14,6 +14,7 @@ export function warnDeprecatedOptions(
     firstClassManifest,
     iifeJsonPaths,
     publicKey,
+    contentScriptWrapper,
   }: Pick<
     ManifestInputPluginOptions,
     | 'crossBrowser'
@@ -22,6 +23,7 @@ export function warnDeprecatedOptions(
     | 'iifeJsonPaths'
     | 'dynamicImportWrapper'
     | 'publicKey'
+    | 'contentScriptWrapper'
   >,
   cache: ManifestInputPluginCache,
 ) {
@@ -35,10 +37,16 @@ export function warnDeprecatedOptions(
     )
 
   if (iifeJsonPaths?.length)
-    this.warn('`options.iifeJsonPaths` is not implemented yet')
+    this.warn('`options.iifeJsonPaths` is deprecated')
 
-  // MV2 manifest is handled in `generateBundle`
-  if (isMV2(cache.manifest)) return
+  if (typeof contentScriptWrapper !== 'undefined')
+    this.warn(
+      '`options.contentScriptWrapper` is deprecated.\nPlease use `options.wrapContentScript`',
+    )
+
+  if (isMV2(cache.manifest))
+    // MV2 manifest is handled in `generateBundle`
+    return
 
   if (browserPolyfill)
     this.warn(

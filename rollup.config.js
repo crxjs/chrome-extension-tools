@@ -7,11 +7,7 @@ import json from '@rollup/plugin-json'
 
 const { dependencies } = require('./package.json')
 
-const external = Object.keys(dependencies).concat(
-  'path',
-  'crypto',
-  'fs',
-)
+const external = Object.keys(dependencies).concat('path', 'fs')
 
 const plugins = [
   json(),

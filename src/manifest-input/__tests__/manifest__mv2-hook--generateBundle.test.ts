@@ -52,8 +52,6 @@ beforeEach(async () => {
   cache = {
     assets: [],
     contentScripts: [],
-    contentScriptCode: {},
-    contentScriptIds: {},
     permsHash: '',
     srcDir: null,
     iife: [],
@@ -118,8 +116,6 @@ test('Warns permissions for verbose true', async () => {
     cache: {
       assets: [],
       contentScripts: [],
-      contentScriptCode: {},
-      contentScriptIds: {},
       permsHash: '',
       srcDir: null,
       iife: [],

@@ -5,6 +5,7 @@ import { getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
 
 const testName = getTestName(__filename)
 const dataDirPath = getExtPath(testName, 'chromium-data-dir')
+// __fixtures__/extensions/mv3-playwright/dist
 const distDirPath = getExtPath(testName, 'dist')
 
 let browserContext: ChromiumBrowserContext
@@ -23,7 +24,7 @@ beforeAll(async () => {
     slowMo: 100,
     args: [`--disable-extensions-except=${distDirPath}`, `--load-extension=${distDirPath}`],
   })) as ChromiumBrowserContext
-}, 30000)
+}, 60000)
 
 afterAll(async () => {
   await browserContext.close()

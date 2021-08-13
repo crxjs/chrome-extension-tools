@@ -1,7 +1,13 @@
+import { basename, relative } from 'path'
 import { RollupOptions } from 'rollup'
 import { ManifestInputPluginCache } from '../plugin-options'
 import { cloneObject } from './cloneObject'
 import { convertMatchPatterns } from './convertMatchPatterns'
+
+export function getImportContentScriptFileName(target: string) {
+  const base = basename(target)
+  return target.replace(base, `import-${base}`)
+}
 
 export function updateManifestV3(
   m: chrome.runtime.ManifestV3,
@@ -56,7 +62,17 @@ export function updateManifestV3(
         .replace('[format]', '*')
         .replace('[name]', '*')
         .replace('[hash]', '*')}`,
+      ...cache.contentScripts.map((x) =>
+        relative(cache.srcDir!, x),
+      ),
     ]
+
+    manifest.content_scripts = manifest.content_scripts.map(
+      (c) => ({
+        ...c,
+        js: c.js?.map(getImportContentScriptFileName),
+      }),
+    )
 
     manifest.web_accessible_resources =
       manifest.web_accessible_resources ?? []

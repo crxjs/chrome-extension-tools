@@ -7,8 +7,6 @@ import { manifestInput } from '../index'
 const cache: ManifestInputPluginCache = {
   assets: [],
   contentScripts: [],
-  contentScriptCode: {},
-  contentScriptIds: {},
   permsHash: '',
   srcDir: null,
   iife: [],
@@ -100,7 +98,10 @@ describe('content scripts and web_accessible_resource (WAR)', () => {
       ],
     } = cache.manifest as chrome.runtime.ManifestV3
 
-    expect(war1.resources).toEqual(['chunks-*/*-*.js'])
+    expect(war1.resources).toEqual([
+      'chunks-*/*-*.js',
+      'content.js',
+    ])
   })
 
   test('sets default if no chunkFileNames value', () => {
@@ -119,7 +120,10 @@ describe('content scripts and web_accessible_resource (WAR)', () => {
       ],
     } = cache.manifest as chrome.runtime.ManifestV3
 
-    expect(war1.resources).toEqual(['chunks/*-*.js'])
+    expect(war1.resources).toEqual([
+      'chunks/*-*.js',
+      'content.js',
+    ])
   })
 
   test('does not modify WAR if no content scripts', () => {
@@ -180,7 +184,10 @@ describe('multiple Rollup OutputOptions', () => {
       ],
     } = cache.manifest as chrome.runtime.ManifestV3
 
-    expect(war1.resources).toEqual(['chunks-*/*-*.js'])
+    expect(war1.resources).toEqual([
+      'chunks-*/*-*.js',
+      'content.js',
+    ])
   })
 
   test('sets default if no chunkFileNames value', () => {
@@ -208,6 +215,9 @@ describe('multiple Rollup OutputOptions', () => {
       ],
     } = cache.manifest as chrome.runtime.ManifestV3
 
-    expect(war1.resources).toEqual(['chunks/*-*.js'])
+    expect(war1.resources).toEqual([
+      'chunks/*-*.js',
+      'content.js',
+    ])
   })
 })

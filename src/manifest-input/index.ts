@@ -18,7 +18,6 @@ import {
   ManifestInputPluginOptions,
 } from '../plugin-options'
 import { cloneObject } from './cloneObject'
-import { hashCode } from './crypto'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
@@ -28,7 +27,10 @@ import {
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import { updateManifestV3 } from './updateManifest'
+import {
+  getImportContentScriptFileName,
+  updateManifestV3,
+} from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -49,6 +51,8 @@ const name = 'manifest-input'
 //   eg, a CSS only Chrome Extension
 export const stubChunkNameForCssOnlyCrx =
   'stub__css-only-chrome-extension-manifest'
+export const importWrapperChunkNamePrefix =
+  '__RPCE-import-wrapper'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -81,6 +85,7 @@ export function manifestInput(
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
+    wrapContentScripts = true,
     cache = {
       assetChanged: false,
       assets: [],
@@ -105,6 +110,10 @@ export function manifestInput(
       cache: cache.readFile,
     },
   )
+
+  /* ------------------ DEPRECATIONS ----------------- */
+
+  // contentScriptWrapper = wrapContentScripts
 
   /* ----------- HOOKS CLOSURES START ----------- */
 
@@ -313,6 +322,8 @@ export function manifestInput(
       // MV2 manifest is handled in `generateBundle`
       if (isMV2(cache.manifest)) return
 
+      /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
+
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
       const manifestBody = cloneObject(cache.manifest!)
@@ -330,20 +341,11 @@ export function manifestInput(
       })
     },
 
-    async resolveId(source, importer) {
-      if (source === stubChunkNameForCssOnlyCrx) {
-        return source
-      } else if (cache.contentScriptIds[source]) {
-        return source
-      } else if (importer && cache.contentScriptIds[importer]) {
-        const result = await this.resolve(
-          source,
-          cache.contentScriptIds[importer],
-        )
-        return result?.id ?? null
-      }
-
-      return null
+    async resolveId(source) {
+      return source === stubChunkNameForCssOnlyCrx ||
+        source.startsWith(importWrapperChunkNamePrefix)
+        ? source
+        : null
     },
 
     load(id) {
@@ -351,44 +353,46 @@ export function manifestInput(
         return {
           code: `console.log(${stubChunkNameForCssOnlyCrx})`,
         }
+      } else if (
+        wrapContentScripts &&
+        isMV3(cache.manifest) &&
+        id.startsWith(importWrapperChunkNamePrefix)
+      ) {
+        const [, target] = id.split(':')
+        const code = ctWrapperScript.replace(
+          '%PATH%',
+          JSON.stringify(target),
+        )
+        return { code }
       }
 
-      const code = cache.contentScriptCode[id]
-      return code ?? null
+      return null
     },
 
-    // FIXME: test this against real usage
     transform(code, id) {
       if (
-        isMV2(cache.manifest) ||
-        !cache.contentScripts.includes(id)
-      )
-        return code
+        wrapContentScripts &&
+        isMV3(cache.manifest) &&
+        cache.contentScripts.includes(id)
+      ) {
+        // Use slash to guarantee support Windows
+        const target = `${slash(relative(cache.srcDir!, id))
+          .split('.')
+          .slice(0, -1)
+          .join('.')}.js`
 
-      const [basename, ...rest] = id.split('/').reverse()
-      const name = basename.replace(/\.[jt]sx?/g, '')
+        const fileName = getImportContentScriptFileName(target)
 
-      const fileName = cache
-        .chunkFileNames!.replace('[format]', 'esm')
-        .replace('[name]', name)
-        .replace('[hash]', hashCode(code, id))
-      const chunkId = [...rest.reverse(), fileName].join('/')
-      this.emitFile({
-        id: chunkId,
-        type: 'chunk',
-        fileName,
-      })
-
-      cache.contentScriptCode[chunkId] = code
-      cache.contentScriptIds[chunkId] = id
-
-      return [
-        '// This is an import wrapper used to support ESM in content scripts.',
-        // TODO: add link to docs
-        `import(chrome.runtime.getURL(${JSON.stringify(
+        // Emit content script wrapper
+        this.emitFile({
+          id: `${importWrapperChunkNamePrefix}:${target}`,
+          type: 'chunk',
           fileName,
-        )})).catch(console.error)`,
-      ].join('\n')
+        })
+      }
+
+      // No source transformation took place
+      return { code, map: null }
     },
 
     watchChange(id) {

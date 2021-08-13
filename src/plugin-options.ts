@@ -17,17 +17,19 @@ export interface ChromeExtensionOptions {
     | {
         executeScript: boolean
       }
+  /** @deprecated Alias for `wrapContentScript` */
   contentScriptWrapper?: boolean
   /** @deprecated Not implemented yet */
   crossBrowser?: boolean
   /** @deprecated Does nothing internally in MV3 */
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
+  /** Extend the manifest programmatically. */
   extendManifest?:
     | Partial<chrome.runtime.Manifest>
     | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
   /** @deprecated Will not be supported in next major version */
   firstClassManifest?: boolean
-  /** @deprecated Not supported yet */
+  /** @deprecated Dropped in favor of `esmContentScripts` */
   iifeJsonPaths?: string[]
   pkg?: {
     description: string
@@ -43,6 +45,13 @@ export interface ChromeExtensionOptions {
   publicKey?: string
   /** @deprecated Does nothing internally in MV3 */
   verbose?: boolean
+  // /**
+  //  * @deprecated Not implemented.
+  //  * If false, content scripts will be rebundled with IIFE format
+  //  */
+  // esmContentScripts?: boolean
+  /** Escape hatch for content script dynamic import wrapper */
+  wrapContentScripts?: boolean
 }
 
 export type ChromeExtensionPlugin = Pick<
@@ -68,8 +77,6 @@ export interface ManifestInputPluginCache {
   assets: string[]
   chunkFileNames?: string
   contentScripts: string[]
-  contentScriptCode: Record<string, string>
-  contentScriptIds: Record<string, string>
   iife: string[]
   input: string[]
   inputAry: string[]

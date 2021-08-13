@@ -2,21 +2,13 @@
 //  - that would probably be overkill
 
 export const code = `
-
+// This is a MOCK bundle from __fixtures__/bundle-imports-stub.ts
 // BUNDLE IMPORTS STUB
 
-const eventPaths = /*@__PURE__*/JSON.parse('%EVENTS%') as string[]
-const importPath = /*@__PURE__*/JSON.parse('%PATH%') as string
-const delayLength = /*@__PURE__*/JSON.parse('%DELAY%') as number
-const excludedPaths = /*@__PURE__*/JSON.parse('%EXCLUDE%') as string[]
+const eventPaths = /*@__PURE__*/JSON.parse('%EVENTS%')
+const importPath = /*@__PURE__*/JSON.parse('%PATH%')
+const delayLength = /*@__PURE__*/JSON.parse('%DELAY%')
+const excludedPaths = /*@__PURE__*/JSON.parse('%EXCLUDE%')
 
-const events = eventPaths.map((eventPath) => resolvePath<ChromeEvent>(chrome, eventPath))
-const triggerEvents = captureEvents(events)
-
-import(importPath).then(async () => {
-  if (delayLength) await delay(delayLength)
-
-  triggerEvents()
-})
-
+import(chrome.runtime.getURL(importPath))
 `.trim()
