@@ -48,9 +48,7 @@ export function updateManifestV3(
       .concat(manifest.host_permissions ?? [])
       .map(convertMatchPatterns)
 
-    const matches = Array.from(new Set(allMatches)).map(
-      convertMatchPatterns,
-    )
+    const matches = Array.from(new Set(allMatches))
     const resources = [
       `${chunkFileNames
         .split('/')
