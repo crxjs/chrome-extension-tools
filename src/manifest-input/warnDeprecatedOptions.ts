@@ -48,7 +48,11 @@ export function warnDeprecatedOptions(
       ].join('\n'),
     )
 
-  if (dynamicImportWrapper !== true)
+  if (
+    // This should be an empty object
+    typeof dynamicImportWrapper !== 'object' ||
+    Object.keys(dynamicImportWrapper).length > 0
+  )
     this.warn(
       '`options.dynamicImportWrapper` is not required for MV3',
     )
