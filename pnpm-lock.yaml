@@ -21,6 +21,7 @@ specifiers:
   '@types/glob': ^7.1.1
   '@types/jest': ^25.1.2
   '@types/jest-in-case': ^1.0.3
+  '@types/lodash': ^4.14.172
   '@types/lodash.difference': ^4.5.6
   '@types/lodash.flatten': ^4.4.6
   '@types/lodash.get': ^4.4.6
@@ -46,9 +47,7 @@ specifiers:
   jest-in-case: ^1.0.2
   json-ptr: ^2.2.0
   jsonpath-plus: ^4.0.0
-  lodash.difference: ^4.5.0
-  lodash.flatten: ^4.4.0
-  lodash.get: ^4.4.2
+  lodash: ^4.17.21
   mem: ^6.0.1
   npm-run-all: ^4.1.5
   playwright: ^1.13.1
@@ -67,6 +66,7 @@ specifiers:
   webextension-polyfill: ^0.6.0
 
 dependencies:
+  '@types/lodash': 4.14.172
   ajv: 8.6.2
   array-flat-polyfill: 1.0.1
   cheerio: 1.0.0-rc.3
@@ -76,9 +76,7 @@ dependencies:
   glob: 7.1.6
   json-ptr: 2.2.0
   jsonpath-plus: 4.0.0
-  lodash.difference: 4.5.0
-  lodash.flatten: 4.4.0
-  lodash.get: 4.4.2
+  lodash: 4.17.21
   mem: 6.1.1
   rollup: 1.32.1
   slash: 3.0.0
@@ -2018,6 +2016,10 @@ packages:
   /@types/lodash/4.14.168:
     resolution: {integrity: sha512-oVfRvqHV/V6D1yifJbVRU3TMp8OT6o6BG+U9MkwuJ3U8/CsDHvalRpsxBqivn71ztOFZBTfJMvETbqHiaNSj7Q==}
     dev: true
+
+  /@types/lodash/4.14.172:
+    resolution: {integrity: sha512-/BHF5HAx3em7/KkzVKm3LrsD6HZAXuXO1AJZQ3cRRBZj4oHZDviWPYu0aEplAqDFNHZPW6d3G7KN+ONcCCC7pw==}
+    dev: false
 
   /@types/minimatch/3.0.3:
     resolution: {integrity: sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==}
@@ -4904,18 +4906,6 @@ packages:
   /lodash.debounce/4.0.8:
     resolution: {integrity: sha1-gteb/zCmfEAF/9XiUVMArZyk168=}
     dev: true
-
-  /lodash.difference/4.5.0:
-    resolution: {integrity: sha1-nMtOUF1Ia5FlE0V3KIWi3yf9AXw=}
-    dev: false
-
-  /lodash.flatten/4.4.0:
-    resolution: {integrity: sha1-8xwiIlqWMtK7+OSt2+8kCqdlph8=}
-    dev: false
-
-  /lodash.get/4.4.2:
-    resolution: {integrity: sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=}
-    dev: false
 
   /lodash/4.17.20:
     resolution: {integrity: sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==}

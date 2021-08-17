@@ -53,7 +53,7 @@ export const normalizeFilename = (p: string) =>
  * Update the manifest source in the output bundle
  */
 export const updateManifest = <
-  T extends chrome.runtime.ManifestBase
+  T extends chrome.runtime.Manifest
 >(
   updater: (manifest: T) => T,
   bundle: OutputBundle,
