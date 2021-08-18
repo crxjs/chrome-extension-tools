@@ -47,6 +47,7 @@ specifiers:
   jest-in-case: ^1.0.2
   json-ptr: ^2.2.0
   jsonpath-plus: ^4.0.0
+  localforage: ^1.9.0
   lodash: ^4.17.21
   mem: ^6.0.1
   npm-run-all: ^4.1.5
@@ -76,6 +77,7 @@ dependencies:
   glob: 7.1.6
   json-ptr: 2.2.0
   jsonpath-plus: 4.0.0
+  localforage: 1.9.0
   lodash: 4.17.21
   mem: 6.1.1
   rollup: 1.32.1
@@ -3891,6 +3893,10 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
+  /immediate/3.0.6:
+    resolution: {integrity: sha1-nbHb0Pr43m++D13V5Wu2BigN5ps=}
+    dev: false
+
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -4883,6 +4889,12 @@ packages:
       type-check: 0.3.2
     dev: true
 
+  /lie/3.1.1:
+    resolution: {integrity: sha1-mkNrLMd0bKWd56QfpGmz77dr2H4=}
+    dependencies:
+      immediate: 3.0.6
+    dev: false
+
   /lines-and-columns/1.1.6:
     resolution: {integrity: sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=}
 
@@ -4895,6 +4907,12 @@ packages:
       pify: 3.0.0
       strip-bom: 3.0.0
     dev: true
+
+  /localforage/1.9.0:
+    resolution: {integrity: sha512-rR1oyNrKulpe+VM9cYmcFn6tsHuokyVHFaCM3+osEmxaHTbEk8oQu6eGDfS6DQLWi/N67XRmB8ECG37OES368g==}
+    dependencies:
+      lie: 3.1.1
+    dev: false
 
   /locate-path/5.0.0:
     resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}

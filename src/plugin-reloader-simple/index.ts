@@ -1,8 +1,9 @@
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { outputJson } from 'fs-extra'
+import { set } from 'lodash'
 import { join } from 'path'
-import { Plugin } from 'rollup'
+import { OutputChunk, Plugin } from 'rollup'
 import { updateManifest } from '../helpers'
 import {
   backgroundPageReloader,
@@ -35,6 +36,7 @@ export interface SimpleReloaderCache {
   timestampPath?: string
   outputDir?: string
   loadMessage?: string
+  manifestVersion?: 2 | 3
 }
 
 // Used for testing
@@ -141,53 +143,73 @@ export const simpleReloader = (
 
       updateManifest(
         (manifest) => {
+          /* ---------------- MANIFEST VERSION --------------- */
+
+          cache.manifestVersion = manifest.manifest_version
+
           /* ------------------ DESCRIPTION ------------------ */
 
           manifest.description = cache.loadMessage
 
           /* ---------------- BACKGROUND PAGE ---------------- */
 
+          if (!cache.bgScriptPath)
+            this.error(
+              `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
+            )
+
           if (manifest.manifest_version === 3) {
-            this.error('Manifest Version 3 is unsupported')
-          } else {
-            if (!manifest.background) {
-              manifest.background = {}
-            }
-
-            manifest.background.persistent = true
-
-            const {
-              scripts: bgScripts = [],
-            } = manifest.background
-
-            if (cache.bgScriptPath) {
-              manifest.background.scripts = [
-                cache.bgScriptPath,
-                ...bgScripts,
-              ]
-            } else {
-              this.error(
-                `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
+            if (unregisterServiceWorkers)
+              throw new Error(
+                '`unregisterServiceWorkers` is deprecated for MV3, please set to `false`',
               )
+
+            const swPath =
+              manifest.background?.service_worker ??
+              'service_worker.js'
+
+            const swCode = `
+              // SIMPLE RELOADER IMPORT
+              import "./${cache.bgScriptPath}"
+            `.trim()
+
+            if (!bundle[swPath]) emit(swPath, swCode, true)
+            else {
+              const sw = bundle[swPath] as OutputChunk
+              sw.code = `
+              ${swCode}
+              ${sw.code}
+              `.trim()
             }
+
+            set(manifest, 'background.service_worker', swPath)
+            set(manifest, 'background.type', 'module')
+          } else {
+            set(
+              manifest,
+              'background.scripts',
+              (manifest.background?.scripts ?? []).concat([
+                cache.bgScriptPath,
+              ]),
+            )
+            set(manifest, 'background.persistent', true)
           }
 
           /* ---------------- CONTENT SCRIPTS ---------------- */
 
-          const { content_scripts: ctScripts } = manifest
-
-          if (cache.ctScriptPath) {
-            manifest.content_scripts = ctScripts?.map(
-              ({ js = [], ...rest }) => ({
-                js: [cache.ctScriptPath!, ...js],
-                ...rest,
-              }),
-            )
-          } else {
+          if (!cache.ctScriptPath)
             this.error(
               `cache.ctScriptPath is ${typeof cache.ctScriptPath}`,
             )
-          }
+
+          const { content_scripts: ctScripts } = manifest
+
+          manifest.content_scripts = ctScripts?.map(
+            ({ js = [], ...rest }) => ({
+              js: [cache.ctScriptPath!, ...js],
+              ...rest,
+            }),
+          )
 
           return manifest
         },
