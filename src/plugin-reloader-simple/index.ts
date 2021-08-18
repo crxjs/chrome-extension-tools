@@ -159,11 +159,6 @@ export const simpleReloader = (
             )
 
           if (manifest.manifest_version === 3) {
-            if (unregisterServiceWorkers)
-              throw new Error(
-                '`unregisterServiceWorkers` is deprecated for MV3, please set to `false`',
-              )
-
             const swPath =
               manifest.background?.service_worker ??
               'service_worker.js'
