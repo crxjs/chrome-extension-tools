@@ -1,6 +1,5 @@
 import glob from 'glob'
-import get from 'lodash.get'
-import diff from 'lodash.difference'
+import { get, difference as diff } from 'lodash'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
 import * as permissions from './permissions'

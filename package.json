@@ -30,6 +30,7 @@
     "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|playwright\""
   },
   "dependencies": {
+    "@types/lodash": "^4.14.172",
     "ajv": "^8.6.2",
     "array-flat-polyfill": "^1.0.1",
     "cheerio": "1.0.0-rc.3",
@@ -39,9 +40,8 @@
     "glob": "^7.1.6",
     "json-ptr": "^2.2.0",
     "jsonpath-plus": "^4.0.0",
-    "lodash.difference": "^4.5.0",
-    "lodash.flatten": "^4.4.0",
-    "lodash.get": "^4.4.2",
+    "localforage": "^1.9.0",
+    "lodash": "^4.17.21",
     "mem": "^6.0.1",
     "rollup": "^1.31.0",
     "slash": "^3.0.0",

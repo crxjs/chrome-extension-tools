@@ -1,4 +1,4 @@
-import flatten from 'lodash.flatten'
+import { flatten } from 'lodash'
 import path from 'path'
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
 import { isAsset, isChunk } from '../src/helpers'

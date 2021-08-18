@@ -1,7 +1,7 @@
 import 'array-flat-polyfill'
 
 import { readFile } from 'fs-extra'
-import flatten from 'lodash.flatten'
+import { flatten } from 'lodash'
 import { relative } from 'path'
 
 import { not } from '../helpers'
