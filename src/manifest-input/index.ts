@@ -8,10 +8,10 @@ import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
 import {
   isChunk,
-  isJsonFilePath,
+  isPresent,
   normalizeFilename,
 } from '../helpers'
-import { ChromeExtensionManifest } from '../manifest'
+import { isMV2, isMV3 } from '../manifest-types'
 import {
   ManifestInputPlugin,
   ManifestInputPluginCache,
@@ -19,29 +19,40 @@ import {
 } from '../plugin-options'
 import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
+import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
 import {
   deriveFiles,
   derivePermissions,
 } from './manifest-parser/index'
-import {
-  validateManifest,
-  ValidationErrorsArray,
-} from './manifest-parser/validate'
+import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-
-export function dedupe<T>(x: T[]): T[] {
-  return [...new Set(x)]
-}
+import {
+  getImportContentScriptFileName,
+  updateManifestV3,
+} from './updateManifest'
+import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
+  loaders: {
+    '.ts': (filePath: string) => {
+      require('ts-node/register')
+      const result = require(filePath)
+
+      return result.default ?? result
+    },
+  },
 })
 
 const name = 'manifest-input'
 
-export const stubChunkName =
-  'stub__empty-chrome-extension-manifest'
+// We use a stub if the manifest has no scripts
+//   eg, a CSS only Chrome Extension
+export const stubChunkNameForCssOnlyCrx =
+  'stub__css-only-chrome-extension-manifest'
+export const importWrapperChunkNamePrefix =
+  '__RPCE-import-wrapper'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -74,9 +85,13 @@ export function manifestInput(
     pkg = npmPkgDetails,
     publicKey,
     verbose = true,
+    wrapContentScripts = true,
     cache = {
       assetChanged: false,
       assets: [],
+      contentScripts: [],
+      contentScriptCode: {},
+      contentScriptIds: {},
       iife: [],
       input: [],
       inputAry: [],
@@ -95,6 +110,10 @@ export function manifestInput(
       cache: cache.readFile,
     },
   )
+
+  /* ------------------ DEPRECATIONS ----------------- */
+
+  // contentScriptWrapper = wrapContentScripts
 
   /* ----------- HOOKS CLOSURES START ----------- */
 
@@ -133,39 +152,22 @@ export function manifestInput(
     /* ============================================ */
 
     options(options) {
+      /* ----------- LOAD AND PROCESS MANIFEST ----------- */
+
       // Do not reload manifest without changes
       if (!cache.manifest) {
-        /* ----------- LOAD AND PROCESS MANIFEST ----------- */
+        const {
+          inputManifestPath,
+          ...cacheValues
+        } = getInputManifestPath(options)
 
-        let inputManifestPath: string | undefined
-        if (Array.isArray(options.input)) {
-          const manifestIndex = options.input.findIndex(
-            isJsonFilePath,
-          )
-          inputManifestPath = options.input[manifestIndex]
-          cache.inputAry = [
-            ...options.input.slice(0, manifestIndex),
-            ...options.input.slice(manifestIndex + 1),
-          ]
-        } else if (typeof options.input === 'object') {
-          inputManifestPath = options.input.manifest
-          cache.inputObj = cloneObject(options.input)
-          delete cache.inputObj['manifest']
-        } else {
-          inputManifestPath = options.input
-        }
-
-        if (!isJsonFilePath(inputManifestPath)) {
-          throw new TypeError(
-            'RollupOptions.input must be a single Chrome extension manifest.',
-          )
-        }
+        Object.assign(cache, cacheValues)
 
         const configResult = explorer.load(
           inputManifestPath,
         ) as {
           filepath: string
-          config: ChromeExtensionManifest
+          config: chrome.runtime.Manifest
           isEmpty?: true
         }
 
@@ -174,36 +176,48 @@ export function manifestInput(
         }
 
         const { options_page, options_ui } = configResult.config
-        if (
-          options_page !== undefined &&
-          options_ui !== undefined
-        ) {
+        if (isPresent(options_ui) && isPresent(options_page)) {
           throw new Error(
             'options_ui and options_page cannot both be defined in manifest.json.',
           )
         }
 
         manifestPath = configResult.filepath
-
-        if (typeof extendManifest === 'function') {
-          cache.manifest = extendManifest(configResult.config)
-        } else if (typeof extendManifest === 'object') {
-          cache.manifest = {
-            ...configResult.config,
-            ...extendManifest,
-          }
-        } else {
-          cache.manifest = configResult.config
-        }
-
         cache.srcDir = path.dirname(manifestPath)
 
+        let extendedManifest: Partial<chrome.runtime.Manifest>
+        if (typeof extendManifest === 'function') {
+          extendedManifest = extendManifest(configResult.config)
+        } else if (typeof extendManifest === 'object') {
+          extendedManifest = {
+            ...configResult.config,
+            ...extendManifest,
+          } as Partial<chrome.runtime.Manifest>
+        } else {
+          extendedManifest = configResult.config
+        }
+
+        const fullManifest = {
+          // MV2 is default
+          manifest_version: 2,
+          name: pkg.name,
+          // version must be all digits with up to three dots
+          version: [
+            ...(pkg.version?.matchAll(/\d+/g) ?? []),
+          ].join('.'),
+          description: pkg.description,
+          ...extendedManifest,
+        } as chrome.runtime.Manifest
+
+        // If the manifest is the source of truth for inputs
+        //   `false` means that all inputs must come from Rollup config
         if (firstClassManifest) {
+          // Any scripts from here will be regenerated as IIFE's
           cache.iife = iifeJsonPaths
             .map((jsonPath) => {
               const result = JSONPath({
                 path: jsonPath,
-                json: cache.manifest!,
+                json: fullManifest,
               })
 
               return result
@@ -211,10 +225,18 @@ export function manifestInput(
             .flat(Infinity)
 
           // Derive entry paths from manifest
-          const { js, html, css, img, others } = deriveFiles(
-            cache.manifest,
-            cache.srcDir,
-          )
+          const {
+            js,
+            html,
+            css,
+            img,
+            others,
+            contentScripts,
+          } = deriveFiles(fullManifest, cache.srcDir, {
+            contentScripts: true,
+          })
+
+          cache.contentScripts = contentScripts
 
           // Cache derived inputs
           cache.input = [...cache.inputAry, ...js, ...html]
@@ -225,31 +247,48 @@ export function manifestInput(
           ]
         }
 
-        /* --------------- END LOAD MANIFEST --------------- */
-      }
+        let finalManifest: chrome.runtime.Manifest
+        if (isMV3(fullManifest)) {
+          finalManifest = updateManifestV3(
+            fullManifest,
+            options,
+            cache,
+          )
+        } else {
+          finalManifest = fullManifest
+        }
 
+        cache.manifest = validateManifest(finalManifest)
+      }
+      /* --------------- END LOAD MANIFEST --------------- */
+
+      // Final `options.input` is an object
+      //   this grants full compatibility with all Rollup options
       const finalInput = cache.input.reduce(
         reduceToRecord(cache.srcDir),
         cache.inputObj,
       )
 
+      // Use a stub if no js scripts
       if (Object.keys(finalInput).length === 0) {
-        finalInput[stubChunkName] = stubChunkName
+        finalInput[
+          stubChunkNameForCssOnlyCrx
+        ] = stubChunkNameForCssOnlyCrx
       }
 
       return { ...options, input: finalInput }
     },
 
-    /* ============================================ */
-    /*              HANDLE WATCH FILES              */
-    /* ============================================ */
-
     async buildStart() {
+      /* ------------ WATCH ASSETS FOR CHANGES ----------- */
+
       this.addWatchFile(manifestPath)
 
       cache.assets.forEach((srcPath) => {
         this.addWatchFile(srcPath)
       })
+
+      /* ------------------ EMIT ASSETS ------------------ */
 
       const assets: EmittedAsset[] = await Promise.all(
         cache.assets.map(async (srcPath) => {
@@ -266,22 +305,94 @@ export function manifestInput(
       assets.forEach((asset) => {
         this.emitFile(asset)
       })
+
+      warnDeprecatedOptions.call(
+        this,
+        {
+          browserPolyfill,
+          crossBrowser,
+          dynamicImportWrapper,
+          firstClassManifest,
+          iifeJsonPaths,
+          publicKey,
+        },
+        cache,
+      )
+
+      // MV2 manifest is handled in `generateBundle`
+      if (isMV2(cache.manifest)) return
+
+      /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
+
+      /* --------------- EMIT MV3 MANIFEST --------------- */
+
+      const manifestBody = cloneObject(cache.manifest!)
+      const manifestJson = JSON.stringify(
+        manifestBody,
+        undefined,
+        2,
+      ).replace(/\.[jt]sx?"/g, '.js"')
+
+      // Emit manifest.json
+      this.emitFile({
+        type: 'asset',
+        fileName: manifestName,
+        source: manifestJson,
+      })
     },
 
-    resolveId(source) {
-      if (source === stubChunkName) {
-        return source
-      }
-
-      return null
+    async resolveId(source) {
+      return source === stubChunkNameForCssOnlyCrx ||
+        source.startsWith(importWrapperChunkNamePrefix)
+        ? source
+        : null
     },
 
     load(id) {
-      if (id === stubChunkName) {
-        return { code: `console.log(${stubChunkName})` }
+      if (id === stubChunkNameForCssOnlyCrx) {
+        return {
+          code: `console.log(${stubChunkNameForCssOnlyCrx})`,
+        }
+      } else if (
+        wrapContentScripts &&
+        isMV3(cache.manifest) &&
+        id.startsWith(importWrapperChunkNamePrefix)
+      ) {
+        const [, target] = id.split(':')
+        const code = ctWrapperScript.replace(
+          '%PATH%',
+          JSON.stringify(target),
+        )
+        return { code }
       }
 
       return null
+    },
+
+    transform(code, id) {
+      if (
+        wrapContentScripts &&
+        isMV3(cache.manifest) &&
+        cache.contentScripts.includes(id)
+      ) {
+        // Use slash to guarantee support Windows
+        const target = `${slash(relative(cache.srcDir!, id))
+          .split('.')
+          .slice(0, -1)
+          .join('.')}.js`
+
+        const fileName = getImportContentScriptFileName(target)
+
+        // Emit content script wrapper
+        this.emitFile({
+          id: `${importWrapperChunkNamePrefix}:${target}`,
+          type: 'chunk',
+          fileName,
+        })
+      }
+
+      // No source transformation took place
+      return { code, map: null }
     },
 
     watchChange(id) {
@@ -302,12 +413,26 @@ export function manifestInput(
     generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
-      delete bundle[stubChunkName + '.js']
+      delete bundle[stubChunkNameForCssOnlyCrx + '.js']
 
-      /* ---------- DERIVE PERMISSIONS START --------- */
+      // We don't support completely empty bundles
+      if (Object.keys(bundle).length === 0) {
+        throw new Error(
+          'The Chrome extension must have at least one asset (html or css) or script file.',
+        )
+      }
 
+      // MV3 is handled in `buildStart` to support Vite
+      if (isMV3(cache.manifest)) return
+
+      /* ------------------------------------------------- */
+      /*                 EMIT MV2 MANIFEST                 */
+      /* ------------------------------------------------- */
+
+      /* ------------ DERIVE PERMISSIONS START ----------- */
+
+      let permissions: string[] = []
       // Get module ids for all chunks
-      let permissions: string[]
       if (cache.assetChanged && cache.permsHash) {
         // Permissions did not change
         permissions = JSON.parse(cache.permsHash) as string[]
@@ -338,51 +463,36 @@ export function manifestInput(
         cache.permsHash = permsHash
       }
 
-      if (Object.keys(bundle).length === 0) {
-        throw new Error(
-          'The manifest must have at least one asset (html or css) or script file.',
-        )
+      const clonedManifest = cloneObject(
+        cache.manifest,
+      ) as chrome.runtime.ManifestV2
+
+      const manifestBody = {
+        ...clonedManifest,
+        permissions: combinePerms(
+          permissions,
+          clonedManifest.permissions || [],
+        ),
       }
 
-      try {
-        // Clone cache.manifest
-        if (!cache.manifest)
-          // This is a programming error, so it should throw
-          throw new TypeError(
-            `cache.manifest is ${typeof cache.manifest}`,
-          )
+      const {
+        background: { scripts: bgs = [] } = {},
+        content_scripts: cts = [],
+        web_accessible_resources: war = [],
+      } = manifestBody
 
-        const clonedManifest = cloneObject(cache.manifest)
+      /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
 
-        const manifestBody = validateManifest({
-          manifest_version: 2,
-          name: pkg.name,
-          version: pkg.version,
-          description: pkg.description,
-          ...clonedManifest,
-          permissions: combinePerms(
-            permissions,
-            clonedManifest.permissions || [],
-          ),
-        })
-
-        const {
-          content_scripts: cts = [],
-          web_accessible_resources: war = [],
-          background: { scripts: bgs = [] } = {},
-        } = manifestBody
-
-        /* ------------- SETUP CONTENT SCRIPTS ------------- */
-
-        const contentScripts = cts.reduce(
-          (r, { js = [] }) => [...r, ...js],
-          [] as string[],
-        )
-
-        if (contentScriptWrapper && contentScripts.length) {
-          const memoizedEmitter = memoize(
-            (scriptPath: string) => {
-              const source = ctWrapperScript.replace(
+      // Emit background script wrappers
+      if (bgs.length && wrapperScript.length) {
+        // background exists because bgs has scripts
+        manifestBody.background!.scripts = bgs
+          .map(normalizeFilename)
+          .map((scriptPath: string) => {
+            // Loader script exists because of type guard above
+            const source =
+              // Path to module being loaded
+              wrapperScript.replace(
                 '%PATH%',
                 // Fix path slashes to support Windows
                 JSON.stringify(
@@ -390,123 +500,105 @@ export function manifestInput(
                 ),
               )
 
-              const assetId = this.emitFile({
-                type: 'asset',
-                source,
-                name: basename(scriptPath),
-              })
+            const assetId = this.emitFile({
+              type: 'asset',
+              source,
+              name: basename(scriptPath),
+            })
 
-              return this.getFileName(assetId)
-            },
+            return this.getFileName(assetId)
+          })
+          .map((p) => slash(p))
+      }
+
+      /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
+
+      /* ------------- SETUP CONTENT SCRIPTS ------------- */
+
+      const contentScripts = cts.reduce(
+        (r, { js = [] }) => [...r, ...js],
+        [] as string[],
+      )
+
+      if (contentScriptWrapper && contentScripts.length) {
+        const memoizedEmitter = memoize((scriptPath: string) => {
+          const source = ctWrapperScript.replace(
+            '%PATH%',
+            // Fix path slashes to support Windows
+            JSON.stringify(
+              slash(relative('assets', scriptPath)),
+            ),
           )
 
-          // Setup content script import wrapper
-          manifestBody.content_scripts = cts.map(
-            ({ js, ...rest }) => {
-              return typeof js === 'undefined'
-                ? rest
-                : {
-                    js: js
-                      .map(normalizeFilename)
-                      .map(memoizedEmitter)
-                      .map((p) => slash(p)),
-                    ...rest,
-                  }
-            },
+          const assetId = this.emitFile({
+            type: 'asset',
+            source,
+            name: basename(scriptPath),
+          })
+
+          return this.getFileName(assetId)
+        })
+
+        // Setup content script import wrapper
+        manifestBody.content_scripts = cts.map(
+          ({ js, ...rest }) => {
+            return typeof js === 'undefined'
+              ? rest
+              : {
+                  js: js
+                    .map(normalizeFilename)
+                    .map(memoizedEmitter)
+                    .map((p) => slash(p)),
+                  ...rest,
+                }
+          },
+        )
+
+        // make all imports & dynamic imports web_acc_res
+        const imports = Object.values(bundle)
+          .filter((x): x is OutputChunk => x.type === 'chunk')
+          .reduce(
+            (r, { isEntry, fileName }) =>
+              // Get imported filenames
+              !isEntry ? [...r, fileName] : r,
+            [] as string[],
           )
 
-          // make all imports & dynamic imports web_acc_res
-          const imports = Object.values(bundle)
-            .filter((x): x is OutputChunk => x.type === 'chunk')
-            .reduce(
-              (r, { isEntry, fileName }) =>
-                // Get imported filenames
-                !isEntry ? [...r, fileName] : r,
-              [] as string[],
-            )
-
-          // SMELL: web accessible resources can be used for fingerprinting extensions
-          manifestBody.web_accessible_resources = dedupe([
+        manifestBody.web_accessible_resources = Array.from(
+          new Set([
             ...war,
             // FEATURE: filter out imports for background?
             ...imports,
             // Need to be web accessible b/c of import
             ...contentScripts,
-          ]).map((p) => slash(p))
-        }
+          ]),
+        ).map((p) => slash(p))
 
         /* ----------- END SETUP CONTENT SCRIPTS ----------- */
-
-        /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
-
-        // Emit background script wrappers
-        if (bgs.length && wrapperScript.length) {
-          // background exists because bgs has scripts
-          manifestBody.background!.scripts = bgs
-            .map(normalizeFilename)
-            .map((scriptPath: string) => {
-              // Loader script exists because of type guard above
-              const source =
-                // Path to module being loaded
-                wrapperScript.replace(
-                  '%PATH%',
-                  // Fix path slashes to support Windows
-                  JSON.stringify(
-                    slash(relative('assets', scriptPath)),
-                  ),
-                )
-
-              const assetId = this.emitFile({
-                type: 'asset',
-                source,
-                name: basename(scriptPath),
-              })
-
-              return this.getFileName(assetId)
-            })
-            .map((p) => slash(p))
-        }
-
-        /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
-
-        /* --------- STABLE EXTENSION ID BEGIN -------- */
-
-        if (publicKey) {
-          manifestBody.key = publicKey
-        }
-
-        /* ---------- STABLE EXTENSION ID END --------- */
-
-        /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
-
-        const manifestJson = JSON.stringify(
-          manifestBody,
-          null,
-          2,
-        )
-          // SMELL: is this necessary?
-          .replace(/\.[jt]sx?"/g, '.js"')
-
-        // Emit manifest.json
-        this.emitFile({
-          type: 'asset',
-          fileName: manifestName,
-          source: manifestJson,
-        })
-      } catch (error) {
-        // Catch here because we need the validated result in scope
-
-        if (error.name !== 'ValidationError') throw error
-        const errors = error.errors as ValidationErrorsArray
-        if (errors) {
-          errors.forEach((err) => {
-            // FIXME: make a better validation error message
-            // https://github.com/atlassian/better-ajv-errors
-            this.warn(JSON.stringify(err, undefined, 2))
-          })
-        }
-        this.error(error.message)
       }
+
+      /* --------- STABLE EXTENSION ID BEGIN -------- */
+
+      if (publicKey) {
+        manifestBody.key = publicKey
+      }
+
+      /* ---------- STABLE EXTENSION ID END --------- */
+
+      /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
+
+      const manifestJson = JSON.stringify(
+        manifestBody,
+        null,
+        2,
+      ).replace(/\.[jt]sx?"/g, '.js"')
+
+      // Emit manifest.json
+      this.emitFile({
+        type: 'asset',
+        fileName: manifestName,
+        source: manifestJson,
+      })
 
       /* ------------ OUTPUT MANIFEST.JSON END ----------- */
     },

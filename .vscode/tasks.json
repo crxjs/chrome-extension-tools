@@ -1,16 +1,33 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558 
+  // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "2.0.0",
   "tasks": [
     {
       "type": "npm",
-      "script": "build",
-      "group": "build"
+      "script": "dev:build",
+      "problemMatcher": [],
+      "label": "npm: dev:build",
+      "detail": "rollup -c -w",
+      "presentation": {
+        "group": "build"
+      }
     },
     {
       "type": "npm",
-      "script": "start",
+      "script": "dev:lint",
+      "problemMatcher": ["$tsc-watch"],
+      "label": "npm: dev:lint",
+      "detail": "npm run lint:types -- --watch",
+      "presentation": {
+        "group": "build"
+      }
+    },
+    {
+      "label": "dev build tasks",
+      "dependsOn": ["npm: dev:lint", "npm: dev:build"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
       "group": {
         "kind": "build",
         "isDefault": true

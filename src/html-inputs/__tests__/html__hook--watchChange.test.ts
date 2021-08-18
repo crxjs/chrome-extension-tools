@@ -16,13 +16,13 @@ import {
   popupJs,
   faviconPng,
   faviconIco,
-} from '../../../__fixtures__/kitchen-sink-paths'
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { loadHtml } from '../cheerio'
 import { HtmlInputsPluginCache } from '../../plugin-options'
 
 const srcDir = join(
   process.cwd(),
-  '__fixtures__/extensions/kitchen-sink',
+  '__fixtures__/extensions/mv2-kitchen-sink',
 )
 const cache: HtmlInputsPluginCache = {
   css: [],

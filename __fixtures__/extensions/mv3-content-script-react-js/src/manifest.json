@@ -1,0 +1,16 @@
+{
+  "action": {
+    "default_popup": "pages/popup/index.html"
+  },
+  "content_scripts": [
+    {
+      "js": ["content1/index.js"],
+      "matches": ["https://*/*", "http://*/*"]
+    },
+    {
+      "js": ["content2/index.jsx"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "manifest_version": 3
+}

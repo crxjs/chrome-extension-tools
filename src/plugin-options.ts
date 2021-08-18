@@ -1,36 +1,57 @@
-import { Plugin, PluginHooks } from 'rollup'
-import { ValidateNamesPlugin } from './validate-names/index'
-import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
-import { ChromeExtensionManifest } from './manifest'
+import { ModuleFormat, Plugin, PluginHooks } from 'rollup'
 import { CheerioFile } from './html-inputs/cheerio'
-import { ModuleFormat } from 'rollup'
+import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
+import { ValidateNamesPlugin } from './validate-names/index'
 
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
 export interface ChromeExtensionOptions {
+  /**
+   * @deprecated This is not supported for MV3, use this instead:
+   * ```js
+   * import browser from 'webextension-polyfill'
+   * ```
+   */
   browserPolyfill?:
     | boolean
     | {
         executeScript: boolean
       }
+  /** @deprecated Alias for `wrapContentScript` */
   contentScriptWrapper?: boolean
-  // TODO: use this option with iifeJsonPaths to enable a preset to support Firefox builds
+  /** @deprecated Not implemented yet */
   crossBrowser?: boolean
+  /** @deprecated Does nothing internally in MV3 */
   dynamicImportWrapper?: DynamicImportWrapperOptions | false
+  /** Extend the manifest programmatically. */
   extendManifest?:
-    | Partial<ChromeExtensionManifest>
-    | ((
-        manifest: ChromeExtensionManifest,
-      ) => ChromeExtensionManifest)
+    | Partial<chrome.runtime.Manifest>
+    | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
+  /** @deprecated Will not be supported in next major version */
   firstClassManifest?: boolean
+  /** @deprecated Dropped in favor of `esmContentScripts` */
   iifeJsonPaths?: string[]
   pkg?: {
     description: string
     name: string
     version: string
   }
+  /**
+   * @deprecated Use `options.extendManifest.key`
+   * ```js
+   * chromeExtension({ extendManifest: { key: '...' } })
+   * ```
+   */
   publicKey?: string
+  /** @deprecated Does nothing internally in MV3 */
   verbose?: boolean
+  // /**
+  //  * @deprecated Not implemented.
+  //  * If false, content scripts will be rebundled with IIFE format
+  //  */
+  // esmContentScripts?: boolean
+  /** Escape hatch for content script dynamic import wrapper */
+  wrapContentScripts?: boolean
 }
 
 export type ChromeExtensionPlugin = Pick<
@@ -54,6 +75,8 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
+  chunkFileNames?: string
+  contentScripts: string[]
   iife: string[]
   input: string[]
   inputAry: string[]
@@ -62,7 +85,7 @@ export interface ManifestInputPluginCache {
   srcDir: string | null
   /** for memoized fs.readFile */
   readFile: Map<string, any>
-  manifest?: ChromeExtensionManifest
+  manifest?: chrome.runtime.Manifest
   assetChanged: boolean
 }
 
@@ -71,6 +94,7 @@ type ManifestInputPluginHooks =
   | 'buildStart'
   | 'resolveId'
   | 'load'
+  | 'transform'
   | 'watchChange'
   | 'generateBundle'
 

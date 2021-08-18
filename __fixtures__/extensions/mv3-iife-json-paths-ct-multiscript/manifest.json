@@ -1,0 +1,12 @@
+{
+  "content_scripts": [
+    {
+      "js": ["content1.js", "content2.js"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ],
+  "description": "iife json paths content multiscript",
+  "manifest_version": 3,
+  "name": "iife-json-paths-ct-multiscript",
+  "version": "1.0.0"
+}

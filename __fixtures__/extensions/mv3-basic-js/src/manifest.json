@@ -1,0 +1,19 @@
+{
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["https://a.com/*", "http://b.com/*"]
+    }
+  ],
+  "host_permissions": ["https://c.com/*"],
+  "manifest_version": 3,
+  "name": "mv3-basic-js",
+  "version": "1.0.0",
+  "description": "Basic MV3 Chrome Extension"
+}

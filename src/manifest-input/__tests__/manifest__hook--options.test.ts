@@ -1,4 +1,4 @@
-import { writeJSON, readJSON } from 'fs-extra'
+import { readJSON, writeJSON } from 'fs-extra'
 import { RollupOptions } from 'rollup'
 import {
   backgroundJs,
@@ -17,15 +17,17 @@ import {
   optionsJpg,
   popupHtml,
   srcDir,
-} from '../../../__fixtures__/kitchen-sink-paths'
+} from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { context } from '../../../__fixtures__/minimal-plugin-context'
 import { getExtPath } from '../../../__fixtures__/utils'
-import { ChromeExtensionManifest } from '../../manifest'
 import { ManifestInputPluginCache } from '../../plugin-options'
 import { cloneObject } from '../cloneObject'
 import { explorer, manifestInput } from '../index'
 
 jest.spyOn(explorer, 'load')
+
+const validate = require('../manifest-parser/validate')
+jest.spyOn(validate, 'validateManifest')
 
 const manifestParser = require('../manifest-parser/index')
 jest.spyOn(manifestParser, 'deriveFiles')
@@ -34,6 +36,7 @@ const manifest = require(manifestJson)
 
 const cache: ManifestInputPluginCache = {
   assets: [],
+  contentScripts: [],
   permsHash: '',
   srcDir: null,
   iife: [],
@@ -53,15 +56,17 @@ const options: RollupOptions = {
 
 const clonedOptions = cloneObject(options)
 
+const crxName = 'mv2-kitchen-sink'
 const expectedInputResult = {
-  background: getExtPath('kitchen-sink/background.js'),
-  content: getExtPath('kitchen-sink/content.js'),
+  background: getExtPath(crxName, 'background.js'),
+  content: getExtPath(crxName, 'content.js'),
   'devtools/devtools': getExtPath(
-    'kitchen-sink/devtools/devtools.html',
+    crxName,
+    'devtools/devtools.html',
   ),
-  index: getExtPath('kitchen-sink/index.html'),
-  options: getExtPath('kitchen-sink/options.html'),
-  'popup/popup': getExtPath('kitchen-sink/popup/popup.html'),
+  index: getExtPath(crxName, 'index.html'),
+  options: getExtPath(crxName, 'options.html'),
+  'popup/popup': getExtPath(crxName, 'popup/popup.html'),
 }
 
 beforeEach(() => {
@@ -93,20 +98,25 @@ test('does not mutate the options object', () => {
 })
 
 test('throws if input does not contain a manifest', () => {
-  const errorMessage =
-    'RollupOptions.input must be a single Chrome extension manifest.'
-
   expect(() => {
     plugin.options.call(context, {
       input: ['not-a-manifest'],
     })
-  }).toThrow(new TypeError(errorMessage))
+  }).toThrow(
+    new TypeError(
+      'Could not find manifest in Rollup options.input: ["not-a-manifest"]',
+    ),
+  )
 
   expect(() => {
     plugin.options.call(context, {
       input: { wrong: 'not-a-manifest' },
     })
-  }).toThrow(new TypeError(errorMessage))
+  }).toThrow(
+    new TypeError(
+      'Could not find manifest in Rollup options.input: {"wrong":"not-a-manifest"}',
+    ),
+  )
 })
 
 test('handles input array', () => {
@@ -189,12 +199,32 @@ test('calls deriveFiles', () => {
   expect(manifestParser.deriveFiles).toBeCalledWith(
     cache.manifest,
     cache.srcDir,
+    {
+      contentScripts: true,
+    },
   )
 })
 
+test('caches contentScript filenames', () => {
+  plugin.options.call(context, options)
+
+  expect(cache.contentScripts).toEqual(
+    expect.arrayContaining([
+      getExtPath('mv2-kitchen-sink', 'content.js'),
+    ]),
+  )
+  expect(Object.keys(cache.contentScripts).length).toBe(1)
+})
+
+test('validates manifest', async () => {
+  plugin.options.call(context, options)
+
+  expect(validate.validateManifest).toBeCalled()
+})
+
 test('does nothing if cache.manifest exists', () => {
-  cache.manifest = {} as ChromeExtensionManifest
-  cache.srcDir = getExtPath('kitchen-sink')
+  cache.manifest = {} as chrome.runtime.Manifest
+  cache.srcDir = getExtPath('mv2-kitchen-sink')
   // bypass no scripts error
   cache.input = ['x']
 
@@ -224,18 +254,23 @@ test('should throw if cosmiconfig cannot load manifest file', () => {
     })
   }
 
-  expect(call).toThrow(/^ENOENT: no such file or directory/)
+  expect(call).toThrow(
+    /^Could not load manifest: not-a-manifest\.json does not exist/,
+  )
 })
 
 test('should throw if manifest file is empty', () => {
   const call = () => {
     plugin.options.call(context, {
-      input: getExtPath('empty/manifest.json'),
+      input: getExtPath('mv2-empty', 'manifest.json'),
     })
   }
 
   const error = new Error(
-    `${getExtPath('empty/manifest.json')} is an empty file.`,
+    `${getExtPath(
+      'mv2-empty',
+      'manifest.json',
+    )} is an empty file.`,
   )
 
   expect(call).toThrow(error)
@@ -263,7 +298,7 @@ test('should throw if options_ui and options_page both exist', () => {
   const call = () => {
     plugin.options.call(context, {
       input: getExtPath(
-        'both-option-types-manifest/manifest.json',
+        'mv2-both-option-types-manifest/manifest.json',
       ),
     })
   }
@@ -276,3 +311,51 @@ test('should throw if options_ui and options_page both exist', () => {
 })
 
 test.todo('populates cache.iife')
+
+describe('MV3', () => {
+  test('coerces background.type to module', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv3-basic-js', 'src', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background!.type).toBe('module')
+  })
+
+  test('does not create background property', () => {
+    plugin.options.call(context, {
+      input: getExtPath(
+        'mv3-content-script-only',
+        'src',
+        'manifest.json',
+      ),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV3
+
+    expect(result.background).toBeUndefined()
+  })
+})
+
+describe('MV2', () => {
+  test('does not modify background property', () => {
+    plugin.options.call(context, options)
+
+    const result = cache.manifest as chrome.runtime.ManifestV2
+
+    expect(result.background).toMatchObject({
+      scripts: ['background.js'],
+    })
+  })
+
+  test('does not create background property', () => {
+    plugin.options.call(context, {
+      input: getExtPath('mv2-html-only', 'manifest.json'),
+    })
+
+    const result = cache.manifest as chrome.runtime.ManifestV2
+
+    expect(result.background).toBeUndefined()
+  })
+})

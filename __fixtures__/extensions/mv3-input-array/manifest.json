@@ -1,0 +1,9 @@
+{
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "description": "input-array chrome extension",
+  "manifest_version": 3,
+  "name": "input-array",
+  "version": "0.1.0"
+}

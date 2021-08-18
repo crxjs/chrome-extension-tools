@@ -1,3 +1,3 @@
 import { importPath } from './placeholders'
 
-import(importPath)
+import(chrome.runtime.getURL(importPath))

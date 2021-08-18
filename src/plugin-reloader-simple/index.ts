@@ -1,19 +1,23 @@
 import { code as bgClientCode } from 'code ./client/background.ts'
 import { code as ctClientCode } from 'code ./client/content.ts'
 import { outputJson } from 'fs-extra'
+import { set } from 'lodash'
 import { join } from 'path'
-import { Plugin } from 'rollup'
+import { OutputChunk, Plugin } from 'rollup'
 import { updateManifest } from '../helpers'
 import {
   backgroundPageReloader,
   contentScriptReloader,
-  timestampPathPlaceholder,
-  loadMessagePlaceholder,
-  timestampFilename,
   ctScriptPathPlaceholder,
   executeScriptPlaceholder,
+  loadMessagePlaceholder,
+  timestampFilename,
+  timestampPathPlaceholder,
   unregisterServiceWorkersPlaceholder,
 } from './CONSTANTS'
+
+const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
@@ -23,6 +27,7 @@ export type SimpleReloaderPlugin = Pick<
 export interface SimpleReloaderOptions {
   executeScript?: boolean
   unregisterServiceWorkers?: boolean
+  reloadDelay?: number
 }
 
 export interface SimpleReloaderCache {
@@ -31,6 +36,7 @@ export interface SimpleReloaderCache {
   timestampPath?: string
   outputDir?: string
   loadMessage?: string
+  manifestVersion?: 2 | 3
 }
 
 // Used for testing
@@ -40,6 +46,7 @@ export const simpleReloader = (
   {
     executeScript = true,
     unregisterServiceWorkers = true,
+    reloadDelay = 100,
   } = {} as SimpleReloaderOptions,
   cache = {} as SimpleReloaderCache,
 ): SimpleReloaderPlugin | undefined => {
@@ -136,47 +143,68 @@ export const simpleReloader = (
 
       updateManifest(
         (manifest) => {
+          /* ---------------- MANIFEST VERSION --------------- */
+
+          cache.manifestVersion = manifest.manifest_version
+
           /* ------------------ DESCRIPTION ------------------ */
 
           manifest.description = cache.loadMessage
 
           /* ---------------- BACKGROUND PAGE ---------------- */
 
-          if (!manifest.background) {
-            manifest.background = {}
-          }
-
-          manifest.background.persistent = true
-
-          const { scripts: bgScripts = [] } = manifest.background
-
-          if (cache.bgScriptPath) {
-            manifest.background.scripts = [
-              cache.bgScriptPath,
-              ...bgScripts,
-            ]
-          } else {
+          if (!cache.bgScriptPath)
             this.error(
               `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
             )
+
+          if (manifest.manifest_version === 3) {
+            const swPath =
+              manifest.background?.service_worker ??
+              'service_worker.js'
+
+            const swCode = `
+              // SIMPLE RELOADER IMPORT
+              import "./${cache.bgScriptPath}"
+            `.trim()
+
+            if (!bundle[swPath]) emit(swPath, swCode, true)
+            else {
+              const sw = bundle[swPath] as OutputChunk
+              sw.code = `
+              ${swCode}
+              ${sw.code}
+              `.trim()
+            }
+
+            set(manifest, 'background.service_worker', swPath)
+            set(manifest, 'background.type', 'module')
+          } else {
+            set(
+              manifest,
+              'background.scripts',
+              (manifest.background?.scripts ?? []).concat([
+                cache.bgScriptPath,
+              ]),
+            )
+            set(manifest, 'background.persistent', true)
           }
 
           /* ---------------- CONTENT SCRIPTS ---------------- */
 
-          const { content_scripts: ctScripts } = manifest
-
-          if (cache.ctScriptPath) {
-            manifest.content_scripts = ctScripts?.map(
-              ({ js = [], ...rest }) => ({
-                js: [cache.ctScriptPath!, ...js],
-                ...rest,
-              }),
-            )
-          } else {
+          if (!cache.ctScriptPath)
             this.error(
               `cache.ctScriptPath is ${typeof cache.ctScriptPath}`,
             )
-          }
+
+          const { content_scripts: ctScripts } = manifest
+
+          manifest.content_scripts = ctScripts?.map(
+            ({ js = [], ...rest }) => ({
+              js: [cache.ctScriptPath!, ...js],
+              ...rest,
+            }),
+          )
 
           return manifest
         },
@@ -190,13 +218,16 @@ export const simpleReloader = (
 
     /* -------------- WRITE TIMESTAMP FILE ------------- */
     async writeBundle() {
+      // Sometimes Chrome says the manifest isn't valid, so we need to wait a bit
+      reloadDelay > 0 && (await delay(reloadDelay))
+
       try {
         await outputJson(
           join(cache.outputDir!, cache.timestampPath!),
           Date.now(),
         )
       } catch (err) {
-        if (typeof err.message === 'string') {
+        if (isErrorLike(err)) {
           this.error(
             `Unable to update timestamp file:\n\t${err.message}`,
           )
@@ -206,4 +237,11 @@ export const simpleReloader = (
       }
     },
   }
+}
+
+interface ErrorLike {
+  message: string
+}
+function isErrorLike(x: unknown): x is ErrorLike {
+  return typeof x === 'object' && x !== null && 'message' in x
 }

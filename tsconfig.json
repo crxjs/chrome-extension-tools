@@ -1,15 +1,12 @@
 {
-  // Root project config
   "extends": "./tsconfigs/tsconfig-base.json",
   "include": [
     "src/**/*",
     "__fixtures__/**/*",
     "__tests__/**/*",
-    "jest.setup.ts"
+    "jest.setup.ts",
+    "examples/**/*.ts"
   ],
   "exclude": ["src/manifest-input/browser"],
-  // "references": [
-  //   { "path": "src/manifest-input/browser" }
-  // ]
   "typeAcquisition": { "enable": true }
 }

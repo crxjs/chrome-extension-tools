@@ -1,6 +1,7 @@
 import { OutputOptions } from 'rollup'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
-import { ChromeExtensionManifest } from './manifest'
+
+export type Unpacked<T> = T extends Array<infer R> ? R : never
 
 export const not = <T>(fn: (x: T) => boolean) => (x: T) => !fn(x)
 
@@ -8,6 +9,10 @@ export function isChunk(
   x: OutputChunk | OutputAsset,
 ): x is OutputChunk {
   return x && x.type === 'chunk'
+}
+
+export function isErrorLike(x: unknown): x is Error {
+  return typeof x === 'object' && x !== null && 'message' in x
 }
 
 export function isOutputOptions(x: any): x is OutputOptions {
@@ -29,8 +34,16 @@ export function isString(x: any): x is string {
   return typeof x === 'string'
 }
 
-export function isJsonFilePath(x: any): x is string {
-  return isString(x) && x.endsWith('json')
+export function isUndefined(x: unknown): x is undefined {
+  return typeof x === 'undefined'
+}
+
+export function isNull(x: unknown): x is null {
+  return x === null
+}
+
+export function isPresent<T>(x: null | undefined | T): x is T {
+  return !isUndefined(x) && !isNull(x)
 }
 
 export const normalizeFilename = (p: string) =>
@@ -39,10 +52,10 @@ export const normalizeFilename = (p: string) =>
 /**
  * Update the manifest source in the output bundle
  */
-export const updateManifest = (
-  updater: (
-    manifest: ChromeExtensionManifest,
-  ) => ChromeExtensionManifest,
+export const updateManifest = <
+  T extends chrome.runtime.Manifest
+>(
+  updater: (manifest: T) => T,
   bundle: OutputBundle,
   handleError?: (message: string) => void,
 ): OutputBundle => {
@@ -58,7 +71,7 @@ export const updateManifest = (
 
     const manifest = JSON.parse(
       manifestAsset.source as string,
-    ) as ChromeExtensionManifest
+    ) as T
 
     const result = updater(manifest)
 

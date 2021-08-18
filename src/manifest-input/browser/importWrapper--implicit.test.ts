@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { chrome } from 'jest-chrome'
 import { defer } from './defer'
 

@@ -1,3 +1,5 @@
+// const esModules = ['lodash-es'].map((x) => `(${x})`).join('|')
+
 module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -5,11 +7,6 @@ module.exports = {
     '!src/simple-reloader/client/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
-  globals: {
-    'ts-jest': {
-      packageJson: 'package.json',
-    },
-  },
   moduleNameMapper: {
     'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
   },
@@ -17,12 +14,11 @@ module.exports = {
   preset: 'ts-jest',
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
+  testRunner: 'jest-circus/runner',
   transform: {
     // Use Sucrase to convert ES6 modules in JS files
     '.(js|jsx)': '@sucrase/jest-plugin',
   },
-  transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!lodash-es/.*)',
-  ],
-  testRunner: 'jest-circus/runner',
+  // For PNPM users, need to add '.*' to get the last instance of the ignored module
+  // transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],
 }

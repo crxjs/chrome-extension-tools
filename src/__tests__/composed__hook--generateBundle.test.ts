@@ -11,10 +11,10 @@ import { requireExtFile } from '../../__fixtures__/utils'
 
 /* ------------------ SETUP TESTS ------------------ */
 
-const config = requireExtFile<RollupOptions>(
-  'kitchen-sink',
+const config = requireExtFile(
+  'mv2-kitchen-sink',
   'rollup.config.js',
-)
+) as RollupOptions
 
 let bundlePromise: Promise<OutputBundle>
 let outputPromise: Promise<RollupOutput>
@@ -31,7 +31,7 @@ beforeAll(async () => {
   )
 
   return outputPromise
-}, 15000)
+}, 30000)
 
 const { _plugins, ...plugin } = chromeExtension({
   verbose: false,

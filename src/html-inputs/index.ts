@@ -1,7 +1,7 @@
 import 'array-flat-polyfill'
 
 import { readFile } from 'fs-extra'
-import flatten from 'lodash.flatten'
+import { flatten } from 'lodash'
 import { relative } from 'path'
 
 import { not } from '../helpers'
@@ -12,7 +12,6 @@ import {
   HtmlInputsPlugin,
 } from '../plugin-options'
 import {
-  formatHtml,
   getCssHrefs,
   getImgSrcs,
   getJsAssets,
@@ -157,7 +156,7 @@ export default function htmlInputs(
       })
 
       cache.html$.map(($) => {
-        const source = formatHtml($)
+        const source = $.html()
         const fileName = relative(srcDir, $.filePath)
 
         this.emitFile({

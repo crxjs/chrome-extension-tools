@@ -1,0 +1,4 @@
+{
+  "background": { "scripts": ["background/index.js"] },
+  "default_locale": "en"
+}

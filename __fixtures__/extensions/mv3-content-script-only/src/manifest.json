@@ -1,0 +1,12 @@
+{
+  "content_scripts": [
+    {
+      "js": ["content/index.js"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "manifest_version": 3,
+  "name": "mv3-content-scripts-only",
+  "version": "1.0.0",
+  "description": "MV3 Chrome Extension with only content scripts"
+}

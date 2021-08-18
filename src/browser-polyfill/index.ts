@@ -1,8 +1,8 @@
+import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
 import fs from 'fs-extra'
 import { Plugin } from 'rollup'
 import { isAsset } from '../helpers'
-import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
-import { ChromeExtensionManifest } from '../manifest'
+import { isMV3 } from '../manifest-types'
 import {
   ChromeExtensionPlugin,
   ManifestInputPlugin,
@@ -58,9 +58,14 @@ export function browserPolyfill({
       }
       const manifest = JSON.parse(
         manifestAsset.source as string,
-      ) as ChromeExtensionManifest
+      ) as chrome.runtime.Manifest
 
       /* ------------- EMIT BROWSER POLYFILL ------------- */
+
+      // Browser polyfill is not supported for MV3, there are better ways to do this:
+      //   `import browser from "webextension-polyfill";`
+      //   See: https://github.com/Lusito/webextension-polyfill-ts#migration-guide-from-webextension-polyfill-ts
+      if (isMV3(manifest)) return
 
       const bpId = this.emitFile({
         type: 'asset',
@@ -82,11 +87,13 @@ export function browserPolyfill({
 
         const executeScriptPolyfillPath = this.getFileName(exId)
 
+        // TODO: support this in MV3
         manifest.background?.scripts?.unshift(
           executeScriptPolyfillPath,
         )
       }
 
+      // TODO: support this in MV3
       manifest.background?.scripts?.unshift(browserPolyfillPath)
       manifest.content_scripts?.forEach((script) => {
         script.js?.unshift(browserPolyfillPath)

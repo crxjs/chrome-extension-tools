@@ -2,6 +2,7 @@
 /lib
 /types
 /coverage
+**/*.js
 
 rollup.config.js
 jest.config.js

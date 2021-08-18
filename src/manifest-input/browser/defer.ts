@@ -1,7 +1,7 @@
 export function defer<T>() {
   let resolve: (value?: T) => void
   let reject: (error: any) => void
-  const promise = new Promise<T>((res, rej) => {
+  const promise = new Promise<T | undefined>((res, rej) => {
     resolve = res
     reject = rej
   })

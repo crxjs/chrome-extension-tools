@@ -13,6 +13,8 @@ import { mixedFormat as m } from './mixed-format'
 
 export { simpleReloader } from './plugin-reloader-simple'
 
+export type { ManifestV2, ManifestV3 } from './manifest-types'
+
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
 ): ChromeExtensionPlugin => {
@@ -78,6 +80,10 @@ export const chromeExtension = (
 
     async load(id) {
       return manifest.load.call(this, id)
+    },
+
+    transform(source, id) {
+      return manifest.transform.call(this, source, id)
     },
 
     watchChange(id) {
