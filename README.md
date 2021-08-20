@@ -2,7 +2,7 @@
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
 [![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
-![example workflow](https://github.com/extend-chrome/rollup-plugin-chrome-extension/actions/workflows/main.yml/badge.svg)
+![GitHub action badge](https://github.com/extend-chrome/rollup-plugin-chrome-extension/actions/workflows/main.yml/badge.svg)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
 <a href="https://www.extend-chrome.dev/rollup-plugin" rel="noopener">
