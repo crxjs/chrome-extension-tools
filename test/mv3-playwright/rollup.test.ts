@@ -1,7 +1,7 @@
 import { remove } from 'fs-extra'
 import { chromium, ChromiumBrowserContext, Page } from 'playwright'
 import { InputOptions, OutputOptions, rollup } from 'rollup'
-import { getExtPath, getTestName, requireExtFile } from '../../__fixtures__/utils'
+import { getExtPath, getTestName } from '../../__fixtures__/utils'
 
 const testName = getTestName(__filename)
 const dataDirPath = getExtPath(testName, 'chromium-data-dir')
@@ -15,7 +15,7 @@ beforeAll(async () => {
   // Clean up the last build
   await remove(distDirPath)
 
-  const config = requireExtFile(__filename, 'rollup.config.js') as InputOptions & { output: OutputOptions }
+  const config = require('./rollup.config.js') as InputOptions & { output: OutputOptions }
   const bundle = await rollup(config)
   await bundle.write(config.output)
 
