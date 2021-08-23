@@ -1,11 +1,18 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName, loadCrxJson } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName, loadCrxJson } from '../helpers/utils'
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
   const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
@@ -32,14 +39,24 @@ test(
     expect(assets.length).toBe(9)
 
     // 4 assets + 1 wrapper script
-    expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
-    expect(output.find(byFileName('manifest.json'))).toBeDefined()
+    expect(
+      output.find(byFileName('images/icon-main-16.png')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('images/icon-main-48.png')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('images/icon-main-128.png')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('manifest.json')),
+    ).toBeDefined()
     expect(output.find(byFileName('options.css'))).toBeDefined()
     expect(output.find(byFileName('options.html'))).toBeDefined()
     expect(output.find(byFileName('options.png'))).toBeDefined()
-    expect(output.find(byFileName('images/favicon.ico'))).toBeDefined()
+    expect(
+      output.find(byFileName('images/favicon.ico')),
+    ).toBeDefined()
   },
   5 * 60 * 1000,
 )
@@ -47,8 +64,12 @@ test(
 test('extends the manifest', async () => {
   const { output } = await outputPromise
 
-  const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
-  const manifest = JSON.parse(manifestAsset.source as string) as chrome.runtime.Manifest
+  const manifestAsset = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
+  const manifest = JSON.parse(
+    manifestAsset.source as string,
+  ) as chrome.runtime.Manifest
 
   // Changes from extendManifest
   expect(manifest).toMatchObject({
@@ -59,7 +80,9 @@ test('extends the manifest', async () => {
       .join(''),
     background: {
       persistent: true,
-      scripts: [expect.stringMatching(/^assets\/background.+\.js$/)],
+      scripts: [
+        expect.stringMatching(/^assets\/background.+\.js$/),
+      ],
     },
     options_page: 'options.html',
   })

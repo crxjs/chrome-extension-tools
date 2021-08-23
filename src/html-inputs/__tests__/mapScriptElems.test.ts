@@ -1,7 +1,7 @@
 import {
   kitchenSinkRoot,
   optionsHtml,
-} from '../../../__fixtures__/mv2-kitchen-sink-paths'
+} from '../../../test/helpers/mv2-kitchen-sink-paths'
 import {
   mutateScriptElems,
   loadHtml,

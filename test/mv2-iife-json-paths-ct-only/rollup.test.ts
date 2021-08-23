@@ -1,19 +1,31 @@
-import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  OutputChunk,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName } from '../helpers/utils'
 
 const config = require('./rollup.config.js') as RollupOptions
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
 test('bundles a single content script as iife', async () => {
   const { output } = await outputPromise
 
-  const contentJs = output.find(byFileName('content.js')) as OutputChunk
-  const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
+  const contentJs = output.find(
+    byFileName('content.js'),
+  ) as OutputChunk
+  const manifestJson = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
 
   expect(contentJs).toBeDefined()
   expect(contentJs).toMatchObject({
@@ -29,7 +41,9 @@ test('bundles a single content script as iife', async () => {
     type: 'asset',
   })
 
-  const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
+  const manifest = JSON.parse(
+    manifestJson.source as string,
+  ) as chrome.runtime.Manifest
 
   expect(manifest.background).toBeUndefined()
   expect(manifest.content_scripts?.[0]).toMatchObject({

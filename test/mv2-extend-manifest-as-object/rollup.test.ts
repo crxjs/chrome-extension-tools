@@ -1,11 +1,18 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName } from '../helpers/utils'
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
   const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
@@ -31,10 +38,18 @@ test(
     expect(assets.length).toBe(6)
 
     // 4 assets + 2 wrapper scripts
-    expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
-    expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
-    expect(output.find(byFileName('manifest.json'))).toBeDefined()
+    expect(
+      output.find(byFileName('images/icon-main-16.png')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('images/icon-main-48.png')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('images/icon-main-128.png')),
+    ).toBeDefined()
+    expect(
+      output.find(byFileName('manifest.json')),
+    ).toBeDefined()
   },
   5 * 60 * 1000,
 )
@@ -42,8 +57,12 @@ test(
 test('extends the manifest', async () => {
   const { output } = await outputPromise
 
-  const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
-  const manifest = JSON.parse(manifestAsset.source as string) as chrome.runtime.Manifest
+  const manifestAsset = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
+  const manifest = JSON.parse(
+    manifestAsset.source as string,
+  ) as chrome.runtime.Manifest
 
   // Changes from extendManifest
   expect(manifest).toMatchObject({
@@ -54,14 +73,17 @@ test('extends the manifest', async () => {
         matches: ['https://www.google.com/*'],
       }),
     ],
-    description: 'properties from options.extendManifest are preferred',
+    description:
+      'properties from options.extendManifest are preferred',
   })
 
   // Original data from manifest.json
   expect(manifest).toMatchObject({
     background: {
       // Background script ESM wrapper
-      scripts: [expect.stringMatching(/^assets\/background.+\.js$/)],
+      scripts: [
+        expect.stringMatching(/^assets\/background.+\.js$/),
+      ],
     },
     icons: {
       '16': 'images/icon-main-16.png',
