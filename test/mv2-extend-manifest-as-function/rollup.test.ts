@@ -1,6 +1,6 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { isAsset, isChunk } from '../src/helpers'
-import { byFileName, loadCrxJson, requireExtFile } from '../__fixtures__/utils'
+import { isAsset, isChunk } from 
+import { byFileName, loadCrxJson, requireExtFile } from '../../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {

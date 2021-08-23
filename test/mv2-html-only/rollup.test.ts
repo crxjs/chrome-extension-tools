@@ -1,5 +1,5 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName, requireExtFile } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {

@@ -1,6 +1,6 @@
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { stubChunkNameForCssOnlyCrx } from '../src/manifest-input'
-import { byFileName, requireExtFile } from '../__fixtures__/utils'
+import { stubChunkNameForCssOnlyCrx } from '../../src/manifest-input'
+import { byFileName, requireExtFile } from '../../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
