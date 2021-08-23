@@ -1,20 +1,15 @@
-import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
-
-import { getExtPath, getCrxName } from '../../utils'
-
 import { chromeExtension, simpleReloader } from '../../../src'
-
-const crxName = getCrxName(__filename)
 
 export default {
   input: [
-    getExtPath(crxName, 'src', 'manifest.ts'),
-    getExtPath(crxName, 'src', 'script.ts'),
+    path.join(__dirname, 'src', 'manifest.ts'),
+    path.join(__dirname, 'src', 'script.ts'),
   ],
   output: {
-    dir: getExtPath(crxName, 'dist'),
+    dir: path.join(__dirname, 'dist'),
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
     sourcemap: 'inline',

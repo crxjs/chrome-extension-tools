@@ -1,15 +1,13 @@
-import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
-
-import { getExtPath, getCrxName } from '../../utils'
-
 import { chromeExtension, simpleReloader } from '../../../src'
+import { getCrxName, getExtPath } from '../../utils'
 
 const crxName = getCrxName(__filename)
 
 export default {
-  input: getExtPath(crxName, 'src', 'manifest.json'),
+  input: path.join(__dirname, 'src', 'manifest.json'),
   output: {
     dir: getExtPath(`${crxName}-dist`),
     format: 'esm',
