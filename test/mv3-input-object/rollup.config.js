@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { chromeExtension } from '../../../src/index'
+import { chromeExtension } from '$src'
+import path from 'path'
 
 export default {
   input: {

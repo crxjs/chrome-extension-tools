@@ -1,16 +1,15 @@
 import { remove } from 'fs-extra'
+import path from 'path'
 import {
   chromium,
   ChromiumBrowserContext,
   Page,
 } from 'playwright'
-import { InputOptions, OutputOptions, rollup } from 'rollup'
-import { getExtPath, getTestName } from '../helpers/utils'
+import { OutputOptions, rollup, RollupOptions } from 'rollup'
+import config from './rollup.config'
 
-const testName = getTestName(__filename)
-const dataDirPath = getExtPath(testName, 'chromium-data-dir')
-// helpers/extensions/mv3-playwright/dist
-const distDirPath = getExtPath(testName, 'dist')
+const dataDirPath = path.join(__dirname, 'chromium-data-dir')
+const distDirPath = path.join(__dirname, 'dist')
 
 let browserContext: ChromiumBrowserContext
 let page: Page
@@ -19,11 +18,8 @@ beforeAll(async () => {
   // Clean up the last build
   await remove(distDirPath)
 
-  const config = require('./rollup.config.js') as InputOptions & {
-    output: OutputOptions
-  }
-  const bundle = await rollup(config)
-  await bundle.write(config.output)
+  const bundle = await rollup(config as RollupOptions)
+  await bundle.write(config.output as OutputOptions)
 
   browserContext = (await chromium.launchPersistentContext(
     dataDirPath,

@@ -1,7 +1,7 @@
 import {
   kitchenSinkRoot,
   optionsHtml,
-} from '../../../test/helpers/mv2-kitchen-sink-paths'
+} from '$test/helpers/mv2-kitchen-sink-paths'
 import { loadHtml } from '../cheerio'
 
 const fs = require('fs-extra')

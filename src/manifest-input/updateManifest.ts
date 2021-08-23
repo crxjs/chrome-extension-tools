@@ -27,6 +27,7 @@ export function updateManifestV3(
       chunkFileNames = 'chunks/[name]-[hash].js',
     } = Array.isArray(output) ? output[0] : output
 
+    // @ts-expect-error need to support both string and function
     cache.chunkFileNames = chunkFileNames
 
     // Output could be an array
@@ -58,6 +59,7 @@ export function updateManifestV3(
     const matches = Array.from(new Set(allMatches))
     const resources = [
       `${chunkFileNames
+        // @ts-expect-error need to support both string and function
         .split('/')
         .join('/')
         .replace('[format]', '*')

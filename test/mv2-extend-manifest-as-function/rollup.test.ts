@@ -1,22 +1,18 @@
 import { isAsset, isChunk } from '$src/helpers'
-import {
-  OutputAsset,
-  rollup,
-  RollupOptions,
-  RollupOutput,
-} from 'rollup'
-import { byFileName, loadCrxJson } from '../helpers/utils'
+import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { byFileName } from '$test/helpers/utils'
+import { readJSONSync } from 'fs-extra'
+import path from 'path'
+import { OutputAsset } from 'rollup'
 
-let outputPromise: Promise<RollupOutput>
-beforeAll(async () => {
-  const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) =>
-    bundle.generate(config.output as any),
-  )
-  return outputPromise
-}, 30000)
+const outputPromise = getRollupOutput(
+  __dirname,
+  'rollup.config.js',
+)
 
-const manifestJson = loadCrxJson(__filename, 'manifest.json')
+const manifestJson = readJSONSync(
+  path.join(__dirname, 'manifest.json'),
+)
 
 test('bundles chunks', async () => {
   const { output } = await outputPromise

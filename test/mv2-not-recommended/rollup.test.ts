@@ -1,20 +1,11 @@
-import {
-  OutputAsset,
-  rollup,
-  RollupOptions,
-  RollupOutput,
-} from 'rollup'
-import { byFileName } from '../helpers/utils'
+import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { OutputAsset } from 'rollup'
+import { byFileName } from '$test/helpers/utils'
 
-const config = require('./rollup.config.js') as RollupOptions
-
-let outputPromise: Promise<RollupOutput>
-beforeAll(async () => {
-  outputPromise = rollup(config).then((bundle) =>
-    bundle.generate(config.output as any),
-  )
-  return outputPromise
-}, 30000)
+const outputPromise = getRollupOutput(
+  __dirname,
+  'rollup.config.js',
+)
 
 test('Handles background html page', async () => {
   const { output } = await outputPromise

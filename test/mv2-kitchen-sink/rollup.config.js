@@ -1,15 +1,13 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { chromeExtension } from '$src'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
-import { chromeExtension } from '../../../src/index'
+import path from 'path'
 
-const input = path.join(__dirname, `manifest.json`)
-const dir = path.join(__dirname, `dist`)
 export default {
-  input: input,
+  input: path.join(__dirname, `manifest.json`),
   output: {
-    dir: dir,
+    dir: path.join(__dirname, `dist`),
     format: 'esm',
     sourcemap: false,
   },

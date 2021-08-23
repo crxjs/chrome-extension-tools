@@ -1,56 +1,7 @@
-import { readJsonSync } from 'fs-extra'
-import { resolve, join, sep } from 'path'
-import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
+import path from 'path'
+import { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 
-export const getTestName = (filename: string): string => {
-  const result = filename
-    .split('__')
-    .pop()
-    ?.split('.')
-    ?.shift()
-
-  if (typeof result === 'string') {
-    return result
-  } else {
-    throw new TypeError(`Invalid filename: ${filename}`)
-  }
-}
-
-export const getCrxName = (filepath: string): string => {
-  const [, crxName, crxParent] = filepath.split(sep).reverse()
-  if (crxParent === 'extensions') return crxName
-  throw new Error(`This is not a CRX fixture: ${filepath}`)
-}
-
-export const getExtPath = (...args: string[]): string =>
-  resolve(__dirname, 'extensions', ...args)
-
-export const getExtPathFromTestName = (
-  testname: string,
-  crxPath: string,
-) => {
-  const crxName = getTestName(testname)
-  const relPath = join(crxName, crxPath)
-  return getExtPath(relPath)
-}
-
-export const loadCrxJson = (
-  filename: string,
-  crxPath: string,
-) => {
-  const fullPath = getExtPathFromTestName(filename, crxPath)
-  return readJsonSync(fullPath)
-}
-
-export const requireExtFile = (
-  currentFilename: string,
-  targetFilename: string,
-) => {
-  const testName = getTestName(currentFilename)
-
-  return require(getExtPath(join(testName, targetFilename)))
-    .default
-}
+export const testDir = path.resolve(__dirname, '..')
 
 /**  Make relative to project root */
 export const getRelative = (p: string): string =>
@@ -74,8 +25,8 @@ export const getAssetSource = (
     throw new Error(`Unable to find ${key} in bundle`)
   }
 
-  if (asset.source instanceof Buffer) {
-    return asset.source.toString('utf8')
+  if (asset.source instanceof Uint8Array) {
+    return asset.source.toString()
   } else {
     return asset.source
   }
