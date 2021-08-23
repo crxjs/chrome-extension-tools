@@ -1,8 +1,9 @@
 import { join } from 'path'
 import { simpleReloader } from '..'
-import { buildCRX } from '../../../test/helpers/build-crx'
-import { context } from '../../../test/helpers/plugin-context'
+import { buildCRX } from '$test/helpers/build-crx'
+import { context } from '$test/helpers/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
+import { NormalizedOutputOptions } from 'rollup'
 
 const fsExtra = require('fs-extra')
 const mockOutputJson = jest.spyOn(fsExtra, 'outputJson')
@@ -27,7 +28,11 @@ test('Writes timestamp file', async () => {
     { outputDir, timestampPath },
   )!
 
-  await plugin.writeBundle.call(context, bundle)
+  await plugin.writeBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+  )
 
   expect(mockOutputJson).toBeCalledWith(
     join(outputDir, timestampPath),
@@ -42,7 +47,11 @@ test('Delays prescribed amount', async () => {
     { outputDir, timestampPath },
   )!
 
-  const promise = plugin.writeBundle.call(context, bundle)
+  const promise = plugin.writeBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+  )
 
   expect(mockOutputJson).not.toBeCalled()
 
@@ -72,7 +81,11 @@ test('Handles write errors with message prop', async () => {
   // @ts-expect-error We don't actually want to throw in the test
   context.error.mockImplementationOnce(() => {})
 
-  await plugin.writeBundle.call(context, bundle)
+  await plugin.writeBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+  )
 
   expect(context.error).toBeCalledWith(
     expect.stringContaining(message),
@@ -95,7 +108,11 @@ test('Handles other write errors', async () => {
   // @ts-expect-error We don't actually want to throw in the test
   context.error.mockImplementationOnce(() => {})
 
-  await plugin.writeBundle.call(context, bundle)
+  await plugin.writeBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+  )
 
   expect(context.error).toBeCalledWith(
     expect.stringContaining('Unable to update timestamp file'),

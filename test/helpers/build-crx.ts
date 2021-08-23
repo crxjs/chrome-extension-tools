@@ -1,3 +1,6 @@
+/* eslint-env jest */
+
+import path from 'path'
 import {
   OutputBundle,
   PluginHooks,
@@ -5,7 +8,6 @@ import {
   RollupBuild,
   RollupOutput,
 } from 'rollup'
-import { getExtPath } from './utils'
 
 type RollupBuildData = {
   build: RollupBuild
@@ -33,7 +35,7 @@ export function buildCRX(
 export async function innerBuildCRX(
   crxPath: string,
 ): Promise<RollupBuildData> {
-  const extPath = getExtPath(crxPath)
+  const extPath = path.resolve(__dirname, '..', crxPath)
   const config = require(extPath).default
 
   if (typeof config.output === 'undefined')

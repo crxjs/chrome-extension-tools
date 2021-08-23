@@ -32,8 +32,12 @@ export async function regenerateBundle(
   }
 
   const { format, chunkFileNames: cfn = '', sourcemap } = output
-  
-  const chunkFileNames = path.join(path.dirname(cfn), '[name].js')
+
+  const chunkFileNames = path.join(
+    // @ts-expect-error need to support both string and function
+    path.dirname(cfn),
+    '[name].js',
+  )
 
   // Transform input array to input object
   const inputValue = Array.isArray(input)

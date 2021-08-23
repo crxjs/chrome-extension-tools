@@ -1,9 +1,13 @@
-import { OutputBundle, OutputChunk } from 'rollup'
-import { context } from '../../../test/helpers/plugin-context'
+import { context } from '$test/helpers/plugin-context'
+import {
+  NormalizedOutputOptions,
+  OutputBundle,
+  OutputChunk,
+} from 'rollup'
 import { isChunk } from '../../helpers'
 import { validateNames } from '../index'
 
-const bundle: OutputBundle = require('../../../helpers/validate-names__sample-bundle.json')
+const bundle: OutputBundle = require('$test/helpers/validate-names__sample-bundle.json')
 
 const helperKey = Object.keys(bundle).find((name) =>
   name.includes('_'),
@@ -31,7 +35,12 @@ test('renames chunks by mutating the bundle', () => {
     expect(facadeModuleId!).toBeNull()
   }
 
-  plugin.generateBundle.call(context, {}, bundle, false)
+  plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   expect(bundle[helperKey]).toBeUndefined()
 

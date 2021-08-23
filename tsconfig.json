@@ -3,8 +3,10 @@
   "include": [
     "src/**/*",
     "test/**/*.ts",
+    "test/**/*.tsx",
     "jest.setup.ts",
-    "examples/**/*.ts"
+    "examples/**/*.ts",
+    "test/rollup.config.d.ts"
   ],
   "exclude": ["src/manifest-input/browser"],
   "typeAcquisition": { "enable": true }

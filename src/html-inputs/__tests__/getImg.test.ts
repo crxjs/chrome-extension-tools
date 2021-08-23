@@ -1,7 +1,7 @@
 import {
   kitchenSinkRoot,
   optionsHtml,
-} from '../../../test/helpers/mv2-kitchen-sink-paths'
+} from '$test/helpers/mv2-kitchen-sink-paths'
 import { getImgSrcs, loadHtml } from '../cheerio'
 
 const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
@@ -11,9 +11,9 @@ test('scrapes correct img tags and favicons', () => {
 
   expect(result).toEqual(
     expect.arrayContaining([
-      'helpers/extensions/mv2-kitchen-sink/options.png',
-      'helpers/extensions/mv2-kitchen-sink/options.jpg',
-      'helpers/extensions/mv2-kitchen-sink/images/favicon.png',
+      'test/mv2-kitchen-sink/options.png',
+      'test/mv2-kitchen-sink/options.jpg',
+      'test/mv2-kitchen-sink/images/favicon.png',
     ]),
   )
 })

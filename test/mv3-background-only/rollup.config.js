@@ -1,11 +1,11 @@
+import { chromeExtension, simpleReloader } from '$src'
 import babel from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import path from 'path'
-import { chromeExtension, simpleReloader } from '../../../src'
 
 export default {
-  input: path.join(__dirname, 'src', 'manifest.json'),
+  input: [path.join(__dirname, 'src', 'manifest.json')],
   output: {
     dir: path.join(__dirname, 'dist'),
     format: 'esm',

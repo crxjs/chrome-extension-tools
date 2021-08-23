@@ -10,6 +10,7 @@ import {
   ChromeExtensionPlugin,
 } from './plugin-options'
 import { mixedFormat as m } from './mixed-format'
+import { InputOptions } from 'rollup'
 
 export { simpleReloader } from './plugin-reloader-simple'
 
@@ -44,7 +45,7 @@ export const chromeExtension = (
     options(options) {
       try {
         return [manifest, html].reduce((opts, plugin) => {
-          const result = plugin.options.call(this, opts)
+          const result = plugin.options.call(this, opts) as InputOptions
 
           return result || options
         }, options)
@@ -74,8 +75,8 @@ export const chromeExtension = (
       ])
     },
 
-    async resolveId(source, importer) {
-      return manifest.resolveId.call(this, source, importer)
+    async resolveId(source, importer, options) {
+      return manifest.resolveId.call(this, source, importer, options)
     },
 
     async load(id) {
@@ -86,9 +87,9 @@ export const chromeExtension = (
       return manifest.transform.call(this, source, id)
     },
 
-    watchChange(id) {
-      manifest.watchChange.call(this, id)
-      html.watchChange.call(this, id)
+    watchChange(id, change) {
+      manifest.watchChange.call(this, id, change)
+      html.watchChange.call(this, id, change)
     },
 
     async generateBundle(...args) {

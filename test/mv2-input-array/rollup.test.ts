@@ -1,20 +1,11 @@
-import {
-  OutputAsset,
-  OutputChunk,
-  rollup,
-  RollupOptions,
-  RollupOutput,
-} from 'rollup'
-import { byFileName } from '../helpers/utils'
+import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { byFileName } from '$test/helpers/utils'
+import { OutputAsset, OutputChunk } from 'rollup'
 
-let outputPromise: Promise<RollupOutput>
-beforeAll(async () => {
-  const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) =>
-    bundle.generate(config.output as any),
-  )
-  return outputPromise
-}, 30000)
+const outputPromise = getRollupOutput(
+  __dirname,
+  'rollup.config.js',
+)
 
 // TODO: test this as MV3
 test('Handles config with input array', async () => {

@@ -1,31 +1,16 @@
 import { isAsset, isChunk } from '$src/helpers'
 import { getScriptSrc, loadHtml } from '$src/html-inputs/cheerio'
 import { deriveFiles } from '$src/manifest-input/manifest-parser'
+import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { byFileName } from '$test/helpers/utils'
 import { flatten } from 'lodash'
 import path from 'path'
-import {
-  OutputAsset,
-  rollup,
-  RollupOptions,
-  RollupOutput,
-} from 'rollup'
-import {
-  byFileName,
-  getExtPath,
-  getTestName,
-} from '../helpers/utils'
+import { OutputAsset } from 'rollup'
 
-const testName = getTestName(__filename)
-const extPath = getExtPath(testName)
-
-let outputPromise: Promise<RollupOutput>
-beforeAll(async () => {
-  const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) =>
-    bundle.generate(config.output as any),
-  )
-  return outputPromise
-}, 30000)
+const outputPromise = getRollupOutput(
+  __dirname,
+  'rollup.config.js',
+)
 
 test('bundles chunks', async () => {
   const { output } = await outputPromise
@@ -156,10 +141,10 @@ test('chunks in output match chunks in manifest', async () => {
   ) as chrome.runtime.Manifest
 
   // Get scripts in manifest
-  const { js, html } = deriveFiles(manifest, extPath, {
+  const { js, html } = deriveFiles(manifest, __dirname, {
     contentScripts: true,
   })
-  const html$ = html.map(loadHtml(extPath))
+  const html$ = html.map(loadHtml(__dirname))
   const htmlJs = flatten(html$.map(getScriptSrc)).map((x) => {
     const { name, dir } = path.parse(x)
 
@@ -167,7 +152,7 @@ test('chunks in output match chunks in manifest', async () => {
   })
 
   js.concat(htmlJs)
-    .map((x) => path.relative(extPath, x))
+    .map((x) => path.relative(__dirname, x))
     .forEach((script) => {
       const chunk = output.find(byFileName(script))
       expect(chunk).toBeDefined()
