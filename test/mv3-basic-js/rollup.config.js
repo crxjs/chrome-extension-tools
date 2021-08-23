@@ -4,9 +4,9 @@ import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
 
-import { getExtPath, getCrxName } from '../../utils'
+import { getExtPath, getCrxName } from '../../__fixtures__/utils'
 
-import { chromeExtension, simpleReloader } from '../../../src'
+import { chromeExtension, simpleReloader } from '../../src'
 
 const crxName = getCrxName(__filename)
 
