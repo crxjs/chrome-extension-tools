@@ -3,7 +3,7 @@
   "include": [
     "src/**/*",
     "__fixtures__/**/*",
-    "__tests__/**/*",
+    "test/**/*.ts",
     "jest.setup.ts",
     "examples/**/*.ts"
   ],
