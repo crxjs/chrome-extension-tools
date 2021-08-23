@@ -371,6 +371,7 @@ export function manifestInput(
     },
 
     transform(code, id) {
+      // TODO: this could be done in `load`
       if (
         wrapContentScripts &&
         isMV3(cache.manifest) &&
@@ -393,7 +394,7 @@ export function manifestInput(
       }
 
       // No source transformation took place
-      return { code, map: null }
+      return null
     },
 
     watchChange(id) {
@@ -432,6 +433,9 @@ export function manifestInput(
 
       /* ------------ DERIVE PERMISSIONS START ----------- */
 
+      // TODO: we want to support this in MV3,
+      //   but this won't work in Vite,
+      //     so need to move it to `buildStart`
       let permissions: string[] = []
       // Get module ids for all chunks
       if (cache.assetChanged && cache.permsHash) {
