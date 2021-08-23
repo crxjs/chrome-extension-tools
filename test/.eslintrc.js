@@ -7,4 +7,12 @@ module.exports = {
     chrome: true,
   },
   extends: ['eslint:recommended', 'plugin:react/recommended'],
+  overrides: [
+    {
+      files: ['**/*.test.ts'],
+      env: {
+        jest: true,
+      },
+    },
+  ],
 }
