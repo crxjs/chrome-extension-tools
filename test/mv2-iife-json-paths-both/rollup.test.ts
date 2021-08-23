@@ -1,11 +1,19 @@
-import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  OutputChunk,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName } from '../helpers/utils'
 
 const config = require('./rollup.config.js') as RollupOptions
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
@@ -13,9 +21,15 @@ beforeAll(async () => {
 test('bundles both background and content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const backgroundJs = output.find(byFileName('background/background.js')) as OutputChunk
-  const contentJs = output.find(byFileName('content/content.js')) as OutputChunk
-  const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
+  const backgroundJs = output.find(
+    byFileName('background/background.js'),
+  ) as OutputChunk
+  const contentJs = output.find(
+    byFileName('content/content.js'),
+  ) as OutputChunk
+  const manifestJson = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
 
   // TODO: remove chunks that only are used by iife entries
   expect(output.length).toBe(3)
@@ -41,9 +55,13 @@ test('bundles both background and content scripts as iife', async () => {
     type: 'asset',
   })
 
-  const manifest: chrome.runtime.ManifestV2 = JSON.parse(manifestJson.source as string)
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
+    manifestJson.source as string,
+  )
 
-  expect(manifest.background?.scripts).toEqual(['background/background.js'])
+  expect(manifest.background?.scripts).toEqual([
+    'background/background.js',
+  ])
   expect(manifest.content_scripts?.[0]).toMatchObject({
     js: ['content/content.js'],
   })

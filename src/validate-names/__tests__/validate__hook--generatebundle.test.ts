@@ -1,9 +1,9 @@
 import { OutputBundle, OutputChunk } from 'rollup'
-import { context } from '../../../__fixtures__/plugin-context'
+import { context } from '../../../test/helpers/plugin-context'
 import { isChunk } from '../../helpers'
 import { validateNames } from '../index'
 
-const bundle: OutputBundle = require('../../../__fixtures__/validate-names__sample-bundle.json')
+const bundle: OutputBundle = require('../../../helpers/validate-names__sample-bundle.json')
 
 const helperKey = Object.keys(bundle).find((name) =>
   name.includes('_'),

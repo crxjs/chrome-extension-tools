@@ -1,20 +1,34 @@
-import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  OutputChunk,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName } from '../helpers/utils'
 
 const config = require('./rollup.config.js') as RollupOptions
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
 test('bundles multiple content scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const content1Js = output.find(byFileName('content1.js')) as OutputChunk
-  const content2Js = output.find(byFileName('content2.js')) as OutputChunk
-  const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
+  const content1Js = output.find(
+    byFileName('content1.js'),
+  ) as OutputChunk
+  const content2Js = output.find(
+    byFileName('content2.js'),
+  ) as OutputChunk
+  const manifestJson = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
 
   expect(content1Js).toBeDefined()
   expect(content1Js).toMatchObject({
@@ -39,7 +53,9 @@ test('bundles multiple content scripts as iife', async () => {
 
   expect(output.length).toBe(3)
 
-  const manifest = JSON.parse(manifestJson.source as string) as chrome.runtime.Manifest
+  const manifest = JSON.parse(
+    manifestJson.source as string,
+  ) as chrome.runtime.Manifest
 
   expect(manifest.background).toBeUndefined()
   expect(manifest.content_scripts?.[0]).toMatchObject({
