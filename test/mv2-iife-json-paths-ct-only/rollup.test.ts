@@ -1,5 +1,5 @@
 import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName, requireExtFile } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../../__fixtures__/utils'
 
 const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
 

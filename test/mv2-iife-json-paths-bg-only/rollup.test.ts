@@ -1,4 +1,4 @@
-import { byFileName, requireExtFile } from '../__fixtures__/utils'
+import { byFileName, requireExtFile } from '../../__fixtures__/utils'
 import { rollup, RollupOutput, OutputAsset } from 'rollup'
 import { RollupOptions } from 'rollup'
 import { OutputChunk } from 'rollup'
