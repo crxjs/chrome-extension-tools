@@ -1,10 +1,10 @@
 import { flatten } from 'lodash'
 import path from 'path'
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { isAsset, isChunk } from '../src/helpers'
-import { getScriptSrc, loadHtml } from '../src/html-inputs/cheerio'
-import { deriveFiles } from '../src/manifest-input/manifest-parser'
-import { byFileName, getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
+import { isAsset, isChunk } from 
+import { getScriptSrc, loadHtml } from '../../src/html-inputs/cheerio'
+import { deriveFiles } from '../../src/manifest-input/manifest-parser'
+import { byFileName, getExtPath, getTestName, requireExtFile } from '../../__fixtures__/utils'
 
 const testName = getTestName(__filename)
 const extPath = getExtPath(testName)

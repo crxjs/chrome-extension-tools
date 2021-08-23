@@ -1,7 +1,7 @@
 import { RollupOptions } from 'rollup'
 import { rollup } from 'rollup'
-import { isErrorLike } from '../src/helpers'
-import { requireExtFile } from '../__fixtures__/utils'
+import { isErrorLike } from 
+import { requireExtFile } from '../../__fixtures__/utils'
 
 const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
 
