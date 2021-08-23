@@ -8,7 +8,7 @@ module.exports = {
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   moduleNameMapper: {
-    'code .+': '<rootDir>/__fixtures__/bundle-imports-stub.ts',
+    'code .+': '<rootDir>/helpers/bundle-imports-stub.ts',
   },
   modulePathIgnorePatterns: ['~~.+', '__fixtures__', 'client'],
   reporters: ['default'],

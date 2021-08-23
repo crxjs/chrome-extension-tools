@@ -14,7 +14,7 @@ import {
   optionsHtml,
   popupHtml,
   srcDir,
-} from '../../../../__fixtures__/mv2-kitchen-sink-paths'
+} from '../../../../test/helpers/mv2-kitchen-sink-paths'
 
 const manifest = readJSONSync(manifestJson)
 

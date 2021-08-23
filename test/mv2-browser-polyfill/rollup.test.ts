@@ -1,12 +1,19 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName } from '../helpers/utils'
 
 const config = require('./rollup.config.js') as RollupOptions
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
@@ -18,9 +25,15 @@ test('bundles chunks', async () => {
   expect(chunks.length).toBe(5)
 
   // 4 chunks + one shared import (shared.js)
-  expect(output.find(byFileName('scripts/background.js'))).toBeDefined()
-  expect(output.find(byFileName('scripts/content.js'))).toBeDefined()
-  expect(output.find(byFileName('options/options.js'))).toBeDefined()
+  expect(
+    output.find(byFileName('scripts/background.js')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('scripts/content.js')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('options/options.js')),
+  ).toBeDefined()
   expect(output.find(byFileName('popup/popup.js'))).toBeDefined()
 })
 
@@ -32,35 +45,71 @@ test('bundles assets', async () => {
   expect(assets.length).toBe(15)
 
   // 11 assets + 2 wrapper scripts + 2 browser polyfills
-  expect(output.find(byFileName('assets/browser-polyfill-executeScript.js'))).toBeDefined()
-  expect(output.find(byFileName('assets/browser-polyfill.js'))).toBeDefined()
-  expect(output.find(byFileName('scripts/content.css'))).toBeDefined()
-  expect(output.find(byFileName('images/favicon.ico'))).toBeDefined()
-  expect(output.find(byFileName('images/favicon.png'))).toBeDefined()
-  expect(output.find(byFileName('images/icon-main-16.png'))).toBeDefined()
-  expect(output.find(byFileName('images/icon-main-48.png'))).toBeDefined()
-  expect(output.find(byFileName('images/icon-main-128.png'))).toBeDefined()
-  expect(output.find(byFileName('images/options.jpg'))).toBeDefined()
+  expect(
+    output.find(
+      byFileName('assets/browser-polyfill-executeScript.js'),
+    ),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('assets/browser-polyfill.js')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('scripts/content.css')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/favicon.ico')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/favicon.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/options.jpg')),
+  ).toBeDefined()
   expect(output.find(byFileName('manifest.json'))).toBeDefined()
-  expect(output.find(byFileName('options/options.css'))).toBeDefined()
-  expect(output.find(byFileName('options/options.html'))).toBeDefined()
-  expect(output.find(byFileName('popup/popup.html'))).toBeDefined()
+  expect(
+    output.find(byFileName('options/options.css')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('options/options.html')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('popup/popup.html')),
+  ).toBeDefined()
 })
 
 // TODO: test browser polyfill in MV3 variant
 test('includes browser polyfill in manifest.json', async () => {
   const { output } = await outputPromise
 
-  const manifestAsset = output.find(byFileName('manifest.json')) as OutputAsset
+  const manifestAsset = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.ManifestV2 = JSON.parse(manifestSource)
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
+    manifestSource,
+  )
 
-  expect(manifest.background?.scripts?.[0]).toBe('assets/browser-polyfill.js')
-  expect(manifest.background?.scripts?.[1]).toBe('assets/browser-polyfill-executeScript.js')
+  expect(manifest.background?.scripts?.[0]).toBe(
+    'assets/browser-polyfill.js',
+  )
+  expect(manifest.background?.scripts?.[1]).toBe(
+    'assets/browser-polyfill-executeScript.js',
+  )
 
   manifest.content_scripts?.forEach(({ js = [] }) => {
     expect(js[0]).toBe('assets/browser-polyfill.js')
-    expect(js[1]).not.toBe('assets/browser-polyfill-executeScript.js')
+    expect(js[1]).not.toBe(
+      'assets/browser-polyfill-executeScript.js',
+    )
   })
 })
 

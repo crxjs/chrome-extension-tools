@@ -1,11 +1,19 @@
-import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../../__fixtures__/utils'
+import {
+  OutputAsset,
+  OutputChunk,
+  rollup,
+  RollupOptions,
+  RollupOutput,
+} from 'rollup'
+import { byFileName } from '../helpers/utils'
 
 const config = require('./rollup.config.js') as RollupOptions
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
+  outputPromise = rollup(config).then((bundle) =>
+    bundle.generate(config.output as any),
+  )
   return outputPromise
 }, 30000)
 
@@ -13,9 +21,15 @@ beforeAll(async () => {
 test('bundles multiple background scripts as iife', async () => {
   const { output } = await outputPromise
 
-  const background1Js = output.find(byFileName('background1.js')) as OutputChunk
-  const background2Js = output.find(byFileName('background2.js')) as OutputChunk
-  const manifestJson = output.find(byFileName('manifest.json')) as OutputAsset
+  const background1Js = output.find(
+    byFileName('background1.js'),
+  ) as OutputChunk
+  const background2Js = output.find(
+    byFileName('background2.js'),
+  ) as OutputChunk
+  const manifestJson = output.find(
+    byFileName('manifest.json'),
+  ) as OutputAsset
 
   expect(background1Js).toBeDefined()
   expect(background1Js).toMatchObject({
@@ -40,9 +54,14 @@ test('bundles multiple background scripts as iife', async () => {
 
   expect(output.length).toBe(3)
 
-  const manifest: chrome.runtime.ManifestV2 = JSON.parse(manifestJson.source as string)
+  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
+    manifestJson.source as string,
+  )
 
-  expect(manifest.background?.scripts).toEqual(['background1.js', 'background2.js'])
+  expect(manifest.background?.scripts).toEqual([
+    'background1.js',
+    'background2.js',
+  ])
   expect(manifest.content_scripts).toBeUndefined()
   expect(manifest.web_accessible_resources).toBeUndefined()
 

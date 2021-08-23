@@ -4,7 +4,7 @@ examples/
 **/lib
 types/
 !types/index.d.ts
-__fixtures__/extensions/kitchen-sink-dist
+helpers/extensions/kitchen-sink-dist
 coverage
 jest_html_reporters.html
 package-lock.json
@@ -12,6 +12,4 @@ package-lock.json
 TODO
 ___mv3-scripts
 **/chromium-data-dir/
-__fixtures__/extensions/**/dist/
-test/**/dist*/
-playground/
+helpers/extensions/**/dist/

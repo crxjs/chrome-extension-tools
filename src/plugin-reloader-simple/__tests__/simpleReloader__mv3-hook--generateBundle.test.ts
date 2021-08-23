@@ -1,11 +1,11 @@
 import { EmittedFile, OutputAsset } from 'rollup'
 import { simpleReloader, _internalCache } from '..'
-import { buildCRX } from '../../../__fixtures__/build-crx'
-import { context } from '../../../__fixtures__/plugin-context'
+import { buildCRX } from '../../../test/helpers/build-crx'
+import { context } from '../../../test/helpers/plugin-context'
 import {
   byFileName,
   getExtPath,
-} from '../../../__fixtures__/utils'
+} from '../../../test/helpers/utils'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import {
   backgroundPageReloader,

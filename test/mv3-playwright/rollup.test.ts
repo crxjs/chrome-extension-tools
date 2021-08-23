@@ -1,11 +1,15 @@
 import { remove } from 'fs-extra'
-import { chromium, ChromiumBrowserContext, Page } from 'playwright'
+import {
+  chromium,
+  ChromiumBrowserContext,
+  Page,
+} from 'playwright'
 import { InputOptions, OutputOptions, rollup } from 'rollup'
-import { getExtPath, getTestName } from '../../__fixtures__/utils'
+import { getExtPath, getTestName } from '../helpers/utils'
 
 const testName = getTestName(__filename)
 const dataDirPath = getExtPath(testName, 'chromium-data-dir')
-// __fixtures__/extensions/mv3-playwright/dist
+// helpers/extensions/mv3-playwright/dist
 const distDirPath = getExtPath(testName, 'dist')
 
 let browserContext: ChromiumBrowserContext
@@ -15,15 +19,23 @@ beforeAll(async () => {
   // Clean up the last build
   await remove(distDirPath)
 
-  const config = require('./rollup.config.js') as InputOptions & { output: OutputOptions }
+  const config = require('./rollup.config.js') as InputOptions & {
+    output: OutputOptions
+  }
   const bundle = await rollup(config)
   await bundle.write(config.output)
 
-  browserContext = (await chromium.launchPersistentContext(dataDirPath, {
-    headless: false,
-    slowMo: 100,
-    args: [`--disable-extensions-except=${distDirPath}`, `--load-extension=${distDirPath}`],
-  })) as ChromiumBrowserContext
+  browserContext = (await chromium.launchPersistentContext(
+    dataDirPath,
+    {
+      headless: false,
+      slowMo: 100,
+      args: [
+        `--disable-extensions-except=${distDirPath}`,
+        `--load-extension=${distDirPath}`,
+      ],
+    },
+  )) as ChromiumBrowserContext
 }, 60000)
 
 afterAll(async () => {
