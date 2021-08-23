@@ -1,20 +1,12 @@
 import { stubChunkNameForCssOnlyCrx } from '$src/manifest-input'
-import {
-  OutputAsset,
-  rollup,
-  RollupOptions,
-  RollupOutput,
-} from 'rollup'
-import { byFileName } from '../helpers/utils'
+import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { byFileName } from '$test/helpers/utils'
+import { OutputAsset } from 'rollup'
 
-let outputPromise: Promise<RollupOutput>
-beforeAll(async () => {
-  const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) =>
-    bundle.generate(config.output as any),
-  )
-  return outputPromise
-}, 30000)
+const outputPromise = getRollupOutput(
+  __dirname,
+  'rollup.config.js',
+)
 
 test('Handles extension with no scripts at all', async () => {
   const { output } = await outputPromise

@@ -1,17 +1,13 @@
 import { isAsset, isChunk } from '$src/helpers'
 import { deriveFiles } from '$src/manifest-input/manifest-parser'
+import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { byFileName } from '$test/helpers/utils'
 import path from 'path'
-import { rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName } from '../helpers/utils'
 
-let outputPromise: Promise<RollupOutput>
-beforeAll(async () => {
-  const config = require('./rollup.config.js') as RollupOptions
-  outputPromise = rollup(config).then((bundle) =>
-    bundle.generate(config.output as any),
-  )
-  return outputPromise
-}, 30000)
+const outputPromise = getRollupOutput(
+  __dirname,
+  'rollup.config.js',
+)
 
 test('bundles chunks and assets', async () => {
   const { output } = await outputPromise
