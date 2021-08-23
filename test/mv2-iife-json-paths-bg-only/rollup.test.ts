@@ -1,9 +1,7 @@
-import { byFileName, requireExtFile } from '../../__fixtures__/utils'
-import { rollup, RollupOutput, OutputAsset } from 'rollup'
-import { RollupOptions } from 'rollup'
-import { OutputChunk } from 'rollup'
+import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
+import { byFileName } from '../../__fixtures__/utils'
 
-const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
+const config = require('./rollup.config.js') as RollupOptions
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {

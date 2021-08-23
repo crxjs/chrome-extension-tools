@@ -8,5 +8,5 @@
     "examples/**/*.ts"
   ],
   "exclude": ["src/manifest-input/browser"],
-  "typeAcquisition": { "enable": true }
+  "typeAcquisition": { "enable": true },
 }

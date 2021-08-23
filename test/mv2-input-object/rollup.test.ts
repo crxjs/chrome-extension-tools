@@ -1,9 +1,9 @@
 import { OutputAsset, OutputChunk, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { byFileName, requireExtFile } from '../../__fixtures__/utils'
+import { byFileName } from '../../__fixtures__/utils'
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
+  const config = require('./rollup.config.js') as RollupOptions
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
 }, 30000)

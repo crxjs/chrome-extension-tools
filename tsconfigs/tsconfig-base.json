@@ -21,6 +21,11 @@
     "strict": true,
     "target": "es2017",
     "rootDir": "..",
-    "resolveJsonModule": true
+    "baseUrl": "..",
+    "resolveJsonModule": true,
+    "paths": {
+      "$src": ["src/index.ts"],
+      "$src/*": ["src/*"]
+    }
   }
 }
