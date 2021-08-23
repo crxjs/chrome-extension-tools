@@ -1,17 +1,17 @@
+import { isAsset, isChunk } from '$src/helpers'
+import { getScriptSrc, loadHtml } from '$src/html-inputs/cheerio'
+import { deriveFiles } from '$src/manifest-input/manifest-parser'
 import { flatten } from 'lodash'
 import path from 'path'
 import { OutputAsset, rollup, RollupOptions, RollupOutput } from 'rollup'
-import { isAsset, isChunk } from 
-import { getScriptSrc, loadHtml } from '../../src/html-inputs/cheerio'
-import { deriveFiles } from '../../src/manifest-input/manifest-parser'
-import { byFileName, getExtPath, getTestName, requireExtFile } from '../../__fixtures__/utils'
+import { byFileName, getExtPath, getTestName } from '../../__fixtures__/utils'
 
 const testName = getTestName(__filename)
 const extPath = getExtPath(testName)
 
 let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
-  const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
+  const config = require('./rollup.config.js') as RollupOptions
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
 }, 30000)

@@ -1,4 +1,4 @@
-import { ManifestV3 } from '../../../../src'
+import { ManifestV3 } from '$src'
 
 const config: ManifestV3 = {
   content_scripts: [

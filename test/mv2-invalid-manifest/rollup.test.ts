@@ -1,9 +1,7 @@
-import { RollupOptions } from 'rollup'
-import { rollup } from 'rollup'
-import { isErrorLike } from 
-import { requireExtFile } from '../../__fixtures__/utils'
+import { isErrorLike } from '$src/helpers'
+import { rollup, RollupOptions } from 'rollup'
 
-const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
+const config = require('./rollup.config.js') as RollupOptions
 
 test('warns and throws if the manifest is invalid', async () => {
   try {
