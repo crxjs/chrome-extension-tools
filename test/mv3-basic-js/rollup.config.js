@@ -1,19 +1,13 @@
-import path from 'path'
-
-import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
-
-import { getExtPath, getCrxName } from '../../__fixtures__/utils'
-
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
+import path from 'path'
 import { chromeExtension, simpleReloader } from '../../src'
 
-const crxName = getCrxName(__filename)
-
 export default {
-  input: getExtPath(crxName, 'src', 'manifest.json'),
+  input: path.join(__dirname, 'src', 'manifest.json'),
   output: {
-    dir: getExtPath(crxName, 'dist'),
+    dir: path.join(__dirname, 'dist'),
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
   },

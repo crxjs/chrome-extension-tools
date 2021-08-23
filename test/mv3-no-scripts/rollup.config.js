@@ -2,14 +2,11 @@
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import { chromeExtension } from '../../../src/index'
-import { getExtPath } from '../../utils'
-import { basename } from 'path'
 
-const crxName = basename(__dirname)
 export default {
-  input: getExtPath(crxName, 'manifest.json'),
+  input: path.join(__dirname, 'manifest.json'),
   output: {
-    dir: getExtPath(crxName, 'dist'),
+    dir: path.join(__dirname, 'dist'),
     format: 'esm',
   },
   plugins: [

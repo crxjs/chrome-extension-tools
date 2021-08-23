@@ -6,12 +6,10 @@ import { getExtPath, getCrxName } from '../../utils'
 
 import { chromeExtension, simpleReloader } from '../../../src'
 
-const crxName = getCrxName(__filename)
-
 export default {
-  input: getExtPath(crxName, 'src', 'manifest.json'),
+  input: path.join(__dirname, 'src', 'manifest.json'),
   output: {
-    dir: getExtPath(`${crxName}-dist`),
+    dir: path.join(__dirname, 'dist'),
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
   },
