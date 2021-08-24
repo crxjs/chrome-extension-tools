@@ -1,18 +1,22 @@
-import { EmittedFile, OutputAsset } from 'rollup'
-import { simpleReloader, _internalCache } from '..'
-import { buildCRX } from '$test/helpers/build-crx'
+import { getRollupBuildData } from '$test/helpers/getRollupBuildData'
+import { srcDir } from '$test/helpers/mv2-kitchen-sink-paths'
 import { context } from '$test/helpers/plugin-context'
+import {
+  EmittedFile,
+  NormalizedOutputOptions,
+  OutputAsset,
+} from 'rollup'
+import { simpleReloader, _internalCache } from '..'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import {
   backgroundPageReloader,
   contentScriptReloader,
   timestampFilename,
 } from '../CONSTANTS'
-import { NormalizedOutputOptions } from 'rollup'
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
 
-const buildPromise = buildCRX()
+const buildPromise = getRollupBuildData(srcDir)
 
 const contentJs = expect.stringMatching(/assets\/content.+?\.js/)
 

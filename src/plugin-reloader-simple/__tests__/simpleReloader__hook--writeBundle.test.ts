@@ -1,18 +1,19 @@
-import { join } from 'path'
-import { simpleReloader } from '..'
-import { buildCRX } from '$test/helpers/build-crx'
+import { cloneObject } from '$src/manifest-input/cloneObject'
+import { getRollupBuildData } from '$test/helpers/getRollupBuildData'
+import { srcDir } from '$test/helpers/mv2-kitchen-sink-paths'
 import { context } from '$test/helpers/plugin-context'
-import { cloneObject } from '../../manifest-input/cloneObject'
+import { join } from 'path'
 import { NormalizedOutputOptions } from 'rollup'
+import { simpleReloader } from '..'
 
 const fsExtra = require('fs-extra')
 const mockOutputJson = jest.spyOn(fsExtra, 'outputJson')
 mockOutputJson.mockImplementation(() => Promise.resolve())
 
+const buildPromise = getRollupBuildData(srcDir)
+
 const outputDir = 'outputDir'
 const timestampPath = 'timestampPath'
-
-const buildPromise = buildCRX()
 
 beforeAll(jest.useFakeTimers)
 afterEach(jest.clearAllMocks)
@@ -23,6 +24,7 @@ beforeEach(() => {
 
 test('Writes timestamp file', async () => {
   const { bundle } = cloneObject(await buildPromise)
+
   const plugin = simpleReloader(
     { reloadDelay: 0 },
     { outputDir, timestampPath },
@@ -42,6 +44,7 @@ test('Writes timestamp file', async () => {
 
 test('Delays prescribed amount', async () => {
   const { bundle } = cloneObject(await buildPromise)
+
   const plugin = simpleReloader(
     { reloadDelay: 100 },
     { outputDir, timestampPath },
@@ -67,6 +70,7 @@ test('Delays prescribed amount', async () => {
 
 test('Handles write errors with message prop', async () => {
   const { bundle } = cloneObject(await buildPromise)
+
   const plugin = simpleReloader(
     { reloadDelay: 0 },
     { outputDir, timestampPath },
@@ -94,6 +98,7 @@ test('Handles write errors with message prop', async () => {
 
 test('Handles other write errors', async () => {
   const { bundle } = cloneObject(await buildPromise)
+
   const plugin = simpleReloader(
     { reloadDelay: 0 },
     { outputDir, timestampPath },
