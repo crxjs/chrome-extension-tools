@@ -2,11 +2,11 @@ import { chromeExtension } from '$src'
 import path from 'path'
 import { defineConfig } from 'vite'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: path.join(__dirname, 'src'),
   build: {
     minify: false,
-    outDir: path.join(__dirname, 'dist'),
+    outDir: path.join(__dirname, 'dist-' + command),
     emptyOutDir: true,
     rollupOptions: {
       input: path.join(__dirname, 'src', 'manifest.json'),
@@ -18,4 +18,4 @@ export default defineConfig({
     },
   },
   plugins: [chromeExtension()],
-})
+}))
