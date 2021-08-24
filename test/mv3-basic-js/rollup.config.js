@@ -21,7 +21,9 @@ export default {
       babelHelpers: 'bundled',
       configFile: path.resolve(__dirname, 'babel.config.json'),
     }),
-    resolve(),
+    resolve({
+      extensions: ['.mjs', '.js', '.json', '.node', '.jsx'],
+    }),
     commonjs({
       namedExports: {
         react: Object.keys(require('react')),
