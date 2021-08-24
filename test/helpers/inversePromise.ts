@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export interface InversePromise<T> extends Promise<T> {
   resolve: (value: T | PromiseLike<T>) => void
   reject: (reason: any) => void

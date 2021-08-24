@@ -1,7 +1,7 @@
 import {
   optionsHtml,
   srcDir,
-} from '$test/helpers/mv2-kitchen-sink-paths'
+} from '$test/data/mv2-kitchen-sink-paths'
 import { getRelativePath } from '../cheerio'
 
 test('returns correct path', () => {
