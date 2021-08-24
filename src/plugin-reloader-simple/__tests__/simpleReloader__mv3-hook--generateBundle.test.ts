@@ -1,4 +1,5 @@
-import { buildCRX } from '$test/helpers/build-crx'
+import { getRollupBuildData } from '$test/helpers/getRollupBuildData'
+import { srcDir } from '$test/helpers/mv3-kitchen-sink-paths'
 import { context } from '$test/helpers/plugin-context'
 import { byFileName } from '$test/helpers/utils'
 import {
@@ -16,13 +17,9 @@ import {
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
 
-const buildPromise = buildCRX(
-  'mv3-kitchen-sink/rollup.config.js',
-)
-
 const contentJs = expect.stringMatching('import-content.js')
 
-beforeAll(() => buildPromise)
+const buildPromise = getRollupBuildData(srcDir)
 
 beforeEach(() => {
   process.env.ROLLUP_WATCH = 'true'
@@ -32,6 +29,7 @@ afterEach(jest.clearAllMocks)
 
 test('emit assets', async () => {
   const { bundle } = cloneObject(await buildPromise)
+
   const plugin = simpleReloader()!
 
   await plugin.generateBundle.call(

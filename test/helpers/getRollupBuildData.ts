@@ -15,28 +15,26 @@ type RollupBuildData = {
   output: RollupOutput
 }
 
-export function buildCRX(
-  crxPath = 'mv2-kitchen-sink/rollup.config.js',
-): ReturnType<typeof innerBuildCRX> {
+export function getRollupBuildData(
+  srcDir: string,
+): Promise<RollupBuildData> {
   return new Promise((resolve, reject) => {
     beforeAll(async () => {
       try {
-        const buildPromise = await innerBuildCRX(crxPath)
-
-        resolve(buildPromise)
+        const data = await performBuild(srcDir)
+        resolve(data)
       } catch (error) {
         reject(error)
       }
-    }, 30000)
+    }, 60000)
   })
 }
 
-/** Builds the kitchen-sink example crx by default */
-export async function innerBuildCRX(
-  crxPath: string,
+export async function performBuild(
+  srcDir: string,
 ): Promise<RollupBuildData> {
-  const extPath = path.resolve(__dirname, '..', crxPath)
-  const config = require(extPath).default
+  const config = require(path.join(srcDir, 'rollup.config.js'))
+    .default
 
   if (typeof config.output === 'undefined')
     throw new TypeError('Rollup config must have output')
@@ -45,7 +43,7 @@ export async function innerBuildCRX(
     (resolve) => {
       config.plugins = config.plugins || []
       config.plugins.push({
-        name: 'save-bundle-plugin',
+        name: 'extract-bundle',
         generateBundle(o, b) {
           resolve(b)
         },
@@ -59,6 +57,7 @@ export async function innerBuildCRX(
       ? config.output[0]
       : config.output,
   )
+  const bundle = await bundlePromise
 
-  return { build, bundle: await bundlePromise, output }
+  return { build, bundle, output }
 }
