@@ -12,3 +12,4 @@ package-lock.json
 TODO
 **/chromium-data-dir/
 test/**/dist/
+test/**/dist*/
