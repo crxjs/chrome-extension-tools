@@ -1,6 +1,6 @@
 import { cloneObject } from '$src/manifest-input/cloneObject'
 import { getRollupBuildData } from '$test/helpers/getRollupBuildData'
-import { srcDir } from '$test/helpers/mv2-kitchen-sink-paths'
+import { srcDir } from '$test/data/mv2-kitchen-sink-paths'
 import { context } from '$test/helpers/plugin-context'
 import { join } from 'path'
 import { NormalizedOutputOptions } from 'rollup'
