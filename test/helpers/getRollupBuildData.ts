@@ -30,7 +30,7 @@ export function getRollupBuildData(
   })
 }
 
-export async function performBuild(
+async function performBuild(
   srcDir: string,
 ): Promise<RollupBuildData> {
   const config = require(path.join(srcDir, 'rollup.config.js'))

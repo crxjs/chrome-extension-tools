@@ -3,10 +3,6 @@ import { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 
 export const testDir = path.resolve(__dirname, '..')
 
-/**  Make relative to project root */
-export const getRelative = (p: string): string =>
-  p.replace(process.cwd() + '/', '')
-
 export function byFileName(n: string) {
   return ({ fileName }: OutputAsset | OutputChunk): boolean =>
     fileName === n

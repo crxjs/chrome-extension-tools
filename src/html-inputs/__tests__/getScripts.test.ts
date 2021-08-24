@@ -1,7 +1,7 @@
 import {
   kitchenSinkRoot,
   optionsHtml,
-} from '$test/helpers/mv2-kitchen-sink-paths'
+} from '$test/data/mv2-kitchen-sink-paths'
 import { getScriptSrc, loadHtml } from '../cheerio'
 
 const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)

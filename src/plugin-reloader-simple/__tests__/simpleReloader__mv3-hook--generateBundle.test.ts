@@ -1,5 +1,5 @@
 import { getRollupBuildData } from '$test/helpers/getRollupBuildData'
-import { srcDir } from '$test/helpers/mv3-kitchen-sink-paths'
+import { srcDir } from '$test/data/mv3-kitchen-sink-paths'
 import { context } from '$test/helpers/plugin-context'
 import { byFileName } from '$test/helpers/utils'
 import {

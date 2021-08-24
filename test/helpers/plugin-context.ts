@@ -1,3 +1,4 @@
+/* eslint-env jest */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   PluginContext,
