@@ -87,13 +87,11 @@ export function browserPolyfill({
 
         const executeScriptPolyfillPath = this.getFileName(exId)
 
-        // TODO: support this in MV3
         manifest.background?.scripts?.unshift(
           executeScriptPolyfillPath,
         )
       }
 
-      // TODO: support this in MV3
       manifest.background?.scripts?.unshift(browserPolyfillPath)
       manifest.content_scripts?.forEach((script) => {
         script.js?.unshift(browserPolyfillPath)
