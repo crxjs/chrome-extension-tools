@@ -3,10 +3,7 @@ import fs from 'fs-extra'
 import { Plugin } from 'rollup'
 import { isAsset } from '../helpers'
 import { isMV3 } from '../manifest-types'
-import {
-  ChromeExtensionPlugin,
-  ManifestInputPlugin,
-} from '../plugin-options'
+import { ManifestInputPlugin } from '../plugin-options'
 
 const defaultOptions = { executeScript: true }
 export function browserPolyfill({
@@ -35,21 +32,7 @@ export function browserPolyfill({
 
   return {
     name: 'browser-polyfill',
-    generateBundle({ plugins = [] }, bundle) {
-      const firefoxPlugin = plugins.find(
-        ({ name }) => name === 'firefox-addon',
-      )
-      const chromeExtensionPlugin = plugins.find(
-        ({ name }) => name === 'chrome-extension',
-      ) as ChromeExtensionPlugin
-
-      if (
-        firefoxPlugin &&
-        !chromeExtensionPlugin._plugins.manifest.crossBrowser
-      ) {
-        return // Don't need to add it
-      }
-
+    generateBundle(options, bundle) {
       const manifestAsset = bundle['manifest.json']
       if (!isAsset(manifestAsset)) {
         throw new TypeError(

@@ -1,15 +1,13 @@
 import 'array-flat-polyfill'
-
 import { readFile } from 'fs-extra'
 import { flatten } from 'lodash'
 import { relative } from 'path'
-
 import { not } from '../helpers'
 import { reduceToRecord } from '../manifest-input/reduceToRecord'
 import {
   HtmlInputsOptions,
-  HtmlInputsPluginCache,
   HtmlInputsPlugin,
+  HtmlInputsPluginCache,
 } from '../plugin-options'
 import {
   getCssHrefs,
@@ -99,6 +97,7 @@ export default function htmlInputs(
         // Cache jsEntries with existing options.input
         cache.input = input.filter(not(isHtml)).concat(cache.js)
 
+        // TODO: if viteConfig.command === 'serve', point to localhost
         // Prepare cache.html$ for asset emission
         cache.html$.forEach(mutateScriptElems(htmlInputsOptions))
 
