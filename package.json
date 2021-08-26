@@ -36,6 +36,7 @@
     "cheerio": "1.0.0-rc.3",
     "convert-source-map": "^1.7.0",
     "cosmiconfig": "^6.0.0",
+    "esbuild-runner": "^2.2.0",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
     "json-ptr": "^2.2.0",
@@ -45,7 +46,6 @@
     "mem": "^6.0.1",
     "rollup": "^1.31.0",
     "slash": "^3.0.0",
-    "ts-node": "^10.2.0",
     "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {
