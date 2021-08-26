@@ -15,6 +15,7 @@ export const derivePermissions = (
   { code }: OutputChunk,
 ) =>
   Object.entries(permissions)
+    .filter(([key]) => key !== 'default')
     .filter(([, fn]) => fn(code))
     .map(([key]) => key)
     .reduce((s, p) => s.add(p), set)
