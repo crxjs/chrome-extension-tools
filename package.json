@@ -46,7 +46,8 @@
     "lodash": "^4.17.21",
     "mem": "^6.0.1",
     "slash": "^3.0.0",
-    "webextension-polyfill": "^0.6.0"
+    "webextension-polyfill": "^0.6.0",
+    "xstate": "^4.23.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.13.0",

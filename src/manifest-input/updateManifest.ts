@@ -21,11 +21,11 @@ export function updateManifestV3(
     manifest.background.type = 'module'
   }
 
+  // TODO: need to map content scripts to import wrapper in manifest
   if (manifest.content_scripts) {
     const { output = {} } = options
-    const {
-      chunkFileNames = 'chunks/[name]-[hash].js',
-    } = Array.isArray(output) ? output[0] : output
+    const { chunkFileNames = 'chunks/[name]-[hash].js' } =
+      Array.isArray(output) ? output[0] : output
 
     // @ts-expect-error need to support both string and function
     cache.chunkFileNames = chunkFileNames

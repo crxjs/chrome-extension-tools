@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig(({ command }) => ({
   root: path.join(__dirname, 'src'),
+  clearScreen: false,
   build: {
     minify: false,
     outDir: path.join(__dirname, 'dist-' + command),

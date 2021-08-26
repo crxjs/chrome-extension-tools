@@ -1,4 +1,4 @@
-import { stubChunkNameForCssOnlyCrx } from '$src/manifest-input'
+import { stubIdForNoScriptChromeExtensions } from '$src/manifest-input'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
@@ -12,7 +12,7 @@ test('Handles extension with no scripts at all', async () => {
   const { output } = await outputPromise
 
   const stubChunk = output.find(
-    byFileName(stubChunkNameForCssOnlyCrx),
+    byFileName(stubIdForNoScriptChromeExtensions),
   )
   expect(stubChunk).toBeUndefined()
 

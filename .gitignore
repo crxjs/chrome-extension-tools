@@ -11,6 +11,5 @@ package-lock.json
 *.log
 TODO
 **/chromium-data-dir/
-test/**/dist/
 test/**/dist*/
 .vscode/settings.json

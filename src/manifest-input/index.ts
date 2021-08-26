@@ -1,3 +1,4 @@
+import { VITE_SERVER_URL } from '$src/shimPluginContext'
 import { code as ctWrapperScript } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
@@ -6,6 +7,7 @@ import memoize from 'mem'
 import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
+import { ViteDevServer } from 'vite'
 import {
   isChunk,
   isPresent,
@@ -27,10 +29,7 @@ import {
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import {
-  getImportContentScriptFileName,
-  updateManifestV3,
-} from './updateManifest'
+import { updateManifestV3 } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -49,10 +48,12 @@ const name = 'manifest-input'
 
 // We use a stub if the manifest has no scripts
 //   eg, a CSS only Chrome Extension
-export const stubChunkNameForCssOnlyCrx =
-  'stub__css-only-chrome-extension-manifest'
-export const importWrapperChunkNamePrefix =
-  '__RPCE-import-wrapper'
+export const stubIdForNoScriptChromeExtensions =
+  '__stubIdForNoScriptChromeExtensions'
+export const esmContentScriptWrapperIdPrefix =
+  '__esmContentScriptWrapper'
+export const esmContentScriptWrapperFileNameExt =
+  '.esm-wrapper.js'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -98,7 +99,7 @@ export function manifestInput(
       inputObj: {},
       permsHash: '',
       readFile: new Map<string, any>(),
-      srcDir: null,
+      srcDir: process.cwd(),
     } as ManifestInputPluginCache,
   } = {} as ManifestInputPluginOptions,
 ): ManifestInputPlugin {
@@ -118,6 +119,7 @@ export function manifestInput(
   /* ----------- HOOKS CLOSURES START ----------- */
 
   let manifestPath: string
+  let viteServer: ViteDevServer | Record<string, never> = {}
 
   const manifestName = 'manifest.json'
 
@@ -147,6 +149,10 @@ export function manifestInput(
       return { iife: cache.iife }
     },
 
+    configureServer(config) {
+      viteServer = config
+    },
+
     /* ============================================ */
     /*                 OPTIONS HOOK                 */
     /* ============================================ */
@@ -156,10 +162,8 @@ export function manifestInput(
 
       // Do not reload manifest without changes
       if (!cache.manifest) {
-        const {
-          inputManifestPath,
-          ...cacheValues
-        } = getInputManifestPath(options)
+        const { inputManifestPath, ...cacheValues } =
+          getInputManifestPath(options)
 
         Object.assign(cache, cacheValues)
 
@@ -225,16 +229,10 @@ export function manifestInput(
             .flat(Infinity)
 
           // Derive entry paths from manifest
-          const {
-            js,
-            html,
-            css,
-            img,
-            others,
-            contentScripts,
-          } = deriveFiles(fullManifest, cache.srcDir, {
-            contentScripts: true,
-          })
+          const { js, html, css, img, others, contentScripts } =
+            deriveFiles(fullManifest, cache.srcDir, {
+              contentScripts: true,
+            })
 
           cache.contentScripts = contentScripts
 
@@ -272,9 +270,8 @@ export function manifestInput(
 
       // Use a stub if no js scripts
       if (Object.keys(finalInput).length === 0) {
-        finalInput[
-          stubChunkNameForCssOnlyCrx
-        ] = stubChunkNameForCssOnlyCrx
+        finalInput[stubIdForNoScriptChromeExtensions] =
+          stubIdForNoScriptChromeExtensions
       }
 
       return { ...options, input: finalInput }
@@ -298,7 +295,7 @@ export function manifestInput(
           return {
             type: 'asset' as const,
             source,
-            fileName: path.relative(cache.srcDir!, srcPath),
+            fileName: path.relative(cache.srcDir, srcPath),
           }
         }),
       )
@@ -325,6 +322,40 @@ export function manifestInput(
 
       /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
 
+      // TODO: refactor content script emission
+      //   - content script wrappers should be emitted as assets
+      //   - we won't need transform in that case
+      //   - can point content script to localhost if vite serve
+
+      if (wrapContentScripts)
+        cache.contentScripts.forEach((srcPath) => {
+          const relPath = path.relative(cache.srcDir, srcPath)
+          const { dir, name } = path.parse(relPath)
+          const targetFileName = path.join(dir, name + '.js')
+          const fileName = path.join(
+            dir,
+            name + esmContentScriptWrapperFileNameExt,
+          )
+
+          const importPath =
+            viteServer.config?.command === 'serve'
+              ? `${VITE_SERVER_URL}/${fileName}`
+              : targetFileName
+
+          this.emitFile({
+            type: 'asset',
+            fileName,
+            source: ctWrapperScript.replace(
+              '%PATH%',
+              JSON.stringify(importPath),
+            ),
+          })
+        })
+
+      // TODO: need to bundle service worker if vite serve
+      //   - can import from localhost?
+      //   - how to do HMR? just reload crx!
+
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
       const manifestBody = cloneObject(cache.manifest!)
@@ -343,59 +374,47 @@ export function manifestInput(
     },
 
     async resolveId(source) {
-      return source === stubChunkNameForCssOnlyCrx ||
-        source.startsWith(importWrapperChunkNamePrefix)
+      return source === stubIdForNoScriptChromeExtensions
         ? source
         : null
     },
 
     load(id) {
-      if (id === stubChunkNameForCssOnlyCrx) {
+      if (id === stubIdForNoScriptChromeExtensions) {
         return {
-          code: `console.log(${stubChunkNameForCssOnlyCrx})`,
+          code: `console.log(${stubIdForNoScriptChromeExtensions})`,
         }
-      } else if (
-        wrapContentScripts &&
-        isMV3(cache.manifest) &&
-        id.startsWith(importWrapperChunkNamePrefix)
-      ) {
-        const [, target] = id.split(':')
-        const code = ctWrapperScript.replace(
-          '%PATH%',
-          JSON.stringify(target),
-        )
-        return { code }
       }
 
       return null
     },
 
-    transform(code, id) {
-      // TODO: this could be done in `load`
-      if (
-        wrapContentScripts &&
-        isMV3(cache.manifest) &&
-        cache.contentScripts.includes(id)
-      ) {
-        // Use slash to guarantee support Windows
-        const target = `${slash(relative(cache.srcDir!, id))
-          .split('.')
-          .slice(0, -1)
-          .join('.')}.js`
+    // transform(code, id) {
+    //   // TODO: this could be done in `load`
+    //   if (
+    //     wrapContentScripts &&
+    //     isMV3(cache.manifest) &&
+    //     cache.contentScripts.includes(id)
+    //   ) {
+    //     // Use slash to guarantee support Windows
+    //     const target = `${slash(relative(cache.srcDir!, id))
+    //       .split('.')
+    //       .slice(0, -1)
+    //       .join('.')}.js`
 
-        const fileName = getImportContentScriptFileName(target)
+    //     const fileName = getImportContentScriptFileName(target)
 
-        // Emit content script wrapper
-        this.emitFile({
-          id: `${importWrapperChunkNamePrefix}:${target}`,
-          type: 'chunk',
-          fileName,
-        })
-      }
+    //     // Emit content script wrapper
+    //     this.emitFile({
+    //       id: `${esmContentScriptWrapperIdPrefix}:${target}`,
+    //       type: 'chunk',
+    //       fileName,
+    //     })
+    //   }
 
-      // No source transformation took place
-      return null
-    },
+    //   // No source transformation took place
+    //   return null
+    // },
 
     watchChange(id) {
       if (id.endsWith(manifestName)) {
@@ -415,7 +434,7 @@ export function manifestInput(
     generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
-      delete bundle[stubChunkNameForCssOnlyCrx + '.js']
+      delete bundle[stubIdForNoScriptChromeExtensions + '.js']
 
       // We don't support completely empty bundles
       if (Object.keys(bundle).length === 0) {

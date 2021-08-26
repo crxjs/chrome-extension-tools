@@ -1,20 +1,22 @@
-import htmlInputs from './html-inputs'
-import manifestInput from './manifest-input'
-import { browserPolyfill as b } from './browser-polyfill'
-import { validateNames as v } from './validate-names'
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
-
+import { InputOptions } from 'rollup'
+import { browserPolyfill as b } from './browser-polyfill'
+import htmlInputs from './html-inputs'
+import manifestInput from './manifest-input'
+import { mixedFormat as m } from './mixed-format'
 import {
   ChromeExtensionOptions,
   ChromeExtensionPlugin,
 } from './plugin-options'
-import { mixedFormat as m } from './mixed-format'
-import { InputOptions } from 'rollup'
-
-export { simpleReloader } from './plugin-reloader-simple'
+import {
+  sendConfigureServer,
+  shimPluginContext,
+} from './shimPluginContext'
+import { validateNames as v } from './validate-names'
 
 export type { ManifestV2, ManifestV3 } from './manifest-types'
+export { simpleReloader } from './plugin-reloader-simple'
 
 export const chromeExtension = (
   options = {} as ChromeExtensionOptions,
@@ -39,13 +41,18 @@ export const chromeExtension = (
   return {
     name: 'chrome-extension',
 
-    // For testing
-    _plugins: { manifest, html, validate },
+    configureServer(server) {
+      sendConfigureServer(server)
+      manifest.configureServer.call(this, server)
+    },
 
     options(options) {
       try {
         return [manifest, html].reduce((opts, plugin) => {
-          const result = plugin.options.call(this, opts) as InputOptions
+          const result = plugin.options.call(
+            this,
+            opts,
+          ) as InputOptions
 
           return result || options
         }, options)
@@ -69,22 +76,29 @@ export const chromeExtension = (
     },
 
     async buildStart(options) {
+      const context = shimPluginContext(this, 'buildStart')
+
       await Promise.all([
-        manifest.buildStart.call(this, options),
-        html.buildStart.call(this, options),
+        manifest.buildStart.call(context, options),
+        html.buildStart.call(context, options),
       ])
     },
 
     async resolveId(source, importer, options) {
-      return manifest.resolveId.call(this, source, importer, options)
+      const context = shimPluginContext(this, 'resolveId')
+
+      return manifest.resolveId.call(
+        context,
+        source,
+        importer,
+        options,
+      )
     },
 
     async load(id) {
-      return manifest.load.call(this, id)
-    },
+      const context = shimPluginContext(this, 'load')
 
-    transform(source, id) {
-      return manifest.transform.call(this, source, id)
+      return manifest.load.call(context, id)
     },
 
     watchChange(id, change) {
@@ -96,7 +110,6 @@ export const chromeExtension = (
       await manifest.generateBundle.call(this, ...args)
       await validate.generateBundle.call(this, ...args)
       await browser.generateBundle.call(this, ...args)
-      // TODO: should skip this if not needed
       await mixedFormat.generateBundle.call(this, ...args)
     },
   }
