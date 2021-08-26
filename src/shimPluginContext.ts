@@ -22,7 +22,6 @@ export const viteServerUrlRegExp = new RegExp(
 
 interface Context {
   server?: ViteDevServer
-  port?: number
   pluginContext?: PluginContext
   lastError?: Error
   files: (EmittedFile & {
@@ -58,7 +57,7 @@ const model = createModel(context, {
     HOOK_START: (hookName: string) => ({ hookName }),
     ERROR: (error: any, id?: string) => ({ id, error }),
     SERVER_CONFIGURE: (server: ViteDevServer) => ({ server }),
-    SERVER_READY: (port: number) => ({ port }),
+    SERVER_LISTENING: () => ({}),
   },
 })
 
@@ -91,14 +90,7 @@ const machine = createMachine<typeof model>(
               src: 'waitForServer',
             },
             on: {
-              SERVER_READY: {
-                target: 'listening',
-                actions: [
-                  model.assign({
-                    port: (context, { port }) => port,
-                  }),
-                ],
-              },
+              SERVER_LISTENING: 'listening',
               ERROR: {
                 target: '#error',
                 actions: model.assign({
@@ -174,7 +166,7 @@ const machine = createMachine<typeof model>(
   },
   {
     actions: {
-      writeFile: pure(({ server, port }, event) => {
+      writeFile: pure(({ server }, event) => {
         try {
           if (event.type !== 'EMIT_START')
             throw new Error(`Invalid event type: ${event.type}`)
@@ -200,12 +192,17 @@ const machine = createMachine<typeof model>(
             fileName,
           )
 
+          const {
+            port,
+            host = 'localhost',
+            https,
+          } = server.config.server
           if (isUndefined(port))
             throw new TypeError('context port is undefined')
           const fileSource = isString(source)
             ? source.replace(
                 viteServerUrlRegExp,
-                port.toString(),
+                `${https ? 'https' : 'http'}://${host}:${port}`,
               )
             : source
 
@@ -248,18 +245,9 @@ const machine = createMachine<typeof model>(
                 ),
               )
 
-            server?.httpServer?.once('listening', () =>
-              resolve(server),
-            )
+            server?.httpServer?.once('listening', resolve)
           })
-            .then((server) => {
-              const { port } = server.config.server
-              return isUndefined(port)
-                ? model.events.ERROR(
-                    new Error('vite server port is undefined'),
-                  )
-                : model.events.SERVER_READY(port)
-            })
+            .then(model.events.SERVER_LISTENING)
             .catch((error) =>
               model.events.ERROR(error, 'waitForServer'),
             ),
