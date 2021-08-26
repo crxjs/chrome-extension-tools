@@ -37,7 +37,7 @@ export const explorer = cosmiconfigSync('manifest', {
   cache: false,
   loaders: {
     '.ts': (filePath: string) => {
-      require('ts-node/register')
+      require('esbuild-runner/register')
       const result = require(filePath)
 
       return result.default ?? result

@@ -36,6 +36,8 @@
     "cheerio": "1.0.0-rc.3",
     "convert-source-map": "^1.7.0",
     "cosmiconfig": "^6.0.0",
+    "esbuild": "^0.12.23",
+    "esbuild-runner": "^2.2.0",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
     "json-ptr": "^2.2.0",
@@ -45,7 +47,6 @@
     "mem": "^6.0.1",
     "rollup": "^1.31.0",
     "slash": "^3.0.0",
-    "ts-node": "^10.2.0",
     "webextension-polyfill": "^0.6.0"
   },
   "devDependencies": {
@@ -87,7 +88,7 @@
     "jest-in-case": "^1.0.2",
     "npm-run-all": "^4.1.5",
     "playwright": "^1.13.1",
-    "prettier": "^1.19.1",
+    "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "read-pkg-up": "^7.0.1",
