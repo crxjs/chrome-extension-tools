@@ -13,3 +13,5 @@ TODO
 ___mv3-scripts
 **/chromium-data-dir/
 __fixtures__/extensions/**/dist/
+test/**/dist*/
+playground/
