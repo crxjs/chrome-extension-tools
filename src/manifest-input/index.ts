@@ -29,6 +29,10 @@ import {
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
+import {
+  stubIdForNoScriptChromeExtensions,
+  generateFileNames,
+} from './fileNameUtils'
 import { updateManifestV3 } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
@@ -45,15 +49,6 @@ export const explorer = cosmiconfigSync('manifest', {
 })
 
 const name = 'manifest-input'
-
-// We use a stub if the manifest has no scripts
-//   eg, a CSS only Chrome Extension
-export const stubIdForNoScriptChromeExtensions =
-  '__stubIdForNoScriptChromeExtensions'
-export const esmContentScriptWrapperIdPrefix =
-  '__esmContentScriptWrapper'
-export const esmContentScriptWrapperFileNameExt =
-  '.esm-wrapper.js'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -329,22 +324,19 @@ export function manifestInput(
 
       if (wrapContentScripts)
         cache.contentScripts.forEach((srcPath) => {
-          const relPath = path.relative(cache.srcDir, srcPath)
-          const { dir, name } = path.parse(relPath)
-          const targetFileName = path.join(dir, name + '.js')
-          const fileName = path.join(
-            dir,
-            name + esmContentScriptWrapperFileNameExt,
-          )
-
+          const { fileName, jsFileName, wrapperFileName } =
+            generateFileNames({
+              srcDir: cache.srcDir,
+              srcPath,
+            })
           const importPath =
             viteServer.config?.command === 'serve'
               ? `${VITE_SERVER_URL}/${fileName}`
-              : targetFileName
+              : jsFileName
 
           this.emitFile({
             type: 'asset',
-            fileName,
+            fileName: wrapperFileName,
             source: ctWrapperScript.replace(
               '%PATH%',
               JSON.stringify(importPath),
