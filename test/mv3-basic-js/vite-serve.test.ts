@@ -1,3 +1,4 @@
+import { filesEmitted } from '$src/shimPluginContext'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
@@ -8,12 +9,12 @@ const distDir = path.join(__dirname, 'dist-serve')
 
 let devServer: ViteDevServer
 beforeAll(async () => {
+  await fs.remove(distDir)
+
   devServer = await createServer({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,
   })
-
-  await devServer.listen(2000)
 })
 
 afterAll(async () => {
@@ -21,11 +22,14 @@ afterAll(async () => {
 })
 
 test('writes entry points to disk', async () => {
+  expect(fs.existsSync(distDir)).toBe(false)
+
+  await Promise.all([devServer.listen(2000), filesEmitted()])
+
   const assets = [
     'manifest.json',
-    'content.js',
     'popup.html',
-    'service_worker.js',
+    'content.esm-wrapper.js',
   ]
 
   expect(fs.existsSync(distDir)).toBe(true)

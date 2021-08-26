@@ -1,7 +1,16 @@
-import { ModuleFormat, Plugin, PluginHooks } from 'rollup'
+import { ModuleFormat, Plugin } from 'rollup'
+import { ResolvedConfig, ViteDevServer } from 'vite'
 import { CheerioFile } from './html-inputs/cheerio'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
-import { ValidateNamesPlugin } from './validate-names/index'
+
+interface VitePlugin {
+  configResolved: (
+    config: ResolvedConfig,
+  ) => void | Promise<void>
+  configureServer: (
+    server: ViteDevServer,
+  ) => (() => void) | void | Promise<(() => void) | void>
+}
 
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
@@ -54,17 +63,8 @@ export interface ChromeExtensionOptions {
   wrapContentScripts?: boolean
 }
 
-export type ChromeExtensionPlugin = Pick<
-  Required<Plugin>,
-  'name' | ManifestInputPluginHooks | HtmlInputsPluginHooks
-> & {
-  // For testing
-  _plugins: {
-    manifest: ManifestInputPlugin
-    html: HtmlInputsPlugin
-    validate: ValidateNamesPlugin
-  }
-}
+export type ChromeExtensionPlugin = ManifestInputHooks &
+  HtmlInputHooks
 
 /* --------- MANIFEST INPUT PLUGIN OPTIONS --------- */
 
@@ -82,27 +82,26 @@ export interface ManifestInputPluginCache {
   inputAry: string[]
   inputObj: Record<string, string>
   permsHash: string
-  srcDir: string | null
+  srcDir: string
   /** for memoized fs.readFile */
   readFile: Map<string, any>
   manifest?: chrome.runtime.Manifest
   assetChanged: boolean
 }
 
-type ManifestInputPluginHooks =
+export type ManifestInputHooks = Pick<
+  Required<Plugin> & VitePlugin,
+  | 'name'
+  | 'configureServer'
   | 'options'
   | 'buildStart'
   | 'resolveId'
   | 'load'
-  | 'transform'
   | 'watchChange'
   | 'generateBundle'
+>
 
-export type ManifestInputPlugin = Pick<
-  PluginHooks,
-  ManifestInputPluginHooks
-> & {
-  name: string
+export type ManifestInputPlugin = ManifestInputHooks & {
   srcDir: string | null
   browserPolyfill?: ChromeExtensionOptions['browserPolyfill']
   crossBrowser?: ChromeExtensionOptions['crossBrowser']
@@ -138,13 +137,10 @@ export interface HtmlInputsPluginCache {
   srcDir?: string
 }
 
-type HtmlInputsPluginHooks =
-  | 'name'
-  | 'options'
-  | 'buildStart'
-  | 'watchChange'
-
-export type HtmlInputsPlugin = Pick<
-  Required<Plugin>,
-  HtmlInputsPluginHooks
-> & { cache: HtmlInputsPluginCache }
+type HtmlInputHooks = Pick<
+  Required<Plugin> & VitePlugin,
+  'name' | 'options' | 'buildStart' | 'watchChange'
+>
+export type HtmlInputsPlugin = HtmlInputHooks & {
+  cache: HtmlInputsPluginCache
+}
