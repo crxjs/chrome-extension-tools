@@ -1,7 +1,7 @@
+import { isViteServe, VITE_SERVER_URL } from '$src/viteAdaptor'
 import cheerio from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
-
 import { isString } from '../helpers'
 import { HtmlInputsOptions } from '../plugin-options'
 
@@ -13,30 +13,38 @@ export type HtmlFilePathData = {
 /** cheerio.Root objects with a file path */
 export type CheerioFile = cheerio.Root & HtmlFilePathData
 
-export const loadHtml = (rootPath: string) => (
-  filePath: string,
-): CheerioFile => {
-  const htmlCode = fs.readFileSync(filePath, 'utf8')
-  const $ = cheerio.load(htmlCode)
+export const loadHtml =
+  (rootPath: string) =>
+  (filePath: string): CheerioFile => {
+    const htmlCode = fs.readFileSync(filePath, 'utf8')
+    const $ = cheerio.load(htmlCode)
 
-  return Object.assign($, { filePath, rootPath })
-}
-
-export const getRelativePath = ({
-  filePath,
-  rootPath,
-}: HtmlFilePathData) => (p: string) => {
-  const htmlFileDir = path.dirname(filePath)
-
-  let relDir: string
-  if (p.startsWith('/')) {
-    relDir = path.relative(process.cwd(), rootPath)
-  } else {
-    relDir = path.relative(process.cwd(), htmlFileDir)
+    return Object.assign($, { filePath, rootPath })
   }
 
-  return path.join(relDir, p)
+export const cloneHtml = (src$: CheerioFile): CheerioFile => {
+  const html = src$.html()
+  const $ = cheerio.load(html)
+  return Object.assign($, {
+    filePath: src$.filePath,
+    rootPath: src$.rootPath,
+  })
 }
+
+export const getRelativePath =
+  ({ filePath, rootPath }: HtmlFilePathData) =>
+  (p: string) => {
+    const htmlFileDir = path.dirname(filePath)
+
+    let relDir: string
+    if (p.startsWith('/')) {
+      relDir = path.relative(process.cwd(), rootPath)
+    } else {
+      relDir = path.relative(process.cwd(), htmlFileDir)
+    }
+
+    return path.join(relDir, p)
+  }
 
 /* -------------------- SCRIPTS -------------------- */
 
@@ -48,43 +56,44 @@ export const getScriptElems = ($: cheerio.Root) =>
     .not('[src^="data:"]')
     .not('[src^="/"]')
 
-// Mutative action
-export const mutateScriptElems = ({
-  browserPolyfill,
-}: Pick<HtmlInputsOptions, 'browserPolyfill'>) => (
-  $: CheerioFile,
-) => {
-  getScriptElems($)
-    .attr('type', 'module')
-    .attr('src', (i, value) => {
-      // FIXME: @types/cheerio is wrong for AttrFunction: index.d.ts, line 16
-      // declare type AttrFunction = (i: number, currentValue: string) => any;
-      // eslint-disable-next-line
-      // @ts-ignore
-      const replaced = value.replace(/\.[jt]sx?/g, '.js')
+export const updateHtmlElements =
+  ({
+    browserPolyfill,
+  }: Pick<HtmlInputsOptions, 'browserPolyfill'>) =>
+  (src$: CheerioFile) => {
+    const $ = cloneHtml(src$)
 
-      return replaced
-    })
+    getScriptElems($)
+      .attr('type', 'module')
+      .attr('src', (i, value) => {
+        const final = isViteServe()
+          ? `${VITE_SERVER_URL}/${value}`
+          : // declare type AttrFunction = (i: number, currentValue: string) => any;
+            // @ts-expect-error FIXME: @types/cheerio is wrong for AttrFunction: index.d.ts, line 16
+            value.replace(/\.[jt]sx?/g, '.js')
 
-  if (browserPolyfill) {
-    const head = $('head')
-    if (
-      browserPolyfill === true ||
-      (typeof browserPolyfill === 'object' &&
-        browserPolyfill.executeScript)
-    ) {
+        return final
+      })
+
+    if (browserPolyfill) {
+      const head = $('head')
+      if (
+        browserPolyfill === true ||
+        (typeof browserPolyfill === 'object' &&
+          browserPolyfill.executeScript)
+      ) {
+        head.prepend(
+          '<script src="/assets/browser-polyfill-executeScript.js"></script>',
+        )
+      }
+
       head.prepend(
-        '<script src="/assets/browser-polyfill-executeScript.js"></script>',
+        '<script src="/assets/browser-polyfill.js"></script>',
       )
     }
 
-    head.prepend(
-      '<script src="/assets/browser-polyfill.js"></script>',
-    )
+    return $
   }
-
-  return $
-}
 
 export const getScripts = ($: cheerio.Root) =>
   getScriptElems($).toArray()

@@ -1,4 +1,4 @@
-import { filesEmitted } from '$src/shimPluginContext'
+import { filesWritten } from '$src/viteAdaptor'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
@@ -24,17 +24,50 @@ afterAll(async () => {
 test('writes entry points to disk', async () => {
   expect(fs.existsSync(distDir)).toBe(false)
 
-  await Promise.all([devServer.listen(2000), filesEmitted()])
-
-  const assets = [
-    'manifest.json',
-    'popup.html',
-    'content.esm-wrapper.js',
-  ]
+  await Promise.all([devServer.listen(2000), filesWritten()])
 
   expect(fs.existsSync(distDir)).toBe(true)
 
-  for (const asset of assets) {
-    expect(fs.existsSync(path.join(distDir, asset))).toBe(true)
-  }
+  const manifest = 'manifest.json'
+  const popup = 'popup.html'
+  const content = 'content.esm-wrapper.js'
+
+  const manifestPath = path.join(distDir, manifest)
+  const manifestSource = await fs.readJson(manifestPath)
+  expect(manifestSource).toMatchObject({
+    action: {
+      default_popup: 'popup.html',
+    },
+    background: {
+      service_worker: 'service_worker.js',
+    },
+    content_scripts: [
+      {
+        js: ['content.esm-wrapper.js'],
+        matches: ['https://a.com/*', 'http://b.com/*'],
+      },
+    ],
+    web_accessible_resources: [
+      {
+        resources: ['chunks/*-*.js', 'content.js'],
+        matches: [
+          'https://a.com/*',
+          'http://b.com/*',
+          'https://c.com/*',
+        ],
+      },
+    ],
+  })
+
+  const contentPath = path.join(distDir, content)
+  const contentSource = await fs.readFile(contentPath, 'utf8')
+  expect(contentSource).toMatch(
+    '"http://localhost:2000/content.js"',
+  )
+
+  const popupPath = path.join(distDir, popup)
+  const popupSource = await fs.readFile(popupPath, 'utf8')
+  expect(popupSource).toMatch(
+    '<script src="http://localhost:2000/popup.jsx" type="module">',
+  )
 }, 60000)

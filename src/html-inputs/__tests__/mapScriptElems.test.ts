@@ -3,7 +3,7 @@ import {
   optionsHtml,
 } from '$test/data/mv2-kitchen-sink-paths'
 import {
-  mutateScriptElems,
+  updateHtmlElements,
   loadHtml,
   getScripts,
 } from '../cheerio'
@@ -13,7 +13,7 @@ const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
 test('maps script tags to js and type module', () => {
   expect.assertions(8)
 
-  const mapped = mutateScriptElems({})(html$)
+  const mapped = updateHtmlElements({})(html$)
 
   const results = getScripts(mapped)
 

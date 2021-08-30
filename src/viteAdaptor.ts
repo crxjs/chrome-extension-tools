@@ -258,9 +258,6 @@ const machine = createMachine<typeof model>(
 
 const service = interpret(machine)
 service.start()
-service.subscribe((state) => {
-  console.log(state.value)
-})
 
 const sendEmitFile: PluginContext['emitFile'] = (
   file: EmittedFile,
@@ -273,7 +270,7 @@ export const sendConfigureServer = (server: ViteDevServer) => {
   service.send(model.events.SERVER_CONFIGURE(server))
 }
 
-export const filesEmitted = () =>
+export const filesWritten = () =>
   new Promise<void>((resolve, reject) =>
     service.subscribe((state) => {
       if (state.matches({ serve: { listening: 'ready' } }))
@@ -286,6 +283,9 @@ export const filesEmitted = () =>
         )
     }),
   )
+
+export const isViteServe = () =>
+  service.getSnapshot().matches('serve')
 
 export const shimPluginContext = (
   pluginContext: PluginContext,

@@ -7,44 +7,43 @@ import { build } from 'vite'
 
 jest.spyOn(console, 'log').mockImplementation(jest.fn())
 
-let outputPromise: Promise<RollupOutput>
+let output: RollupOutput['output']
 beforeAll(async () => {
-  outputPromise = build({
+  const { output: o } = (await build({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,
-  }) as typeof outputPromise
-})
+  })) as RollupOutput
 
-test('bundles chunks and assets', async () => {
-  const { output } = await outputPromise
+  output = o
+}, 30000)
 
+test('bundles chunks', async () => {
   // Chunks
   const chunks = output.filter(isChunk)
+
   expect(
     chunks.find(byFileName('service_worker.js')),
   ).toBeDefined()
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
-  // 3 entries and 1 content script wrapper
-  expect(chunks.length).toBe(4)
+  expect(chunks.length).toBe(3)
 })
 
 test('bundles assets', async () => {
-  const { output } = await outputPromise
-
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
+  expect(
+    assets.find(byFileName('content.esm-wrapper.js')),
+  ).toBeDefined()
 
-  // 1 html file and 1 manifest
-  expect(assets.length).toBe(2)
+  // 1 html file, 1 content script wrapper, and 1 manifest
+  expect(assets.length).toBe(3)
 })
 
 test('chunks in output match chunks in manifest', async () => {
-  const { output } = await outputPromise
-
   const assets = output.filter(isAsset)
   const manifestJson = assets.find(byFileName('manifest.json'))!
   const manifest = JSON.parse(
@@ -52,16 +51,16 @@ test('chunks in output match chunks in manifest', async () => {
   ) as chrome.runtime.Manifest
 
   // Get scripts in manifest
-  const extPath = path.resolve(__dirname, 'src')
-  const { js } = deriveFiles(manifest, extPath, {
+  const srcDir = path.resolve(__dirname, 'src')
+  const { contentScripts } = deriveFiles(manifest, srcDir, {
     contentScripts: true,
   })
 
-  js.map((x) => path.relative(extPath, x)).forEach((script) => {
-    const chunk = output.find(byFileName(script))
-    expect(chunk).toBeDefined()
-    if (chunk?.type === 'chunk') {
-      expect(typeof chunk?.map?.toUrl()).toBe('string')
-    }
-  })
+  contentScripts
+    .map((x) => path.relative(srcDir, x))
+    .forEach((script) => {
+      const asset = output.find(byFileName(script))
+      // TODO: need to update wrapper ext in updateMV3
+      expect(asset).toBeDefined()
+    })
 })
