@@ -48,4 +48,4 @@ test('CRX loads and runs successfully', async () => {
   await page.waitForSelector('text="Background response"')
   await page.waitForSelector('text="Background OK"')
   await page.waitForSelector('text="Options page OK"')
-})
+}, 600000)

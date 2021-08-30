@@ -1,4 +1,4 @@
-import { stubIdForNoScriptChromeExtensions } from '$src/stubIdForNoScriptChromeExtensions'
+import { stubIdForNoScriptChromeExtensions } from '$src/manifest-input/fileNameUtils'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'

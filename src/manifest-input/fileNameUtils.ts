@@ -9,14 +9,18 @@ export const esmContentScriptWrapperIdPrefix =
   '__esmContentScriptWrapper'
 export const esmContentScriptWrapperFileNameExt =
   '.esm-wrapper.js'
-export const generateFileNames = ({
-  srcDir,
-  srcPath,
-}: {
-  srcDir: string
-  srcPath: string
-}) => {
-  const fileName = path.relative(srcDir, srcPath)
+export const generateContentScriptFileNames = (
+  x:
+    | {
+        srcDir: string
+        srcPath: string
+      }
+    | { fileName: string },
+) => {
+  const fileName =
+    'fileName' in x
+      ? x.fileName
+      : path.relative(x.srcDir, x.srcPath)
   const { dir, name } = path.parse(fileName)
   const wrapperFileName = path.join(
     dir,
