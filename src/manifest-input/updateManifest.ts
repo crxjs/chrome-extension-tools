@@ -1,12 +1,18 @@
-import { basename, relative } from 'path'
+import { relative } from 'path'
 import { RollupOptions } from 'rollup'
 import { ManifestInputPluginCache } from '../plugin-options'
 import { cloneObject } from './cloneObject'
 import { convertMatchPatterns } from './convertMatchPatterns'
+import { generateContentScriptFileNames } from './fileNameUtils'
 
-export function getImportContentScriptFileName(target: string) {
-  const base = basename(target)
-  return target.replace(base, `import-${base}`)
+export function getImportContentScriptFileName(
+  fileName: string,
+) {
+  const { wrapperFileName } = generateContentScriptFileNames({
+    fileName,
+  })
+
+  return wrapperFileName
 }
 
 export function updateManifestV3(
@@ -27,7 +33,7 @@ export function updateManifestV3(
     const { chunkFileNames = 'chunks/[name]-[hash].js' } =
       Array.isArray(output) ? output[0] : output
 
-    // @ts-expect-error need to support both string and function
+    // @ts-expect-error FIXME: need to support both string and function
     cache.chunkFileNames = chunkFileNames
 
     // Output could be an array

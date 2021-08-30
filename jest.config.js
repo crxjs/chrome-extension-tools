@@ -8,6 +8,8 @@ module.exports = {
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   moduleNameMapper: {
+    'code ./browser/contentScriptWrapper.ts':
+      '<rootDir>/test/data/content-script-wrapper.ts',
     'code .+': '<rootDir>/test/data/bundle-imports-stub.ts',
     '^\\$src(.+)$': '<rootDir>/src$1',
     '^\\$src$': '<rootDir>/src/index.ts',

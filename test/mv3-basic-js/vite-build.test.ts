@@ -1,50 +1,54 @@
 import { isAsset, isChunk } from '$src/helpers'
 import { deriveFiles } from '$src/manifest-input/manifest-parser'
 import { byFileName } from '$test/helpers/utils'
+import fs from 'fs-extra'
 import path from 'path'
 import { RollupOutput } from 'rollup'
 import { build } from 'vite'
 
 jest.spyOn(console, 'log').mockImplementation(jest.fn())
 
-let outputPromise: Promise<RollupOutput>
+const distDir = path.join(__dirname, 'dist-build')
+
+let output: RollupOutput['output']
 beforeAll(async () => {
-  outputPromise = build({
+  await fs.remove(distDir)
+
+  const { output: o } = (await build({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,
-  }) as typeof outputPromise
-})
+  })) as RollupOutput
 
-test('bundles chunks and assets', async () => {
-  const { output } = await outputPromise
+  output = o
+}, 30000)
 
+test('bundles chunks', async () => {
   // Chunks
   const chunks = output.filter(isChunk)
+
   expect(
     chunks.find(byFileName('service_worker.js')),
   ).toBeDefined()
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
-  // 3 scripts + 1 content script wrapper
-  expect(chunks.length).toBe(4)
+  expect(chunks.length).toBe(3)
 })
 
 test('bundles assets', async () => {
-  const { output } = await outputPromise
-
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
+  expect(
+    assets.find(byFileName('content.esm-wrapper.js')),
+  ).toBeDefined()
 
-  // 1 html file and the manifest
-  expect(assets.length).toBe(2)
+  // 1 html file, 1 content script wrapper, and the manifest
+  expect(assets.length).toBe(3)
 })
 
 test('entries in manifest match entries in output', async () => {
-  const { output } = await outputPromise
-
   const assets = output.filter(isAsset)
   const manifestJson = assets.find(byFileName('manifest.json'))!
   const manifest = JSON.parse(
@@ -53,11 +57,15 @@ test('entries in manifest match entries in output', async () => {
 
   // Get scripts in manifest
   const srcDir = path.join(__dirname, 'src')
-  const { js } = deriveFiles(manifest, srcDir, {
+  const { contentScripts } = deriveFiles(manifest, srcDir, {
     contentScripts: true,
   })
-  js.map((x) => path.relative(srcDir, x)).forEach((script) => {
-    const chunk = output.find(byFileName(script))
-    expect(chunk).toBeDefined()
-  })
+
+  contentScripts
+    .map((x) => path.relative(srcDir, x))
+    .forEach((script) => {
+      const asset = output.find(byFileName(script))
+      // TODO: need to update wrapper ext in updateMV3
+      expect(asset).toBeDefined()
+    })
 })

@@ -20,8 +20,8 @@ test('bundles chunks and assets', async () => {
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
-  // 3 scripts + 1 content script wrapper
-  expect(chunks.length).toBe(4)
+  // 3 scripts
+  expect(chunks.length).toBe(3)
 })
 
 test('bundles assets', async () => {
@@ -31,9 +31,12 @@ test('bundles assets', async () => {
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
+  expect(
+    assets.find(byFileName('content.esm-wrapper.js')),
+  ).toBeDefined()
 
   // 1 html file and the manifest
-  expect(assets.length).toBe(2)
+  expect(assets.length).toBe(3)
 })
 
 test('entries in manifest match entries in output', async () => {

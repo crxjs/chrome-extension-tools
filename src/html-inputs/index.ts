@@ -15,7 +15,7 @@ import {
   getJsAssets,
   getScriptSrc,
   loadHtml,
-  mutateScriptElems,
+  updateHtmlElements,
 } from './cheerio'
 
 const isHtml = (path: string) => /\.html?$/.test(path)
@@ -97,10 +97,6 @@ export default function htmlInputs(
         // Cache jsEntries with existing options.input
         cache.input = input.filter(not(isHtml)).concat(cache.js)
 
-        // TODO: if viteConfig.command === 'serve', point to localhost
-        // Prepare cache.html$ for asset emission
-        cache.html$.forEach(mutateScriptElems(htmlInputsOptions))
-
         if (cache.input.length === 0) {
           throw new Error(
             'At least one HTML file must have at least one script.',
@@ -154,16 +150,18 @@ export default function htmlInputs(
         })
       })
 
-      cache.html$.map(($) => {
-        const source = $.html()
-        const fileName = relative(srcDir, $.filePath)
+      cache.html$
+        .map(updateHtmlElements(htmlInputsOptions))
+        .forEach(($) => {
+          const source = $.html()
+          const fileName = relative(srcDir, $.filePath)
 
-        this.emitFile({
-          type: 'asset',
-          source, // String
-          fileName,
+          this.emitFile({
+            type: 'asset',
+            source, // String
+            fileName,
+          })
         })
-      })
 
       await Promise.all(emitting)
     },

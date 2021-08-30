@@ -12,7 +12,7 @@ import {
 import {
   sendConfigureServer,
   shimPluginContext,
-} from './shimPluginContext'
+} from './viteAdaptor'
 import { validateNames as v } from './validate-names'
 
 export type { ManifestV2, ManifestV3 } from './manifest-types'
@@ -41,11 +41,6 @@ export const chromeExtension = (
   return {
     name: 'chrome-extension',
 
-    configureServer(server) {
-      sendConfigureServer(server)
-      manifest.configureServer.call(this, server)
-    },
-
     options(options) {
       try {
         return [manifest, html].reduce((opts, plugin) => {
@@ -73,6 +68,10 @@ export const chromeExtension = (
           throw error
         }
       }
+    },
+
+    configureServer(server) {
+      sendConfigureServer(server)
     },
 
     async buildStart(options) {

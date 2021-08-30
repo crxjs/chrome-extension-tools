@@ -1,4 +1,4 @@
-import { VITE_SERVER_URL } from '$src/shimPluginContext'
+import { isViteServe, VITE_SERVER_URL } from '$src/viteAdaptor'
 import { code as ctWrapperScript } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
@@ -7,7 +7,6 @@ import memoize from 'mem'
 import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
-import { ViteDevServer } from 'vite'
 import {
   isChunk,
   isPresent,
@@ -21,6 +20,10 @@ import {
 } from '../plugin-options'
 import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
+import {
+  generateContentScriptFileNames,
+  stubIdForNoScriptChromeExtensions,
+} from './fileNameUtils'
 import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
 import {
@@ -29,10 +32,6 @@ import {
 } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import {
-  stubIdForNoScriptChromeExtensions,
-  generateFileNames,
-} from './fileNameUtils'
 import { updateManifestV3 } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
@@ -114,7 +113,6 @@ export function manifestInput(
   /* ----------- HOOKS CLOSURES START ----------- */
 
   let manifestPath: string
-  let viteServer: ViteDevServer | Record<string, never> = {}
 
   const manifestName = 'manifest.json'
 
@@ -142,10 +140,6 @@ export function manifestInput(
 
     get formatMap() {
       return { iife: cache.iife }
-    },
-
-    configureServer(config) {
-      viteServer = config
     },
 
     /* ============================================ */
@@ -325,14 +319,13 @@ export function manifestInput(
       if (wrapContentScripts)
         cache.contentScripts.forEach((srcPath) => {
           const { fileName, jsFileName, wrapperFileName } =
-            generateFileNames({
+            generateContentScriptFileNames({
               srcDir: cache.srcDir,
               srcPath,
             })
-          const importPath =
-            viteServer.config?.command === 'serve'
-              ? `${VITE_SERVER_URL}/${fileName}`
-              : jsFileName
+          const importPath = isViteServe()
+            ? `${VITE_SERVER_URL}/${fileName}`
+            : jsFileName
 
           this.emitFile({
             type: 'asset',
