@@ -27,19 +27,26 @@ export const derivePermissions = (
 export function deriveFiles(
   manifest: chrome.runtime.Manifest,
   srcDir: string,
-  options: { contentScripts: boolean },
-) {
+): {
+  css: string[]
+  contentScripts: string[]
+  serviceWorker?: string
+  js: string[]
+  html: string[]
+  img: string[]
+  others: string[]
+} {
   if (manifest.manifest_version === 3) {
-    return deriveFilesMV3(manifest, srcDir, options)
+    return deriveFilesMV3(manifest, srcDir)
   } else {
-    return deriveFilesMV2(manifest, srcDir, options)
+    return deriveFilesMV2(manifest, srcDir)
   }
 }
 
 export function deriveFilesMV3(
   manifest: chrome.runtime.ManifestV3,
   srcDir: string,
-  options: { contentScripts: boolean },
+  options = { serviceWorker: true, contentScripts: true },
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -67,9 +74,14 @@ export function deriveFilesMV3(
     [] as ContentScript[],
   ).reduce((r, { js = [] }) => [...r, ...js], [] as string[])
 
+  const serviceWorker: string | undefined = get(
+    manifest,
+    'background.service_worker',
+  )
+
   const js = [
     ...files.filter((f) => /\.[jt]sx?$/.test(f)),
-    get(manifest, 'background.service_worker'),
+    options.serviceWorker && serviceWorker,
     ...(options.contentScripts ? contentScripts : []),
   ]
 
@@ -105,11 +117,12 @@ export function deriveFilesMV3(
   ]
 
   // Files like fonts, things that are not expected
-  const others = diff(files, css, contentScripts, js, html, img)
+  const others = diff(files, css, js, html, img)
 
   return {
     css: validate(css),
     contentScripts: validate(contentScripts),
+    serviceWorker: serviceWorker && join(srcDir, serviceWorker),
     js: validate(js),
     html: validate(html),
     img: validate(img),
@@ -126,7 +139,6 @@ export function deriveFilesMV3(
 export function deriveFilesMV2(
   manifest: chrome.runtime.ManifestV2,
   srcDir: string,
-  options: { contentScripts: boolean },
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -155,7 +167,7 @@ export function deriveFilesMV2(
   const js = [
     ...files.filter((f) => /\.[jt]sx?$/.test(f)),
     ...get(manifest, 'background.scripts', [] as string[]),
-    ...(options.contentScripts ? contentScripts : []),
+    ...contentScripts,
   ]
 
   const html = [

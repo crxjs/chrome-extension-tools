@@ -1,3 +1,4 @@
+import { isViteServe } from '$src/viteAdaptor'
 import { relative } from 'path'
 import { RollupOptions } from 'rollup'
 import { ManifestInputPluginCache } from '../plugin-options'
@@ -5,9 +6,7 @@ import { cloneObject } from './cloneObject'
 import { convertMatchPatterns } from './convertMatchPatterns'
 import { generateContentScriptFileNames } from './fileNameUtils'
 
-export function getImportContentScriptFileName(
-  fileName: string,
-) {
+export function getImportWrapperFileName(fileName: string) {
   const { wrapperFileName } = generateContentScriptFileNames({
     fileName,
   })
@@ -78,9 +77,17 @@ export function updateManifestV3(
     manifest.content_scripts = manifest.content_scripts.map(
       (c) => ({
         ...c,
-        js: c.js?.map(getImportContentScriptFileName),
+        js: c.js?.map(getImportWrapperFileName),
       }),
     )
+
+    if (isViteServe() && manifest.background?.service_worker) {
+      manifest.background.type = 'module'
+      manifest.background.service_worker =
+        getImportWrapperFileName(
+          manifest.background.service_worker,
+        )
+    }
 
     manifest.web_accessible_resources =
       manifest.web_accessible_resources ?? []

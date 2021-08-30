@@ -1,29 +1,36 @@
+import { filesWritten } from '$src/viteAdaptor'
 import fs from 'fs-extra'
 import path from 'path'
-import {
-  chromium,
-  ChromiumBrowserContext,
-  Page,
-} from 'playwright'
-import { build } from 'vite'
+import { chromium, ChromiumBrowserContext } from 'playwright'
+import { createServer, ViteDevServer } from 'vite'
 
-jest.spyOn(console, 'log').mockImplementation(jest.fn())
-
-const outDir = path.join(__dirname, 'dist-vite-build')
+const outDir = path.join(__dirname, 'dist-vite-serve')
 const dataDirPath = path.join(
   __dirname,
-  'chromium-data-dir-build',
+  'chromium-data-dir-serve',
 )
 
 let browserContext: ChromiumBrowserContext
-let page: Page
-
+let devServer: ViteDevServer
 beforeAll(async () => {
-  await build({
+  await fs.remove(outDir)
+
+  devServer = await createServer({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir },
   })
+}, 30000)
+
+afterAll(async () => {
+  await browserContext?.close()
+
+  // MV3 service worker is unresponsive if this directory exists from a previous run
+  await fs.remove(dataDirPath)
+})
+
+test('CRX loads and runs successfully', async () => {
+  await Promise.all([devServer.listen(), filesWritten()])
 
   browserContext = (await chromium.launchPersistentContext(
     dataDirPath,
@@ -36,17 +43,8 @@ beforeAll(async () => {
       ],
     },
   )) as ChromiumBrowserContext
-}, 60000)
 
-afterAll(async () => {
-  await browserContext?.close()
-
-  // MV3 service worker is unresponsive if this directory exists from a previous run
-  await fs.remove(dataDirPath)
-})
-
-test('CRX loads and runs successfully', async () => {
-  page = await browserContext.newPage()
+  const page = await browserContext.newPage()
   await page.goto('https://google.com')
 
   await page.waitForSelector('text="Content script loaded"')

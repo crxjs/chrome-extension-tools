@@ -2,13 +2,10 @@ import path from 'path'
 
 // We use a stub if the manifest has no scripts
 //   eg, a CSS only Chrome Extension
-
 export const stubIdForNoScriptChromeExtensions =
   '__stubIdForNoScriptChromeExtensions'
-export const esmContentScriptWrapperIdPrefix =
-  '__esmContentScriptWrapper'
-export const esmContentScriptWrapperFileNameExt =
-  '.esm-wrapper.js'
+
+export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
 export const generateContentScriptFileNames = (
   x:
     | {
@@ -24,7 +21,7 @@ export const generateContentScriptFileNames = (
   const { dir, name } = path.parse(fileName)
   const wrapperFileName = path.join(
     dir,
-    name + esmContentScriptWrapperFileNameExt,
+    name + esmImportWrapperFileNameExt,
   )
   const jsFileName = path.join(dir, name + '.js')
 
