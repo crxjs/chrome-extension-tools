@@ -6,17 +6,16 @@ import {
   Page,
 } from 'playwright'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
-import config from './rollup.config'
+import config, { outDir } from './rollup.config'
 
 const dataDirPath = path.join(__dirname, 'chromium-data-dir')
-const distDirPath = path.join(__dirname, 'dist')
 
 let browserContext: ChromiumBrowserContext
 let page: Page
 
 beforeAll(async () => {
   // Clean up the last build
-  await remove(distDirPath)
+  await remove(outDir)
 
   const bundle = await rollup(config as RollupOptions)
   await bundle.write(config.output as OutputOptions)
@@ -27,8 +26,8 @@ beforeAll(async () => {
       headless: false,
       slowMo: 100,
       args: [
-        `--disable-extensions-except=${distDirPath}`,
-        `--load-extension=${distDirPath}`,
+        `--disable-extensions-except=${outDir}`,
+        `--load-extension=${outDir}`,
       ],
     },
   )) as ChromiumBrowserContext
