@@ -2,7 +2,7 @@
 //  - that would probably be overkill
 
 export const code = `
-// This is a MOCK bundle from helpers/bundle-imports-stub.ts
+// This is a MOCK bundle from ${__filename}
 // BUNDLE IMPORTS STUB
 
 const eventPaths = /*@__PURE__*/JSON.parse('%EVENTS%')

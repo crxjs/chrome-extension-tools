@@ -1,5 +1,5 @@
 import { isViteServe, VITE_SERVER_URL } from '$src/viteAdaptor'
-import { code as ctWrapperScript } from 'code ./browser/contentScriptWrapper.ts'
+import { code as ctWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import { JSONPath } from 'jsonpath-plus'
@@ -218,12 +218,18 @@ export function manifestInput(
             .flat(Infinity)
 
           // Derive entry paths from manifest
-          const { js, html, css, img, others, contentScripts } =
-            deriveFiles(fullManifest, cache.srcDir, {
-              contentScripts: true,
-            })
+          const {
+            js,
+            html,
+            css,
+            img,
+            others,
+            contentScripts,
+            serviceWorker,
+          } = deriveFiles(fullManifest, cache.srcDir)
 
           cache.contentScripts = contentScripts
+          cache.serviceWorker = serviceWorker
 
           // Cache derived inputs
           cache.input = [...cache.inputAry, ...js, ...html]
@@ -234,19 +240,7 @@ export function manifestInput(
           ]
         }
 
-        let finalManifest: chrome.runtime.Manifest
-        if (isMV3(fullManifest)) {
-          finalManifest = updateManifestV3(
-            fullManifest,
-            options,
-            wrapContentScripts,
-            cache,
-          )
-        } else {
-          finalManifest = fullManifest
-        }
-
-        cache.manifest = validateManifest(finalManifest)
+        cache.manifest = validateManifest(fullManifest)
       }
       /* --------------- END LOAD MANIFEST --------------- */
 
@@ -266,7 +260,7 @@ export function manifestInput(
       return { ...options, input: finalInput }
     },
 
-    async buildStart() {
+    async buildStart(options) {
       /* ------------ WATCH ASSETS FOR CHANGES ----------- */
 
       this.addWatchFile(manifestPath)
@@ -311,11 +305,6 @@ export function manifestInput(
 
       /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
 
-      // TODO: refactor content script emission
-      //   - content script wrappers should be emitted as assets
-      //   - we won't need transform in that case
-      //   - can point content script to localhost if vite serve
-
       if (wrapContentScripts)
         cache.contentScripts.forEach((srcPath) => {
           const { fileName, jsFileName, wrapperFileName } =
@@ -330,7 +319,7 @@ export function manifestInput(
           this.emitFile({
             type: 'asset',
             fileName: wrapperFileName,
-            source: ctWrapperScript.replace(
+            source: ctWrapper.replace(
               '%PATH%',
               JSON.stringify(importPath),
             ),
@@ -340,10 +329,30 @@ export function manifestInput(
       // TODO: need to bundle service worker if vite serve
       //   - can import from localhost?
       //   - how to do HMR? just reload crx!
+      if (isViteServe() && cache.serviceWorker) {
+        const { fileName, wrapperFileName } =
+          generateContentScriptFileNames({
+            srcDir: cache.srcDir,
+            srcPath: cache.serviceWorker,
+          })
+
+        this.emitFile({
+          type: 'asset',
+          fileName: wrapperFileName,
+          source: 'import %PATH%'.replace(
+            '%PATH%',
+            JSON.stringify(`${VITE_SERVER_URL}/${fileName}`),
+          ),
+        })
+      }
 
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
-      const manifestBody = cloneObject(cache.manifest!)
+      const manifestBody = updateManifestV3(
+        cloneObject(cache.manifest!),
+        options,
+        cache,
+      )
       const manifestJson = JSON.stringify(
         manifestBody,
         undefined,
@@ -531,7 +540,7 @@ export function manifestInput(
 
       if (contentScriptWrapper && contentScripts.length) {
         const memoizedEmitter = memoize((scriptPath: string) => {
-          const source = ctWrapperScript.replace(
+          const source = ctWrapper.replace(
             '%PATH%',
             // Fix path slashes to support Windows
             JSON.stringify(

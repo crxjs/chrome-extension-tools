@@ -8,15 +8,16 @@ import { build } from 'vite'
 
 jest.spyOn(console, 'log').mockImplementation(jest.fn())
 
-const distDir = path.join(__dirname, 'dist-build')
+const outDir = path.join(__dirname, 'dist-build')
 
 let output: RollupOutput['output']
 beforeAll(async () => {
-  await fs.remove(distDir)
+  await fs.remove(outDir)
 
   const { output: o } = (await build({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,
+    build: { outDir },
   })) as RollupOutput
 
   output = o
@@ -57,9 +58,7 @@ test('entries in manifest match entries in output', async () => {
 
   // Get scripts in manifest
   const srcDir = path.join(__dirname, 'src')
-  const { contentScripts } = deriveFiles(manifest, srcDir, {
-    contentScripts: true,
-  })
+  const { contentScripts } = deriveFiles(manifest, srcDir)
 
   contentScripts
     .map((x) => path.relative(srcDir, x))
