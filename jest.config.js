@@ -15,7 +15,6 @@ module.exports = {
     '^\\$src$': '<rootDir>/src/index.ts',
     '^\\$test(.+)$': '<rootDir>/test$1',
   },
-  modulePathIgnorePatterns: ['~~.+', '__fixtures__', 'client'],
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
   testRunner: 'jest-circus/runner',
@@ -24,4 +23,8 @@ module.exports = {
   },
   // For PNPM users, need to add '.*' to get the last instance of the ignored module
   // transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],
+  watchPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/test/.+?dist',
+  ],
 }
