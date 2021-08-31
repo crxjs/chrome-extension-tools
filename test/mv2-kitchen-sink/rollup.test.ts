@@ -37,7 +37,9 @@ test('bundles chunks', async () => {
     fileName.includes('imported'),
   )
   // Chunk name should not be double hashed
-  expect(imported?.fileName).toMatch(/^imported-[a-z0-9]+?\.js$/)
+  expect(imported?.fileName).toMatch(
+    /^modules\/imported-[a-z0-9]+?\.js$/,
+  )
 })
 
 test('bundles assets', async () => {
@@ -102,9 +104,8 @@ test('Includes content script imports in web_accessible_resources', async () => 
     byFileName('manifest.json'),
   ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.Manifest = JSON.parse(
-    manifestSource,
-  )
+  const manifest: chrome.runtime.Manifest =
+    JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     web_accessible_resources: expect.arrayContaining([
@@ -121,9 +122,8 @@ test('Includes content_security_policy untouched', async () => {
     byFileName('manifest.json'),
   ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.Manifest = JSON.parse(
-    manifestSource,
-  )
+  const manifest: chrome.runtime.Manifest =
+    JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     content_security_policy:
@@ -141,9 +141,7 @@ test('chunks in output match chunks in manifest', async () => {
   ) as chrome.runtime.Manifest
 
   // Get scripts in manifest
-  const { js, html } = deriveFiles(manifest, __dirname, {
-    contentScripts: true,
-  })
+  const { js, html } = deriveFiles(manifest, __dirname)
   const html$ = html.map(loadHtml(__dirname))
   const htmlJs = flatten(html$.map(getScriptSrc)).map((x) => {
     const { name, dir } = path.parse(x)

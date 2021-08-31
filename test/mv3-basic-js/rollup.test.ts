@@ -1,8 +1,6 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { deriveFilesMV3 } from '$src/manifest-input/manifest-parser'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
-import path from 'path'
 
 const outputPromise = getRollupOutput(
   __dirname,

@@ -76,7 +76,6 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
-  chunkFileNames?: string
   serviceWorker?: string
   contentScripts: string[]
   iife: string[]
@@ -99,6 +98,7 @@ export type ManifestInputHooks = Pick<
   | 'resolveId'
   | 'load'
   | 'watchChange'
+  | 'outputOptions'
   | 'generateBundle'
 >
 
