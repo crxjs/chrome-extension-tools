@@ -2,7 +2,7 @@ import { loadHtml, getCssHrefs } from '../cheerio'
 import {
   kitchenSinkRoot,
   optionsHtml,
-} from '$test/data/mv2-kitchen-sink-paths'
+} from '$test/helpers/mv2-kitchen-sink-paths'
 
 const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
 
