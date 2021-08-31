@@ -8,12 +8,23 @@ module.exports = {
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   moduleNameMapper: {
-    'code ./browser/contentScriptWrapper.ts':
-      '<rootDir>/test/data/content-script-wrapper.ts',
-    'code .+': '<rootDir>/test/data/bundle-imports-stub.ts',
+    // aliases
     '^\\$src(.+)$': '<rootDir>/src$1',
     '^\\$src$': '<rootDir>/src/index.ts',
     '^\\$test(.+)$': '<rootDir>/test$1',
+    // bundle imports
+    'code ./browser/contentScriptWrapper.ts':
+      '<rootDir>/test/fixtures/dist/contentScriptWrapper.js',
+    'code ./browser/executeScriptPolyfill.ts':
+      '<rootDir>/test/fixtures/dist/executeScriptPolyfill.js',
+    'code ./browser/importWrapper--explicit.ts':
+      '<rootDir>/test/fixtures/dist/importWrapper--explicit.js',
+    'code ./browser/importWrapper--implicit.ts':
+      '<rootDir>/test/fixtures/dist/importWrapper--implicit.js',
+    'code ./client/background.ts':
+      '<rootDir>/test/fixtures/dist/reloaderBackground.js',
+    'code ./client/content.ts':
+      '<rootDir>/test/fixtures/dist/reloaderContent.js',
   },
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
