@@ -5,8 +5,7 @@
     "test/**/*.ts",
     "test/**/*.tsx",
     "jest.setup.ts",
-    "playground/**/*.ts",
-    "test/rollup.config.d.ts"
+    "playground/**/*.ts"
   ],
   "exclude": ["src/manifest-input/browser"],
   "typeAcquisition": { "enable": true }
