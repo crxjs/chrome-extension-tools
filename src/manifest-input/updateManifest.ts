@@ -1,4 +1,4 @@
-import { getViteServer } from '$src/viteAdaptor'
+import { getViteServer } from '../viteAdaptor'
 import { relative } from 'path'
 import { ManifestInputPluginCache } from '../plugin-options'
 import { cloneObject } from './cloneObject'
