@@ -14,7 +14,7 @@ import {
   popupHtml,
   serviceWorkerJs,
   srcDir,
-} from '$test/data/mv3-kitchen-sink-paths'
+} from '$test/paths/mv3-kitchen-sink-paths'
 
 const manifest = readJSONSync(manifestJson)
 
