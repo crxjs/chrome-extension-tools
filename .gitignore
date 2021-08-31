@@ -1,10 +1,7 @@
 node_modules/
 playground/
-**/dest
 **/lib
 types/
-!types/index.d.ts
-test/kitchen-sink-dist
 coverage
 jest_html_reporters.html
 package-lock.json
