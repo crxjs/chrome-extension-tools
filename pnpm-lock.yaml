@@ -6,6 +6,7 @@ specifiers:
   '@babel/preset-react': ^7.12.13
   '@extend-chrome/messages': ^1.2.2
   '@extend-chrome/storage': ^1.5.0
+  '@rollup/plugin-alias': ^3.1.5
   '@rollup/plugin-babel': ^5.3.0
   '@rollup/plugin-commonjs': ^20.0.0
   '@rollup/plugin-json': ^4.0.2
@@ -83,6 +84,7 @@ dependencies:
   localforage: 1.9.0
   lodash: 4.17.21
   mem: 6.1.1
+  rxjs: 7.3.0
   slash: 3.0.0
   webextension-polyfill: 0.6.0
   xstate: 4.23.1
@@ -93,6 +95,7 @@ devDependencies:
   '@babel/preset-react': 7.12.13
   '@extend-chrome/messages': 1.2.2
   '@extend-chrome/storage': 1.5.0
+  '@rollup/plugin-alias': 3.1.5_rollup@2.56.3
   '@rollup/plugin-babel': 5.3.0_rollup@2.56.3
   '@rollup/plugin-commonjs': 20.0.0_rollup@2.56.3
   '@rollup/plugin-json': 4.1.0_rollup@2.56.3
@@ -131,7 +134,6 @@ devDependencies:
   read-pkg-up: 7.0.1
   rollup: 2.56.3
   rollup-plugin-bundle-imports: 1.4.5
-  rxjs: 7.3.0
   tslib: 2.3.0
   typescript: 4.3.5
   vite: 2.5.1
@@ -1795,6 +1797,16 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.11.1
+    dev: true
+
+  /@rollup/plugin-alias/3.1.5_rollup@2.56.3:
+    resolution: {integrity: sha512-yzUaSvCC/LJPbl9rnzX3HN7vy0tq7EzHoEiQl1ofh4n5r2Rd5bj/+zcJgaGA76xbw95/JjWQyvHg9rOJp2y0oQ==}
+    engines: {node: '>=8.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0
+    dependencies:
+      rollup: 2.56.3
+      slash: 3.0.0
     dev: true
 
   /@rollup/plugin-babel/5.3.0_rollup@2.56.3:
@@ -6521,7 +6533,6 @@ packages:
     resolution: {integrity: sha512-p2yuGIg9S1epc3vrjKf6iVb3RCaAYjYskkO+jHIaV0IjOPlJop4UnodOoFb2xeNwlguqLYvGw1b1McillYb5Gw==}
     dependencies:
       tslib: 2.1.0
-    dev: true
 
   /safe-buffer/5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}
@@ -7093,7 +7104,6 @@ packages:
 
   /tslib/2.1.0:
     resolution: {integrity: sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==}
-    dev: true
 
   /tslib/2.3.0:
     resolution: {integrity: sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==}
