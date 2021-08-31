@@ -50,7 +50,7 @@ test('writes entry points to disk', async () => {
     ],
     web_accessible_resources: [
       {
-        resources: ['chunks/*-*.js', 'content.js'],
+        resources: ['modules/*.js', 'content.js'],
         matches: [
           'https://a.com/*',
           'http://b.com/*',

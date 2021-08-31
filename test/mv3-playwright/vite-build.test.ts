@@ -7,8 +7,6 @@ import {
 } from 'playwright'
 import { build } from 'vite'
 
-jest.spyOn(console, 'log').mockImplementation(jest.fn())
-
 const outDir = path.join(__dirname, 'dist-vite-build')
 const dataDirPath = path.join(
   __dirname,
@@ -53,4 +51,4 @@ test('CRX loads and runs successfully', async () => {
   await page.waitForSelector('text="Background response"')
   await page.waitForSelector('text="Background OK"')
   await page.waitForSelector('text="Options page OK"')
-})
+}, 30000)

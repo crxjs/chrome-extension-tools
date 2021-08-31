@@ -1,4 +1,4 @@
-import { isViteServe, VITE_SERVER_URL } from '$src/viteAdaptor'
+import { getViteServer, VITE_SERVER_URL } from '$src/viteAdaptor'
 import { code as ctWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
@@ -21,9 +21,12 @@ import {
 import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import {
-  generateContentScriptFileNames,
+  assetFileNames,
+  chunkFileNames,
+  entryFileNames,
+  generateWrapperFileNames,
   stubIdForNoScriptChromeExtensions,
-} from './fileNameUtils'
+} from './fileNames'
 import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
 import {
@@ -260,7 +263,7 @@ export function manifestInput(
       return { ...options, input: finalInput }
     },
 
-    async buildStart(options) {
+    async buildStart() {
       /* ------------ WATCH ASSETS FOR CHANGES ----------- */
 
       this.addWatchFile(manifestPath)
@@ -308,11 +311,11 @@ export function manifestInput(
       if (wrapContentScripts)
         cache.contentScripts.forEach((srcPath) => {
           const { fileName, jsFileName, wrapperFileName } =
-            generateContentScriptFileNames({
+            generateWrapperFileNames({
               srcDir: cache.srcDir,
               srcPath,
             })
-          const importPath = isViteServe()
+          const importPath = getViteServer()
             ? `${VITE_SERVER_URL}/${fileName}`
             : jsFileName
 
@@ -329,9 +332,9 @@ export function manifestInput(
       // TODO: need to bundle service worker if vite serve
       //   - can import from localhost?
       //   - how to do HMR? just reload crx!
-      if (isViteServe() && cache.serviceWorker) {
+      if (getViteServer() && cache.serviceWorker) {
         const { fileName, wrapperFileName } =
-          generateContentScriptFileNames({
+          generateWrapperFileNames({
             srcDir: cache.srcDir,
             srcPath: cache.serviceWorker,
           })
@@ -350,7 +353,6 @@ export function manifestInput(
 
       const manifestBody = updateManifestV3(
         cloneObject(cache.manifest!),
-        options,
         cache,
       )
       const manifestJson = JSON.stringify(
@@ -424,6 +426,16 @@ export function manifestInput(
     /* ============================================ */
     /*                GENERATEBUNDLE                */
     /* ============================================ */
+
+    outputOptions(options) {
+      // Entries must be in original location
+      return {
+        ...options,
+        assetFileNames,
+        chunkFileNames,
+        entryFileNames,
+      }
+    },
 
     generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */

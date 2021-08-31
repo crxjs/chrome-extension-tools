@@ -10,6 +10,6 @@ jest_html_reporters.html
 package-lock.json
 *.log
 TODO
-**/chromium-data-dir/
+**/chromium-data-dir*/
 test/**/dist*/
 .vscode/settings.json

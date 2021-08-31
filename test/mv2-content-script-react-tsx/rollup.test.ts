@@ -50,9 +50,7 @@ test('chunks in output match chunks in manifest', async () => {
 
   // Get scripts in manifest
   const srcDir = path.join(__dirname, 'src')
-  const { js } = deriveFiles(manifest, srcDir, {
-    contentScripts: true,
-  })
+  const { js } = deriveFiles(manifest, srcDir)
 
   js.map((x) => path.relative(srcDir, x)).forEach((script) => {
     const chunk = output.find(byFileName(script))

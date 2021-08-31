@@ -4,6 +4,8 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   root: path.join(__dirname, 'src'),
+  clearScreen: false,
+  logLevel: 'error',
   build: {
     emptyOutDir: true,
     minify: false,
