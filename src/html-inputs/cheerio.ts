@@ -1,5 +1,5 @@
-import { isViteServe, VITE_SERVER_URL } from '$src/viteAdaptor'
-import cheerio from 'cheerio'
+import { getViteServer, VITE_SERVER_URL } from '$src/viteAdaptor'
+import cheerio, { CheerioAPI } from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
 import { isString } from '../helpers'
@@ -10,8 +10,8 @@ export type HtmlFilePathData = {
   rootPath: string
 }
 
-/** cheerio.Root objects with a file path */
-export type CheerioFile = cheerio.Root & HtmlFilePathData
+/** CheerioAPI objects with a file path */
+export type CheerioFile = CheerioAPI & HtmlFilePathData
 
 export const loadHtml =
   (rootPath: string) =>
@@ -48,7 +48,7 @@ export const getRelativePath =
 
 /* -------------------- SCRIPTS -------------------- */
 
-export const getScriptElems = ($: cheerio.Root) =>
+export const getScriptElems = ($: CheerioAPI) =>
   $('script')
     .not('[data-rollup-asset]')
     .not('[src^="http:"]')
@@ -66,11 +66,9 @@ export const updateHtmlElements =
     getScriptElems($)
       .attr('type', 'module')
       .attr('src', (i, value) => {
-        const final = isViteServe()
+        const final = getViteServer()
           ? `${VITE_SERVER_URL}/${value}`
-          : // declare type AttrFunction = (i: number, currentValue: string) => any;
-            // @ts-expect-error FIXME: @types/cheerio is wrong for AttrFunction: index.d.ts, line 16
-            value.replace(/\.[jt]sx?/g, '.js')
+          : value.replace(/\.[jt]sx?/g, '.js')
 
         return final
       })
@@ -95,7 +93,7 @@ export const updateHtmlElements =
     return $
   }
 
-export const getScripts = ($: cheerio.Root) =>
+export const getScripts = ($: CheerioAPI) =>
   getScriptElems($).toArray()
 
 export const getScriptSrc = ($: CheerioFile) =>
@@ -106,7 +104,7 @@ export const getScriptSrc = ($: CheerioFile) =>
 
 /* ----------------- ASSET SCRIPTS ----------------- */
 
-const getAssets = ($: cheerio.Root) =>
+const getAssets = ($: CheerioAPI) =>
   $('script')
     .filter('[data-rollup-asset="true"]')
     .not('[src^="http:"]')
@@ -123,7 +121,7 @@ export const getJsAssets = ($: CheerioFile) =>
 
 /* -------------------- css ------------------- */
 
-const getCss = ($: cheerio.Root) =>
+const getCss = ($: CheerioAPI) =>
   $('link')
     .filter('[rel="stylesheet"]')
     .not('[href^="http:"]')
@@ -140,14 +138,14 @@ export const getCssHrefs = ($: CheerioFile) =>
 
 /* -------------------- img ------------------- */
 
-const getImgs = ($: cheerio.Root) =>
+const getImgs = ($: CheerioAPI) =>
   $('img')
     .not('[src^="http://"]')
     .not('[src^="https://"]')
     .not('[src^="data:"]')
     .toArray()
 
-const getFavicons = ($: cheerio.Root) =>
+const getFavicons = ($: CheerioAPI) =>
   $('link[rel="icon"]')
     .not('[href^="http:"]')
     .not('[href^="https:"]')
