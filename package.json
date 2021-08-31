@@ -46,6 +46,7 @@
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
     "mem": "^6.0.1",
+    "rollup": "^2.56.3",
     "rxjs": "^7.3.0",
     "slash": "^3.0.0",
     "webextension-polyfill": "^0.6.0",
@@ -94,14 +95,10 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "read-pkg-up": "^7.0.1",
-    "rollup": "^2.56.3",
     "rollup-plugin-bundle-imports": "^1.4.5",
     "tslib": "^2.3.0",
     "typescript": "^4.3.5",
     "vite": "^2.5.1"
-  },
-  "peerDependencies": {
-    "rollup": "*"
   },
   "engines": {
     "node": ">=12.0.0"
