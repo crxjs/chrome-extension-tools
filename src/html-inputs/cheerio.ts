@@ -1,4 +1,4 @@
-import { getViteServer, VITE_SERVER_URL } from '$src/viteAdaptor'
+import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
 import cheerio, { CheerioAPI } from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'

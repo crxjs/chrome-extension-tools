@@ -1,4 +1,4 @@
-import { getViteServer, VITE_SERVER_URL } from '$src/viteAdaptor'
+import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
 import { code as ctWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
