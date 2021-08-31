@@ -105,6 +105,10 @@ export const chromeExtension = (
       html.watchChange.call(this, id, change)
     },
 
+    outputOptions(options) {
+      return manifest.outputOptions.call(this, options)
+    },
+
     async generateBundle(...args) {
       await manifest.generateBundle.call(this, ...args)
       await validate.generateBundle.call(this, ...args)

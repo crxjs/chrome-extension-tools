@@ -284,8 +284,12 @@ export const filesWritten = () =>
     }),
   )
 
-export const isViteServe = () =>
-  service.getSnapshot().matches('serve')
+export const getViteServer = () => {
+  const state = service.getSnapshot()
+  return state.matches('serve')
+    ? state.context.server
+    : undefined
+}
 
 export const shimPluginContext = (
   pluginContext: PluginContext,

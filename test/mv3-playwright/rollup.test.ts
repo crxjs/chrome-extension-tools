@@ -8,7 +8,10 @@ import {
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import config, { outDir } from './rollup.config'
 
-const dataDirPath = path.join(__dirname, 'chromium-data-dir')
+const dataDirPath = path.join(
+  __dirname,
+  'chromium-data-dir-rollup',
+)
 
 let browserContext: ChromiumBrowserContext
 let page: Page
