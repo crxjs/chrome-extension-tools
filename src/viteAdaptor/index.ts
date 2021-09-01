@@ -1,5 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
+import { EmittedChunk } from 'rollup'
+import { EmittedAsset } from 'rollup'
 import { EmittedFile, PluginContext } from 'rollup'
 import { from } from 'rxjs'
 import { ViteDevServer } from 'vite'
@@ -12,7 +14,8 @@ import {
 import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
-import { isString, isUndefined } from './helpers'
+import { isString, isUndefined } from '../helpers'
+import { bundleChunk } from './bundleChunk'
 
 export const VITE_SERVER_URL = '__VITE_SERVER_URL__'
 export const viteServerUrlRegExp = new RegExp(
@@ -33,6 +36,10 @@ interface Context {
     string,
     ActorRef<ModelEventsFrom<typeof model>>
   >
+  bundlers: Record<
+    string,
+    ActorRef<ModelEventsFrom<typeof model>>
+  >
 }
 
 const getEmittedFileId = (file: EmittedFile): string =>
@@ -43,13 +50,18 @@ const getEmittedFileId = (file: EmittedFile): string =>
 const context: Context = {
   files: [],
   writers: {},
+  bundlers: {},
 }
 
 const model = createModel(context, {
   events: {
-    EMIT_START: (file: EmittedFile & { id?: string }) => ({
+    WRITE_ASSET: (file: EmittedAsset & { id: string }) => ({
+      file,
+    }),
+    WRITE_CHUNK: (file: EmittedChunk) => ({ file }),
+    EMIT_FILE: (file: EmittedFile) => ({
       file: {
-        id: file.id ?? getEmittedFileId(file),
+        id: getEmittedFileId(file),
         ...file,
       },
     }),
@@ -97,7 +109,7 @@ const machine = createMachine<typeof model>(
                   lastError: (context, { error }) => error,
                 }),
               },
-              EMIT_START: {
+              EMIT_FILE: {
                 actions: model.assign({
                   files: ({ files }, { file }) => [
                     ...files,
@@ -110,7 +122,11 @@ const machine = createMachine<typeof model>(
           listening: {
             entry: pure(({ files }) =>
               files.map((file) =>
-                send(model.events.EMIT_START(file)),
+                send(
+                  file.type === 'asset'
+                    ? model.events.WRITE_ASSET(file)
+                    : model.events.WRITE_CHUNK(file),
+                ),
               ),
             ),
             initial: 'writing',
@@ -130,10 +146,19 @@ const machine = createMachine<typeof model>(
               ready: {},
             },
             on: {
-              EMIT_START: {
+              EMIT_FILE: {
                 target: '.writing',
-                actions: 'writeFile',
+                actions: [
+                  'addFile',
+                  send((context, { file }) =>
+                    file.type === 'asset'
+                      ? model.events.WRITE_ASSET(file)
+                      : model.events.WRITE_CHUNK(file),
+                  ),
+                ],
               },
+              WRITE_ASSET: { actions: 'writeAsset' },
+              WRITE_CHUNK: { actions: 'writeChunk' },
               EMIT_DONE: {
                 target: '.check',
                 actions: model.assign({
@@ -166,14 +191,52 @@ const machine = createMachine<typeof model>(
   },
   {
     actions: {
-      writeFile: pure(({ server }, event) => {
+      writeChunk: pure(({ server }, event) => {
         try {
-          if (event.type !== 'EMIT_START')
+          if (event.type !== 'WRITE_CHUNK')
             throw new Error(`Invalid event type: ${event.type}`)
-          if (event.file.type === 'chunk')
+
+          const { fileName, id } = event.file
+
+          if (isUndefined(fileName))
             throw new Error(
-              'EmittedChunks are not supported in vite serve',
+              'EmittedChunk.fileName must be defined in vite serve',
             )
+
+          if (isUndefined(server))
+            throw new Error('vite server is undefined')
+
+          return assign<Context, ModelEventsFrom<typeof model>>({
+            bundlers: ({ bundlers }) => {
+              const actorRef = spawn(
+                from(
+                  bundleChunk(event.file, server)
+                    .then(() => model.events.EMIT_DONE(id))
+                    .catch((error) =>
+                      model.events.ERROR(id, error),
+                    ),
+                ),
+                id,
+              )
+              return { ...bundlers, [id]: actorRef }
+            },
+          })
+        } catch (error) {
+          return send(
+            model.events.ERROR(
+              error,
+              event.type === 'WRITE_CHUNK'
+                ? event.file.id
+                : event.type,
+            ),
+          )
+        }
+      }),
+      writeAsset: pure(({ server }, event) => {
+        try {
+          if (event.type !== 'WRITE_ASSET')
+            throw new Error(`Invalid event type: ${event.type}`)
+
           const { fileName, source, id } = event.file
 
           if (isUndefined(fileName))
@@ -185,8 +248,9 @@ const machine = createMachine<typeof model>(
               'EmittedAsset.source must be defined in vite serve',
             )
 
-          if (!server)
-            throw new Error(`vite server is ${typeof server}`)
+          if (isUndefined(server))
+            throw new Error('vite server is undefined')
+
           const filePath = path.join(
             server.config.build.outDir,
             fileName,
@@ -197,8 +261,10 @@ const machine = createMachine<typeof model>(
             host = 'localhost',
             https,
           } = server.config.server
+
           if (isUndefined(port))
-            throw new TypeError('context port is undefined')
+            throw new TypeError('vite server port is undefined')
+
           const fileSource = isString(source)
             ? source.replace(
                 viteServerUrlRegExp,
@@ -226,9 +292,9 @@ const machine = createMachine<typeof model>(
           return send(
             model.events.ERROR(
               error,
-              event.type === 'EMIT_START'
+              event.type === 'WRITE_ASSET'
                 ? event.file.id
-                : undefined,
+                : event.type,
             ),
           )
         }
@@ -262,7 +328,7 @@ service.start()
 const sendEmitFile: PluginContext['emitFile'] = (
   file: EmittedFile,
 ) => {
-  service.send(model.events.EMIT_START(file))
+  service.send(model.events.EMIT_FILE(file))
   return getEmittedFileId(file)
 }
 

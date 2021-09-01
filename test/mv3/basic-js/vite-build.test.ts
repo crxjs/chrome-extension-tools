@@ -1,5 +1,4 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { deriveFiles } from '$src/manifest-input/manifest-parser'
 import { byFileName } from '$test/helpers/utils'
 import fs from 'fs-extra'
 import path from 'path'
@@ -44,23 +43,4 @@ test('bundles assets', async () => {
 
   // 1 html file and the manifest
   expect(assets.length).toBe(2)
-})
-
-test('entries in manifest match entries in output', async () => {
-  const assets = output.filter(isAsset)
-  const manifestJson = assets.find(byFileName('manifest.json'))!
-  const manifest = JSON.parse(
-    manifestJson.source as string,
-  ) as chrome.runtime.Manifest
-
-  // Get scripts in manifest
-  const srcDir = path.join(__dirname, 'src')
-  const { contentScripts } = deriveFiles(manifest, srcDir)
-
-  contentScripts
-    .map((x) => path.relative(srcDir, x))
-    .forEach((script) => {
-      const asset = output.find(byFileName(script))
-      expect(asset).toBeDefined()
-    })
 })
