@@ -30,6 +30,12 @@ export type WebAccessibleResource = Unpacked<
   chrome.runtime.ManifestV3['web_accessible_resources']
 >
 
+export type DeclarativeNetRequestResource = {
+  id: string
+  enabled: boolean
+  path: string
+}
+
 export function isMV2(
   m?: chrome.runtime.ManifestBase,
 ): m is chrome.runtime.ManifestV2 {
