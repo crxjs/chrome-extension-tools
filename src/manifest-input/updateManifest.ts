@@ -1,6 +1,6 @@
 import { getViteServer } from '../viteAdaptor'
 import { cloneObject } from './cloneObject'
-import { getImportWrapperFileName } from './fileNames'
+import { generateFileNames } from './fileNames'
 
 export function updateManifestV3(m: chrome.runtime.ManifestV3) {
   const manifest = cloneObject(m)
@@ -10,11 +10,12 @@ export function updateManifestV3(m: chrome.runtime.ManifestV3) {
   }
 
   if (getViteServer() && manifest.background?.service_worker) {
+    const { wrapperFileName } = generateFileNames({
+      fileName: manifest.background.service_worker,
+    })
+
+    manifest.background.service_worker = wrapperFileName
     manifest.background.type = 'module'
-    manifest.background.service_worker =
-      getImportWrapperFileName(
-        manifest.background.service_worker,
-      )
   }
 
   return manifest

@@ -1,9 +1,0 @@
-{
-  "name": "iife-json-paths-bg-only",
-  "description": "iife json paths bg only",
-  "manifest_version": 2,
-  "version": "1.0.0",
-  "background": {
-    "scripts": ["background.js"]
-  }
-}
