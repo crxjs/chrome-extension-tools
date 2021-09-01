@@ -1,6 +1,8 @@
 import { bgCheckStream, sendBgOk } from './messages'
 import { tabIds } from './storage'
 
+console.log('service worker')
+
 const openOptionsPage = (): Promise<void> =>
   new Promise<void>((resolve, reject) => {
     chrome.runtime.openOptionsPage(() => {
