@@ -309,23 +309,11 @@ export function manifestInput(
       /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
 
       if (wrapContentScripts)
-        cache.contentScripts.forEach((srcPath) => {
-          const { fileName, jsFileName, wrapperFileName } =
-            generateWrapperFileNames({
-              srcDir: cache.srcDir,
-              srcPath,
-            })
-          const importPath = getViteServer()
-            ? `${VITE_SERVER_URL}/${fileName}`
-            : jsFileName
-
+        cache.contentScripts.forEach((fileName) => {
           this.emitFile({
-            type: 'asset',
-            fileName: wrapperFileName,
-            source: ctWrapper.replace(
-              '%PATH%',
-              JSON.stringify(importPath),
-            ),
+            type: 'chunk',
+            fileName: path.relative(cache.srcDir, fileName),
+            id: fileName,
           })
         })
 
@@ -347,13 +335,21 @@ export function manifestInput(
             JSON.stringify(`${VITE_SERVER_URL}/${fileName}`),
           ),
         })
+      } else if (cache.serviceWorker) {
+        this.emitFile({
+          type: 'chunk',
+          fileName: path.relative(
+            cache.srcDir,
+            cache.serviceWorker,
+          ),
+          id: cache.serviceWorker,
+        })
       }
 
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
       const manifestBody = updateManifestV3(
         cloneObject(cache.manifest!),
-        cache,
       )
       const manifestJson = JSON.stringify(
         manifestBody,
