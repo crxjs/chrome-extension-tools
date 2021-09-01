@@ -90,11 +90,7 @@ export function deriveFilesMV3(
     'background.service_worker',
   )
 
-  const js = [
-    ...files.filter((f) => /\.[jt]sx?$/.test(f)),
-    options.serviceWorker && serviceWorker,
-    ...(options.contentScripts ? contentScripts : []),
-  ]
+  const js = files.filter((f) => /\.[jt]sx?$/.test(f))
 
   const html = [
     ...files.filter((f) => /\.html?$/.test(f)),
