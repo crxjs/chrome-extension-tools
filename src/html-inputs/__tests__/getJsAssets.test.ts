@@ -9,7 +9,5 @@ const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
 test('scrapes correct asset scripts', () => {
   const result = getJsAssets(html$)
 
-  expect(result).toEqual([
-    'test/examples/mv2-kitchen-sink/asset.js',
-  ])
+  expect(result).toEqual(['test/mv2/kitchen-sink/asset.js'])
 })

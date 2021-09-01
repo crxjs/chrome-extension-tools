@@ -11,12 +11,10 @@ test('returns correct path', () => {
   })
 
   expect(getter('options.js')).toBe(
-    'test/examples/mv2-kitchen-sink/options.js',
+    'test/mv2/kitchen-sink/options.js',
   )
   expect(getter('options/options.js')).toBe(
-    'test/examples/mv2-kitchen-sink/options/options.js',
+    'test/mv2/kitchen-sink/options/options.js',
   )
-  expect(getter('../options.js')).toBe(
-    'test/examples/options.js',
-  )
+  expect(getter('../options.js')).toBe('test/mv2/options.js')
 })
