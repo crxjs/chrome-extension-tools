@@ -3,8 +3,8 @@ import path from 'path'
 export const srcDir = path.resolve(
   __dirname,
   '..',
-  'examples',
-  'mv2-kitchen-sink',
+  'mv2',
+  'kitchen-sink',
 )
 export const manifestJson = path.join(srcDir, 'manifest.json')
 export const indexHtml = path.join(srcDir, 'index.html')
