@@ -18,6 +18,7 @@
   ],
   "scripts": {
     "build": "rollup -c",
+    "build:test": "rollup -c test/fixtures/rollup.config.js",
     "build:types": "tsc -p tsconfigs/tsconfig-types.json",
     "dev:build": "rollup -c -w",
     "dev:lint": "npm run lint:types -- --watch",
@@ -26,8 +27,7 @@
     "lint:types": "tsc --noEmit",
     "prepublishOnly": "run-p build build:types",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
-    "test": "jest",
-    "test:build": "rollup -c test/fixtures/rollup.config.js",
+    "test": "jest --testPathIgnorePatterns=\"/node_modules/|playwright\"",
     "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|playwright\""
   },
   "dependencies": {
