@@ -24,7 +24,7 @@ import {
   assetFileNames,
   chunkFileNames,
   entryFileNames,
-  generateWrapperFileNames,
+  generateFileNames,
   stubIdForNoScriptChromeExtensions,
 } from './fileNames'
 import { getInputManifestPath } from './getInputManifestPath'
@@ -37,6 +37,8 @@ import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { updateManifestV3 } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
+import { regenerateBundle } from '$src/mixed-format/regenerateBundle'
+import { OutputOptions } from 'rollup'
 
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
@@ -309,41 +311,46 @@ export function manifestInput(
       /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
 
       if (wrapContentScripts)
-        cache.contentScripts.forEach((fileName) => {
+        cache.contentScripts.forEach((id) => {
+          const { jsFileName } = generateFileNames({
+            srcDir: cache.srcDir,
+            id,
+          })
+
           this.emitFile({
             type: 'chunk',
-            fileName: path.relative(cache.srcDir, fileName),
-            id: fileName,
+            fileName: jsFileName,
+            id,
           })
         })
 
       // TODO: need to bundle service worker if vite serve
       //   - can import from localhost?
       //   - how to do HMR? just reload crx!
-      if (getViteServer() && cache.serviceWorker) {
-        const { fileName, wrapperFileName } =
-          generateWrapperFileNames({
+      if (cache.serviceWorker) {
+        const id = cache.serviceWorker
+        const { fileName, wrapperFileName, jsFileName } =
+          generateFileNames({
             srcDir: cache.srcDir,
-            srcPath: cache.serviceWorker,
+            id,
           })
 
-        this.emitFile({
-          type: 'asset',
-          fileName: wrapperFileName,
-          source: 'import %PATH%'.replace(
-            '%PATH%',
-            JSON.stringify(`${VITE_SERVER_URL}/${fileName}`),
-          ),
-        })
-      } else if (cache.serviceWorker) {
-        this.emitFile({
-          type: 'chunk',
-          fileName: path.relative(
-            cache.srcDir,
-            cache.serviceWorker,
-          ),
-          id: cache.serviceWorker,
-        })
+        if (getViteServer()) {
+          this.emitFile({
+            type: 'asset',
+            fileName: wrapperFileName,
+            source: 'import %PATH%'.replace(
+              '%PATH%',
+              JSON.stringify(`${VITE_SERVER_URL}/${fileName}`),
+            ),
+          })
+        } else {
+          this.emitFile({
+            type: 'chunk',
+            fileName: jsFileName,
+            id,
+          })
+        }
       }
 
       /* --------------- EMIT MV3 MANIFEST --------------- */
@@ -433,7 +440,7 @@ export function manifestInput(
       }
     },
 
-    generateBundle(options, bundle) {
+    async generateBundle(options, bundle) {
       /* ----------------- CLEAN UP STUB ----------------- */
 
       delete bundle[stubIdForNoScriptChromeExtensions + '.js']
@@ -446,7 +453,64 @@ export function manifestInput(
       }
 
       // MV3 is handled in `buildStart` to support Vite
-      if (isMV3(cache.manifest)) return
+      if (isMV3(cache.manifest)) {
+        const outputOptions: OutputOptions = {
+          chunkFileNames: options.chunkFileNames,
+          sourcemap: options.sourcemap,
+        }
+
+        // FIXME: throw right here
+        const contentScripts = await Promise.all(
+          cache.contentScripts.map((id) => {
+            const { jsFileName } = generateFileNames({
+              srcDir: cache.srcDir,
+              id,
+            })
+
+            return regenerateBundle.call(
+              this,
+              {
+                input: jsFileName,
+                output: {
+                  format: 'iife',
+                  ...outputOptions,
+                },
+              },
+              bundle,
+            )
+          }),
+        )
+
+        const esmInputs = Object.entries(bundle)
+          .filter(
+            ([, file]) =>
+              isChunk(file) &&
+              file.isEntry &&
+              !cache.contentScripts.includes(file.name),
+          )
+          .map(([key]) => key)
+
+        const base = await regenerateBundle.call(
+          this,
+          {
+            input: esmInputs,
+            output: { format: 'esm', ...outputOptions },
+          },
+          bundle,
+        )
+
+        // Empty bundle
+        Object.entries(bundle)
+          .filter(([, v]) => isChunk(v))
+          .forEach(([key]) => {
+            delete bundle[key]
+          })
+
+        // Refill bundle
+        Object.assign(bundle, base, ...contentScripts)
+
+        return
+      }
 
       /* ------------------------------------------------- */
       /*                 EMIT MV2 MANIFEST                 */

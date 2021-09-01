@@ -21,8 +21,8 @@ const manifest = readJSONSync(manifestJson)
 test('gets correct scripts', () => {
   const result = deriveFiles(manifest, srcDir)
 
-  expect(result.js).toContain(serviceWorkerJs)
-  expect(result.js).toContain(contentJs)
+  expect(result.contentScripts).toEqual([contentJs])
+  expect(result.serviceWorker).toBe(serviceWorkerJs)
 })
 
 test('gets correct html', () => {
@@ -58,12 +58,4 @@ test('gets correct locales folder', () => {
 
   expect(result.others).toContain(localesEnJson)
   expect(result.others).toContain(localesEsJson)
-})
-
-test('does not emit duplicates', () => {
-  const result = deriveFiles(manifest, srcDir)
-
-  expect(result.js.length).toBe(2)
-  expect(result.js).toContain(serviceWorkerJs)
-  expect(result.js).toContain(contentJs)
 })

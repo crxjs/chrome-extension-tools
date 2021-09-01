@@ -4,7 +4,7 @@ import { InputOptions } from 'rollup'
 import { browserPolyfill as b } from './browser-polyfill'
 import htmlInputs from './html-inputs'
 import manifestInput from './manifest-input'
-import { mixedFormat as m } from './mixed-format'
+// import { mixedFormat as m } from './mixed-format'
 import {
   ChromeExtensionOptions,
   ChromeExtensionPlugin,
@@ -34,7 +34,7 @@ export const chromeExtension = (
   const html = htmlInputs(manifest)
   const validate = v()
   const browser = b(manifest)
-  const mixedFormat = m(manifest)
+  // const mixedFormat = m(manifest)
 
   /* ----------------- RETURN PLUGIN ----------------- */
 
@@ -113,7 +113,7 @@ export const chromeExtension = (
       await manifest.generateBundle.call(this, ...args)
       await validate.generateBundle.call(this, ...args)
       await browser.generateBundle.call(this, ...args)
-      await mixedFormat.generateBundle.call(this, ...args)
+      // await mixedFormat.generateBundle.call(this, ...args)
     },
   }
 }

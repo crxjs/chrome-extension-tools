@@ -20,6 +20,9 @@ test('bundles chunks and assets', async () => {
 
   // 3 scripts
   expect(chunks.length).toBe(3)
+
+  // TODO: assert that content.js is IIFE format
+  // TODO: assert that popup.js is ESM format
 })
 
 test('bundles assets', async () => {

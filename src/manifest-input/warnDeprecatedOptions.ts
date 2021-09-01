@@ -37,7 +37,9 @@ export function warnDeprecatedOptions(
     )
 
   if (iifeJsonPaths?.length)
-    this.warn('`options.iifeJsonPaths` is deprecated')
+    this.warn(
+      '`options.iifeJsonPaths` is deprecated and does nothing internally',
+    )
 
   if (typeof contentScriptWrapper !== 'undefined')
     this.warn(
