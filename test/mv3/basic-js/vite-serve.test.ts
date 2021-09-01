@@ -29,7 +29,7 @@ test('writes entry points to disk', async () => {
 
   const manifest = 'manifest.json'
   const popup = 'popup.html'
-  const content = 'content.esm-wrapper.js'
+  const content = 'content.js'
   const worker = 'service_worker.esm-wrapper.js'
 
   const manifestPath = path.join(outDir, manifest)
@@ -48,23 +48,11 @@ test('writes entry points to disk', async () => {
         matches: ['https://a.com/*', 'http://b.com/*'],
       },
     ],
-    web_accessible_resources: [
-      {
-        resources: ['modules/*.js', 'content.js'],
-        matches: [
-          'https://a.com/*',
-          'http://b.com/*',
-          'https://c.com/*',
-        ],
-      },
-    ],
   })
 
   const contentPath = path.join(outDir, content)
   const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatch(
-    '"http://localhost:2000/content.js"',
-  )
+  expect(contentSource).toBe("console.log('content script')")
 
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')

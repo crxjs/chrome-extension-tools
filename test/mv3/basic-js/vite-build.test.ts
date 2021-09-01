@@ -41,12 +41,9 @@ test('bundles assets', async () => {
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
-  expect(
-    assets.find(byFileName('content.esm-wrapper.js')),
-  ).toBeDefined()
 
-  // 1 html file, 1 content script wrapper, and the manifest
-  expect(assets.length).toBe(3)
+  // 1 html file and the manifest
+  expect(assets.length).toBe(2)
 })
 
 test('entries in manifest match entries in output', async () => {
@@ -64,7 +61,6 @@ test('entries in manifest match entries in output', async () => {
     .map((x) => path.relative(srcDir, x))
     .forEach((script) => {
       const asset = output.find(byFileName(script))
-      // TODO: need to update wrapper ext in updateMV3
       expect(asset).toBeDefined()
     })
 })

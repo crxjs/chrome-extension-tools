@@ -29,10 +29,7 @@ test('bundles assets', async () => {
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
-  expect(
-    assets.find(byFileName('content.esm-wrapper.js')),
-  ).toBeDefined()
 
   // 1 html file and the manifest
-  expect(assets.length).toBe(3)
+  expect(assets.length).toBe(2)
 })
