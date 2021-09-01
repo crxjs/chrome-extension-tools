@@ -1,13 +1,13 @@
 import glob from 'glob'
-import { get, difference as diff } from 'lodash'
+import { difference as diff, get } from 'lodash'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
-import * as permissions from './permissions'
+import { isString } from '../../helpers'
 import {
   ContentScript,
   DeclarativeNetRequestResource,
 } from '../../manifest-types'
-import { isString } from '../../helpers'
+import * as permissions from './permissions'
 
 /* ============================================ */
 /*              DERIVE PERMISSIONS              */
@@ -49,7 +49,6 @@ export function deriveFiles(
 export function deriveFilesMV3(
   manifest: chrome.runtime.ManifestV3,
   srcDir: string,
-  options = { serviceWorker: true, contentScripts: true },
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']

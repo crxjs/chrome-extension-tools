@@ -17,7 +17,7 @@ import {
 
 context.getFileName.mockImplementation(() => 'mock-file-name')
 
-const contentJs = expect.stringMatching('content.esm-wrapper.js')
+const contentJs = expect.stringMatching('content.js')
 
 const buildPromise = getRollupBuildData(srcDir)
 

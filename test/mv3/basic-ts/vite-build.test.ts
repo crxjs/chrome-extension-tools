@@ -1,5 +1,4 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { deriveFiles } from '$src/manifest-input/manifest-parser'
 import { byFileName } from '$test/helpers/utils'
 import path from 'path'
 import { RollupOutput } from 'rollup'
@@ -35,30 +34,7 @@ test('bundles assets', async () => {
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
-  expect(
-    assets.find(byFileName('content.esm-wrapper.js')),
-  ).toBeDefined()
 
-  // 1 html file, 1 content script wrapper, and 1 manifest
-  expect(assets.length).toBe(3)
-})
-
-test('chunks in output match chunks in manifest', async () => {
-  const assets = output.filter(isAsset)
-  const manifestJson = assets.find(byFileName('manifest.json'))!
-  const manifest = JSON.parse(
-    manifestJson.source as string,
-  ) as chrome.runtime.Manifest
-
-  // Get scripts in manifest
-  const srcDir = path.resolve(__dirname, 'src')
-  const { contentScripts } = deriveFiles(manifest, srcDir)
-
-  contentScripts
-    .map((x) => path.relative(srcDir, x))
-    .forEach((script) => {
-      const asset = output.find(byFileName(script))
-      // TODO: need to update wrapper ext in updateMV3
-      expect(asset).toBeDefined()
-    })
+  // 1 html file and 1 manifest
+  expect(assets.length).toBe(2)
 })

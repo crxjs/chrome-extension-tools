@@ -1,11 +1,10 @@
 import path from 'path'
-import { OutputChunk } from 'rollup'
-import { RollupOptions } from 'rollup'
 import {
-  Plugin,
   OutputBundle,
+  Plugin,
   PluginContext,
   rollup,
+  RollupOptions,
 } from 'rollup'
 import { resolveFromBundle } from './resolveFromBundle'
 
@@ -68,23 +67,5 @@ export async function regenerateBundle(
   })
   const newBundle = _b!
 
-  if (typeof inputValue === 'string') {
-    delete bundle[inputValue]
-
-    const bundleKey = path.basename(inputValue)
-
-    return {
-      [inputValue]: {
-        ...(newBundle[bundleKey] as OutputChunk),
-        fileName: inputValue,
-      },
-    }
-  } else {
-    // Remove regenerated entries from bundle
-    Object.values(inputValue).forEach((key) => {
-      delete bundle[key]
-    })
-
-    return newBundle
-  }
+  return newBundle
 }

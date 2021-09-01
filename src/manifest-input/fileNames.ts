@@ -13,18 +13,16 @@ export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
 export const stubIdForNoScriptChromeExtensions =
   '__stubIdForNoScriptChromeExtensions'
 
-export const generateWrapperFileNames = (
+export const generateFileNames = (
   x:
     | {
         srcDir: string
-        srcPath: string
+        id: string
       }
     | { fileName: string },
 ) => {
   const fileName =
-    'fileName' in x
-      ? x.fileName
-      : path.relative(x.srcDir, x.srcPath)
+    'fileName' in x ? x.fileName : path.relative(x.srcDir, x.id)
   const { dir, name } = path.parse(fileName)
   const wrapperFileName = path.join(
     dir,
@@ -33,12 +31,4 @@ export const generateWrapperFileNames = (
   const jsFileName = path.join(dir, name + '.js')
 
   return { jsFileName, wrapperFileName, fileName }
-}
-
-export function getImportWrapperFileName(fileName: string) {
-  const { wrapperFileName } = generateWrapperFileNames({
-    fileName,
-  })
-
-  return wrapperFileName
 }
