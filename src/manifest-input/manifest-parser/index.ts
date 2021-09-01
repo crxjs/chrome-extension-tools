@@ -3,7 +3,10 @@ import { get, difference as diff } from 'lodash'
 import { join } from 'path'
 import { OutputChunk } from 'rollup'
 import * as permissions from './permissions'
-import { ContentScript } from '../../manifest-types'
+import {
+  ContentScript,
+  DeclarativeNetRequestResource,
+} from '../../manifest-types'
 import { isString } from '../../helpers'
 
 /* ============================================ */
@@ -52,6 +55,13 @@ export function deriveFilesMV3(
     ? ['_locales/**/messages.json']
     : []
 
+  // TODO: add tests for declarativeNetRequest
+  const rulesets: DeclarativeNetRequestResource[] = get(
+    manifest,
+    'declarative_net_request.rule_resources',
+    [] as DeclarativeNetRequestResource[],
+  )
+
   const files = get(
     manifest,
     'web_accessible_resources',
@@ -67,6 +77,7 @@ export function deriveFilesMV3(
         return [...r, x]
       }
     }, [] as string[])
+    .concat(rulesets.map(({ path }) => path))
 
   const contentScripts = get(
     manifest,
