@@ -4,16 +4,15 @@ import { InputOptions } from 'rollup'
 import { browserPolyfill as b } from './browser-polyfill'
 import htmlInputs from './html-inputs'
 import manifestInput from './manifest-input'
-// import { mixedFormat as m } from './mixed-format'
 import {
   ChromeExtensionOptions,
   ChromeExtensionPlugin,
 } from './plugin-options'
+import { validateNames as v } from './validate-names'
 import {
   sendConfigureServer,
   shimPluginContext,
 } from './viteAdaptor'
-import { validateNames as v } from './validate-names'
 
 export type { ManifestV2, ManifestV3 } from './manifest-types'
 export { simpleReloader } from './plugin-reloader-simple'
@@ -113,7 +112,6 @@ export const chromeExtension = (
       await manifest.generateBundle.call(this, ...args)
       await validate.generateBundle.call(this, ...args)
       await browser.generateBundle.call(this, ...args)
-      // await mixedFormat.generateBundle.call(this, ...args)
     },
   }
 }
