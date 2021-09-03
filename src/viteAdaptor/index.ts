@@ -361,6 +361,8 @@ export const shimPluginContext = (
   pluginContext: PluginContext,
   hookName: string,
 ): PluginContext => {
+  if (!service.initialized) return pluginContext
+
   service.send(model.events.HOOK_START(hookName))
 
   const proxy = new Proxy(pluginContext, {
