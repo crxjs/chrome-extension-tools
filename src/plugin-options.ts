@@ -36,7 +36,7 @@ export interface ChromeExtensionOptions {
   extendManifest?:
     | Partial<chrome.runtime.Manifest>
     | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
-  /** @deprecated Will not be supported in next major version */
+  /** @deprecated Is not supported as of 5.0.0 */
   firstClassManifest?: boolean
   /** @deprecated Dropped in favor of `esmContentScripts` */
   iifeJsonPaths?: string[]
