@@ -31,9 +31,9 @@ export function warnDeprecatedOptions(
   if (crossBrowser)
     this.warn('`options.crossBrowser` is not implemented yet')
 
-  if (!firstClassManifest)
+  if (typeof firstClassManifest === 'boolean')
     this.warn(
-      '`options.firstClassManifest` will be removed in version 5.0.0',
+      '`options.firstClassManifest` is deprecated and does nothing internally',
     )
 
   if (iifeJsonPaths?.length)

@@ -78,7 +78,7 @@ export function manifestInput(
     crossBrowser = false,
     dynamicImportWrapper = {},
     extendManifest = {},
-    firstClassManifest = true,
+    firstClassManifest,
     iifeJsonPaths = [],
     pkg = npmPkgDetails,
     publicKey,
@@ -200,31 +200,27 @@ export function manifestInput(
           ...extendedManifest,
         } as chrome.runtime.Manifest
 
-        // If the manifest is the source of truth for inputs
-        //   `false` means that all inputs must come from Rollup config
-        if (firstClassManifest) {
-          // Derive entry paths from manifest
-          const {
-            js,
-            html,
-            css,
-            img,
-            others,
-            contentScripts,
-            serviceWorker,
-          } = deriveFiles(fullManifest, cache.srcDir)
+        // Derive entry paths from manifest
+        const {
+          js,
+          html,
+          css,
+          img,
+          others,
+          contentScripts,
+          serviceWorker,
+        } = deriveFiles(fullManifest, cache.srcDir)
 
-          cache.contentScripts = contentScripts
-          cache.serviceWorker = serviceWorker
+        cache.contentScripts = contentScripts
+        cache.serviceWorker = serviceWorker
 
-          // Cache derived inputs
-          cache.input = [...cache.inputAry, ...js, ...html]
+        // Cache derived inputs
+        cache.input = [...cache.inputAry, ...js, ...html]
 
-          cache.assets = [
-            // Dedupe assets
-            ...new Set([...css, ...img, ...others]),
-          ]
-        }
+        cache.assets = [
+          // Dedupe assets
+          ...new Set([...css, ...img, ...others]),
+        ]
 
         cache.manifest = validateManifest(fullManifest)
       }
@@ -305,9 +301,6 @@ export function manifestInput(
           })
         })
 
-      // TODO: need to bundle service worker if vite serve
-      //   - can import from localhost?
-      //   - how to do HMR? just reload crx!
       if (cache.serviceWorker) {
         const id = cache.serviceWorker
         const { fileName, wrapperFileName, jsFileName } =
