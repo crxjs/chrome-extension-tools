@@ -5,8 +5,6 @@ import path from 'path'
 import { RollupOutput } from 'rollup'
 import { build } from 'vite'
 
-jest.spyOn(console, 'log').mockImplementation(jest.fn())
-
 const outDir = path.join(__dirname, 'dist-build')
 
 let output: RollupOutput['output']
