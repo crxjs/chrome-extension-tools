@@ -4,8 +4,6 @@ import path from 'path'
 import { RollupOutput } from 'rollup'
 import { build } from 'vite'
 
-jest.spyOn(console, 'log').mockImplementation(jest.fn())
-
 let output: RollupOutput['output']
 beforeAll(async () => {
   const { output: o } = (await build({
