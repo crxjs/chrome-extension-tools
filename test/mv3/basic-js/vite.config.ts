@@ -11,11 +11,6 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: path.join(__dirname, 'src', 'manifest.json'),
-      output: {
-        // TODO: set entryFileNames in options hook
-        //  - vite produces an invalid build w/o entryFileNames
-        entryFileNames: '[name].js',
-      },
     },
   },
   plugins: [chromeExtension()],
