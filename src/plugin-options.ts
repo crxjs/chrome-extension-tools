@@ -78,7 +78,6 @@ export interface ManifestInputPluginCache {
   assets: string[]
   serviceWorker?: string
   contentScripts: string[]
-  iife: string[]
   input: string[]
   inputAry: string[]
   inputObj: Record<string, string>
@@ -106,9 +105,6 @@ export type ManifestInputPlugin = ManifestInputHooks & {
   srcDir: string | null
   browserPolyfill?: ChromeExtensionOptions['browserPolyfill']
   crossBrowser?: ChromeExtensionOptions['crossBrowser']
-  formatMap?: Partial<
-    Record<ModuleFormat, string[] | Record<string, string>>
-  >
 }
 
 /* ----------- HTML INPUTS PLUGIN OPTIONS ---------- */

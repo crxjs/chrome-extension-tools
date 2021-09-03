@@ -1,11 +1,10 @@
-import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
+import { regenerateBundle } from '$src/mixed-format/regenerateBundle'
 import { code as ctWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
-import { JSONPath } from 'jsonpath-plus'
 import memoize from 'mem'
 import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk } from 'rollup'
+import { EmittedAsset, OutputChunk, OutputOptions } from 'rollup'
 import slash from 'slash'
 import {
   isChunk,
@@ -18,6 +17,7 @@ import {
   ManifestInputPluginCache,
   ManifestInputPluginOptions,
 } from '../plugin-options'
+import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
 import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import {
@@ -37,8 +37,6 @@ import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import { updateManifestV3 } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
-import { regenerateBundle } from '$src/mixed-format/regenerateBundle'
-import { OutputOptions } from 'rollup'
 
 export const explorer = cosmiconfigSync('manifest', {
   cache: false,
@@ -92,7 +90,6 @@ export function manifestInput(
       contentScripts: [],
       contentScriptCode: {},
       contentScriptIds: {},
-      iife: [],
       input: [],
       inputAry: [],
       inputObj: {},
@@ -141,10 +138,6 @@ export function manifestInput(
 
     get srcDir() {
       return cache.srcDir
-    },
-
-    get formatMap() {
-      return { iife: cache.iife }
     },
 
     /* ============================================ */
@@ -210,18 +203,6 @@ export function manifestInput(
         // If the manifest is the source of truth for inputs
         //   `false` means that all inputs must come from Rollup config
         if (firstClassManifest) {
-          // Any scripts from here will be regenerated as IIFE's
-          cache.iife = iifeJsonPaths
-            .map((jsonPath) => {
-              const result = JSONPath({
-                path: jsonPath,
-                json: fullManifest,
-              })
-
-              return result
-            })
-            .flat(Infinity)
-
           // Derive entry paths from manifest
           const {
             js,
