@@ -13,9 +13,7 @@ test('bundles chunks', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(chunks.length).toBe(5)
 
-  // 4 chunks + one shared import (shared.js)
   expect(
     output.find(byFileName('scripts/background.js')),
   ).toBeDefined()
@@ -26,6 +24,9 @@ test('bundles chunks', async () => {
     output.find(byFileName('options/options.js')),
   ).toBeDefined()
   expect(output.find(byFileName('popup/popup.js'))).toBeDefined()
+
+  // 4 chunks + one shared import (shared.js)
+  expect(chunks.length).toBe(5)
 })
 
 test('bundles assets', async () => {
@@ -33,9 +34,7 @@ test('bundles assets', async () => {
 
   // Assets
   const assets = output.filter(isAsset)
-  expect(assets.length).toBe(15)
 
-  // 11 assets + 2 wrapper scripts + 2 browser polyfills
   expect(
     output.find(
       byFileName('assets/browser-polyfill-executeScript.js'),
@@ -44,37 +43,9 @@ test('bundles assets', async () => {
   expect(
     output.find(byFileName('assets/browser-polyfill.js')),
   ).toBeDefined()
-  expect(
-    output.find(byFileName('scripts/content.css')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/favicon.ico')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/favicon.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-16.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-48.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-128.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/options.jpg')),
-  ).toBeDefined()
-  expect(output.find(byFileName('manifest.json'))).toBeDefined()
-  expect(
-    output.find(byFileName('options/options.css')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('options/options.html')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('popup/popup.html')),
-  ).toBeDefined()
+
+  // 11 assets + 1 wrapper script + 2 browser polyfills
+  expect(assets.length).toBe(14)
 })
 
 // TODO: test browser polyfill in MV3 variant
@@ -85,9 +56,8 @@ test('includes browser polyfill in manifest.json', async () => {
     byFileName('manifest.json'),
   ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
-    manifestSource,
-  )
+  const manifest: chrome.runtime.ManifestV2 =
+    JSON.parse(manifestSource)
 
   expect(manifest.background?.scripts?.[0]).toBe(
     'assets/browser-polyfill.js',
@@ -103,23 +73,3 @@ test('includes browser polyfill in manifest.json', async () => {
     )
   })
 })
-
-// cases(
-//   'includes browser polyfill in html pages',
-//   ({ pagePath, headScriptsLength }) => {
-//     expect(CRXBuildError).toBeUndefined()
-
-//     const asset = output.find(byFileName(pagePath)) as OutputAsset
-//     const source = asset.source as string
-//     const $ = cheerio.load(source)
-//     const headScripts = $('head').children('script')
-
-//     expect(headScripts.length).toBe(headScriptsLength)
-//     expect(headScripts.first().attr('src')).toBe('/assets/browser-polyfill.js')
-//     expect(headScripts.next().attr('src')).toBe('/assets/browser-polyfill-executeScript.js')
-//   },
-//   [
-//     { name: 'options page', pagePath: 'options/options.html', headScriptsLength: 2 },
-//     { name: 'popup page', pagePath: 'popup/popup.html', headScriptsLength: 3 },
-//   ],
-// )
