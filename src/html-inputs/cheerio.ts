@@ -8,6 +8,7 @@ import { HtmlInputsOptions } from '../plugin-options'
 export type HtmlFilePathData = {
   filePath: string
   rootPath: string
+  relPath: string
 }
 
 /** CheerioAPI objects with a file path */
@@ -19,7 +20,12 @@ export const loadHtml =
     const htmlCode = fs.readFileSync(filePath, 'utf8')
     const $ = cheerio.load(htmlCode)
 
-    return Object.assign($, { filePath, rootPath })
+    const relPath = path.relative(rootPath, filePath)
+    return Object.assign($, {
+      filePath,
+      rootPath,
+      relPath,
+    })
   }
 
 export const cloneHtml = (src$: CheerioFile): CheerioFile => {
@@ -28,6 +34,7 @@ export const cloneHtml = (src$: CheerioFile): CheerioFile => {
   return Object.assign($, {
     filePath: src$.filePath,
     rootPath: src$.rootPath,
+    relPath: src$.relPath,
   })
 }
 
@@ -66,11 +73,16 @@ export const updateHtmlElements =
     getScriptElems($)
       .attr('type', 'module')
       .attr('src', (i, value) => {
-        const final = getViteServer()
-          ? `${VITE_SERVER_URL}/${value}`
-          : value.replace(/\.[jt]sx?/g, '.js')
-
-        return final
+        let result: string
+        if (getViteServer()) {
+          const relDir = path.dirname($.relPath)
+          const relPath =
+            relDir === '.' ? value : path.join(relDir, value)
+          result = `${VITE_SERVER_URL}/${relPath}`
+        } else {
+          result = value.replace(/\.[jt]sx?/g, '.js')
+        }
+        return result
       })
 
     if (browserPolyfill) {
