@@ -1,8 +1,8 @@
 import Ajv from 'ajv'
 import { JsonPointer } from 'json-ptr'
-import schema from '../../../schema/manifest-strict.schema.json'
-import schemaMV2 from '../../../schema/manifest-v2.schema.json'
-import schemaMV3 from '../../../schema/manifest-v3.schema.json'
+import schema from '../../schema/manifest-strict.schema.json'
+import schemaMV2 from '../../schema/manifest-v2.schema.json'
+import schemaMV3 from '../../schema/manifest-v3.schema.json'
 
 export const ajv = new Ajv({
   schemas: [schema, schemaMV2, schemaMV3],
@@ -18,10 +18,10 @@ ajv.addFormat('permission', true)
 
 const validator = ajv.compile(schema)
 
-const setupPointer = (target: Record<string, unknown>) => (
-  pointer: string,
-): string | Record<string, unknown> =>
-  JsonPointer.create(pointer).get(target) as string
+const setupPointer =
+  (target: Record<string, unknown>) =>
+  (pointer: string): string | Record<string, unknown> =>
+    JsonPointer.create(pointer).get(target) as string
 
 const getSchemaDataMV2 = setupPointer(schemaMV2)
 const getSchemaDataMV3 = setupPointer(schemaMV3)
@@ -32,7 +32,7 @@ const ignoredErrors = [
 ]
 
 export function validateManifest<
-  T extends chrome.runtime.ManifestBase
+  T extends chrome.runtime.ManifestBase,
 >(manifest: T): T {
   const valid = validator(manifest)
   if (valid === true) return manifest
