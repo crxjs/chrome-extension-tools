@@ -1,16 +1,10 @@
 import { regenerateBundle } from '$src/mixed-format/regenerateBundle'
-import { code as ctWrapper } from 'code ./browser/contentScriptWrapper.ts'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import memoize from 'mem'
-import path, { basename, relative } from 'path'
-import { EmittedAsset, OutputChunk, OutputOptions } from 'rollup'
-import slash from 'slash'
-import {
-  isChunk,
-  isPresent,
-  normalizeFilename,
-} from '../helpers'
+import path from 'path'
+import { EmittedAsset } from 'rollup'
+import { isChunk, isPresent } from '../helpers'
 import { isMV2, isMV3 } from '../manifest-types'
 import {
   ManifestInputPlugin,
@@ -18,7 +12,6 @@ import {
   ManifestInputPluginOptions,
 } from '../plugin-options'
 import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
-import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import {
   assetFileNames,
@@ -28,14 +21,10 @@ import {
   stubIdForNoScriptChromeExtensions,
 } from './fileNames'
 import { getInputManifestPath } from './getInputManifestPath'
-import { combinePerms } from './manifest-parser/combine'
-import {
-  deriveFiles,
-  derivePermissions,
-} from './manifest-parser/index'
+import { deriveFiles } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
-import { updateManifestV3 } from './updateManifest'
+import { updateManifest } from './updateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -74,20 +63,21 @@ const npmPkgDetails =
 export function manifestInput(
   {
     browserPolyfill = false,
-    contentScriptWrapper = true,
+    contentScriptWrapper,
     crossBrowser = false,
-    dynamicImportWrapper = {},
+    dynamicImportWrapper,
     extendManifest = {},
     firstClassManifest,
     iifeJsonPaths = [],
     pkg = npmPkgDetails,
     publicKey,
-    verbose = true,
-    wrapContentScripts = true,
+    verbose,
+    wrapContentScripts,
     cache = {
       assetChanged: false,
       assets: [],
       contentScripts: [],
+      background: [],
       contentScriptCode: {},
       contentScriptIds: {},
       input: [],
@@ -108,28 +98,10 @@ export function manifestInput(
     },
   )
 
-  /* ------------------ DEPRECATIONS ----------------- */
-
-  // contentScriptWrapper = wrapContentScripts
-
-  /* ----------- HOOKS CLOSURES START ----------- */
-
   let manifestPath: string
-
   const manifestName = 'manifest.json'
 
-  /* ------------ HOOKS CLOSURES END ------------ */
-
-  /* - SETUP DYNAMIC IMPORT LOADER SCRIPT START - */
-
-  let wrapperScript = ''
-  if (dynamicImportWrapper !== false) {
-    wrapperScript = prepImportWrapperScript(dynamicImportWrapper)
-  }
-
-  /* -- SETUP DYNAMIC IMPORT LOADER SCRIPT END -- */
-
-  /* --------------- plugin object -------------- */
+  const backgroundScriptWrapper = prepImportWrapperScript({})
   return {
     name,
 
@@ -208,11 +180,11 @@ export function manifestInput(
           img,
           others,
           contentScripts,
-          serviceWorker,
+          background,
         } = deriveFiles(fullManifest, cache.srcDir)
 
         cache.contentScripts = contentScripts
-        cache.serviceWorker = serviceWorker
+        cache.background = background
 
         // Cache derived inputs
         cache.input = [...cache.inputAry, ...js, ...html]
@@ -243,6 +215,22 @@ export function manifestInput(
     },
 
     async buildStart() {
+      warnDeprecatedOptions.call(
+        this,
+        {
+          browserPolyfill,
+          crossBrowser,
+          dynamicImportWrapper,
+          firstClassManifest,
+          iifeJsonPaths,
+          publicKey,
+          contentScriptWrapper,
+          wrapContentScripts,
+          verbose,
+        },
+        cache,
+      )
+
       /* ------------ WATCH ASSETS FOR CHANGES ----------- */
 
       this.addWatchFile(manifestPath)
@@ -269,69 +257,57 @@ export function manifestInput(
         this.emitFile(asset)
       })
 
-      warnDeprecatedOptions.call(
-        this,
-        {
-          browserPolyfill,
-          crossBrowser,
-          dynamicImportWrapper,
-          firstClassManifest,
-          iifeJsonPaths,
-          publicKey,
-        },
-        cache,
-      )
+      /* ------------------ EMIT CHUNKS ------------------ */
 
-      // MV2 manifest is handled in `generateBundle`
-      if (isMV2(cache.manifest)) return
-
-      /* ---------- EMIT CONTENT SCRIPT WRAPPERS --------- */
-
-      if (wrapContentScripts)
-        cache.contentScripts.forEach((id) => {
-          const { jsFileName } = generateFileNames({
-            srcDir: cache.srcDir,
-            id,
-          })
-
-          this.emitFile({
-            type: 'chunk',
-            fileName: jsFileName,
-            id,
-          })
+      cache.contentScripts.forEach((id) => {
+        const { jsFileName } = generateFileNames({
+          srcDir: cache.srcDir,
+          id,
         })
 
-      if (cache.serviceWorker) {
-        const id = cache.serviceWorker
+        this.emitFile({
+          type: 'chunk',
+          fileName: jsFileName,
+          id,
+        })
+      })
+
+      cache.background.forEach((id) => {
         const { fileName, wrapperFileName, jsFileName } =
           generateFileNames({
             srcDir: cache.srcDir,
             id,
           })
 
-        if (getViteServer()) {
-          this.emitFile({
-            type: 'asset',
-            fileName: wrapperFileName,
-            source: 'import %PATH%'.replace(
-              '%PATH%',
-              JSON.stringify(`${VITE_SERVER_URL}/${fileName}`),
-            ),
-          })
-        } else {
+        const server = getViteServer()
+        if (!server) {
           this.emitFile({
             type: 'chunk',
             fileName: jsFileName,
             id,
           })
+
+          if (isMV3(cache.manifest)) return
         }
-      }
 
-      /* --------------- EMIT MV3 MANIFEST --------------- */
+        const importPath = JSON.stringify(
+          server
+            ? `${VITE_SERVER_URL}/${fileName}`
+            : `./${jsFileName}`,
+        )
+        const source = isMV2(cache.manifest)
+          ? backgroundScriptWrapper
+          : 'import %PATH%'
+        this.emitFile({
+          type: 'asset',
+          fileName: wrapperFileName,
+          source: source.replace('%PATH%', importPath),
+        })
+      })
 
-      const manifestBody = updateManifestV3(
-        cloneObject(cache.manifest!),
-      )
+      /* ----------------- EMIT MANIFEST ----------------- */
+
+      const manifestBody = updateManifest(cache.manifest!)
       const manifestJson = JSON.stringify(
         manifestBody,
         undefined,
@@ -362,31 +338,44 @@ export function manifestInput(
       return null
     },
 
-    // transform(code, id) {
-    //   // TODO: this could be done in `load`
-    //   if (
-    //     wrapContentScripts &&
-    //     isMV3(cache.manifest) &&
-    //     cache.contentScripts.includes(id)
-    //   ) {
-    //     // Use slash to guarantee support Windows
-    //     const target = `${slash(relative(cache.srcDir!, id))
-    //       .split('.')
-    //       .slice(0, -1)
-    //       .join('.')}.js`
+    /* ------------ DERIVE PERMISSIONS START ----------- */
+    // TODO: add permissions detection to this build step
+    // - if serve, use transform (accuracy doesn't matter)
+    // - if build, use renderChunk (accuracy does matter)
+    // TODO: use this.setAssetSource to update the manifest
+    // IDEA: log data like this https://github.com/yousifalraheem/rollup-plugin-summary/blob/75760f53bc7066efa87e3b32171b47f93e7d149f/index.js#L210-L226
+    // transform() {
+    //   let permissions: string[] = []
+    //   // Get module ids for all chunks
+    //   if (cache.assetChanged && cache.permsHash) {
+    //     // Permissions did not change
+    //     permissions = JSON.parse(cache.permsHash) as string[]
 
-    //     const fileName = getImportContentScriptFileName(target)
+    //     cache.assetChanged = false
+    //   } else {
+    //     const chunks = Object.values(bundle).filter(isChunk)
 
-    //     // Emit content script wrapper
-    //     this.emitFile({
-    //       id: `${esmContentScriptWrapperIdPrefix}:${target}`,
-    //       type: 'chunk',
-    //       fileName,
-    //     })
+    //     // Permissions may have changed
+    //     permissions = Array.from(
+    //       chunks.reduce(derivePermissions, new Set<string>()),
+    //     )
+
+    //     const permsHash = JSON.stringify(permissions)
+
+    //     if (verbose && permissions.length) {
+    //       if (!cache.permsHash) {
+    //         this.warn(
+    //           `Detected permissions: ${permissions.toString()}`,
+    //         )
+    //       } else if (permsHash !== cache.permsHash) {
+    //         this.warn(
+    //           `Detected new permissions: ${permissions.toString()}`,
+    //         )
+    //       }
+    //     }
+
+    //     cache.permsHash = permsHash
     //   }
-
-    //   // No source transformation took place
-    //   return null
     // },
 
     watchChange(id) {
@@ -415,256 +404,89 @@ export function manifestInput(
     },
 
     async generateBundle(options, bundle) {
-      /* ----------------- CLEAN UP STUB ----------------- */
-
+      // Clean up stub
       delete bundle[stubIdForNoScriptChromeExtensions + '.js']
 
-      // We don't support completely empty bundles
+      // The bundle has to have something in it
       if (Object.keys(bundle).length === 0) {
         throw new Error(
           'The Chrome extension must have at least one asset (html or css) or script file.',
         )
       }
 
-      // MV3 is handled in `buildStart` to support Vite
-      if (isMV3(cache.manifest)) {
-        const outputOptions: OutputOptions = {
-          chunkFileNames: options.chunkFileNames,
-          sourcemap: options.sourcemap,
-        }
+      // Regenerate content scripts as IIFE
+      const contentScriptJsFileNames = cache.contentScripts.map(
+        (id) =>
+          generateFileNames({
+            srcDir: cache.srcDir,
+            id,
+          }).jsFileName,
+      )
 
-        // FIXME: throw right here
-        const contentScripts = await Promise.all(
-          cache.contentScripts.map((id) => {
-            const { jsFileName } = generateFileNames({
-              srcDir: cache.srcDir,
-              id,
-            })
-
-            return regenerateBundle.call(
+      const contentScripts = await Promise.all(
+        contentScriptJsFileNames.map((input) =>
+          regenerateBundle
+            .call(
               this,
               {
-                input: jsFileName,
+                input,
                 output: {
                   format: 'iife',
-                  ...outputOptions,
+                  sourcemap: options.sourcemap,
+                  chunkFileNames,
+                  entryFileNames,
                 },
               },
               bundle,
             )
-          }),
-        )
-
-        const esmInputs = Object.entries(bundle)
-          .filter(
-            ([, file]) =>
-              isChunk(file) &&
-              file.isEntry &&
-              !cache.contentScripts.includes(file.name),
-          )
-          .map(([key]) => key)
-
-        const base = await regenerateBundle.call(
-          this,
-          {
-            input: esmInputs,
-            output: { format: 'esm', ...outputOptions },
-          },
-          bundle,
-        )
-
-        // Empty bundle
-        Object.entries(bundle)
-          .filter(([, v]) => isChunk(v))
-          .forEach(([key]) => {
-            delete bundle[key]
-          })
-
-        // Refill bundle
-        Object.assign(bundle, base, ...contentScripts)
-
-        return
-      }
-
-      /* ------------------------------------------------- */
-      /*                 EMIT MV2 MANIFEST                 */
-      /* ------------------------------------------------- */
-
-      /* ------------ DERIVE PERMISSIONS START ----------- */
-
-      // TODO: we want to support this in MV3,
-      //   but this won't work in Vite,
-      //     so need to move it to `buildStart`
-      let permissions: string[] = []
-      // Get module ids for all chunks
-      if (cache.assetChanged && cache.permsHash) {
-        // Permissions did not change
-        permissions = JSON.parse(cache.permsHash) as string[]
-
-        cache.assetChanged = false
-      } else {
-        const chunks = Object.values(bundle).filter(isChunk)
-
-        // Permissions may have changed
-        permissions = Array.from(
-          chunks.reduce(derivePermissions, new Set<string>()),
-        )
-
-        const permsHash = JSON.stringify(permissions)
-
-        if (verbose && permissions.length) {
-          if (!cache.permsHash) {
-            this.warn(
-              `Detected permissions: ${permissions.toString()}`,
-            )
-          } else if (permsHash !== cache.permsHash) {
-            this.warn(
-              `Detected new permissions: ${permissions.toString()}`,
-            )
-          }
-        }
-
-        cache.permsHash = permsHash
-      }
-
-      const clonedManifest = cloneObject(
-        cache.manifest,
-      ) as chrome.runtime.ManifestV2
-
-      const manifestBody = {
-        ...clonedManifest,
-        permissions: combinePerms(
-          permissions,
-          clonedManifest.permissions || [],
+            // Rollup strips the dir from the output file name
+            .then((b) => {
+              // These vars are easier to debug
+              const chunks = Object.values(b)
+              const result = {
+                [input]: { ...chunks[0], fileName: input },
+              }
+              return result
+            }),
         ),
-      }
-
-      const {
-        background: { scripts: bgs = [] } = {},
-        content_scripts: cts = [],
-        web_accessible_resources: war = [],
-      } = manifestBody
-
-      /* ------------ SETUP BACKGROUND SCRIPTS ----------- */
-
-      // Emit background script wrappers
-      if (bgs.length && wrapperScript.length) {
-        // background exists because bgs has scripts
-        manifestBody.background!.scripts = bgs
-          .map(normalizeFilename)
-          .map((scriptPath: string) => {
-            // Loader script exists because of type guard above
-            const source =
-              // Path to module being loaded
-              wrapperScript.replace(
-                '%PATH%',
-                // Fix path slashes to support Windows
-                JSON.stringify(
-                  slash(relative('assets', scriptPath)),
-                ),
-              )
-
-            const assetId = this.emitFile({
-              type: 'asset',
-              source,
-              name: basename(scriptPath),
-            })
-
-            return this.getFileName(assetId)
-          })
-          .map((p) => slash(p))
-      }
-
-      /* ---------- END SETUP BACKGROUND SCRIPTS --------- */
-
-      /* ------------- SETUP CONTENT SCRIPTS ------------- */
-
-      const contentScripts = cts.reduce(
-        (r, { js = [] }) => [...r, ...js],
-        [] as string[],
       )
 
-      if (contentScriptWrapper && contentScripts.length) {
-        const memoizedEmitter = memoize((scriptPath: string) => {
-          const source = ctWrapper.replace(
-            '%PATH%',
-            // Fix path slashes to support Windows
-            JSON.stringify(
-              slash(relative('assets', scriptPath)),
-            ),
+      const iifeBundle = Object.assign({}, ...contentScripts)
+
+      const esmInputs = Object.entries(bundle)
+        .filter(([, file]) => {
+          return (
+            isChunk(file) &&
+            file.isEntry &&
+            !contentScriptJsFileNames.includes(file.fileName)
           )
+        })
+        .map(([key]) => key)
 
-          const assetId = this.emitFile({
-            type: 'asset',
-            source,
-            name: basename(scriptPath),
-          })
+      // Regenerate everything else as a new ESM bundle
+      const esmBundle = await regenerateBundle.call(
+        this,
+        {
+          input: esmInputs,
+          output: {
+            format: 'esm',
+            sourcemap: options.sourcemap,
+            chunkFileNames,
+            entryFileNames,
+          },
+        },
+        bundle,
+      )
 
-          return this.getFileName(assetId)
+      // Remove the original chunks
+      Object.entries(bundle)
+        .filter(([, v]) => isChunk(v))
+        .forEach(([key]) => {
+          delete bundle[key]
         })
 
-        // Setup content script import wrapper
-        manifestBody.content_scripts = cts.map(
-          ({ js, ...rest }) => {
-            return typeof js === 'undefined'
-              ? rest
-              : {
-                  js: js
-                    .map(normalizeFilename)
-                    .map(memoizedEmitter)
-                    .map((p) => slash(p)),
-                  ...rest,
-                }
-          },
-        )
-
-        // make all imports & dynamic imports web_acc_res
-        const imports = Object.values(bundle)
-          .filter((x): x is OutputChunk => x.type === 'chunk')
-          .reduce(
-            (r, { isEntry, fileName }) =>
-              // Get imported filenames
-              !isEntry ? [...r, fileName] : r,
-            [] as string[],
-          )
-
-        manifestBody.web_accessible_resources = Array.from(
-          new Set([
-            ...war,
-            // FEATURE: filter out imports for background?
-            ...imports,
-            // Need to be web accessible b/c of import
-            ...contentScripts,
-          ]),
-        ).map((p) => slash(p))
-
-        /* ----------- END SETUP CONTENT SCRIPTS ----------- */
-      }
-
-      /* --------- STABLE EXTENSION ID BEGIN -------- */
-
-      if (publicKey) {
-        manifestBody.key = publicKey
-      }
-
-      /* ---------- STABLE EXTENSION ID END --------- */
-
-      /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
-
-      const manifestJson = JSON.stringify(
-        manifestBody,
-        null,
-        2,
-      ).replace(/\.[jt]sx?"/g, '.js"')
-
-      // Emit manifest.json
-      this.emitFile({
-        type: 'asset',
-        fileName: manifestName,
-        source: manifestJson,
-      })
-
-      /* ------------ OUTPUT MANIFEST.JSON END ----------- */
+      // Refill bundle with our new mixed format files
+      Object.assign(bundle, esmBundle, iifeBundle)
     },
   }
 }

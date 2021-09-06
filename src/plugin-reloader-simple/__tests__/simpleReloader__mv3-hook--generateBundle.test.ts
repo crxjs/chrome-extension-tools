@@ -176,7 +176,6 @@ test('add reloader script to content scripts', async () => {
     manifestObj.source as string,
   )
 
-  expect(manifest.content_scripts!.length).toBe(2)
   expect(manifest.content_scripts!).toContainEqual({
     js: ['mock-file-name', contentJs],
     matches: ['https://www.google.com/*'],
@@ -186,6 +185,7 @@ test('add reloader script to content scripts', async () => {
     css: ['content.css'],
     matches: ['https://www.yahoo.com/*'],
   })
+  expect(manifest.content_scripts!.length).toBe(2)
 })
 
 test('Errors if manifest is not in the bundle', async () => {
