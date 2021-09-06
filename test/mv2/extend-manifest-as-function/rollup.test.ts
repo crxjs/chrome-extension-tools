@@ -19,43 +19,41 @@ test('bundles chunks', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(chunks.length).toBe(3)
 
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('options.js'))).toBeDefined()
+
+  expect(chunks.length).toBe(3)
 })
 
-test(
-  'bundles assets',
-  async () => {
-    const { output } = await outputPromise
+test('bundles assets', async () => {
+  const { output } = await outputPromise
 
-    // Assets
-    const assets = output.filter(isAsset)
-    expect(assets.length).toBe(9)
+  // Assets
+  const assets = output.filter(isAsset)
 
-    // 4 assets + 1 wrapper script
-    expect(
-      output.find(byFileName('images/icon-main-16.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-48.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-128.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('manifest.json')),
-    ).toBeDefined()
-    expect(output.find(byFileName('options.css'))).toBeDefined()
-    expect(output.find(byFileName('options.html'))).toBeDefined()
-    expect(output.find(byFileName('options.png'))).toBeDefined()
-    expect(
-      output.find(byFileName('images/favicon.ico')),
-    ).toBeDefined()
-  },
-  5 * 60 * 1000,
-)
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+  expect(output.find(byFileName('options.css'))).toBeDefined()
+  expect(output.find(byFileName('options.html'))).toBeDefined()
+  expect(output.find(byFileName('options.png'))).toBeDefined()
+  expect(
+    output.find(byFileName('images/favicon.ico')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('background.esm-wrapper.js')),
+  ).toBeDefined()
+
+  expect(assets.length).toBe(9)
+})
 
 test('extends the manifest', async () => {
   const { output } = await outputPromise
@@ -76,9 +74,7 @@ test('extends the manifest', async () => {
       .join(''),
     background: {
       persistent: true,
-      scripts: [
-        expect.stringMatching(/^assets\/background.+\.js$/),
-      ],
+      scripts: ['background.esm-wrapper.js'],
     },
     options_page: 'options.html',
   })

@@ -13,38 +13,37 @@ test('bundles chunks', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(chunks.length).toBe(3)
 
-  // 2 chunks + one shared import (imported.js)
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
+
+  // 2 chunks
+  expect(chunks.length).toBe(2)
 })
 
-test(
-  'bundles assets',
-  async () => {
-    const { output } = await outputPromise
+test('bundles assets', async () => {
+  const { output } = await outputPromise
 
-    // Assets
-    const assets = output.filter(isAsset)
-    expect(assets.length).toBe(6)
+  // Assets
+  const assets = output.filter(isAsset)
 
-    // 4 assets + 2 wrapper scripts
-    expect(
-      output.find(byFileName('images/icon-main-16.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-48.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-128.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('manifest.json')),
-    ).toBeDefined()
-  },
-  5 * 60 * 1000,
-)
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+  expect(
+    output.find(byFileName('background.esm-wrapper.js')),
+  ).toBeDefined()
+
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
+
+  expect(assets.length).toBe(5)
+})
 
 test('extends the manifest', async () => {
   const { output } = await outputPromise
@@ -60,8 +59,8 @@ test('extends the manifest', async () => {
   expect(manifest).toMatchObject({
     content_scripts: [
       expect.objectContaining({
-        // Content script ESM wrapper
-        js: [expect.stringMatching(/^assets\/content.+\.js$/)],
+        // Content script is IIFE
+        js: ['content.js'],
         matches: ['https://www.google.com/*'],
       }),
     ],
@@ -73,9 +72,7 @@ test('extends the manifest', async () => {
   expect(manifest).toMatchObject({
     background: {
       // Background script ESM wrapper
-      scripts: [
-        expect.stringMatching(/^assets\/background.+\.js$/),
-      ],
+      scripts: ['background.esm-wrapper.js'],
     },
     icons: {
       '16': 'images/icon-main-16.png',

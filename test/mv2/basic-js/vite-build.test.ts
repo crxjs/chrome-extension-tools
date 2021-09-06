@@ -1,15 +1,26 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
+import fs from 'fs-extra'
+import path from 'path'
+import { RollupOutput } from 'rollup'
+import { build } from 'vite'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
+const outDir = path.join(__dirname, 'dist-build')
+
+let output: RollupOutput['output']
+beforeAll(async () => {
+  await fs.remove(outDir)
+
+  const { output: o } = (await build({
+    configFile: path.join(__dirname, 'vite.config.ts'),
+    envFile: false,
+    build: { outDir },
+  })) as RollupOutput
+
+  output = o
+}, 30000)
 
 test('bundles chunks', async () => {
-  const { output } = await outputPromise
-
   // Chunks
   const chunks = output.filter(isChunk)
 
@@ -21,8 +32,6 @@ test('bundles chunks', async () => {
 })
 
 test('bundles assets', async () => {
-  const { output } = await outputPromise
-
   // Assets
   const assets = output.filter(isAsset)
 
@@ -30,6 +39,6 @@ test('bundles assets', async () => {
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
   expect(assets.find(byFileName('background.esm-wrapper.js')))
 
-  // 1 dynamic import wrapper, an html file, and the manifest
+  // 1 dyanmic import wrapper, an html file and the manifest
   expect(assets.length).toBe(3)
 })
