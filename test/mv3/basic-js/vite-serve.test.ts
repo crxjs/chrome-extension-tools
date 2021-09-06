@@ -23,7 +23,9 @@ afterAll(async () => {
 test('writes entry points to disk', async () => {
   expect(fs.existsSync(outDir)).toBe(false)
 
-  await Promise.all([devServer.listen(2000), filesWritten()])
+  await Promise.all([devServer.listen(), filesWritten()])
+
+  const { port } = devServer.config.server
 
   expect(fs.existsSync(outDir)).toBe(true)
 
@@ -57,12 +59,12 @@ test('writes entry points to disk', async () => {
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')
   expect(popupSource).toMatch(
-    '<script src="http://localhost:2000/popup.jsx" type="module">',
+    `<script src="http://localhost:${port}/popup.jsx" type="module">`,
   )
 
   const workerPath = path.join(outDir, worker)
   const workerSource = await fs.readFile(workerPath, 'utf8')
   expect(workerSource).toMatch(
-    'import "http://localhost:2000/service_worker.js"',
+    `import "http://localhost:${port}/service_worker.js"`,
   )
 }, 60000)
