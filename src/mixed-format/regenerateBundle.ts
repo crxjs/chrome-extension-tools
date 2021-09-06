@@ -8,6 +8,7 @@ import {
 } from 'rollup'
 import { resolveFromBundle } from './resolveFromBundle'
 
+/** This is really fast b/c we don't use any plugins, and we use the previous bundle as the filesystem */
 export async function regenerateBundle(
   this: PluginContext,
   { input, output }: RollupOptions,
@@ -30,14 +31,6 @@ export async function regenerateBundle(
     return {}
   }
 
-  const { format, chunkFileNames: cfn = '', sourcemap } = output
-
-  const chunkFileNames = path.join(
-    // @ts-expect-error need to support both string and function
-    path.dirname(cfn),
-    '[name].js',
-  )
-
   // Transform input array to input object
   const inputValue = Array.isArray(input)
     ? input.reduce((r, x) => {
@@ -51,21 +44,18 @@ export async function regenerateBundle(
     plugins: [resolveFromBundle(bundle)],
   })
 
-  let _b: OutputBundle
+  let newBundle: OutputBundle
   await build.generate({
-    format,
-    sourcemap,
-    chunkFileNames,
+    ...output,
     plugins: [
       {
         name: 'get-bundle',
         generateBundle(o, b) {
-          _b = b
+          newBundle = b
         },
       } as Plugin,
     ],
   })
-  const newBundle = _b!
 
-  return newBundle
+  return newBundle!
 }

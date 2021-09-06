@@ -59,7 +59,7 @@ export interface ChromeExtensionOptions {
   //  * If false, content scripts will be rebundled with IIFE format
   //  */
   // esmContentScripts?: boolean
-  /** Escape hatch for content script dynamic import wrapper */
+  /** @deprecated Escape hatch for content script dynamic import wrapper */
   wrapContentScripts?: boolean
 }
 
@@ -76,7 +76,7 @@ export interface ManifestInputPluginOptions
 
 export interface ManifestInputPluginCache {
   assets: string[]
-  serviceWorker?: string
+  background: string[]
   contentScripts: string[]
   input: string[]
   inputAry: string[]

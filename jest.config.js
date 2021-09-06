@@ -1,5 +1,6 @@
-// const esModules = ['lodash-es'].map((x) => `(${x})`).join('|')
-
+// TODO: if process.env.CI, build for production and test against the build
+// - add global setup file to build
+// - update moduleNameMapper to point $src to pkg.main
 module.exports = {
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -32,10 +33,12 @@ module.exports = {
   transform: {
     '\\.[tj]sx?$': 'esbuild-runner/jest',
   },
-  // For PNPM users, need to add '.*' to get the last instance of the ignored module
-  // transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],
   watchPathIgnorePatterns: [
     '<rootDir>/node_modules/',
     '<rootDir>/test/.+?dist',
   ],
 }
+
+// For PNPM users, need to add '.*' to get the last instance of the ignored module
+// const esModules = ['lodash-es'].map((x) => `(${x})`).join('|')
+// transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],

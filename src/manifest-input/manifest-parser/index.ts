@@ -33,7 +33,7 @@ export function deriveFiles(
 ): {
   css: string[]
   contentScripts: string[]
-  serviceWorker?: string
+  background: string[]
   js: string[]
   html: string[]
   img: string[]
@@ -84,10 +84,9 @@ export function deriveFilesMV3(
     [] as ContentScript[],
   ).reduce((r, { js = [] }) => [...r, ...js], [] as string[])
 
-  const serviceWorker: string | undefined = get(
-    manifest,
-    'background.service_worker',
-  )
+  const background: string[] = [
+    get(manifest, 'background.service_worker'),
+  ]
 
   const js = files.filter((f) => /\.[jt]sx?$/.test(f))
 
@@ -126,12 +125,12 @@ export function deriveFilesMV3(
   const others = diff(files, css, js, html, img)
 
   return {
-    css: validate(css),
+    background: validate(background),
     contentScripts: validate(contentScripts),
-    serviceWorker: serviceWorker && join(srcDir, serviceWorker),
-    js: validate(js),
+    css: validate(css),
     html: validate(html),
     img: validate(img),
+    js: validate(js),
     others: validate(others),
   }
 
@@ -150,6 +149,13 @@ export function deriveFilesMV2(
     ? ['_locales/**/messages.json']
     : []
 
+  // TODO: add tests for declarativeNetRequest
+  const rulesets: DeclarativeNetRequestResource[] = get(
+    manifest,
+    'declarative_net_request.rule_resources',
+    [] as DeclarativeNetRequestResource[],
+  )
+
   const files = get(
     manifest,
     'web_accessible_resources',
@@ -164,17 +170,21 @@ export function deriveFilesMV2(
         return [...r, x]
       }
     }, [] as string[])
+    .concat(rulesets.map(({ path }) => path))
 
   const contentScripts = get(
     manifest,
     'content_scripts',
     [] as ContentScript[],
   ).reduce((r, { js = [] }) => [...r, ...js], [] as string[])
-  const js = [
-    ...files.filter((f) => /\.[jt]sx?$/.test(f)),
-    ...get(manifest, 'background.scripts', [] as string[]),
-    ...contentScripts,
-  ]
+
+  const background = get(
+    manifest,
+    'background.scripts',
+    [] as string[],
+  )
+
+  const js = files.filter((f) => /\.[jt]sx?$/.test(f))
 
   const html = [
     ...files.filter((f) => /\.html?$/.test(f)),
@@ -230,11 +240,12 @@ export function deriveFilesMV2(
   const others = diff(files, css, contentScripts, js, html, img)
 
   return {
-    css: validate(css),
+    background: validate(background),
     contentScripts: validate(contentScripts),
-    js: validate(js),
+    css: validate(css),
     html: validate(html),
     img: validate(img),
+    js: validate(js),
     others: validate(others),
   }
 

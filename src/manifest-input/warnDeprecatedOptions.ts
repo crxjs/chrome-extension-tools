@@ -1,5 +1,7 @@
+import { format } from '$src/helpers'
+import { isMV3 } from '$src/manifest-types'
+import { isUndefined } from 'lodash'
 import { PluginContext } from 'rollup'
-import { isMV2 } from '../manifest-types'
 import {
   ManifestInputPluginCache,
   ManifestInputPluginOptions,
@@ -9,70 +11,78 @@ export function warnDeprecatedOptions(
   this: PluginContext,
   {
     browserPolyfill,
+    contentScriptWrapper,
     crossBrowser,
     dynamicImportWrapper,
     firstClassManifest,
     iifeJsonPaths,
     publicKey,
-    contentScriptWrapper,
+    wrapContentScripts,
   }: Pick<
     ManifestInputPluginOptions,
-    | 'crossBrowser'
     | 'browserPolyfill'
+    | 'cache'
+    | 'contentScriptWrapper'
+    | 'crossBrowser'
+    | 'dynamicImportWrapper'
     | 'firstClassManifest'
     | 'iifeJsonPaths'
-    | 'dynamicImportWrapper'
     | 'publicKey'
-    | 'contentScriptWrapper'
+    | 'verbose'
+    | 'wrapContentScripts'
   >,
   cache: ManifestInputPluginCache,
 ) {
   /* ------------ WARN DEPRECATED OPTIONS ------------ */
   if (crossBrowser)
-    this.warn('`options.crossBrowser` is not implemented yet')
+    this.warn(
+      format`options.crossBrowser is deprecated
+      This option does nothing internally`,
+    )
 
   if (typeof firstClassManifest === 'boolean')
     this.warn(
-      '`options.firstClassManifest` is deprecated and does nothing internally',
+      format`options.firstClassManifest is deprecated
+      This option does nothing internally`,
     )
 
   if (iifeJsonPaths?.length)
     this.warn(
-      '`options.iifeJsonPaths` is deprecated and does nothing internally',
+      format`options.iifeJsonPaths is deprecated
+      This option does nothing internally`,
     )
 
-  if (typeof contentScriptWrapper !== 'undefined')
+  if (typeof contentScriptWrapper === 'undefined')
     this.warn(
-      '`options.contentScriptWrapper` is deprecated.\nPlease use `options.wrapContentScript`',
+      format`options.contentScriptWrapper is deprecated
+      Content scripts are no longer wrapped in production`,
     )
 
-  if (isMV2(cache.manifest))
-    // MV2 manifest is handled in `generateBundle`
-    return
-
-  if (browserPolyfill)
+  if (typeof wrapContentScripts === 'undefined')
     this.warn(
-      [
-        '`options.browserPolyfill` is deprecated for MV3 and does nothing internally',
-        'See: https://extend-chrome.dev/rollup-plugin#mv3-faq',
-      ].join('\n'),
+      format`options.wrapContentScripts is deprecated
+      Content scripts are no longer wrapped in production`,
     )
 
-  if (
-    // This should be an empty object
-    typeof dynamicImportWrapper !== 'object' ||
-    Object.keys(dynamicImportWrapper).length > 0
-  )
+  if (browserPolyfill && isMV3(cache.manifest))
     this.warn(
-      '`options.dynamicImportWrapper` is not required for MV3',
+      format`options.browserPolyfill is not supported for MV3
+      It may be supported in a future version
+      For alternatives: https://extend-chrome.dev/rollup-plugin#mv3-faq`,
+    )
+
+  if (!isUndefined(dynamicImportWrapper))
+    this.warn(
+      format`options.dynamicImportWrapper is deprecated
+      Content scripts are no longer wrapped in production
+      Only background pages or service workers use wrappers`,
     )
 
   if (publicKey)
     this.warn(
-      [
-        '`options.publicKey` is deprecated for MV3,',
-        'please use `options.extendManifest` instead',
-        'see: https://extend-chrome.dev/rollup-plugin#mv3-faq',
-      ].join('\n'),
+      format`options.publicKey is deprecated
+      This option does nothing internally
+      Please use options.extendManifest instead
+      For more info: https://extend-chrome.dev/rollup-plugin#mv3-faq`,
     )
 }
