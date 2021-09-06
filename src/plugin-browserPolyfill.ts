@@ -1,9 +1,9 @@
-import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
+import { code as executeScriptPolyfill } from 'code ./client-browserPolyfill/executeScriptPolyfill.ts'
 import fs from 'fs-extra'
 import { Plugin } from 'rollup'
-import { isAsset } from '../helpers'
-import { isMV3 } from '../manifest-types'
-import { ManifestInputPlugin } from '../types'
+import { isAsset } from './helpers'
+import { isMV3 } from './manifest-types'
+import { ManifestInputPlugin } from './types'
 
 const defaultOptions = { executeScript: true }
 export function browserPolyfill({
