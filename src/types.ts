@@ -1,4 +1,4 @@
-import { ModuleFormat, Plugin } from 'rollup'
+import { Plugin } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { CheerioFile } from './html-inputs/cheerio'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'

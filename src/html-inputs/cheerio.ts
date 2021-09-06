@@ -3,7 +3,7 @@ import cheerio, { CheerioAPI } from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
 import { isString } from '../helpers'
-import { HtmlInputsOptions } from '../plugin-options'
+import { HtmlInputsOptions } from '../types'
 
 export type HtmlFilePathData = {
   filePath: string

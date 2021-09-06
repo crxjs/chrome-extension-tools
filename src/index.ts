@@ -7,7 +7,7 @@ import manifestInput from './manifest-input'
 import {
   ChromeExtensionOptions,
   ChromeExtensionPlugin,
-} from './plugin-options'
+} from './types'
 import { validateNames as v } from './validate-names'
 import {
   sendConfigureServer,

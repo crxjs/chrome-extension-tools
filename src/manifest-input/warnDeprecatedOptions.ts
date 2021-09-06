@@ -5,7 +5,7 @@ import { PluginContext } from 'rollup'
 import {
   ManifestInputPluginCache,
   ManifestInputPluginOptions,
-} from '../plugin-options'
+} from '../types'
 
 export function warnDeprecatedOptions(
   this: PluginContext,
