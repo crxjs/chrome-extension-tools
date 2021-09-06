@@ -3,9 +3,9 @@ import 'array-flat-polyfill'
 export const combinePerms = (
   ...permissions: string[] | string[][]
 ): string[] => {
-  const { perms, xperms } = (permissions.flat(
-    Infinity,
-  ) as string[])
+  const { perms, xperms } = (
+    permissions.flat(Infinity) as string[]
+  )
     .filter((perm) => typeof perm !== 'undefined')
     .reduce(
       ({ perms, xperms }, perm) => {

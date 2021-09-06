@@ -1,33 +1,13 @@
 import glob from 'glob'
 import { difference as diff, get } from 'lodash'
 import { join } from 'path'
-import { OutputChunk } from 'rollup'
-import { isString } from '../../helpers'
+import { isString } from '../helpers'
 import {
   ContentScript,
   DeclarativeNetRequestResource,
-} from '../../manifest-types'
-import * as permissions from './permissions'
+} from '../manifest-types'
 
-/* ============================================ */
-/*              DERIVE PERMISSIONS              */
-/* ============================================ */
-
-export const derivePermissions = (
-  set: Set<string>,
-  { code }: OutputChunk,
-) =>
-  Object.entries(permissions)
-    .filter(([key]) => key !== 'default')
-    .filter(([, fn]) => fn(code))
-    .map(([key]) => key)
-    .reduce((s, p) => s.add(p), set)
-
-/* -------------------------------------------- */
-/*                 DERIVE FILES                 */
-/* -------------------------------------------- */
-
-export function deriveFiles(
+export function parseManifest(
   manifest: chrome.runtime.Manifest,
   srcDir: string,
 ): {

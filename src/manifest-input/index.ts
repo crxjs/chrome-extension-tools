@@ -1,4 +1,3 @@
-import { regenerateBundle } from '$src/mixed-format/regenerateBundle'
 import { cosmiconfigSync } from 'cosmiconfig'
 import fs from 'fs-extra'
 import memoize from 'mem'
@@ -21,10 +20,11 @@ import {
   stubIdForNoScriptChromeExtensions,
 } from './fileNames'
 import { getInputManifestPath } from './getInputManifestPath'
-import { deriveFiles } from './manifest-parser/index'
-import { validateManifest } from './manifest-parser/validate'
+import { parseManifest } from './parseManifest'
 import { reduceToRecord } from './reduceToRecord'
+import { regenerateBundle } from './regenerateBundle'
 import { updateManifest } from './updateManifest'
+import { validateManifest } from './validateManifest'
 import { warnDeprecatedOptions } from './warnDeprecatedOptions'
 
 export const explorer = cosmiconfigSync('manifest', {
@@ -181,7 +181,7 @@ export function manifestInput(
           others,
           contentScripts,
           background,
-        } = deriveFiles(fullManifest, cache.srcDir)
+        } = parseManifest(fullManifest, cache.srcDir)
 
         cache.contentScripts = contentScripts
         cache.background = background

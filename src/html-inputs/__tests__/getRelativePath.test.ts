@@ -8,6 +8,7 @@ test('returns correct path', () => {
   const getter = getRelativePath({
     filePath: optionsHtml,
     rootPath: srcDir,
+    relPath: 'options.html',
   })
 
   expect(getter('options.js')).toBe(

@@ -1,4 +1,4 @@
-import { combinePerms } from '../combine'
+import { combinePerms } from './combinePerms'
 
 test('returns all permissions', () => {
   const perms1 = ['a', 'b', 'c']
