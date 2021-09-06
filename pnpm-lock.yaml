@@ -13,6 +13,7 @@ specifiers:
   '@rollup/plugin-node-resolve': ^13.0.4
   '@rollup/plugin-sucrase': ^3.0.0
   '@rollup/plugin-typescript': ^8.2.5
+  '@rollup/pluginutils': ^4.1.1
   '@sucrase/jest-plugin': ^2.1.0
   '@testing-library/dom': ^6.12.2
   '@testing-library/jest-dom': ^5.1.1
@@ -69,6 +70,7 @@ specifiers:
   xstate: ^4.23.1
 
 dependencies:
+  '@rollup/pluginutils': 4.1.1
   '@types/lodash': 4.14.172
   ajv: 8.6.2
   array-flat-polyfill: 1.0.1
@@ -1903,6 +1905,14 @@ packages:
       rollup: 2.56.3
     dev: true
 
+  /@rollup/pluginutils/4.1.1:
+    resolution: {integrity: sha512-clDjivHqWGXi7u+0d2r2sBi4Ie6VLEAzWMIkvJLnDmxoOhBYOTfzGbOQBA32THHm11/LiJbd01tJUpJsbshSWQ==}
+    engines: {node: '>= 8.0.0'}
+    dependencies:
+      estree-walker: 2.0.2
+      picomatch: 2.3.0
+    dev: false
+
   /@sheerun/mutationobserver-shim/0.3.3:
     resolution: {integrity: sha512-DetpxZw1fzPD5xUBrIAoplLChO2VB8DlL5Gg+I1IR9b2wPqYIca2WSUxL5g1vLeR4MsQq1NeWriXAVffV+U1Fw==}
     dev: true
@@ -3612,7 +3622,6 @@ packages:
 
   /estree-walker/2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
-    dev: true
 
   /esutils/2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
@@ -6049,7 +6058,6 @@ packages:
   /picomatch/2.3.0:
     resolution: {integrity: sha512-lY1Q/PiJGC2zOv/z391WOTD+Z02bCgsFfvxoXXf6h7kv9o+WmsmzYqrAwY63sNgOxE4xEdq0WyUnXfKeBrSvYw==}
     engines: {node: '>=8.6'}
-    dev: true
 
   /pidtree/0.3.1:
     resolution: {integrity: sha512-qQbW94hLHEqCg7nhby4yRC7G2+jYHY4Rguc2bjw7Uug4GIJuu1tvf2uHaZv5Q8zdt+WKJ6qK1FOI6amaWUo5FA==}

@@ -8,7 +8,7 @@ import {
   ChromeExtensionOptions,
   ChromeExtensionPlugin,
 } from './types'
-import { validateNames as v } from './validate-names'
+import { fixInvalidFileNames as v } from './plugin-fixInvalidFileNames'
 import {
   sendConfigureServer,
   shimPluginContext,
