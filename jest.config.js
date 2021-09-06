@@ -16,7 +16,7 @@ module.exports = {
     // bundle imports
     'code ./browser/contentScriptWrapper.ts':
       '<rootDir>/test/fixtures/dist/contentScriptWrapper.js',
-    'code ./browser/executeScriptPolyfill.ts':
+    'code ./client-browserPolyfill/executeScriptPolyfill.ts':
       '<rootDir>/test/fixtures/dist/executeScriptPolyfill.js',
     'code ./browser/importWrapper--explicit.ts':
       '<rootDir>/test/fixtures/dist/importWrapper--explicit.js',

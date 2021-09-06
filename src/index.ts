@@ -1,7 +1,7 @@
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
 import { InputOptions } from 'rollup'
-import { browserPolyfill as b } from './browser-polyfill'
+import { browserPolyfill as b } from './plugin-browserPolyfill'
 import htmlInputs from './html-inputs'
 import manifestInput from './manifest-input'
 import {
