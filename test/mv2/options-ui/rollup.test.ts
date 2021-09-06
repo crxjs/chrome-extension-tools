@@ -13,9 +13,7 @@ test('bundles chunks', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(chunks.length).toBe(10)
 
-  // 9 chunks + one shared import (imported.js)
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
   expect(output.find(byFileName('options1.js'))).toBeDefined()
@@ -29,79 +27,63 @@ test('bundles chunks', async () => {
   expect(
     output.find(byFileName('devtools/devtools2.js')),
   ).toBeDefined()
+
+  // 9 chunks + one shared import (imported.js)
+  expect(chunks.length).toBe(10)
 })
 
-test(
-  'bundles assets',
-  async () => {
-    const { output } = await outputPromise
-
-    // Assets
-    const assets = output.filter(isAsset)
-    expect(assets.length).toBe(19)
-
-    // 17 assets + 2 wrapper scripts
-    expect(output.find(byFileName('asset.js'))).toBeDefined()
-    expect(
-      output.find(byFileName('popup/popup.html')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('devtools/devtools.html')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-16.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-48.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/icon-main-128.png')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/favicon.ico')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('images/favicon.png')),
-    ).toBeDefined()
-    expect(output.find(byFileName('options.html'))).toBeDefined()
-    expect(output.find(byFileName('options.css'))).toBeDefined()
-    expect(output.find(byFileName('content.css'))).toBeDefined()
-    expect(output.find(byFileName('options.png'))).toBeDefined()
-    expect(output.find(byFileName('options.jpg'))).toBeDefined()
-    expect(
-      output.find(byFileName('manifest.json')),
-    ).toBeDefined()
-
-    expect(
-      output.find(byFileName('fonts/NotoSans-Light.ttf')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('fonts/NotoSans-Black.ttf')),
-    ).toBeDefined()
-    expect(
-      output.find(byFileName('fonts/Missaali-Regular.otf')),
-    ).toBeDefined()
-  },
-  5 * 60 * 1000,
-)
-
-test('Includes content script imports in web_accessible_resources', async () => {
+test('bundles assets', async () => {
   const { output } = await outputPromise
 
-  const manifestAsset = output.find(
-    byFileName('manifest.json'),
-  ) as OutputAsset
-  const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.Manifest = JSON.parse(
-    manifestSource,
-  )
+  // Assets
+  const assets = output.filter(isAsset)
 
-  expect(manifest).toMatchObject({
-    web_accessible_resources: expect.arrayContaining([
-      'content.js',
-      expect.stringMatching(/imported-.+?\.js/),
-    ]),
-  })
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+  expect(
+    output.find(byFileName('background.esm-wrapper.js')),
+  ).toBeDefined()
+
+  expect(output.find(byFileName('options.html'))).toBeDefined()
+  expect(output.find(byFileName('options.css'))).toBeDefined()
+  expect(output.find(byFileName('content.css'))).toBeDefined()
+  expect(output.find(byFileName('options.png'))).toBeDefined()
+  expect(output.find(byFileName('options.jpg'))).toBeDefined()
+
+  expect(output.find(byFileName('asset.js'))).toBeDefined()
+  expect(
+    output.find(byFileName('popup/popup.html')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('devtools/devtools.html')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/favicon.ico')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/favicon.png')),
+  ).toBeDefined()
+
+  expect(
+    output.find(byFileName('fonts/NotoSans-Light.ttf')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('fonts/NotoSans-Black.ttf')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('fonts/Missaali-Regular.otf')),
+  ).toBeDefined()
+
+  // 17 assets + 2 wrapper scripts
+  expect(assets.length).toBe(18)
 })
 
 test('Includes content_security_policy untouched', async () => {
@@ -111,9 +93,8 @@ test('Includes content_security_policy untouched', async () => {
     byFileName('manifest.json'),
   ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.Manifest = JSON.parse(
-    manifestSource,
-  )
+  const manifest: chrome.runtime.Manifest =
+    JSON.parse(manifestSource)
 
   expect(manifest).toMatchObject({
     content_security_policy:

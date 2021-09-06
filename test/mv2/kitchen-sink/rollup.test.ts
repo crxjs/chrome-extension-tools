@@ -1,10 +1,6 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { getScriptSrc, loadHtml } from '$src/html-inputs/cheerio'
-import { deriveFiles } from '$src/manifest-input/manifest-parser'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
-import { flatten } from 'lodash'
-import path from 'path'
 import { OutputAsset } from 'rollup'
 
 const outputPromise = getRollupOutput(
@@ -17,8 +13,6 @@ test('bundles chunks', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(chunks.length).toBe(10)
-  // 9 chunks + one shared import (imported.js)
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
   expect(output.find(byFileName('options1.js'))).toBeDefined()
@@ -38,8 +32,12 @@ test('bundles chunks', async () => {
   )
   // Chunk name should not be double hashed
   expect(imported?.fileName).toMatch(
-    /^modules\/imported-[a-z0-9]+?\.js$/,
+    // eslint-disable-next-line no-useless-escape
+    /^modules\/imported-[a-z0-9\-]+?\.js$/,
   )
+
+  // 9 chunks + one shared import (imported.js)
+  expect(chunks.length).toBe(10)
 })
 
 test('bundles assets', async () => {
@@ -47,16 +45,18 @@ test('bundles assets', async () => {
 
   // Assets
   const assets = output.filter(isAsset)
-  expect(assets.length).toBe(21)
 
-  // 17 assets + 2 wrapper scripts
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+
   expect(output.find(byFileName('asset.js'))).toBeDefined()
+
   expect(
     output.find(byFileName('popup/popup.html')),
   ).toBeDefined()
   expect(
     output.find(byFileName('devtools/devtools.html')),
   ).toBeDefined()
+
   expect(
     output.find(byFileName('images/icon-main-16.png')),
   ).toBeDefined()
@@ -72,12 +72,12 @@ test('bundles assets', async () => {
   expect(
     output.find(byFileName('images/favicon.png')),
   ).toBeDefined()
+
   expect(output.find(byFileName('options.html'))).toBeDefined()
   expect(output.find(byFileName('options.css'))).toBeDefined()
   expect(output.find(byFileName('content.css'))).toBeDefined()
   expect(output.find(byFileName('options.png'))).toBeDefined()
   expect(output.find(byFileName('options.jpg'))).toBeDefined()
-  expect(output.find(byFileName('manifest.json'))).toBeDefined()
 
   expect(
     output.find(byFileName('fonts/NotoSans-Light.ttf')),
@@ -95,24 +95,8 @@ test('bundles assets', async () => {
   expect(
     output.find(byFileName('_locales/es/messages.json')),
   ).toBeDefined()
-})
 
-test('Includes content script imports in web_accessible_resources', async () => {
-  const { output } = await outputPromise
-
-  const manifestAsset = output.find(
-    byFileName('manifest.json'),
-  ) as OutputAsset
-  const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.Manifest =
-    JSON.parse(manifestSource)
-
-  expect(manifest).toMatchObject({
-    web_accessible_resources: expect.arrayContaining([
-      'content.js',
-      expect.stringMatching(/imported-.+?\.js/),
-    ]),
-  })
+  expect(assets.length).toBe(20)
 })
 
 test('Includes content_security_policy untouched', async () => {
@@ -129,32 +113,6 @@ test('Includes content_security_policy untouched', async () => {
     content_security_policy:
       "script-src 'self'; object-src 'self'",
   })
-})
-
-test('chunks in output match chunks in manifest', async () => {
-  const { output } = await outputPromise
-
-  const assets = output.filter(isAsset)
-  const manifestJson = assets.find(byFileName('manifest.json'))!
-  const manifest = JSON.parse(
-    manifestJson.source as string,
-  ) as chrome.runtime.Manifest
-
-  // Get scripts in manifest
-  const { js, html } = deriveFiles(manifest, __dirname)
-  const html$ = html.map(loadHtml(__dirname))
-  const htmlJs = flatten(html$.map(getScriptSrc)).map((x) => {
-    const { name, dir } = path.parse(x)
-
-    return path.join(dir, `${name}.js`)
-  })
-
-  js.concat(htmlJs)
-    .map((x) => path.relative(__dirname, x))
-    .forEach((script) => {
-      const chunk = output.find(byFileName(script))
-      expect(chunk).toBeDefined()
-    })
 })
 
 // TODO: emit assets shared by manifest and html files one time only
