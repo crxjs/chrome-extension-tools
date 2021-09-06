@@ -2,7 +2,7 @@ import { existsSync } from 'fs'
 import { basename } from 'path'
 import { InputOptions } from 'rollup'
 import { isString, isUndefined } from '../helpers'
-import { ManifestInputPluginCache } from '../plugin-options'
+import { ManifestInputPluginCache } from '../types'
 import { cloneObject } from './cloneObject'
 
 const isManifestFileName = (filename: string) =>

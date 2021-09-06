@@ -8,7 +8,7 @@ import {
   HtmlInputsOptions,
   HtmlInputsPlugin,
   HtmlInputsPluginCache,
-} from '../plugin-options'
+} from '../types'
 import {
   getCssHrefs,
   getImgSrcs,

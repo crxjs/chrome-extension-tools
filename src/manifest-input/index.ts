@@ -10,7 +10,7 @@ import {
   ManifestInputPlugin,
   ManifestInputPluginCache,
   ManifestInputPluginOptions,
-} from '../plugin-options'
+} from '../types'
 import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import {

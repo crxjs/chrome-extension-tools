@@ -3,7 +3,7 @@ import fs from 'fs-extra'
 import { Plugin } from 'rollup'
 import { isAsset } from '../helpers'
 import { isMV3 } from '../manifest-types'
-import { ManifestInputPlugin } from '../plugin-options'
+import { ManifestInputPlugin } from '../types'
 
 const defaultOptions = { executeScript: true }
 export function browserPolyfill({
