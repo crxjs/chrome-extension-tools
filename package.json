@@ -32,6 +32,7 @@
     "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|/e2e/\""
   },
   "dependencies": {
+    "@rollup/pluginutils": "^4.1.1",
     "@types/lodash": "^4.14.172",
     "ajv": "^8.6.2",
     "array-flat-polyfill": "^1.0.1",
