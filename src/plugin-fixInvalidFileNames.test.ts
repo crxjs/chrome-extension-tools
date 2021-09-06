@@ -4,8 +4,8 @@ import {
   OutputBundle,
   OutputChunk,
 } from 'rollup'
-import { isChunk } from '../../helpers'
-import { validateNames } from '../index'
+import { isChunk } from './helpers'
+import { fixInvalidFileNames } from './plugin-fixInvalidFileNames'
 
 const bundle: OutputBundle = require('$test/helpers/validate-names__sample-bundle.json')
 
@@ -18,7 +18,7 @@ const helperName = helperKey.split('-')[0]
 const fixedKey = helperKey.slice(1)
 const fixedName = helperName.slice(1)
 
-const plugin = validateNames()
+const plugin = fixInvalidFileNames()
 
 test('renames chunks by mutating the bundle', () => {
   const helperChunk = bundle[helperKey] as OutputChunk
