@@ -3,7 +3,10 @@ import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 
 export type Unpacked<T> = T extends Array<infer R> ? R : never
 
-export const not = <T>(fn: (x: T) => boolean) => (x: T) => !fn(x)
+export const not =
+  <T>(fn: (x: T) => boolean) =>
+  (x: T) =>
+    !fn(x)
 
 export function isChunk(
   x: OutputChunk | OutputAsset,
@@ -49,11 +52,22 @@ export function isPresent<T>(x: null | undefined | T): x is T {
 export const normalizeFilename = (p: string) =>
   p.replace(/\.[tj]sx?$/, '.js')
 
+export function format(
+  strings: TemplateStringsArray,
+  ...placeholders: string[]
+) {
+  const raw = strings.reduce(
+    (result, string, i) => result + placeholders[i - 1] + string,
+  )
+  const formatted = raw.replace(/^  +/gm, '').trim()
+  return formatted
+}
+
 /**
  * Update the manifest source in the output bundle
  */
 export const updateManifest = <
-  T extends chrome.runtime.Manifest
+  T extends chrome.runtime.Manifest,
 >(
   updater: (manifest: T) => T,
   bundle: OutputBundle,

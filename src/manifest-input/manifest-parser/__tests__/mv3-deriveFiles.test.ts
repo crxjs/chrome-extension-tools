@@ -22,7 +22,9 @@ test('gets correct scripts', () => {
   const result = deriveFiles(manifest, srcDir)
 
   expect(result.contentScripts).toEqual([contentJs])
-  expect(result.serviceWorker).toBe(serviceWorkerJs)
+  expect(result.background).toEqual([serviceWorkerJs])
+
+  expect(result.js).toEqual([])
 })
 
 test('gets correct html', () => {
