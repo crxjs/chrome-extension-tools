@@ -1,0 +1,13 @@
+{
+  "background": {
+    "scripts": ["background.ts"]
+  },
+  "content_scripts": [
+    {
+      "js": ["content.ts"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ],
+  "options_page": "options.html",
+  "permissions": ["storage"]
+}
