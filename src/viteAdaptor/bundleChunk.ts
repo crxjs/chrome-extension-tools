@@ -14,8 +14,8 @@ import { ViteDevServer } from 'vite'
 export const resolveFromServer = (
   server: ViteDevServer,
 ): Plugin => ({
-  name: 'resolve-from-bundle',
-  resolveId(source, importer) {
+  name: 'resolve-from-vite-dev-server',
+  resolveId(source) {
     if (source.startsWith('/@fs')) return source
 
     const id = path.join(server.config.root, source)

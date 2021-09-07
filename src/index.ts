@@ -12,7 +12,7 @@ import { fixInvalidFileNames as v } from './plugin-fixInvalidFileNames'
 import {
   sendConfigureServer,
   shimPluginContext,
-} from './viteAdaptor'
+} from './viteAdaptor/viteAdaptor'
 
 export type { ManifestV2, ManifestV3 } from './manifest-types'
 export { simpleReloader } from './plugin-reloader-simple'

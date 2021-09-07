@@ -1,4 +1,5 @@
-import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
+import { VITE_SERVER_URL } from '../viteAdaptor/viteAdaptor.machine'
+import { getViteServer } from '../viteAdaptor/viteAdaptor'
 import cheerio, { CheerioAPI } from 'cheerio'
 import fs from 'fs-extra'
 import path from 'path'
