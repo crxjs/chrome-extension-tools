@@ -1,4 +1,4 @@
-import { getViteServer } from '../viteAdaptor'
+import { getViteServer } from '../viteAdaptor/viteAdaptor'
 import { cloneObject } from './cloneObject'
 import { generateFileNames } from './fileNames'
 

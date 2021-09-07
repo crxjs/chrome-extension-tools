@@ -5,12 +5,7 @@ import { EmittedAsset } from 'rollup'
 import { EmittedFile, PluginContext } from 'rollup'
 import { from } from 'rxjs'
 import { ViteDevServer } from 'vite'
-import {
-  ActorRef,
-  createMachine,
-  interpret,
-  spawn,
-} from 'xstate'
+import { ActorRef, createMachine, spawn } from 'xstate'
 import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
@@ -34,15 +29,15 @@ interface Context {
   })[]
   writers: Record<
     string,
-    ActorRef<ModelEventsFrom<typeof model>>
+    ActorRef<ModelEventsFrom<typeof viteAdaptorModel>>
   >
   bundlers: Record<
     string,
-    ActorRef<ModelEventsFrom<typeof model>>
+    ActorRef<ModelEventsFrom<typeof viteAdaptorModel>>
   >
 }
 
-const getEmittedFileId = (file: EmittedFile): string =>
+export const getEmittedFileId = (file: EmittedFile): string =>
   file.type === 'asset'
     ? file.fileName ?? file.name ?? 'fake asset id'
     : file.id
@@ -53,7 +48,7 @@ const context: Context = {
   bundlers: {},
 }
 
-const model = createModel(context, {
+export const viteAdaptorModel = createModel(context, {
   events: {
     WRITE_ASSET: (file: EmittedAsset & { id: string }) => ({
       file,
@@ -73,10 +68,12 @@ const model = createModel(context, {
   },
 })
 
-const machine = createMachine<typeof model>(
+export const viteAdaptorMachine = createMachine<
+  typeof viteAdaptorModel
+>(
   {
-    id: 'pluginContextShim',
-    context: model.initialContext,
+    id: 'viteAdaptor',
+    context: viteAdaptorModel.initialContext,
     initial: 'start',
     states: {
       start: {
@@ -84,7 +81,7 @@ const machine = createMachine<typeof model>(
           HOOK_START: 'build',
           SERVER_CONFIGURE: {
             target: 'serve',
-            actions: model.assign({
+            actions: viteAdaptorModel.assign({
               server: (context, { server }) => server,
             }),
           },
@@ -105,12 +102,12 @@ const machine = createMachine<typeof model>(
               SERVER_LISTENING: 'listening',
               ERROR: {
                 target: '#error',
-                actions: model.assign({
+                actions: viteAdaptorModel.assign({
                   lastError: (context, { error }) => error,
                 }),
               },
               EMIT_FILE: {
-                actions: model.assign({
+                actions: viteAdaptorModel.assign({
                   files: ({ files }, { file }) => [
                     ...files,
                     file,
@@ -124,8 +121,8 @@ const machine = createMachine<typeof model>(
               files.map((file) =>
                 send(
                   file.type === 'asset'
-                    ? model.events.WRITE_ASSET(file)
-                    : model.events.WRITE_CHUNK(file),
+                    ? viteAdaptorModel.events.WRITE_ASSET(file)
+                    : viteAdaptorModel.events.WRITE_CHUNK(file),
                 ),
               ),
             ),
@@ -152,8 +149,10 @@ const machine = createMachine<typeof model>(
                   'addFile',
                   send((context, { file }) =>
                     file.type === 'asset'
-                      ? model.events.WRITE_ASSET(file)
-                      : model.events.WRITE_CHUNK(file),
+                      ? viteAdaptorModel.events.WRITE_ASSET(file)
+                      : viteAdaptorModel.events.WRITE_CHUNK(
+                          file,
+                        ),
                   ),
                 ],
               },
@@ -161,7 +160,7 @@ const machine = createMachine<typeof model>(
               WRITE_CHUNK: { actions: 'writeChunk' },
               EMIT_DONE: {
                 target: '.check',
-                actions: model.assign({
+                actions: viteAdaptorModel.assign({
                   files: ({ files }, { id }) => {
                     return files.map((file) =>
                       file.id === id
@@ -173,7 +172,7 @@ const machine = createMachine<typeof model>(
               },
               ERROR: {
                 target: '#error',
-                actions: model.assign({
+                actions: viteAdaptorModel.assign({
                   files: ({ files }, { id, error }) =>
                     files.map((file) =>
                       file.id === id
@@ -206,14 +205,19 @@ const machine = createMachine<typeof model>(
           if (isUndefined(server))
             throw new Error('vite server is undefined')
 
-          return assign<Context, ModelEventsFrom<typeof model>>({
+          return assign<
+            Context,
+            ModelEventsFrom<typeof viteAdaptorModel>
+          >({
             bundlers: ({ bundlers }) => {
               const actorRef = spawn(
                 from(
                   bundleChunk(event.file, server)
-                    .then(() => model.events.EMIT_DONE(id))
+                    .then(() =>
+                      viteAdaptorModel.events.EMIT_DONE(id),
+                    )
                     .catch((error) =>
-                      model.events.ERROR(id, error),
+                      viteAdaptorModel.events.ERROR(id, error),
                     ),
                 ),
                 id,
@@ -223,7 +227,7 @@ const machine = createMachine<typeof model>(
           })
         } catch (error) {
           return send(
-            model.events.ERROR(
+            viteAdaptorModel.events.ERROR(
               error,
               event.type === 'WRITE_CHUNK'
                 ? event.file.id
@@ -272,15 +276,20 @@ const machine = createMachine<typeof model>(
               )
             : source
 
-          return assign<Context, ModelEventsFrom<typeof model>>({
+          return assign<
+            Context,
+            ModelEventsFrom<typeof viteAdaptorModel>
+          >({
             writers: ({ writers }) => {
               const actorRef = spawn(
                 from(
                   fs
                     .outputFile(filePath, fileSource)
-                    .then(() => model.events.EMIT_DONE(id))
+                    .then(() =>
+                      viteAdaptorModel.events.EMIT_DONE(id),
+                    )
                     .catch((error) =>
-                      model.events.ERROR(id, error),
+                      viteAdaptorModel.events.ERROR(id, error),
                     ),
                 ),
                 id,
@@ -290,7 +299,7 @@ const machine = createMachine<typeof model>(
           })
         } catch (error) {
           return send(
-            model.events.ERROR(
+            viteAdaptorModel.events.ERROR(
               error,
               event.type === 'WRITE_ASSET'
                 ? event.file.id
@@ -313,72 +322,14 @@ const machine = createMachine<typeof model>(
 
             server?.httpServer?.once('listening', resolve)
           })
-            .then(model.events.SERVER_LISTENING)
+            .then(viteAdaptorModel.events.SERVER_LISTENING)
             .catch((error) =>
-              model.events.ERROR(error, 'waitForServer'),
+              viteAdaptorModel.events.ERROR(
+                error,
+                'waitForServer',
+              ),
             ),
         ),
     },
   },
 )
-
-const service = interpret(machine)
-service.start()
-
-const sendEmitFile: PluginContext['emitFile'] = (
-  file: EmittedFile,
-) => {
-  service.send(model.events.EMIT_FILE(file))
-  return getEmittedFileId(file)
-}
-
-export const sendConfigureServer = (server: ViteDevServer) => {
-  service.send(model.events.SERVER_CONFIGURE(server))
-}
-
-export const filesWritten = () =>
-  new Promise<void>((resolve, reject) =>
-    service.subscribe((state) => {
-      if (state.matches({ serve: { listening: 'ready' } }))
-        resolve()
-      if (state.matches({ serve: 'error' }))
-        reject(
-          state.context.lastError ??
-            `context.lastError is ${typeof state.context
-              .lastError}`,
-        )
-    }),
-  )
-
-export const getViteServer = () => {
-  const state = service.getSnapshot()
-  return state.matches('serve')
-    ? state.context.server
-    : undefined
-}
-
-export const shimPluginContext = (
-  pluginContext: PluginContext,
-  hookName: string,
-): PluginContext => {
-  if (!service.initialized) return pluginContext
-
-  service.send(model.events.HOOK_START(hookName))
-
-  const proxy = new Proxy(pluginContext, {
-    get(target, key, receiver) {
-      switch (key) {
-        case 'emitFile':
-          if (service.initialized) {
-            return sendEmitFile
-          }
-
-        // eslint-disable-next-line no-fallthrough
-        default:
-          return Reflect.get(target, key, receiver)
-      }
-    },
-  })
-
-  return proxy
-}
