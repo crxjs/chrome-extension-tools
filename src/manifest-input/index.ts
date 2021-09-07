@@ -10,7 +10,8 @@ import {
   ManifestInputPluginCache,
   ManifestInputPluginOptions,
 } from '../types'
-import { getViteServer, VITE_SERVER_URL } from '../viteAdaptor'
+import { VITE_SERVER_URL } from '../viteAdaptor/viteAdaptor.machine'
+import { getViteServer } from '../viteAdaptor/viteAdaptor'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import {
   assetFileNames,
@@ -138,6 +139,7 @@ export function manifestInput(
           throw new Error(`${options.input} is an empty file.`)
         }
 
+        // SMELL: move to manifest validator?
         const { options_page, options_ui } = configResult.config
         if (isPresent(options_ui) && isPresent(options_page)) {
           throw new Error(
