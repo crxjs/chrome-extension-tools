@@ -1,5 +1,5 @@
-> ⚠️ Breaking change in Chrome 94+!!! Please **upgrade** to v3.6+
-> `npm i rollup rollup-plugin-chrome-extension@latest -D`
+> ⚠️⚠️⚠️ Breaking change in Chrome 94+!!! ⚠️⚠️⚠️\
+> [Please **upgrade** to v3.6 or later](https://github.com/extend-chrome/rollup-plugin-chrome-extension/discussions/116)
 
 # [rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
 
