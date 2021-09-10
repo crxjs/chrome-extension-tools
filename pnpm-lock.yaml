@@ -64,6 +64,7 @@ specifiers:
   rxjs: ^7.3.0
   slash: ^3.0.0
   tslib: ^2.3.0
+  type-fest: ^2.2.0
   typescript: ^4.3.5
   vite: ^2.5.1
   webextension-polyfill: ^0.6.0
@@ -89,6 +90,7 @@ dependencies:
   rollup: 2.56.3
   rxjs: 7.3.0
   slash: 3.0.0
+  type-fest: 2.2.0
   webextension-polyfill: 0.6.0
   xstate: 4.23.1
 
@@ -7159,6 +7161,11 @@ packages:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
     dev: true
+
+  /type-fest/2.2.0:
+    resolution: {integrity: sha512-T/HWTs/P20wqgy3GoIDv80tAB3Xvgk2vpxnS1vF8oVboipjrSB1hP5f1gFhCVt5QuMvOsALSwBBd02J94P51lg==}
+    engines: {node: '>=12.20'}
+    dev: false
 
   /typedarray-to-buffer/3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
