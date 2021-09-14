@@ -1,49 +1,17 @@
-import { isUndefined } from '$src/helpers'
-import {
-  assign,
-  createMachine,
-  send,
-  StateMachine,
-  StateNodeConfig,
-} from 'xstate'
-import { pure } from 'xstate/lib/actions'
+import { assign, createMachine } from 'xstate'
+import { send } from 'xstate/lib/actions'
 import { narrowEvent } from './helpers-xstate'
-import {
-  AssetFile,
-  ProcessorContext,
-  ProcessorEvent,
-  ProcessorId,
-} from './processor.model'
-import { assetProcessor } from './processorForAssets.machine'
-import { htmlProcessor } from './processorForHtml.machine'
-import { manifestProcessor } from './processorForManifest.machine'
-import { createProcessor } from './processorManager.machine'
-import {
-  SupervisorContext,
-  SupervisorEvent,
-  supervisorModel as model,
-} from './supervisor.model'
+import { supervisorSpawnActions } from './supervisorSpawn.actions'
+import { supervisorModel as model } from './supervisor.model'
 
-const createInvokeStateNode = ({
-  id,
-  src,
-}: {
-  id: ProcessorId
-  src: StateMachine<ProcessorContext, any, ProcessorEvent>
-}): // eslint-disable-next-line @typescript-eslint/ban-types
-StateNodeConfig<SupervisorContext, {}, SupervisorEvent> => ({
-  invoke: { id, src: createProcessor(id, src) },
-  on: { DONE: '.done' },
-  states: { done: { type: 'final' } },
-})
-
-export const machine = createMachine<typeof model>(
+export const supervisorMachine = createMachine<typeof model>(
   {
     id: 'supervisor',
     context: model.initialContext,
-    initial: 'ready',
+    on: { ERROR: '#error' },
+    initial: 'options',
     states: {
-      ready: {
+      options: {
         on: {
           ROOT: {
             actions: model.assign({
@@ -55,99 +23,102 @@ export const machine = createMachine<typeof model>(
               input: (context, { input }) => input,
             }),
           },
-          ADD_PLUGIN: {
+          PLUGIN: {
             actions: model.assign({
-              plugins: ({ plugins }, { plugin }) => [
-                ...plugins,
-                plugin,
-              ],
+              plugins: ({ plugins }, { plugin }) => {
+                plugins.add(plugin)
+                return new Set(plugins)
+              },
             }),
           },
-          PARSE: 'parsing',
-          PROCESS: 'processing',
+          START: 'start',
         },
       },
-      parsing: {
-        type: 'parallel',
-        onDone: 'ready',
-        states: {
-          manifest: createInvokeStateNode({
-            id: 'manifest',
-            src: manifestProcessor,
-          }),
-          html: createInvokeStateNode({
-            id: 'html',
-            src: htmlProcessor,
-          }),
-        },
+      start: {
+        entry: 'parseInput',
         on: {
-          FILE_READY: [
+          ADD_MANIFEST: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnManifestFile',
+          },
+          ADD_CSS: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnCssFile',
+          },
+          ADD_HTML: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnHtmlFile',
+          },
+          ADD_IMAGE: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnImageFile',
+          },
+          ADD_JSON: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnJsonFile',
+          },
+          ADD_RAW: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnRawFile',
+          },
+          ADD_SCRIPT: {
+            cond: 'fileDoesNotExist',
+            actions: 'spawnScriptFile',
+          },
+          READY: [
             {
-              // NOTE: this might be a good use case for File.parentProcessorId
-              cond: (context, { file }) =>
-                file.processorId === 'html',
-              actions: ['assignFile', 'sendToProcessor'],
+              cond: 'allFilesReady',
+              actions: 'resetFilesReady',
+              target: 'watch',
             },
             {
-              actions: 'assignFile',
+              actions: 'incrementFilesReady',
             },
           ],
         },
       },
-      processing: {
-        entry: 'sendAllToProcessor',
-        type: 'parallel',
-        onDone: 'emitting',
-        on: { FILE_READY: { actions: 'assignFile' } },
-        states: {
-          css: createInvokeStateNode({
-            id: 'css',
-            src: assetProcessor,
-          }),
-          images: createInvokeStateNode({
-            id: 'images',
-            src: assetProcessor,
-          }),
-          others: createInvokeStateNode({
-            id: 'assets',
-            src: assetProcessor,
-          }),
+      watch: {
+        on: {
+          CHANGE: {
+            actions: send(
+              // Send change to file
+              (context, { id }) => model.events.CHANGE(id),
+              { to: (context, { id }) => id },
+            ),
+            target: 'options',
+          },
         },
       },
-      emitting: {
-        invoke: {
-          src: 'emitFiles',
-          onDone: 'ready',
-          onError: 'error',
-        },
+      error: {
+        id: 'error',
+        type: 'final',
+        entry: 'handleError',
       },
-      error: { type: 'final' },
     },
   },
   {
-    actions: {
-      assignFile: assign({
-        files: ({ files }, event) => {
-          const { file } = narrowEvent(event, 'FILE_READY')
-          return { ...files, [file.id]: file }
-        },
-      }),
-      sendToProcessor: pure((context, event) => {
-        const { file } = narrowEvent(event, 'FILE_READY')
-        return send(event, { to: file.processorId })
-      }),
-      sendAllToProcessor: pure(({ files: f }) => {
-        const files = Object.values(f).filter(
-          (x): x is AssetFile =>
-            x.type === 'asset' && !isUndefined(x.processedAt),
-        )
+    guards: {
+      allFilesReady: ({ files, filesReady }) =>
+        files.length === filesReady + 1,
+      fileDoesNotExist: ({ files }, event) => {
+        const { file } = narrowEvent(event, [
+          'ADD_CSS',
+          'ADD_HTML',
+          'ADD_JSON',
+          'ADD_RAW',
+          'ADD_IMAGE',
+          'ADD_MANIFEST',
+        ])
 
-        return files.map((file) =>
-          send(model.events.FILE_START(file), {
-            to: file.processorId,
-          }),
-        )
+        return files.every(({ id }) => id === file.id)
+      },
+    },
+    actions: {
+      ...supervisorSpawnActions,
+      incrementFilesReady: assign({
+        filesReady: ({ filesReady }) => filesReady + 1,
       }),
+      resetFilesReady: assign({ filesReady: 0 }),
     },
   },
 )
