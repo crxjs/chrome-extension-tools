@@ -1,4 +1,4 @@
-import { stubIdForNoScriptChromeExtensions } from '$src/manifest-input/fileNames'
+import { stubId } from '$src/manifest-input/fileNames'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
@@ -11,9 +11,7 @@ const outputPromise = getRollupOutput(
 test('Handles extension with no scripts at all', async () => {
   const { output } = await outputPromise
 
-  const stubChunk = output.find(
-    byFileName(stubIdForNoScriptChromeExtensions),
-  )
+  const stubChunk = output.find(byFileName(stubId))
   expect(stubChunk).toBeUndefined()
 
   const manifestAsset = output.find(

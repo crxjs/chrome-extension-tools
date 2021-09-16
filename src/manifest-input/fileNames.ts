@@ -8,10 +8,10 @@ export const chunkMatchPattern = 'modules/*.js'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
 
-// We use a stub if the manifest has no scripts
-//   eg, a CSS only Chrome Extension
-export const stubIdForNoScriptChromeExtensions =
-  '__stubIdForNoScriptChromeExtensions'
+// We use a stub so Rollup won't complain
+//  b/c there are no initial inputs
+//   we emit everything in buildStart
+export const stubId = '__stubId'
 
 export const generateFileNames = (
   x:

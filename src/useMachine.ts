@@ -1,6 +1,7 @@
 import {
   EventObject,
   interpret,
+  Interpreter,
   InterpreterOptions,
   MachineOptions,
   State,
@@ -27,6 +28,20 @@ export interface UseMachineOptions<
   state?: StateConfig<TContext, TEvent>
 }
 
+export const useConfig = <TContext, TEvent extends EventObject>(
+  service: Interpreter<TContext, any, TEvent, any>,
+  options: Partial<MachineOptions<TContext, TEvent>> = {},
+): void => {
+  const { guards, actions, activities, services, delays } =
+    options
+
+  Object.assign(service.machine.options.actions, actions)
+  Object.assign(service.machine.options.guards, guards)
+  Object.assign(service.machine.options.activities, activities)
+  Object.assign(service.machine.options.services, services)
+  Object.assign(service.machine.options.delays, delays)
+}
+
 export function useMachine<
   TContext,
   TEvent extends EventObject,
@@ -41,7 +56,18 @@ export function useMachine<
   options: Partial<InterpreterOptions> &
     Partial<UseMachineOptions<TContext, TEvent>> &
     Partial<MachineOptions<TContext, TEvent>> = {},
-) {
+): {
+  send: Interpreter<TContext, any, TEvent, TTypestate>['send']
+  service: Interpreter<TContext, any, TEvent, TTypestate>
+  waitFor: (
+    matcher: (
+      state: State<TContext, TEvent, any, TTypestate>,
+    ) => boolean,
+    options?: {
+      multipleMatchers?: boolean | undefined
+    },
+  ) => Promise<State<TContext, TEvent, any, TTypestate>>
+} {
   const machine =
     typeof getMachine === 'function' ? getMachine() : getMachine
 
@@ -74,19 +100,7 @@ export function useMachine<
     deferEvents: true,
     ...interpreterOptions,
   })
-
-  const useConfig = (
-    options: Partial<MachineOptions<TContext, TEvent>> = {},
-  ): void => {
-    const { guards, actions, activities, services, delays } =
-      options
-
-    Object.assign(service.machine.options.actions, actions)
-    Object.assign(service.machine.options.guards, guards)
-    Object.assign(service.machine.options.activities, activities)
-    Object.assign(service.machine.options.services, services)
-    Object.assign(service.machine.options.delays, delays)
-  }
+  service.start()
 
   const matchSubs = new Set<Subscription>()
   const waitFor = (
@@ -121,5 +135,5 @@ export function useMachine<
       matchSubs.add(sub)
     })
 
-  return [useConfig, waitFor]
+  return { send: service.send, waitFor, service }
 }

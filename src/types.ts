@@ -1,16 +1,6 @@
-import { Plugin } from 'rollup'
-import { ViteDevServer } from 'vite'
+import { Plugin } from 'vite'
 import { CheerioFile } from './html-inputs/cheerio'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
-
-interface VitePlugin {
-  // configResolved: (
-  //   config: ResolvedConfig,
-  // ) => void | Promise<void>
-  configureServer: (
-    server: ViteDevServer,
-  ) => (() => void) | void | Promise<(() => void) | void>
-}
 
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
@@ -65,7 +55,7 @@ export interface ChromeExtensionOptions {
 
 export type ChromeExtensionPlugin = ManifestInputHooks &
   HtmlInputHooks &
-  VitePlugin
+  Plugin
 
 /* --------- MANIFEST INPUT PLUGIN OPTIONS --------- */
 
@@ -135,7 +125,7 @@ export interface HtmlInputsPluginCache {
 }
 
 type HtmlInputHooks = Pick<
-  Required<Plugin> & VitePlugin,
+  Required<Plugin> & Plugin,
   'name' | 'options' | 'buildStart' | 'watchChange'
 >
 export type HtmlInputsPlugin = HtmlInputHooks & {

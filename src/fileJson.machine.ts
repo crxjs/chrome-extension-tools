@@ -1,48 +1,81 @@
-import { createMachine } from 'xstate'
-import { loadJsonAsset } from './fileLoaders.services'
+import { readJSON } from 'fs-extra'
+import { from } from 'rxjs'
+import { createMachine, sendParent } from 'xstate'
 import { createAssetModel, JsonAsset } from './file.model'
+import { narrowEvent } from './helpers-xstate'
 
-const context: JsonAsset = {
-  id: 'id placeholder',
-  fileName: 'filename placeholder',
-  jsonData: {},
-  manifestPath: 'manifest jsonpath placeholder',
-  type: 'asset',
-}
+const context = {} as JsonAsset
 const model = createAssetModel(context)
-export const jsonFile = createMachine<typeof model>({
-  context: model.initialContext,
-  on: {
-    ERROR: { actions: 'forwardToParent', target: '#error' },
+export const jsonFile = createMachine<typeof model>(
+  {
+    context: model.initialContext,
+    on: {
+      ERROR: { actions: 'forwardToParent', target: '#error' },
+    },
+    initial: 'load',
+    states: {
+      load: {
+        invoke: { src: 'loadJsonAsset' },
+        on: {
+          READY: { actions: 'assignFile', target: 'transform' },
+        },
+      },
+      transform: {
+        invoke: { src: 'runTransformHooks' },
+        on: {
+          READY: { actions: 'assignFile', target: 'render' },
+        },
+      },
+      render: {
+        invoke: { src: 'runRenderHooks' },
+        on: {
+          READY: {
+            actions: 'forwardToParent',
+            target: 'complete',
+          },
+        },
+      },
+      complete: {
+        on: {
+          CHANGE: [
+            {
+              cond: ({ id }, { id: changedId }) =>
+                id === changedId,
+              target: 'load',
+            },
+            'render',
+          ],
+        },
+      },
+      error: {
+        id: 'error',
+        entry: 'forwardToParent',
+        type: 'final',
+      },
+    },
   },
-  initial: 'load',
-  states: {
-    load: {
-      invoke: { src: loadJsonAsset },
-      on: {
-        READY: { actions: 'assignFile', target: 'transform' },
+  {
+    actions: {
+      assignFile: (context, event) => {
+        const { file } = narrowEvent(event, 'READY')
+        return { ...context, ...file }
       },
+      forwardToParent: sendParent((context, event) => event),
     },
-    transform: {
-      invoke: { src: 'runTransformHooks' },
-      on: {
-        READY: { actions: 'assignFile', target: 'render' },
-      },
+    services: {
+      // TODO: support alternate file formats (use cosmiconfig?)
+      loadJsonAsset: ({ id, ...rest }) =>
+        from(
+          readJSON(id)
+            .then((jsonData) =>
+              model.events.READY({
+                id,
+                ...rest,
+                jsonData,
+              }),
+            )
+            .catch(model.events.ERROR),
+        ),
     },
-    render: {
-      invoke: { src: 'runRenderHooks' },
-      on: {
-        READY: { actions: 'assignFile', target: 'write' },
-      },
-    },
-    write: {
-      invoke: { src: 'emitFile' },
-      on: { READY: 'watch' },
-    },
-    watch: {
-      invoke: { src: 'watchFile' },
-      on: { START: 'write' },
-    },
-    error: { id: 'error', entry: 'logError', type: 'final' },
   },
-})
+)

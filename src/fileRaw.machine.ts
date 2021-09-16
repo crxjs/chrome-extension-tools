@@ -1,16 +1,10 @@
-import { createMachine } from 'xstate'
-import { fileActions } from './file.actions'
+import { readFile } from 'fs-extra'
+import { from } from 'rxjs'
+import { assign, createMachine, sendParent } from 'xstate'
 import { createAssetModel, RawAsset } from './file.model'
-import { rawFileAssigner } from './fileAssigners'
-import { loadRawAsset } from './fileLoaders.services'
+import { narrowEvent } from './helpers-xstate'
 
-const context: RawAsset = {
-  id: 'id placeholder',
-  fileName: 'filename placeholder',
-  source: new Uint8Array(),
-  manifestPath: 'manifest jsonpath placeholder',
-  type: 'asset',
-}
+const context = {} as RawAsset
 const model = createAssetModel(context)
 export const rawFile = createMachine<typeof model>(
   {
@@ -45,14 +39,34 @@ export const rawFile = createMachine<typeof model>(
         invoke: { src: 'watchFile' },
         on: { START: 'write' },
       },
-      error: { id: 'error', entry: 'logError', type: 'final' },
+      error: {
+        id: 'error',
+        entry: 'forwardToParent',
+        type: 'final',
+      },
     },
   },
   {
     actions: {
-      ...fileActions,
-      assignFile: model.assign(rawFileAssigner),
+      assignFile: assign((context, event) => {
+        const { file } = narrowEvent(event, 'READY')
+        return { ...context, ...file }
+      }),
+      forwardToParent: sendParent((context, event) => event),
     },
-    services: { loadRawAsset },
+    services: {
+      loadRawAsset: ({ id, ...rest }) =>
+        from(
+          readFile(id)
+            .then((source) =>
+              model.events.READY({
+                id,
+                ...rest,
+                source,
+              }),
+            )
+            .catch(model.events.ERROR),
+        ),
+    },
   },
 )

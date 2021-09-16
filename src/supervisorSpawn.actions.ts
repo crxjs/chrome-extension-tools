@@ -34,11 +34,11 @@ const stringAssetPluginsRunner =
     hookType,
     plugins,
   }: PluginsRunnerOptions<'css' | 'html'>) =>
-  (f: StringAsset) =>
+  (context: StringAsset) =>
     from(
       (async () => {
         try {
-          let file = f
+          let file = context
           for (const p of plugins) {
             const result = await p[hookType]?.[fileType]?.(
               file.source,
@@ -61,11 +61,11 @@ const rawAssetPluginRunner =
     hookType,
     plugins,
   }: PluginsRunnerOptions<'image' | 'raw'>) =>
-  (f: RawAsset) =>
+  (context: RawAsset) =>
     from(
       (async () => {
         try {
-          let file = f
+          let file = context
           for (const p of plugins) {
             const result = await p[hookType]?.[fileType]?.(
               file.source,
@@ -89,12 +89,12 @@ const manifestAssetPluginsRunner =
     hookType,
     plugins,
   }: PluginsRunnerOptions<'manifest'>) =>
-  (f: ManifestAsset) =>
+  (context: ManifestAsset) =>
     from(
       (async () => {
         try {
-          let { jsonData } = f
-          const { packageJson } = f
+          let { jsonData } = context
+          const { packageJson } = context
           for (const p of plugins) {
             jsonData =
               (await p[hookType]?.[fileType]?.(
@@ -103,7 +103,7 @@ const manifestAssetPluginsRunner =
               )) ?? jsonData
           }
 
-          return model.events.READY({ ...f, jsonData })
+          return model.events.READY({ ...context, jsonData })
         } catch (error) {
           return model.events.ERROR(error)
         }
@@ -115,11 +115,11 @@ const jsonAssetPluginsRunner =
     hookType,
     plugins,
   }: PluginsRunnerOptions<'json'>) =>
-  (f: JsonAsset) =>
+  (context: JsonAsset) =>
     from(
       (async () => {
         try {
-          let file = f
+          let file = context
           for (const p of plugins) {
             const result = await p[hookType]?.[fileType]?.(file)
 
@@ -139,7 +139,6 @@ export const supervisorSpawnActions: MachineOptions<
   SupervisorEvent
 >['actions'] = {
   spawnCssFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files, plugins }, { file }) => [
       ...files,
@@ -161,11 +160,11 @@ export const supervisorSpawnActions: MachineOptions<
           },
           file,
         ),
+        file.id,
       ),
     ],
   }),
   spawnHtmlFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files, plugins }, { file }) => [
       ...files,
@@ -187,11 +186,11 @@ export const supervisorSpawnActions: MachineOptions<
           },
           file,
         ),
+        file.id,
       ),
     ],
   }),
   spawnImageFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files, plugins }, { file }) => [
       ...files,
@@ -213,11 +212,11 @@ export const supervisorSpawnActions: MachineOptions<
           },
           file,
         ),
+        file.id,
       ),
     ],
   }),
   spawnJsonFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files, plugins }, { file }) => [
       ...files,
@@ -239,11 +238,11 @@ export const supervisorSpawnActions: MachineOptions<
           },
           file,
         ),
+        file.id,
       ),
     ],
   }),
   spawnManifestFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files, plugins }, { file }) => [
       ...files,
@@ -265,11 +264,11 @@ export const supervisorSpawnActions: MachineOptions<
           },
           file,
         ),
+        'manifest.json',
       ),
     ],
   }),
   spawnRawFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files, plugins }, { file }) => [
       ...files,
@@ -291,15 +290,15 @@ export const supervisorSpawnActions: MachineOptions<
           },
           file,
         ),
+        file.id,
       ),
     ],
   }),
   spawnScriptFile: assign({
-    // The file events are the same, that's what matters here
     // @ts-expect-error It's close enough 😜
     files: ({ files }, { file }) => [
       ...files,
-      spawn(scriptFile.withConfig(file)),
+      spawn(scriptFile.withConfig(file), file.id),
     ],
   }),
 }
