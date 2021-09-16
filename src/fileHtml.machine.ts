@@ -1,16 +1,10 @@
-import { createMachine } from 'xstate'
-import { fileActions } from './file.actions'
+import { readFile } from 'fs-extra'
+import { from } from 'rxjs'
+import { assign, createMachine, sendParent } from 'xstate'
 import { createAssetModel, StringAsset } from './file.model'
-import { stringFileAssigner } from './fileAssigners'
-import { loadStringAsset } from './fileLoaders.services'
+import { narrowEvent } from './helpers-xstate'
 
-const context: StringAsset = {
-  id: 'id placeholder',
-  fileName: 'filename placeholder',
-  source: 'source placeholder',
-  manifestPath: 'manifest jsonpath placeholder',
-  type: 'asset',
-}
+const context = {} as StringAsset
 const model = createAssetModel(context)
 export const htmlFile = createMachine<typeof model>(
   {
@@ -46,25 +40,52 @@ export const htmlFile = createMachine<typeof model>(
       render: {
         invoke: { src: 'runRenderHooks' },
         on: {
-          READY: { actions: 'assignFile', target: 'write' },
+          READY: {
+            actions: 'forwardToParent',
+            target: 'complete',
+          },
         },
       },
-      write: {
-        invoke: { src: 'emitFile' },
-        on: { READY: 'watch' },
+      complete: {
+        on: {
+          CHANGE: [
+            {
+              cond: ({ id }, { id: changedId }) =>
+                id === changedId,
+              target: 'load',
+            },
+            'render',
+          ],
+        },
       },
-      watch: {
-        invoke: { src: 'watchFile' },
-        on: { START: 'write' },
+      error: {
+        id: 'error',
+        entry: 'forwardToParent',
+        type: 'final',
       },
-      error: { id: 'error', entry: 'logError', type: 'final' },
     },
   },
   {
     actions: {
-      ...fileActions,
-      assignFile: model.assign(stringFileAssigner),
+      assignFile: assign((context, event) => {
+        const { file } = narrowEvent(event, 'READY')
+        return { ...context, ...file }
+      }),
+      forwardToParent: sendParent((context, event) => event),
     },
-    services: { loadStringAsset },
+    services: {
+      loadStringAsset: ({ id, ...rest }) =>
+        from(
+          readFile(id, 'utf8')
+            .then((source) =>
+              model.events.READY({
+                id,
+                ...rest,
+                source,
+              }),
+            )
+            .catch(model.events.ERROR),
+        ),
+    },
   },
 )

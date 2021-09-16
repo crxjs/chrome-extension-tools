@@ -18,7 +18,7 @@ import {
   chunkFileNames,
   entryFileNames,
   generateFileNames,
-  stubIdForNoScriptChromeExtensions,
+  stubId,
 } from './fileNames'
 import { getInputManifestPath } from './getInputManifestPath'
 import { parseManifest } from './parseManifest'
@@ -209,8 +209,7 @@ export function manifestInput(
 
       // Use a stub if no js scripts
       if (Object.keys(finalInput).length === 0) {
-        finalInput[stubIdForNoScriptChromeExtensions] =
-          stubIdForNoScriptChromeExtensions
+        finalInput[stubId] = stubId
       }
 
       return { ...options, input: finalInput }
@@ -325,15 +324,13 @@ export function manifestInput(
     },
 
     async resolveId(source) {
-      return source === stubIdForNoScriptChromeExtensions
-        ? source
-        : null
+      return source === stubId ? source : null
     },
 
     load(id) {
-      if (id === stubIdForNoScriptChromeExtensions) {
+      if (id === stubId) {
         return {
-          code: `console.log(${stubIdForNoScriptChromeExtensions})`,
+          code: `console.log(${stubId})`,
         }
       }
 
@@ -407,7 +404,7 @@ export function manifestInput(
 
     async generateBundle(options, bundle) {
       // Clean up stub
-      delete bundle[stubIdForNoScriptChromeExtensions + '.js']
+      delete bundle[stubId + '.js']
 
       // The bundle has to have something in it
       if (Object.keys(bundle).length === 0) {

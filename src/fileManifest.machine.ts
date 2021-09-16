@@ -1,25 +1,26 @@
-import { PackageJson } from 'type-fest'
-import { createMachine } from 'xstate'
-import { fileActions } from './file.actions'
-import {
-  createAssetModel,
-  Manifest,
-  ManifestAsset,
-} from './file.model'
-import { manifestFileAssigner } from './fileAssigners'
-import {
-  loadManifest,
-  loadPackageJson,
-} from './fileLoaders.services'
+import { cosmiconfig } from 'cosmiconfig'
+import { dirname } from 'path'
+import readPkgUp from 'read-pkg-up'
+import { from } from 'rxjs'
+import { assign, createMachine, sendParent } from 'xstate'
+import { createAssetModel, ManifestAsset } from './file.model'
+import { isUndefined } from './helpers'
+import { narrowEvent } from './helpers-xstate'
+import { supervisorModel } from './supervisor.model'
 
-const context: ManifestAsset = {
-  id: 'id placeholder',
-  fileName: 'filename placeholder',
-  jsonData: {} as Manifest,
-  packageJson: {} as PackageJson,
-  manifestPath: '$',
-  type: 'asset',
-}
+export const explorer = cosmiconfig('manifest', {
+  cache: false,
+  loaders: {
+    '.ts': (filePath: string) => {
+      require('esbuild-runner/register')
+      const result = require(filePath)
+
+      return result.default ?? result
+    },
+  },
+})
+
+const context = {} as ManifestAsset
 const model = createAssetModel(context)
 export const manifestFile = createMachine<typeof model>(
   {
@@ -37,17 +38,22 @@ export const manifestFile = createMachine<typeof model>(
             invoke: { src: 'loadManifest' },
             on: {
               READY: {
-                actions: 'assignManifest',
+                actions: [
+                  'assignFile',
+                  sendParent(({ root }) =>
+                    supervisorModel.events.ROOT(root),
+                  ),
+                ],
                 target: '.done',
               },
             },
             states: { done: { type: 'final' } },
           },
           package: {
-            invoke: { src: loadPackageJson },
+            invoke: { src: 'loadPackageJson' },
             on: {
               READY: {
-                actions: 'assignPackageJson',
+                actions: 'assignFile',
                 target: '.done',
               },
             },
@@ -87,14 +93,61 @@ export const manifestFile = createMachine<typeof model>(
         invoke: { src: 'watchFile' },
         on: { START: 'write' },
       },
-      error: { id: 'error', entry: 'logError', type: 'final' },
+      error: {
+        id: 'error',
+        entry: 'forwardToParent',
+        type: 'final',
+      },
     },
   },
   {
     actions: {
-      ...fileActions,
-      assignFile: model.assign(manifestFileAssigner),
+      assignFile: assign((context, event) => {
+        const { file } = narrowEvent(event, 'READY')
+        return { ...context, ...file }
+      }),
+      forwardToParent: sendParent((context, event) => event),
     },
-    services: { loadManifest },
+    services: {
+      loadManifest: ({ root, id }) => {
+        const loader = id
+          ? explorer.load(id)
+          : explorer.search(root)
+
+        return from(
+          loader
+            .then((result) => {
+              if (result === null)
+                throw new Error(
+                  `Could not load manifest at location: ${id}`,
+                )
+              if (result.isEmpty)
+                throw new Error(
+                  `Manifest is empty at location: ${id}`,
+                )
+
+              return model.events.READY({
+                fileName: 'manifest.json',
+                root: dirname(result.filepath),
+                jsonData: result.config,
+              })
+            })
+            .catch(model.events.ERROR),
+        )
+      },
+      loadPackageJson: () =>
+        from(
+          readPkgUp()
+            .then((result) => {
+              if (isUndefined(result))
+                throw new Error('Could not load package.json')
+
+              return model.events.READY({
+                packageJson: result.packageJson,
+              })
+            })
+            .catch(model.events.ERROR),
+        ),
+    },
   },
 )

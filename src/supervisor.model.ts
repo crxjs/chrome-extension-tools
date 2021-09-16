@@ -1,3 +1,4 @@
+import { Plugin } from 'rollup'
 import { PackageJson, Promisable } from 'type-fest'
 import { ActorRefFrom, EventFrom, StateMachine } from 'xstate'
 import { createModel } from 'xstate/lib/model'
@@ -7,7 +8,7 @@ import {
   FileEvent,
   JsonAsset,
   Manifest,
-  ManifestAsset,
+  parsingEventCreators,
   RawAsset,
   Script,
   StringAsset,
@@ -17,14 +18,23 @@ export interface SupervisorContext {
   files: ActorRefFrom<StateMachine<File, any, FileEvent>>[]
   filesReady: number
   root: string
-  input: string[]
+  entries: (
+    | {
+        type: 'ADD_SCRIPT'
+        file: Partial<Script>
+      }
+    | {
+        type: `ADD_${string}`
+        file: Partial<Asset>
+      }
+  )[]
   plugins: Set<RPCEPlugin>
 }
 const supervisorContext: SupervisorContext = {
   files: [],
   filesReady: 0,
   root: process.cwd(),
-  input: [],
+  entries: [],
   plugins: new Set(),
 }
 export type SupervisorEvent = EventFrom<typeof supervisorModel>
@@ -33,24 +43,16 @@ export const supervisorModel = createModel(supervisorContext, {
     // public events
     PLUGIN: (plugin: RPCEPlugin) => ({ plugin }),
     ROOT: (root: string) => ({ root }),
-    INPUT: (input: string[]) => ({ input }),
-    // file events
-    CHANGE: (id: string) => ({ id }),
-    ERROR: (error: Error) => ({ error }),
     START: () => ({}),
-    READY: (file: Asset) => ({ file }),
-    // parsing events
-    ADD_CSS: (file: Omit<StringAsset, 'source'>) => ({ file }),
-    ADD_HTML: (file: Omit<StringAsset, 'source'>) => ({ file }),
-    ADD_IMAGE: (file: Omit<RawAsset, 'source'>) => ({ file }),
-    ADD_JSON: (file: Omit<JsonAsset, 'jsonData'>) => ({ file }),
-    ADD_MANIFEST: (
-      file: Omit<ManifestAsset, 'jsonData' | 'packageJson'>,
-    ) => ({
-      file,
+    READY: (file: File) => ({ file }),
+    CHANGE: (id: string, change: { event: string }) => ({
+      id,
+      ...change,
     }),
-    ADD_RAW: (file: Omit<RawAsset, 'source'>) => ({ file }),
-    ADD_SCRIPT: (file: Script) => ({ file }),
+    // file events
+    ERROR: (error: Error) => ({ error }),
+    // parsing events
+    ...parsingEventCreators,
   },
 })
 

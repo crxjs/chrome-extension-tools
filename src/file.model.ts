@@ -3,7 +3,6 @@ import { EmittedAsset, EmittedChunk } from 'rollup'
 import { JsonObject, PackageJson } from 'type-fest'
 import { EventFrom } from 'xstate'
 import { createModel } from 'xstate/lib/model'
-import { isString } from './helpers'
 
 export type FileType =
   | 'css'
@@ -24,37 +23,22 @@ export interface Script extends EmittedChunk {
 export interface BaseAsset extends EmittedAsset {
   id: string
   fileName: string
-  manifestPath: string
+  origin: string
   name?: never
 }
-
 export interface StringAsset extends BaseAsset {
   source: string
 }
-export function isStringAsset(x: Asset): x is StringAsset {
-  return isString(x.source)
-}
-
 export interface RawAsset extends BaseAsset {
   source: Uint8Array
 }
-export function isRawAsset(x: Asset): x is RawAsset {
-  return x.source instanceof Uint8Array
-}
-
 export interface JsonAsset extends BaseAsset {
   jsonData: JsonObject
 }
-export function isJsonAsset(x: Asset): x is JsonAsset {
-  return 'jsonData' in x && !('packageJson' in x)
-}
-
 export interface ManifestAsset extends JsonAsset {
   jsonData: Manifest
   packageJson: PackageJson
-}
-export function isManifestAsset(x: Asset): x is ManifestAsset {
-  return 'jsonData' in x && 'packageJson' in x
+  root: string
 }
 
 export type Asset =
@@ -76,6 +60,30 @@ export const fileModel = createModel({} as File, {
   },
 })
 
+export const parsingEventCreators = {
+  ADD_MANIFEST: (file: Partial<ManifestAsset>) => ({
+    file: { ...file, type: 'asset' as const },
+  }),
+  ADD_CSS: (file: Partial<StringAsset>) => ({
+    file: { ...file, type: 'asset' as const },
+  }),
+  ADD_HTML: (file: Partial<StringAsset>) => ({
+    file: { ...file, type: 'asset' as const },
+  }),
+  ADD_IMAGE: (file: Partial<RawAsset>) => ({
+    file: { ...file, type: 'asset' as const },
+  }),
+  ADD_JSON: (file: Partial<JsonAsset>) => ({
+    file: { ...file, type: 'asset' as const },
+  }),
+  ADD_RAW: (file: Partial<RawAsset>) => ({
+    file: { ...file, type: 'asset' as const },
+  }),
+  ADD_SCRIPT: (file: Partial<Script>) => ({
+    file: { ...file, type: 'chunk' as const },
+  }),
+}
+
 export const createAssetModel = <TContext extends BaseAsset>(
   context: TContext,
 ) =>
@@ -84,14 +92,10 @@ export const createAssetModel = <TContext extends BaseAsset>(
       // public events
       ERROR: (error: Error) => ({ error }),
       START: () => ({}),
-      READY: (file: Asset) => ({ file }),
+      READY: (file: Partial<TContext>) => ({ file }),
+      CHANGE: (id: string) => ({ id }),
       // parsing events
-      ADD_CSS: (file: StringAsset) => ({ file }),
-      ADD_HTML: (file: StringAsset) => ({ file }),
-      ADD_IMAGE: (file: RawAsset) => ({ file }),
-      ADD_JSON: (file: JsonAsset) => ({ file }),
-      ADD_RAW: (file: RawAsset) => ({ file }),
-      ADD_SCRIPT: (file: Script) => ({ file }),
+      ...parsingEventCreators,
     },
   })
 
