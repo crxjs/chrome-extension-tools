@@ -1,8 +1,8 @@
 import { assign, createMachine } from 'xstate'
-import { send } from 'xstate/lib/actions'
+import { send, pure } from 'xstate/lib/actions'
 import { narrowEvent } from './helpers-xstate'
-import { supervisorSpawnActions } from './supervisorSpawn.actions'
 import { supervisorModel as model } from './supervisor.model'
+import { supervisorSpawnActions } from './supervisorSpawn.actions'
 
 export const supervisorMachine = createMachine<typeof model>(
   {
@@ -12,17 +12,9 @@ export const supervisorMachine = createMachine<typeof model>(
     initial: 'options',
     states: {
       options: {
+        entry: 'clearEntryFiles',
         on: {
-          ROOT: {
-            actions: model.assign({
-              root: (context, { root }) => root,
-            }),
-          },
-          INPUT: {
-            actions: model.assign({
-              input: (context, { input }) => input,
-            }),
-          },
+          ROOT: { actions: 'assignRoot' },
           PLUGIN: {
             actions: model.assign({
               plugins: ({ plugins }, { plugin }) => {
@@ -31,11 +23,14 @@ export const supervisorMachine = createMachine<typeof model>(
               },
             }),
           },
+          ADD_MANIFEST: { actions: 'assignEntryFile' },
+          ADD_HTML: { actions: 'assignEntryFile' },
+          ADD_SCRIPT: { actions: 'assignEntryFile' },
           START: 'start',
         },
       },
       start: {
-        entry: 'parseInput',
+        entry: 'sendEntryFiles',
         on: {
           ADD_MANIFEST: {
             cond: 'fileDoesNotExist',
@@ -68,21 +63,32 @@ export const supervisorMachine = createMachine<typeof model>(
           READY: [
             {
               cond: 'allFilesReady',
-              actions: 'resetFilesReady',
+              actions: [
+                'resetFilesReady',
+                'emitFile',
+                'watchFile',
+              ],
               target: 'watch',
             },
             {
-              actions: 'incrementFilesReady',
+              actions: [
+                'incrementFilesReady',
+                'emitFile',
+                'watchFile',
+              ],
             },
           ],
+          ROOT: { actions: 'assignRoot' },
         },
       },
       watch: {
         on: {
           CHANGE: {
+            // TODO: restart the child actor
             actions: send(
               // Send change to file
-              (context, { id }) => model.events.CHANGE(id),
+              (context, { id, ...change }) =>
+                model.events.CHANGE(id, change),
               { to: (context, { id }) => id },
             ),
             target: 'options',
@@ -115,6 +121,26 @@ export const supervisorMachine = createMachine<typeof model>(
     },
     actions: {
       ...supervisorSpawnActions,
+      assignRoot: assign({
+        root: (context, event) => {
+          const { root } = narrowEvent(event, 'ROOT')
+          return root
+        },
+      }),
+      assignEntryFile: assign({
+        entries: ({ entries }, event) => {
+          const entry = narrowEvent(event, [
+            'ADD_MANIFEST',
+            'ADD_HTML',
+            'ADD_SCRIPT',
+          ])
+
+          return [...entries, entry]
+        },
+      }),
+      sendEntryFiles: pure(({ entries }) =>
+        entries.map((entry) => send(entry)),
+      ),
       incrementFilesReady: assign({
         filesReady: ({ filesReady }) => filesReady + 1,
       }),

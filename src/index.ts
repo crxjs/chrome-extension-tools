@@ -1,14 +1,16 @@
-import { readJSONSync } from 'fs-extra'
-import { join } from 'path'
-import { InputOptions } from 'rollup'
-import { browserPolyfill as b } from './plugin-browserPolyfill'
-import htmlInputs from './html-inputs'
-import manifestInput from './manifest-input'
+import { createFilter } from '@rollup/pluginutils'
+import { basename } from 'path'
+import { RollupOptions } from 'rollup'
+import { Plugin } from 'vite'
+import { isString } from './helpers'
+import { narrowEvent } from './helpers-xstate'
+import { stubId } from './manifest-input/fileNames'
+import { supervisorMachine } from './supervisor.machine'
 import {
-  ChromeExtensionOptions,
-  ChromeExtensionPlugin,
-} from './types'
-import { fixInvalidFileNames as v } from './plugin-fixInvalidFileNames'
+  RPCEPlugin,
+  supervisorModel as model,
+} from './supervisor.model'
+import { useConfig, useMachine } from './useMachine'
 import {
   sendConfigureServer,
   shimPluginContext,
@@ -17,55 +19,45 @@ import {
 export type { ManifestV2, ManifestV3 } from './manifest-types'
 export { simpleReloader } from './plugin-reloader-simple'
 
-export const chromeExtension = (
-  options = {} as ChromeExtensionOptions,
-): ChromeExtensionPlugin => {
-  /* --------------- LOAD PACKAGE.JSON --------------- */
+export const chromeExtension = (): Plugin => {
+  const isHtml = createFilter(['**/*.html'])
+  // const isScript = createFilter(
+  //   ['**/*.js', '**/*.ts', '**/*.tsx', '**/*.jsx'],
+  //   ['**/manifest*'],
+  // )
+  // const isCss = createFilter(['**/*.css'])
+  // const isImage = createFilter([
+  //   '**/*.png',
+  //   '**/*.jpg',
+  //   '**/*.jpeg',
+  // ])
+  // const isJson = createFilter(['**/*.json'], ['**/manifest*'])
 
-  try {
-    const packageJsonPath = join(process.cwd(), 'package.json')
-    options.pkg = options.pkg || readJSONSync(packageJsonPath)
-  } catch (error) {}
+  const {
+    send,
+    service: supervisor,
+    waitFor,
+  } = useMachine(supervisorMachine)
 
-  /* ----------------- SETUP PLUGINS ----------------- */
-
-  const manifest = manifestInput(options)
-  const html = htmlInputs(manifest)
-  const validate = v()
-  const browser = b(manifest)
-  // const mixedFormat = m(manifest)
-
-  /* ----------------- RETURN PLUGIN ----------------- */
+  supervisor.subscribe({
+    next: (state) => {
+      console.log('🚀 ~ supervisor ~ state', state.value)
+      console.log('🚀 ~ supervisor ~ state', state)
+    },
+    error: (error) => {
+      console.error(error)
+    },
+    complete: () => {
+      console.log('supervisor complete')
+    },
+  })
 
   return {
     name: 'chrome-extension',
 
-    options(options) {
-      try {
-        return [manifest, html].reduce((opts, plugin) => {
-          const result = plugin.options.call(
-            this,
-            opts,
-          ) as InputOptions
-
-          return result || options
-        }, options)
-      } catch (error) {
-        const manifestError =
-          'The manifest must have at least one script or HTML file.'
-        const htmlError =
-          'At least one HTML file must have at least one script.'
-
-        if (
-          error.message === manifestError ||
-          error.message === htmlError
-        ) {
-          throw new Error(
-            'A Chrome extension must have at least one script or HTML file.',
-          )
-        } else {
-          throw error
-        }
+    config(config) {
+      if (isString(config.root)) {
+        send(model.events.ROOT(config.root))
       }
     },
 
@@ -73,45 +65,107 @@ export const chromeExtension = (
       sendConfigureServer(server)
     },
 
-    async buildStart(options) {
-      const context = shimPluginContext(this, 'buildStart')
+    options({ plugins = [], input = [], ...options }) {
+      // TODO: add builtin plugins
+      const builtins: (false | RPCEPlugin | null | undefined)[] =
+        []
 
-      await Promise.all([
-        manifest.buildStart.call(context, options),
-        html.buildStart.call(context, options),
-      ])
+      builtins.concat(plugins).forEach((p) => {
+        if (p && p.name !== 'chrome-extension')
+          send(model.events.PLUGIN(p))
+      })
+
+      let finalInput: RollupOptions['input'] = [stubId]
+      if (isString(input)) {
+        send(
+          model.events.ADD_MANIFEST({
+            id: input,
+            origin: 'input',
+          }),
+        )
+      } else if (Array.isArray(input)) {
+        const result = input.filter((id) => {
+          if (isHtml(id))
+            send(model.events.ADD_HTML({ id, origin: 'input' }))
+          else if (basename(id).startsWith('manifest'))
+            send(
+              model.events.ADD_MANIFEST({
+                id,
+                origin: 'input',
+              }),
+            )
+          else return true
+
+          return false
+        })
+
+        if (result.length) finalInput = result
+      } else {
+        const result = Object.entries(input).filter(
+          ([fileName, id]) => {
+            if (isHtml(id))
+              send(
+                model.events.ADD_HTML({
+                  id,
+                  fileName,
+                  origin: 'input',
+                }),
+              )
+            else if (fileName === 'manifest')
+              send(
+                model.events.ADD_MANIFEST({
+                  id,
+                  origin: 'input',
+                }),
+              )
+            else return true
+
+            return false
+          },
+        )
+
+        if (result.length)
+          finalInput = Object.fromEntries(result)
+      }
+
+      return {
+        input: finalInput,
+        plugins,
+        ...options,
+      }
     },
 
-    async resolveId(source, importer, options) {
-      const context = shimPluginContext(this, 'resolveId')
+    async buildStart() {
+      const shim = shimPluginContext(this, 'buildStart')
+      useConfig(supervisor, {
+        actions: {
+          handleError: (context, event) => {
+            const { error } = narrowEvent(event, 'ERROR')
+            shim.error(error)
+          },
+          emitFile: (context, event) => {
+            const { file } = narrowEvent(event, 'READY')
+            shim.emitFile(file)
+          },
+        },
+      })
 
-      return manifest.resolveId.call(
-        context,
-        source,
-        importer,
-        options,
-      )
+      send(model.events.START())
+      await waitFor((state) => state.matches('watch'))
     },
 
-    async load(id) {
-      const context = shimPluginContext(this, 'load')
+    resolveId(id) {
+      if (id === stubId) return id
+      return null
+    },
 
-      return manifest.load.call(context, id)
+    load(id) {
+      if (id === stubId) return `console.log('${stubId}')`
+      return null
     },
 
     watchChange(id, change) {
-      manifest.watchChange.call(this, id, change)
-      html.watchChange.call(this, id, change)
-    },
-
-    outputOptions(options) {
-      return manifest.outputOptions.call(this, options)
-    },
-
-    async generateBundle(...args) {
-      await manifest.generateBundle.call(this, ...args)
-      await validate.generateBundle.call(this, ...args)
-      await browser.generateBundle.call(this, ...args)
+      send(model.events.CHANGE(id, change))
     },
   }
 }
