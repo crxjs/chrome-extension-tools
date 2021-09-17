@@ -28,6 +28,7 @@
       "$src/*": ["src/*"],
       "$test": ["test/index.ts"],
       "$test/*": ["test/*"]
-    }
+    },
+    "noErrorTruncation": true
   }
 }

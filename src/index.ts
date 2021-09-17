@@ -3,21 +3,25 @@ import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { isString } from './helpers'
-import { narrowEvent } from './xstate-helpers'
-import { stubId } from './manifest-input/fileNames'
-import { supervisorMachine } from './supervisor.machine'
-import {
-  RPCEPlugin,
-  supervisorModel as model,
-} from './supervisor.model'
-import { useConfig, useMachine } from './useMachine'
+import { machine, model } from './supervisor.machine'
+import { Asset, RPCEPlugin } from './types'
 import {
   sendConfigureServer,
   shimPluginContext,
 } from './viteAdaptor/viteAdaptor'
+import {
+  narrowEvent,
+  useConfig,
+  useMachine,
+} from './xstate-helpers'
+import { PluginsStartOptions } from './xstate-models'
 
-export type { ManifestV2, ManifestV3 } from './manifest-types'
-export { simpleReloader } from './plugin-reloader-simple'
+const stubId = '_stubIdForRPCE'
+
+function runPlugins(
+  plugins: RPCEPlugin[],
+  options: PluginsStartOptions,
+): Asset {}
 
 export const chromeExtension = (): Plugin => {
   const isHtml = createFilter(['**/*.html'])
@@ -37,7 +41,7 @@ export const chromeExtension = (): Plugin => {
     send,
     service: supervisor,
     waitFor,
-  } = useMachine(supervisorMachine)
+  } = useMachine(machine)
 
   supervisor.subscribe({
     next: (state) => {
@@ -70,28 +74,31 @@ export const chromeExtension = (): Plugin => {
       const builtins: (false | RPCEPlugin | null | undefined)[] =
         []
 
-      builtins.concat(plugins).forEach((p) => {
-        if (p && p.name !== 'chrome-extension')
-          send(model.events.PLUGIN(p))
-      })
-
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
         send(
-          model.events.ADD_MANIFEST({
+          model.events.ADD_FILE({
             id: input,
             origin: 'input',
+            fileType: 'MANIFEST',
           }),
         )
       } else if (Array.isArray(input)) {
         const result = input.filter((id) => {
           if (isHtml(id))
-            send(model.events.ADD_HTML({ id, origin: 'input' }))
-          else if (basename(id).startsWith('manifest'))
             send(
-              model.events.ADD_MANIFEST({
+              model.events.ADD_FILE({
                 id,
                 origin: 'input',
+                fileType: 'HTML',
+              }),
+            )
+          else if (basename(id).startsWith('manifest'))
+            send(
+              model.events.ADD_FILE({
+                id,
+                origin: 'input',
+                fileType: 'MANIFEST',
               }),
             )
           else return true
@@ -105,17 +112,19 @@ export const chromeExtension = (): Plugin => {
           ([fileName, id]) => {
             if (isHtml(id))
               send(
-                model.events.ADD_HTML({
+                model.events.ADD_FILE({
                   id,
                   fileName,
                   origin: 'input',
+                  fileType: 'HTML',
                 }),
               )
             else if (fileName === 'manifest')
               send(
-                model.events.ADD_MANIFEST({
+                model.events.ADD_FILE({
                   id,
                   origin: 'input',
+                  fileType: 'MANIFEST',
                 }),
               )
             else return true
@@ -130,12 +139,12 @@ export const chromeExtension = (): Plugin => {
 
       return {
         input: finalInput,
-        plugins,
+        plugins: plugins.concat(builtins),
         ...options,
       }
     },
 
-    async buildStart() {
+    async buildStart({ plugins }) {
       const shim = shimPluginContext(this, 'buildStart')
       useConfig(supervisor, {
         actions: {
@@ -143,9 +152,26 @@ export const chromeExtension = (): Plugin => {
             const { error } = narrowEvent(event, 'ERROR')
             shim.error(error)
           },
-          emitFile: (context, event) => {
-            const { file } = narrowEvent(event, 'READY')
+          handleFile: (context, event) => {
+            const { file } = narrowEvent(event, 'FILE_DONE')
             shim.emitFile(file)
+            shim.addWatchFile(file.id)
+          },
+        },
+        services: {
+          pluginsRunner: () => (send, onReceived) => {
+            onReceived(async (event) => {
+              try {
+                const { type, ...options } = narrowEvent(
+                  event,
+                  'PLUGINS_START',
+                )
+                const result = await runPlugins(plugins, options)
+                send(model.events.PLUGINS_RESULT(result))
+              } catch (error) {
+                send(model.events.ERROR(error))
+              }
+            })
           },
         },
       })

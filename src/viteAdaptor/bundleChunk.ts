@@ -1,4 +1,4 @@
-import { isString } from '$src/helpers'
+import { isString } from '../helpers'
 import fs from 'fs'
 import { isUndefined } from 'lodash'
 import path from 'path'
