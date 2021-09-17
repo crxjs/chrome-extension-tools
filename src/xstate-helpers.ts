@@ -1,5 +1,6 @@
 import {
   EventObject,
+  ExtractEvent,
   interpret,
   Interpreter,
   InterpreterOptions,
@@ -11,7 +12,35 @@ import {
   Typestate,
 } from 'xstate'
 
-export type MaybeLazy<T> = T | (() => T)
+export function narrowEvent<
+  TEvent extends EventObject,
+  TEventType extends TEvent['type'],
+>(
+  event: TEvent,
+  type: TEventType,
+): ExtractEvent<TEvent, TEventType>
+export function narrowEvent<
+  TEvent extends EventObject,
+  TEventType extends TEvent['type'],
+>(
+  event: TEvent,
+  type: TEventType[],
+): ExtractEvent<TEvent, TEventType>
+export function narrowEvent<TEvent extends EventObject>(
+  event: TEvent,
+  types: string | string[],
+): EventObject {
+  types = Array.isArray(types) ? types : [types]
+  if (!types.includes(event.type)) {
+    throw new Error(
+      `Expected event${
+        types.length > 1 ? 's' : ''
+      } "${types.join(', ')}" but got "${event.type}".`,
+    )
+  }
+
+  return event
+}
 
 export interface UseMachineOptions<
   TContext,
@@ -50,9 +79,7 @@ export function useMachine<
     context: TContext
   },
 >(
-  getMachine: MaybeLazy<
-    StateMachine<TContext, any, TEvent, TTypestate>
-  >,
+  machine: StateMachine<TContext, any, TEvent, TTypestate>,
   options: Partial<InterpreterOptions> &
     Partial<UseMachineOptions<TContext, TEvent>> &
     Partial<MachineOptions<TContext, TEvent>> = {},
@@ -68,9 +95,6 @@ export function useMachine<
     },
   ) => Promise<State<TContext, TEvent, any, TTypestate>>
 } {
-  const machine =
-    typeof getMachine === 'function' ? getMachine() : getMachine
-
   const {
     context,
     guards,
