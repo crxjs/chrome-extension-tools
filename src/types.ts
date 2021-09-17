@@ -1,8 +1,109 @@
-import { Plugin } from 'vite'
-import { CheerioFile } from './html-inputs/cheerio'
-import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
+import { EmittedAsset } from 'rollup'
+import { JsonObject, PackageJson, Promisable } from 'type-fest'
+import { isPresent, Unpacked } from './helpers'
 
-/* -------------- MAIN PLUGIN OPTIONS -------------- */
+type Nullable<TType> = TType | null | undefined
+type Manifest = chrome.runtime.Manifest
+
+export type ManifestV2 = Omit<
+  chrome.runtime.ManifestV2,
+  'name' | 'description' | 'version'
+> &
+  Partial<
+    Pick<
+      chrome.runtime.ManifestV2,
+      'name' | 'description' | 'version'
+    >
+  >
+
+export type ManifestV3 = Omit<
+  chrome.runtime.ManifestV3,
+  'name' | 'description' | 'version'
+> &
+  Partial<
+    Pick<
+      chrome.runtime.ManifestV3,
+      'name' | 'description' | 'version'
+    >
+  >
+
+export type ContentScript = Unpacked<
+  chrome.runtime.Manifest['content_scripts']
+>
+
+export type WebAccessibleResource = Unpacked<
+  chrome.runtime.ManifestV3['web_accessible_resources']
+>
+
+export type DeclarativeNetRequestResource = {
+  id: string
+  enabled: boolean
+  path: string
+}
+
+export function isMV2(
+  m?: chrome.runtime.ManifestBase,
+): m is chrome.runtime.ManifestV2 {
+  if (!isPresent(m)) throw new TypeError('manifest is undefined')
+  return m.manifest_version === 2
+}
+
+export function isMV3(
+  m?: chrome.runtime.ManifestBase,
+): m is chrome.runtime.ManifestV3 {
+  if (!isPresent(m)) throw new TypeError('manifest is undefined')
+  return m.manifest_version === 3
+}
+
+interface BaseAsset extends EmittedAsset {
+  id: string
+  fileName: string
+  name?: never
+}
+
+export interface StringAsset extends BaseAsset {
+  source?: string
+  origin?: string
+}
+
+export interface RawAsset extends BaseAsset {
+  source?: Uint8Array
+  origin?: string
+}
+
+export interface JsonAsset extends BaseAsset {
+  json?: JsonObject
+}
+
+interface RPCEHooks {
+  manifest?: (
+    source: Manifest,
+    packageJson: PackageJson,
+  ) => Promisable<Nullable<Manifest>>
+  html?: (
+    source: string,
+    file: StringAsset,
+  ) => Promisable<Nullable<StringAsset | string>>
+  css?: (
+    source: string,
+    file: StringAsset,
+  ) => Promisable<Nullable<StringAsset | string>>
+  image?: (
+    source: Uint8Array,
+    file: RawAsset,
+  ) => Promisable<Nullable<RawAsset | Uint8Array>>
+  json?: (file: JsonAsset) => Promisable<Nullable<JsonAsset>>
+  raw?: (
+    source: Uint8Array,
+    file: RawAsset,
+  ) => Promisable<Nullable<RawAsset | Uint8Array>>
+}
+
+export interface RPCEPlugin extends Plugin {
+  name: string
+  crxTransform?: RPCEHooks
+  crxRender?: RPCEHooks
+}
 
 export interface ChromeExtensionOptions {
   /**
@@ -16,118 +117,16 @@ export interface ChromeExtensionOptions {
     | {
         executeScript: boolean
       }
-  /** @deprecated Alias for `wrapContentScript` */
-  contentScriptWrapper?: boolean
-  /** @deprecated Not implemented yet */
-  crossBrowser?: boolean
-  /** @deprecated Does nothing internally in MV3 */
-  dynamicImportWrapper?: DynamicImportWrapperOptions | false
-  /** Extend the manifest programmatically. */
+  /**
+   * @deprecated Use a dynamic manifest instead.
+   * TODO: add link to docs
+   */
   extendManifest?:
     | Partial<chrome.runtime.Manifest>
     | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
-  /** @deprecated Is not supported as of 5.0.0 */
-  firstClassManifest?: boolean
-  /** @deprecated Dropped in favor of `esmContentScripts` */
-  iifeJsonPaths?: string[]
   pkg?: {
     description: string
     name: string
     version: string
   }
-  /**
-   * @deprecated Use `options.extendManifest.key`
-   * ```js
-   * chromeExtension({ extendManifest: { key: '...' } })
-   * ```
-   */
-  publicKey?: string
-  /** @deprecated Does nothing internally in MV3 */
-  verbose?: boolean
-  // /**
-  //  * @deprecated Not implemented.
-  //  * If false, content scripts will be rebundled with IIFE format
-  //  */
-  // esmContentScripts?: boolean
-  /** @deprecated Escape hatch for content script dynamic import wrapper */
-  wrapContentScripts?: boolean
-}
-
-export type ChromeExtensionPlugin = ManifestInputHooks &
-  HtmlInputHooks &
-  Plugin
-
-/* --------- MANIFEST INPUT PLUGIN OPTIONS --------- */
-
-export interface ManifestInputPluginOptions
-  extends ChromeExtensionOptions {
-  cache?: ManifestInputPluginCache
-}
-
-export interface ManifestInputPluginCache {
-  assets: string[]
-  background: string[]
-  contentScripts: string[]
-  input: string[]
-  inputAry: string[]
-  inputObj: Record<string, string>
-  permsHash: string
-  srcDir: string
-  /** for memoized fs.readFile */
-  readFile: Map<string, any>
-  manifest?: chrome.runtime.Manifest
-  assetChanged: boolean
-}
-
-export type ManifestInputHooks = Pick<
-  Required<Plugin>,
-  | 'name'
-  | 'options'
-  | 'buildStart'
-  | 'resolveId'
-  | 'load'
-  | 'watchChange'
-  | 'outputOptions'
-  | 'generateBundle'
->
-
-export type ManifestInputPlugin = ManifestInputHooks & {
-  srcDir: string | null
-  browserPolyfill?: ChromeExtensionOptions['browserPolyfill']
-  crossBrowser?: ChromeExtensionOptions['crossBrowser']
-}
-
-/* ----------- HTML INPUTS PLUGIN OPTIONS ---------- */
-
-export interface HtmlInputsOptions {
-  browserPolyfill?: ChromeExtensionOptions['browserPolyfill']
-  /** This will change between builds, so cannot destructure */
-  readonly srcDir: string | null
-}
-
-export interface HtmlInputsPluginCache {
-  /** Scripts that should not be bundled */
-  scripts: string[]
-  /** Scripts that should be bundled */
-  js: string[]
-  /** Absolute paths for HTML files to emit */
-  html: string[]
-  /** Html files as Cheerio objects */
-  html$: CheerioFile[]
-  /** Image files to emit */
-  img: string[]
-  /** Stylesheets to emit */
-  css: string[]
-  /** Cache of last options.input, will have other scripts */
-  input: string[]
-  /** Source dir for calculating relative paths */
-  srcDir?: string
-}
-
-type HtmlInputHooks = Pick<
-  Required<Plugin> & Plugin,
-  'name' | 'options' | 'buildStart' | 'watchChange'
->
-export type HtmlInputsPlugin = HtmlInputHooks & {
-  cache: HtmlInputsPluginCache
 }
