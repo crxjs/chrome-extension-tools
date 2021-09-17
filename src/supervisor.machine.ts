@@ -1,39 +1,37 @@
-import { assign, createMachine } from 'xstate'
-import { pure, send } from 'xstate/lib/actions'
+import { ActorRefFrom, spawn } from 'xstate'
+import { pure, send, assign } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
-import { supervisorSpawnActions } from '../playground/second-attempt/fileSpawn.actions'
-import { RPCEPlugin } from './types'
+import { createFileMachine, fileMachine } from './file.machine'
 import { narrowEvent } from './xstate-helpers'
 import {
-  fileTypes,
-  ParsingEvent,
+  SharedEvent,
   sharedEventCreators,
 } from './xstate-models'
 
 export interface SupervisorContext {
-  files: any[]
-  filesReady: number
+  files: ActorRefFrom<typeof fileMachine>[]
   root: string
-  entries: ParsingEvent[]
-  plugins: Set<RPCEPlugin>
+  entries: Extract<SharedEvent, { type: 'ADD_FILE' }>[]
 }
 const supervisorContext: SupervisorContext = {
   files: [],
-  filesReady: 0,
   root: process.cwd(),
   entries: [],
-  plugins: new Set(),
 }
 
 export const model = createModel(supervisorContext, {
-  events: {
-    PLUGIN: (plugin: RPCEPlugin) => ({ plugin }),
-    ROOT: (root: string) => ({ root }),
-    ...sharedEventCreators,
-  },
+  events: { ...sharedEventCreators },
 })
 
-export const supervisorMachine = createMachine<typeof model>(
+/**
+ * This machine requires some implementation specific actions and services:
+ * Required actions:
+ *   - handleError
+ *   - handleFile
+ * Required services:
+ *   - pluginsRunner
+ */
+export const machine = model.createMachine(
   {
     id: 'supervisor',
     context: model.initialContext,
@@ -41,83 +39,48 @@ export const supervisorMachine = createMachine<typeof model>(
     initial: 'options',
     states: {
       options: {
-        entry: 'clearEntryFiles',
+        entry: model.assign({ entries: [] }),
         on: {
-          ROOT: { actions: 'assignRoot' },
-          PLUGIN: {
+          ADD_FILE: {
             actions: model.assign({
-              plugins: ({ plugins }, { plugin }) => {
-                plugins.add(plugin)
-                return new Set(plugins)
-              },
+              entries: ({ entries }, event) => [
+                ...entries,
+                event,
+              ],
             }),
           },
-          MANIFEST: { actions: 'assignEntryFile' },
-          HTML: { actions: 'assignEntryFile' },
+          ROOT: {
+            actions: model.assign({
+              root: (context, { root }) => root,
+            }),
+          },
           START: 'start',
         },
       },
       start: {
-        entry: 'sendEntryFiles',
+        entry: 'addAllEntryFiles',
         on: {
-          MANIFEST: {
+          ADD_FILE: {
             cond: 'fileDoesNotExist',
-            actions: 'spawnManifestFile',
+            actions: 'spawnFile',
           },
-          CSS: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnCssFile',
-          },
-          HTML: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnHtmlFile',
-          },
-          IMAGE: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnImageFile',
-          },
-          JSON: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnJsonFile',
-          },
-          RAW: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnRawFile',
-          },
-          SCRIPT: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnScriptFile',
-          },
-          READY: [
+          FILE_DONE: [
             {
               cond: 'allFilesReady',
-              actions: [
-                'resetFilesReady',
-                'emitFile',
-                'watchFile',
-              ],
+              actions: 'handleFile',
               target: 'watch',
             },
             {
-              actions: [
-                'incrementFilesReady',
-                'emitFile',
-                'watchFile',
-              ],
+              actions: 'handleFile',
             },
           ],
-          ROOT: { actions: 'assignRoot' },
         },
       },
       watch: {
         on: {
           CHANGE: {
-            // TODO: handle change event type
-            actions: send(
-              // Send change to file
-              (context, { id, ...change }) =>
-                model.events.CHANGE(id, change),
-              { to: (context, { id }) => id },
+            actions: pure(({ files }, event) =>
+              files.map((f) => send(event, { to: f.id })),
             ),
             target: 'options',
           },
@@ -131,41 +94,33 @@ export const supervisorMachine = createMachine<typeof model>(
     },
   },
   {
+    actions: {
+      addAllEntryFiles: pure(({ entries }) =>
+        entries.map((entry) => send(entry)),
+      ),
+      spawnFile: assign({
+        files: ({ files }, event) => {
+          const { type, ...file } = narrowEvent(
+            event,
+            'ADD_FILE',
+          )
+
+          const ref = spawn(createFileMachine(file))
+
+          return [...files, ref]
+        },
+      }),
+    },
     guards: {
-      allFilesReady: ({ files, filesReady }) =>
-        files.length === filesReady + 1,
+      allFilesReady: ({ files }) =>
+        files.every((file) =>
+          file.getSnapshot()?.hasTag('ready'),
+        ),
       fileDoesNotExist: ({ files }, event) => {
-        const { id } = narrowEvent(event, fileTypes)
+        const { id } = narrowEvent(event, 'ADD_FILE')
 
         return files.every((f) => f.id !== id)
       },
-    },
-    actions: {
-      ...supervisorSpawnActions,
-      assignRoot: assign({
-        root: (context, event) => {
-          const { root } = narrowEvent(event, 'ROOT')
-          return root
-        },
-      }),
-      assignEntryFile: assign({
-        entries: ({ entries }, event) => {
-          const entry = narrowEvent(event, [
-            'MANIFEST',
-            'HTML',
-            'SCRIPT',
-          ])
-
-          return [...entries, entry]
-        },
-      }),
-      incrementFilesReady: assign({
-        filesReady: ({ filesReady }) => filesReady + 1,
-      }),
-      resetFilesReady: assign({ filesReady: 0 }),
-      sendEntryFiles: pure(({ entries }) =>
-        entries.map((entry) => send(entry)),
-      ),
     },
   },
 )
