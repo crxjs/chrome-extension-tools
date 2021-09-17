@@ -3,7 +3,7 @@ import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { isString } from './helpers'
-import { narrowEvent } from './helpers-xstate'
+import { narrowEvent } from './xstate-helpers'
 import { stubId } from './manifest-input/fileNames'
 import { supervisorMachine } from './supervisor.machine'
 import {

@@ -1,8 +1,37 @@
 import { assign, createMachine } from 'xstate'
-import { send, pure } from 'xstate/lib/actions'
-import { narrowEvent } from './helpers-xstate'
-import { supervisorModel as model } from './supervisor.model'
-import { supervisorSpawnActions } from './supervisorSpawn.actions'
+import { pure, send } from 'xstate/lib/actions'
+import { createModel } from 'xstate/lib/model'
+import { supervisorSpawnActions } from '../playground/second-attempt/fileSpawn.actions'
+import { RPCEPlugin } from './types'
+import { narrowEvent } from './xstate-helpers'
+import {
+  fileTypes,
+  ParsingEvent,
+  sharedEventCreators,
+} from './xstate-models'
+
+export interface SupervisorContext {
+  files: any[]
+  filesReady: number
+  root: string
+  entries: ParsingEvent[]
+  plugins: Set<RPCEPlugin>
+}
+const supervisorContext: SupervisorContext = {
+  files: [],
+  filesReady: 0,
+  root: process.cwd(),
+  entries: [],
+  plugins: new Set(),
+}
+
+export const model = createModel(supervisorContext, {
+  events: {
+    PLUGIN: (plugin: RPCEPlugin) => ({ plugin }),
+    ROOT: (root: string) => ({ root }),
+    ...sharedEventCreators,
+  },
+})
 
 export const supervisorMachine = createMachine<typeof model>(
   {
@@ -23,40 +52,39 @@ export const supervisorMachine = createMachine<typeof model>(
               },
             }),
           },
-          ADD_MANIFEST: { actions: 'assignEntryFile' },
-          ADD_HTML: { actions: 'assignEntryFile' },
-          ADD_SCRIPT: { actions: 'assignEntryFile' },
+          MANIFEST: { actions: 'assignEntryFile' },
+          HTML: { actions: 'assignEntryFile' },
           START: 'start',
         },
       },
       start: {
         entry: 'sendEntryFiles',
         on: {
-          ADD_MANIFEST: {
+          MANIFEST: {
             cond: 'fileDoesNotExist',
             actions: 'spawnManifestFile',
           },
-          ADD_CSS: {
+          CSS: {
             cond: 'fileDoesNotExist',
             actions: 'spawnCssFile',
           },
-          ADD_HTML: {
+          HTML: {
             cond: 'fileDoesNotExist',
             actions: 'spawnHtmlFile',
           },
-          ADD_IMAGE: {
+          IMAGE: {
             cond: 'fileDoesNotExist',
             actions: 'spawnImageFile',
           },
-          ADD_JSON: {
+          JSON: {
             cond: 'fileDoesNotExist',
             actions: 'spawnJsonFile',
           },
-          ADD_RAW: {
+          RAW: {
             cond: 'fileDoesNotExist',
             actions: 'spawnRawFile',
           },
-          ADD_SCRIPT: {
+          SCRIPT: {
             cond: 'fileDoesNotExist',
             actions: 'spawnScriptFile',
           },
@@ -84,7 +112,7 @@ export const supervisorMachine = createMachine<typeof model>(
       watch: {
         on: {
           CHANGE: {
-            // TODO: restart the child actor
+            // TODO: handle change event type
             actions: send(
               // Send change to file
               (context, { id, ...change }) =>
@@ -107,16 +135,9 @@ export const supervisorMachine = createMachine<typeof model>(
       allFilesReady: ({ files, filesReady }) =>
         files.length === filesReady + 1,
       fileDoesNotExist: ({ files }, event) => {
-        const { file } = narrowEvent(event, [
-          'ADD_CSS',
-          'ADD_HTML',
-          'ADD_JSON',
-          'ADD_RAW',
-          'ADD_IMAGE',
-          'ADD_MANIFEST',
-        ])
+        const { id } = narrowEvent(event, fileTypes)
 
-        return files.every(({ id }) => id === file.id)
+        return files.every((f) => f.id !== id)
       },
     },
     actions: {
@@ -130,21 +151,21 @@ export const supervisorMachine = createMachine<typeof model>(
       assignEntryFile: assign({
         entries: ({ entries }, event) => {
           const entry = narrowEvent(event, [
-            'ADD_MANIFEST',
-            'ADD_HTML',
-            'ADD_SCRIPT',
+            'MANIFEST',
+            'HTML',
+            'SCRIPT',
           ])
 
           return [...entries, entry]
         },
       }),
-      sendEntryFiles: pure(({ entries }) =>
-        entries.map((entry) => send(entry)),
-      ),
       incrementFilesReady: assign({
         filesReady: ({ filesReady }) => filesReady + 1,
       }),
       resetFilesReady: assign({ filesReady: 0 }),
+      sendEntryFiles: pure(({ entries }) =>
+        entries.map((entry) => send(entry)),
+      ),
     },
   },
 )
