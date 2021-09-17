@@ -68,7 +68,7 @@ specifiers:
   typescript: ^4.3.5
   vite: ^2.5.1
   webextension-polyfill: ^0.6.0
-  xstate: ^4.23.1
+  xstate: ^4.25.0
 
 dependencies:
   '@rollup/pluginutils': 4.1.1
@@ -92,7 +92,7 @@ dependencies:
   slash: 3.0.0
   type-fest: 2.2.0
   webextension-polyfill: 0.6.0
-  xstate: 4.23.1
+  xstate: 4.25.0
 
 devDependencies:
   '@babel/plugin-proposal-class-properties': 7.13.0
@@ -7410,8 +7410,8 @@ packages:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==}
     dev: true
 
-  /xstate/4.23.1:
-    resolution: {integrity: sha512-8ZoCe8d6wDSPfkep+GBgi+fKAdMyXcaizoNf5FKceEhlso4+9n1TeK6oviaDsXZ3Z5O8xKkJOxXPNuD4cA9LCw==}
+  /xstate/4.25.0:
+    resolution: {integrity: sha512-qP7lc/ypOuuWME4ArOBnzaCa90TfHkjiqYDmxpiCjPy6FcXstInA2vH6qRVAHbPXRK4KQIYfIEOk1X38P+TldQ==}
     dev: false
 
   /y18n/4.0.3:

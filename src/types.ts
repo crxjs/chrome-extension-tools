@@ -1,6 +1,6 @@
-import { EmittedAsset } from 'rollup'
 import { JsonObject, PackageJson, Promisable } from 'type-fest'
 import { isPresent, Unpacked } from './helpers'
+import { Plugin } from 'rollup'
 
 type Nullable<TType> = TType | null | undefined
 type Manifest = chrome.runtime.Manifest
@@ -55,25 +55,50 @@ export function isMV3(
   return m.manifest_version === 3
 }
 
-interface BaseAsset extends EmittedAsset {
+export type FileType =
+  | 'CSS'
+  | 'HTML'
+  | 'IMAGE'
+  | 'JSON'
+  | 'MANIFEST'
+  | 'RAW'
+  | 'SCRIPT'
+
+export interface BaseAsset {
+  fileType: FileType
+  /* Input file name, relative to root */
   id: string
-  fileName: string
-  name?: never
+  /* Output file name, relative to outDir */
+  fileName?: string
+  /* Where the file is referenced, html or manifest and JSON path */
+  origin?: string
 }
 
 export interface StringAsset extends BaseAsset {
+  fileType: 'CSS' | 'HTML'
   source?: string
-  origin?: string
 }
 
 export interface RawAsset extends BaseAsset {
+  fileType: 'IMAGE' | 'RAW'
   source?: Uint8Array
-  origin?: string
 }
 
 export interface JsonAsset extends BaseAsset {
-  json?: JsonObject
+  fileType: 'JSON'
+  source?: JsonObject
 }
+
+export interface ManifestAsset extends BaseAsset {
+  fileType: 'MANIFEST'
+  source?: Manifest
+}
+
+export type Asset =
+  | StringAsset
+  | RawAsset
+  | JsonAsset
+  | ManifestAsset
 
 interface RPCEHooks {
   manifest?: (
