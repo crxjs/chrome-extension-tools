@@ -1,5 +1,4 @@
 import { of } from 'rxjs'
-import { PackageJson } from 'type-fest'
 import { assign, sendParent } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import { isUndefined } from './helpers'
@@ -7,18 +6,12 @@ import { Asset, BaseAsset } from './types'
 import { narrowEvent } from './xstate-helpers'
 import { sharedEventCreators } from './xstate-models'
 
-type FileContext = Asset & {
-  packageJson?: PackageJson
-}
-const context = {} as FileContext
+const context = {} as Asset
 const model = createModel(context, {
   events: {
     PARSED: () => ({}),
     LOADED: (
-      values: Exclude<
-        Pick<FileContext, 'id' | 'packageJson' | 'source'>,
-        undefined
-      >,
+      values: Exclude<Pick<Asset, 'id' | 'source'>, undefined>,
     ) => values,
     ...sharedEventCreators,
   },
