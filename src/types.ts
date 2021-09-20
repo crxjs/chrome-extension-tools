@@ -1,6 +1,6 @@
-import { JsonObject, PackageJson, Promisable } from 'type-fest'
+import { Plugin } from 'vite'
+import { JsonObject, Promisable } from 'type-fest'
 import { isPresent, Unpacked } from './helpers'
-import { Plugin } from 'rollup'
 
 type Nullable<TType> = TType | null | undefined
 type Manifest = chrome.runtime.Manifest
@@ -100,11 +100,8 @@ export type Asset =
   | JsonAsset
   | ManifestAsset
 
-interface RPCEHooks {
-  manifest?: (
-    source: Manifest,
-    packageJson: PackageJson,
-  ) => Promisable<Nullable<Manifest>>
+interface RPCEHookTypes {
+  manifest?: (source: Manifest) => Promisable<Nullable<Manifest>>
   html?: (
     source: string,
     file: StringAsset,
@@ -124,11 +121,18 @@ interface RPCEHooks {
   ) => Promisable<Nullable<RawAsset | Uint8Array>>
 }
 
-export interface RPCEPlugin extends Plugin {
-  name: string
-  crxTransform?: RPCEHooks
-  crxRender?: RPCEHooks
-}
+type RPCEHooks<THooks> = {
+  [TransformProp in keyof THooks as `transformCrx${Capitalize<
+    string & TransformProp
+  >}`]: THooks[TransformProp]
+} &
+  {
+    [RenderProp in keyof THooks as `renderCrx${Capitalize<
+      string & RenderProp
+    >}`]: THooks[RenderProp]
+  }
+
+export type RPCEPlugin = Plugin & RPCEHooks<RPCEHookTypes>
 
 export interface ChromeExtensionOptions {
   /**
