@@ -1,39 +1,47 @@
 import { ActorRefFrom, spawn } from 'xstate'
-import { pure, send, assign } from 'xstate/lib/actions'
+import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
-import { createFileMachine, fileMachine } from './file.machine'
+import { assetMachine, createFileMachine } from './asset.machine'
 import { narrowEvent } from './xstate-helpers'
 import {
   SharedEvent,
   sharedEventCreators,
 } from './xstate-models'
 
-export interface SupervisorContext {
-  files: ActorRefFrom<typeof fileMachine>[]
+export interface FilesContext {
+  files: ActorRefFrom<typeof assetMachine>[]
   root: string
   entries: Extract<SharedEvent, { type: 'ADD_FILE' }>[]
 }
-const supervisorContext: SupervisorContext = {
+const filesContext: FilesContext = {
   files: [],
   root: process.cwd(),
   entries: [],
 }
 
-export const model = createModel(supervisorContext, {
+export const model = createModel(filesContext, {
   events: { ...sharedEventCreators },
 })
 
 /**
- * This machine requires some implementation specific actions and services:
+ * The files orchestrator manages the loading and parsing
+ * behavior of files that Rollup doesn't natively handle:
+ * the manifest, css, html, json, images, and other files
+ * like fonts, etc.
+ *
+ * This machine requires some implementation specific
+ * actions and services:
+ *
  * Required actions:
  *   - handleError
  *   - handleFile
+ *
  * Required services:
  *   - pluginsRunner
  */
 export const machine = model.createMachine(
   {
-    id: 'supervisor',
+    id: 'files orchestrator',
     context: model.initialContext,
     on: { ERROR: '#error' },
     initial: 'options',

@@ -1,5 +1,6 @@
-import { Plugin } from 'vite'
+import { EmittedChunk } from 'rollup'
 import { JsonObject, Promisable } from 'type-fest'
+import { Plugin } from 'vite'
 import { isPresent, Unpacked } from './helpers'
 
 type Nullable<TType> = TType | null | undefined
@@ -55,17 +56,26 @@ export function isMV3(
   return m.manifest_version === 3
 }
 
-export type FileType =
+export type AssetType =
   | 'CSS'
   | 'HTML'
   | 'IMAGE'
   | 'JSON'
   | 'MANIFEST'
   | 'RAW'
-  | 'SCRIPT'
+
+export type ScriptType = 'SCRIPT'
+
+export type FileType = AssetType & ScriptType
+
+export interface Script extends EmittedChunk {
+  fileType: ScriptType
+  /* Where the file is referenced, html or manifest and JSON path */
+  origin?: string
+}
 
 export interface BaseAsset {
-  fileType: FileType
+  fileType: AssetType
   /* Input file name, relative to root */
   id: string
   /* Output file name, relative to outDir */
