@@ -1,16 +1,19 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { EmittedChunk } from 'rollup'
-import { EmittedAsset } from 'rollup'
-import { EmittedFile, PluginContext } from 'rollup'
+import {
+  EmittedAsset,
+  EmittedChunk,
+  EmittedFile,
+  PluginContext,
+} from 'rollup'
 import { from } from 'rxjs'
 import { ViteDevServer } from 'vite'
-import { ActorRef, createMachine, spawn } from 'xstate'
+import { ActorRef, spawn } from 'xstate'
 import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
 import { isString, isUndefined } from '../helpers'
-import { bundleChunk } from './bundleChunk'
+import { rollupFromServer } from './rollupFromServer'
 
 export const VITE_SERVER_URL = '__VITE_SERVER_URL__'
 export const viteServerUrlRegExp = new RegExp(
@@ -21,7 +24,6 @@ export const viteServerUrlRegExp = new RegExp(
 interface Context {
   server?: ViteDevServer
   pluginContext?: PluginContext
-  lastError?: Error
   files: (EmittedFile & {
     id: string
     done?: true
@@ -68,9 +70,7 @@ export const viteAdaptorModel = createModel(context, {
   },
 })
 
-export const viteAdaptorMachine = createMachine<
-  typeof viteAdaptorModel
->(
+export const viteAdaptorMachine = viteAdaptorModel.createMachine(
   {
     id: 'viteAdaptor',
     context: viteAdaptorModel.initialContext,
@@ -78,7 +78,11 @@ export const viteAdaptorMachine = createMachine<
     states: {
       start: {
         on: {
-          HOOK_START: 'build',
+          HOOK_START: {
+            cond: (context, { hookName }) =>
+              hookName === 'options',
+            target: 'build',
+          },
           SERVER_CONFIGURE: {
             target: 'serve',
             actions: viteAdaptorModel.assign({
@@ -100,12 +104,7 @@ export const viteAdaptorMachine = createMachine<
             },
             on: {
               SERVER_LISTENING: 'listening',
-              ERROR: {
-                target: '#error',
-                actions: viteAdaptorModel.assign({
-                  lastError: (context, { error }) => error,
-                }),
-              },
+              ERROR: { target: '#error' },
               EMIT_FILE: {
                 actions: viteAdaptorModel.assign({
                   files: ({ files }, { file }) => [
@@ -117,15 +116,7 @@ export const viteAdaptorMachine = createMachine<
             },
           },
           listening: {
-            entry: pure(({ files }) =>
-              files.map((file) =>
-                send(
-                  file.type === 'asset'
-                    ? viteAdaptorModel.events.WRITE_ASSET(file)
-                    : viteAdaptorModel.events.WRITE_CHUNK(file),
-                ),
-              ),
-            ),
+            entry: 'sendWriteEvents',
             initial: 'writing',
             states: {
               writing: {},
@@ -179,7 +170,6 @@ export const viteAdaptorMachine = createMachine<
                         ? { ...file, error, done: true }
                         : file,
                     ),
-                  lastError: (context, { error }) => error,
                 }),
               },
             },
@@ -212,7 +202,7 @@ export const viteAdaptorMachine = createMachine<
             bundlers: ({ bundlers }) => {
               const actorRef = spawn(
                 from(
-                  bundleChunk(event.file, server)
+                  rollupFromServer(event.file, server)
                     .then(() =>
                       viteAdaptorModel.events.EMIT_DONE(id),
                     )
@@ -308,6 +298,15 @@ export const viteAdaptorMachine = createMachine<
           )
         }
       }),
+      sendWriteEvents: pure(({ files }) =>
+        files.map((file) =>
+          send(
+            file.type === 'asset'
+              ? viteAdaptorModel.events.WRITE_ASSET(file)
+              : viteAdaptorModel.events.WRITE_CHUNK(file),
+          ),
+        ),
+      ),
     },
     services: {
       waitForServer: ({ server }) =>
