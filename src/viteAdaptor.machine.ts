@@ -12,8 +12,8 @@ import { ActorRef, spawn } from 'xstate'
 import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
-import { isString, isUndefined } from '../helpers'
-import { rollupFromServer } from './rollupFromServer'
+import { isString, isUndefined } from './helpers'
+import { writeFromServerToIIFE } from './viteAdaptor-writeFromServerToIIFE'
 
 export const VITE_SERVER_URL = '__VITE_SERVER_URL__'
 export const viteServerUrlRegExp = new RegExp(
@@ -202,12 +202,12 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
             bundlers: ({ bundlers }) => {
               const actorRef = spawn(
                 from(
-                  rollupFromServer(event.file, server)
+                  writeFromServerToIIFE(event.file, server)
                     .then(() =>
                       viteAdaptorModel.events.EMIT_DONE(id),
                     )
-                    .catch((error) =>
-                      viteAdaptorModel.events.ERROR(id, error),
+                    .catch((error: Error) =>
+                      viteAdaptorModel.events.ERROR(error, id),
                     ),
                 ),
                 id,

@@ -1,4 +1,4 @@
-import { isString } from '../helpers'
+import { isString } from './helpers'
 import fs from 'fs'
 import { isUndefined } from 'lodash'
 import path from 'path'
@@ -41,7 +41,7 @@ export const resolveFromServer = (
   },
 })
 
-export const rollupFromServer = async (
+export const writeFromServerToIIFE = async (
   file: EmittedChunk,
   server: ViteDevServer,
 ) => {
