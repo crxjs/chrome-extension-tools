@@ -2,25 +2,20 @@ import { createFilter } from '@rollup/pluginutils'
 import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
-import { isString } from './helpers'
 import { machine, model } from './files.machine'
-import { Asset, RPCEPlugin } from './types'
+import { isString } from './helpers'
+import { runPlugins } from './runPlugins'
+import { RPCEPlugin } from './types'
 import { useViteAdaptor } from './viteAdaptor/viteAdaptor'
 import {
   narrowEvent,
   useConfig,
   useMachine,
 } from './xstate-helpers'
-import { PluginsStartOptions } from './xstate-models'
 
 export { useViteAdaptor }
 
 const stubId = '_stubIdForRPCE'
-
-function runPlugins(
-  plugins: RPCEPlugin[],
-  options: PluginsStartOptions,
-): Asset {}
 
 export const chromeExtension = (): Plugin => {
   const isHtml = createFilter(['**/*.html'])
