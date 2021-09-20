@@ -1,4 +1,4 @@
-import { filesWritten } from '$src/viteAdaptor/viteAdaptor'
+import { fileWriteComplete } from '$src/viteAdaptor/viteAdaptor'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
@@ -23,7 +23,7 @@ afterAll(async () => {
 test('writes entry points to disk', async () => {
   expect(fs.existsSync(outDir)).toBe(false)
 
-  await Promise.all([devServer.listen(), filesWritten()])
+  await Promise.all([devServer.listen(), fileWriteComplete()])
 
   const { port } = devServer.config.server
 

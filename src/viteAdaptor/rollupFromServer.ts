@@ -41,7 +41,7 @@ export const resolveFromServer = (
   },
 })
 
-export const bundleChunk = async (
+export const rollupFromServer = async (
   file: EmittedChunk,
   server: ViteDevServer,
 ) => {
