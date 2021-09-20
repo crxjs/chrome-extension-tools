@@ -5,10 +5,7 @@ import { Plugin } from 'vite'
 import { isString } from './helpers'
 import { machine, model } from './supervisor.machine'
 import { Asset, RPCEPlugin } from './types'
-import {
-  shimPluginContext,
-  useViteAdaptor,
-} from './viteAdaptor/viteAdaptor'
+import { useViteAdaptor } from './viteAdaptor/viteAdaptor'
 import {
   narrowEvent,
   useConfig,
@@ -39,13 +36,9 @@ export const chromeExtension = (): Plugin => {
   // ])
   // const isJson = createFilter(['**/*.json'], ['**/manifest*'])
 
-  const {
-    send,
-    service: supervisor,
-    waitFor,
-  } = useMachine(machine)
+  const { send, service, waitFor } = useMachine(machine)
 
-  supervisor.subscribe({
+  service.subscribe({
     next: (state) => {
       console.log('🚀 ~ supervisor ~ state', state.value)
       console.log('🚀 ~ supervisor ~ state', state)
@@ -60,6 +53,8 @@ export const chromeExtension = (): Plugin => {
 
   return useViteAdaptor({
     name: 'chrome-extension',
+
+    api: { service },
 
     config(config) {
       if (isString(config.root)) {
