@@ -1,14 +1,12 @@
-import { readFile, readJSON } from 'fs-extra'
-import { from, Observable, of } from 'rxjs'
+import { of } from 'rxjs'
 import { assign, EventFrom, sendParent } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import { isUndefined } from './helpers'
-import { Asset, BaseAsset } from './types'
+import { Asset } from './types'
 import { narrowEvent } from './xstate-helpers'
 import { sharedEventCreators } from './xstate-models'
 
-const context = {} as Asset
-const model = createModel(context, {
+export const model = createModel({} as Asset, {
   events: {
     PARSED: () => ({}),
     LOADED: (values: Pick<Asset, 'id' | 'source'>) => values,
@@ -16,7 +14,7 @@ const model = createModel(context, {
   },
 })
 
-type AssetEvent = EventFrom<typeof model>
+export type AssetEvent = EventFrom<typeof model>
 
 /**
  * This machine uses services that are file type specific
@@ -163,68 +161,3 @@ export const assetMachine = model.createMachine(
     },
   },
 )
-
-const stringLoader = ({ id }: Asset) =>
-  from(
-    readFile(id, 'utf8')
-      .then((source) =>
-        model.events.LOADED({
-          id,
-          source,
-        }),
-      )
-      .catch(model.events.ERROR),
-  )
-const rawLoader = ({ id }: Asset) =>
-  from(
-    readFile(id)
-      .then((source) =>
-        model.events.LOADED({
-          id,
-          source,
-        }),
-      )
-      .catch(model.events.ERROR),
-  )
-const jsonLoader = ({ id }: Asset) =>
-  from(
-    readJSON(id)
-      .then((source) =>
-        model.events.LOADED({
-          id,
-          source,
-        }),
-      )
-      .catch(model.events.ERROR),
-  )
-
-export function createFileMachine(file: BaseAsset) {
-  let loader: (context: Asset) => Observable<AssetEvent>
-  if (file.fileType === 'CSS' || file.fileType === 'HTML') {
-    loader = stringLoader
-  } else if (
-    file.fileType === 'JSON' ||
-    file.fileType === 'MANIFEST'
-  ) {
-    loader = jsonLoader
-  } else {
-    loader = rawLoader
-  }
-
-  let parser: (context: Asset) => Observable<AssetEvent> = () =>
-    of(model.events.PARSED())
-  if (file.fileType === 'HTML') {
-    parser = htmlParser
-  } else if (file.fileType === 'MANIFEST') {
-    parser = manifestParser
-  }
-
-  return assetMachine
-    .withConfig({
-      services: {
-        loader,
-        parser,
-      },
-    })
-    .withContext(file)
-}

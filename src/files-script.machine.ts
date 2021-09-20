@@ -5,7 +5,7 @@ import { sharedEventCreators } from './xstate-models'
 const model = createModel({} as Script, {
   events: { ...sharedEventCreators },
 })
-export const scriptFile = model.createMachine({
+export const scriptMachine = model.createMachine({
   context: model.initialContext,
   on: {
     ERROR: { actions: 'forwardToParent', target: '#error' },

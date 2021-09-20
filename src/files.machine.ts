@@ -1,17 +1,23 @@
-import { ActorRefFrom, spawn } from 'xstate'
 import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
-import { assetMachine, createFileMachine } from './asset.machine'
+import { spawnFile } from './files-spawnFile'
 import { narrowEvent } from './xstate-helpers'
 import {
   SharedEvent,
   sharedEventCreators,
 } from './xstate-models'
 
+type AddFileEvent = Extract<
+  SharedEvent,
+  {
+    type: 'ADD_FILE'
+  }
+>
+
 export interface FilesContext {
-  files: ActorRefFrom<typeof assetMachine>[]
+  files: ReturnType<typeof spawnFile>[]
   root: string
-  entries: Extract<SharedEvent, { type: 'ADD_FILE' }>[]
+  entries: AddFileEvent[]
 }
 const filesContext: FilesContext = {
   files: [],
@@ -50,17 +56,10 @@ export const machine = model.createMachine(
         entry: model.assign({ entries: [] }),
         on: {
           ADD_FILE: {
-            actions: model.assign({
-              entries: ({ entries }, event) => [
-                ...entries,
-                event,
-              ],
-            }),
+            actions: 'assignEntryFile',
           },
           ROOT: {
-            actions: model.assign({
-              root: (context, { root }) => root,
-            }),
+            actions: 'assignRoot',
           },
           START: 'start',
         },
@@ -106,14 +105,26 @@ export const machine = model.createMachine(
       addAllEntryFiles: pure(({ entries }) =>
         entries.map((entry) => send(entry)),
       ),
+      assignEntryFile: assign({
+        entries: ({ entries }, e) => {
+          const event = narrowEvent(e, 'ADD_FILE')
+          return [...entries, event]
+        },
+      }),
+      assignRoot: assign({
+        root: (context, event) => {
+          const { root } = narrowEvent(event, 'ROOT')
+          return root
+        },
+      }),
       spawnFile: assign({
-        files: ({ files }, event) => {
+        files: ({ files, root }, event) => {
           const { type, ...file } = narrowEvent(
             event,
             'ADD_FILE',
           )
 
-          const ref = spawn(createFileMachine(file))
+          const ref = spawnFile(file, root)
 
           return [...files, ref]
         },
