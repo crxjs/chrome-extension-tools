@@ -3,7 +3,7 @@ import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { isString } from './helpers'
-import { machine, model } from './supervisor.machine'
+import { machine, model } from './files.machine'
 import { Asset, RPCEPlugin } from './types'
 import { useViteAdaptor } from './viteAdaptor/viteAdaptor'
 import {
