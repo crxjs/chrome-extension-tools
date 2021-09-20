@@ -1,5 +1,4 @@
 import { PluginContext } from 'rollup'
-import { EmittedChunk } from 'rollup'
 import { JsonObject, Promisable } from 'type-fest'
 import { Plugin } from 'vite'
 import { isPresent, Unpacked } from './helpers'
@@ -65,14 +64,21 @@ export type AssetType =
   | 'MANIFEST'
   | 'RAW'
 
-export type ScriptType = 'SCRIPT'
+export type ScriptType = 'BACKGROUND' | 'CONTENT' | 'SCRIPT'
 
 export type FileType = AssetType | ScriptType
 
-export interface Script extends EmittedChunk {
+export type ParserReturnType = Record<
+  Exclude<FileType, 'MANIFEST' | 'HTML' | 'JSON'>,
+  string[]
+>
+
+export interface Script {
   fileType: ScriptType
-  /* Where the file is referenced, html or manifest and JSON path */
-  origin?: string
+  /* Input file name, relative to root */
+  id: string
+  /* Output file name, relative to outDir */
+  fileName: string
 }
 
 export interface BaseAsset {
@@ -80,9 +86,7 @@ export interface BaseAsset {
   /* Input file name, relative to root */
   id: string
   /* Output file name, relative to outDir */
-  fileName?: string
-  /* Where the file is referenced, html or manifest and JSON path */
-  origin?: string
+  fileName: string
 }
 
 export interface StringAsset extends BaseAsset {
@@ -142,16 +146,17 @@ interface RPCEHookTypes {
   ) => Promisable<Nullable<RawAsset | Uint8Array>>
 }
 
+type HookType = 'transform' | 'render'
+
+export type PluginsStartOptions = Asset & {
+  hook: HookType
+}
+
 type CreateRPCEHooks<THooks> = {
-  [TransformProp in keyof THooks as `transformCrx${Capitalize<
+  [TransformProp in keyof THooks as `${HookType}Crx${Capitalize<
     string & TransformProp
   >}`]: THooks[TransformProp]
-} &
-  {
-    [RenderProp in keyof THooks as `renderCrx${Capitalize<
-      string & RenderProp
-    >}`]: THooks[RenderProp]
-  }
+}
 
 export type RPCEHooks = CreateRPCEHooks<RPCEHookTypes>
 
