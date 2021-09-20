@@ -6,8 +6,8 @@ import { isString } from './helpers'
 import { machine, model } from './supervisor.machine'
 import { Asset, RPCEPlugin } from './types'
 import {
-  sendConfigureServer,
   shimPluginContext,
+  useViteAdaptor,
 } from './viteAdaptor/viteAdaptor'
 import {
   narrowEvent,
@@ -15,6 +15,8 @@ import {
   useMachine,
 } from './xstate-helpers'
 import { PluginsStartOptions } from './xstate-models'
+
+export { useViteAdaptor }
 
 const stubId = '_stubIdForRPCE'
 
@@ -56,17 +58,13 @@ export const chromeExtension = (): Plugin => {
     },
   })
 
-  return {
+  return useViteAdaptor({
     name: 'chrome-extension',
 
     config(config) {
       if (isString(config.root)) {
         send(model.events.ROOT(config.root))
       }
-    },
-
-    configureServer(server) {
-      sendConfigureServer(server)
     },
 
     options({ plugins = [], input = [], ...options }) {
@@ -145,17 +143,16 @@ export const chromeExtension = (): Plugin => {
     },
 
     async buildStart({ plugins }) {
-      const shim = shimPluginContext(this, 'buildStart')
-      useConfig(supervisor, {
+      useConfig(service, {
         actions: {
           handleError: (context, event) => {
             const { error } = narrowEvent(event, 'ERROR')
-            shim.error(error)
+            this.error(error)
           },
           handleFile: (context, event) => {
             const { file } = narrowEvent(event, 'FILE_DONE')
-            shim.emitFile(file)
-            shim.addWatchFile(file.id)
+            this.emitFile(file)
+            this.addWatchFile(file.id)
           },
         },
         services: {
@@ -166,7 +163,11 @@ export const chromeExtension = (): Plugin => {
                   event,
                   'PLUGINS_START',
                 )
-                const result = await runPlugins(plugins, options)
+                const result = await runPlugins.call(
+                  this,
+                  plugins,
+                  options,
+                )
                 send(model.events.PLUGINS_RESULT(result))
               } catch (error) {
                 send(model.events.ERROR(error))
@@ -193,5 +194,5 @@ export const chromeExtension = (): Plugin => {
     watchChange(id, change) {
       send(model.events.CHANGE(id, change))
     },
-  }
+  })
 }
