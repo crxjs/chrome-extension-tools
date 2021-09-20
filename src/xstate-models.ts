@@ -1,7 +1,7 @@
 import { ChangeEvent, EmittedFile } from 'rollup'
 import { EventFrom } from 'xstate'
 import { createModel } from 'xstate/lib/model'
-import { Asset, FileType, BaseAsset } from './types'
+import { Asset, FileType, BaseAsset, Script } from './types'
 
 export const fileTypes: FileType[] = [
   'CSS',
@@ -19,7 +19,7 @@ export type PluginsStartOptions = Asset & {
 
 export const sharedEventCreators = {
   ROOT: (root: string) => ({ root }),
-  ADD_FILE: (options: BaseAsset) => options,
+  ADD_FILE: (options: BaseAsset | Script) => options,
   FILE_DONE: (file: EmittedFile & { id: string }) => ({ file }),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,
