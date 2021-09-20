@@ -1,10 +1,11 @@
+import { PluginContext } from 'rollup'
 import { EmittedChunk } from 'rollup'
 import { JsonObject, Promisable } from 'type-fest'
 import { Plugin } from 'vite'
 import { isPresent, Unpacked } from './helpers'
 
 type Nullable<TType> = TType | null | undefined
-type Manifest = chrome.runtime.Manifest
+export type Manifest = chrome.runtime.Manifest
 
 export type ManifestV2 = Omit<
   chrome.runtime.ManifestV2,
@@ -66,7 +67,7 @@ export type AssetType =
 
 export type ScriptType = 'SCRIPT'
 
-export type FileType = AssetType & ScriptType
+export type FileType = AssetType | ScriptType
 
 export interface Script extends EmittedChunk {
   fileType: ScriptType
@@ -111,27 +112,37 @@ export type Asset =
   | ManifestAsset
 
 interface RPCEHookTypes {
-  manifest?: (source: Manifest) => Promisable<Nullable<Manifest>>
+  manifest?: (
+    this: PluginContext,
+    source: Manifest,
+  ) => Promisable<Nullable<Manifest>>
   html?: (
+    this: PluginContext,
     source: string,
     file: StringAsset,
   ) => Promisable<Nullable<StringAsset | string>>
   css?: (
+    this: PluginContext,
     source: string,
     file: StringAsset,
   ) => Promisable<Nullable<StringAsset | string>>
   image?: (
+    this: PluginContext,
     source: Uint8Array,
     file: RawAsset,
   ) => Promisable<Nullable<RawAsset | Uint8Array>>
-  json?: (file: JsonAsset) => Promisable<Nullable<JsonAsset>>
+  json?: (
+    this: PluginContext,
+    file: JsonAsset,
+  ) => Promisable<Nullable<JsonAsset>>
   raw?: (
+    this: PluginContext,
     source: Uint8Array,
     file: RawAsset,
   ) => Promisable<Nullable<RawAsset | Uint8Array>>
 }
 
-type RPCEHooks<THooks> = {
+type CreateRPCEHooks<THooks> = {
   [TransformProp in keyof THooks as `transformCrx${Capitalize<
     string & TransformProp
   >}`]: THooks[TransformProp]
@@ -142,7 +153,9 @@ type RPCEHooks<THooks> = {
     >}`]: THooks[RenderProp]
   }
 
-export type RPCEPlugin = Plugin & RPCEHooks<RPCEHookTypes>
+export type RPCEHooks = CreateRPCEHooks<RPCEHookTypes>
+
+export type RPCEPlugin = Plugin & RPCEHooks
 
 export interface ChromeExtensionOptions {
   /**
