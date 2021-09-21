@@ -1,5 +1,4 @@
-import { normalizePath } from '@rollup/pluginutils'
-import { ChangeEvent, EmittedFile } from 'rollup'
+import { ChangeEvent } from 'rollup'
 import { EventFrom } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import {
