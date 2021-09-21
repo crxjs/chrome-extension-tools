@@ -1,6 +1,12 @@
-import { assign, pure, send } from 'xstate/lib/actions'
+import { dirname, join } from 'path'
+import {
+  assign,
+  forwardTo,
+  pure,
+  send,
+} from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
-import { spawnFile } from './files-spawnFile'
+import { spawnFile } from './files_spawnFile'
 import { narrowEvent } from './xstate-helpers'
 import {
   SharedEvent,
@@ -22,7 +28,14 @@ export interface FilesContext {
 const filesContext: FilesContext = {
   files: [],
   root: process.cwd(),
-  entries: [],
+  entries: [
+    {
+      fileName: 'manifest.json',
+      fileType: 'MANIFEST',
+      id: 'manifest.json',
+      type: 'ADD_FILE',
+    },
+  ],
 }
 
 export const model = createModel(filesContext, {
@@ -40,9 +53,9 @@ export const model = createModel(filesContext, {
  *
  * Required actions:
  *   - handleError
- *   - handleFile
  *
  * Required services:
+ *   - handleFile
  *   - pluginsRunner
  */
 export const machine = model.createMachine(
@@ -55,21 +68,56 @@ export const machine = model.createMachine(
       options: {
         entry: model.assign({ entries: [] }),
         on: {
-          ADD_FILE: {
-            actions: 'assignEntryFile',
-          },
+          ADD_FILE: [
+            {
+              cond: (context, { fileType }) =>
+                fileType === 'MANIFEST',
+              actions: model.assign({
+                entries: ({ entries }, event) =>
+                  entries
+                    .filter(
+                      ({ fileType }) => fileType !== 'MANIFEST',
+                    )
+                    .concat([event]),
+                root: (context, { id }) => dirname(id),
+              }),
+            },
+            {
+              actions: model.assign({
+                entries: ({ entries }, event) => [
+                  ...entries,
+                  event,
+                ],
+              }),
+            },
+          ],
           ROOT: {
-            actions: 'assignRoot',
+            actions: model.assign({
+              root: (context, { root }) => root,
+              entries: ({ entries }, { root }) =>
+                entries.map((entry) => ({
+                  ...entry,
+                  id: join(root, 'manifest.json'),
+                })),
+            }),
           },
           START: 'start',
         },
       },
       start: {
-        entry: 'addAllEntryFiles',
+        invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
+        entry: ['sendStartToAllFiles', 'addAllEntryFiles'],
         on: {
           ADD_FILE: {
             cond: 'fileDoesNotExist',
             actions: 'spawnFile',
+          },
+          PLUGINS_START: { actions: forwardTo('pluginsRunner') },
+          PLUGINS_RESULT: {
+            actions: forwardTo(
+              ({ files }, { id }) =>
+                files.find((f) => id === f.id)!,
+            ),
           },
           FILE_DONE: [
             {
@@ -86,9 +134,13 @@ export const machine = model.createMachine(
       watch: {
         on: {
           CHANGE: {
-            actions: pure(({ files }, event) =>
-              files.map((f) => send(event, { to: f.id })),
-            ),
+            actions: pure(({ files }) => {
+              const actions: any[] = []
+              files.forEach((f) =>
+                actions.push(forwardTo(() => f)),
+              )
+              return actions
+            }),
             target: 'options',
           },
         },
@@ -105,18 +157,6 @@ export const machine = model.createMachine(
       addAllEntryFiles: pure(({ entries }) =>
         entries.map((entry) => send(entry)),
       ),
-      assignEntryFile: assign({
-        entries: ({ entries }, e) => {
-          const event = narrowEvent(e, 'ADD_FILE')
-          return [...entries, event]
-        },
-      }),
-      assignRoot: assign({
-        root: (context, event) => {
-          const { root } = narrowEvent(event, 'ROOT')
-          return root
-        },
-      }),
       spawnFile: assign({
         files: ({ files, root }, event) => {
           const { type, ...file } = narrowEvent(

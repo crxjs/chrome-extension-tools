@@ -1,5 +1,5 @@
 import { readFile, readJSON } from 'fs-extra'
-import { join, relative, resolve } from 'path'
+import { dirname, join, relative, resolve } from 'path'
 import { from, Observable, of } from 'rxjs'
 import { spawn } from 'xstate'
 import {
@@ -7,12 +7,12 @@ import {
   assetMachine,
   model,
 } from './files-asset.machine'
-import { parseHtml } from './files-parseHtml'
+import { scriptMachine } from './files-script.machine'
+import { parseHtml } from './files_parseHtml'
 import {
   expandMatchPatterns,
   parseManifest,
-} from './files-parseManifest'
-import { scriptMachine } from './files-script.machine'
+} from './files_parseManifest'
 import {
   Asset,
   BaseAsset,
@@ -26,7 +26,8 @@ export function spawnFile(
   file: BaseAsset | Script,
   root: string,
 ) {
-  if (isScript(file)) return spawn(scriptMachine)
+  if (isScript(file))
+    return spawn(scriptMachine.withContext(file), file.id)
 
   let loader: (context: Asset) => Observable<AssetEvent>
   if (file.fileType === 'CSS' || file.fileType === 'HTML') {
@@ -57,6 +58,7 @@ export function spawnFile(
         },
       })
       .withContext(file),
+    { name: file.id },
   )
 }
 
@@ -91,13 +93,15 @@ function htmlParser(
 ): (context: Asset) => Observable<AssetEvent> {
   return ({ id: htmlId, source }) => {
     try {
+      const htmlDir = dirname(htmlId)
+
       const result = Object.entries(
         parseHtml(source as string),
       ) as [FileType, string[]][]
 
       const files = result.flatMap(([fileType, fileNames]) =>
         fileNames.map((htmlFileName): Script | BaseAsset => {
-          const id = resolve(htmlId, htmlFileName)
+          const id = resolve(htmlDir, htmlFileName)
           const fileName = relative(root, id)
 
           return {
