@@ -4,7 +4,7 @@ import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
 import { isString, normalizeFilename } from './helpers'
-import { runPlugins } from './runPlugins'
+import { runPlugins } from './index_runPlugins'
 import { RPCEPlugin } from './types'
 import { useViteAdaptor } from './viteAdaptor'
 import {
@@ -191,6 +191,10 @@ export const chromeExtension = (): Plugin => {
 
     watchChange(id, change) {
       send(model.events.CHANGE(id, change))
+    },
+
+    generateBundle(options, bundle) {
+      delete bundle[stubId + '.js']
     },
   })
 }

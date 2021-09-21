@@ -6,12 +6,12 @@ import {
   JsonAsset,
   Manifest,
   ManifestAsset,
+  PluginsStartOptions,
   RawAsset,
   RPCEHooks,
   RPCEPlugin,
   StringAsset,
 } from './types'
-import { PluginsStartOptions } from './xstate-models'
 
 export async function runPlugins(
   this: PluginContext,
