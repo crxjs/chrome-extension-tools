@@ -1,7 +1,6 @@
 import { readJSONSync } from 'fs-extra'
-import { parseManifest } from './files-parseManifest'
+import { parseManifest } from './files_parseManifest'
 import {
-  backgroundJs,
   contentCss,
   contentJs,
   devtoolsHtml,
@@ -11,25 +10,29 @@ import {
   localesEnJson,
   localesEsJson,
   manifestJson,
+  missaaliOtf,
+  notoSansBlack,
+  notoSansLight,
   optionsHtml,
   popupHtml,
+  serviceWorkerJs,
   srcDir,
-} from '$test/helpers/mv2-kitchen-sink-paths'
+} from '$test/helpers/mv3-kitchen-sink-paths'
 import { join } from 'path'
 
 const manifest = readJSONSync(join(srcDir, manifestJson))
 
 test('gets correct scripts', () => {
-  const result = parseManifest(manifest)
+  const result = parseManifest(manifest, srcDir)
 
   expect(result.CONTENT).toEqual([contentJs])
-  expect(result.BACKGROUND).toEqual([backgroundJs])
+  expect(result.BACKGROUND).toEqual([serviceWorkerJs])
 
   expect(result.MODULE).toEqual([])
 })
 
 test('gets correct html', () => {
-  const result = parseManifest(manifest)
+  const result = parseManifest(manifest, srcDir)
 
   expect(result.HTML).toContain(optionsHtml)
   expect(result.HTML).toContain(popupHtml)
@@ -37,19 +40,19 @@ test('gets correct html', () => {
 })
 
 test('gets correct css', () => {
-  const result = parseManifest(manifest)
+  const result = parseManifest(manifest, srcDir)
 
   expect(result.CSS).toContain(contentCss)
 })
 
 test('gets correct action icon', () => {
-  const result = parseManifest(manifest)
+  const result = parseManifest(manifest, srcDir)
 
   expect(result.IMAGE).toContain(icon16)
 })
 
 test('gets correct action img', () => {
-  const result = parseManifest(manifest)
+  const result = parseManifest(manifest, srcDir)
 
   expect(result.IMAGE).toContain(icon16)
   expect(result.IMAGE).toContain(icon48)
@@ -57,8 +60,16 @@ test('gets correct action img', () => {
 })
 
 test('gets correct locales folder', () => {
-  const result = parseManifest(manifest)
+  const result = parseManifest(manifest, srcDir)
 
   expect(result.JSON).toContain(localesEnJson)
   expect(result.JSON).toContain(localesEsJson)
+})
+
+test('gets correct raw files', () => {
+  const result = parseManifest(manifest, srcDir)
+
+  expect(result.RAW).toContain(notoSansLight)
+  expect(result.RAW).toContain(notoSansBlack)
+  expect(result.RAW).toContain(missaaliOtf)
 })

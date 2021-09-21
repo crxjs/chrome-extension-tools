@@ -13,7 +13,7 @@ import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
 import { isString, isUndefined } from './helpers'
-import { writeAsIIFE } from './viteAdaptor-writeFromServerToIIFE'
+import { writeAsIIFE } from './viteAdaptor-writeAsIIFE'
 
 export const VITE_SERVER_URL = '__VITE_SERVER_URL__'
 export const viteServerUrlRegExp = new RegExp(
