@@ -10,13 +10,17 @@ import {
   localesEnJson,
   localesEsJson,
   manifestJson,
+  missaaliOtf,
+  notoSansBlack,
+  notoSansLight,
   optionsHtml,
   popupHtml,
   serviceWorkerJs,
   srcDir,
 } from '$test/helpers/mv3-kitchen-sink-paths'
+import { join } from 'path'
 
-const manifest = readJSONSync(manifestJson)
+const manifest = readJSONSync(join(srcDir, manifestJson))
 
 test('gets correct scripts', () => {
   const result = parseManifest(manifest, srcDir)
@@ -24,7 +28,7 @@ test('gets correct scripts', () => {
   expect(result.CONTENT).toEqual([contentJs])
   expect(result.BACKGROUND).toEqual([serviceWorkerJs])
 
-  expect(result.SCRIPT).toEqual([])
+  expect(result.MODULE).toEqual([])
 })
 
 test('gets correct html', () => {
@@ -58,6 +62,14 @@ test('gets correct action img', () => {
 test('gets correct locales folder', () => {
   const result = parseManifest(manifest, srcDir)
 
-  expect(result.RAW).toContain(localesEnJson)
-  expect(result.RAW).toContain(localesEsJson)
+  expect(result.JSON).toContain(localesEnJson)
+  expect(result.JSON).toContain(localesEsJson)
+})
+
+test('gets correct raw files', () => {
+  const result = parseManifest(manifest, srcDir)
+
+  expect(result.RAW).toContain(notoSansLight)
+  expect(result.RAW).toContain(notoSansBlack)
+  expect(result.RAW).toContain(missaaliOtf)
 })

@@ -2,6 +2,10 @@ import cheerio, { CheerioAPI } from 'cheerio'
 import { isString } from './helpers'
 import { FileType } from './types'
 
+/**
+ * Returns filenames relative to the html file,
+ * which may be at any depth inside the root folder.
+ */
 export function parseHtml(
   source: string,
 ): Record<
@@ -13,7 +17,7 @@ export function parseHtml(
 > {
   const $ = cheerio.load(source)
   return {
-    SCRIPT: getScriptSrc($),
+    MODULE: getScriptSrc($),
     CSS: getCssHrefs($),
     IMAGE: getImgSrcs($),
     RAW: getJsAssets($),
