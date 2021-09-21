@@ -9,23 +9,25 @@ import {
   ScriptType,
 } from './types'
 
+/**
+ * Returns filenames and match patterns relative
+ * to the manifest, which must be in the root folder.
+ */
 export function parseManifest(
   manifest: Manifest,
-  root: string,
 ): Record<
   ScriptType | Exclude<AssetType, 'MANIFEST'>,
   string[]
 > {
   if (manifest.manifest_version === 3) {
-    return deriveFilesMV3(manifest, root)
+    return deriveFilesMV3(manifest)
   } else {
-    return deriveFilesMV2(manifest, root)
+    return deriveFilesMV2(manifest)
   }
 }
 
 export function deriveFilesMV3(
   manifest: chrome.runtime.ManifestV3,
-  root: string,
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -38,17 +40,13 @@ export function deriveFilesMV3(
     [] as DeclarativeNetRequestResource[],
   )
 
-  const json = locales
-    .reduce(expandPatterns(root), [] as string[])
-    .concat(rulesets.map(({ path }) => path))
+  const json = locales.concat(rulesets.map(({ path }) => path))
 
   const files = get(
     manifest,
     'web_accessible_resources',
     [] as Required<typeof manifest>['web_accessible_resources'],
-  )
-    .flatMap(({ resources }) => resources)
-    .reduce(expandPatterns(root), [] as string[])
+  ).flatMap(({ resources }) => resources)
 
   const contentScripts = get(
     manifest,
@@ -99,7 +97,7 @@ export function deriveFilesMV3(
   return {
     BACKGROUND: dedupe(background),
     CONTENT: dedupe(contentScripts),
-    SCRIPT: dedupe(js),
+    MODULE: dedupe(js),
     CSS: dedupe(css),
     HTML: dedupe(html),
     IMAGE: dedupe(img),
@@ -110,7 +108,6 @@ export function deriveFilesMV3(
 
 export function deriveFilesMV2(
   manifest: chrome.runtime.ManifestV2,
-  root: string,
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -123,15 +120,13 @@ export function deriveFilesMV2(
     [] as DeclarativeNetRequestResource[],
   )
 
-  const json = locales
-    .reduce(expandPatterns(root), [] as string[])
-    .concat(rulesets.map(({ path }) => path))
+  const json = locales.concat(rulesets.map(({ path }) => path))
 
   const files = get(
     manifest,
     'web_accessible_resources',
     [] as Required<typeof manifest>['web_accessible_resources'],
-  ).reduce(expandPatterns(root), [] as string[])
+  )
 
   const contentScripts = get(
     manifest,
@@ -203,7 +198,7 @@ export function deriveFilesMV2(
   return {
     BACKGROUND: dedupe(background),
     CONTENT: dedupe(contentScripts),
-    SCRIPT: dedupe(js),
+    MODULE: dedupe(js),
     CSS: dedupe(css),
     HTML: dedupe(html),
     IMAGE: dedupe(img),
@@ -216,20 +211,15 @@ function dedupe(ary: any[]) {
   return [...new Set(ary.filter(isString))]
 }
 
-function expandPatterns(
+export function expandMatchPatterns(
   root: string,
-): (
-  previousValue: string[],
-  currentValue: string,
-  currentIndex: number,
-  array: string[],
-) => string[] {
-  return (r, x) => {
+): (currentValue: string) => string[] {
+  return (x) => {
     if (glob.hasMagic(x)) {
       const files = glob.sync(x, { cwd: root })
-      return [...r, ...files.map((f) => f.replace(root, ''))]
+      return files.map((f) => f.replace(root, ''))
     } else {
-      return [...r, x]
+      return [x]
     }
   }
 }

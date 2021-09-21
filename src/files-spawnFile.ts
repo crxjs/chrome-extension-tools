@@ -8,7 +8,10 @@ import {
   model,
 } from './files-asset.machine'
 import { parseHtml } from './files-parseHtml'
-import { parseManifest } from './files-parseManifest'
+import {
+  expandMatchPatterns,
+  parseManifest,
+} from './files-parseManifest'
 import { scriptMachine } from './files-script.machine'
 import {
   Asset,
@@ -61,19 +64,25 @@ function manifestParser(
   root: string,
 ): (context: Asset) => Observable<AssetEvent> {
   return ({ source }) => {
-    const result = Object.entries(
-      parseManifest(source as Manifest, root),
-    ) as [FileType, string[]][]
+    try {
+      const result = Object.entries(
+        parseManifest(source as Manifest),
+      ) as [FileType, string[]][]
 
-    const files = result.flatMap(([fileType, fileNames]) =>
-      fileNames.map((fileName) => ({
-        fileType,
-        fileName,
-        id: join(root, fileName),
-      })),
-    )
+      const files = result.flatMap(([fileType, fileNames]) =>
+        fileNames
+          .flatMap(expandMatchPatterns(root))
+          .map((fileName) => ({
+            fileType,
+            fileName,
+            id: join(root, fileName),
+          })),
+      )
 
-    return from(files.map(model.events.ADD_FILE))
+      return from(files.map(model.events.ADD_FILE))
+    } catch (error) {
+      return of(model.events.ERROR(error))
+    }
   }
 }
 
@@ -81,24 +90,28 @@ function htmlParser(
   root: string,
 ): (context: Asset) => Observable<AssetEvent> {
   return ({ id: htmlId, source }) => {
-    const result = Object.entries(
-      parseHtml(source as string),
-    ) as [FileType, string[]][]
+    try {
+      const result = Object.entries(
+        parseHtml(source as string),
+      ) as [FileType, string[]][]
 
-    const files = result.flatMap(([fileType, fileNames]) =>
-      fileNames.map((htmlFileName): Script | BaseAsset => {
-        const id = resolve(htmlId, htmlFileName)
-        const fileName = relative(root, id)
+      const files = result.flatMap(([fileType, fileNames]) =>
+        fileNames.map((htmlFileName): Script | BaseAsset => {
+          const id = resolve(htmlId, htmlFileName)
+          const fileName = relative(root, id)
 
-        return {
-          fileType,
-          id,
-          fileName,
-        }
-      }),
-    )
+          return {
+            fileType,
+            id,
+            fileName,
+          }
+        }),
+      )
 
-    return from(files.map(model.events.ADD_FILE))
+      return from(files.map(model.events.ADD_FILE))
+    } catch (error) {
+      return of(model.events.ERROR(error))
+    }
   }
 }
 
