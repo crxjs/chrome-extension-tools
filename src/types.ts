@@ -64,7 +64,7 @@ export type AssetType =
   | 'MANIFEST'
   | 'RAW'
 
-export type ScriptType = 'BACKGROUND' | 'CONTENT' | 'SCRIPT'
+export type ScriptType = 'BACKGROUND' | 'CONTENT' | 'MODULE'
 
 export type FileType = AssetType | ScriptType
 

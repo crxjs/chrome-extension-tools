@@ -38,7 +38,6 @@ export const assetMachine = model.createMachine(
         invoke: { src: 'loader', onDone: 'transform' },
         on: {
           LOADED: { actions: 'updateContext' },
-          ROOT: { actions: 'forwardToParent' },
         },
       },
       transform: {

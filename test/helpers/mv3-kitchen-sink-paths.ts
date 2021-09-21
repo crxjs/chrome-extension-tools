@@ -6,81 +6,58 @@ export const srcDir = path.resolve(
   'mv3',
   'kitchen-sink',
 )
-export const manifestJson = path.join(srcDir, 'manifest.json')
-export const indexHtml = path.join(srcDir, 'index.html')
+export const manifestJson = 'manifest.json'
+export const indexHtml = 'index.html'
 
 // Icons
-export const icon16 = path.join(
-  srcDir,
-  'images/icon-main-16.png',
-)
-export const icon48 = path.join(
-  srcDir,
-  'images/icon-main-48.png',
-)
-export const icon128 = path.join(
-  srcDir,
-  'images/icon-main-128.png',
-)
-export const faviconIco = path.join(srcDir, 'images/favicon.ico')
-export const faviconPng = path.join(srcDir, 'images/favicon.png')
+export const icon16 = 'images/icon-main-16.png'
+
+export const icon48 = 'images/icon-main-48.png'
+
+export const icon128 = 'images/icon-main-128.png'
+
+export const faviconIco = 'images/favicon.ico'
+export const faviconPng = 'images/favicon.png'
 
 // Fonts
-export const notoSansBlack = path.join(
-  srcDir,
-  'fonts/NotoSans-Black.ttf',
-)
-export const missaaliOtf = path.join(
-  srcDir,
-  'fonts/Missaali-Regular.otf',
-)
-export const notoSansLight = path.join(
-  srcDir,
-  'fonts/NotoSans-Light.ttf',
-)
+export const notoSansBlack = 'fonts/NotoSans-Black.ttf'
+
+export const missaaliOtf = 'fonts/Missaali-Regular.otf'
+
+export const notoSansLight = 'fonts/NotoSans-Light.ttf'
 
 // Options assets
 export const kitchenSinkRoot = path.join(srcDir)
-export const optionsHtml = path.join(srcDir, 'options.html')
-export const optionsCss = path.join(srcDir, 'options.css')
-export const optionsPng = path.join(srcDir, 'options.png')
-export const optionsJpg = path.join(srcDir, 'options.jpg')
-export const assetJs = path.join(srcDir, 'asset.js')
+export const optionsHtml = 'options.html'
+export const optionsCss = 'options.css'
+export const optionsPng = 'options.png'
+export const optionsJpg = 'options.jpg'
+export const assetJs = 'asset.js'
 
 // Options chunks
-export const optionsJs = path.join(srcDir, 'options1.js')
-export const optionsJsx = path.join(srcDir, 'options2.jsx')
-export const optionsTs = path.join(srcDir, 'options3.ts')
-export const optionsTsx = path.join(srcDir, 'options4.tsx')
+export const optionsJs = 'options1.js'
+export const optionsJsx = 'options2.jsx'
+export const optionsTs = 'options3.ts'
+export const optionsTsx = 'options4.tsx'
 
 // External script files
-export const serviceWorkerJs = path.join(
-  srcDir,
-  'service_worker.js',
-)
-export const contentJs = path.join(srcDir, 'content.js')
+export const serviceWorkerJs = 'service_worker.js'
+
+export const contentJs = 'content.js'
 
 // Popup subfolder
-export const popupHtml = path.join(srcDir, 'popup/popup.html')
-export const popupJs = path.join(srcDir, 'popup/popup.js')
+export const popupHtml = 'popup/popup.html'
+export const popupJs = 'popup/popup.js'
 
-export const contentCss = path.join(srcDir, 'content.css')
+export const contentCss = 'content.css'
 
 // Devtools subfolder
-export const devtoolsHtml = path.join(
-  srcDir,
-  'devtools/devtools.html',
-)
+export const devtoolsHtml = 'devtools/devtools.html'
 
 // Locales subfolder
-export const localesEnJson = path.join(
-  srcDir,
-  '_locales/en/messages.json',
-)
-export const localesEsJson = path.join(
-  srcDir,
-  '_locales/en/messages.json',
-)
+export const localesEnJson = '_locales/en/messages.json'
+
+export const localesEsJson = '_locales/en/messages.json'
 
 // Double underscore bug
-export const _textFile = path.join(srcDir, '_war/test.txt')
+export const _textFile = '_war/test.txt'

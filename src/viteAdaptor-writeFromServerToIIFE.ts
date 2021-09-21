@@ -41,7 +41,7 @@ export const resolveFromServer = (
   },
 })
 
-export const writeFromServerToIIFE = async (
+export const writeAsIIFE = async (
   file: EmittedChunk,
   server: ViteDevServer,
 ) => {
