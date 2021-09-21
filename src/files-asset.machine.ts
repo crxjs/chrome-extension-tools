@@ -66,15 +66,17 @@ export const assetMachine = model.createMachine(
       },
       complete: {
         on: {
-          CHANGE: [
-            {
-              cond: ({ id }, { id: changedId }) =>
-                id === changedId,
-              target: 'load',
-            },
-            'render',
-          ],
+          CHANGE: {
+            cond: ({ id }, { id: changedId }) =>
+              id === changedId,
+            target: 'changed',
+          },
+          START: 'render',
         },
+        tags: 'ready',
+      },
+      changed: {
+        on: { START: 'load' },
       },
       error: {
         id: 'error',

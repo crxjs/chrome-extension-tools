@@ -1,9 +1,11 @@
+import { normalizePath } from '@rollup/pluginutils'
 import { ChangeEvent, EmittedFile } from 'rollup'
 import { EventFrom } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import {
   Asset,
   BaseAsset,
+  CompleteFile,
   FileType,
   PluginsStartOptions,
   Script,
@@ -16,22 +18,22 @@ export const fileTypes: FileType[] = [
   'JSON',
   'MANIFEST',
   'RAW',
-  'SCRIPT',
+  'MODULE',
   'BACKGROUND',
   'CONTENT',
 ]
 
-export const isScript = (
-  file: Script | Asset | BaseAsset,
-): file is Script =>
+export const isScript = (file: {
+  fileType: string
+}): file is Script =>
   file.fileType === 'BACKGROUND' ||
   file.fileType === 'CONTENT' ||
-  file.fileType === 'SCRIPT'
+  file.fileType === 'MODULE'
 
 export const sharedEventCreators = {
   ROOT: (root: string) => ({ root }),
   ADD_FILE: (options: BaseAsset | Script) => options,
-  FILE_DONE: (file: EmittedFile & { id: string }) => ({ file }),
+  FILE_DONE: (file: CompleteFile) => ({ file }),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,
     ...change,

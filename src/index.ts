@@ -1,17 +1,20 @@
-import { createFilter } from '@rollup/pluginutils'
+import { createFilter, normalizePath } from '@rollup/pluginutils'
 import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { isString } from './helpers'
+import { isString, normalizeFilename } from './helpers'
 import { runPlugins } from './runPlugins'
 import { RPCEPlugin } from './types'
-import { useViteAdaptor } from './viteAdaptor/viteAdaptor'
+import { useViteAdaptor } from './viteAdaptor'
 import {
   narrowEvent,
   useConfig,
   useMachine,
 } from './xstate-helpers'
+import { isScript } from './xstate-models'
+
+export const simpleReloader = () => ({ name: 'simpleReloader' })
 
 export { useViteAdaptor }
 
@@ -35,14 +38,13 @@ export const chromeExtension = (): Plugin => {
 
   service.subscribe({
     next: (state) => {
-      console.log('🚀 ~ supervisor ~ state', state.value)
-      console.log('🚀 ~ supervisor ~ state', state)
+      console.log('🚀 ~ files state', state)
     },
     error: (error) => {
       console.error(error)
     },
     complete: () => {
-      console.log('supervisor complete')
+      console.log('files orchestrator complete')
     },
   })
 
@@ -67,8 +69,8 @@ export const chromeExtension = (): Plugin => {
         send(
           model.events.ADD_FILE({
             id: input,
-            origin: 'input',
             fileType: 'MANIFEST',
+            fileName: 'manifest.json',
           }),
         )
       } else if (Array.isArray(input)) {
@@ -77,16 +79,16 @@ export const chromeExtension = (): Plugin => {
             send(
               model.events.ADD_FILE({
                 id,
-                origin: 'input',
                 fileType: 'HTML',
+                fileName: 'manifest.json',
               }),
             )
           else if (basename(id).startsWith('manifest'))
             send(
               model.events.ADD_FILE({
                 id,
-                origin: 'input',
                 fileType: 'MANIFEST',
+                fileName: 'manifest.json',
               }),
             )
           else return true
@@ -103,7 +105,6 @@ export const chromeExtension = (): Plugin => {
                 model.events.ADD_FILE({
                   id,
                   fileName,
-                  origin: 'input',
                   fileType: 'HTML',
                 }),
               )
@@ -111,8 +112,8 @@ export const chromeExtension = (): Plugin => {
               send(
                 model.events.ADD_FILE({
                   id,
-                  origin: 'input',
                   fileType: 'MANIFEST',
+                  fileName: 'manifest.json',
                 }),
               )
             else return true
@@ -141,6 +142,13 @@ export const chromeExtension = (): Plugin => {
           },
           handleFile: (context, event) => {
             const { file } = narrowEvent(event, 'FILE_DONE')
+
+            file.id = normalizePath(file.id)
+            file.fileName = normalizePath(file.fileName)
+
+            if (isScript(file))
+              file.fileName = normalizeFilename(file.fileName)
+
             this.emitFile(file)
             this.addWatchFile(file.id)
           },

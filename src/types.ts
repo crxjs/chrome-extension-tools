@@ -75,7 +75,7 @@ export type ParserReturnType = Record<
 
 export interface Script {
   fileType: ScriptType
-  /* Input file name, relative to root */
+  /* Input file name, absolute */
   id: string
   /* Output file name, relative to outDir */
   fileName: string
@@ -114,6 +114,14 @@ export type Asset =
   | RawAsset
   | JsonAsset
   | ManifestAsset
+
+export interface CompleteFile {
+  fileName: string
+  fileType: FileType
+  id: string
+  source?: string | Uint8Array
+  type: 'chunk' | 'asset'
+}
 
 interface RPCEHookTypes {
   manifest?: (
