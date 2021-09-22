@@ -34,6 +34,9 @@ export const assetMachine = model.createMachine(
     },
     initial: 'load',
     states: {
+      changed: {
+        on: { START: 'load' },
+      },
       load: {
         invoke: { src: 'loader', onDone: 'transform' },
         on: {
@@ -50,10 +53,22 @@ export const assetMachine = model.createMachine(
         },
       },
       parse: {
-        invoke: { src: 'parser', onDone: 'render' },
+        invoke: {
+          src: 'parser',
+          onDone: [
+            {
+              cond: ({ fileType }) => fileType === 'MANIFEST',
+              target: 'ready',
+            },
+            { target: 'render' },
+          ],
+        },
         on: {
           ADD_FILE: { actions: 'forwardToParent' },
         },
+      },
+      ready: {
+        on: { START: 'render' },
       },
       render: {
         entry: 'startPluginRender',
@@ -66,17 +81,15 @@ export const assetMachine = model.createMachine(
       },
       complete: {
         on: {
-          CHANGE: {
-            cond: ({ id }, { id: changedId }) =>
-              id === changedId,
-            target: 'changed',
-          },
-          START: 'render',
+          CHANGE: [
+            {
+              cond: ({ id }, { id: changedId }) =>
+                id === changedId,
+              target: 'changed',
+            },
+            'ready',
+          ],
         },
-        tags: 'ready',
-      },
-      changed: {
-        on: { START: 'load' },
       },
       error: {
         id: 'error',

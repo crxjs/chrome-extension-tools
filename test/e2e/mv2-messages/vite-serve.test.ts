@@ -1,4 +1,4 @@
-import { fileWriteComplete } from '$src/viteAdaptor/viteAdaptor'
+import { fileWriteComplete } from '$src/viteAdaptor'
 import fs from 'fs-extra'
 import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright'
