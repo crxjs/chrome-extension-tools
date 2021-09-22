@@ -1,5 +1,6 @@
+import { cosmiconfig } from 'cosmiconfig'
 import { readFile, readJSON } from 'fs-extra'
-import { dirname, join, relative, resolve } from 'path'
+import { relative } from 'path'
 import { from, Observable, of } from 'rxjs'
 import { spawn } from 'xstate'
 import {
@@ -8,19 +9,22 @@ import {
   model,
 } from './files-asset.machine'
 import { scriptMachine } from './files-script.machine'
-import { parseHtml } from './files_parseHtml'
-import {
-  expandMatchPatterns,
-  parseManifest,
-} from './files_parseManifest'
-import {
-  Asset,
-  BaseAsset,
-  FileType,
-  Manifest,
-  Script,
-} from './types'
+import { htmlParser } from './files_htmlParser'
+import { manifestParser } from './files_manifestParser'
+import { Asset, BaseAsset, Manifest, Script } from './types'
 import { isScript } from './xstate-models'
+
+const manifestExplorer = cosmiconfig('manifest', {
+  cache: false,
+  loaders: {
+    '.ts': (filePath: string) => {
+      require('esbuild-runner/register')
+      const result = require(filePath)
+
+      return result.default ?? result
+    },
+  },
+})
 
 export function spawnFile(
   file: BaseAsset | Script,
@@ -32,11 +36,10 @@ export function spawnFile(
   let loader: (context: Asset) => Observable<AssetEvent>
   if (file.fileType === 'CSS' || file.fileType === 'HTML') {
     loader = stringLoader
-  } else if (
-    file.fileType === 'JSON' ||
-    file.fileType === 'MANIFEST'
-  ) {
+  } else if (file.fileType === 'JSON') {
     loader = jsonLoader
+  } else if (file.fileType === 'MANIFEST') {
+    loader = manifestLoader
   } else {
     loader = rawLoader
   }
@@ -49,6 +52,11 @@ export function spawnFile(
     parser = manifestParser(root)
   }
 
+  const { fileName } = file
+  file.fileName = fileName.startsWith(root)
+    ? relative(root, fileName)
+    : fileName
+
   return spawn(
     assetMachine
       .withConfig({
@@ -60,63 +68,6 @@ export function spawnFile(
       .withContext(file),
     { name: file.id },
   )
-}
-
-function manifestParser(
-  root: string,
-): (context: Asset) => Observable<AssetEvent> {
-  return ({ source }) => {
-    try {
-      const result = Object.entries(
-        parseManifest(source as Manifest),
-      ) as [FileType, string[]][]
-
-      const files = result.flatMap(([fileType, fileNames]) =>
-        fileNames
-          .flatMap(expandMatchPatterns(root))
-          .map((fileName) => ({
-            fileType,
-            fileName,
-            id: join(root, fileName),
-          })),
-      )
-
-      return from(files.map(model.events.ADD_FILE))
-    } catch (error) {
-      return of(model.events.ERROR(error))
-    }
-  }
-}
-
-function htmlParser(
-  root: string,
-): (context: Asset) => Observable<AssetEvent> {
-  return ({ id: htmlId, source }) => {
-    try {
-      const htmlDir = dirname(htmlId)
-
-      const result = Object.entries(
-        parseHtml(source as string),
-      ) as [FileType, string[]][]
-
-      const files = result.flatMap(([fileType, fileNames]) =>
-        fileNames.map((htmlFileName): Script | BaseAsset => {
-          const id = resolve(htmlDir, htmlFileName)
-          const fileName = relative(root, id)
-
-          return {
-            fileType,
-            id,
-            fileName,
-          }
-        }),
-      )
-
-      return from(files.map(model.events.ADD_FILE))
-    } catch (error) {
-      return of(model.events.ERROR(error))
-    }
-  }
 }
 
 function stringLoader({ id }: Asset) {
@@ -154,6 +105,27 @@ function jsonLoader({ id }: Asset) {
           source,
         }),
       )
+      .catch(model.events.ERROR),
+  )
+}
+
+function manifestLoader({ id }: Asset) {
+  return from(
+    manifestExplorer
+      .load(id)
+      .then((result) => {
+        if (result === null)
+          throw new Error(`Unable to load manifest at ${id}`)
+        const { config, isEmpty } = result
+        if (isEmpty)
+          throw new Error(
+            `Manifest appears to be empty at ${id}`,
+          )
+        return model.events.LOADED({
+          id,
+          source: config as Manifest,
+        })
+      })
       .catch(model.events.ERROR),
   )
 }

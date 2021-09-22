@@ -1,12 +1,17 @@
 {
   "extends": "./tsconfigs/tsconfig-base.json",
   "include": [
-    "src/**/*",
-    "test/**/*.ts",
-    "test/**/*.tsx",
+    "jest.globalSetup.ts",
     "jest.setup.ts",
-    "jest.globalSetup.ts"
+    "src",
+    "test/**/*.ts",
+    "test/**/*.tsx"
   ],
-  "exclude": ["src/manifest-input/browser", "playground/**/*"],
+  "exclude": [
+    "lib",
+    "playground",
+    "src/browser",
+    "test/fixtures"
+  ],
   "typeAcquisition": { "enable": true }
 }

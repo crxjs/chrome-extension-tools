@@ -20,11 +20,11 @@ module.exports = {
     '^\\$test(.+)$': '<rootDir>/test$1',
     // bundled imports
     ...Object.fromEntries(
-      readdirSync(join(__dirname, 'test', 'fixtures'))
-        .filter((filename) => filename.endsWith('.ts'))
+      readdirSync(join(__dirname, 'src', 'browser'))
+        .filter((filename) => filename.startsWith('code-'))
         .map((filename) => [
           `code ./browser/${filename}`,
-          `<rootDir>/test/fixtures/dist/${
+          `<rootDir>/test/fixtures/${
             filename.slice(0, -2) + 'js'
           }`,
         ]),

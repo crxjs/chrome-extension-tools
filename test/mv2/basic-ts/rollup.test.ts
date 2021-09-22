@@ -7,7 +7,7 @@ const outputPromise = getRollupOutput(
   'rollup.config.js',
 )
 
-test('bundles chunks and assets', async () => {
+test('bundles chunks', async () => {
   const { output } = await outputPromise
 
   // Chunks
