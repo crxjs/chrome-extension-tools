@@ -106,7 +106,7 @@ export const machine = model.createMachine(
       },
       start: {
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
-        entry: ['sendStartToAllFiles', 'addAllEntryFiles'],
+        entry: ['restartExistingFiles', 'addAllEntryFiles'],
         on: {
           ADD_FILE: {
             cond: 'fileDoesNotExist',
@@ -121,7 +121,11 @@ export const machine = model.createMachine(
           },
           FILE_DONE: [
             {
-              cond: 'allFilesReady',
+              cond: 'readyForManifest',
+              actions: ['renderManifest', 'handleFile'],
+            },
+            {
+              cond: 'allFilesComplete',
               actions: 'handleFile',
               target: 'watch',
             },
@@ -169,12 +173,31 @@ export const machine = model.createMachine(
           return [...files, ref]
         },
       }),
+      restartExistingFiles: pure(({ files }) =>
+        files.map((file) =>
+          send(model.events.START(), { to: file.id }),
+        ),
+      ),
+      renderManifest: send(model.events.START(), {
+        to: ({ files }) =>
+          files.find(
+            (f) =>
+              f.getSnapshot()?.context.fileType === 'MANIFEST',
+          )!,
+      }),
     },
     guards: {
-      allFilesReady: ({ files }) =>
+      allFilesComplete: ({ files }) =>
         files.every((file) =>
-          file.getSnapshot()?.hasTag('ready'),
+          file.getSnapshot()?.matches('complete'),
         ),
+      readyForManifest: ({ files }) =>
+        files.every((file) => {
+          const snap = file.getSnapshot()
+          if (snap?.context.fileType === 'MANIFEST')
+            return snap?.matches('ready')
+          return snap?.matches('complete')
+        }),
       fileDoesNotExist: ({ files }, event) => {
         const { id } = narrowEvent(event, 'ADD_FILE')
 

@@ -5,7 +5,9 @@ import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
 import { isString, normalizeFilename } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { RPCEPlugin } from './types'
+import { esmBackground } from './plugin-esmBackground'
+import { packageJson } from './plugin-packageJson'
+import type { ManifestV2, ManifestV3, RPCEPlugin } from './types'
 import { useViteAdaptor } from './viteAdaptor'
 import {
   narrowEvent,
@@ -14,11 +16,12 @@ import {
 } from './xstate-helpers'
 import { isScript } from './xstate-models'
 
+export { useViteAdaptor }
+export type { ManifestV3, ManifestV2 }
+
 export const simpleReloader = () => ({ name: 'simpleReloader' })
 
-export { useViteAdaptor }
-
-const stubId = '_stubIdForRPCE'
+export const stubId = '_stubIdForRPCE'
 
 export const chromeExtension = (): Plugin => {
   const isHtml = createFilter(['**/*.html'])
@@ -59,10 +62,10 @@ export const chromeExtension = (): Plugin => {
       }
     },
 
-    options({ plugins = [], input = [], ...options }) {
+    async options({ plugins = [], input = [], ...options }) {
       // TODO: add builtin plugins
       const builtins: (false | RPCEPlugin | null | undefined)[] =
-        []
+        [esmBackground(), packageJson()].map(useViteAdaptor)
 
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
@@ -124,6 +127,14 @@ export const chromeExtension = (): Plugin => {
 
         if (result.length)
           finalInput = Object.fromEntries(result)
+      }
+
+      // Plugins added during the options hook miss that hook
+      for (const b of builtins.filter(
+        (x): x is RPCEPlugin => !!x,
+      )) {
+        const result = await b?.options?.call(this, options)
+        options = result ?? options
       }
 
       return {
