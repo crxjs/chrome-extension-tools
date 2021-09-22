@@ -72,6 +72,9 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
         typeof value === 'function'
       )
         return function (this: PluginContext, ...args: any[]) {
+          if (!service.initialized)
+            return value.call(this, ...args)
+
           if (prop === 'configureServer') {
             const [server] = args
             service.send(

@@ -1,10 +1,53 @@
 import cheerio, { CheerioAPI } from 'cheerio'
+import {
+  dirname,
+  isAbsolute,
+  join,
+  relative,
+  resolve,
+} from 'path'
+import { from, Observable, of } from 'rxjs'
+import { AssetEvent, model } from './files-asset.machine'
 import { isString } from './helpers'
-import { FileType } from './types'
+import { Asset, BaseAsset, FileType, Script } from './types'
+
+export function htmlParser(
+  root: string,
+): (context: Asset) => Observable<AssetEvent> {
+  return ({ id: htmlId, source }) => {
+    try {
+      const htmlDir = dirname(htmlId)
+
+      const result = Object.entries(
+        parseHtml(source as string),
+      ) as [FileType, string[]][]
+
+      const files = result.flatMap(([fileType, fileNames]) =>
+        fileNames.map((inputFileName): Script | BaseAsset => {
+          let id: string
+          if (isAbsolute(inputFileName))
+            id = join(root, inputFileName)
+          else id = resolve(htmlDir, inputFileName)
+          const fileName = relative(root, id)
+
+          return {
+            fileType,
+            id,
+            fileName,
+          }
+        }),
+      )
+
+      return from(files.map(model.events.ADD_FILE))
+    } catch (error) {
+      return of(model.events.ERROR(error))
+    }
+  }
+}
 
 /**
- * Returns filenames relative to the html file,
- * which may be at any depth inside the root folder.
+ * Returns filenames relative to the HTML file
+ * The HTML file may be at any depth inside the root
  */
 export function parseHtml(
   source: string,
@@ -60,7 +103,7 @@ export function getJsAssets($: CheerioAPI) {
     .filter(isString)
 }
 
-/* -------------------- css ------------------- */
+/* ---------------------- CSS ---------------------- */
 
 function getCss($: CheerioAPI) {
   return $('link')
@@ -78,7 +121,7 @@ export function getCssHrefs($: CheerioAPI) {
     .filter(isString)
 }
 
-/* -------------------- img ------------------- */
+/* --------------------- IMAGES -------------------- */
 
 function getImgs($: CheerioAPI) {
   return $('img')

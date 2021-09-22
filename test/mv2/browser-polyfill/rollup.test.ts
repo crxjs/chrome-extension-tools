@@ -36,12 +36,10 @@ test('bundles assets', async () => {
   const assets = output.filter(isAsset)
 
   expect(
-    output.find(
-      byFileName('assets/browser-polyfill-executeScript.js'),
-    ),
+    output.find(byFileName('browser-polyfill.js')),
   ).toBeDefined()
   expect(
-    output.find(byFileName('assets/browser-polyfill.js')),
+    output.find(byFileName('browser-polyfill-executeScript.js')),
   ).toBeDefined()
 
   // 11 assets + 1 wrapper script + 2 browser polyfills
@@ -60,16 +58,14 @@ test('includes browser polyfill in manifest.json', async () => {
     JSON.parse(manifestSource)
 
   expect(manifest.background?.scripts?.[0]).toBe(
-    'assets/browser-polyfill.js',
+    'browser-polyfill.js',
   )
   expect(manifest.background?.scripts?.[1]).toBe(
-    'assets/browser-polyfill-executeScript.js',
+    'browser-polyfill-executeScript.js',
   )
 
   manifest.content_scripts?.forEach(({ js = [] }) => {
-    expect(js[0]).toBe('assets/browser-polyfill.js')
-    expect(js[1]).not.toBe(
-      'assets/browser-polyfill-executeScript.js',
-    )
+    expect(js[0]).toBe('browser-polyfill.js')
+    expect(js[1]).not.toBe('browser-polyfill-executeScript.js')
   })
 })

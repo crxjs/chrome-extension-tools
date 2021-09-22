@@ -187,7 +187,7 @@ export interface ChromeExtensionOptions {
    * TODO: add link to docs
    */
   extendManifest?:
-    | Partial<chrome.runtime.Manifest>
+    | Partial<Manifest>
     | (<T extends chrome.runtime.ManifestBase>(manifest: T) => T)
   pkg?: {
     description: string

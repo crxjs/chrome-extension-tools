@@ -3,6 +3,7 @@ import readPkgUp from 'read-pkg-up'
 import { PackageJson } from 'type-fest'
 import { RPCEPlugin } from './types'
 
+/** Applies name, version, and description from package.json to the manifest */
 export const packageJson = (): RPCEPlugin => {
   let packageJson: PackageJson
   return {

@@ -15,9 +15,8 @@ test('Handles config with input array', async () => {
     byFileName('manifest.json'),
   ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
-    manifestSource,
-  )
+  const manifest: chrome.runtime.ManifestV2 =
+    JSON.parse(manifestSource)
 
   expect(manifest).toBeDefined()
   expect(manifest.background).toBeDefined()

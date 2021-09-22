@@ -5,9 +5,19 @@ import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
 import { isString, normalizeFilename } from './helpers'
 import { runPlugins } from './index_runPlugins'
+import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
+import { extendManifest } from './plugin-extendManifest'
+import { hybridFormatOutput } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
-import type { ManifestV2, ManifestV3, RPCEPlugin } from './types'
+import { viteSupport } from './plugin-viteSupport'
+import type {
+  ChromeExtensionOptions,
+  CompleteFile,
+  ManifestV2,
+  ManifestV3,
+  RPCEPlugin,
+} from './types'
 import { useViteAdaptor } from './viteAdaptor'
 import {
   narrowEvent,
@@ -23,7 +33,9 @@ export const simpleReloader = () => ({ name: 'simpleReloader' })
 
 export const stubId = '_stubIdForRPCE'
 
-export const chromeExtension = (): Plugin => {
+export const chromeExtension = (
+  pluginOptions: ChromeExtensionOptions = {},
+): Plugin => {
   const isHtml = createFilter(['**/*.html'])
   // const isScript = createFilter(
   //   ['**/*.js', '**/*.ts', '**/*.tsx', '**/*.jsx'],
@@ -51,10 +63,18 @@ export const chromeExtension = (): Plugin => {
     },
   })
 
+  const files = new Set<CompleteFile>()
+
   return useViteAdaptor({
     name: 'chrome-extension',
 
-    api: { service },
+    api: {
+      files,
+      /** The updated root folder, derived from either the Vite config or the manifest dirname */
+      get root() {
+        return service.getSnapshot().context.root
+      },
+    },
 
     config(config) {
       if (isString(config.root)) {
@@ -63,9 +83,16 @@ export const chromeExtension = (): Plugin => {
     },
 
     async options({ plugins = [], input = [], ...options }) {
-      // TODO: add builtin plugins
-      const builtins: (false | RPCEPlugin | null | undefined)[] =
-        [esmBackground(), packageJson()].map(useViteAdaptor)
+      const builtins: RPCEPlugin[] = [
+        packageJson(),
+        esmBackground(),
+        hybridFormatOutput(),
+        pluginOptions.browserPolyfill && browserPolyfill(),
+        viteSupport(),
+        extendManifest(pluginOptions),
+      ]
+        .filter((x): x is RPCEPlugin => !!x)
+        .map(useViteAdaptor)
 
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
@@ -83,7 +110,7 @@ export const chromeExtension = (): Plugin => {
               model.events.ADD_FILE({
                 id,
                 fileType: 'HTML',
-                fileName: 'manifest.json',
+                fileName: id,
               }),
             )
           else if (basename(id).startsWith('manifest'))
@@ -107,7 +134,9 @@ export const chromeExtension = (): Plugin => {
               send(
                 model.events.ADD_FILE({
                   id,
-                  fileName,
+                  fileName: fileName.endsWith('.html')
+                    ? fileName
+                    : fileName + '.html',
                   fileType: 'HTML',
                 }),
               )
@@ -160,6 +189,7 @@ export const chromeExtension = (): Plugin => {
             if (isScript(file))
               file.fileName = normalizeFilename(file.fileName)
 
+            files.add(file)
             this.emitFile(file)
             this.addWatchFile(file.id)
           },
@@ -201,6 +231,7 @@ export const chromeExtension = (): Plugin => {
     },
 
     watchChange(id, change) {
+      files.clear()
       send(model.events.CHANGE(id, change))
     },
 

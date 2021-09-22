@@ -1,1 +1,6 @@
-console.log('content script')
+(function () {
+	'use strict';
+
+	console.log('content script');
+
+}());
