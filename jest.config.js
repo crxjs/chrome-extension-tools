@@ -32,7 +32,6 @@ module.exports = {
   },
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
-  testRunner: 'jest-circus/runner',
   transform: {
     '\\.[tj]sx?$': 'esbuild-runner/jest',
   },
