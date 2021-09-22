@@ -4,7 +4,8 @@
     "src/**/*",
     "test/**/*.ts",
     "test/**/*.tsx",
-    "jest.setup.ts"
+    "jest.setup.ts",
+    "jest.globalSetup.ts"
   ],
   "exclude": ["src/manifest-input/browser", "playground/**/*"],
   "typeAcquisition": { "enable": true }
