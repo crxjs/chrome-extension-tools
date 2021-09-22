@@ -67,14 +67,13 @@ async function runManifestPlugins(
 ) {
   const file = asset
   for (const p of plugins) {
-    const result = (await p[
-      `${hook}Crx${capitalize(file.fileType)}` as
-        | 'transformCrxManifest'
-        | 'renderCrxManifest'
-    ]?.call(this, file.source as any)) as
-      | undefined
-      | null
-      | Manifest
+    const hookName = `${hook}Crx${capitalize(file.fileType)}` as
+      | 'transformCrxManifest'
+      | 'renderCrxManifest'
+    const result = (await p[hookName]?.call(
+      this,
+      file.source as any,
+    )) as undefined | null | Manifest
 
     if (result) file.source = result
   }

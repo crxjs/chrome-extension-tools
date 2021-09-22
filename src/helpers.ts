@@ -1,5 +1,4 @@
-import { OutputOptions } from 'rollup'
-import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
+import { OutputAsset, OutputChunk, OutputOptions } from 'rollup'
 
 export type Unpacked<T> = T extends Array<infer R> ? R : never
 

@@ -28,7 +28,13 @@ test('bundles assets', async () => {
 
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
-  expect(assets.find(byFileName('background.esm-wrapper.js')))
+  const backgroundEsmWrapper = assets.find(
+    byFileName('background.esm-wrapper.js'),
+  )
+  expect(backgroundEsmWrapper).toBeDefined()
+  expect(backgroundEsmWrapper?.source).toMatch(
+    '/** backgroundEsmWrapper */',
+  )
 
   // 1 dynamic import wrapper, an html file, and the manifest
   expect(assets.length).toBe(3)
