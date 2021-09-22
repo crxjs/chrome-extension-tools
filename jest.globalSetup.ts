@@ -5,6 +5,9 @@ import fs from 'fs'
 import path from 'path'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import bundleImports from 'rollup-plugin-bundle-imports'
+import { format } from './src/helpers'
+
+const browserCodeDirname = path.join(__dirname, 'src', 'browser')
 
 const testFixtureDirname = path.join(
   __dirname,
@@ -12,16 +15,31 @@ const testFixtureDirname = path.join(
   'fixtures',
 )
 
+const entryFiles = fs
+  .readdirSync(browserCodeDirname)
+  .filter((filename) => filename.startsWith('code-'))
+
 const config: RollupOptions = {
-  input: fs
-    .readdirSync(testFixtureDirname)
-    .filter((filename) => filename.endsWith('ts'))
-    .map((filename) => path.join(testFixtureDirname, filename)),
+  input: entryFiles,
   output: {
-    dir: path.join(testFixtureDirname, 'dist'),
+    dir: testFixtureDirname,
     format: 'esm',
   },
   plugins: [
+    {
+      resolveId(source, importer) {
+        if (!importer) return source
+        return null
+      },
+      load(id) {
+        if (entryFiles.includes(id)) {
+          const importPath = path.join(browserCodeDirname, id)
+          return format`import { code } from 'code ${importPath}'
+                         export { code }`
+        }
+        return null
+      },
+    },
     json(),
     sucrase({
       transforms: ['typescript'],
@@ -36,9 +54,7 @@ const config: RollupOptions = {
   ],
 }
 
-const { output, ...input } = config
-
 export default async () => {
-  const build = await rollup(input)
-  return build.write(output as OutputOptions)
+  const build = await rollup(config)
+  return build.write(config.output as OutputOptions)
 }
