@@ -4,6 +4,7 @@
 /coverage
 **/*.js
 **/*.jsx
+**/*.cjs
 
 rollup.config.js
 jest.config.js
