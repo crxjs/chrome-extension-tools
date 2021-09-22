@@ -32,6 +32,11 @@ module.exports = {
   },
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/playground/',
+    '/dist/',
+  ],
   transform: {
     '\\.[tj]sx?$': 'esbuild-runner/jest',
   },
