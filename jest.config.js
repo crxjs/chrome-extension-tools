@@ -1,5 +1,9 @@
 // TODO: if process.env.CI, build for production and test against the build
 // - add global setup file to build
+
+const { readdirSync } = require('fs')
+const { join } = require('path')
+
 // - update moduleNameMapper to point $src to pkg.main
 module.exports = {
   collectCoverageFrom: [
@@ -8,24 +12,23 @@ module.exports = {
     '!src/simple-reloader/client/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
+  globalSetup: './jest.globalSetup.ts',
   moduleNameMapper: {
     // aliases
     '^\\$src(.+)$': '<rootDir>/src$1',
     '^\\$src$': '<rootDir>/src/index.ts',
     '^\\$test(.+)$': '<rootDir>/test$1',
-    // bundle imports
-    'code ./browser/contentScriptWrapper.ts':
-      '<rootDir>/test/fixtures/dist/contentScriptWrapper.js',
-    'code ./client-browserPolyfill/executeScriptPolyfill.ts':
-      '<rootDir>/test/fixtures/dist/executeScriptPolyfill.js',
-    'code ./browser/importWrapper--explicit.ts':
-      '<rootDir>/test/fixtures/dist/importWrapper--explicit.js',
-    'code ./browser/importWrapper--implicit.ts':
-      '<rootDir>/test/fixtures/dist/importWrapper--implicit.js',
-    'code ./client/background.ts':
-      '<rootDir>/test/fixtures/dist/reloaderBackground.js',
-    'code ./client/content.ts':
-      '<rootDir>/test/fixtures/dist/reloaderContent.js',
+    // bundled imports
+    ...Object.fromEntries(
+      readdirSync(join(__dirname, 'test', 'fixtures'))
+        .filter((filename) => filename.endsWith('.ts'))
+        .map((filename) => [
+          `code ./browser/${filename}`,
+          `<rootDir>/test/fixtures/dist/${
+            filename.slice(0, -2) + 'js'
+          }`,
+        ]),
+    ),
   },
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],
