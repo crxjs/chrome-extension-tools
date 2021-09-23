@@ -5,9 +5,9 @@ import resolve from '@rollup/plugin-node-resolve'
 import path from 'path'
 
 export default {
-  input: [path.join(__dirname, 'src', 'manifest.json')],
+  input: ['src/manifest.json'],
   output: {
-    dir: path.join(__dirname, 'dist'),
+    dir: 'dist',
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
   },
@@ -17,7 +17,7 @@ export default {
     simpleReloader(),
     babel({
       // Do not transpile dependencies
-      ignore: ['node_modules'],
+      ignore: [path.resolve(__dirname, '../../../node_modules')],
       babelHelpers: 'bundled',
       configFile: path.resolve(__dirname, 'babel.config.json'),
     }),
