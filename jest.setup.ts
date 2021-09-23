@@ -2,6 +2,12 @@
 
 import 'array-flat-polyfill'
 
+// nothing should timeout during debug
+const timeout = process.env.JEST_TIMEOUT
+  ? parseInt(process.env.JEST_TIMEOUT)
+  : false
+if (timeout) jest.setTimeout(timeout)
+
 // Jest attempts to sandbox globals, but it doesn't work with `instanceof`
 // https://github.com/facebook/jest/issues/2549
 // Object.defineProperty(Uint8Array, Symbol.hasInstance, {
