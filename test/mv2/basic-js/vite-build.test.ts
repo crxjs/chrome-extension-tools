@@ -5,6 +5,8 @@ import path from 'path'
 import { RollupOutput } from 'rollup'
 import { build } from 'vite'
 
+process.chdir(__dirname)
+
 const outDir = path.join(__dirname, 'dist-build')
 
 let output: RollupOutput['output']
@@ -12,7 +14,7 @@ beforeAll(async () => {
   await fs.remove(outDir)
 
   const { output: o } = (await build({
-    configFile: path.join(__dirname, 'vite.config.ts'),
+    configFile: 'vite.config.ts',
     envFile: false,
     build: { outDir },
   })) as RollupOutput
