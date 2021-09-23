@@ -2,6 +2,8 @@ import { isAsset, isChunk } from '$src/helpers'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 
+process.chdir(__dirname)
+
 const outputPromise = getRollupOutput(
   __dirname,
   'rollup.config.js',
