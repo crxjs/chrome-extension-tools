@@ -56,9 +56,8 @@ test('gets correct action img', () => {
   expect(result.IMAGE).toContain(icon128)
 })
 
-test('gets correct locales folder', () => {
+test('gets match pattern for locales folders', () => {
   const result = parseManifest(manifest)
 
-  expect(result.JSON).toContain(localesEnJson)
-  expect(result.JSON).toContain(localesEsJson)
+  expect(result.JSON).toEqual(['_locales/**/messages.json'])
 })
