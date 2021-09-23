@@ -15,6 +15,8 @@ import { ModelEventsFrom } from 'xstate/lib/model.types'
 import { isString, isUndefined } from './helpers'
 import { writeAsIIFE } from './viteAdaptor_writeAsIIFE'
 
+export const configHook = 'config'
+export const serverHook = 'configureServer'
 export const VITE_SERVER_URL = '__VITE_SERVER_URL__'
 export const viteServerUrlRegExp = new RegExp(
   VITE_SERVER_URL,
@@ -63,9 +65,11 @@ export const viteAdaptorModel = createModel(context, {
       },
     }),
     EMIT_DONE: (id: string) => ({ id }),
-    HOOK_START: (hookName: string) => ({ hookName }),
+    HOOK_START: (hookName: string, args: any[]) => ({
+      hookName,
+      args,
+    }),
     ERROR: (error: any, id?: string) => ({ id, error }),
-    SERVER_CONFIGURE: (server: ViteDevServer) => ({ server }),
     SERVER_LISTENING: () => ({}),
   },
 })
@@ -78,17 +82,22 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
     states: {
       start: {
         on: {
-          HOOK_START: {
-            cond: (context, { hookName }) =>
-              hookName === 'options',
-            target: 'build',
-          },
-          SERVER_CONFIGURE: {
-            target: 'serve',
-            actions: viteAdaptorModel.assign({
-              server: (context, { server }) => server,
-            }),
-          },
+          HOOK_START: [
+            {
+              cond: (context, { hookName, args }) =>
+                hookName === configHook &&
+                args[1]?.command === 'build',
+              target: 'build',
+            },
+            {
+              cond: (context, { hookName }) =>
+                hookName === serverHook,
+              actions: viteAdaptorModel.assign({
+                server: (context, { args: [server] }) => server,
+              }),
+              target: 'serve',
+            },
+          ],
         },
       },
       build: {

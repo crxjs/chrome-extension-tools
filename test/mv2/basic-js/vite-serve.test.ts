@@ -3,6 +3,8 @@ import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
 
+process.chdir(__dirname)
+
 const outDir = path.join(__dirname, 'dist-serve')
 
 let devServer: ViteDevServer
@@ -10,7 +12,7 @@ beforeAll(async () => {
   await fs.remove(outDir)
 
   devServer = await createServer({
-    configFile: path.join(__dirname, 'vite.config.ts'),
+    configFile: 'vite.config.ts',
     envFile: false,
     build: { outDir },
   })
