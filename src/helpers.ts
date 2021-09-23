@@ -36,6 +36,11 @@ export function isString(x: any): x is string {
   return typeof x === 'string'
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function isFunction(x: any): x is Function {
+  return typeof x === 'function'
+}
+
 export function isUndefined(x: unknown): x is undefined {
   return typeof x === 'undefined'
 }

@@ -2,8 +2,11 @@ import { RPCEPlugin } from '$src/types'
 import { narrowEvent } from '$src/xstate-helpers'
 import { EmittedFile, PluginContext } from 'rollup'
 import { interpret } from 'xstate'
+import { isFunction, isString, isUndefined } from './helpers'
 import {
+  configHook,
   getEmittedFileId,
+  serverHook,
   viteAdaptorMachine,
   viteAdaptorModel,
 } from './viteAdaptor.machine'
@@ -11,6 +14,10 @@ import {
 const service = interpret(viteAdaptorMachine)
 
 service.start()
+
+// service.subscribe((state) => {
+//   console.log('🚀 ~ state', state)
+// })
 
 const sendEmitFile: PluginContext['emitFile'] = (
   file: EmittedFile,
@@ -20,24 +27,29 @@ const sendEmitFile: PluginContext['emitFile'] = (
 }
 
 export const fileWriteComplete = () =>
-  new Promise<void>((resolve, reject) =>
-    service.subscribe((state) => {
-      if (state.matches({ serve: { listening: 'ready' } }))
-        resolve()
-      if (state.matches({ serve: 'error' })) {
-        const { error, id } = narrowEvent(state.event, 'ERROR')
-        error.id = id
-        reject(error)
-      }
-    }),
-  )
-
-export const getViteServer = () => {
-  const state = service.getSnapshot()
-  return state.matches('serve')
-    ? state.context.server
-    : undefined
-}
+  new Promise<void>((resolve, reject) => {
+    const sub = service.subscribe({
+      next(state) {
+        if (state.matches({ serve: { listening: 'ready' } })) {
+          sub.unsubscribe()
+          resolve()
+        } else if (state.matches({ serve: 'error' })) {
+          const { error, id } = narrowEvent(state.event, 'ERROR')
+          error.id = id
+          sub.unsubscribe()
+          reject(error)
+        }
+      },
+      error(err) {
+        reject(err)
+      },
+      complete() {
+        reject(
+          new Error(`The service "${service.id}" has stopped`),
+        )
+      },
+    })
+  })
 
 export const shimPluginContext = (
   pluginContext: PluginContext,
@@ -62,38 +74,40 @@ export const shimPluginContext = (
   return proxy
 }
 
-export const useViteAdaptor = (plugin: RPCEPlugin) => {
-  const proxy = new Proxy(plugin, {
+export const useViteAdaptor = (plugin: RPCEPlugin) =>
+  new Proxy(plugin, {
+    ownKeys(target) {
+      const keys = new Set(Reflect.ownKeys(target))
+      keys.add(configHook)
+      keys.add(serverHook)
+      return Array.from(keys)
+    },
     get(target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver)
 
-      if (
-        typeof prop === 'string' &&
-        typeof value === 'function'
-      )
+      if (isString(prop) && isFunction(value))
         return function (this: PluginContext, ...args: any[]) {
           if (!service.initialized)
             return value.call(this, ...args)
 
-          if (prop === 'configureServer') {
-            const [server] = args
-            service.send(
-              viteAdaptorModel.events.SERVER_CONFIGURE(server),
-            )
-          } else {
-            service.send(
-              viteAdaptorModel.events.HOOK_START(prop),
-            )
-          }
+          service.send(
+            viteAdaptorModel.events.HOOK_START(prop, args),
+          )
 
           const shim = shimPluginContext(this)
 
           return value.call(shim, ...args)
         }
+      else if (
+        (configHook === prop || serverHook === prop) &&
+        isUndefined(value)
+      )
+        return function (this: PluginContext, ...args: any[]) {
+          service.send(
+            viteAdaptorModel.events.HOOK_START(prop, args),
+          )
+        }
 
       return value
     },
   })
-
-  return proxy
-}
