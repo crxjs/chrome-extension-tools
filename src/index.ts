@@ -8,7 +8,7 @@ import { runPlugins } from './index_runPlugins'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
-import { hybridFormatOutput } from './plugin-hybridOutput'
+import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
 import { viteSupport } from './plugin-viteSupport'
 import type {

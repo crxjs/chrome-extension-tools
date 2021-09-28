@@ -1,5 +1,5 @@
 import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
-import { generateFileNames } from './plugin-helpers'
+import { generateFileNames } from './plugin_helpers'
 import { isMV2, isMV3, RPCEPlugin } from './types'
 import { VITE_SERVER_URL } from './viteAdaptor.machine'
 
@@ -8,7 +8,7 @@ export const esmBackground = (): RPCEPlugin => {
   let isViteServe = false
 
   return {
-    name: 'crx-esm-background',
+    name: 'esm-background',
     configureServer() {
       isViteServe = true
     },

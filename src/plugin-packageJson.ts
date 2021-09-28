@@ -7,7 +7,7 @@ import { RPCEPlugin } from './types'
 export const packageJson = (): RPCEPlugin => {
   let packageJson: PackageJson
   return {
-    name: 'crx-manifest-package-json',
+    name: 'package-json',
     api: {
       get packageJson() {
         return packageJson
