@@ -24,7 +24,7 @@ export const hybridFormat = (): RPCEPlugin => {
     },
 
     buildStart(options) {
-      options.plugins.forEach((p) => plugins.add(p))
+      options.plugins?.forEach((p) => plugins.add(p))
 
       const { api } = Array.from(plugins).find(
         ({ name }) => name === 'chrome-extension',

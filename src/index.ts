@@ -3,7 +3,12 @@ import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { isString, normalizeFilename, not } from './helpers'
+import {
+  isString,
+  isUndefined,
+  normalizeFilename,
+  not,
+} from './helpers'
 import { runPlugins } from './index_runPlugins'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
@@ -33,8 +38,8 @@ export const simpleReloader = () => ({ name: 'simpleReloader' })
 
 export const stubId = '_stubIdForRPCE'
 
-const isThisPlugin = ({ name }: RPCEPlugin) =>
-  name === 'chrome-extension'
+const isThisPlugin = (p: RPCEPlugin) =>
+  p?.name === 'chrome-extension'
 
 export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
@@ -95,7 +100,7 @@ export const chromeExtension = (
     },
 
     async config(config, env) {
-      // Vite ignores changes to config.plugin, so adding them in configResolved
+      // Vite ignores changes to config.plugin, so we're adding them in configResolved
       // Just running the config hook for the builtins here for thoroughness
       for (const b of builtins) {
         const result = await b?.config?.call(this, config, env)
@@ -112,7 +117,8 @@ export const chromeExtension = (
     async configResolved(config) {
       // Save user plugins to run RPCE hooks in buildStart
       config.plugins.forEach((p) => {
-        if (!isThisPlugin(p)) vitePlugins.add(p)
+        if (!isUndefined(p) && !isThisPlugin(p))
+          vitePlugins.add(p)
       })
 
       // We can't add them in the config hook :/
@@ -215,7 +221,7 @@ export const chromeExtension = (
     async buildStart({ plugins: rollupPlugins }) {
       const plugins = Array.from(vitePlugins)
         .concat(rollupPlugins)
-        .filter(not(isThisPlugin))
+        .filter((x) => !isUndefined(x) && !isThisPlugin(x))
 
       useConfig(service, {
         actions: {
