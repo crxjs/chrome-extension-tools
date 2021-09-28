@@ -14,12 +14,19 @@ import { CompleteFile, RPCEPlugin } from './types'
 export const hybridFormat = (): RPCEPlugin => {
   let files: Set<CompleteFile>
   let root = process.cwd()
+  const plugins = new Set<RPCEPlugin>()
 
   return {
     name: 'hybrid-format',
 
+    configResolved(config) {
+      config.plugins.forEach((p) => plugins.add(p))
+    },
+
     buildStart(options) {
-      const { api } = options.plugins.find(
+      options.plugins.forEach((p) => plugins.add(p))
+
+      const { api } = Array.from(plugins).find(
         ({ name }) => name === 'chrome-extension',
       )!
 
