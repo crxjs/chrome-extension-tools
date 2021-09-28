@@ -3,7 +3,7 @@ import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { isString, normalizeFilename } from './helpers'
+import { isString, normalizeFilename, not } from './helpers'
 import { runPlugins } from './index_runPlugins'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
@@ -32,6 +32,9 @@ export type { ManifestV3, ManifestV2 }
 export const simpleReloader = () => ({ name: 'simpleReloader' })
 
 export const stubId = '_stubIdForRPCE'
+
+const isThisPlugin = ({ name }: RPCEPlugin) =>
+  name === 'chrome-extension'
 
 export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
@@ -65,6 +68,21 @@ export const chromeExtension = (
 
   const files = new Set<CompleteFile>()
 
+  let addBuiltinsDuringOptionsHook = true
+  const builtins: RPCEPlugin[] = [
+    packageJson(),
+    esmBackground(),
+    hybridFormat(),
+    pluginOptions.browserPolyfill && browserPolyfill(),
+    viteSupport(),
+    extendManifest(pluginOptions),
+  ]
+    .filter((x): x is RPCEPlugin => !!x)
+    .map(useViteAdaptor)
+    .map((p) => ({ ...p, name: `crx:${p.name}` }))
+
+  const vitePlugins = new Set<RPCEPlugin>()
+
   return useViteAdaptor({
     name: 'chrome-extension',
 
@@ -76,24 +94,44 @@ export const chromeExtension = (
       },
     },
 
-    config(config) {
+    async config(config, env) {
+      // Vite ignores changes to config.plugin, so adding them in configResolved
+      // Just running the config hook for the builtins here for thoroughness
+      for (const b of builtins) {
+        const result = await b?.config?.call(this, config, env)
+        config = result ?? config
+      }
+
       if (isString(config.root)) {
         send(model.events.ROOT(config.root))
       }
+
+      return config
     },
 
-    async options({ plugins = [], input = [], ...options }) {
-      const builtins: RPCEPlugin[] = [
-        packageJson(),
-        esmBackground(),
-        hybridFormatOutput(),
-        pluginOptions.browserPolyfill && browserPolyfill(),
-        viteSupport(),
-        extendManifest(pluginOptions),
-      ]
-        .filter((x): x is RPCEPlugin => !!x)
-        .map(useViteAdaptor)
+    async configResolved(config) {
+      // Save user plugins to run RPCE hooks in buildStart
+      config.plugins.forEach((p) => {
+        if (!isThisPlugin(p)) vitePlugins.add(p)
+      })
 
+      // We can't add them in the config hook :/
+      // but sync changes in this hook seem to work...
+      // TODO: test this specifically in new Vite releases
+      const rpceIndex = config.plugins.findIndex(isThisPlugin)
+      // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
+      config.plugins.splice(rpceIndex, 0, ...builtins)
+      // Tell the options hook not to add the builtins again
+      addBuiltinsDuringOptionsHook = false
+
+      // Run possibly async builtins last
+      // After this, Vite will take over
+      for (const b of builtins) {
+        await b?.configResolved?.call(this, config)
+      }
+    },
+
+    async options({ input = [], ...options }) {
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
         send(
@@ -158,22 +196,27 @@ export const chromeExtension = (
           finalInput = Object.fromEntries(result)
       }
 
-      // Plugins added during the options hook miss that hook
-      for (const b of builtins.filter(
-        (x): x is RPCEPlugin => !!x,
-      )) {
-        const result = await b?.options?.call(this, options)
-        options = result ?? options
+      // Vite will run this hook for all our added plugins,
+      // but we still need to add builtin plugins for Rollup
+      // TODO: check if this needs to be done in Rollup watch mode
+      if (addBuiltinsDuringOptionsHook) {
+        for (const b of builtins) {
+          await b?.options?.call(this, options)
+        }
+
+        options.plugins = (options.plugins ?? []).concat(
+          builtins,
+        )
       }
 
-      return {
-        input: finalInput,
-        plugins: plugins.concat(builtins),
-        ...options,
-      }
+      return { input: finalInput, ...options }
     },
 
-    async buildStart({ plugins }) {
+    async buildStart({ plugins: rollupPlugins }) {
+      const plugins = Array.from(vitePlugins)
+        .concat(rollupPlugins)
+        .filter(not(isThisPlugin))
+
       useConfig(service, {
         actions: {
           handleError: (context, event) => {
