@@ -103,9 +103,10 @@ export const useViteAdaptor = (plugin: RPCEPlugin) =>
         isUndefined(value)
       )
         return function (this: PluginContext, ...args: any[]) {
-          service.send(
-            viteAdaptorModel.events.HOOK_START(prop, args),
-          )
+          if (service.initialized)
+            service.send(
+              viteAdaptorModel.events.HOOK_START(prop, args),
+            )
         }
 
       return value

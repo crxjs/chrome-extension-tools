@@ -17,6 +17,7 @@ import { writeAsIIFE } from './viteAdaptor_writeAsIIFE'
 
 export const configHook = 'config'
 export const serverHook = 'configureServer'
+export const rollupHook = 'options'
 export const VITE_SERVER_URL = '__VITE_SERVER_URL__'
 export const viteServerUrlRegExp = new RegExp(
   VITE_SERVER_URL,
@@ -84,17 +85,27 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
         on: {
           HOOK_START: [
             {
-              cond: (context, { hookName, args }) =>
-                hookName === configHook &&
-                args[1]?.command === 'build',
+              cond: (context, { hookName }) => {
+                return hookName === rollupHook
+              },
               target: 'build',
             },
             {
-              cond: (context, { hookName }) =>
-                hookName === serverHook,
-              actions: viteAdaptorModel.assign({
-                server: (context, { args: [server] }) => server,
-              }),
+              cond: (context, { hookName, args }) => {
+                return (
+                  hookName === configHook &&
+                  args[1]?.command === 'build'
+                )
+              },
+              target: 'build',
+            },
+            {
+              cond: (context, { hookName, args }) => {
+                return (
+                  hookName === configHook &&
+                  args[1]?.command === 'serve'
+                )
+              },
               target: 'serve',
             },
           ],
@@ -108,6 +119,20 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
         states: {
           error: { id: 'error' },
           starting: {
+            on: {
+              HOOK_START: {
+                cond: (context, { hookName }) => {
+                  return hookName === serverHook
+                },
+                actions: viteAdaptorModel.assign({
+                  server: (context, { args: [server] }) =>
+                    server,
+                }),
+                target: 'waiting',
+              },
+            },
+          },
+          waiting: {
             invoke: {
               src: 'waitForServer',
             },
