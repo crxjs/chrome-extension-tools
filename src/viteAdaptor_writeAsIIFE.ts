@@ -1,4 +1,3 @@
-import { isString } from './helpers'
 import fs from 'fs'
 import { isUndefined } from 'lodash'
 import path from 'path'
@@ -9,7 +8,12 @@ import {
   Plugin,
   rollup,
 } from 'rollup'
-import { ViteDevServer } from 'vite'
+import {
+  TransformResult,
+  transformWithEsbuild,
+  ViteDevServer,
+} from 'vite'
+import { isString } from './helpers'
 
 export async function writeAsIIFE(
   file: EmittedChunk,
@@ -27,6 +31,8 @@ export async function writeAsIIFE(
   return build.write(options)
 }
 
+const modules = new Map<string, TransformResult>()
+
 export function resolveFromServer(
   server: ViteDevServer,
 ): Plugin {
@@ -36,22 +42,35 @@ export function resolveFromServer(
       if (source.startsWith('/@fs')) return source
 
       const id = path.join(server.config.root, source)
-
       const fileExists = fs.existsSync(id)
-
       return fileExists ? id : false
     },
     async load(id) {
       try {
-        const result = await server.transformRequest(id)
+        let result: TransformResult
+        if (id.startsWith('/@fs') && modules.has(id)) {
+          result = modules.get(id)!
+        } else {
+          const x = await server.transformRequest(id)
+          if (!x) return null
+          if (isString(x)) {
+            result = { code: x, map: null }
+          } else {
+            // @ts-expect-error transformRequest return type is unworkable
+            result = x
+          }
+          if (isUndefined(result.code)) return null
+        }
 
-        if (!result) return null
-        if (isString(result)) return result
-        if (isUndefined(result.code))
-          throw new Error('result.code is undefined')
+        if (id.startsWith('/@fs') && !modules.has(id)) {
+          result = await transformWithEsbuild(result.code, id, {
+            format: 'esm',
+          })
+          modules.set(id, result)
+        }
 
-        const { code, map, ast } = result
-        return { code, map, ast }
+        const { code, map } = result
+        return { code, map }
       } catch (error) {
         console.log(`Could not load ${id}`)
         console.error(error)
