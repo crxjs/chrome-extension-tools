@@ -7,16 +7,16 @@ import {
   RollupOptions,
 } from 'rollup'
 import { isChunk } from './helpers'
-import { generateFileNames } from './plugin-helpers'
+import { generateFileNames } from './plugin_helpers'
 import { CompleteFile, RPCEPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
-export const hybridFormatOutput = (): RPCEPlugin => {
+export const hybridFormat = (): RPCEPlugin => {
   let files: Set<CompleteFile>
   let root = process.cwd()
 
   return {
-    name: 'hybrid-format-output',
+    name: 'hybrid-format',
 
     buildStart(options) {
       const { api } = options.plugins.find(

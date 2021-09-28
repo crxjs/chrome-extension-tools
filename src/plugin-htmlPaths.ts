@@ -3,13 +3,13 @@ import { dirname, join, relative } from 'path'
 import { RPCEPlugin } from './types'
 import { VITE_SERVER_URL } from './viteAdaptor.machine'
 
-export const fixHtmlSrc = (): RPCEPlugin => {
+export const htmlPaths = (): RPCEPlugin => {
   let isViteServe = false
   let root = process.cwd()
   return {
-    name: 'fix-html-src',
-    configureServer() {
-      isViteServe = true
+    name: 'html-paths',
+    config(options, { command }) {
+      isViteServe = command === 'serve'
     },
     buildStart({ plugins }) {
       const { api } = plugins.find(
@@ -21,7 +21,7 @@ export const fixHtmlSrc = (): RPCEPlugin => {
     renderCrxHtml(source, { id }) {
       const $ = cheerio.load(source)
 
-      const result = $('script')
+      $('script')
         .not('[data-rollup-asset]')
         .not('[src^="http:"]')
         .not('[src^="https:"]')
@@ -43,7 +43,7 @@ export const fixHtmlSrc = (): RPCEPlugin => {
           return result
         })
 
-      return result.html()
+      return $.html()
     },
   }
 }
