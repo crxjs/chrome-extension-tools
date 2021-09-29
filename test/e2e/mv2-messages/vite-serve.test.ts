@@ -4,6 +4,8 @@ import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright'
 import { createServer, ViteDevServer } from 'vite'
 
+jest.setTimeout(30000)
+
 const timeout = (ms: number, message: string) =>
   new Promise((resolve, reject) => {
     setTimeout(() => reject(new Error(message)), ms)
@@ -36,7 +38,7 @@ beforeAll(async () => {
       ],
     },
   )) as ChromiumBrowserContext
-}, 30000)
+})
 
 afterAll(async () => {
   await browserContext?.close()
@@ -58,4 +60,4 @@ test.skip('Chrome Extension loads and runs successfully', async () => {
   await page.waitForSelector('text="Background response"')
   await page.waitForSelector('text="Background OK"')
   await page.waitForSelector('text="Options page OK"')
-}, 300000)
+})

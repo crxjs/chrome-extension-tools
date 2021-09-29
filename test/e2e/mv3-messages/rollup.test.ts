@@ -8,6 +8,8 @@ import {
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import config, { outDir } from './rollup.config'
 
+jest.setTimeout(30000)
+
 const dataDirPath = path.join(
   __dirname,
   'chromium-data-dir-rollup',
@@ -34,7 +36,7 @@ beforeAll(async () => {
       ],
     },
   )) as ChromiumBrowserContext
-}, 60000)
+})
 
 afterAll(async () => {
   await browserContext.close()
@@ -50,4 +52,4 @@ test('CRX loads and runs successfully', async () => {
   await page.waitForSelector('text="Background response"')
   await page.waitForSelector('text="Background OK"')
   await page.waitForSelector('text="Options page OK"')
-}, 600000)
+})
