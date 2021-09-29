@@ -43,10 +43,10 @@ export const esmBackground = (): RPCEPlugin => {
         manifest.background?.service_worker
       ) {
         manifest.background.type = 'module'
+        const { service_worker: sw } = manifest.background
+        const { wrapperFileName, outputFileName } =
+          generateFileNames(sw)
         if (isViteServe) {
-          const { service_worker: sw } = manifest.background
-          const { wrapperFileName } = generateFileNames(sw)
-
           const importPath = `${VITE_SERVER_URL}/${sw}`
 
           this.emitFile({
@@ -56,6 +56,8 @@ export const esmBackground = (): RPCEPlugin => {
           })
 
           manifest.background.service_worker = wrapperFileName
+        } else {
+          manifest.background.service_worker = outputFileName
         }
       }
 
