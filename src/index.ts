@@ -7,7 +7,6 @@ import {
   isString,
   isUndefined,
   normalizeFilename,
-  not,
 } from './helpers'
 import { runPlugins } from './index_runPlugins'
 import { browserPolyfill } from './plugin-browserPolyfill'
