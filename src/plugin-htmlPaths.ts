@@ -1,22 +1,22 @@
 import cheerio from 'cheerio'
 import { dirname, join, relative } from 'path'
+import { findRPCE } from './plugin_helpers'
 import { RPCEPlugin } from './types'
 import { VITE_SERVER_URL } from './viteAdaptor.machine'
 
 export const htmlPaths = (): RPCEPlugin => {
   let isViteServe = false
-  let root = process.cwd()
+  let root: string
   return {
     name: 'html-paths',
     config(options, { command }) {
       isViteServe = command === 'serve'
     },
-    buildStart({ plugins }) {
-      const { api } = plugins.find(
-        ({ name }) => name === 'chrome-extension',
-      )!
-
-      root = api.root
+    configResolved({ plugins }) {
+      root = findRPCE(plugins)?.api.root
+    },
+    buildStart({ plugins = [] }) {
+      root = root ?? findRPCE(plugins)?.api.root
     },
     renderCrxHtml(source, { id }) {
       const $ = cheerio.load(source)

@@ -3,18 +3,16 @@ import { basename } from 'path'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import {
-  isString,
-  isUndefined,
-  normalizeFilename,
-} from './helpers'
+import { isString, normalizeFilename, not } from './helpers'
 import { runPlugins } from './index_runPlugins'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
+import { htmlPaths } from './plugin-htmlPaths'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
 import { viteSupport } from './plugin-viteSupport'
+import { isRPCE } from './plugin_helpers'
 import type {
   ChromeExtensionOptions,
   CompleteFile,
@@ -36,9 +34,6 @@ export type { ManifestV3, ManifestV2 }
 export const simpleReloader = () => ({ name: 'simpleReloader' })
 
 export const stubId = '_stubIdForRPCE'
-
-const isThisPlugin = (p: RPCEPlugin) =>
-  p?.name === 'chrome-extension'
 
 export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
@@ -75,6 +70,7 @@ export const chromeExtension = (
   let addBuiltinsDuringOptionsHook = true
   const builtins: RPCEPlugin[] = [
     packageJson(),
+    htmlPaths(),
     esmBackground(),
     hybridFormat(),
     pluginOptions.browserPolyfill && browserPolyfill(),
@@ -85,7 +81,7 @@ export const chromeExtension = (
     .map(useViteAdaptor)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
 
-  const vitePlugins = new Set<RPCEPlugin>()
+  const allPlugins = new Set<RPCEPlugin>(builtins)
 
   return useViteAdaptor({
     name: 'chrome-extension',
@@ -115,15 +111,14 @@ export const chromeExtension = (
 
     async configResolved(config) {
       // Save user plugins to run RPCE hooks in buildStart
-      config.plugins.forEach((p) => {
-        if (!isUndefined(p) && !isThisPlugin(p))
-          vitePlugins.add(p)
-      })
+      config.plugins
+        .filter(not(isRPCE))
+        .forEach((p) => p && allPlugins.add(p))
 
       // We can't add them in the config hook :/
       // but sync changes in this hook seem to work...
       // TODO: test this specifically in new Vite releases
-      const rpceIndex = config.plugins.findIndex(isThisPlugin)
+      const rpceIndex = config.plugins.findIndex(isRPCE)
       // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
       config.plugins.splice(rpceIndex, 0, ...builtins)
       // Tell the options hook not to add the builtins again
@@ -217,10 +212,12 @@ export const chromeExtension = (
       return { input: finalInput, ...options }
     },
 
-    async buildStart({ plugins: rollupPlugins }) {
-      const plugins = Array.from(vitePlugins)
-        .concat(rollupPlugins)
-        .filter((x) => !isUndefined(x) && !isThisPlugin(x))
+    async buildStart({ plugins: rollupPlugins = [] }) {
+      rollupPlugins
+        .filter(not(isRPCE))
+        .forEach((p) => p && allPlugins.add(p))
+
+      const plugins = Array.from(allPlugins)
 
       useConfig(service, {
         actions: {
