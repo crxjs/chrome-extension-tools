@@ -9,5 +9,6 @@ package-lock.json
 TODO
 **/chromium-data-dir*/
 test/**/dist*/
+test/fixtures/
 .vscode/settings.json
 .vite/
