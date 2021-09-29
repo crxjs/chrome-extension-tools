@@ -17,7 +17,7 @@ import { extendManifest } from './plugin-extendManifest'
 import { htmlPaths } from './plugin-htmlPaths'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
-import { viteSupport } from './plugin-viteSupport'
+import { fileNames } from './plugin-fileNames'
 import { isRPCE } from './plugin_helpers'
 import type {
   ChromeExtensionOptions,
@@ -74,7 +74,7 @@ export const chromeExtension = (
     esmBackground(),
     hybridFormat(),
     pluginOptions.browserPolyfill && browserPolyfill(),
-    viteSupport(),
+    fileNames(),
     extendManifest(pluginOptions),
   ]
     .filter((x): x is RPCEPlugin => !!x)
