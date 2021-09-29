@@ -1,5 +1,5 @@
 import cheerio from 'cheerio'
-import { dirname, join, relative } from 'path'
+import { dirname, join, relative } from './path'
 import { findRPCE } from './plugin_helpers'
 import { RPCEPlugin } from './types'
 import { VITE_SERVER_URL } from './viteAdaptor.machine'
@@ -34,6 +34,7 @@ export const htmlPaths = (): RPCEPlugin => {
             const relPath = relative(root, id)
             const relDir = dirname(relPath)
 
+            // TODO: don't use vite server url if mv3
             result = `${VITE_SERVER_URL}/${
               relDir === '.' ? value : join(relDir, value)
             }`
