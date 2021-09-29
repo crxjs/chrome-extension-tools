@@ -18,8 +18,8 @@ export const packageJson = (): RPCEPlugin => {
       packageJson =
         result?.packageJson ??
         (process.env.npm_package_name &&
-          process.env.npm_package_version &&
-          process.env.npm_package_description)
+        process.env.npm_package_version &&
+        process.env.npm_package_description
           ? {
               name: process.env.npm_package_name,
               version: process.env.npm_package_version,
@@ -29,7 +29,7 @@ export const packageJson = (): RPCEPlugin => {
               name: '',
               version: '',
               description: '',
-            }
+            })
 
       return undefined
     },
