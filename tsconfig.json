@@ -12,6 +12,6 @@
     "playground",
     "src/browser",
     "test/fixtures"
-  ],
-  "typeAcquisition": { "enable": true }
+  ]
+  // "typeAcquisition": { "enable": true }
 }

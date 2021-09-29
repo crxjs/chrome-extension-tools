@@ -18,6 +18,7 @@ specifiers:
   '@testing-library/dom': ^6.12.2
   '@testing-library/jest-dom': ^5.1.1
   '@types/chrome': ^0.0.152
+  '@types/csp-dev': ^1.0.0
   '@types/fs-extra': ^8.0.1
   '@types/glob': ^7.1.1
   '@types/jest': ^25.1.2
@@ -37,6 +38,7 @@ specifiers:
   cheerio: 1.0.0-rc.10
   convert-source-map: ^1.7.0
   cosmiconfig: ^6.0.0
+  csp-dev: ^1.0.1
   esbuild: ^0.12.23
   esbuild-runner: ^2.2.0
   eslint: ^6.8.0
@@ -71,12 +73,14 @@ specifiers:
 
 dependencies:
   '@rollup/pluginutils': 4.1.1
+  '@types/csp-dev': 1.0.0
   '@types/lodash': 4.14.172
   ajv: 8.6.2
   array-flat-polyfill: 1.0.1
   cheerio: 1.0.0-rc.10
   convert-source-map: 1.7.0
   cosmiconfig: 6.0.0
+  csp-dev: 1.0.1
   esbuild: 0.12.24
   esbuild-runner: 2.2.1_esbuild@0.12.24
   fs-extra: 8.1.0
@@ -1894,6 +1898,10 @@ packages:
       '@types/filesystem': 0.0.32
     dev: true
 
+  /@types/csp-dev/1.0.0:
+    resolution: {integrity: sha512-OTHJTGqXvgFu1AE4Eo8cu+jgkQChpzTOHpMDrVkxAmNORVz7/11Zjj2NXZyWQcxibf18C966bU1JWtANrR8uJQ==}
+    dev: false
+
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
     dev: true
@@ -2826,6 +2834,10 @@ packages:
       shebang-command: 2.0.0
       which: 2.0.2
     dev: true
+
+  /csp-dev/1.0.1:
+    resolution: {integrity: sha512-k1ziAWPnh7h7U/aHOMmosl6d1RJaxbB831KOPXpIOjbDbq8K/3N/4VCZUwo5TLHUE9xWk6aDpKxFsHKlSnKX9Q==}
+    dev: false
 
   /css-select/4.1.3:
     resolution: {integrity: sha512-gT3wBNd9Nj49rAbmtFHj1cljIAOLYSX1nZ8CB7TBO3INYckygm5B7LISU/szY//YmdiSLbJvDLOx9VnMVpMBxA==}
