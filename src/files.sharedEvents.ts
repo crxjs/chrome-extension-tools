@@ -1,3 +1,4 @@
+import { normalizePath } from '@rollup/pluginutils'
 import { ChangeEvent } from 'rollup'
 import { EventFrom } from 'xstate'
 import { createModel } from 'xstate/lib/model'
@@ -31,7 +32,12 @@ export const isScript = (file: {
 
 export const sharedEventCreators = {
   ROOT: (root: string) => ({ root }),
-  ADD_FILE: (options: BaseAsset | Script) => options,
+  /** All paths are normalized here to use posix */
+  ADD_FILE: ({ fileName, id, ...rest }: BaseAsset | Script) => ({
+    fileName: normalizePath(fileName),
+    id: normalizePath(id),
+    ...rest,
+  }),
   FILE_DONE: (file: CompleteFile) => ({ file }),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,

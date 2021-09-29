@@ -1,4 +1,4 @@
-import { dirname, join } from 'path'
+import { dirname, join } from './path'
 import {
   assign,
   forwardTo,
@@ -7,11 +7,11 @@ import {
 } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { spawnFile } from './files_spawnFile'
-import { narrowEvent } from './xstate-helpers'
+import { narrowEvent } from './files_helpers'
 import {
   SharedEvent,
   sharedEventCreators,
-} from './xstate-models'
+} from './files.sharedEvents'
 
 type AddFileEvent = Extract<
   SharedEvent,

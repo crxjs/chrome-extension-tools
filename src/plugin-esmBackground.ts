@@ -47,15 +47,15 @@ export const esmBackground = (): RPCEPlugin => {
           const { service_worker: sw } = manifest.background
           const { wrapperFileName } = generateFileNames(sw)
 
-          const importPath = JSON.stringify(
-            `${VITE_SERVER_URL}/${sw}`,
-          )
+          const importPath = `${VITE_SERVER_URL}/${sw}`
 
           this.emitFile({
             type: 'asset',
             fileName: wrapperFileName,
             source: `import "${importPath}"`,
           })
+
+          manifest.background.service_worker = wrapperFileName
         }
       }
 

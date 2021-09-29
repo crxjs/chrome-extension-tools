@@ -53,8 +53,13 @@ export function isPresent<T>(x: null | undefined | T): x is T {
   return !isUndefined(x) && !isNull(x)
 }
 
-export const normalizeFilename = (p: string) =>
-  p.replace(/\.[tj]sx?$/, '.js')
+export const jsRegex = /\.[tj]sx?$/
+export const htmlRegex = /\.html?$/
+export const imageRegex =
+  /\.(jpe?g|png|svg|tiff?|gif|webp|bmp|ico)$/
+
+export const getJsFilename = (p: string) =>
+  p.replace(jsRegex, '.js')
 
 export function format(
   strings: TemplateStringsArray,

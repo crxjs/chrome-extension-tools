@@ -1,4 +1,4 @@
-import { dirname, join, parse, relative } from 'path'
+import { dirname, join, parse, relative } from './path'
 import {
   OutputBundle,
   Plugin,
@@ -32,6 +32,20 @@ export const hybridFormat = (): RPCEPlugin => {
 
       files = api.files
       root = api.root
+    },
+
+    renderCrxManifest(manifest) {
+      manifest.content_scripts = manifest.content_scripts?.map(
+        ({ js, ...rest }) => ({
+          ...rest,
+          js: js?.map((x) => {
+            const { name, dir } = parse(x)
+            return join(dir, `${name}.js`)
+          }),
+        }),
+      )
+
+      return manifest
     },
 
     async generateBundle({ sourcemap, chunkFileNames }, bundle) {

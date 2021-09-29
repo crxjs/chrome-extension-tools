@@ -3,8 +3,8 @@ import { assign, EventFrom, sendParent } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import { isUndefined } from './helpers'
 import { Asset } from './types'
-import { narrowEvent } from './xstate-helpers'
-import { sharedEventCreators } from './xstate-models'
+import { narrowEvent } from './files_helpers'
+import { sharedEventCreators } from './files.sharedEvents'
 
 export const model = createModel({} as Asset, {
   events: {

@@ -1,6 +1,7 @@
 import { cosmiconfig } from 'cosmiconfig'
 import { readFile, readJSON } from 'fs-extra'
-import { relative } from 'path'
+import { relative } from './path'
+import { posix, sep } from 'path'
 import { from, Observable, of } from 'rxjs'
 import { spawn } from 'xstate'
 import {
@@ -12,7 +13,7 @@ import { scriptMachine } from './files-script.machine'
 import { htmlParser } from './files_htmlParser'
 import { manifestParser } from './files_manifestParser'
 import { Asset, BaseAsset, Manifest, Script } from './types'
-import { isScript } from './xstate-models'
+import { isScript } from './files.sharedEvents'
 
 const manifestExplorer = cosmiconfig('manifest', {
   cache: false,
@@ -70,9 +71,13 @@ export function spawnFile(
   )
 }
 
+/** Opposite of normalizePath. Transform posix to use system path separator. */
+const getSystemPath = (id: string) =>
+  id.split(posix.sep).join(sep)
+
 function stringLoader({ id }: Asset) {
   return from(
-    readFile(id, 'utf8')
+    readFile(getSystemPath(id), 'utf8')
       .then((source) =>
         model.events.LOADED({
           id,
@@ -85,7 +90,7 @@ function stringLoader({ id }: Asset) {
 
 function rawLoader({ id }: Asset) {
   return from(
-    readFile(id)
+    readFile(getSystemPath(id))
       .then((source) =>
         model.events.LOADED({
           id,
@@ -98,7 +103,7 @@ function rawLoader({ id }: Asset) {
 
 function jsonLoader({ id }: Asset) {
   return from(
-    readJSON(id)
+    readJSON(getSystemPath(id))
       .then((source) =>
         model.events.LOADED({
           id,
@@ -112,7 +117,7 @@ function jsonLoader({ id }: Asset) {
 function manifestLoader({ id }: Asset) {
   return from(
     manifestExplorer
-      .load(id)
+      .load(getSystemPath(id))
       .then((result) => {
         if (result === null)
           throw new Error(`Unable to load manifest at ${id}`)
