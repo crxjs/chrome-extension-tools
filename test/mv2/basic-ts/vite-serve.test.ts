@@ -70,4 +70,4 @@ test('writes entry points to disk', async () => {
   expect(backgroundSource).toMatch(
     `const importPath = /*@__PURE__*/JSON.parse('"http://localhost:${port}/background/index.ts"');`,
   )
-}, 60000)
+})
