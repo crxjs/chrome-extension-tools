@@ -1,12 +1,9 @@
 /* eslint-env jest */
 
+import { jestSetTimeout } from '$test/timeout'
 import 'array-flat-polyfill'
 
-// nothing should timeout during debug
-const timeout = process.env.JEST_TIMEOUT
-  ? parseInt(process.env.JEST_TIMEOUT)
-  : false
-if (timeout) jest.setTimeout(timeout)
+jestSetTimeout(5000)
 
 // Jest attempts to sandbox globals, but it doesn't work with `instanceof`
 // https://github.com/facebook/jest/issues/2549

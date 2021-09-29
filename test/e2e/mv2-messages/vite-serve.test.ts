@@ -1,15 +1,11 @@
 import { fileWriteComplete } from '$src/viteAdaptor'
+import { jestSetTimeout, timeLimit } from '$test/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright'
 import { createServer, ViteDevServer } from 'vite'
 
-jest.setTimeout(30000)
-
-const timeout = (ms: number, message: string) =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => reject(new Error(message)), ms)
-  })
+jestSetTimeout(30000)
 
 const outDir = path.join(__dirname, 'dist-vite-serve')
 const dataDir = path.join(__dirname, 'chromium-data-dir-serve')
@@ -38,6 +34,9 @@ beforeAll(async () => {
       ],
     },
   )) as ChromiumBrowserContext
+
+  const crxDash = await browserContext.newPage()
+  crxDash.goto('chrome://extensions')
 })
 
 afterAll(async () => {
@@ -48,13 +47,13 @@ afterAll(async () => {
 })
 
 // FIXME: need to add localhost to CSP for vite serve to work
-test.skip('Chrome Extension loads and runs successfully', async () => {
+test('Chrome Extension loads and runs successfully', async () => {
   const page = await browserContext.newPage()
   await page.goto('https://google.com')
 
   await Promise.race([
     page.waitForSelector('text="Content script loaded"'),
-    timeout(10000, 'Unable to load Chrome Extension'),
+    timeLimit(10000, 'Unable to load Chrome Extension'),
   ])
 
   await page.waitForSelector('text="Background response"')

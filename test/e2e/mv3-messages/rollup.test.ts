@@ -1,3 +1,4 @@
+import { jestSetTimeout } from '$test/timeout'
 import { remove } from 'fs-extra'
 import path from 'path'
 import {
@@ -8,7 +9,7 @@ import {
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import config, { outDir } from './rollup.config'
 
-jest.setTimeout(30000)
+jestSetTimeout(30000)
 
 const dataDirPath = path.join(
   __dirname,
