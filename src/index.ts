@@ -27,6 +27,7 @@ import type {
   RPCEPlugin,
 } from './types'
 import { useViteAdaptor } from './viteAdaptor'
+import { viteServeCsp } from './plugin-viteServeCsp'
 
 export { useViteAdaptor }
 export type { ManifestV3, ManifestV2 }
@@ -76,6 +77,7 @@ export const chromeExtension = (
     pluginOptions.browserPolyfill && browserPolyfill(),
     fileNames(),
     extendManifest(pluginOptions),
+    viteServeCsp(),
   ]
     .filter((x): x is RPCEPlugin => !!x)
     .map(useViteAdaptor)
