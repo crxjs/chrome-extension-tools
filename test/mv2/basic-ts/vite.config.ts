@@ -14,4 +14,9 @@ export default defineConfig({
     },
   },
   plugins: [chromeExtension()],
+  // TODO: set cacheDir for all vite serve tests
+  cacheDir: path.join(__dirname, '.vite'),
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
 })
