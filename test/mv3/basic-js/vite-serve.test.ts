@@ -67,4 +67,4 @@ test('writes entry points to disk', async () => {
   expect(workerSource).toMatch(
     `import "http://localhost:${port}/service_worker.js"`,
   )
-}, 60000)
+})
