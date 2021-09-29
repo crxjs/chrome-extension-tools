@@ -1,10 +1,16 @@
-import { createFilter, normalizePath } from '@rollup/pluginutils'
-import { basename } from 'path'
+import { createFilter } from '@rollup/pluginutils'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { isString, normalizeFilename, not } from './helpers'
+import { isScript } from './files.sharedEvents'
+import {
+  narrowEvent,
+  useConfig,
+  useMachine,
+} from './files_helpers'
+import { getJsFilename, isString, not } from './helpers'
 import { runPlugins } from './index_runPlugins'
+import { basename } from './path'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
@@ -21,12 +27,6 @@ import type {
   RPCEPlugin,
 } from './types'
 import { useViteAdaptor } from './viteAdaptor'
-import {
-  narrowEvent,
-  useConfig,
-  useMachine,
-} from './xstate-helpers'
-import { isScript } from './xstate-models'
 
 export { useViteAdaptor }
 export type { ManifestV3, ManifestV2 }
@@ -228,11 +228,8 @@ export const chromeExtension = (
           handleFile: (context, event) => {
             const { file } = narrowEvent(event, 'FILE_DONE')
 
-            file.id = normalizePath(file.id)
-            file.fileName = normalizePath(file.fileName)
-
             if (isScript(file))
-              file.fileName = normalizeFilename(file.fileName)
+              file.fileName = getJsFilename(file.fileName)
 
             files.add(file)
             this.emitFile(file)

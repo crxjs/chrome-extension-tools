@@ -1,7 +1,7 @@
 import { sendParent } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import { Script } from './types'
-import { sharedEventCreators } from './xstate-models'
+import { sharedEventCreators } from './files.sharedEvents'
 
 const model = createModel({} as Script, {
   events: { ...sharedEventCreators },

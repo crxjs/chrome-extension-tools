@@ -1,11 +1,21 @@
-import { join } from 'path'
+import glob from 'glob'
 import { from, Observable, of } from 'rxjs'
 import { AssetEvent, model } from './files-asset.machine'
-import {
-  expandMatchPatterns,
-  parseManifest,
-} from './files_parseManifest'
+import { parseManifest } from './files_parseManifest'
+import { join } from './path'
 import { Asset, FileType, Manifest } from './types'
+
+function expandMatchPatterns(
+  root: string,
+): (currentValue: string) => string[] {
+  return (x) => {
+    if (glob.hasMagic(x)) {
+      return glob.sync(x, { cwd: root })
+    } else {
+      return [x]
+    }
+  }
+}
 
 export function manifestParser(
   root: string,

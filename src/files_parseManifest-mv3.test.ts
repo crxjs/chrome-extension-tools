@@ -1,5 +1,3 @@
-import { readJSONSync } from 'fs-extra'
-import { parseManifest } from './files_parseManifest'
 import {
   contentCss,
   contentJs,
@@ -7,18 +5,15 @@ import {
   icon128,
   icon16,
   icon48,
-  localesEnJson,
-  localesEsJson,
   manifestJson,
-  missaaliOtf,
-  notoSansBlack,
-  notoSansLight,
   optionsHtml,
   popupHtml,
   serviceWorkerJs,
   srcDir,
 } from '$test/helpers/mv3-kitchen-sink-paths'
+import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
+import { parseManifest } from './files_parseManifest'
 
 const manifest = readJSONSync(join(srcDir, manifestJson))
 
