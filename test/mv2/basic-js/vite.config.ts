@@ -13,4 +13,8 @@ export default defineConfig({
     },
   },
   plugins: [chromeExtension()],
+  cacheDir: '.vite',
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
 })

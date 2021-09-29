@@ -10,3 +10,4 @@ TODO
 **/chromium-data-dir*/
 test/**/dist*/
 .vscode/settings.json
+.vite/
