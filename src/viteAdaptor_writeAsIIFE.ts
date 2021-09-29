@@ -8,30 +8,42 @@ import {
   Plugin,
   rollup,
 } from 'rollup'
-import {
-  TransformResult,
-  transformWithEsbuild,
-  ViteDevServer,
-} from 'vite'
-import { isString } from './helpers'
+import { ViteDevServer } from 'vite'
+import { format, isString } from './helpers'
 
 export async function writeAsIIFE(
   file: EmittedChunk,
   server: ViteDevServer,
-) {
-  const inputOptions: InputOptions = {
-    input: path.relative(server.config.root, file.id),
-    plugins: [resolveFromServer(server)],
+): Promise<void> {
+  try {
+    const inputOptions: InputOptions = {
+      input: path.relative(server.config.root, file.id),
+      plugins: [resolveFromServer(server)],
+    }
+    const build = await rollup(inputOptions)
+    const options: OutputOptions = {
+      format: 'iife',
+      file: path.join(
+        server.config.build.outDir,
+        file.fileName!,
+      ),
+    }
+    await build.write(options)
+  } catch (error) {
+    if (error.message?.includes('is not exported by')) {
+      // TODO: add documentation with example
+      const message = format`Could not bundle ${file.id} because Vite did not pre-bundle a dependency.
+          You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.
+          Original Error: ${error.message}`
+      throw new Error(message)
+    } else if (error.message)
+      throw new Error(
+        format`An error occurred while writing ${file.id}
+        Error: ${error.message}`,
+      )
+    else throw error
   }
-  const build = await rollup(inputOptions)
-  const options: OutputOptions = {
-    format: 'iife',
-    file: path.join(server.config.build.outDir, file.fileName!),
-  }
-  return build.write(options)
 }
-
-const modules = new Map<string, TransformResult>()
 
 export function resolveFromServer(
   server: ViteDevServer,
@@ -47,27 +59,10 @@ export function resolveFromServer(
     },
     async load(id) {
       try {
-        let result: TransformResult
-        if (id.startsWith('/@fs') && modules.has(id)) {
-          result = modules.get(id)!
-        } else {
-          const x = await server.transformRequest(id)
-          if (!x) return null
-          if (isString(x)) {
-            result = { code: x, map: null }
-          } else {
-            // @ts-expect-error transformRequest return type is unworkable
-            result = x
-          }
-          if (isUndefined(result.code)) return null
-        }
-
-        if (id.startsWith('/@fs') && !modules.has(id)) {
-          result = await transformWithEsbuild(result.code, id, {
-            format: 'esm',
-          })
-          modules.set(id, result)
-        }
+        const result = await server.transformRequest(id)
+        if (!result) return null
+        if (isString(result)) return result
+        if (isUndefined(result.code)) return null
 
         const { code, map } = result
         return { code, map }
