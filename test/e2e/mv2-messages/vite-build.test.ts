@@ -1,3 +1,4 @@
+import { jestSetTimeout } from '$test/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import {
@@ -7,7 +8,7 @@ import {
 } from 'playwright'
 import { build } from 'vite'
 
-jest.setTimeout(30000)
+jestSetTimeout(30000)
 
 const outDir = path.join(__dirname, 'dist-vite-build')
 const dataDirPath = path.join(
