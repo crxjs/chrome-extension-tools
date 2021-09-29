@@ -1,4 +1,4 @@
-import { join, parse } from 'path'
+import { join, parse } from './path'
 import { RPCEPlugin } from './types'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
