@@ -5,7 +5,7 @@ import {
   join,
   relative,
   resolve,
-} from 'path'
+} from './path'
 import { from, Observable, of } from 'rxjs'
 import { AssetEvent, model } from './files-asset.machine'
 import { isString } from './helpers'

@@ -1,6 +1,10 @@
-import glob from 'glob'
 import { difference as diff, get } from 'lodash'
-import { isString } from './helpers'
+import {
+  htmlRegex,
+  imageRegex,
+  isString,
+  jsRegex,
+} from './helpers'
 import {
   AssetType,
   ContentScript,
@@ -8,6 +12,10 @@ import {
   Manifest,
   ScriptType,
 } from './types'
+
+function dedupe(ary: any[]) {
+  return [...new Set(ary.filter(isString))]
+}
 
 /**
  * Returns filenames and match patterns relative
@@ -58,10 +66,10 @@ export function deriveFilesMV3(
     get(manifest, 'background.service_worker'),
   ]
 
-  const js = files.filter((f) => /\.[jt]sx?$/.test(f))
+  const js = files.filter((f) => jsRegex.test(f))
 
   const html = [
-    ...files.filter((f) => /\.html?$/.test(f)),
+    ...files.filter((f) => htmlRegex.test(f)),
     get(manifest, 'options_page'),
     get(manifest, 'options_ui.page'),
     get(manifest, 'devtools_page'),
@@ -82,9 +90,7 @@ export function deriveFilesMV3(
   ]
 
   const img = [
-    ...files.filter((f) =>
-      /\.(jpe?g|png|svg|tiff?|gif|webp|bmp|ico)$/i.test(f),
-    ),
+    ...files.filter((f) => imageRegex.test(f)),
     ...(Object.values(get(manifest, 'icons', {})) as string[]),
     ...(Object.values(
       get(manifest, 'action.default_icon', {}),
@@ -140,10 +146,10 @@ export function deriveFilesMV2(
     [] as string[],
   )
 
-  const js = files.filter((f) => /\.[jt]sx?$/.test(f))
+  const js = files.filter((f) => jsRegex.test(f))
 
   const html = [
-    ...files.filter((f) => /\.html?$/.test(f)),
+    ...files.filter((f) => htmlRegex.test(f)),
     get(manifest, 'background.page'),
     get(manifest, 'options_page'),
     get(manifest, 'options_ui.page'),
@@ -186,9 +192,7 @@ export function deriveFilesMV2(
 
   const img = [
     ...actionIconSet,
-    ...files.filter((f) =>
-      /\.(jpe?g|png|svg|tiff?|gif|webp|bmp|ico)$/i.test(f),
-    ),
+    ...files.filter((f) => imageRegex.test(f)),
     ...Object.values(get(manifest, 'icons', {})),
   ]
 
@@ -204,22 +208,5 @@ export function deriveFilesMV2(
     IMAGE: dedupe(img),
     RAW: dedupe(others),
     JSON: dedupe(json),
-  }
-}
-
-function dedupe(ary: any[]) {
-  return [...new Set(ary.filter(isString))]
-}
-
-export function expandMatchPatterns(
-  root: string,
-): (currentValue: string) => string[] {
-  return (x) => {
-    if (glob.hasMagic(x)) {
-      const files = glob.sync(x, { cwd: root })
-      return files.map((f) => f.replace(root, ''))
-    } else {
-      return [x]
-    }
   }
 }

@@ -1,5 +1,4 @@
 import fs from 'fs-extra'
-import path from 'path'
 import {
   EmittedAsset,
   EmittedChunk,
@@ -13,6 +12,7 @@ import { assign, pure, send } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
 import { isString, isUndefined } from './helpers'
+import { join } from './path'
 import { writeAsIIFE } from './viteAdaptor_writeAsIIFE'
 
 export const configHook = 'config'
@@ -279,7 +279,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
           if (isUndefined(server))
             throw new Error('vite server is undefined')
 
-          const filePath = path.join(
+          const filePath = join(
             server.config.build.outDir,
             fileName,
           )

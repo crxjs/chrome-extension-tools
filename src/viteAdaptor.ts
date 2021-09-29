@@ -1,8 +1,8 @@
-import { RPCEPlugin } from '$src/types'
-import { narrowEvent } from '$src/xstate-helpers'
 import { EmittedFile, PluginContext } from 'rollup'
 import { interpret } from 'xstate'
+import { narrowEvent } from './files_helpers'
 import { isFunction, isString, isUndefined } from './helpers'
+import { RPCEPlugin } from './types'
 import {
   configHook,
   getEmittedFileId,

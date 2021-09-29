@@ -1,6 +1,5 @@
 import fs from 'fs'
 import { isUndefined } from 'lodash'
-import path from 'path'
 import {
   EmittedChunk,
   InputOptions,
@@ -10,6 +9,7 @@ import {
 } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { format, isString } from './helpers'
+import { join, relative } from './path'
 
 export async function writeAsIIFE(
   file: EmittedChunk,
@@ -17,16 +17,13 @@ export async function writeAsIIFE(
 ): Promise<void> {
   try {
     const inputOptions: InputOptions = {
-      input: path.relative(server.config.root, file.id),
+      input: relative(server.config.root, file.id),
       plugins: [resolveFromServer(server)],
     }
     const build = await rollup(inputOptions)
     const options: OutputOptions = {
       format: 'iife',
-      file: path.join(
-        server.config.build.outDir,
-        file.fileName!,
-      ),
+      file: join(server.config.build.outDir, file.fileName!),
     }
     await build.write(options)
   } catch (error) {
@@ -53,7 +50,7 @@ export function resolveFromServer(
     resolveId(source) {
       if (source.startsWith('/@fs')) return source
 
-      const id = path.join(server.config.root, source)
+      const id = join(server.config.root, source)
       const fileExists = fs.existsSync(id)
       return fileExists ? id : false
     },
