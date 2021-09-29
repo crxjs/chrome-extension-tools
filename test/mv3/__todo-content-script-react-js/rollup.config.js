@@ -17,7 +17,7 @@ export default {
     simpleReloader(),
     babel({
       // Do not transpile dependencies
-      ignore: ['node_modules'],
+      ignore: [path.resolve(__dirname, '../../../node_modules')],
       babelHelpers: 'bundled',
       configFile: path.resolve(__dirname, 'babel.config.json'),
     }),
