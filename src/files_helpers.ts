@@ -91,9 +91,6 @@ export function useMachine<
       state: State<TContext, TEvent, any, TTypestate>,
     ) => boolean,
     /** should throw an error */
-    checkError: (
-      state: State<TContext, TEvent, any, TTypestate>,
-    ) => void,
   ) => Promise<State<TContext, TEvent, any, TTypestate>>
 } {
   const {
@@ -137,15 +134,11 @@ export function useMachine<
     matcher: (
       state: State<TContext, TEvent, any, TTypestate>,
     ) => boolean,
-    checkError: (
-      state: State<TContext, TEvent, any, TTypestate>,
-    ) => void,
   ): Promise<State<TContext, TEvent, any, TTypestate>> =>
     new Promise((resolve, reject) => {
       const sub = service.subscribe({
         next: (state) => {
           try {
-            checkError(state)
             if (!matcher(state)) return
 
             clearMatchSubs()
@@ -157,11 +150,11 @@ export function useMachine<
         },
         error: (error) => {
           clearMatchSubs()
-          return reject(error)
+          reject(error)
         },
         complete: () => {
           clearMatchSubs()
-          return reject(new Error(`${service.id} has stopped`))
+          reject(new Error(`${service.id} has stopped`))
         },
       })
 

@@ -2,7 +2,7 @@ import { createFilter } from '@rollup/pluginutils'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { ERROR, isScript } from './files.sharedEvents'
+import { isScript } from './files.sharedEvents'
 import {
   narrowEvent,
   useConfig,
@@ -148,12 +148,12 @@ export const chromeExtension = (
 
       if (isViteServe) {
         // Just do this in Vite serve
-      // We can't add them in the config hook :/
-      // but sync changes in this hook seem to work...
-      // TODO: test this specifically in new Vite releases
-      const rpceIndex = config.plugins.findIndex(isRPCE)
-      // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
-      config.plugins.splice(rpceIndex, 0, ...builtins)
+        // We can't add them in the config hook :/
+        // but sync changes in this hook seem to work...
+        // TODO: test this specifically in new Vite releases
+        const rpceIndex = config.plugins.findIndex(isRPCE)
+        // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
+        config.plugins.splice(rpceIndex, 0, ...builtins)
         // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
         config.plugins.push(finalValidator)
       }
@@ -256,10 +256,6 @@ export const chromeExtension = (
 
       useConfig(service, {
         actions: {
-          handleError: (context, event) => {
-            const { error } = narrowEvent(event, 'ERROR')
-            this.error(error)
-          },
           handleFile: (context, event) => {
             const { file } = narrowEvent(event, 'FILE_DONE')
 
@@ -294,16 +290,15 @@ export const chromeExtension = (
       })
 
       send(model.events.START())
-      await waitFor(
-        (s) => s.matches('watch'),
-        (s) => {
-          if (
-            s.matches('error') &&
-            s.event.type === 'xstate.error'
-          )
-            throw s.event.data
-        },
-      )
+      await waitFor((state) => {
+        if (
+          state.matches('error') &&
+          state.event.type === 'ERROR'
+        )
+          throw state.event.error
+
+        return state.matches('watch')
+      })
     },
 
     resolveId(id) {
