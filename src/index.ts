@@ -17,7 +17,11 @@ import { extendManifest } from './plugin-extendManifest'
 import { htmlPaths } from './plugin-htmlPaths'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
-import { fileNames } from './plugin-fileNames'
+import {
+  preValidateManifest,
+  validateManifest,
+} from './plugin-validateManifest'
+import { viteServeCsp } from './plugin-viteServeCsp'
 import { isRPCE } from './plugin_helpers'
 import type {
   ChromeExtensionOptions,
