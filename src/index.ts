@@ -2,7 +2,7 @@ import { createFilter } from '@rollup/pluginutils'
 import { RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { isScript } from './files.sharedEvents'
+import { ERROR, isScript } from './files.sharedEvents'
 import {
   narrowEvent,
   useConfig,
@@ -14,6 +14,7 @@ import { basename } from './path'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
+import { fileNames } from './plugin-fileNames'
 import { htmlPaths } from './plugin-htmlPaths'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
@@ -31,7 +32,6 @@ import type {
   RPCEPlugin,
 } from './types'
 import { useViteAdaptor } from './viteAdaptor'
-import { viteServeCsp } from './plugin-viteServeCsp'
 
 export { useViteAdaptor }
 export type { ManifestV3, ManifestV2 }
@@ -72,15 +72,17 @@ export const chromeExtension = (
 
   const files = new Set<CompleteFile>()
 
-  let addBuiltinsDuringOptionsHook = true
-  const builtins: RPCEPlugin[] = [
+  let isViteServe = false
+  const [finalValidator, ...builtins]: RPCEPlugin[] = [
+    validateManifest(), // we'll make this run last of all
     packageJson(),
+    extendManifest(pluginOptions),
+    preValidateManifest(), // pre validate the extended manifest
     htmlPaths(),
     esmBackground(),
     hybridFormat(),
     pluginOptions.browserPolyfill && browserPolyfill(),
     fileNames(),
-    extendManifest(pluginOptions),
     viteServeCsp(),
   ]
     .filter((x): x is RPCEPlugin => !!x)
@@ -101,6 +103,8 @@ export const chromeExtension = (
     },
 
     async config(config, env) {
+      isViteServe = env.command === 'serve'
+
       // Vite ignores changes to config.plugin, so we're adding them in configResolved
       // Just running the config hook for the builtins here for thoroughness
       for (const b of builtins) {
@@ -115,20 +119,44 @@ export const chromeExtension = (
       return config
     },
 
+    async configureServer(server) {
+      const cbs = new Set<() => void | Promise<void>>()
+      for (const b of builtins) {
+        const result = await b?.configureServer?.call(
+          this,
+          server,
+        )
+        result && cbs.add(result)
+      }
+
+      return async () => {
+        try {
+          for (const cb of cbs) {
+            await cb()
+          }
+        } finally {
+          cbs.clear()
+        }
+      }
+    },
+
     async configResolved(config) {
       // Save user plugins to run RPCE hooks in buildStart
       config.plugins
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
 
+      if (isViteServe) {
+        // Just do this in Vite serve
       // We can't add them in the config hook :/
       // but sync changes in this hook seem to work...
       // TODO: test this specifically in new Vite releases
       const rpceIndex = config.plugins.findIndex(isRPCE)
       // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
       config.plugins.splice(rpceIndex, 0, ...builtins)
-      // Tell the options hook not to add the builtins again
-      addBuiltinsDuringOptionsHook = false
+        // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
+        config.plugins.push(finalValidator)
+      }
 
       // Run possibly async builtins last
       // After this, Vite will take over
@@ -205,7 +233,7 @@ export const chromeExtension = (
       // Vite will run this hook for all our added plugins,
       // but we still need to add builtin plugins for Rollup
       // TODO: check if this needs to be done in Rollup watch mode
-      if (addBuiltinsDuringOptionsHook) {
+      if (!isViteServe) {
         for (const b of builtins) {
           await b?.options?.call(this, options)
         }
@@ -213,6 +241,7 @@ export const chromeExtension = (
         options.plugins = (options.plugins ?? []).concat(
           builtins,
         )
+        options.plugins.push(finalValidator)
       }
 
       return { input: finalInput, ...options }
@@ -265,7 +294,16 @@ export const chromeExtension = (
       })
 
       send(model.events.START())
-      await waitFor((state) => state.matches('watch'))
+      await waitFor(
+        (s) => s.matches('watch'),
+        (s) => {
+          if (
+            s.matches('error') &&
+            s.event.type === 'xstate.error'
+          )
+            throw s.event.data
+        },
+      )
     },
 
     resolveId(id) {
