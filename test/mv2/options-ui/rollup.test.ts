@@ -1,7 +1,10 @@
 import { isAsset, isChunk } from '$src/helpers'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
+
+jestSetTimeout(30000)
 
 const outputPromise = getRollupOutput(
   __dirname,

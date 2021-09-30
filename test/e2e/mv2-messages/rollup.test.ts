@@ -1,4 +1,4 @@
-import { jestSetTimeout } from '$test/timeout'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { remove } from 'fs-extra'
 import path from 'path'
 import {

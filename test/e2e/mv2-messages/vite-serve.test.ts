@@ -1,9 +1,11 @@
 import { fileWriteComplete } from '$src/viteAdaptor'
-import { jestSetTimeout, timeLimit } from '$test/timeout'
+import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright'
 import { createServer, ViteDevServer } from 'vite'
+
+process.chdir(__dirname)
 
 jestSetTimeout(30000)
 

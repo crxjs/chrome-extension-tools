@@ -1,9 +1,8 @@
 import { chromeExtension } from '$src'
-import path from 'path'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  root: path.join(__dirname, 'src'),
+  root: 'src',
   clearScreen: false,
   logLevel: 'error',
   build: {
@@ -11,7 +10,7 @@ export default defineConfig({
     minify: false,
     sourcemap: 'inline',
     rollupOptions: {
-      input: path.join(__dirname, 'src', 'manifest.json'),
+      input: 'src/manifest.json',
       output: {
         // TODO: set entryFileNames in options hook
         //  - vite produces an invalid build w/o entryFileNames
@@ -20,7 +19,7 @@ export default defineConfig({
     },
   },
   plugins: [chromeExtension()],
-  cacheDir: path.join(__dirname, '.vite'),
+  cacheDir: '.vite',
   optimizeDeps: {
     include: ['react', 'react-dom', '@extend-chrome/storage'],
   },
