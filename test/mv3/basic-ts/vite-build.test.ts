@@ -1,20 +1,20 @@
 import { isAsset, isChunk } from '$src/helpers'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import path from 'path'
 import { RollupOutput } from 'rollup'
 import { build } from 'vite'
 
-let output: RollupOutput['output']
-beforeAll(async () => {
-  const { output: o } = (await build({
-    configFile: path.join(__dirname, 'vite.config.ts'),
-    envFile: false,
-  })) as RollupOutput
+jestSetTimeout(30000)
 
-  output = o
-}, 30000)
+const outputPromise = build({
+  configFile: path.join(__dirname, 'vite.config.ts'),
+  envFile: false,
+}) as Promise<RollupOutput>
 
 test('bundles chunks', async () => {
+  const { output } = await outputPromise
+
   // Chunks
   const chunks = output.filter(isChunk)
 
@@ -28,6 +28,8 @@ test('bundles chunks', async () => {
 })
 
 test('bundles assets', async () => {
+  const { output } = await outputPromise
+
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
