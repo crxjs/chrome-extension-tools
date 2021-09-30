@@ -1,6 +1,9 @@
 import { isAsset, isChunk } from '$src/helpers'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
+
+jestSetTimeout(30000)
 
 process.chdir(__dirname)
 
