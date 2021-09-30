@@ -1,9 +1,9 @@
 {
   "background": {
-    "service_worker": "service_worker.js"
+    "service_worker": ["service_worker.js"]
   },
   "description": "invalid-manifest chrome extension",
-  "manifest_version": "b",
+  "manifest_version": 3,
   "name": "invalid-manifest",
-  "versionNumber": "0.1.0"
+  "version": "0.1.0"
 }

@@ -1,4 +1,4 @@
-import { jestSetTimeout } from '$test/timeout'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import {
@@ -7,6 +7,8 @@ import {
   Page,
 } from 'playwright'
 import { build } from 'vite'
+
+process.chdir(__dirname)
 
 jestSetTimeout(30000)
 
