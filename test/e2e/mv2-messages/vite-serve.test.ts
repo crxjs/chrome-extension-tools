@@ -48,7 +48,6 @@ afterAll(async () => {
   await fs.remove(dataDir)
 })
 
-// FIXME: need to add localhost to CSP for vite serve to work
 test('Chrome Extension loads and runs successfully', async () => {
   const page = await browserContext.newPage()
   await page.goto('https://google.com')

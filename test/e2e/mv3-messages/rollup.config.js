@@ -7,7 +7,7 @@ import path from 'path'
 export const outDir = path.join(__dirname, 'dist-rollup-build')
 
 export default {
-  input: path.join(__dirname, 'src', 'manifest.json'),
+  input: 'src/manifest.json',
   output: {
     dir: outDir,
     format: 'esm',

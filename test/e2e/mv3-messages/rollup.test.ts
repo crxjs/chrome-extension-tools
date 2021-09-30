@@ -11,6 +11,8 @@ import config, { outDir } from './rollup.config'
 
 jestSetTimeout(30000)
 
+process.chdir(__dirname)
+
 const dataDirPath = path.join(
   __dirname,
   'chromium-data-dir-rollup',
