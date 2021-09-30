@@ -18,6 +18,7 @@ export default {
     chromeExtension(),
     // Adds a Chrome extension reloader during watch mode
     simpleReloader(),
+    typescript(),
     resolve(),
     commonjs({
       namedExports: {
@@ -25,6 +26,5 @@ export default {
         'react-dom': Object.keys(require('react-dom')),
       },
     }),
-    typescript(),
   ],
 }

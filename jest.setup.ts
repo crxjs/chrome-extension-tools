@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import { jestSetTimeout } from '$test/timeout'
+import { jestSetTimeout } from './test/helpers/timeout'
 import 'array-flat-polyfill'
 
 jestSetTimeout(5000)
