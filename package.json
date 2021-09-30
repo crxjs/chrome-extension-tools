@@ -50,7 +50,7 @@
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
     "mem": "^6.0.1",
-    "read-pkg-up": "^7.0.1",
+    "read-pkg-up": "^8.0.0",
     "rollup": "^2.56.3",
     "rxjs": "^7.3.0",
     "slash": "^3.0.0",
