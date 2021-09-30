@@ -52,7 +52,7 @@ export function resolveFromServer(
 
       const id = join(server.config.root, source)
       const fileExists = fs.existsSync(id)
-      return fileExists ? id : false
+      return fileExists ? id : source
     },
     async load(id) {
       try {
