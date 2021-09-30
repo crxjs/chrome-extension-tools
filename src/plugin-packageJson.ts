@@ -5,7 +5,7 @@ import { RPCEPlugin } from './types'
 
 /** Applies name, version, and description from package.json to the manifest */
 export const packageJson = (): RPCEPlugin => {
-  let packageJson: PackageJson
+  let packageJson: PackageJson | undefined
   return {
     name: 'package-json',
     api: {
@@ -36,10 +36,10 @@ export const packageJson = (): RPCEPlugin => {
     transformCrxManifest(manifest) {
       manifest.manifest_version = manifest.manifest_version ?? 2
       manifest.name =
-        manifest.name ?? startCase(packageJson.name)
-      manifest.version = manifest.version ?? packageJson.version
+        manifest.name ?? startCase(packageJson?.name)
+      manifest.version = manifest.version ?? packageJson?.version
       manifest.description =
-        manifest.description ?? packageJson.description
+        manifest.description ?? packageJson?.description
       return manifest
     },
   }
