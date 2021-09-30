@@ -1,5 +1,5 @@
 import { startCase } from 'lodash'
-import readPkgUp from 'read-pkg-up'
+import { readPackageUpAsync as readPkgUp } from 'read-pkg-up'
 import { PackageJson } from 'type-fest'
 import { RPCEPlugin } from './types'
 
