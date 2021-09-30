@@ -90,9 +90,10 @@ export function useMachine<
     matcher: (
       state: State<TContext, TEvent, any, TTypestate>,
     ) => boolean,
-    options?: {
-      multipleMatchers?: boolean | undefined
-    },
+    /** should throw an error */
+    checkError: (
+      state: State<TContext, TEvent, any, TTypestate>,
+    ) => void,
   ) => Promise<State<TContext, TEvent, any, TTypestate>>
 } {
   const {
@@ -127,33 +128,41 @@ export function useMachine<
   service.start()
 
   const matchSubs = new Set<Subscription>()
+  function clearMatchSubs() {
+    matchSubs.forEach((sub) => sub.unsubscribe())
+    matchSubs.clear()
+  }
+
   const waitFor = (
     matcher: (
       state: State<TContext, TEvent, any, TTypestate>,
     ) => boolean,
-    options = {} as {
-      /** Default: false; If true, other matchers will stay active after this one resolves */
-      multipleMatchers?: boolean
-    },
+    checkError: (
+      state: State<TContext, TEvent, any, TTypestate>,
+    ) => void,
   ): Promise<State<TContext, TEvent, any, TTypestate>> =>
     new Promise((resolve, reject) => {
       const sub = service.subscribe({
         next: (state) => {
-          if (!matcher(state)) return
+          try {
+            checkError(state)
+            if (!matcher(state)) return
 
-          if (options.multipleMatchers) {
-            sub.unsubscribe()
-            matchSubs.delete(sub)
-          } else {
-            matchSubs.forEach((sub) => sub.unsubscribe())
-            matchSubs.clear()
+            clearMatchSubs()
+            resolve(state)
+          } catch (error) {
+            clearMatchSubs()
+            reject(error)
           }
-
-          resolve(state)
         },
-        error: (error) => reject(error),
-        complete: () =>
-          reject(new Error(`${service.id} has stopped`)),
+        error: (error) => {
+          clearMatchSubs()
+          return reject(error)
+        },
+        complete: () => {
+          clearMatchSubs()
+          return reject(new Error(`${service.id} has stopped`))
+        },
       })
 
       matchSubs.add(sub)
