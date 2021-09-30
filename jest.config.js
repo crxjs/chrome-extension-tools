@@ -1,11 +1,15 @@
 // TODO: if process.env.CI, build for production and test against the build
 // - add global setup file to build
+// - update moduleNameMapper to point $src to pkg.main
+
+const esModules = ['read-pkg'].map((x) => `(${x})`).join('|')
 
 const { readdirSync } = require('fs')
 const { join } = require('path')
 
-// - update moduleNameMapper to point $src to pkg.main
 module.exports = {
+  // For PNPM users, need to add '.*' to get the last instance of the ignored module
+  transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/manifest-input/browser/**/*',
@@ -45,7 +49,3 @@ module.exports = {
     '<rootDir>/test/.+?dist',
   ],
 }
-
-// For PNPM users, need to add '.*' to get the last instance of the ignored module
-// const esModules = ['lodash-es'].map((x) => `(${x})`).join('|')
-// transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],
