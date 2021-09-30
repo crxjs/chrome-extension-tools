@@ -58,17 +58,18 @@ export const chromeExtension = (
 
   const { send, service, waitFor } = useMachine(machine)
 
-  service.subscribe({
-    next: (state) => {
-      console.log('🚀 ~ files state', state)
-    },
-    error: (error) => {
-      console.error(error)
-    },
-    complete: () => {
-      console.log('files orchestrator complete')
-    },
-  })
+  // service.subscribe({
+  //   next: (state) => {
+  //     console.log('state.value', state.value)
+  //     console.log('state.event', state.event)
+  //   },
+  //   error: (error) => {
+  //     console.error(error)
+  //   },
+  //   complete: () => {
+  //     console.log('files orchestrator complete')
+  //   },
+  // })
 
   const files = new Set<CompleteFile>()
 
