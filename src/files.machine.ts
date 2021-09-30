@@ -149,11 +149,7 @@ export const machine = model.createMachine(
           },
         },
       },
-      error: {
-        id: 'error',
-        type: 'final',
-        entry: 'handleError',
-      },
+      error: { id: 'error', type: 'final' },
     },
   },
   {
