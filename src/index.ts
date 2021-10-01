@@ -11,6 +11,7 @@ import {
 import { getJsFilename, isString, not } from './helpers'
 import { runPlugins } from './index_runPlugins'
 import { basename } from './path'
+import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
@@ -78,6 +79,7 @@ export const chromeExtension = (
     validateManifest(), // we'll make this run last of all
     packageJson(),
     extendManifest(pluginOptions),
+    autoPerms(),
     preValidateManifest(), // pre validate the extended manifest
     htmlPaths(),
     esmBackground(),
