@@ -7,13 +7,11 @@ jestSetTimeout(30000)
 
 process.chdir(__dirname)
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 test('bundles chunks', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -23,10 +21,6 @@ test('bundles chunks', async () => {
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
   expect(chunks.length).toBe(3)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)

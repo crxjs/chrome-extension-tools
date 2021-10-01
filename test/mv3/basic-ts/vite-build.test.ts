@@ -7,13 +7,11 @@ import { build } from 'vite'
 
 jestSetTimeout(30000)
 
-const outputPromise = build({
-  configFile: path.join(__dirname, 'vite.config.ts'),
-  envFile: false,
-}) as Promise<RollupOutput>
-
 test('bundles chunks', async () => {
-  const { output } = await outputPromise
+  const { output } = (await build({
+    configFile: path.join(__dirname, 'vite.config.ts'),
+    envFile: false,
+  })) as RollupOutput
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -25,10 +23,6 @@ test('bundles chunks', async () => {
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
   expect(chunks.length).toBe(3)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)

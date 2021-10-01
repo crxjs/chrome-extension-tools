@@ -5,9 +5,9 @@ import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright'
 import { createServer, ViteDevServer } from 'vite'
 
-process.chdir(__dirname)
-
 jestSetTimeout(30000)
+
+process.chdir(__dirname)
 
 const outDir = path.join(__dirname, 'dist-vite-serve')
 const dataDir = path.join(__dirname, 'chromium-data-dir-serve')

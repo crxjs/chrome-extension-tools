@@ -1,7 +1,10 @@
 import { fileWriteComplete } from '$src/viteAdaptor'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
+
+jestSetTimeout(30000)
 
 const outDir = path.join(__dirname, 'dist-serve')
 

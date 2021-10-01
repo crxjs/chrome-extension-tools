@@ -2,22 +2,19 @@ import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset, OutputChunk } from 'rollup'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 // TODO: test input objects with MV3
 test('Handles config with input object', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),
   ) as OutputAsset
   const manifestSource = manifestAsset.source as string
-  const manifest: chrome.runtime.ManifestV2 = JSON.parse(
-    manifestSource,
-  )
+  const manifest: chrome.runtime.ManifestV2 =
+    JSON.parse(manifestSource)
 
   expect(manifest).toBeDefined()
   expect(manifest.background).toBeDefined()

@@ -5,58 +5,15 @@ import { readJSONSync } from 'fs-extra'
 import path from 'path'
 import { OutputAsset } from 'rollup'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 const manifestJson = readJSONSync(
   path.join(__dirname, 'manifest.json'),
 )
 
-test('bundles chunks', async () => {
-  const { output } = await outputPromise
-
-  // Chunks
-  const chunks = output.filter(isChunk)
-
-  expect(output.find(byFileName('background.js'))).toBeDefined()
-  expect(output.find(byFileName('options.js'))).toBeDefined()
-
-  expect(chunks.length).toBe(3)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
-
-  // Assets
-  const assets = output.filter(isAsset)
-
-  expect(
-    output.find(byFileName('images/icon-main-16.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-48.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-128.png')),
-  ).toBeDefined()
-  expect(output.find(byFileName('manifest.json'))).toBeDefined()
-  expect(output.find(byFileName('options.css'))).toBeDefined()
-  expect(output.find(byFileName('options.html'))).toBeDefined()
-  expect(output.find(byFileName('options.png'))).toBeDefined()
-  expect(
-    output.find(byFileName('images/favicon.ico')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('background.esm-wrapper.js')),
-  ).toBeDefined()
-
-  expect(assets.length).toBe(9)
-})
-
-test('extends the manifest', async () => {
-  const { output } = await outputPromise
+test('bundles extended manifest', async () => {
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),
@@ -89,4 +46,37 @@ test('extends the manifest', async () => {
       '128': 'images/icon-main-128.png',
     },
   })
+
+  // Chunks
+  const chunks = output.filter(isChunk)
+
+  expect(output.find(byFileName('background.js'))).toBeDefined()
+  expect(output.find(byFileName('options.js'))).toBeDefined()
+
+  expect(chunks.length).toBe(3)
+
+  // Assets
+  const assets = output.filter(isAsset)
+
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+  expect(output.find(byFileName('options.css'))).toBeDefined()
+  expect(output.find(byFileName('options.html'))).toBeDefined()
+  expect(output.find(byFileName('options.png'))).toBeDefined()
+  expect(
+    output.find(byFileName('images/favicon.ico')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('background.esm-wrapper.js')),
+  ).toBeDefined()
+
+  expect(assets.length).toBe(9)
 })
