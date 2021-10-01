@@ -1,14 +1,15 @@
 import { isAsset, isChunk } from '$src/helpers'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
+jestSetTimeout(30000)
 
 test('bundles chunks and assets', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -23,10 +24,6 @@ test('bundles chunks and assets', async () => {
 
   // TODO: assert that content.js is IIFE format
   // TODO: assert that popup.js is ESM format
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)

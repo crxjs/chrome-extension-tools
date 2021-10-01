@@ -5,13 +5,11 @@ import { byFileName } from '$test/helpers/utils'
 
 jestSetTimeout(30000)
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 test('bundles chunks and assets', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -23,10 +21,6 @@ test('bundles chunks and assets', async () => {
 
   // 3 entries
   expect(chunks.length).toBe(3)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)

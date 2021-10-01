@@ -6,13 +6,11 @@ import { OutputAsset } from 'rollup'
 
 jestSetTimeout(30000)
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 test('bundles chunks', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -33,10 +31,6 @@ test('bundles chunks', async () => {
 
   // 9 chunks + one shared import (imported.js)
   expect(chunks.length).toBe(10)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)
@@ -87,10 +81,6 @@ test('bundles assets', async () => {
 
   // 17 assets + 2 wrapper scripts
   expect(assets.length).toBe(18)
-})
-
-test('Includes content_security_policy untouched', async () => {
-  const { output } = await outputPromise
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),
@@ -104,5 +94,3 @@ test('Includes content_security_policy untouched', async () => {
       "script-src 'self'; object-src 'self'",
   })
 })
-
-test.todo('Emits assets in both manifest and html files once')

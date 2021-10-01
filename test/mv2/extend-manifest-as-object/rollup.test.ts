@@ -3,50 +3,11 @@ import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
-test('bundles chunks', async () => {
-  const { output } = await outputPromise
-
-  // Chunks
-  const chunks = output.filter(isChunk)
-
-  expect(output.find(byFileName('background.js'))).toBeDefined()
-  expect(output.find(byFileName('content.js'))).toBeDefined()
-
-  // 2 chunks
-  expect(chunks.length).toBe(2)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
-
-  // Assets
-  const assets = output.filter(isAsset)
-
-  expect(output.find(byFileName('manifest.json'))).toBeDefined()
-  expect(
-    output.find(byFileName('background.esm-wrapper.js')),
-  ).toBeDefined()
-
-  expect(
-    output.find(byFileName('images/icon-main-16.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-48.png')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('images/icon-main-128.png')),
-  ).toBeDefined()
-
-  expect(assets.length).toBe(5)
-})
-
-test('extends the manifest', async () => {
-  const { output } = await outputPromise
+test('bundles extended manifest', async () => {
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),
@@ -83,4 +44,33 @@ test('extends the manifest', async () => {
     name: 'options.extendManifest as object',
     version: '1.0.0',
   })
+
+  // Chunks
+  const chunks = output.filter(isChunk)
+
+  expect(output.find(byFileName('background.js'))).toBeDefined()
+  expect(output.find(byFileName('content.js'))).toBeDefined()
+
+  // 2 chunks
+  expect(chunks.length).toBe(2)
+
+  // Assets
+  const assets = output.filter(isAsset)
+
+  expect(output.find(byFileName('manifest.json'))).toBeDefined()
+  expect(
+    output.find(byFileName('background.esm-wrapper.js')),
+  ).toBeDefined()
+
+  expect(
+    output.find(byFileName('images/icon-main-16.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-48.png')),
+  ).toBeDefined()
+  expect(
+    output.find(byFileName('images/icon-main-128.png')),
+  ).toBeDefined()
+
+  expect(assets.length).toBe(5)
 })
