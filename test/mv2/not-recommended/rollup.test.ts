@@ -2,13 +2,11 @@ import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { OutputAsset } from 'rollup'
 import { byFileName } from '$test/helpers/utils'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 test('Handles background html page', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   const backgroundHtml = output.find(
     byFileName('background.html'),
@@ -17,18 +15,10 @@ test('Handles background html page', async () => {
 
   expect(backgroundHtml).toBeDefined()
   expect(backgroundJs).toBeDefined()
-})
-
-test('Handles content scripts with only css', async () => {
-  const { output } = await outputPromise
 
   const contentCss = output.find(byFileName('content.css'))
 
   expect(contentCss).toBeDefined()
-})
-
-test('Handles CSP in manifest.json', async () => {
-  const { output } = await outputPromise
 
   const manifestJson = output.find(
     byFileName('manifest.json'),

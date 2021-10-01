@@ -6,13 +6,11 @@ import { OutputAsset } from 'rollup'
 
 jestSetTimeout(30000)
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 test('bundles chunks', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -30,10 +28,6 @@ test('bundles chunks', async () => {
 
   // 4 chunks + one shared import (shared.js)
   expect(chunks.length).toBe(5)
-})
-
-test('bundles assets', async () => {
-  const { output } = await outputPromise
 
   // Assets
   const assets = output.filter(isAsset)
@@ -47,11 +41,8 @@ test('bundles assets', async () => {
 
   // 11 assets + 1 wrapper script + 2 browser polyfills
   expect(assets.length).toBe(14)
-})
 
-// TODO: test browser polyfill in MV3 variant
-test('includes browser polyfill in manifest.json', async () => {
-  const { output } = await outputPromise
+  // TODO: test browser polyfill in MV3 variant
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),

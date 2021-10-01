@@ -2,13 +2,11 @@ import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 test.skip('Handles extension only html and no scripts at all', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),

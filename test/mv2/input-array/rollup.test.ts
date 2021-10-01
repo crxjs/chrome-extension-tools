@@ -2,14 +2,12 @@ import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset, OutputChunk } from 'rollup'
 
-const outputPromise = getRollupOutput(
-  __dirname,
-  'rollup.config.js',
-)
-
 // TODO: test this as MV3
 test('Handles config with input array', async () => {
-  const { output } = await outputPromise
+  const { output } = await getRollupOutput(
+    __dirname,
+    'rollup.config.js',
+  )
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),
