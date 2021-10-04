@@ -4,6 +4,8 @@ import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
 import { isScript } from './files.sharedEvents'
 import {
+  debugHelper,
+  logActorStates,
   narrowEvent,
   useConfig,
   useMachine,
@@ -45,32 +47,14 @@ export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
 ): Plugin => {
   const isHtml = createFilter(['**/*.html'])
-  // const isScript = createFilter(
-  //   ['**/*.js', '**/*.ts', '**/*.tsx', '**/*.jsx'],
-  //   ['**/manifest*'],
-  // )
-  // const isCss = createFilter(['**/*.css'])
-  // const isImage = createFilter([
-  //   '**/*.png',
-  //   '**/*.jpg',
-  //   '**/*.jpeg',
-  // ])
-  // const isJson = createFilter(['**/*.json'], ['**/manifest*'])
 
   const { send, service, waitFor } = useMachine(machine)
 
-  // service.subscribe({
-  //   next: (state) => {
-  //     console.log('state.value', state.value)
-  //     console.log('state.event', state.event)
-  //   },
-  //   error: (error) => {
-  //     console.error(error)
-  //   },
-  //   complete: () => {
-  //     console.log('files orchestrator complete')
-  //   },
-  // })
+  if (process.env.XSTATE_LOG)
+    debugHelper(service, (state, ids, actors) => {
+      logActorStates(actors)
+      console.log(state, ids)
+    })
 
   const files = new Set<CompleteFile>()
 
