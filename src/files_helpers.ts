@@ -215,7 +215,9 @@ export function logActorStates(actors: Map<any, string[]>) {
       if (!snap?.value) return r
       return format`
         ${r}
-        ${ids.join(' -> ')} :: ${snap.value}`
+        ${ids
+          .map((id) => id.replace(process.cwd() + '/', ''))
+          .join(' -> ')} :: ${snap.value}`
     },
     '',
   )
