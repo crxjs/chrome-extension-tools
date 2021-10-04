@@ -10,7 +10,11 @@ import {
   StateMachine,
   Subscription,
   Typestate,
+  ActorRef,
 } from 'xstate'
+import { format } from './helpers'
+import { join } from './path'
+import { writeFileSync } from 'fs'
 
 export function narrowEvent<
   TEvent extends EventObject,
@@ -162,4 +166,62 @@ export function useMachine<
     })
 
   return { send: service.send, waitFor, service }
+}
+
+export function debugHelper<
+  TContext,
+  TEvent extends EventObject,
+>(
+  service:
+    | Interpreter<TContext, any, TEvent>
+    | ActorRef<any, any>,
+  subscriber: (
+    state: State<any, EventObject>,
+    parentIds: string[],
+    actors: Map<any, string[]>,
+  ) => void,
+  { actors, ids: pids } = {
+    actors: new Map<any, string[]>(),
+    ids: [] as string[],
+  },
+): void {
+  const ids = pids.length > 0 ? pids : [service.id]
+  actors.set(service, ids)
+
+  service.subscribe((state) => {
+    subscriber(state, ids, actors)
+
+    if (state?.children)
+      Object.entries(
+        state.children as Record<
+          string,
+          ActorRef<EventObject, unknown>
+        >,
+      ).forEach(([id, ref]) => {
+        if (actors.has(ref)) return
+
+        debugHelper(ref, subscriber, {
+          actors,
+          ids: [...ids, id],
+        })
+      })
+  })
+}
+
+export function logActorStates(actors: Map<any, string[]>) {
+  const actorStates = Array.from(actors).reduce(
+    (r, [actor, ids]) => {
+      const snap = actor.getSnapshot()
+      if (!snap?.value) return r
+      return format`
+        ${r}
+        ${ids.join(' -> ')} :: ${snap.value}`
+    },
+    '',
+  )
+
+  writeFileSync(
+    join(process.cwd(), 'actorStates.log'),
+    actorStates,
+  )
 }
