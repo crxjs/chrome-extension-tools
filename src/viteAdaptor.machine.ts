@@ -13,6 +13,7 @@ import { createModel } from 'xstate/lib/model'
 import { ModelEventsFrom } from 'xstate/lib/model.types'
 import { isString, isUndefined } from './helpers'
 import { join } from './path'
+import { RPCEPlugin } from './types'
 import { writeAsIIFE } from './viteAdaptor_writeAsIIFE'
 
 export const configHook = 'config'
@@ -40,6 +41,7 @@ interface Context {
     string,
     ActorRef<ModelEventsFrom<typeof viteAdaptorModel>>
   >
+  plugins: Set<RPCEPlugin>
 }
 
 export const getEmittedFileId = (file: EmittedFile): string =>
@@ -51,6 +53,7 @@ const context: Context = {
   files: [],
   writers: {},
   bundlers: {},
+  plugins: new Set(),
 }
 
 export const viteAdaptorModel = createModel(context, {
@@ -72,6 +75,7 @@ export const viteAdaptorModel = createModel(context, {
     }),
     ERROR: (error: any, id?: string) => ({ id, error }),
     SERVER_LISTENING: () => ({}),
+    ADD_PLUGIN: (plugin: RPCEPlugin) => ({ plugin }),
   },
 })
 
@@ -79,6 +83,14 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
   {
     id: 'viteAdaptor',
     context: viteAdaptorModel.initialContext,
+    on: {
+      ADD_PLUGIN: {
+        actions: viteAdaptorModel.assign({
+          plugins: ({ plugins }, { plugin }) =>
+            new Set(plugins).add(plugin),
+        }),
+      },
+    },
     initial: 'start',
     states: {
       start: {
@@ -233,10 +245,10 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
             Context,
             ModelEventsFrom<typeof viteAdaptorModel>
           >({
-            bundlers: ({ bundlers }) => {
+            bundlers: ({ bundlers, plugins }) => {
               const actorRef = spawn(
                 from(
-                  writeAsIIFE(event.file, server)
+                  writeAsIIFE(event.file, server, plugins)
                     .then(() =>
                       viteAdaptorModel.events.EMIT_DONE(id),
                     )

@@ -10,10 +10,12 @@ import {
 import { ViteDevServer } from 'vite'
 import { format, isString } from './helpers'
 import { join, relative } from './path'
+import { RPCEPlugin } from './types'
 
 export async function writeAsIIFE(
   file: EmittedChunk,
   server: ViteDevServer,
+  plugins: Set<RPCEPlugin>,
 ): Promise<void> {
   try {
     const inputOptions: InputOptions = {
@@ -24,6 +26,22 @@ export async function writeAsIIFE(
     const options: OutputOptions = {
       format: 'iife',
       file: join(server.config.build.outDir, file.fileName!),
+      plugins: [
+        {
+          name: 'vite-serve-render-chunk-driver',
+          async renderChunk(code, chunk, options) {
+            for (const p of plugins) {
+              await p?.viteServeRenderChunk?.(
+                code,
+                chunk,
+                options,
+              )
+            }
+
+            return null
+          },
+        },
+      ],
     }
     await build.write(options)
   } catch (error) {
