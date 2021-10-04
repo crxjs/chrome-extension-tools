@@ -32,45 +32,46 @@ export const assetMachine = model.createMachine(
     on: {
       ERROR: { actions: 'forwardToParent', target: '#error' },
     },
-    initial: 'load',
+    initial: 'loading',
     states: {
       changed: {
-        on: { START: 'load' },
+        on: { START: 'loading' },
       },
-      load: {
-        invoke: { src: 'loader', onDone: 'transform' },
+      loading: {
+        invoke: { src: 'loader' },
         on: {
-          LOADED: { actions: 'updateContext' },
+          LOADED: {
+            actions: 'updateContext',
+            target: 'transforming',
+          },
         },
       },
-      transform: {
+      transforming: {
         entry: 'startPluginTransform',
         on: {
           PLUGINS_RESULT: {
             actions: 'updateContext',
-            target: 'parse',
+            target: 'parsing',
           },
         },
       },
-      parse: {
-        invoke: {
-          src: 'parser',
-          onDone: [
+      parsing: {
+        invoke: { src: 'parser' },
+        on: {
+          ADD_FILE: { actions: 'forwardToParent' },
+          PARSED: [
             {
               cond: ({ fileType }) => fileType === 'MANIFEST',
               target: 'ready',
             },
-            { target: 'render' },
+            { target: 'rendering' },
           ],
-        },
-        on: {
-          ADD_FILE: { actions: 'forwardToParent' },
         },
       },
       ready: {
-        on: { START: 'render' },
+        on: { START: 'rendering' },
       },
-      render: {
+      rendering: {
         entry: 'startPluginRender',
         on: {
           PLUGINS_RESULT: {
