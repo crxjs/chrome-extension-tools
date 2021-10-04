@@ -12,7 +12,7 @@ import {
 } from './files_helpers'
 import { getJsFilename, isString, not } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { basename } from './path'
+import { basename, isAbsolute, join } from './path'
 import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
@@ -38,6 +38,10 @@ import { useViteAdaptor } from './viteAdaptor'
 
 export { useViteAdaptor }
 export type { ManifestV3, ManifestV2 }
+
+function getAbsolutePath(input: string): string {
+  return isAbsolute(input) ? input : join(process.cwd(), input)
+}
 
 export const simpleReloader = () => ({ name: 'simpleReloader' })
 
@@ -157,17 +161,19 @@ export const chromeExtension = (
       if (isString(input)) {
         send(
           model.events.ADD_FILE({
-            id: input,
+            id: getAbsolutePath(input),
             fileType: 'MANIFEST',
             fileName: 'manifest.json',
           }),
         )
       } else if (Array.isArray(input)) {
-        const result = input.filter((id) => {
+        // Don't include html or manifest files
+        const result: string[] = []
+        input.forEach((id) => {
           if (isHtml(id))
             send(
               model.events.ADD_FILE({
-                id,
+                id: getAbsolutePath(id),
                 fileType: 'HTML',
                 fileName: id,
               }),
@@ -175,43 +181,42 @@ export const chromeExtension = (
           else if (basename(id).startsWith('manifest'))
             send(
               model.events.ADD_FILE({
-                id,
+                id: getAbsolutePath(id),
                 fileType: 'MANIFEST',
                 fileName: 'manifest.json',
               }),
             )
-          else return true
-
-          return false
+          else {
+            result.push(id)
+          }
         })
 
         if (result.length) finalInput = result
       } else {
-        const result = Object.entries(input).filter(
-          ([fileName, id]) => {
-            if (isHtml(id))
-              send(
-                model.events.ADD_FILE({
-                  id,
-                  fileName: fileName.endsWith('.html')
-                    ? fileName
-                    : fileName + '.html',
-                  fileType: 'HTML',
-                }),
-              )
-            else if (fileName === 'manifest')
-              send(
-                model.events.ADD_FILE({
-                  id,
-                  fileType: 'MANIFEST',
-                  fileName: 'manifest.json',
-                }),
-              )
-            else return true
-
-            return false
-          },
-        )
+        const result: [string, string][] = []
+        Object.entries(input).forEach(([fileName, id]) => {
+          if (isHtml(id))
+            send(
+              model.events.ADD_FILE({
+                id: getAbsolutePath(id),
+                fileType: 'HTML',
+                fileName: fileName.endsWith('.html')
+                  ? fileName
+                  : fileName + '.html',
+              }),
+            )
+          else if (basename(id).startsWith('manifest'))
+            send(
+              model.events.ADD_FILE({
+                id: getAbsolutePath(id),
+                fileType: 'MANIFEST',
+                fileName: 'manifest.json',
+              }),
+            )
+          else {
+            result.push([fileName, id])
+          }
+        })
 
         if (result.length)
           finalInput = Object.fromEntries(result)
@@ -284,7 +289,7 @@ export const chromeExtension = (
         )
           throw state.event.error
 
-        return state.matches('watch')
+        return state.matches('watching')
       })
     },
 

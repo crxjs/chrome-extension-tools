@@ -1,4 +1,4 @@
-import { dirname, join } from './path'
+import { dirname, join, resolve } from './path'
 import {
   assign,
   forwardTo,
@@ -60,12 +60,12 @@ export const model = createModel(filesContext, {
  */
 export const machine = model.createMachine(
   {
-    id: 'files orchestrator',
+    id: 'files',
     context: model.initialContext,
     on: { ERROR: '#error' },
-    initial: 'options',
+    initial: 'configuring',
     states: {
-      options: {
+      configuring: {
         entry: model.assign({ entries: [] }),
         on: {
           ADD_FILE: [
@@ -79,7 +79,8 @@ export const machine = model.createMachine(
                       ({ fileType }) => fileType !== 'MANIFEST',
                     )
                     .concat([event]),
-                root: (context, { id }) => dirname(id),
+                root: (context, { id }) =>
+                  resolve(process.cwd(), dirname(id)),
               }),
             },
             {
@@ -101,10 +102,10 @@ export const machine = model.createMachine(
                 })),
             }),
           },
-          START: 'start',
+          START: 'starting',
         },
       },
-      start: {
+      starting: {
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
         entry: ['restartExistingFiles', 'addAllEntryFiles'],
         on: {
@@ -127,7 +128,7 @@ export const machine = model.createMachine(
             {
               cond: 'allFilesComplete',
               actions: 'handleFile',
-              target: 'watch',
+              target: 'watching',
             },
             {
               actions: 'handleFile',
@@ -135,7 +136,7 @@ export const machine = model.createMachine(
           ],
         },
       },
-      watch: {
+      watching: {
         on: {
           CHANGE: {
             actions: pure(({ files }) => {
@@ -145,7 +146,7 @@ export const machine = model.createMachine(
               )
               return actions
             }),
-            target: 'options',
+            target: 'configuring',
           },
         },
       },
