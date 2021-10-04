@@ -74,8 +74,10 @@ export const shimPluginContext = (
   return proxy
 }
 
-export const useViteAdaptor = (plugin: RPCEPlugin) =>
-  new Proxy(plugin, {
+export const useViteAdaptor = (plugin: RPCEPlugin) => {
+  service.send(viteAdaptorModel.events.ADD_PLUGIN(plugin))
+
+  return new Proxy(plugin, {
     ownKeys(target) {
       const keys = new Set(Reflect.ownKeys(target))
       keys.add(configHook)
@@ -112,3 +114,4 @@ export const useViteAdaptor = (plugin: RPCEPlugin) =>
       return value
     },
   })
+}
