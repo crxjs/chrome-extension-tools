@@ -1,6 +1,6 @@
 import { capitalize } from 'lodash'
 import { PluginContext } from 'rollup'
-import { isString } from './helpers'
+import { structuredClone, isString } from './helpers'
 import {
   Asset,
   JsonAsset,
@@ -40,14 +40,14 @@ async function runRawPlugins(
   plugins: RPCEPlugin[],
   hook: string,
 ) {
-  let file = asset
+  let file = structuredClone(asset)
   for (const p of plugins) {
     const result = (await p[
       `${hook}Crx${capitalize(asset.fileType)}` as Extract<
         keyof RPCEHooks,
         `${typeof hook}Crx${'Raw' | 'Image'}`
       >
-    ]?.call(this, file.source as any, file as any)) as
+    ]?.call(this, file.source!, file)) as
       | undefined
       | null
       | Uint8Array
@@ -65,14 +65,14 @@ async function runManifestPlugins(
   plugins: RPCEPlugin[],
   hook: string,
 ) {
-  const file = asset
+  const file = structuredClone(asset)
   for (const p of plugins) {
     const hookName = `${hook}Crx${capitalize(file.fileType)}` as
       | 'transformCrxManifest'
       | 'renderCrxManifest'
     const result = (await p[hookName]?.call(
       this,
-      file.source as any,
+      file.source!,
     )) as undefined | null | Manifest
 
     if (result) file.source = result
@@ -86,7 +86,7 @@ async function runJsonPlugins(
   plugins: RPCEPlugin[],
   hook: string,
 ) {
-  let file = asset
+  let file = structuredClone(asset)
   for (const p of plugins) {
     const result = (await p[
       `${hook}Crx${capitalize(asset.fileType)}` as
@@ -105,7 +105,7 @@ async function runStringPlugins(
   plugins: RPCEPlugin[],
   hook: string,
 ) {
-  let file = asset
+  let file = structuredClone(asset)
   for (const p of plugins) {
     const result = (await p[
       `${hook}Crx${capitalize(asset.fileType)}` as Extract<
@@ -114,7 +114,7 @@ async function runStringPlugins(
           Lowercase<typeof asset.fileType>
         >}`
       >
-    ]?.call(this, file.source as any, file as any)) as
+    ]?.call(this, file.source!, file)) as
       | undefined
       | null
       | string
