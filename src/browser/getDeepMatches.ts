@@ -8,8 +8,15 @@
  * @param {string[]} excludeKeys Exclude a property if the key exactly matches
  * @returns {T[]} The matched values from the parent object
  */
-export function getDeepMatches<T>(object: any, pred: (x: any) => boolean, excludeKeys: string[]): T[] {
-  const keys = typeof object === 'object' && object ? Object.keys(object) : []
+export function getDeepMatches<T>(
+  object: any,
+  pred: (x: any) => boolean,
+  excludeKeys: string[],
+): T[] {
+  const keys =
+    typeof object === 'object' && object
+      ? Object.keys(object)
+      : []
 
   return keys.length
     ? keys
@@ -20,7 +27,10 @@ export function getDeepMatches<T>(object: any, pred: (x: any) => boolean, exclud
           if (target && pred(target)) {
             return [...r, target]
           } else {
-            return [...r, ...getDeepMatches(target, pred, excludeKeys)]
+            return [
+              ...r,
+              ...getDeepMatches(target, pred, excludeKeys),
+            ]
           }
         }, [] as T[])
     : []

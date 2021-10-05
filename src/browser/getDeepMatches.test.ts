@@ -9,7 +9,13 @@ test("null keys don't cause an exception to be thrown when the predicate doesn't
       },
     },
   }
-  expect(getDeepMatches(obj, (x) => typeof x === 'object' && 'addListener' in x, [])).toEqual([
+  expect(
+    getDeepMatches(
+      obj,
+      (x) => typeof x === 'object' && 'addListener' in x,
+      [],
+    ),
+  ).toEqual([
     {
       addListener: obj.runtime.onMessage.addListener,
     },

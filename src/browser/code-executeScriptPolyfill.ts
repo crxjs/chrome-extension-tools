@@ -15,12 +15,23 @@ const withP = (...args: [any, any?]): Promise<any[]> =>
 // @ts-expect-error FIXME: executeScript should return Promise<any[]>
 chrome.tabs.executeScript = (...args: any): void => {
   ;(async () => {
-    const baseArgs = (typeof args[0] === 'number' ? [args[0]] : []) as any[]
+    const baseArgs = (
+      typeof args[0] === 'number' ? [args[0]] : []
+    ) as any[]
 
-    const [done] = await withP(...(baseArgs.concat({ code: checkPolyfilled }) as [any, any]))
+    const [done] = await withP(
+      ...(baseArgs.concat({ code: checkPolyfilled }) as [
+        any,
+        any,
+      ]),
+    )
 
     if (!done) {
-      await withP(...(baseArgs.concat([{ file: 'browser-polyfill-executeScript.js' }]) as [any, any]))
+      await withP(
+        ...(baseArgs.concat([
+          { file: 'browser-polyfill-executeScript.js' },
+        ]) as [any, any]),
+      )
     }
 
     _executeScript(...(args as [any, any, any]))
