@@ -36,14 +36,13 @@ import type {
 } from './types'
 import { useViteAdaptor } from './viteAdaptor'
 
+export { simpleReloader } from './plugins-simpleReloader'
 export { useViteAdaptor }
 export type { ManifestV3, ManifestV2 }
 
 function getAbsolutePath(input: string): string {
   return isAbsolute(input) ? input : join(process.cwd(), input)
 }
-
-export const simpleReloader = () => ({ name: 'simpleReloader' })
 
 export const stubId = '_stubIdForRPCE'
 
