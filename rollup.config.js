@@ -7,6 +7,8 @@ import alias from '@rollup/plugin-alias'
 import fs from 'fs-extra'
 import path from 'path'
 import bundleImports from 'rollup-plugin-bundle-imports'
+import resolve from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
 
 const { dependencies, peerDependencies = {} } = fs.readJsonSync(
   path.join(process.cwd(), 'package.json'),
@@ -15,7 +17,11 @@ const { dependencies, peerDependencies = {} } = fs.readJsonSync(
 const external = Object.keys({
   ...dependencies,
   ...peerDependencies,
-}).concat('fs', 'path', 'xstate/lib/actions', 'xstate/lib/model')
+})
+  .concat('fs', 'path', 'xstate/lib/actions', 'xstate/lib/model')
+  // ESM libraries are not supported by Rollup in config files,
+  // so include them in the build to make it easier to use.
+  .filter((lib) => !['read-pkg-up'].includes(lib))
 
 const plugins = [
   alias({
@@ -30,6 +36,8 @@ const plugins = [
       },
     ],
   }),
+  resolve(),
+  commonjs(),
   json(),
   sucrase({
     transforms: ['typescript'],
