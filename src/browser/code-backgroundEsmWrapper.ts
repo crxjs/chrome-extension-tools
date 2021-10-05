@@ -2,10 +2,11 @@ import { getDeepMatches } from './getDeepMatches'
 import { importPath } from './placeholders'
 import { ChromeEvent } from './types'
 
-const events = getDeepMatches<ChromeEvent>(chrome, (x) => typeof x === 'object' && 'addListener' in x, [
-  'webRequest',
-  'extension',
-])
+const events = getDeepMatches<ChromeEvent>(
+  chrome,
+  (x) => typeof x === 'object' && 'addListener' in x,
+  ['webRequest', 'extension'],
+)
 
 const triggerEvents = captureEvents(events)
 
@@ -88,7 +89,10 @@ function captureEvents(events: ChromeEvent[]) {
     }
 
     // All future listeners are handled by our code
-    event.addListener = function addListener(cb: any, ...options) {
+    event.addListener = function addListener(
+      cb: any,
+      ...options
+    ) {
       callbacks.set(cb, options)
     }
 
