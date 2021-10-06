@@ -35,11 +35,11 @@ interface Context {
   })[]
   writers: Record<
     string,
-    ActorRef<ModelEventsFrom<typeof viteAdaptorModel>>
+    ActorRef<ModelEventsFrom<typeof model>>
   >
   bundlers: Record<
     string,
-    ActorRef<ModelEventsFrom<typeof viteAdaptorModel>>
+    ActorRef<ModelEventsFrom<typeof model>>
   >
   plugins: Set<RPCEPlugin>
 }
@@ -56,7 +56,7 @@ const context: Context = {
   plugins: new Set(),
 }
 
-export const viteAdaptorModel = createModel(context, {
+export const model = createModel(context, {
   events: {
     WRITE_ASSET: (file: EmittedAsset & { id: string }) => ({
       file,
@@ -79,13 +79,13 @@ export const viteAdaptorModel = createModel(context, {
   },
 })
 
-export const viteAdaptorMachine = viteAdaptorModel.createMachine(
+export const viteAdaptorMachine = model.createMachine(
   {
     id: 'viteAdaptor',
-    context: viteAdaptorModel.initialContext,
+    context: model.initialContext,
     on: {
       ADD_PLUGIN: {
-        actions: viteAdaptorModel.assign({
+        actions: model.assign({
           plugins: ({ plugins }, { plugin }) =>
             new Set(plugins).add(plugin),
         }),
@@ -136,7 +136,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
                 cond: (context, { hookName }) => {
                   return hookName === serverHook
                 },
-                actions: viteAdaptorModel.assign({
+                actions: model.assign({
                   server: (context, { args: [server] }) =>
                     server,
                 }),
@@ -152,7 +152,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
               SERVER_LISTENING: 'listening',
               ERROR: { target: '#error' },
               EMIT_FILE: {
-                actions: viteAdaptorModel.assign({
+                actions: model.assign({
                   files: ({ files }, { file }) => [
                     ...files,
                     file,
@@ -186,10 +186,8 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
                   'addFile',
                   send((context, { file }) =>
                     file.type === 'asset'
-                      ? viteAdaptorModel.events.WRITE_ASSET(file)
-                      : viteAdaptorModel.events.WRITE_CHUNK(
-                          file,
-                        ),
+                      ? model.events.WRITE_ASSET(file)
+                      : model.events.WRITE_CHUNK(file),
                   ),
                 ],
               },
@@ -197,7 +195,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
               WRITE_CHUNK: { actions: 'writeChunk' },
               EMIT_DONE: {
                 target: '.check',
-                actions: viteAdaptorModel.assign({
+                actions: model.assign({
                   files: ({ files }, { id }) => {
                     return files.map((file) =>
                       file.id === id
@@ -209,7 +207,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
               },
               ERROR: {
                 target: '#error',
-                actions: viteAdaptorModel.assign({
+                actions: model.assign({
                   files: ({ files }, { id, error }) =>
                     files.map((file) =>
                       file.id === id
@@ -241,19 +239,14 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
           if (isUndefined(server))
             throw new Error('vite server is undefined')
 
-          return assign<
-            Context,
-            ModelEventsFrom<typeof viteAdaptorModel>
-          >({
+          return assign<Context, ModelEventsFrom<typeof model>>({
             bundlers: ({ bundlers, plugins }) => {
               const actorRef = spawn(
                 from(
                   writeAsIIFE(event.file, server, plugins)
-                    .then(() =>
-                      viteAdaptorModel.events.EMIT_DONE(id),
-                    )
+                    .then(() => model.events.EMIT_DONE(id))
                     .catch((error: Error) =>
-                      viteAdaptorModel.events.ERROR(error, id),
+                      model.events.ERROR(error, id),
                     ),
                 ),
                 id,
@@ -263,7 +256,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
           })
         } catch (error) {
           return send(
-            viteAdaptorModel.events.ERROR(
+            model.events.ERROR(
               error,
               event.type === 'WRITE_CHUNK'
                 ? event.file.id
@@ -312,20 +305,15 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
               )
             : source
 
-          return assign<
-            Context,
-            ModelEventsFrom<typeof viteAdaptorModel>
-          >({
+          return assign<Context, ModelEventsFrom<typeof model>>({
             writers: ({ writers }) => {
               const actorRef = spawn(
                 from(
                   fs
                     .outputFile(filePath, fileSource)
-                    .then(() =>
-                      viteAdaptorModel.events.EMIT_DONE(id),
-                    )
+                    .then(() => model.events.EMIT_DONE(id))
                     .catch((error) =>
-                      viteAdaptorModel.events.ERROR(id, error),
+                      model.events.ERROR(id, error),
                     ),
                 ),
                 id,
@@ -335,7 +323,7 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
           })
         } catch (error) {
           return send(
-            viteAdaptorModel.events.ERROR(
+            model.events.ERROR(
               error,
               event.type === 'WRITE_ASSET'
                 ? event.file.id
@@ -348,8 +336,8 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
         files.map((file) =>
           send(
             file.type === 'asset'
-              ? viteAdaptorModel.events.WRITE_ASSET(file)
-              : viteAdaptorModel.events.WRITE_CHUNK(file),
+              ? model.events.WRITE_ASSET(file)
+              : model.events.WRITE_CHUNK(file),
           ),
         ),
       ),
@@ -367,12 +355,9 @@ export const viteAdaptorMachine = viteAdaptorModel.createMachine(
 
             server?.httpServer?.once('listening', resolve)
           })
-            .then(viteAdaptorModel.events.SERVER_LISTENING)
+            .then(model.events.SERVER_LISTENING)
             .catch((error) =>
-              viteAdaptorModel.events.ERROR(
-                error,
-                'waitForServer',
-              ),
+              model.events.ERROR(error, 'waitForServer'),
             ),
         ),
     },
