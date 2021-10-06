@@ -1,5 +1,6 @@
 import { OutputAsset, OutputChunk, OutputOptions } from 'rollup'
 import v8 from 'v8'
+import { Observable } from 'rxjs'
 
 export type Unpacked<T> = T extends Array<infer R> ? R : never
 
@@ -50,6 +51,10 @@ export function isNull(x: unknown): x is null {
   return x === null
 }
 
+export function isNumber(x: unknown): x is number {
+  return typeof x === 'number'
+}
+
 export function isPresent<T>(x: null | undefined | T): x is T {
   return !isUndefined(x) && !isNull(x)
 }
@@ -75,3 +80,26 @@ export function format(
 
 export const structuredClone = <T>(obj: T): T =>
   v8.deserialize(v8.serialize(obj))
+
+export function log() {
+  return function logFn<T>(source: Observable<T>) {
+    const output = new Observable<T>((observer) => {
+      const subscription = source.subscribe({
+        next: (val) => {
+          console.log(val)
+          observer.next(val)
+        },
+        error: (err) => {
+          console.error(err)
+          observer.error(err)
+        },
+        complete: () => {
+          console.log('%ccomplete', 'color: green')
+          observer.complete()
+        },
+      })
+      return subscription
+    })
+    return output
+  }
+}

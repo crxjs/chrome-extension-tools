@@ -1,16 +1,17 @@
-import { isUndefined } from '$src/helpers'
+import { isNumber, isUndefined } from '$src/helpers'
 import {
   delay,
   filter,
+  interval,
   map,
+  merge,
   mergeMap,
   pairwise,
   retry,
   sample,
   scan,
+  startWith,
   throttleTime,
-  merge,
-  interval,
 } from 'rxjs'
 import { fromFetch } from 'rxjs/fetch'
 import { Manifest } from '../types'
@@ -38,11 +39,10 @@ const reloadStream = merge(
 
 updateVersionStream
   .pipe(
+    startWith([undefined, { tab: { id: undefined } }] as const),
     scan(
-      (tabIds, [, { tab }]) =>
-        typeof tab?.id === 'number'
-          ? tabIds.add(tab.id)
-          : tabIds,
+      (tabIds, [, { tab = {} }]) =>
+        isNumber(tab?.id) ? tabIds.add(tab.id) : tabIds,
       new Set<number>(),
     ),
     sample(reloadStream),
