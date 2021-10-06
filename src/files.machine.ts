@@ -134,6 +134,10 @@ export const machine = model.createMachine(
               actions: 'handleFile',
             },
           ],
+          FILE_READY: {
+            cond: 'readyForManifest',
+            actions: 'renderManifest',
+          },
         },
       },
       watching: {

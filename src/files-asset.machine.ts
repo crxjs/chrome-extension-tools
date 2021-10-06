@@ -63,6 +63,7 @@ export const assetMachine = model.createMachine(
             {
               cond: ({ fileType }) => fileType === 'MANIFEST',
               target: 'ready',
+              actions: 'sendReadyToParent',
             },
             { target: 'rendering' },
           ],
@@ -102,6 +103,9 @@ export const assetMachine = model.createMachine(
   {
     actions: {
       forwardToParent: sendParent((context, event) => event),
+      sendReadyToParent: sendParent(({ id }) =>
+        model.events.FILE_READY(id),
+      ),
       sendFileToParent: sendParent((context, event) => {
         const { type, ...result } = narrowEvent(
           event,
