@@ -62,7 +62,7 @@ specifiers:
   react-dom: ^17.0.2
   read-pkg-up: ^8.0.0
   rollup: ^2.58.0
-  rollup-plugin-bundle-imports: ^1.5.0
+  rollup-plugin-bundle-imports: ^1.5.1
   rxjs: ^7.3.0
   slash: ^3.0.0
   tslib: ^2.3.0
@@ -141,7 +141,7 @@ devDependencies:
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   rollup: 2.58.0
-  rollup-plugin-bundle-imports: 1.5.0_64635903489b5e025a81039b168e6f98
+  rollup-plugin-bundle-imports: 1.5.1_64635903489b5e025a81039b168e6f98
   tslib: 2.3.0
   typescript: 4.3.5
   vite: 2.5.10
@@ -5347,8 +5347,8 @@ packages:
       glob: 7.1.7
     dev: true
 
-  /rollup-plugin-bundle-imports/1.5.0_64635903489b5e025a81039b168e6f98:
-    resolution: {integrity: sha512-2AcyhlTmvWp1/OVmMtxpr2tXIF2uxYs+zXO1hX+hvnfNH+a3Z/Ro5+4Gc5C4VLCJpULqCYo8Et/Y2ywT8TCFOg==}
+  /rollup-plugin-bundle-imports/1.5.1_64635903489b5e025a81039b168e6f98:
+    resolution: {integrity: sha512-EIOiPV3Pk+RJtujTAXOdiKBV82qd+PM44uczsZI07XQ53nmMy5rFq2+YcMSRmGWRz9aCGEmib7Q6Ge4EZaRG+A==}
     peerDependencies:
       '@rollup/plugin-commonjs': ^21.0.0
       '@rollup/plugin-node-resolve': ^13.0.5

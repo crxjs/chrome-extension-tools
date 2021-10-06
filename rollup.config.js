@@ -18,7 +18,13 @@ const external = Object.keys({
   ...dependencies,
   ...peerDependencies,
 })
-  .concat('fs', 'path', 'xstate/lib/actions', 'xstate/lib/model')
+  .concat(
+    'v8',
+    'fs',
+    'path',
+    'xstate/lib/actions',
+    'xstate/lib/model',
+  )
   // ESM libraries are not supported by Rollup in config files,
   // so include them in the build to make it easier to use.
   .filter((lib) => !['read-pkg-up'].includes(lib))
