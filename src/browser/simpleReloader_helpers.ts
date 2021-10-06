@@ -1,4 +1,4 @@
-import { format } from '$src/helpers'
+import { format } from '../helpers'
 import { getMessage } from '@extend-chrome/messages'
 
 export const [sendReload, reloadStream] = getMessage('RELOAD')
