@@ -8,7 +8,7 @@ import {
   getEmittedFileId,
   serverHook,
   viteAdaptorMachine,
-  viteAdaptorModel,
+  model,
 } from './viteAdaptor.machine'
 
 const service = interpret(viteAdaptorMachine)
@@ -22,7 +22,7 @@ service.start()
 const sendEmitFile: PluginContext['emitFile'] = (
   file: EmittedFile,
 ) => {
-  service.send(viteAdaptorModel.events.EMIT_FILE(file))
+  service.send(model.events.EMIT_FILE(file))
   return getEmittedFileId(file)
 }
 
@@ -75,7 +75,7 @@ export const shimPluginContext = (
 }
 
 export const useViteAdaptor = (plugin: RPCEPlugin) => {
-  service.send(viteAdaptorModel.events.ADD_PLUGIN(plugin))
+  service.send(model.events.ADD_PLUGIN(plugin))
 
   return new Proxy(plugin, {
     ownKeys(target) {
@@ -92,9 +92,7 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
           if (!service.initialized)
             return value.call(this, ...args)
 
-          service.send(
-            viteAdaptorModel.events.HOOK_START(prop, args),
-          )
+          service.send(model.events.HOOK_START(prop, args))
 
           const shim = shimPluginContext(this)
 
@@ -106,9 +104,7 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
       )
         return function (this: PluginContext, ...args: any[]) {
           if (service.initialized)
-            service.send(
-              viteAdaptorModel.events.HOOK_START(prop, args),
-            )
+            service.send(model.events.HOOK_START(prop, args))
         }
 
       return value
