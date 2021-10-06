@@ -39,6 +39,7 @@ export const sharedEventCreators = {
     ...rest,
   }),
   FILE_DONE: (file: CompleteFile) => ({ file }),
+  FILE_READY: (id: string) => ({ id }),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,
     ...change,
