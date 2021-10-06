@@ -1,5 +1,4 @@
 import { OutputAsset, OutputChunk, OutputOptions } from 'rollup'
-import v8 from 'v8'
 import { Observable } from 'rxjs'
 
 export type Unpacked<T> = T extends Array<infer R> ? R : never
@@ -77,9 +76,6 @@ export function format(
   const formatted = raw.replace(/^  +/gm, '').trim()
   return formatted
 }
-
-export const structuredClone = <T>(obj: T): T =>
-  v8.deserialize(v8.serialize(obj))
 
 export function log() {
   return function logFn<T>(source: Observable<T>) {

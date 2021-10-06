@@ -1,6 +1,7 @@
 import { capitalize } from 'lodash'
 import { PluginContext } from 'rollup'
-import { structuredClone, isString } from './helpers'
+import v8 from 'v8'
+import { isString } from './helpers'
 import {
   Asset,
   JsonAsset,
@@ -12,6 +13,9 @@ import {
   RPCEPlugin,
   StringAsset,
 } from './types'
+
+export const structuredClone = <T>(obj: T): T =>
+  v8.deserialize(v8.serialize(obj))
 
 export async function runPlugins(
   this: PluginContext,

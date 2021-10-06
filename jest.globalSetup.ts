@@ -55,6 +55,10 @@ const config: RollupOptions = {
 }
 
 export default async () => {
-  const build = await rollup(config)
-  return build.write(config.output as OutputOptions)
+  try {
+    const build = await rollup(config)
+    await build.write(config.output as OutputOptions)
+  } catch (error) {
+    console.error(error)
+  }
 }
