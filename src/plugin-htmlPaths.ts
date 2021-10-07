@@ -2,7 +2,7 @@ import cheerio from 'cheerio'
 import { dirname, join, relative } from './path'
 import { findRPCE } from './plugin_helpers'
 import { RPCEPlugin } from './types'
-import { VITE_SERVER_URL } from './viteAdaptor.machine'
+import { VITE_SERVER_URL } from './plugin-viteServerUrl'
 
 export const htmlPaths = (): RPCEPlugin => {
   let isViteServe = false

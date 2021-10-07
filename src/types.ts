@@ -1,10 +1,6 @@
-import {
-  OutputOptions,
-  PluginContext,
-  RenderedChunk,
-} from 'rollup'
+import { PluginContext } from 'rollup'
 import { JsonObject, Promisable } from 'type-fest'
-import { Plugin } from 'vite'
+import { Plugin as VitePlugin } from 'vite'
 import { isPresent, Unpacked } from './helpers'
 
 type Nullable<TType> = TType | null | undefined
@@ -172,14 +168,7 @@ type CreateRPCEHooks<THooks> = {
 
 export type RPCEHooks = CreateRPCEHooks<RPCEHookTypes>
 
-export type RPCEPlugin = Plugin &
-  RPCEHooks & {
-    viteServeRenderChunk?: (
-      source: string,
-      chunk: RenderedChunk,
-      options: OutputOptions,
-    ) => Promisable<void>
-  }
+export type RPCEPlugin = VitePlugin & RPCEHooks
 
 export interface ChromeExtensionOptions {
   /**
