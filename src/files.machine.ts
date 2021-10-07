@@ -1,4 +1,3 @@
-import { dirname, join, resolve } from './path'
 import {
   assign,
   forwardTo,
@@ -6,12 +5,14 @@ import {
   send,
 } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
-import { spawnFile } from './files_spawnFile'
-import { narrowEvent } from './files_helpers'
 import {
   SharedEvent,
   sharedEventCreators,
 } from './files.sharedEvents'
+import { narrowEvent } from './files_helpers'
+import { spawnFile } from './files_spawnFile'
+import { dirname, join, resolve } from './path'
+import { FileType } from './types'
 
 type AddFileEvent = Extract<
   SharedEvent,
@@ -24,6 +25,7 @@ export interface FilesContext {
   files: ReturnType<typeof spawnFile>[]
   root: string
   entries: AddFileEvent[]
+  excluded: Set<FileType>
 }
 const filesContext: FilesContext = {
   files: [],
@@ -36,6 +38,7 @@ const filesContext: FilesContext = {
       type: 'ADD_FILE',
     },
   ],
+  excluded: new Set(),
 }
 
 export const model = createModel(filesContext, {
@@ -68,6 +71,12 @@ export const machine = model.createMachine(
       configuring: {
         entry: model.assign({ entries: [] }),
         on: {
+          EXCLUDE_FILE: {
+            actions: model.assign({
+              excluded: ({ excluded }, { fileType }) =>
+                new Set(excluded).add(fileType),
+            }),
+          },
           ADD_FILE: [
             {
               cond: (context, { fileType }) =>
@@ -109,10 +118,11 @@ export const machine = model.createMachine(
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
         entry: ['restartExistingFiles', 'addAllEntryFiles'],
         on: {
-          ADD_FILE: {
-            cond: 'fileDoesNotExist',
-            actions: 'spawnFile',
-          },
+          ADD_FILE: [
+            { cond: 'fileIsExcluded' },
+            { cond: 'fileExists' },
+            { actions: 'spawnFile' },
+          ],
           PLUGINS_START: { actions: forwardTo('pluginsRunner') },
           PLUGINS_RESULT: {
             actions: forwardTo(
@@ -199,10 +209,15 @@ export const machine = model.createMachine(
             return snap?.matches('ready')
           return snap?.matches('complete')
         }),
-      fileDoesNotExist: ({ files }, event) => {
+      fileIsExcluded: ({ excluded }, event) => {
+        const { fileType } = narrowEvent(event, 'ADD_FILE')
+
+        return excluded.has(fileType)
+      },
+      fileExists: ({ files }, event) => {
         const { id } = narrowEvent(event, 'ADD_FILE')
 
-        return files.every((f) => f.id !== id)
+        return files.some((f) => f.id === id)
       },
     },
   },

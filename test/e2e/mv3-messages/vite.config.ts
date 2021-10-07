@@ -22,6 +22,6 @@ export default defineConfig({
   plugins: [chromeExtension()],
   cacheDir: path.join(__dirname, '.vite'),
   optimizeDeps: {
-    include: ['react', 'react-dom'],
+    include: ['react', 'react-dom', '@extend-chrome/storage'],
   },
 })

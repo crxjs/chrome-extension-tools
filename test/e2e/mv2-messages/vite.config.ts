@@ -1,5 +1,6 @@
 import { chromeExtension } from '$src'
 import { defineConfig } from 'vite'
+import { join } from 'path'
 
 export default defineConfig({
   root: 'src',
@@ -19,7 +20,7 @@ export default defineConfig({
     },
   },
   plugins: [chromeExtension()],
-  cacheDir: '.vite',
+  cacheDir: join(process.cwd(), '.vite'),
   optimizeDeps: {
     include: ['react', 'react-dom', '@extend-chrome/storage'],
   },

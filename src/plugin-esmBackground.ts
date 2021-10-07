@@ -1,7 +1,7 @@
 import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
 import { generateFileNames } from './plugin_helpers'
 import { isMV2, isMV3, RPCEPlugin } from './types'
-import { VITE_SERVER_URL } from './viteAdaptor.machine'
+import { VITE_SERVER_URL } from './plugin-viteServerUrl'
 
 /** Adds ESM support for the background page. Emits wrapper files and updates the manifest config. */
 export const esmBackground = (): RPCEPlugin => {

@@ -1,4 +1,4 @@
-import { fileWriteComplete } from '$src/viteAdaptor'
+import { viteAdaptorReady } from '$src/viteAdaptor'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
@@ -23,7 +23,7 @@ afterAll(async () => {
 })
 
 test.skip('writes entry points to disk', async () => {
-  await Promise.all([devServer.listen(), fileWriteComplete()])
+  await Promise.all([devServer.listen(), viteAdaptorReady()])
 
   const manifest = 'manifest.json'
   const manifestPath = path.join(outDir, manifest)

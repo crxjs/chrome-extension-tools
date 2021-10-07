@@ -1,4 +1,4 @@
-import { fileWriteComplete } from '$src/viteAdaptor'
+import { viteAdaptorReady } from '$src/viteAdaptor'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -26,7 +26,7 @@ afterAll(async () => {
 test('writes entry points to disk', async () => {
   expect(fs.existsSync(outDir)).toBe(false)
 
-  await Promise.all([devServer.listen(), fileWriteComplete()])
+  await Promise.all([devServer.listen(), viteAdaptorReady()])
 
   const { port } = devServer.config.server
 
@@ -62,7 +62,7 @@ test('writes entry points to disk', async () => {
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')
   expect(popupSource).toMatch(
-    `<script src="http://localhost:${port}/pages/popup/index.tsx" type="module">`,
+    `http://localhost:${port}/pages/popup/index.tsx`,
   )
 
   const backgroundPath = path.join(outDir, background)
@@ -71,6 +71,6 @@ test('writes entry points to disk', async () => {
     'utf8',
   )
   expect(backgroundSource).toMatch(
-    `const importPath = /*#__PURE__*/ JSON.parse('"http://localhost:${port}/background/index.ts"');`,
+    `http://localhost:${port}/background/index.ts`,
   )
 })
