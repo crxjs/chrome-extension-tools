@@ -38,6 +38,7 @@ export const sharedEventCreators = {
     id: normalizePath(id),
     ...rest,
   }),
+  EXCLUDE_FILE: (fileType: FileType) => ({ fileType }),
   FILE_DONE: (file: CompleteFile) => ({ file }),
   FILE_READY: (id: string) => ({ id }),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({

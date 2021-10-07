@@ -25,6 +25,7 @@ import {
   preValidateManifest,
   validateManifest,
 } from './plugin-validateManifest'
+import { viteCrxHtml } from './plugin-viteCrxHtml'
 import { viteServeCsp } from './plugin-viteServeCsp'
 import { isRPCE } from './plugin_helpers'
 import type {
@@ -67,17 +68,18 @@ export const chromeExtension = (
     packageJson(),
     extendManifest(pluginOptions),
     autoPerms(),
-    preValidateManifest(), // pre validate the extended manifest
-    htmlPaths(),
+    preValidateManifest(),
     esmBackground(),
     hybridFormat(),
     pluginOptions.browserPolyfill && browserPolyfill(),
     fileNames(),
+    htmlPaths(),
+    viteCrxHtml(),
     viteServeCsp(),
   ]
     .filter((x): x is RPCEPlugin => !!x)
-    .map(useViteAdaptor)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
+    .map(useViteAdaptor)
 
   const allPlugins = new Set<RPCEPlugin>(builtins)
 
@@ -102,9 +104,10 @@ export const chromeExtension = (
         config = result ?? config
       }
 
-      if (isString(config.root)) {
+      if (isString(config.root))
         send(model.events.ROOT(config.root))
-      }
+
+      if (isViteServe) send(model.events.EXCLUDE_FILE('MODULE'))
 
       return config
     },
@@ -259,6 +262,9 @@ export const chromeExtension = (
           },
         },
         services: {
+          // TODO: run render hooks in generateBundle
+          // - vite server port will be available
+          // - generate bundle runs in all modes now
           pluginsRunner: () => (send, onReceived) => {
             onReceived(async (event) => {
               try {
