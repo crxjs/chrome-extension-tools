@@ -4,13 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": [
-      "DOM",
-      "es2019",
-      "es2020.bigint",
-      "es2020.string",
-      "es2020.symbol.wellknown"
-    ],
+    "lib": ["DOM", "es2020"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,
