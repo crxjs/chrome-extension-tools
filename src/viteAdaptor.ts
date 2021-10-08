@@ -1,6 +1,11 @@
 import { PluginContext } from 'rollup'
 import { interpret } from 'xstate'
-import { narrowEvent } from './files_helpers'
+import {
+  debugHelper,
+  logActorStates,
+  narrowEvent,
+} from './files_helpers'
+import { join } from './path'
 import { RPCEPlugin } from './types'
 import { model, viteAdaptorMachine } from './viteAdaptor.machine'
 
@@ -8,10 +13,20 @@ const service = interpret(viteAdaptorMachine)
 
 service.start()
 
-// debugHelper(service, (state, ids) => {
-//   if (!state?.matches?.('serving')) return
-//   console.log('🚀 ~ debugHelper ~ state, ids', state, ids)
-// })
+debugHelper(service, (state, ids, actors) => {
+  logActorStates(
+    actors,
+    join(process.cwd(), 'viteAdaptor-states.log'),
+  )
+
+  // if (ids.length > 1) return
+
+  // const data = state.toJSON()
+  // writeJsonSync(
+  //   join(process.cwd(), 'viteAdaptor-state.json'),
+  //   data,
+  // )
+})
 
 export const viteAdaptorReady = () =>
   new Promise<void>((resolve, reject) => {
