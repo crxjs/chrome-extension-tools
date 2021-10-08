@@ -12,7 +12,7 @@ import { CompleteFile, RPCEPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
 export const hybridFormat = (): RPCEPlugin => {
-  let files: Set<CompleteFile>
+  let files: Map<string, CompleteFile>
   let root = process.cwd()
   const plugins = new Set<RPCEPlugin>()
 
@@ -51,7 +51,7 @@ export const hybridFormat = (): RPCEPlugin => {
     async generateBundle({ sourcemap, chunkFileNames }, bundle) {
       const entryFileNames = '[name].js'
 
-      const filesForIIFE = Array.from(files).filter(
+      const filesForIIFE = Array.from(files.values()).filter(
         ({ fileType }) => fileType === 'CONTENT',
       )
 
