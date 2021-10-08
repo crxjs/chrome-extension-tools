@@ -115,7 +115,9 @@ export const viteAdaptorMachine = model.createMachine(
           ],
           SERVER_READY: 'serving',
         },
+        initial: 'start',
         states: {
+          start: {},
           initializing: {
             invoke: { src: 'waitForServer' },
           },
