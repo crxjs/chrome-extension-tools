@@ -1,11 +1,13 @@
 import CSP from 'csp-dev'
 import { set } from 'lodash'
+import { ViteDevServer } from 'vite'
+import { isUndefined } from './helpers'
 import { isMV2, RPCEPlugin } from './types'
-import { VITE_SERVER_URL } from './plugin-viteServerUrl'
 
 const defaultSrc = ['self']
 
 function addViteServerToScriptSrc(
+  serverUrl: string,
   csp?: string,
 ): string | undefined {
   const parser = new CSP(csp)
@@ -14,30 +16,30 @@ function addViteServerToScriptSrc(
   const objectSrc =
     parser.share('json')['object-src'] ?? defaultSrc
 
-  parser.newDirective('script-src', [
-    ...scriptSrc,
-    VITE_SERVER_URL,
-  ])
+  parser.newDirective('script-src', [...scriptSrc, serverUrl])
   parser.newDirective('object-src', objectSrc)
 
   return parser.share('string')
 }
 
 export const viteServeCsp = (): RPCEPlugin => {
-  let isViteServe = false
+  let server: ViteDevServer | undefined
   return {
     name: 'vite-serve-csp',
-    configureServer() {
-      isViteServe = true
+    configureServer(s) {
+      server = s
     },
     renderCrxManifest(manifest) {
-      if (!isViteServe) return manifest
+      const { port } = server?.config.server ?? {}
+      if (isUndefined(port)) return manifest
 
+      const serverUrl = `http://localhost:${port}`
       if (isMV2(manifest)) {
         set(
           manifest,
           'content_security_policy',
           addViteServerToScriptSrc(
+            serverUrl,
             manifest.content_security_policy,
           ),
         )
@@ -46,6 +48,7 @@ export const viteServeCsp = (): RPCEPlugin => {
           manifest,
           'content_security_policy.extension_pages',
           addViteServerToScriptSrc(
+            serverUrl,
             manifest.content_security_policy?.extension_pages,
           ),
         )

@@ -1,16 +1,17 @@
 import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
+import { ViteDevServer } from 'vite'
+import { isUndefined } from './helpers'
 import { generateFileNames } from './plugin_helpers'
 import { isMV2, isMV3, RPCEPlugin } from './types'
-import { VITE_SERVER_URL } from './plugin-viteServerUrl'
 
 /** Adds ESM support for the background page. Emits wrapper files and updates the manifest config. */
 export const esmBackground = (): RPCEPlugin => {
-  let isViteServe = false
+  let server: ViteDevServer | undefined
 
   return {
     name: 'esm-background',
-    configureServer() {
-      isViteServe = true
+    configureServer(s) {
+      server = s
     },
     renderCrxManifest(manifest) {
       if (isMV2(manifest) && manifest.background?.scripts) {
@@ -20,10 +21,12 @@ export const esmBackground = (): RPCEPlugin => {
             const { outputFileName, wrapperFileName } =
               generateFileNames(fileName)
 
+            const { port } = server?.config.server ?? {}
+
             const importPath = JSON.stringify(
-              isViteServe
-                ? `${VITE_SERVER_URL}/${fileName}`
-                : `./${outputFileName}`,
+              isUndefined(port)
+                ? `./${outputFileName}`
+                : `${`http://localhost:${port}`}/${fileName}`,
             )
 
             this.emitFile({
@@ -46,8 +49,13 @@ export const esmBackground = (): RPCEPlugin => {
         const { service_worker: sw } = manifest.background
         const { wrapperFileName, outputFileName } =
           generateFileNames(sw)
-        if (isViteServe) {
-          const importPath = `${VITE_SERVER_URL}/${sw}`
+
+        const { port } = server?.config.server ?? {}
+
+        if (isUndefined(port)) {
+          manifest.background.service_worker = outputFileName
+        } else {
+          const importPath = `${`http://localhost:${port}`}/${sw}`
 
           this.emitFile({
             type: 'asset',
@@ -56,8 +64,6 @@ export const esmBackground = (): RPCEPlugin => {
           })
 
           manifest.background.service_worker = wrapperFileName
-        } else {
-          manifest.background.service_worker = outputFileName
         }
       }
 
