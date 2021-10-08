@@ -65,13 +65,20 @@ export const machine = model.createMachine(
   {
     id: 'files',
     context: model.initialContext,
-    on: { ERROR: '#error' },
+    on: {
+      ERROR: '#error',
+      ASSET_ID: {
+        actions: forwardTo(
+          ({ files }, { id }) => files.find((f) => f.id === id)!,
+        ),
+      },
+    },
     initial: 'configuring',
     states: {
       configuring: {
         entry: model.assign({ entries: [] }),
         on: {
-          EXCLUDE_FILE: {
+          EXCLUDE_FILE_TYPE: {
             actions: model.assign({
               excluded: ({ excluded }, { fileType }) =>
                 new Set(excluded).add(fileType),
@@ -127,10 +134,44 @@ export const machine = model.createMachine(
           PLUGINS_RESULT: {
             actions: forwardTo(
               ({ files }, { id }) =>
+                files.find((f) => f.id === id)!,
+            ),
+          },
+          EMIT_FILE: [
+            {
+              cond: ({ files }, { children }) =>
+                children.length === 0 &&
+                files.every((file) =>
+                  file.getSnapshot()?.matches('ready'),
+                ),
+              actions: ['addChildFiles', 'handleFile'],
+              target: 'ready',
+            },
+            {
+              actions: ['addChildFiles', 'handleFile'],
+            },
+          ],
+        },
+      },
+      ready: {
+        on: {
+          START: {
+            actions: 'forwardToAllFiles',
+            target: 'rendering',
+          },
+        },
+      },
+      rendering: {
+        invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
+        on: {
+          PLUGINS_START: { actions: forwardTo('pluginsRunner') },
+          PLUGINS_RESULT: {
+            actions: forwardTo(
+              ({ files }, { id }) =>
                 files.find((f) => id === f.id)!,
             ),
           },
-          FILE_DONE: [
+          SET_ASSET_SOURCE: [
             {
               cond: 'readyForManifest',
               actions: ['renderManifest', 'handleFile'],
@@ -138,19 +179,15 @@ export const machine = model.createMachine(
             {
               cond: 'allFilesComplete',
               actions: 'handleFile',
-              target: 'watching',
+              target: 'complete',
             },
             {
               actions: 'handleFile',
             },
           ],
-          FILE_READY: {
-            cond: 'readyForManifest',
-            actions: 'renderManifest',
-          },
         },
       },
-      watching: {
+      complete: {
         on: {
           CHANGE: {
             actions: pure(({ files }) => {
@@ -172,6 +209,9 @@ export const machine = model.createMachine(
       addAllEntryFiles: pure(({ entries }) =>
         entries.map((entry) => send(entry)),
       ),
+      forwardToAllFiles: pure(({ files }, event) =>
+        files.map((file) => send(event, { to: () => file })),
+      ),
       spawnFile: assign({
         files: ({ files, root }, event) => {
           const { type, ...file } = narrowEvent(
@@ -184,12 +224,19 @@ export const machine = model.createMachine(
           return [...files, ref]
         },
       }),
+      addChildFiles: pure((context, event) => {
+        const { children } = narrowEvent(event, 'EMIT_FILE')
+
+        return children.map((child) =>
+          send(model.events.ADD_FILE(child)),
+        )
+      }),
       restartExistingFiles: pure(({ files }) =>
         files.map((file) =>
           send(model.events.START(), { to: file.id }),
         ),
       ),
-      renderManifest: send(model.events.START(), {
+      renderManifest: send(model.events.START(true), {
         to: ({ files }) =>
           files.find(
             (f) =>
