@@ -1,5 +1,5 @@
 import glob from 'glob'
-import { from, Observable, of } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { AssetEvent, model } from './files-asset.machine'
 import { parseManifest } from './files_parseManifest'
 import { join } from './path'
@@ -36,12 +36,14 @@ export function manifestParser(
           })),
       )
 
-      return from([
-        ...files.map(model.events.ADD_FILE),
-        model.events.PARSED(),
-      ])
+      if (files.length === 0)
+        throw new Error(
+          'Manifest must define at least one entry file',
+        )
+
+      return of(model.events.PARSED(files))
     } catch (error) {
-      return of(model.events.ERROR(error))
+      return of(model.events.ERROR(error as Error))
     }
   }
 }

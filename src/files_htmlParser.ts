@@ -1,4 +1,7 @@
 import cheerio, { CheerioAPI } from 'cheerio'
+import { Observable, of } from 'rxjs'
+import { AssetEvent, model } from './files-asset.machine'
+import { isString } from './helpers'
 import {
   dirname,
   isAbsolute,
@@ -6,9 +9,6 @@ import {
   relative,
   resolve,
 } from './path'
-import { from, Observable, of } from 'rxjs'
-import { AssetEvent, model } from './files-asset.machine'
-import { isString } from './helpers'
 import { Asset, BaseAsset, FileType, Script } from './types'
 
 export function htmlParser(
@@ -38,12 +38,9 @@ export function htmlParser(
         }),
       )
 
-      return from([
-        ...files.map(model.events.ADD_FILE),
-        model.events.PARSED(),
-      ])
+      return of(model.events.PARSED(files))
     } catch (error) {
-      return of(model.events.ERROR(error))
+      return of(model.events.ERROR(error as Error))
     }
   }
 }

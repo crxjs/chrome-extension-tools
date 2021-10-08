@@ -1,8 +1,8 @@
 import { createFilter } from '@rollup/pluginutils'
-import { RollupOptions } from 'rollup'
+import { PluginContext, RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
-import { isScript } from './files.sharedEvents'
+import { SharedEvent } from './files.sharedEvents'
 import {
   debugHelper,
   logActorStates,
@@ -29,10 +29,12 @@ import { viteCrxHtml } from './plugin-viteCrxHtml'
 import { viteServeCsp } from './plugin-viteServeCsp'
 import { isRPCE } from './plugin_helpers'
 import type {
+  Asset,
   ChromeExtensionOptions,
   CompleteFile,
   ManifestV2,
   ManifestV3,
+  RPCEHookType,
   RPCEPlugin,
 } from './types'
 import { useViteAdaptor } from './viteAdaptor'
@@ -54,16 +56,21 @@ export const chromeExtension = (
 
   const { send, service, waitFor } = useMachine(machine)
 
-  // if (process.env.XSTATE_LOG)
-  debugHelper(service, (state, ids, actors) => {
-    logActorStates(
-      actors,
-      join(process.cwd(), 'rpce-states.log'),
-    )
-    // console.log(state, ids)
-  })
+  if (process.env.XSTATE_LOG)
+    debugHelper(service, (state, ids, actors) => {
+      if (ids.length > 2 || !state.event) return
 
-  const files = new Set<CompleteFile>()
+      logActorStates(
+        actors,
+        join(process.cwd(), 'rpce-states.log'),
+      )
+      console.log(state, ids)
+    })
+
+  const files = new Map<
+    string,
+    CompleteFile & { source?: string | Uint8Array }
+  >()
 
   let isViteServe = false
   const [finalValidator, ...builtins]: RPCEPlugin[] = [
@@ -85,6 +92,36 @@ export const chromeExtension = (
     .map(useViteAdaptor)
 
   const allPlugins = new Set<RPCEPlugin>(builtins)
+  function setupPluginsRunner(
+    this: PluginContext,
+    hook: RPCEHookType,
+  ) {
+    const plugins = Array.from(allPlugins)
+    useConfig(service, {
+      services: {
+        // TODO: run render hooks in generateBundle
+        // - vite server port will be available
+        // - generate bundle runs in all modes now
+        pluginsRunner: () => (send, onReceived) => {
+          onReceived(async (e: SharedEvent) => {
+            try {
+              const event = narrowEvent(e, 'PLUGINS_START')
+              const result = await runPlugins.call(
+                this,
+                plugins,
+                event as Asset,
+                hook,
+              )
+
+              send(model.events.PLUGINS_RESULT(result))
+            } catch (error) {
+              send(model.events.ERROR(error))
+            }
+          })
+        },
+      },
+    })
+  }
 
   return useViteAdaptor({
     name: 'chrome-extension',
@@ -110,7 +147,8 @@ export const chromeExtension = (
       if (isString(config.root))
         send(model.events.ROOT(config.root))
 
-      if (isViteServe) send(model.events.EXCLUDE_FILE('MODULE'))
+      if (isViteServe)
+        send(model.events.EXCLUDE_FILE_TYPE('MODULE'))
 
       return config
     },
@@ -249,42 +287,27 @@ export const chromeExtension = (
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
 
-      const plugins = Array.from(allPlugins)
-
+      setupPluginsRunner.call(this, 'transform')
       useConfig(service, {
         actions: {
           handleFile: (context, event) => {
-            const { file } = narrowEvent(event, 'FILE_DONE')
+            try {
+              const { file: f } = narrowEvent(event, 'EMIT_FILE')
+              const file = Object.assign({}, f)
 
-            if (isScript(file))
-              file.fileName = getJsFilename(file.fileName)
+              if (file.type === 'chunk')
+                file.fileName = getJsFilename(file.fileName)
 
-            files.add(file)
-            this.emitFile(file)
-            this.addWatchFile(file.id)
-          },
-        },
-        services: {
-          // TODO: run render hooks in generateBundle
-          // - vite server port will be available
-          // - generate bundle runs in all modes now
-          pluginsRunner: () => (send, onReceived) => {
-            onReceived(async (event) => {
-              try {
-                const { type, ...options } = narrowEvent(
-                  event,
-                  'PLUGINS_START',
-                )
-                const result = await runPlugins.call(
-                  this,
-                  plugins,
-                  options,
-                )
-                send(model.events.PLUGINS_RESULT(result))
-              } catch (error) {
-                send(model.events.ERROR(error))
-              }
-            })
+              const assetId = this.emitFile(file)
+              send(
+                model.events.ASSET_ID({ id: file.id, assetId }),
+              )
+
+              files.set(assetId, file)
+              this.addWatchFile(file.id)
+            } catch (error) {
+              send(model.events.ERROR(error))
+            }
           },
         },
       })
@@ -297,7 +320,7 @@ export const chromeExtension = (
         )
           throw state.event.error
 
-        return state.matches('watching')
+        return state.matches('ready')
       })
     },
 
@@ -311,13 +334,44 @@ export const chromeExtension = (
       return null
     },
 
+    async generateBundle(options, bundle) {
+      delete bundle[stubId + '.js']
+
+      setupPluginsRunner.call(this, 'render')
+      useConfig(service, {
+        actions: {
+          handleFile: (context, event) => {
+            try {
+              const { assetId, source } = narrowEvent(
+                event,
+                'SET_ASSET_SOURCE',
+              )
+
+              this.setAssetSource(assetId, source)
+              const file = files.get(assetId)!
+              file.source = source
+            } catch (error) {
+              send(model.events.ERROR(error))
+            }
+          },
+        },
+      })
+
+      send(model.events.START())
+      await waitFor((state) => {
+        if (
+          state.matches('error') &&
+          state.event.type === 'ERROR'
+        )
+          throw state.event.error
+
+        return state.matches('complete')
+      })
+    },
+
     watchChange(id, change) {
       files.clear()
       send(model.events.CHANGE(id, change))
-    },
-
-    generateBundle(options, bundle) {
-      delete bundle[stubId + '.js']
     },
   })
 }

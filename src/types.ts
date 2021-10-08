@@ -87,26 +87,28 @@ export interface BaseAsset {
   id: string
   /* Output file name, relative to outDir */
   fileName: string
+  /* Asset id from Rollup emitFile */
+  assetId?: string
 }
 
 export interface StringAsset extends BaseAsset {
   fileType: 'CSS' | 'HTML'
-  source?: string
+  source: string
 }
 
 export interface RawAsset extends BaseAsset {
   fileType: 'IMAGE' | 'RAW'
-  source?: Uint8Array
+  source: Uint8Array
 }
 
 export interface JsonAsset extends BaseAsset {
   fileType: 'JSON'
-  source?: JsonObject
+  source: JsonObject
 }
 
 export interface ManifestAsset extends BaseAsset {
   fileType: 'MANIFEST'
-  source?: Manifest
+  source: Manifest
 }
 
 export type Asset =
@@ -116,11 +118,11 @@ export type Asset =
   | ManifestAsset
 
 export interface CompleteFile {
-  fileName: string
   fileType: FileType
+  fileName: string
   id: string
-  source?: string | Uint8Array
   type: 'chunk' | 'asset'
+  source?: string | Uint8Array
 }
 
 interface RPCEHookTypes {
@@ -154,14 +156,10 @@ interface RPCEHookTypes {
   ) => Promisable<Nullable<RawAsset | Uint8Array>>
 }
 
-type HookType = 'transform' | 'render'
-
-export type PluginsStartOptions = Asset & {
-  hook: HookType
-}
+export type RPCEHookType = 'transform' | 'render'
 
 type CreateRPCEHooks<THooks> = {
-  [TransformProp in keyof THooks as `${HookType}Crx${Capitalize<
+  [TransformProp in keyof THooks as `${RPCEHookType}Crx${Capitalize<
     string & TransformProp
   >}`]: THooks[TransformProp]
 }

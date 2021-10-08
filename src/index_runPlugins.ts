@@ -7,9 +7,9 @@ import {
   JsonAsset,
   Manifest,
   ManifestAsset,
-  PluginsStartOptions,
   RawAsset,
   RPCEHooks,
+  RPCEHookType,
   RPCEPlugin,
   StringAsset,
 } from './types'
@@ -20,7 +20,8 @@ export const structuredClone = <T>(obj: T): T =>
 export async function runPlugins(
   this: PluginContext,
   plugins: RPCEPlugin[],
-  { hook, ...asset }: PluginsStartOptions,
+  asset: Asset,
+  hook: RPCEHookType,
 ): Promise<Asset> {
   if (asset.fileType === 'CSS' || asset.fileType === 'HTML') {
     return runStringPlugins.call(this, asset, plugins, hook)
