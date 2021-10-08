@@ -43,7 +43,7 @@ export function manifestParser(
 
       return of(model.events.PARSED(files))
     } catch (error) {
-      return of(model.events.ERROR(error as Error))
+      return of(model.events.ERROR(error))
     }
   }
 }

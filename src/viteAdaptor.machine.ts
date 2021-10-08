@@ -10,7 +10,6 @@ import { from } from 'rxjs'
 import { Plugin as VitePlugin, ViteDevServer } from 'vite'
 import { createModel } from 'xstate/lib/model'
 import { format } from './helpers'
-import { replaceViteServerUrl } from './plugin-viteServerUrl'
 import { RPCEHooks, RPCEPlugin } from './types'
 import { resolveFromServer } from './viteAdaptor_writeAsIIFE'
 
@@ -222,7 +221,6 @@ export const viteAdaptorMachine = model.createMachine(
             },
             plugins: [
               resolveFromServer(server!),
-              replaceViteServerUrl(server!),
               // @ts-expect-error Vite is using a different version of Rollup
               ...pluginProxies,
             ],

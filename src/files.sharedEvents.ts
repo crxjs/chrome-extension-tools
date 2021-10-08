@@ -54,7 +54,7 @@ export const sharedEventCreators = {
     id,
     ...change,
   }),
-  ERROR: (error: Error) => ({ error }),
+  ERROR: (error: unknown) => ({ error }),
   START: (manifest = false) => ({ manifest }),
   PLUGINS_START: (asset: Omit<Required<Asset>, 'assetId'>) =>
     asset,
