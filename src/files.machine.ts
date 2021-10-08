@@ -67,7 +67,7 @@ export const machine = model.createMachine(
     context: model.initialContext,
     on: {
       ERROR: '#error',
-      ASSET_ID: {
+      FILE_ID: {
         actions: forwardTo(
           ({ files }, { id }) => files.find((f) => f.id === id)!,
         ),
@@ -171,7 +171,7 @@ export const machine = model.createMachine(
                 files.find((f) => id === f.id)!,
             ),
           },
-          SET_ASSET_SOURCE: [
+          COMPLETE_FILE: [
             {
               cond: 'readyForManifest',
               actions: ['renderManifest', 'handleFile'],

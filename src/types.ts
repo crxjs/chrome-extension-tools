@@ -79,6 +79,8 @@ export interface Script {
   id: string
   /* Output file name, relative to outDir */
   fileName: string
+  /* File id from Rollup emitFile */
+  fileId?: string
 }
 
 export interface BaseAsset {
@@ -87,8 +89,8 @@ export interface BaseAsset {
   id: string
   /* Output file name, relative to outDir */
   fileName: string
-  /* Asset id from Rollup emitFile */
-  assetId?: string
+  /* File id from Rollup emitFile */
+  fileId?: string
 }
 
 export interface StringAsset extends BaseAsset {

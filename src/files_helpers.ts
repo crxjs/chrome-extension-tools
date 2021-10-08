@@ -221,7 +221,7 @@ export function logActorStates(
         ${ids
           .map((id) => id.replace(process.cwd() + '/', ''))
           .join(' -> ')} :: ${JSON.stringify(snap.value)} ${
-        snap.context.assetId ?? ''
+        snap.context.fileId ?? ''
       }`
     },
     '',

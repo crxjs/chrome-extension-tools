@@ -10,7 +10,12 @@ import {
   useConfig,
   useMachine,
 } from './files_helpers'
-import { getJsFilename, isString, not } from './helpers'
+import {
+  getJsFilename,
+  isString,
+  isUndefined,
+  not,
+} from './helpers'
 import { runPlugins } from './index_runPlugins'
 import { basename, isAbsolute, join } from './path'
 import { autoPerms } from './plugin-autoPerms'
@@ -298,12 +303,10 @@ export const chromeExtension = (
               if (file.type === 'chunk')
                 file.fileName = getJsFilename(file.fileName)
 
-              const assetId = this.emitFile(file)
-              send(
-                model.events.ASSET_ID({ id: file.id, assetId }),
-              )
+              const fileId = this.emitFile(file)
+              send(model.events.FILE_ID({ id: file.id, fileId }))
 
-              files.set(assetId, file)
+              files.set(fileId, file)
               this.addWatchFile(file.id)
             } catch (error) {
               send(model.events.ERROR(error))
@@ -342,13 +345,16 @@ export const chromeExtension = (
         actions: {
           handleFile: (context, event) => {
             try {
-              const { assetId, source } = narrowEvent(
+              const { fileId, source } = narrowEvent(
                 event,
-                'SET_ASSET_SOURCE',
+                'COMPLETE_FILE',
               )
 
-              this.setAssetSource(assetId, source)
-              const file = files.get(assetId)!
+              // This is a script, do nothing for now
+              if (isUndefined(source)) return
+
+              this.setAssetSource(fileId, source)
+              const file = files.get(fileId)!
               file.source = source
             } catch (error) {
               send(model.events.ERROR(error))

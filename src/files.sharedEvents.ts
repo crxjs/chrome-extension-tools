@@ -39,26 +39,28 @@ export const sharedEventCreators = {
   }),
   EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
   EMIT_FILE: (
-    file: Omit<CompleteFile, 'source' | 'assetId'>,
+    file: Omit<CompleteFile, 'source' | 'fileId'>,
     children = [] as (BaseAsset | Script)[],
   ) => ({
     file,
     children,
   }),
-  SET_ASSET_SOURCE: (data: {
-    assetId: string
-    source: string | Uint8Array
+  SCRIPT_COMPLETE: (id: string) => ({ id }),
+  COMPLETE_FILE: (data: {
+    id: string
+    fileId: string
+    source?: string | Uint8Array
   }) => data,
-  ASSET_ID: (input: { id: string; assetId: string }) => input,
+  FILE_ID: (input: { id: string; fileId: string }) => input,
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,
     ...change,
   }),
   ERROR: (error: unknown) => ({ error }),
   START: (manifest = false) => ({ manifest }),
-  PLUGINS_START: (asset: Omit<Required<Asset>, 'assetId'>) =>
+  PLUGINS_START: (asset: Omit<Required<Asset>, 'fileId'>) =>
     asset,
-  PLUGINS_RESULT: (asset: Omit<Required<Asset>, 'assetId'>) =>
+  PLUGINS_RESULT: (asset: Omit<Required<Asset>, 'fileId'>) =>
     asset,
 }
 export type SharedEvent = EventFrom<typeof sharedEventModel>
