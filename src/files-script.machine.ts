@@ -15,12 +15,13 @@ export const scriptMachine = model.createMachine(
     initial: 'ready',
     states: {
       ready: {
-        entry: 'sendFileToParent',
+        entry: 'sendEmitFileToParent',
         on: {
           START: 'complete',
         },
       },
       complete: {
+        entry: 'sendCompleteToParent',
         on: {
           START: 'ready',
         },
@@ -34,11 +35,14 @@ export const scriptMachine = model.createMachine(
   },
   {
     actions: {
-      sendFileToParent: sendParent((context) =>
+      sendEmitFileToParent: sendParent((context) =>
         model.events.EMIT_FILE({
           type: 'chunk',
           ...context,
         }),
+      ),
+      sendCompleteToParent: sendParent(({ id, fileId }) =>
+        model.events.COMPLETE_FILE({ id, fileId: fileId! }),
       ),
     },
   },
