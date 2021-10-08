@@ -31,13 +31,13 @@ export const assetMachine = model.createMachine(
     context: model.initialContext,
     on: {
       ERROR: { actions: 'forwardToParent', target: '#error' },
-      ASSET_ID: {
+      FILE_ID: {
         cond: ({ id }, event) => {
           return id === event.id
         },
         actions: assign({
-          assetId: (context, { assetId }) => {
-            return assetId
+          fileId: (context, { fileId }) => {
+            return fileId
           },
         }),
       },
@@ -108,7 +108,7 @@ export const assetMachine = model.createMachine(
         entry: 'sendPluginsStart',
         on: {
           PLUGINS_RESULT: {
-            actions: 'sendSourceToParent',
+            actions: 'sendCompleteToParent',
             target: 'complete',
           },
         },
@@ -138,16 +138,16 @@ export const assetMachine = model.createMachine(
   {
     actions: {
       forwardToParent: sendParent((context, event) => event),
-      sendSourceToParent: sendParent(
-        ({ id, assetId }, event) => {
+      sendCompleteToParent: sendParent(
+        ({ id, fileId }, event) => {
           const { type, ...r } = narrowEvent(
             event,
             'PLUGINS_RESULT',
           )
           const result = r as Asset
 
-          if (isUndefined(assetId))
-            throw new TypeError(`assetId is undefined for ${id}`)
+          if (isUndefined(fileId))
+            throw new TypeError(`fileId is undefined for ${id}`)
 
           let source: string | Uint8Array
           if (
@@ -159,8 +159,9 @@ export const assetMachine = model.createMachine(
             source = result.source
           }
 
-          return model.events.SET_ASSET_SOURCE({
-            assetId,
+          return model.events.COMPLETE_FILE({
+            id,
+            fileId,
             source,
           })
         },
