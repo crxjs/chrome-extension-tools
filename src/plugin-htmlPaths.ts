@@ -1,19 +1,20 @@
 import cheerio from 'cheerio'
+import { ViteDevServer } from 'vite'
+import { isNumber } from './helpers'
 import { dirname, join, relative } from './path'
 import { findRPCE } from './plugin_helpers'
 import { RPCEPlugin } from './types'
-import { VITE_SERVER_URL } from './plugin-viteServerUrl'
 
 export const htmlPaths = (): RPCEPlugin => {
-  let isViteServe = false
+  let server: ViteDevServer | undefined
   let root: string
   return {
     name: 'html-paths',
-    config(options, { command }) {
-      isViteServe = command === 'serve'
-    },
     configResolved({ plugins }) {
       root = findRPCE(plugins)?.api.root
+    },
+    configureServer(s) {
+      server = s
     },
     buildStart({ plugins = [] }) {
       root = root ?? findRPCE(plugins)?.api.root
@@ -30,12 +31,13 @@ export const htmlPaths = (): RPCEPlugin => {
         .attr('type', 'module')
         .attr('src', (i, value) => {
           let result: string
-          if (isViteServe) {
+          const { port } = server?.config.server ?? {}
+          if (isNumber(port)) {
             const relPath = relative(root, id)
             const relDir = dirname(relPath)
 
             // TODO: don't use vite server url if mv3
-            result = `${VITE_SERVER_URL}/${
+            result = `http://localhost:${port}/${
               relDir === '.' ? value : join(relDir, value)
             }`
           } else {
