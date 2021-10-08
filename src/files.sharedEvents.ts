@@ -7,7 +7,6 @@ import {
   BaseAsset,
   CompleteFile,
   FileType,
-  PluginsStartOptions,
   Script,
 } from './types'
 
@@ -38,17 +37,29 @@ export const sharedEventCreators = {
     id: normalizePath(id),
     ...rest,
   }),
-  EXCLUDE_FILE: (fileType: FileType) => ({ fileType }),
-  FILE_DONE: (file: CompleteFile) => ({ file }),
-  FILE_READY: (id: string) => ({ id }),
+  EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
+  EMIT_FILE: (
+    file: Omit<CompleteFile, 'source' | 'assetId'>,
+    children = [] as (BaseAsset | Script)[],
+  ) => ({
+    file,
+    children,
+  }),
+  SET_ASSET_SOURCE: (data: {
+    assetId: string
+    source: string | Uint8Array
+  }) => data,
+  ASSET_ID: (input: { id: string; assetId: string }) => input,
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,
     ...change,
   }),
   ERROR: (error: Error) => ({ error }),
-  START: () => ({}),
-  PLUGINS_START: (options: PluginsStartOptions) => options,
-  PLUGINS_RESULT: (result: Asset) => result,
+  START: (manifest = false) => ({ manifest }),
+  PLUGINS_START: (asset: Omit<Required<Asset>, 'assetId'>) =>
+    asset,
+  PLUGINS_RESULT: (asset: Omit<Required<Asset>, 'assetId'>) =>
+    asset,
 }
 export type SharedEvent = EventFrom<typeof sharedEventModel>
 export const sharedEventModel = createModel(

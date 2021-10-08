@@ -12,15 +12,18 @@ export const scriptMachine = model.createMachine(
     on: {
       ERROR: { actions: 'forwardToParent', target: '#error' },
     },
-    initial: 'complete',
+    initial: 'ready',
     states: {
-      complete: {
+      ready: {
         entry: 'sendFileToParent',
         on: {
-          // TODO: does vite serve clear outDir on change?
           START: 'complete',
         },
-        tags: 'ready',
+      },
+      complete: {
+        on: {
+          START: 'ready',
+        },
       },
       error: {
         id: 'error',
@@ -32,9 +35,9 @@ export const scriptMachine = model.createMachine(
   {
     actions: {
       sendFileToParent: sendParent((context) =>
-        model.events.FILE_DONE({
-          ...context,
+        model.events.EMIT_FILE({
           type: 'chunk',
+          ...context,
         }),
       ),
     },

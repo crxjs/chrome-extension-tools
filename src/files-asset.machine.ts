@@ -1,16 +1,16 @@
 import { of } from 'rxjs'
 import { assign, EventFrom, sendParent } from 'xstate'
 import { createModel } from 'xstate/lib/model'
-import { isUndefined } from './helpers'
-import { Asset } from './types'
-import { narrowEvent } from './files_helpers'
 import { sharedEventCreators } from './files.sharedEvents'
+import { narrowEvent } from './files_helpers'
+import { isUndefined } from './helpers'
+import { Asset, BaseAsset, Script } from './types'
 
 export const model = createModel({} as Asset, {
   events: {
-    PARSED: () => ({}),
-    LOADED: (values: Pick<Asset, 'id' | 'source'>) => values,
     ...sharedEventCreators,
+    LOADED: ({ source }: { source: any }) => ({ source }),
+    PARSED: (files: (BaseAsset | Script)[]) => ({ files }),
   },
 })
 
@@ -23,34 +23,49 @@ export type AssetEvent = EventFrom<typeof model>
  * All services may emit an ERROR event
  *
  * Required services:
- *   - "loader": should emit LOADED events, may emit ROOT event
- *   - "parser": should emit ADD_FILE events
+ *   - "loader": should emit LOADED event, may emit ROOT event
+ *   - "parser": should emit PARSED event
  */
 export const assetMachine = model.createMachine(
   {
     context: model.initialContext,
     on: {
       ERROR: { actions: 'forwardToParent', target: '#error' },
+      ASSET_ID: {
+        cond: ({ id }, event) => {
+          return id === event.id
+        },
+        actions: assign({
+          assetId: (context, { assetId }) => {
+            return assetId
+          },
+        }),
+      },
     },
     initial: 'loading',
     states: {
-      changed: {
-        on: { START: 'loading' },
-      },
       loading: {
         invoke: { src: 'loader' },
         on: {
           LOADED: {
-            actions: 'updateContext',
+            actions: assign({
+              source: (context, { source }) => source,
+            }),
             target: 'transforming',
           },
         },
       },
       transforming: {
-        entry: 'startPluginTransform',
+        entry: 'sendPluginsStart',
         on: {
           PLUGINS_RESULT: {
-            actions: 'updateContext',
+            cond: ({ id }, event) => {
+              return id === event.id
+            },
+            actions: assign({
+              source: (context, { source }) => source as any,
+              fileName: (context, { fileName }) => fileName,
+            }),
             target: 'parsing',
           },
         },
@@ -58,25 +73,42 @@ export const assetMachine = model.createMachine(
       parsing: {
         invoke: { src: 'parser' },
         on: {
-          ADD_FILE: { actions: 'forwardToParent' },
-          PARSED: [
-            {
-              cond: ({ fileType }) => fileType === 'MANIFEST',
-              target: 'ready',
-              actions: 'sendReadyToParent',
-            },
-            { target: 'rendering' },
-          ],
+          PARSED: {
+            actions: sendParent(
+              ({ source, ...rest }, { files }) =>
+                model.events.EMIT_FILE(
+                  {
+                    type: 'asset',
+                    ...rest,
+                  },
+                  files,
+                ),
+            ),
+            target: 'ready',
+          },
         },
       },
       ready: {
-        on: { START: 'rendering' },
+        on: {
+          START: [
+            {
+              cond: ({ fileType }, { manifest }) =>
+                fileType === 'MANIFEST' && manifest,
+              target: 'rendering',
+            },
+            {
+              cond: ({ fileType }, { manifest }) =>
+                fileType !== 'MANIFEST' && !manifest,
+              target: 'rendering',
+            },
+          ],
+        },
       },
       rendering: {
-        entry: 'startPluginRender',
+        entry: 'sendPluginsStart',
         on: {
           PLUGINS_RESULT: {
-            actions: 'sendFileToParent',
+            actions: 'sendSourceToParent',
             target: 'complete',
           },
         },
@@ -93,6 +125,9 @@ export const assetMachine = model.createMachine(
           ],
         },
       },
+      changed: {
+        on: { START: 'loading' },
+      },
       error: {
         id: 'error',
         entry: 'forwardToParent',
@@ -103,62 +138,36 @@ export const assetMachine = model.createMachine(
   {
     actions: {
       forwardToParent: sendParent((context, event) => event),
-      sendReadyToParent: sendParent(({ id }) =>
-        model.events.FILE_READY(id),
-      ),
-      sendFileToParent: sendParent((context, event) => {
-        const { type, ...result } = narrowEvent(
-          event,
-          'PLUGINS_RESULT',
-        )
+      sendSourceToParent: sendParent(
+        ({ id, assetId }, event) => {
+          const { type, ...r } = narrowEvent(
+            event,
+            'PLUGINS_RESULT',
+          )
+          const result = r as Asset
 
-        if (isUndefined(result.source))
-          throw new TypeError('Output file source is undefined')
+          if (isUndefined(assetId))
+            throw new TypeError(`assetId is undefined for ${id}`)
 
-        let source: string | Uint8Array
-        if (
-          result.fileType === 'JSON' ||
-          result.fileType === 'MANIFEST'
-        ) {
-          source = JSON.stringify(result.source)
-        } else {
-          source = result.source
-        }
-
-        return model.events.FILE_DONE({
-          ...result,
-          source,
-          type: 'asset',
-        })
-      }),
-      startPluginTransform: sendParent((context) =>
-        model.events.PLUGINS_START({
-          ...context,
-          hook: 'transform',
-        }),
-      ),
-      startPluginRender: sendParent((context) =>
-        model.events.PLUGINS_START({
-          ...context,
-          hook: 'render',
-        }),
-      ),
-      // @ts-expect-error It's the same
-      updateContext: assign(({ id, ...context }, event) => {
-        const {
-          type,
-          id: resultId,
-          ...result
-        } = narrowEvent(event, ['PLUGINS_RESULT', 'LOADED'])
-
-        if (id === resultId)
-          return {
-            ...context,
-            ...result,
+          let source: string | Uint8Array
+          if (
+            result.fileType === 'JSON' ||
+            result.fileType === 'MANIFEST'
+          ) {
+            source = JSON.stringify(result.source)
+          } else {
+            source = result.source
           }
 
-        return context
-      }),
+          return model.events.SET_ASSET_SOURCE({
+            assetId,
+            source,
+          })
+        },
+      ),
+      sendPluginsStart: sendParent((context) =>
+        model.events.PLUGINS_START(context),
+      ),
     },
     services: {
       loader: ({ id }) =>

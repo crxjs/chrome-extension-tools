@@ -1,6 +1,5 @@
 import { cosmiconfig } from 'cosmiconfig'
 import { readFile, readJSON } from 'fs-extra'
-import { relative } from './path'
 import { posix, sep } from 'path'
 import { from, Observable, of } from 'rxjs'
 import { spawn } from 'xstate'
@@ -10,10 +9,12 @@ import {
   model,
 } from './files-asset.machine'
 import { scriptMachine } from './files-script.machine'
+import { isScript } from './files.sharedEvents'
 import { htmlParser } from './files_htmlParser'
 import { manifestParser } from './files_manifestParser'
-import { Asset, BaseAsset, Manifest, Script } from './types'
-import { isScript } from './files.sharedEvents'
+import { isUndefined } from './helpers'
+import { relative } from './path'
+import { Asset, BaseAsset, Script } from './types'
 
 const manifestExplorer = cosmiconfig('manifest', {
   cache: false,
@@ -46,7 +47,7 @@ export function spawnFile(
   }
 
   let parser: (context: Asset) => Observable<AssetEvent> = () =>
-    of(model.events.PARSED())
+    of(model.events.PARSED([]))
   if (file.fileType === 'HTML') {
     parser = htmlParser(root)
   } else if (file.fileType === 'MANIFEST') {
@@ -66,7 +67,7 @@ export function spawnFile(
           parser,
         },
       })
-      .withContext(file),
+      .withContext(file as Asset),
     { name: file.id },
   )
 }
@@ -78,12 +79,11 @@ const getSystemPath = (id: string) =>
 function stringLoader({ id }: Asset) {
   return from(
     readFile(getSystemPath(id), 'utf8')
-      .then((source) =>
-        model.events.LOADED({
-          id,
-          source,
-        }),
-      )
+      .then((source) => {
+        if (isUndefined(source))
+          throw new TypeError(`Source is undefined for ${id}`)
+        return model.events.LOADED({ source })
+      })
       .catch(model.events.ERROR),
   )
 }
@@ -91,12 +91,11 @@ function stringLoader({ id }: Asset) {
 function rawLoader({ id }: Asset) {
   return from(
     readFile(getSystemPath(id))
-      .then((source) =>
-        model.events.LOADED({
-          id,
-          source,
-        }),
-      )
+      .then((source) => {
+        if (isUndefined(source))
+          throw new TypeError(`Source is undefined for ${id}`)
+        return model.events.LOADED({ source })
+      })
       .catch(model.events.ERROR),
   )
 }
@@ -104,12 +103,11 @@ function rawLoader({ id }: Asset) {
 function jsonLoader({ id }: Asset) {
   return from(
     readJSON(getSystemPath(id))
-      .then((source) =>
-        model.events.LOADED({
-          id,
-          source,
-        }),
-      )
+      .then((source) => {
+        if (isUndefined(source))
+          throw new TypeError(`Source is undefined for ${id}`)
+        return model.events.LOADED({ source })
+      })
       .catch(model.events.ERROR),
   )
 }
@@ -121,15 +119,12 @@ function manifestLoader({ id }: Asset) {
       .then((result) => {
         if (result === null)
           throw new Error(`Unable to load manifest at ${id}`)
-        const { config, isEmpty } = result
+        const { config: source, isEmpty } = result
         if (isEmpty)
           throw new Error(
             `Manifest appears to be empty at ${id}`,
           )
-        return model.events.LOADED({
-          id,
-          source: config as Manifest,
-        })
+        return model.events.LOADED({ source })
       })
       .catch(model.events.ERROR),
   )
