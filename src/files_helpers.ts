@@ -208,7 +208,10 @@ export function debugHelper<
   })
 }
 
-export function logActorStates(actors: Map<any, string[]>) {
+export function logActorStates(
+  actors: Map<any, string[]>,
+  filename?: string,
+) {
   const actorStates = Array.from(actors).reduce(
     (r, [actor, ids]) => {
       const snap = actor.getSnapshot()
@@ -217,13 +220,13 @@ export function logActorStates(actors: Map<any, string[]>) {
         ${r}
         ${ids
           .map((id) => id.replace(process.cwd() + '/', ''))
-          .join(' -> ')} :: ${snap.value}`
+          .join(' -> ')} :: ${JSON.stringify(snap.value)}`
     },
     '',
   )
 
   writeFileSync(
-    join(process.cwd(), 'actorStates.log'),
+    filename ?? join(process.cwd(), 'actorStates.log'),
     actorStates,
   )
 }

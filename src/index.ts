@@ -54,11 +54,14 @@ export const chromeExtension = (
 
   const { send, service, waitFor } = useMachine(machine)
 
-  if (process.env.XSTATE_LOG)
-    debugHelper(service, (state, ids, actors) => {
-      logActorStates(actors)
-      console.log(state, ids)
-    })
+  // if (process.env.XSTATE_LOG)
+  debugHelper(service, (state, ids, actors) => {
+    logActorStates(
+      actors,
+      join(process.cwd(), 'rpce-states.log'),
+    )
+    // console.log(state, ids)
+  })
 
   const files = new Set<CompleteFile>()
 
