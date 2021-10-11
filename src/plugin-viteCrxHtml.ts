@@ -61,13 +61,13 @@ export const viteCrxHtml = (): RPCEPlugin => {
           bundle,
         }
 
-        const result = await applyHtmlTransforms(
+        const source = await applyHtmlTransforms(
           file.source,
           hooks,
           context,
         )
 
-        bundle[id] = { ...file, source: result }
+        bundle[id] = Object.assign(file, { source })
       }
     },
   }
