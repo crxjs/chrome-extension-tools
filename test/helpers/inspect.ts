@@ -12,12 +12,6 @@ if (Number.isInteger(xstateVizPort)) {
     port: 8888,
   })
 
-  server.on('connection', (wss) => {
-    wss.on('message', (event) => {
-      console.log('🚀 ~ wss.on ~ event', event)
-    })
-  })
-
   // @ts-expect-error Different @types/ws versions
   const inspector = inspect({ server })
 
