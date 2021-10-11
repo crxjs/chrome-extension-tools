@@ -1,6 +1,3 @@
-> ⚠️⚠️⚠️ Breaking change in Chrome 94+!!! ⚠️⚠️⚠️\
-> [Please **upgrade** to v3.6 or later](https://github.com/extend-chrome/rollup-plugin-chrome-extension/discussions/116)
-
 # [rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
