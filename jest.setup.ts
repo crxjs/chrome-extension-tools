@@ -1,6 +1,7 @@
 /* eslint-env jest */
 
 import { jestSetTimeout } from './test/helpers/timeout'
+import './test/helpers/inspect'
 import 'array-flat-polyfill'
 
 jestSetTimeout(5000)
@@ -16,12 +17,13 @@ jestSetTimeout(5000)
 //   writable: true,
 // })
 
+// TODO: do we still need this?
 if (process.env.npm_config_argv) {
   process.env.JEST_WATCH = JSON.parse(
     process.env.npm_config_argv,
   ).original.includes('--watch')
 }
 
-jest.spyOn(console, 'log').mockImplementation()
-jest.spyOn(console, 'error')
-jest.spyOn(console, 'warn').mockImplementation()
+// jest.spyOn(console, 'log').mockImplementation()
+// jest.spyOn(console, 'error')
+// jest.spyOn(console, 'warn').mockImplementation()

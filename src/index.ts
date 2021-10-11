@@ -59,18 +59,9 @@ export const chromeExtension = (
 ): Plugin => {
   const isHtml = createFilter(['**/*.html'])
 
-  const { send, service, waitFor } = useMachine(machine)
-
-  if (process.env.XSTATE_LOG)
-    debugHelper(service, (state, ids, actors) => {
-      if (ids.length > 2 || !state.event) return
-
-      logActorStates(
-        actors,
-        join(process.cwd(), 'rpce-states.log'),
-      )
-      console.log(state, ids)
-    })
+  const { send, service, waitFor } = useMachine(machine, {
+    devTools: true,
+  })
 
   const files = new Map<
     string,
