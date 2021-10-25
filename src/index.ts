@@ -4,8 +4,6 @@ import { Plugin } from 'vite'
 import { machine, model } from './files.machine'
 import { SharedEvent } from './files.sharedEvents'
 import {
-  debugHelper,
-  logActorStates,
   narrowEvent,
   useConfig,
   useMachine,
