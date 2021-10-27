@@ -163,17 +163,12 @@ export const viteAdaptorMachine = model.createMachine(
       rollupWatch:
         ({ options, plugins, server }) =>
         (send) => {
-          const outputs: OutputOptions[] = [options?.output]
-            .flat()
-            .filter((x): x is OutputOptions => !!x)
-            .map((x) => ({
-              ...x,
-              dir: server!.config.build.outDir,
-              format: 'esm',
-            }))
-
-          const watchOptions: RollupWatchOptions = {
+          const watcher = watch({
             ...options,
+            output: {
+              ...options?.output,
+              dir: server!.config.build.outDir,
+            },
             plugins: [
               resolveFromServer(server!),
               // @ts-expect-error Vite is using a different version of Rollup
@@ -181,14 +176,11 @@ export const viteAdaptorMachine = model.createMachine(
                 // No errors here ;)
                 .map(createPluginProxy),
             ],
-          }
+          })
 
-          const watcher = watch(watchOptions)
           watcher.on('event', async (event) => {
             try {
               if (event.code === 'BUNDLE_END') {
-                for (const output of outputs)
-                  await event.result?.write(output)
                 await event.result?.close()
                 send(model.events.BUNDLE_END(event))
               } else if (event.code === 'BUNDLE_START') {
