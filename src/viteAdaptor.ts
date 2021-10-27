@@ -5,33 +5,7 @@ import { RPCEPlugin } from './types'
 import { model, viteAdaptorMachine } from './viteAdaptor.machine'
 
 const service = interpret(viteAdaptorMachine, { devTools: true })
-
 service.start()
-
-export const viteAdaptorReady = () =>
-  new Promise<void>((resolve, reject) => {
-    const sub = service.subscribe({
-      next(state) {
-        if (state.matches({ serving: 'ready' })) {
-          sub.unsubscribe()
-          resolve()
-        } else if (state.matches('error')) {
-          const { error, id } = narrowEvent(state.event, 'ERROR')
-          error.id = id
-          sub.unsubscribe()
-          reject(error)
-        }
-      },
-      error(err) {
-        reject(err)
-      },
-      complete() {
-        reject(
-          new Error(`The service "${service.id}" has stopped`),
-        )
-      },
-    })
-  })
 
 const viteConfigHooks = [
   'config',
@@ -68,9 +42,14 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
           if (!service.initialized)
             return value?.call?.(this, ...args)
 
-          const result = service
-            .getSnapshot()
-            .matches('starting')
+          const snap = service.getSnapshot()
+
+          if (snap.matches('error')) {
+            const { error } = narrowEvent(snap.event, 'ERROR')
+            this.error(error)
+          }
+
+          const result = snap.matches('starting')
             ? // it's vite build or pure rollup, don't interfere
               value?.call?.(this, ...args)
             : // it's vite serve, the adaptor will run this hook
@@ -86,3 +65,28 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
     },
   })
 }
+
+export const viteAdaptorReady = () =>
+  new Promise<void>((resolve, reject) => {
+    const sub = service.subscribe({
+      next(state) {
+        if (state.matches({ serving: 'ready' })) {
+          sub.unsubscribe()
+          resolve()
+        } else if (state.matches('error')) {
+          const { error, id } = narrowEvent(state.event, 'ERROR')
+          error.id = id
+          sub.unsubscribe()
+          reject(error)
+        }
+      },
+      error(err) {
+        reject(err)
+      },
+      complete() {
+        reject(
+          new Error(`The service "${service.id}" has stopped`),
+        )
+      },
+    })
+  })
