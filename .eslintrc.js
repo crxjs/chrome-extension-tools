@@ -16,10 +16,17 @@ module.exports = {
     sourceType: 'module',
     project: './tsconfig.json',
   },
+  overrides: [
+    {
+      files: ['**/*.test.ts'],
+      env: {
+        jest: true,
+      },
+    },
+  ],
   plugins: ['@typescript-eslint'],
   rules: {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'no-empty': ['error', { allowEmptyCatch: true }],
     '@typescript-eslint/no-empty-function': 'off',
     '@typescript-eslint/ban-ts-ignore': 'off',
     '@typescript-eslint/camelcase': 'off',
@@ -67,10 +74,11 @@ module.exports = {
       },
     ],
     'no-console': 'off',
+    'no-empty': ['error', { allowEmptyCatch: true }],
+    'no-extra-semi': 0,
     quotes: ['warn', 'single', { avoidEscape: true }],
     'require-atomic-updates': 'off',
     semi: ['warn', 'never'],
-    'no-extra-semi': 'off',
     '@typescript-eslint/no-misused-promises': [
       'error',
       {
