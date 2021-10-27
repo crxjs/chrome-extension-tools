@@ -28,7 +28,7 @@ import {
   preValidateManifest,
   validateManifest,
 } from './plugin-validateManifest'
-import { viteCrxHtml } from './plugin-viteCrxHtml'
+import { transformIndexHtml } from './plugin-transformIndexHtml'
 import { viteServeCsp } from './plugin-viteServeCsp'
 import { isRPCE } from './plugin_helpers'
 import type {
@@ -44,7 +44,7 @@ import { useViteAdaptor } from './viteAdaptor'
 
 export { simpleReloader } from './plugins-simpleReloader'
 export { useViteAdaptor }
-export type { ManifestV3, ManifestV2 }
+export type { ManifestV3, ManifestV2, RPCEPlugin, CompleteFile }
 
 function getAbsolutePath(input: string): string {
   return isAbsolute(input) ? input : join(process.cwd(), input)
@@ -78,7 +78,7 @@ export const chromeExtension = (
     pluginOptions.browserPolyfill && browserPolyfill(),
     fileNames(),
     htmlPaths(),
-    viteCrxHtml(),
+    transformIndexHtml(),
     viteServeCsp(),
   ]
     .filter((x): x is RPCEPlugin => !!x)
