@@ -1,8 +1,8 @@
 /* eslint-env jest */
 
-import { jestSetTimeout } from './test/helpers/timeout'
-import './test/helpers/inspect'
 import 'array-flat-polyfill'
+import './test/helpers/inspect'
+import { jestSetTimeout } from './test/helpers/timeout'
 
 jestSetTimeout(5000)
 
@@ -26,4 +26,4 @@ if (process.env.npm_config_argv) {
 
 // jest.spyOn(console, 'log').mockImplementation()
 // jest.spyOn(console, 'error')
-// jest.spyOn(console, 'warn').mockImplementation()
+jest.spyOn(console, 'warn').mockImplementation()
