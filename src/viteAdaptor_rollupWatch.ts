@@ -4,6 +4,7 @@ import { Plugin } from 'rollup'
 import { Plugin as VitePlugin, ViteDevServer } from 'vite'
 import { isString } from './helpers'
 import { join } from './path'
+import { stubId } from './stubId'
 import { RPCEHooks, RPCEPlugin } from './types'
 
 // Creates an exhaustive list of RPCEHooks
@@ -63,28 +64,25 @@ export function resolveFromServer(
   return {
     name: 'resolve-from-vite-dev-server',
     resolveId(source) {
+      if (source === stubId) return source
       if (source.startsWith('/@fs')) return source
 
       const id = join(server.config.root, source)
       const fileExists = fs.existsSync(id)
       // Add query param so plugins can differentiate (eg, exclude from HMR)
-      // return fileExists ? `${id}?crx` : source
-      return fileExists ? id : source
+      return fileExists ? `${id}?crx` : source
+      // return fileExists ? id : source
     },
     async load(id) {
-      try {
-        const result = await server.transformRequest(id)
-        if (!result) return null
-        if (isString(result)) return result
-        if (isUndefined(result.code)) return null
+      if (id === stubId) return id
 
-        const { code, map } = result
-        return { code, map }
-      } catch (error) {
-        console.log(`Could not load ${id}`)
-        console.error(error)
-        return null
-      }
+      const result = await server.transformRequest(id)
+      if (!result) return null
+      if (isString(result)) return result
+      if (isUndefined(result.code)) return null
+
+      const { code, map } = result
+      return { code, map }
     },
   }
 }
