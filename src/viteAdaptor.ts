@@ -57,8 +57,10 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
 
       if (viteConfigHooks.includes(prop)) {
         return function (this: PluginContext, ...args: any[]) {
+          // notify the adaptor of the vite hook
           if (service.initialized)
             service.send(model.events.HOOK_START(prop, args))
+          // vite hooks are always run by vite
           return value?.call?.(this, ...args)
         }
       } else if (rollupStartHooks.includes(prop)) {
@@ -69,8 +71,10 @@ export const useViteAdaptor = (plugin: RPCEPlugin) => {
           const result = service
             .getSnapshot()
             .matches('starting')
-            ? value?.call?.(this, ...args)
-            : undefined
+            ? // it's vite build or pure rollup, don't interfere
+              value?.call?.(this, ...args)
+            : // it's vite serve, the adaptor will run this hook
+              undefined
 
           service.send(model.events.HOOK_START(prop, args))
 
