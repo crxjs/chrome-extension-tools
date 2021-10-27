@@ -131,8 +131,8 @@ export const chromeExtension = (
     async config(config, env) {
       isViteServe = env.command === 'serve'
 
-      // Vite ignores changes to config.plugin, so we're adding them in configResolved
-      // Just running the config hook for the builtins here for thoroughness
+      // Vite ignores changes to config.plugin, so we add them in configResolved
+      // Run the config hook for the builtins here for consistency
       for (const b of builtins) {
         const result = await b?.config?.call(this, config, env)
         config = result ?? config
@@ -142,6 +142,7 @@ export const chromeExtension = (
         send(model.events.ROOT(config.root))
 
       if (isViteServe)
+        // HTML script modules are not emitted in vite serve
         send(model.events.EXCLUDE_FILE_TYPE('MODULE'))
 
       return config
