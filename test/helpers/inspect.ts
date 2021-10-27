@@ -12,7 +12,6 @@ if (Number.isInteger(xstateVizPort)) {
     port: 8888,
   })
 
-  // @ts-expect-error Different @types/ws versions
   const inspector = inspect({ server })
 
   beforeAll(async () => {
