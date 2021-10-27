@@ -9,14 +9,14 @@ import { isFunction, isString, isUndefined } from './helpers'
 import { parse } from './path'
 import { RPCEPlugin } from './types'
 
-export const viteCrxHtml = (): RPCEPlugin => {
+export const transformIndexHtml = (): RPCEPlugin => {
   const preHooks = new Set<IndexHtmlTransformHook>()
   const postHooks = new Set<IndexHtmlTransformHook>()
 
   let server: ViteDevServer | undefined
 
   return {
-    name: 'vite-crx-html',
+    name: 'transform-index-html',
     configResolved({ plugins }) {
       plugins.forEach(({ transformIndexHtml: hook }) => {
         if (isUndefined(hook)) return
@@ -32,6 +32,7 @@ export const viteCrxHtml = (): RPCEPlugin => {
     configureServer(s) {
       server = s
     },
+    // Apply prehooks
     async transformCrxHtml(html, { id, fileName }) {
       if (server)
         return server.transformIndexHtml(fileName, html, id)
@@ -41,6 +42,7 @@ export const viteCrxHtml = (): RPCEPlugin => {
         filename: id,
       })
     },
+    // Apply posthooks
     async generateBundle(options, bundle) {
       if (server) return
 
@@ -213,7 +215,7 @@ function serializeAttrs(
   let res = ''
   for (const key in attrs) {
     if (typeof attrs[key] === 'boolean') {
-      res += attrs[key] ? ` ${key}` : ``
+      res += attrs[key] ? ` ${key}` : ''
     } else {
       res += ` ${key}=${JSON.stringify(attrs[key])}`
     }
