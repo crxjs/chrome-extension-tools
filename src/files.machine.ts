@@ -139,11 +139,7 @@ export const machine = model.createMachine(
           },
           EMIT_FILE: [
             {
-              cond: ({ files }, { children }) =>
-                children.length === 0 &&
-                files.every((file) =>
-                  file.getSnapshot()?.matches('ready'),
-                ),
+              cond: 'allFilesReady',
               actions: ['addChildFiles', 'handleFile'],
               target: 'ready',
             },
@@ -245,6 +241,17 @@ export const machine = model.createMachine(
       }),
     },
     guards: {
+      allFilesReady: ({ files, excluded }, event) => {
+        const { children } = narrowEvent(event, 'EMIT_FILE')
+        const fileIsChildless =
+          children.filter(
+            ({ fileType }) => !excluded.has(fileType),
+          ).length === 0
+        const allFilesReady = files.every((file) =>
+          file.getSnapshot()?.matches('ready'),
+        )
+        return fileIsChildless && allFilesReady
+      },
       allFilesComplete: ({ files }) =>
         files.every((file) =>
           file.getSnapshot()?.matches('complete'),
