@@ -1,4 +1,4 @@
-import { stubId } from '$src'
+import { stubId } from '$src/stubId'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
