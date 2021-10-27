@@ -24,13 +24,14 @@ import { fileNames } from './plugin-fileNames'
 import { htmlPaths } from './plugin-htmlPaths'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
+import { transformIndexHtml } from './plugin-transformIndexHtml'
 import {
   preValidateManifest,
   validateManifest,
 } from './plugin-validateManifest'
-import { transformIndexHtml } from './plugin-transformIndexHtml'
 import { viteServeCsp } from './plugin-viteServeCsp'
 import { isRPCE } from './plugin_helpers'
+import { stubId } from './stubId'
 import type {
   Asset,
   ChromeExtensionOptions,
@@ -49,8 +50,6 @@ export type { ManifestV3, ManifestV2, RPCEPlugin, CompleteFile }
 function getAbsolutePath(input: string): string {
   return isAbsolute(input) ? input : join(process.cwd(), input)
 }
-
-export const stubId = '_stubIdForRPCE'
 
 export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
