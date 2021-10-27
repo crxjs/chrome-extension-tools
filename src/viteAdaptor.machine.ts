@@ -1,9 +1,7 @@
 import {
   EmittedFile,
-  OutputOptions,
   RollupOptions,
   RollupWatcherEvent,
-  RollupWatchOptions,
   watch,
 } from 'rollup'
 import { from } from 'rxjs'
