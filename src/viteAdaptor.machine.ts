@@ -7,11 +7,14 @@ import {
   watch,
 } from 'rollup'
 import { from } from 'rxjs'
-import { Plugin as VitePlugin, ViteDevServer } from 'vite'
+import { ViteDevServer } from 'vite'
 import { createModel } from 'xstate/lib/model'
 import { format } from './helpers'
-import { RPCEHooks, RPCEPlugin } from './types'
-import { resolveFromServer } from './viteAdaptor_writeAsIIFE'
+import { RPCEPlugin } from './types'
+import {
+  createPluginProxy,
+  resolveFromServer,
+} from './viteAdaptor_rollupWatch'
 
 export const configHook = 'config'
 export const serverHook = 'configureServer'
@@ -169,60 +172,14 @@ export const viteAdaptorMachine = model.createMachine(
               format: 'esm',
             }))
 
-          const serverHooks: (keyof VitePlugin | symbol)[] = [
-            'resolveId',
-            'load',
-            'transform',
-            'buildEnd',
-            'closeBundle',
-          ]
-          const rpceHooks: Record<keyof RPCEHooks, 0> = {
-            renderCrxCss: 0,
-            renderCrxHtml: 0,
-            renderCrxImage: 0,
-            renderCrxJson: 0,
-            renderCrxManifest: 0,
-            renderCrxRaw: 0,
-            transformCrxCss: 0,
-            transformCrxHtml: 0,
-            transformCrxImage: 0,
-            transformCrxJson: 0,
-            transformCrxManifest: 0,
-            transformCrxRaw: 0,
-          }
-          const excludedHooks = [
-            ...serverHooks,
-            ...Object.keys(rpceHooks),
-          ]
-
-          /**
-           * Vite and RPCE both have duplicate sets of plugins
-           * This set of plugin proxies will allow us to:
-           *  - run only the build hooks in Rollup Watch, and
-           *  - defer the other hooks to Vite or RPCE
-           */
-          const pluginProxies = Array.from(plugins).map(
-            (p) =>
-              new Proxy(p, {
-                get(target, prop) {
-                  if (excludedHooks.includes(prop))
-                    return undefined
-
-                  return Reflect.get(target, prop)
-                },
-              }),
-          )
-
           const watchOptions: RollupWatchOptions = {
             ...options,
-            output: {
-              ...options?.output,
-              dir: server!.config.build.outDir,
-            },
             plugins: [
               resolveFromServer(server!),
               // @ts-expect-error Vite is using a different version of Rollup
-              ...pluginProxies,
+              ...Array.from(plugins)
+                // No errors here ;)
+                .map(createPluginProxy),
             ],
           }
 
