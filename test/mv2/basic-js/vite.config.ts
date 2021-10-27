@@ -1,5 +1,6 @@
 import { chromeExtension } from '$src'
 import { defineConfig } from 'vite'
+import { xstateInspectCompat } from '../../helpers/xstateInspectCompat'
 
 export default defineConfig({
   root: 'src',
@@ -12,7 +13,7 @@ export default defineConfig({
       input: 'src/manifest.json',
     },
   },
-  plugins: [chromeExtension()],
+  plugins: [xstateInspectCompat(), chromeExtension()],
   cacheDir: '../.vite',
   optimizeDeps: {
     include: ['react', 'react-dom'],
