@@ -116,6 +116,12 @@
     "testScript": "test:ci"
   },
   "peerDependencies": {
-    "rollup": "^2.58.0"
+    "rollup": "^2.58.0",
+    "vite": "^2.5.10"
+  },
+  "peerDependenciesMeta": {
+    "vite": {
+      "optional": true
+    }
   }
 }
