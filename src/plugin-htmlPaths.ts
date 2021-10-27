@@ -27,7 +27,7 @@ export const htmlPaths = (): RPCEPlugin => {
         .not('[src^="http:"]')
         .not('[src^="https:"]')
         .not('[src^="data:"]')
-        .not('[src^="/"]')
+        // .not('[src^="/"]')
         .attr('type', 'module')
         .attr('src', (i, value) => {
           let result: string
@@ -35,11 +35,14 @@ export const htmlPaths = (): RPCEPlugin => {
           if (isNumber(port)) {
             const relPath = relative(root, id)
             const relDir = dirname(relPath)
+            const urlBase = `http://localhost:${port}`
+            const urlPath =
+              relDir === '.' ? value : join(relDir, value)
 
             // TODO: don't use vite server url if mv3
-            result = `http://localhost:${port}/${
-              relDir === '.' ? value : join(relDir, value)
-            }`
+            result = [urlBase, urlPath].join(
+              urlPath.startsWith('/') ? '' : '/',
+            )
           } else {
             result = value.replace(/\.[jt]sx?/g, '.js')
           }
