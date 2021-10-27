@@ -35,7 +35,7 @@ specifiers:
   '@types/ws': ^8.2.0
   '@typescript-eslint/eslint-plugin': ^4.29.0
   '@typescript-eslint/parser': ^4.29.0
-  '@xstate/inspect': ^0.5.0
+  '@xstate/inspect': ^0.5.1
   ajv: ^8.6.2
   array-flat-polyfill: ^1.0.1
   cheerio: 1.0.0-rc.10
@@ -135,7 +135,7 @@ devDependencies:
   '@types/ws': 8.2.0
   '@typescript-eslint/eslint-plugin': 4.29.0_034f3853c93ba6b42c02fba5b8f7c00d
   '@typescript-eslint/parser': 4.29.0_eslint@6.8.0+typescript@4.3.5
-  '@xstate/inspect': link:../../GitHub/xstate/packages/xstate-inspect
+  '@xstate/inspect': 0.5.1_ws@8.2.3
   eslint: 6.8.0
   eslint-plugin-react: 7.22.0_eslint@6.8.0
   jest: 27.1.0
@@ -2519,6 +2519,15 @@ packages:
       eslint-visitor-keys: 2.1.0
     dev: true
 
+  /@xstate/inspect/0.5.1_ws@8.2.3:
+    resolution: {integrity: sha512-m1zKFzyV/skUfpdiO/52w9o5EUporqIYEevryjcPpUEiIjVXKgti3EXl8TfXxggeNmsa2H9P0M0wZ5alM8M3Ng==}
+    peerDependencies:
+      ws: ^7.3.1
+    dependencies:
+      fast-safe-stringify: 2.1.1
+      ws: 8.2.3
+    dev: true
+
   /abab/2.0.5:
     resolution: {integrity: sha512-9IK9EadsbHo6jLWIpxpR6pL0sazTXV6+SQv25ZB+F7Bj9mJNaOc4nCRabwd5M/JwmUa8idz6Eci6eKfJryPs6Q==}
     dev: true
@@ -3643,6 +3652,10 @@ packages:
 
   /fast-levenshtein/2.0.6:
     resolution: {integrity: sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=}
+    dev: true
+
+  /fast-safe-stringify/2.1.1:
+    resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
     dev: true
 
   /fastq/1.11.1:
