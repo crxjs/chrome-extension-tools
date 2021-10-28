@@ -1,4 +1,4 @@
-import { viteAdaptorReady } from '$src/viteAdaptor'
+import { filesReady } from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -28,7 +28,7 @@ afterAll(async () => {
 test('writes entry points to disk', async () => {
   expect(fs.existsSync(outDir)).toBe(false)
 
-  await Promise.all([devServer.listen(), viteAdaptorReady()])
+  await Promise.all([devServer.listen(), filesReady()])
 
   const { port } = devServer.config.server
 

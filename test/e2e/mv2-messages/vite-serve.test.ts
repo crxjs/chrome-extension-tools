@@ -1,4 +1,4 @@
-import { viteAdaptorReady } from '$src/viteAdaptor'
+import { filesReady } from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -23,7 +23,7 @@ beforeAll(async () => {
     build: { outDir },
   })
 
-  await Promise.all([devServer.listen(), viteAdaptorReady()])
+  await Promise.all([devServer.listen(), filesReady()])
 
   browserContext = (await chromium.launchPersistentContext(
     dataDir,
