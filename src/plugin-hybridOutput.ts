@@ -72,6 +72,9 @@ export const hybridFormat = (): RPCEPlugin => {
                   format: 'iife',
                   sourcemap,
                 },
+                // Don't rewrite this in IIFE's
+                context: 'this',
+                onwarn: (warning) => this.warn(warning),
               },
               bundle,
             )
@@ -110,6 +113,7 @@ export const hybridFormat = (): RPCEPlugin => {
             chunkFileNames,
             entryFileNames,
           },
+          onwarn: (warning) => this.warn(warning),
         },
         bundle,
       )
@@ -130,7 +134,7 @@ export const hybridFormat = (): RPCEPlugin => {
 /** This is really fast b/c we don't use any plugins, and we use the previous bundle as the filesystem */
 export async function regenerateBundle(
   this: PluginContext,
-  { input, output }: RollupOptions,
+  { context, input, output, onwarn }: RollupOptions,
   bundle: OutputBundle,
 ): Promise<OutputBundle> {
   if (!output || Array.isArray(output)) {
@@ -159,7 +163,9 @@ export async function regenerateBundle(
     : input
 
   const build = await rollup({
+    context,
     input: inputValue,
+    onwarn,
     plugins: [resolveFromBundle(bundle)],
   })
 
