@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
 import { ViteDevServer } from 'vite'
-import { isNumber } from './helpers'
+import { isNumber, isUndefined } from './helpers'
 import { dirname, join, relative } from './path'
 import { findRPCE } from './plugin_helpers'
 import { RPCEPlugin } from './types'
@@ -22,12 +22,11 @@ export const htmlPaths = (): RPCEPlugin => {
     renderCrxHtml(source, { id }) {
       const $ = cheerio.load(source)
 
-      $('script')
+      $('script[src]')
         .not('[data-rollup-asset]')
         .not('[src^="http:"]')
         .not('[src^="https:"]')
         .not('[src^="data:"]')
-        // .not('[src^="/"]')
         .attr('type', 'module')
         .attr('src', (i, value) => {
           let result: string
