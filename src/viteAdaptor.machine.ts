@@ -9,10 +9,7 @@ import { ViteDevServer } from 'vite'
 import { createModel } from 'xstate/lib/model'
 import { format } from './helpers'
 import { RPCEPlugin } from './types'
-import {
-  createPluginProxy,
-  resolveFromServer,
-} from './viteAdaptor_rollupWatch'
+import { createWatchOptions } from './viteAdaptor_rollupWatch'
 
 export const configHook = 'config'
 export const serverHook = 'configureServer'
@@ -136,7 +133,7 @@ export const viteAdaptorMachine = model.createMachine(
         },
       },
       building: { type: 'final' },
-      error: { id: 'error', type: 'final' },
+      error: { id: 'error' },
     },
   },
   {
@@ -161,22 +158,13 @@ export const viteAdaptorMachine = model.createMachine(
       rollupWatch:
         ({ options, plugins, server }) =>
         (send) => {
-          const watcher = watch({
-            ...options,
-            output: {
-              ...options?.output,
-              dir: server!.config.build.outDir,
-            },
-            plugins: [
-              resolveFromServer(server!),
-              // @ts-expect-error Vite is using a different version of Rollup
-              ...Array.from(plugins)
-                // No errors here ;)
-                .map(createPluginProxy),
-            ],
-          })
+          const watcher = watch(
+            createWatchOptions(options, server, plugins),
+          )
 
           watcher.on('event', async (event) => {
+            console.log('--------------------')
+            console.log('rollup watcher event', event)
             try {
               if (event.code === 'BUNDLE_END') {
                 await event.result?.close()
@@ -186,6 +174,13 @@ export const viteAdaptorMachine = model.createMachine(
               } else if (event.code === 'ERROR') {
                 await event.result?.close()
                 const { error } = event
+
+                error.pluginCode = error.pluginCode?.slice(
+                  0,
+                  512,
+                )
+                error.frame = error.frame?.slice(0, 512)
+
                 if (
                   error.message?.includes('is not exported by')
                 ) {
@@ -194,7 +189,9 @@ export const viteAdaptorMachine = model.createMachine(
                       You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.
                       Original Error: ${error.message}`
                   throw new Error(message)
-                } else throw error
+                } else {
+                  throw error
+                }
               }
             } catch (error) {
               send(model.events.ERROR(error))
