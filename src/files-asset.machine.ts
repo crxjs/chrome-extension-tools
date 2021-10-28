@@ -2,7 +2,7 @@ import { of } from 'rxjs'
 import { assign, EventFrom, sendParent } from 'xstate'
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
-import { narrowEvent } from './files_helpers'
+import { narrowEvent } from './xstate_helpers'
 import { isUndefined } from './helpers'
 import { Asset, BaseAsset, Script } from './types'
 
