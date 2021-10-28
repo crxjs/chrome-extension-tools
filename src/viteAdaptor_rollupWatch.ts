@@ -1,6 +1,10 @@
 import fs from 'fs'
 import { isUndefined } from 'lodash'
-import { Plugin } from 'rollup'
+import {
+  Plugin,
+  RollupOptions,
+  RollupWatchOptions,
+} from 'rollup'
 import { Plugin as VitePlugin, ViteDevServer } from 'vite'
 import { isString } from './helpers'
 import { join } from './path'
@@ -50,6 +54,30 @@ export function createPluginProxy(p: RPCEPlugin): RPCEPlugin {
       return Reflect.get(target, prop)
     },
   })
+}
+
+export function createWatchOptions(
+  options: RollupOptions | undefined,
+  server: ViteDevServer | undefined,
+  plugins: Set<RPCEPlugin>,
+): RollupWatchOptions {
+  return {
+    ...options,
+    // The context should not be touched here
+    // we'll rewrite it in the hybrid output plugin
+    context: 'this',
+    output: {
+      ...options?.output,
+      dir: server!.config.build.outDir,
+    },
+    plugins: [
+      resolveFromServer(server!),
+      // @ts-expect-error Vite is using a different version of Rollup
+      ...Array.from(plugins)
+        // No errors here!
+        .map(createPluginProxy),
+    ],
+  }
 }
 
 /**
