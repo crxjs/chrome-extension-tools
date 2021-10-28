@@ -9,7 +9,7 @@ import {
   SharedEvent,
   sharedEventCreators,
 } from './files.sharedEvents'
-import { narrowEvent } from './files_helpers'
+import { narrowEvent } from './xstate_helpers'
 import { spawnFile } from './files_spawnFile'
 import { dirname, join, resolve } from './path'
 import { FileType } from './types'

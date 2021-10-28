@@ -1,6 +1,6 @@
 import cheerio from 'cheerio'
 import { ViteDevServer } from 'vite'
-import { isNumber, isUndefined } from './helpers'
+import { isNumber } from './helpers'
 import { dirname, join, relative } from './path'
 import { findRPCE } from './plugin_helpers'
 import { RPCEPlugin } from './types'

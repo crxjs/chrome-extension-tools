@@ -1,13 +1,10 @@
 import { createFilter } from '@rollup/pluginutils'
 import { PluginContext, RollupOptions } from 'rollup'
 import { Plugin } from 'vite'
+import { interpret } from 'xstate'
 import { machine, model } from './files.machine'
 import { SharedEvent } from './files.sharedEvents'
-import {
-  narrowEvent,
-  useConfig,
-  useMachine,
-} from './files_helpers'
+import { narrowEvent, useConfig } from './xstate_helpers'
 import {
   getJsFilename,
   isString,
@@ -40,11 +37,12 @@ import type {
   ManifestV3,
   RPCEHookType,
   RPCEPlugin,
+  Writeable,
 } from './types'
-import { useViteAdaptor } from './viteAdaptor'
+import { waitForState } from './xstate_helpers'
+import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 
 export { simpleReloader } from './plugins-simpleReloader'
-export { useViteAdaptor }
 export type { ManifestV3, ManifestV2, RPCEPlugin, CompleteFile }
 
 function getAbsolutePath(input: string): string {
@@ -56,9 +54,11 @@ export const chromeExtension = (
 ): Plugin => {
   const isHtml = createFilter(['**/*.html'])
 
-  const { send, service, waitFor } = useMachine(machine, {
+  const service = interpret(machine, {
+    deferEvents: true,
     devTools: true,
   })
+  service.start()
 
   const files = new Map<
     string,
@@ -66,8 +66,9 @@ export const chromeExtension = (
   >()
 
   let isViteServe = false
-  const [finalValidator, ...builtins]: RPCEPlugin[] = [
-    validateManifest(), // we'll make this run last of all
+  const builtins: RPCEPlugin[] = [
+    validateManifest(),
+    viteServeFileWriter(),
     packageJson(),
     extendManifest(pluginOptions),
     autoPerms(),
@@ -82,7 +83,6 @@ export const chromeExtension = (
   ]
     .filter((x): x is RPCEPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
-    .map(useViteAdaptor)
 
   const allPlugins = new Set<RPCEPlugin>(builtins)
   function setupPluginsRunner(
@@ -92,9 +92,6 @@ export const chromeExtension = (
     const plugins = Array.from(allPlugins)
     useConfig(service, {
       services: {
-        // TODO: run render hooks in generateBundle
-        // - vite server port will be available
-        // - generate bundle runs in all modes now
         pluginsRunner: () => (send, onReceived) => {
           onReceived(async (e: SharedEvent) => {
             try {
@@ -116,7 +113,7 @@ export const chromeExtension = (
     })
   }
 
-  return useViteAdaptor({
+  return {
     name: 'chrome-extension',
 
     api: {
@@ -125,6 +122,8 @@ export const chromeExtension = (
       get root() {
         return service.getSnapshot().context.root
       },
+      /** The files service, used to send events from other plugins */
+      service,
     },
 
     async config(config, env) {
@@ -138,11 +137,7 @@ export const chromeExtension = (
       }
 
       if (isString(config.root))
-        send(model.events.ROOT(config.root))
-
-      if (isViteServe)
-        // HTML script modules are not emitted in vite serve
-        send(model.events.EXCLUDE_FILE_TYPE('MODULE'))
+        service.send(model.events.ROOT(config.root))
 
       return config
     },
@@ -169,21 +164,36 @@ export const chromeExtension = (
     },
 
     async configResolved(config) {
+      /**
+       * Vite ignores replacements of `config.plugins`,
+       * so we need to change the array in place.
+       *
+       * Something like this is used by one the major Vite contributors here:
+       * https://github.com/antfu/vite-plugin-inspect/blob/0c31c478fdc02f398e68c567b01c5b9368a5efaa/src/node/index.ts#L217-L220
+       */
+      const plugins = config.plugins as Writeable<
+        typeof config.plugins
+      >
+
       // Save user plugins to run RPCE hooks in buildStart
-      config.plugins
+      plugins
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
 
+      // Add plugins to Vite config in serve mode
+      // Otherwise, add them to Rollup options
       if (isViteServe) {
-        // Just do this in Vite serve
-        // We can't add them in the config hook :/
-        // but sync changes in this hook seem to work...
-        // TODO: test this specifically in new Vite releases
-        const rpceIndex = config.plugins.findIndex(isRPCE)
-        // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
-        config.plugins.splice(rpceIndex, 0, ...builtins)
-        // @ts-expect-error Sorry Vite, I'm ignoring your `readonly`!
-        config.plugins.push(finalValidator)
+        const [
+          finalValidator, // we'll run this last of all
+          finalFileWriter, // we'll run this first of all
+          ...rest
+        ] = builtins
+
+        plugins.push(finalValidator)
+        plugins.unshift(finalFileWriter)
+
+        const rpceIndex = plugins.findIndex(isRPCE)
+        plugins.splice(rpceIndex + 1, 0, ...rest)
       }
 
       // Run possibly async builtins last
@@ -196,7 +206,7 @@ export const chromeExtension = (
     async options({ input = [], ...options }) {
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
-        send(
+        service.send(
           model.events.ADD_FILE({
             id: getAbsolutePath(input),
             fileType: 'MANIFEST',
@@ -208,7 +218,7 @@ export const chromeExtension = (
         const result: string[] = []
         input.forEach((id) => {
           if (isHtml(id))
-            send(
+            service.send(
               model.events.ADD_FILE({
                 id: getAbsolutePath(id),
                 fileType: 'HTML',
@@ -216,7 +226,7 @@ export const chromeExtension = (
               }),
             )
           else if (basename(id).startsWith('manifest'))
-            send(
+            service.send(
               model.events.ADD_FILE({
                 id: getAbsolutePath(id),
                 fileType: 'MANIFEST',
@@ -233,7 +243,7 @@ export const chromeExtension = (
         const result: [string, string][] = []
         Object.entries(input).forEach(([fileName, id]) => {
           if (isHtml(id))
-            send(
+            service.send(
               model.events.ADD_FILE({
                 id: getAbsolutePath(id),
                 fileType: 'HTML',
@@ -243,7 +253,7 @@ export const chromeExtension = (
               }),
             )
           else if (basename(id).startsWith('manifest'))
-            send(
+            service.send(
               model.events.ADD_FILE({
                 id: getAbsolutePath(id),
                 fileType: 'MANIFEST',
@@ -267,10 +277,15 @@ export const chromeExtension = (
           await b?.options?.call(this, options)
         }
 
-        options.plugins = (options.plugins ?? []).concat(
-          builtins,
-        )
-        options.plugins.push(finalValidator)
+        const [finalValidator, , ...rest] = builtins
+
+        const { plugins = [] } = options
+
+        const rpceIndex = plugins.findIndex(isRPCE)
+        plugins.splice(rpceIndex + 1, 0, ...rest)
+        plugins.push(finalValidator)
+
+        options.plugins = plugins
       }
 
       return { input: finalInput, ...options }
@@ -293,19 +308,21 @@ export const chromeExtension = (
                 file.fileName = getJsFilename(file.fileName)
 
               const fileId = this.emitFile(file)
-              send(model.events.FILE_ID({ id: file.id, fileId }))
+              service.send(
+                model.events.FILE_ID({ id: file.id, fileId }),
+              )
 
               files.set(fileId, file)
               this.addWatchFile(file.id)
             } catch (error) {
-              send(model.events.ERROR(error))
+              service.send(model.events.ERROR(error))
             }
           },
         },
       })
 
-      send(model.events.START())
-      await waitFor((state) => {
+      service.send(model.events.START())
+      await waitForState(service, (state) => {
         if (
           state.matches('error') &&
           state.event.type === 'ERROR'
@@ -346,14 +363,14 @@ export const chromeExtension = (
               const file = files.get(fileId)!
               file.source = source
             } catch (error) {
-              send(model.events.ERROR(error))
+              service.send(model.events.ERROR(error))
             }
           },
         },
       })
 
-      send(model.events.START())
-      await waitFor((state) => {
+      service.send(model.events.START())
+      await waitForState(service, (state) => {
         if (
           state.matches('error') &&
           state.event.type === 'ERROR'
@@ -366,7 +383,7 @@ export const chromeExtension = (
 
     watchChange(id, change) {
       files.clear()
-      send(model.events.CHANGE(id, change))
+      service.send(model.events.CHANGE(id, change))
     },
-  })
+  }
 }

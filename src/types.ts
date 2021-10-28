@@ -4,6 +4,7 @@ import { Plugin as VitePlugin } from 'vite'
 import { isPresent, Unpacked } from './helpers'
 
 type Nullable<TType> = TType | null | undefined
+export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 export type Manifest = chrome.runtime.Manifest
 
 export type ManifestV2 = Omit<
