@@ -5,37 +5,28 @@ import {
   send,
 } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
-import {
-  SharedEvent,
-  sharedEventCreators,
-} from './files.sharedEvents'
-import { narrowEvent } from './xstate_helpers'
+import { sharedEventCreators } from './files.sharedEvents'
 import { spawnFile } from './files_spawnFile'
 import { dirname, join, resolve } from './path'
-import { FileType } from './types'
-
-type AddFileEvent = Extract<
-  SharedEvent,
-  {
-    type: 'ADD_FILE'
-  }
->
+import { BaseAsset, FileType, Script } from './types'
+import { narrowEvent } from './xstate_helpers'
 
 export interface FilesContext {
   files: ReturnType<typeof spawnFile>[]
+  // filesReady: string[]
   root: string
-  entries: AddFileEvent[]
+  entries: (BaseAsset | Script)[]
   excluded: Set<FileType>
 }
 const filesContext: FilesContext = {
   files: [],
+  // filesReady: [],
   root: process.cwd(),
   entries: [
     {
       fileName: 'manifest.json',
       fileType: 'MANIFEST',
       id: 'manifest.json',
-      type: 'ADD_FILE',
     },
   ],
   excluded: new Set(),
@@ -51,8 +42,7 @@ export const model = createModel(filesContext, {
  * the manifest, css, html, json, images, and other files
  * like fonts, etc.
  *
- * This machine requires some implementation specific
- * actions and services:
+ * This machine requires some external actions and services:
  *
  * Required actions:
  *   - handleError
@@ -65,18 +55,10 @@ export const machine = model.createMachine(
   {
     id: 'files',
     context: model.initialContext,
-    on: {
-      ERROR: '#error',
-      FILE_ID: {
-        actions: forwardTo(
-          ({ files }, { id }) => files.find((f) => f.id === id)!,
-        ),
-      },
-    },
+    on: { ERROR: '#error' },
     initial: 'configuring',
     states: {
       configuring: {
-        entry: model.assign({ entries: [] }),
         on: {
           EXCLUDE_FILE_TYPE: {
             actions: model.assign({
@@ -84,26 +66,27 @@ export const machine = model.createMachine(
                 new Set(excluded).add(fileType),
             }),
           },
-          ADD_FILE: [
+          UPDATE_FILES: [
             {
-              cond: (context, { fileType }) =>
-                fileType === 'MANIFEST',
+              cond: (context, { added }) =>
+                added.some(
+                  ({ fileType }) => fileType === 'MANIFEST',
+                ),
               actions: model.assign({
-                entries: ({ entries }, event) =>
-                  entries
-                    .filter(
-                      ({ fileType }) => fileType !== 'MANIFEST',
-                    )
-                    .concat([event]),
-                root: (context, { id }) =>
-                  resolve(process.cwd(), dirname(id)),
+                entries: (context, { added }) => added,
+                root: (context, { added }) => {
+                  const { id } = added.find(
+                    ({ fileType }) => fileType === 'MANIFEST',
+                  )!
+                  return resolve(process.cwd(), dirname(id))
+                },
               }),
             },
             {
               actions: model.assign({
-                entries: ({ entries }, event) => [
+                entries: ({ entries }, { added }) => [
                   ...entries,
-                  event,
+                  ...added,
                 ],
               }),
             },
@@ -118,35 +101,22 @@ export const machine = model.createMachine(
                 })),
             }),
           },
-          START: 'starting',
+          START: {
+            actions: 'forwardToAllFiles',
+            target: 'parsing',
+          },
         },
       },
-      starting: {
+      parsing: {
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
-        entry: ['restartExistingFiles', 'addAllEntryFiles'],
+        entry: 'addEntryFiles',
         on: {
-          ADD_FILE: [
-            { cond: 'fileIsExcluded' },
-            { cond: 'fileExists' },
-            { actions: 'spawnFile' },
-          ],
+          EMIT_FILE: { actions: 'handleFile' },
+          FILE_ID: { actions: 'forwardToFile' },
+          PLUGINS_RESULT: { actions: 'forwardToFile' },
           PLUGINS_START: { actions: forwardTo('pluginsRunner') },
-          PLUGINS_RESULT: {
-            actions: forwardTo(
-              ({ files }, { id }) =>
-                files.find((f) => f.id === id)!,
-            ),
-          },
-          EMIT_FILE: [
-            {
-              cond: 'allFilesReady',
-              actions: ['addChildFiles', 'handleFile'],
-              target: 'ready',
-            },
-            {
-              actions: ['addChildFiles', 'handleFile'],
-            },
-          ],
+          READY: { cond: 'allFilesReady', target: 'ready' },
+          UPDATE_FILES: { actions: 'updateFiles' },
         },
       },
       ready: {
@@ -161,12 +131,7 @@ export const machine = model.createMachine(
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
         on: {
           PLUGINS_START: { actions: forwardTo('pluginsRunner') },
-          PLUGINS_RESULT: {
-            actions: forwardTo(
-              ({ files }, { id }) =>
-                files.find((f) => id === f.id)!,
-            ),
-          },
+          PLUGINS_RESULT: { actions: 'forwardToFile' },
           COMPLETE_FILE: [
             {
               cond: 'readyForManifest',
@@ -186,13 +151,21 @@ export const machine = model.createMachine(
       complete: {
         on: {
           CHANGE: {
-            actions: pure(({ files }) => {
-              const actions: any[] = []
-              files.forEach((f) =>
-                actions.push(forwardTo(() => f)),
-              )
-              return actions
-            }),
+            actions: [
+              'forwardToAllFiles',
+              model.assign({
+                entries: ({ root }) => {
+                  return [
+                    {
+                      fileName: 'manifest.json',
+                      fileType: 'MANIFEST',
+                      id: join(root, 'manifest.json'),
+                    },
+                  ]
+                },
+                // filesReady: [],
+              }),
+            ],
             target: 'configuring',
           },
         },
@@ -202,36 +175,39 @@ export const machine = model.createMachine(
   },
   {
     actions: {
-      addAllEntryFiles: pure(({ entries }) =>
-        entries.map((entry) => send(entry)),
+      addEntryFiles: send(({ entries }) =>
+        model.events.UPDATE_FILES(entries),
       ),
-      forwardToAllFiles: pure(({ files }, event) =>
-        files.map((file) => send(event, { to: () => file })),
+      forwardToAllFiles: pure(({ files }) =>
+        files.map((file) => forwardTo(() => file)),
       ),
-      spawnFile: assign({
-        files: ({ files, root }, event) => {
-          const { type, ...file } = narrowEvent(
-            event,
-            'ADD_FILE',
-          )
+      forwardToFile: forwardTo(({ files }, event) => {
+        const { id } = narrowEvent(event, [
+          'FILE_ID',
+          'PLUGINS_RESULT',
+        ])
+        return files.find((f) => f.id === id)!
+      }),
+      updateFiles: assign({
+        files: ({ files, root, excluded }, event) => {
+          const { added } = narrowEvent(event, 'UPDATE_FILES')
 
-          const ref = spawnFile(file, root)
+          const newFiles = added
+            // File does not exist
+            .filter(({ id }) => files.every((f) => f.id !== id))
+            // File type is not excluded
+            .filter(({ fileType }) => !excluded.has(fileType))
+            .map((file) => spawnFile(file, root))
 
-          return [...files, ref]
+          return [...files, ...newFiles]
         },
       }),
-      addChildFiles: pure((context, event) => {
-        const { children } = narrowEvent(event, 'EMIT_FILE')
-
-        return children.map((child) =>
-          send(model.events.ADD_FILE(child)),
-        )
-      }),
-      restartExistingFiles: pure(({ files }) =>
-        files.map((file) =>
-          send(model.events.START(), { to: file.id }),
-        ),
-      ),
+      // updateFilesReady: assign({
+      //   filesReady: ({ filesReady }, event) => {
+      //     const { id } = narrowEvent(event, 'READY')
+      //     return [...filesReady, id]
+      //   },
+      // }),
       renderManifest: send(model.events.START(true), {
         to: ({ files }) =>
           files.find(
@@ -241,17 +217,14 @@ export const machine = model.createMachine(
       }),
     },
     guards: {
-      allFilesReady: ({ files, excluded }, event) => {
-        const { children } = narrowEvent(event, 'EMIT_FILE')
-        const fileIsChildless =
-          children.filter(
-            ({ fileType }) => !excluded.has(fileType),
-          ).length === 0
-        const allFilesReady = files.every((file) =>
+      // allFilesReady: ({ files, filesReady }, event) => {
+      //   narrowEvent(event, 'READY')
+      //   return files.length === filesReady.length + 1
+      // },
+      allFilesReady: ({ files }) =>
+        files.every((file) =>
           file.getSnapshot()?.matches('ready'),
-        )
-        return fileIsChildless && allFilesReady
-      },
+        ),
       allFilesComplete: ({ files }) =>
         files.every((file) =>
           file.getSnapshot()?.matches('complete'),
@@ -263,16 +236,6 @@ export const machine = model.createMachine(
             return snap?.matches('ready')
           return snap?.matches('complete')
         }),
-      fileIsExcluded: ({ excluded }, event) => {
-        const { fileType } = narrowEvent(event, 'ADD_FILE')
-
-        return excluded.has(fileType)
-      },
-      fileExists: ({ files }, event) => {
-        const { id } = narrowEvent(event, 'ADD_FILE')
-
-        return files.some((f) => f.id === id)
-      },
     },
   },
 )

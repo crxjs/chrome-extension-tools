@@ -3,19 +3,28 @@ import { createModel } from 'xstate/lib/model'
 import { Script } from './types'
 import { sharedEventCreators } from './files.sharedEvents'
 
-const model = createModel({} as Script, {
-  events: { ...sharedEventCreators },
-})
+const model = createModel(
+  {} as Script & { children?: Map<string, never> },
+  {
+    events: { ...sharedEventCreators },
+  },
+)
 export const scriptMachine = model.createMachine(
   {
     context: model.initialContext,
     on: {
       ERROR: { actions: 'forwardToParent', target: '#error' },
     },
-    initial: 'ready',
+    initial: 'emitting',
     states: {
-      ready: {
+      emitting: {
         entry: 'sendEmitFileToParent',
+        on: {
+          FILE_ID: 'ready',
+        },
+      },
+      ready: {
+        entry: 'sendReadyToParent',
         on: {
           START: 'complete',
         },
@@ -23,7 +32,7 @@ export const scriptMachine = model.createMachine(
       complete: {
         entry: 'sendCompleteToParent',
         on: {
-          START: 'ready',
+          START: 'emitting',
         },
       },
       error: {
@@ -43,6 +52,9 @@ export const scriptMachine = model.createMachine(
       ),
       sendCompleteToParent: sendParent(({ id, fileId }) =>
         model.events.COMPLETE_FILE({ id, fileId: fileId! }),
+      ),
+      sendReadyToParent: sendParent(({ id }) =>
+        model.events.READY(id),
       ),
     },
   },
