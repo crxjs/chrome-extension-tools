@@ -102,6 +102,6 @@ export const machine = model.createMachine({
         },
       },
     },
-    error: { id: 'error' },
+    error: { id: 'error', type: 'final' },
   },
 })

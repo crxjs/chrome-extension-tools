@@ -21,6 +21,12 @@ import { RPCEPlugin, Writeable } from './types'
 import { narrowEvent, useConfig } from './xstate_helpers'
 
 const service = interpret(machine, { devTools: true })
+service.subscribe((state) => {
+  console.log(
+    'vite-serve-file-writer state',
+    JSON.stringify(state.value),
+  )
+})
 
 /**
  * The Vite dev server doesn't write files to the disk,
@@ -40,9 +46,10 @@ export function viteServeFileWriter(): RPCEPlugin {
   let lastError: unknown
   useConfig(service, {
     actions: {
-      handleError(context, event) {
+      handleError({ server }, event) {
         const { error } = narrowEvent(event, 'ERROR')
         lastError = error
+        server?.close()
       },
     },
     services: {
@@ -66,21 +73,15 @@ export function viteServeFileWriter(): RPCEPlugin {
           })
 
           watcher.on('event', async (event) => {
+            console.log('rollup watcher event', event)
             try {
               if (event.code === 'BUNDLE_END') {
-                await event.result?.close()
                 send(model.events.BUNDLE_END(event))
               } else if (event.code === 'BUNDLE_START') {
                 send(model.events.BUNDLE_START(event))
               } else if (event.code === 'ERROR') {
                 await event.result?.close()
                 const { error } = event
-
-                error.pluginCode = error.pluginCode?.slice(
-                  0,
-                  512,
-                )
-                error.frame = error.frame?.slice(0, 512)
 
                 if (
                   error.message?.includes('is not exported by')
@@ -95,6 +96,9 @@ export function viteServeFileWriter(): RPCEPlugin {
                 }
               }
             } catch (error) {
+              console.log('rollup watcher error')
+              delete (error as any).pluginCode
+              delete (error as any).frame
               send(model.events.ERROR(error))
             }
           })
@@ -211,6 +215,9 @@ export function viteServeFileWriter(): RPCEPlugin {
         service.send(model.events.HOOK_START(optionsHook, args))
       if (lastError) throw lastError
     },
+    closeBundle() {
+      service.stop()
+    },
   }
 }
 
@@ -231,14 +238,19 @@ export function resolveFromServer(
 
       const id = join(server.config.root, source)
       const fileExists = fs.existsSync(id)
-      // Add query param so plugins can differentiate (eg, exclude from HMR)
-      return fileExists ? `${id}?crx` : source
-      // return fileExists ? id : source
+      return fileExists ? id : source
     },
     async load(id) {
       if (id === stubId) return id
 
-      const result = await server.transformRequest(id)
+      // Add crx query param so plugins can differentiate (eg, exclude from HMR)
+      const [baseId, baseParams] = id.split('?')
+      const fullParams = new URLSearchParams(baseParams)
+      fullParams.set('crx', '')
+      const requestId = `${baseId}?${fullParams}`
+
+      const result = await server.transformRequest(requestId)
+
       if (!result) return null
       if (isString(result)) return result
       if (isUndefined(result.code)) return null

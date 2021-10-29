@@ -29,22 +29,33 @@ export const isScript = (file: {
   file.fileType === 'CONTENT' ||
   file.fileType === 'MODULE'
 
-export const sharedEventCreators = {
-  ROOT: (root: string) => ({ root }),
-  /** All paths are normalized here to use posix */
-  ADD_FILE: ({ fileName, id, ...rest }: BaseAsset | Script) => ({
+function normalizeFilePaths({
+  fileName,
+  id,
+  ...rest
+}: BaseAsset | Script) {
+  return {
     fileName: normalizePath(fileName),
     id: normalizePath(id),
     ...rest,
+  }
+}
+
+export const sharedEventCreators = {
+  ROOT: (root: string) => ({ root }),
+  /** All paths are normalized here to use posix */
+  REMOVE_FILE: (id: string) => ({ id }),
+  UPDATE_FILES: (
+    added: (BaseAsset | Script)[],
+    removed?: (BaseAsset | Script)[],
+  ) => ({
+    added: added.map(normalizeFilePaths),
+    removed: removed?.map(normalizeFilePaths),
   }),
   EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
   EMIT_FILE: (
     file: Omit<CompleteFile, 'source' | 'fileId'>,
-    children = [] as (BaseAsset | Script)[],
-  ) => ({
-    file,
-    children,
-  }),
+  ) => ({ file }),
   SCRIPT_COMPLETE: (id: string) => ({ id }),
   COMPLETE_FILE: (data: {
     id: string
@@ -58,6 +69,7 @@ export const sharedEventCreators = {
   }),
   ERROR: (error: unknown) => ({ error }),
   START: (manifest = false) => ({ manifest }),
+  READY: (id: string) => ({ id }),
   PLUGINS_START: (asset: Omit<Required<Asset>, 'fileId'>) =>
     asset,
   PLUGINS_RESULT: (asset: Omit<Required<Asset>, 'fileId'>) =>
