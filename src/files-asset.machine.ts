@@ -1,18 +1,28 @@
 import { of } from 'rxjs'
 import { assign, EventFrom, sendParent } from 'xstate'
+import { pure } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
-import { narrowEvent } from './xstate_helpers'
 import { isUndefined } from './helpers'
 import { Asset, BaseAsset, Script } from './types'
+import { narrowEvent } from './xstate_helpers'
 
-export const model = createModel({} as Asset, {
-  events: {
-    ...sharedEventCreators,
-    LOADED: ({ source }: { source: any }) => ({ source }),
-    PARSED: (files: (BaseAsset | Script)[]) => ({ files }),
+export const model = createModel(
+  {} as Asset & {
+    /** Used to track added/removed child files */
+    children?: Map<string, BaseAsset | Script>
+    prevChildren?: Map<string, BaseAsset | Script>
   },
-})
+  {
+    events: {
+      ...sharedEventCreators,
+      LOADED: ({ source }: { source: any }) => ({ source }),
+      PARSED: (files: (BaseAsset | Script)[]) => ({
+        files: new Map(files.map((file) => [file.id, file])),
+      }),
+    },
+  },
+)
 
 export type AssetEvent = EventFrom<typeof model>
 
@@ -31,16 +41,6 @@ export const assetMachine = model.createMachine(
     context: model.initialContext,
     on: {
       ERROR: { actions: 'forwardToParent', target: '#error' },
-      FILE_ID: {
-        cond: ({ id }, event) => {
-          return id === event.id
-        },
-        actions: assign({
-          fileId: (context, { fileId }) => {
-            return fileId
-          },
-        }),
-      },
     },
     initial: 'loading',
     states: {
@@ -56,7 +56,7 @@ export const assetMachine = model.createMachine(
         },
       },
       transforming: {
-        entry: 'sendPluginsStart',
+        entry: 'sendPluginsStartToParent',
         on: {
           PLUGINS_RESULT: {
             cond: ({ id }, event) => {
@@ -74,21 +74,32 @@ export const assetMachine = model.createMachine(
         invoke: { src: 'parser' },
         on: {
           PARSED: {
-            actions: sendParent(
-              ({ source, ...rest }, { files }) =>
-                model.events.EMIT_FILE(
-                  {
-                    type: 'asset',
-                    ...rest,
-                  },
-                  files,
-                ),
-            ),
+            actions: [
+              'updateOwnChildren',
+              'sendUpdateFilesToParent',
+            ],
+            target: 'emitting',
+          },
+        },
+      },
+      emitting: {
+        entry: 'sendEmitFileToParent',
+        on: {
+          FILE_ID: {
+            cond: ({ id }, event) => {
+              return id === event.id
+            },
+            actions: assign({
+              fileId: (context, { fileId }) => {
+                return fileId
+              },
+            }),
             target: 'ready',
           },
         },
       },
       ready: {
+        entry: 'sendReadyToParent',
         on: {
           START: [
             {
@@ -105,7 +116,7 @@ export const assetMachine = model.createMachine(
         },
       },
       rendering: {
-        entry: 'sendPluginsStart',
+        entry: 'sendPluginsStartToParent',
         on: {
           PLUGINS_RESULT: {
             actions: 'sendCompleteToParent',
@@ -121,12 +132,15 @@ export const assetMachine = model.createMachine(
                 id === changedId,
               target: 'changed',
             },
-            'ready',
+            'unchanged',
           ],
         },
       },
       changed: {
         on: { START: 'loading' },
+      },
+      unchanged: {
+        on: { START: 'emitting' },
       },
       error: {
         id: 'error',
@@ -166,9 +180,44 @@ export const assetMachine = model.createMachine(
           })
         },
       ),
-      sendPluginsStart: sendParent((context) =>
+      sendUpdateFilesToParent: pure(
+        ({ prevChildren }, event) => {
+          const { files } = narrowEvent(event, 'PARSED')
+
+          const addedFiles = Array.from(files.values()).filter(
+            (file) => {
+              return !prevChildren?.has(file.id)
+            },
+          )
+
+          // TODO: remove files in watch mode
+          // const removedFiles = Array.from(children.values())
+          //   .filter((child) => !files.has(child.id))
+
+          return sendParent(
+            model.events.UPDATE_FILES(addedFiles),
+          )
+        },
+      ),
+      sendEmitFileToParent: sendParent(({ source, ...rest }) =>
+        model.events.EMIT_FILE({
+          type: 'asset',
+          ...rest,
+        }),
+      ),
+      sendPluginsStartToParent: sendParent((context) =>
         model.events.PLUGINS_START(context),
       ),
+      sendReadyToParent: sendParent(({ id }) =>
+        model.events.READY(id),
+      ),
+      updateOwnChildren: assign({
+        children: (context, event) => {
+          const { files } = narrowEvent(event, 'PARSED')
+          return files
+        },
+        prevChildren: ({ children }) => children,
+      }),
     },
     services: {
       loader: ({ id }) =>

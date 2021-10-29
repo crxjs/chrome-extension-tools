@@ -207,11 +207,13 @@ export const chromeExtension = (
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
         service.send(
-          model.events.ADD_FILE({
-            id: getAbsolutePath(input),
-            fileType: 'MANIFEST',
-            fileName: 'manifest.json',
-          }),
+          model.events.UPDATE_FILES([
+            {
+              id: getAbsolutePath(input),
+              fileType: 'MANIFEST',
+              fileName: 'manifest.json',
+            },
+          ]),
         )
       } else if (Array.isArray(input)) {
         // Don't include html or manifest files
@@ -219,19 +221,23 @@ export const chromeExtension = (
         input.forEach((id) => {
           if (isHtml(id))
             service.send(
-              model.events.ADD_FILE({
-                id: getAbsolutePath(id),
-                fileType: 'HTML',
-                fileName: id,
-              }),
+              model.events.UPDATE_FILES([
+                {
+                  id: getAbsolutePath(id),
+                  fileType: 'HTML',
+                  fileName: id,
+                },
+              ]),
             )
           else if (basename(id).startsWith('manifest'))
             service.send(
-              model.events.ADD_FILE({
-                id: getAbsolutePath(id),
-                fileType: 'MANIFEST',
-                fileName: 'manifest.json',
-              }),
+              model.events.UPDATE_FILES([
+                {
+                  id: getAbsolutePath(id),
+                  fileType: 'MANIFEST',
+                  fileName: 'manifest.json',
+                },
+              ]),
             )
           else {
             result.push(id)
@@ -244,21 +250,25 @@ export const chromeExtension = (
         Object.entries(input).forEach(([fileName, id]) => {
           if (isHtml(id))
             service.send(
-              model.events.ADD_FILE({
-                id: getAbsolutePath(id),
-                fileType: 'HTML',
-                fileName: fileName.endsWith('.html')
-                  ? fileName
-                  : fileName + '.html',
-              }),
+              model.events.UPDATE_FILES([
+                {
+                  id: getAbsolutePath(id),
+                  fileType: 'HTML',
+                  fileName: fileName.endsWith('.html')
+                    ? fileName
+                    : fileName + '.html',
+                },
+              ]),
             )
           else if (basename(id).startsWith('manifest'))
             service.send(
-              model.events.ADD_FILE({
-                id: getAbsolutePath(id),
-                fileType: 'MANIFEST',
-                fileName: 'manifest.json',
-              }),
+              model.events.UPDATE_FILES([
+                {
+                  id: getAbsolutePath(id),
+                  fileType: 'MANIFEST',
+                  fileName: 'manifest.json',
+                },
+              ]),
             )
           else {
             result.push([fileName, id])
@@ -314,6 +324,10 @@ export const chromeExtension = (
 
               files.set(fileId, file)
               this.addWatchFile(file.id)
+              console.log(
+                '🚀 ~ buildStart ~ addWatchFile',
+                file.id,
+              )
             } catch (error) {
               service.send(model.events.ERROR(error))
             }
