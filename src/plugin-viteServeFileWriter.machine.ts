@@ -95,10 +95,23 @@ export const machine = model.createMachine({
       initial: 'working',
       states: {
         working: {
-          on: { BUNDLE_END: 'ready' },
+          on: {
+            BUNDLE_START: {
+              actions: 'handleBundleStart',
+            },
+            BUNDLE_END: {
+              actions: 'handleBundleEnd',
+              target: 'ready',
+            },
+          },
         },
         ready: {
-          on: { BUNDLE_START: 'working' },
+          on: {
+            BUNDLE_START: {
+              actions: 'handleBundleStart',
+              target: 'working',
+            },
+          },
         },
       },
     },
