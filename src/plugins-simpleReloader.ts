@@ -51,16 +51,16 @@ export const simpleReloader = (): RPCEPlugin => {
     resolveId(source) {
       if (!this.meta.watchMode) return null
 
-      if (source.endsWith(bgFilename)) return source
-      if (source.endsWith(csFilename)) return source
+      if (source.includes(bgFilename)) return source
+      if (source.includes(csFilename)) return source
 
       return null
     },
     load(id) {
       if (!this.meta.watchMode) return null
 
-      if (id.endsWith(bgFilename)) return bgCode
-      if (id.endsWith(csFilename)) return csCode
+      if (id.includes(bgFilename)) return bgCode
+      if (id.includes(csFilename)) return csCode
 
       return null
     },
