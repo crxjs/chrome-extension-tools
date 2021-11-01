@@ -21,12 +21,12 @@ import { RPCEPlugin, Writeable } from './types'
 import { narrowEvent, useConfig } from './xstate_helpers'
 
 const service = interpret(machine, { devTools: true })
-service.subscribe((state) => {
-  console.log(
-    'vite-serve-file-writer state',
-    JSON.stringify(state.value),
-  )
-})
+// service.subscribe((state) => {
+//   console.log(
+//     'vite-serve-file-writer state',
+//     JSON.stringify(state.value),
+//   )
+// })
 
 /**
  * The Vite dev server doesn't write files to the disk,
@@ -73,7 +73,6 @@ export function viteServeFileWriter(): RPCEPlugin {
           })
 
           watcher.on('event', async (event) => {
-            console.log('rollup watcher event', event)
             try {
               if (event.code === 'BUNDLE_END') {
                 send(model.events.BUNDLE_END(event))
@@ -96,7 +95,6 @@ export function viteServeFileWriter(): RPCEPlugin {
                 }
               }
             } catch (error) {
-              console.log('rollup watcher error')
               delete (error as any).pluginCode
               delete (error as any).frame
               send(model.events.ERROR(error))
@@ -248,6 +246,13 @@ export function resolveFromServer(
       const fullParams = new URLSearchParams(baseParams)
       fullParams.set('crx', '')
       const requestId = `${baseId}?${fullParams}`
+
+      // TODO: (somewhere) add Buffer.toJSON() for XState inspector
+      const watchId = join(
+        server.config.root ?? process.cwd(),
+        baseId,
+      )
+      if (fs.existsSync(watchId)) this.addWatchFile(watchId)
 
       const result = await server.transformRequest(requestId)
 
