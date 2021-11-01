@@ -46,9 +46,25 @@ export function viteServeFileWriter(): RPCEPlugin {
   let lastError: unknown
   useConfig(service, {
     actions: {
+      handleBundleStart(context, _event) {
+        narrowEvent(_event, 'BUNDLE_START')
+        console.log('Building Chrome Extension files...')
+      },
+      handleBundleEnd(context, _event) {
+        const { event } = narrowEvent(_event, 'BUNDLE_END')
+        console.log(`Build completed in ${event.duration} ms`)
+      },
       handleError({ server }, event) {
         const { error } = narrowEvent(event, 'ERROR')
-        lastError = error
+        if (error.message?.includes('is not exported by')) {
+          // TODO: add documentation with example
+          lastError =
+            Error(format`Could not complete bundle because Vite did not pre-bundle a dependency.
+          You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.
+          Original Error: ${error.message}`)
+        } else lastError = error
+
+        console.error(lastError)
         server?.close()
       },
     },
@@ -67,8 +83,7 @@ export function viteServeFileWriter(): RPCEPlugin {
             },
             plugins: [
               resolveFromServer(server!),
-              // @ts-expect-error Vite is using a different version of Rollup
-              ...plugins,
+              ...(plugins as Plugin[]),
             ],
           })
 
@@ -80,23 +95,13 @@ export function viteServeFileWriter(): RPCEPlugin {
                 send(model.events.BUNDLE_START(event))
               } else if (event.code === 'ERROR') {
                 await event.result?.close()
-                const { error } = event
 
-                if (
-                  error.message?.includes('is not exported by')
-                ) {
-                  // TODO: add documentation with example
-                  const message = format`Could not complete bundle because Vite did not pre-bundle a dependency.
-                    You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.
-                    Original Error: ${error.message}`
-                  throw new Error(message)
-                } else {
-                  throw error
-                }
+                const { error } = event
+                delete error.pluginCode
+                delete error.frame
+                throw error
               }
             } catch (error) {
-              delete (error as any).pluginCode
-              delete (error as any).frame
               send(model.events.ERROR(error))
             }
           })
@@ -200,7 +205,6 @@ export function viteServeFileWriter(): RPCEPlugin {
       if (!isViteServe) return
 
       if (service.initialized) {
-        args[0].toJSON = () => 'ViteDevServer'
         service.send(model.events.HOOK_START(serverHook, args))
       }
 
