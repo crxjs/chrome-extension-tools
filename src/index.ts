@@ -41,6 +41,7 @@ import type {
 } from './types'
 import { waitForState } from './xstate_helpers'
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
+import { xstateCompat } from './plugin-xstate-compat'
 
 export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, RPCEPlugin, CompleteFile }
@@ -68,6 +69,7 @@ export const chromeExtension = (
   let isViteServe = false
   const builtins: RPCEPlugin[] = [
     validateManifest(),
+    xstateCompat(),
     viteServeFileWriter(),
     packageJson(),
     extendManifest(pluginOptions),
@@ -83,6 +85,21 @@ export const chromeExtension = (
   ]
     .filter((x): x is RPCEPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
+  function addBuiltinPlugins(plugins: RPCEPlugin[]) {
+    const [
+      validatorPlugin,
+      xstatePlugin,
+      fileWriterPlugin,
+      ...pluginsAfterRPCE
+    ] = builtins
+
+    plugins.push(validatorPlugin)
+    if (isViteServe) plugins.unshift(fileWriterPlugin)
+    plugins.unshift(xstatePlugin)
+
+    const rpceIndex = plugins.findIndex(isRPCE)
+    plugins.splice(rpceIndex + 1, 0, ...pluginsAfterRPCE)
+  }
 
   const allPlugins = new Set<RPCEPlugin>(builtins)
   function setupPluginsRunner(
@@ -182,19 +199,7 @@ export const chromeExtension = (
 
       // Add plugins to Vite config in serve mode
       // Otherwise, add them to Rollup options
-      if (isViteServe) {
-        const [
-          finalValidator, // we'll run this last of all
-          finalFileWriter, // we'll run this first of all
-          ...rest
-        ] = builtins
-
-        plugins.push(finalValidator)
-        plugins.unshift(finalFileWriter)
-
-        const rpceIndex = plugins.findIndex(isRPCE)
-        plugins.splice(rpceIndex + 1, 0, ...rest)
-      }
+      if (isViteServe) addBuiltinPlugins(plugins)
 
       // Run possibly async builtins last
       // After this, Vite will take over
@@ -287,14 +292,8 @@ export const chromeExtension = (
           await b?.options?.call(this, options)
         }
 
-        const [finalValidator, , ...rest] = builtins
-
         const { plugins = [] } = options
-
-        const rpceIndex = plugins.findIndex(isRPCE)
-        plugins.splice(rpceIndex + 1, 0, ...rest)
-        plugins.push(finalValidator)
-
+        addBuiltinPlugins(plugins as RPCEPlugin[])
         options.plugins = plugins
       }
 
@@ -324,10 +323,6 @@ export const chromeExtension = (
 
               files.set(fileId, file)
               this.addWatchFile(file.id)
-              console.log(
-                '🚀 ~ buildStart ~ addWatchFile',
-                file.id,
-              )
             } catch (error) {
               service.send(model.events.ERROR(error))
             }
