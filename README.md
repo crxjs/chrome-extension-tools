@@ -19,6 +19,8 @@ Now with MV3 support.
 Use `manifest.json` as the input. Every file in the manifest will
 be bundled or copied to the output folder.
 
+> Vite support is in beta! [See the PR for details](https://github.com/extend-chrome/rollup-plugin-chrome-extension/pull/117).
+
 ## [Documentation](https://www.extend-chrome.dev/rollup-plugin)
 
 We have
