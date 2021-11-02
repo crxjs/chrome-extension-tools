@@ -1,4 +1,4 @@
-import { Manifest } from '.pnpm/vite@2.5.10/node_modules/vite'
+import { Manifest } from 'vite'
 import mem from 'mem'
 import { OutputAsset } from 'rollup'
 import * as permTests from './plugin-autoPerms_permTests'
