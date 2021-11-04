@@ -33,7 +33,9 @@ export function spawnFile(
   root: string,
 ) {
   if (isScript(file))
-    return spawn(scriptMachine.withContext(file), file.id)
+    return spawn(scriptMachine.withContext(file), {
+      name: file.id,
+    })
 
   let loader: (context: Asset) => Observable<AssetEvent>
   if (file.fileType === 'CSS' || file.fileType === 'HTML') {
