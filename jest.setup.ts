@@ -1,10 +1,14 @@
 /* eslint-env jest */
 
 import 'array-flat-polyfill'
+import { join } from 'path'
 import './test/helpers/inspect'
 import { jestSetTimeout } from './test/helpers/timeout'
 
 jestSetTimeout(5000)
+
+// For testing package detection
+process.chdir(join(__dirname, 'test'))
 
 // Jest attempts to sandbox globals, but it doesn't work with `instanceof`
 // https://github.com/facebook/jest/issues/2549
