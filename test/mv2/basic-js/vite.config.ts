@@ -9,9 +9,6 @@ export default defineConfig({
   build: {
     minify: false,
     emptyOutDir: true,
-    rollupOptions: {
-      input: 'src/manifest.json',
-    },
   },
   plugins: [xstateInspectCompat(), chromeExtension()],
   cacheDir: '../.vite',
