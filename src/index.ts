@@ -12,7 +12,7 @@ import {
   not,
 } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { basename, isAbsolute, join } from './path'
+import { basename, isAbsolute, join, parse } from './path'
 import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { esmBackground } from './plugin-esmBackground'
@@ -211,10 +211,13 @@ export const chromeExtension = (
     async options({ input = [], ...options }) {
       let finalInput: RollupOptions['input'] = [stubId]
       if (isString(input)) {
+        const { ext, dir } = parse(input)
+        const id =
+          ext === '.html' ? join(dir, 'manifest.json') : input
         service.send(
           model.events.UPDATE_FILES([
             {
-              id: getAbsolutePath(input),
+              id: getAbsolutePath(id),
               fileType: 'MANIFEST',
               fileName: 'manifest.json',
             },
