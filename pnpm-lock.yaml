@@ -36,6 +36,7 @@ specifiers:
   cheerio: 1.0.0-rc.3
   convert-source-map: ^1.7.0
   cosmiconfig: ^6.0.0
+  esbuild: ^0.12.23
   esbuild-runner: ^2.2.0
   eslint: ^6.8.0
   eslint-plugin-react: ^7.22.0
@@ -53,7 +54,7 @@ specifiers:
   mem: ^6.0.1
   npm-run-all: ^4.1.5
   playwright: ^1.13.1
-  prettier: ^1.19.1
+  prettier: ^2.3.2
   react: ^17.0.2
   react-dom: ^17.0.2
   read-pkg-up: ^7.0.1
@@ -73,7 +74,8 @@ dependencies:
   cheerio: 1.0.0-rc.3
   convert-source-map: 1.7.0
   cosmiconfig: 6.0.0
-  esbuild-runner: 2.2.0
+  esbuild: 0.12.29
+  esbuild-runner: 2.2.0_esbuild@0.12.29
   fs-extra: 8.1.0
   glob: 7.1.6
   json-ptr: 2.2.0
@@ -124,7 +126,7 @@ devDependencies:
   jest-in-case: 1.0.2
   npm-run-all: 4.1.5
   playwright: 1.13.1
-  prettier: 1.19.1
+  prettier: 2.4.1
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   read-pkg-up: 7.0.1
@@ -3179,14 +3181,21 @@ packages:
       is-symbol: 1.0.3
     dev: true
 
-  /esbuild-runner/2.2.0:
+  /esbuild-runner/2.2.0_esbuild@0.12.29:
     resolution: {integrity: sha512-Ew8AF48i+edfI37qA157g5gQVsgBd8kbg0rOiGDZGxnf3/aUK9GXSYHGcfP5RNZF/6ziJWT0sD96jAfssYi0qQ==}
     hasBin: true
     peerDependencies:
       esbuild: '*'
     dependencies:
+      esbuild: 0.12.29
       source-map-support: 0.5.19
       tslib: 2.2.0
+    dev: false
+
+  /esbuild/0.12.29:
+    resolution: {integrity: sha512-w/XuoBCSwepyiZtIRsKsetiLDUVGPVw1E/R3VTFSecIy8UR7Cq3SOtwKHJMFoVqqVG36aGkzh4e8BvpO1Fdc7g==}
+    hasBin: true
+    requiresBuild: true
     dev: false
 
   /escalade/3.1.1:
@@ -3729,7 +3738,6 @@ packages:
 
   /graceful-fs/4.2.8:
     resolution: {integrity: sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==}
-    dev: true
 
   /growly/1.3.0:
     resolution: {integrity: sha1-8QdIy+dq+WS3yWyTxrzCivEgwIE=}
@@ -4794,7 +4802,7 @@ packages:
   /jsonfile/4.0.0:
     resolution: {integrity: sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=}
     optionalDependencies:
-      graceful-fs: 4.2.6
+      graceful-fs: 4.2.8
     dev: false
 
   /jsonpath-plus/4.0.0:
@@ -5490,9 +5498,9 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/1.19.1:
-    resolution: {integrity: sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==}
-    engines: {node: '>=4'}
+  /prettier/2.4.1:
+    resolution: {integrity: sha512-9fbDAXSBcc6Bs1mZrDYb3XKzDLm4EXXL9sC1LqKP5rZkT6KRr/rf9amVUcODVXgguK/isJz0d0hP72WeaKWsvA==}
+    engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
 
