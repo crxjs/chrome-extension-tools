@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import { capitalize } from 'lodash'
 import { PluginContext } from 'rollup'
 import v8 from 'v8'
@@ -47,16 +48,19 @@ async function runRawPlugins(
 ) {
   let file = structuredClone(asset)
   for (const p of plugins) {
-    const result = (await p[
-      `${hook}Crx${capitalize(asset.fileType)}` as Extract<
-        keyof RPCEHooks,
-        `${typeof hook}Crx${'Raw' | 'Image'}`
-      >
-    ]?.call(this, file.source!, file)) as
-      | undefined
-      | null
-      | Uint8Array
-      | RawAsset
+    const hookName = `${hook}Crx${capitalize(
+      asset.fileType,
+    )}` as Extract<
+      keyof RPCEHooks,
+      `${typeof hook}Crx${'Raw' | 'Image'}`
+    >
+    if (!p.hasOwnProperty(hookName)) continue
+
+    const result = (await p[hookName]?.call(
+      this,
+      file.source!,
+      file,
+    )) as undefined | null | Uint8Array | RawAsset
 
     if (result instanceof Uint8Array) file.source = result
     else if (result) file = result
@@ -75,6 +79,8 @@ async function runManifestPlugins(
     const hookName = `${hook}Crx${capitalize(file.fileType)}` as
       | 'transformCrxManifest'
       | 'renderCrxManifest'
+    if (!p.hasOwnProperty(hookName)) continue
+
     const result = (await p[hookName]?.call(
       this,
       file.source!,
@@ -93,11 +99,15 @@ async function runJsonPlugins(
 ) {
   let file = structuredClone(asset)
   for (const p of plugins) {
-    const result = (await p[
-      `${hook}Crx${capitalize(asset.fileType)}` as
-        | 'transformCrxJson'
-        | 'renderCrxJson'
-    ]?.call(this, file)) as undefined | null | JsonAsset
+    const hookName = `${hook}Crx${capitalize(
+      asset.fileType,
+    )}` as 'transformCrxJson' | 'renderCrxJson'
+    if (!p.hasOwnProperty(hookName)) continue
+
+    const result = (await p[hookName]?.call(this, file)) as
+      | undefined
+      | null
+      | JsonAsset
 
     if (result) file = result
   }
@@ -112,18 +122,21 @@ async function runStringPlugins(
 ) {
   let file = structuredClone(asset)
   for (const p of plugins) {
-    const result = (await p[
-      `${hook}Crx${capitalize(asset.fileType)}` as Extract<
-        keyof RPCEHooks,
-        `${typeof hook}Crx${Capitalize<
-          Lowercase<typeof asset.fileType>
-        >}`
-      >
-    ]?.call(this, file.source!, file)) as
-      | undefined
-      | null
-      | string
-      | StringAsset
+    const hookName = `${hook}Crx${capitalize(
+      asset.fileType,
+    )}` as Extract<
+      keyof RPCEHooks,
+      `${typeof hook}Crx${Capitalize<
+        Lowercase<typeof asset.fileType>
+      >}`
+    >
+    if (!p.hasOwnProperty(hookName)) continue
+
+    const result = (await p[hookName]?.call(
+      this,
+      file.source!,
+      file,
+    )) as undefined | null | string | StringAsset
 
     if (isString(result)) file.source = result
     else if (result) file = result
