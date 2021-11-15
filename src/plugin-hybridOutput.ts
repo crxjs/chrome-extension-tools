@@ -1,4 +1,3 @@
-import { dirname, join, parse, relative } from './path'
 import {
   OutputBundle,
   Plugin,
@@ -7,6 +6,7 @@ import {
   RollupOptions,
 } from 'rollup'
 import { isChunk } from './helpers'
+import { dirname, join, parse, relative } from './path'
 import { generateFileNames } from './plugin_helpers'
 import { CompleteFile, RPCEPlugin } from './types'
 
@@ -81,15 +81,39 @@ export const hybridFormat = (): RPCEPlugin => {
             // Rollup strips the dir from the output file name,
             // need to rename the file in the new bundle
             .then((b) => {
-              const chunks = Object.values(b)
+              const [iifeChunk] = Object.values(b)
               const result = {
-                [input]: { ...chunks[0], fileName: input },
+                [input]: { ...iifeChunk, fileName: input },
               }
               return result
             }),
         ),
       )
 
+      /**
+       * Regenerating to different formats can be kinda slow
+       *
+       * TODO: implement a cache to only regenerate changed files
+       * - reconcile original bundle chunk modules to iife chunk modules
+       * - look up changed iife's by reconciled chunk module names
+       * - changed id -> bundle[chunk].modules -> iifeChunk.modules
+       *
+       * for (const [key, chunk] of Object.entries(bundle).filter(
+       *   (x): x is [string, OutputChunk] => x[1].type === 'chunk',
+       * )) {
+       *   // This output file was changed
+       *   console.log(
+       *     key,
+       *     // When one of these modules changed
+       *     Object.keys(chunk.modules).filter(
+       *       (k) => !k.includes('node_modules'),
+       *     ),
+       *   )
+       * }
+       *
+       * Cache iifeBundle and delete the changed chunk,
+       * then only build the changed file
+       */
       const iifeBundle = Object.assign({}, ...contentScripts)
 
       const esmInputs = Object.entries(bundle)
