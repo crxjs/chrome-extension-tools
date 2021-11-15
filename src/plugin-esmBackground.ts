@@ -1,6 +1,7 @@
 import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
 import { ViteDevServer } from 'vite'
 import { isUndefined } from './helpers'
+import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
 import { isMV2, isMV3, RPCEPlugin } from './types'
 
@@ -23,18 +24,21 @@ export const esmBackground = (): RPCEPlugin => {
 
             const { port } = server?.config.server ?? {}
 
-            const importPath = JSON.stringify(
-              isUndefined(port)
-                ? `./${outputFileName}`
-                : `${`http://localhost:${port}`}/${fileName}`,
-            )
+            let importPath: string
+            if (isUndefined(port)) {
+              const { base } = parse(outputFileName)
+              // wrapper has same dirname as output file
+              importPath = `./${base}`
+            } else {
+              importPath = `${`http://localhost:${port}`}/${fileName}`
+            }
 
             this.emitFile({
               type: 'asset',
               fileName: wrapperFileName,
               source: backgroundEsmWrapper.replace(
                 '%PATH%',
-                importPath,
+                JSON.stringify(importPath),
               ),
             })
 
