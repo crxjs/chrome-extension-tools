@@ -41,7 +41,7 @@ import type {
 } from './types'
 import { waitForState } from './xstate_helpers'
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
-import { xstateCompat } from './plugin-xstate-compat'
+import { xstateCompat } from './plugin-xstateCompat'
 
 export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, RPCEPlugin, CompleteFile }
