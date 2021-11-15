@@ -85,7 +85,10 @@ export const chromeExtension = (
   ]
     .filter((x): x is RPCEPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
+  let builtinPluginsDone = false
   function addBuiltinPlugins(plugins: RPCEPlugin[]) {
+    if (builtinPluginsDone) return
+
     const [
       validatorPlugin,
       xstatePlugin,
@@ -99,6 +102,8 @@ export const chromeExtension = (
 
     const rpceIndex = plugins.findIndex(isRPCE)
     plugins.splice(rpceIndex + 1, 0, ...pluginsAfterRPCE)
+
+    builtinPluginsDone = true
   }
 
   const allPlugins = new Set<RPCEPlugin>(builtins)
