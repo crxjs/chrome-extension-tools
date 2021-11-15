@@ -54,9 +54,9 @@ export const autoPerms = (): RPCEPlugin => {
       const permissions = Array.from(perms)
 
       this.warn(
-        `Detected permissions: ${permissions.map(
-          (p) => `  - ${p}`,
-        )}`,
+        `Detected permissions: ${permissions
+          .filter((p) => !required.has(p))
+          .map((p) => `  - ${p}`)}`,
       )
 
       const manifestOutput = Object.values(bundle).find(
