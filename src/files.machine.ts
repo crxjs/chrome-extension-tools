@@ -118,6 +118,24 @@ export const machine = model.createMachine(
           READY: { cond: 'allFilesReady', target: 'ready' },
           UPDATE_FILES: { actions: 'updateFiles' },
         },
+        initial: 'preparingFiles',
+        states: {
+          preparingFiles: {
+            on: {
+              EXCLUDE_FILE_TYPE: {
+                actions: model.assign({
+                  excluded: ({ excluded }, { fileType }) =>
+                    new Set(excluded).add(fileType),
+                }),
+              },
+              PLUGINS_RESULT: {
+                actions: 'forwardToFile',
+                target: 'emittingFiles',
+              },
+            },
+          },
+          emittingFiles: {},
+        },
       },
       ready: {
         on: {
