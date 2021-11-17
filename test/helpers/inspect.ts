@@ -22,9 +22,9 @@ if (Number.isInteger(xstateVizPort)) {
     const page = await browser.newPage()
 
     await page.goto(
-      // `https://statecharts.io/inspect?server=localhost:${server.options.port}`,
+      `https://statecharts.io/inspect?server=localhost:${server.options.port}`,
       // `https://stately.ai/viz?inspect&server=ws://localhost:${server.options.port}`,
-      `http://localhost:3000/viz?inspect&server=ws://localhost:${server.options.port}`,
+      // `http://localhost:3000/viz?inspect&server=ws://localhost:${server.options.port}`,
     )
   })
 
