@@ -193,11 +193,14 @@ export function viteServeFileWriter(): RPCEPlugin {
       )
 
       // HTML script modules are not emitted in Vite serve
-      externalPlugins
-        .find(isRPCE)!
-        .api.service.send(
-          filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
-        )
+      const { api } = externalPlugins.find(isRPCE)!
+
+      api.service.send(
+        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+      )
+      api.service.send(
+        filesModel.events.EXCLUDE_FILE_TYPE('BACKGROUND'),
+      )
 
       if (lastError) throw lastError
     },
