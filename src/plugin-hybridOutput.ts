@@ -12,6 +12,7 @@ import { CompleteFile, RPCEPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
 export const hybridFormat = (): RPCEPlugin => {
+  let isViteServe = false
   let files: Map<string, CompleteFile>
   let root = process.cwd()
   const plugins = new Set<RPCEPlugin>()
@@ -20,6 +21,7 @@ export const hybridFormat = (): RPCEPlugin => {
     name: 'hybrid-format',
 
     configResolved(config) {
+      isViteServe = config.command === 'serve'
       config.plugins.forEach((p) => plugins.add(p))
     },
 
@@ -61,6 +63,37 @@ export const hybridFormat = (): RPCEPlugin => {
           relative(root, generateFileNames(id).outputFileName),
       )
 
+      /**
+       * Problem: Vite Serve provides environment variables on `import.meta.env` as an object:
+       *
+       * ```javascript
+       * import.meta.env = { ... }
+       * ```
+       *
+       * When Rollup transpiles ESM to IIFE, `import.meta.env` is replaced with `undefined`:
+       *
+       * ```javascript
+       * undefined = { ... } // invalid JavaScript!
+       * ```
+       *
+       * This mini plugin patches that behavior:
+       *
+       * ```javascript
+       * let __importMetaEnv;
+       * __importMetaEnv = { ... }
+       * ```
+       *
+       * REPL: https://replit.com/@jacksteamdev/rollup-repro-plugin-intro#rollup.config.js
+       */
+      const viteServeImportMetaEnv: Plugin = {
+        name: 'fix-vite-serve-import-meta-env',
+        intro: 'let __importMetaEnv;',
+        resolveImportMeta(prop) {
+          if (prop === 'env') return '__importMetaEnv'
+          return null
+        },
+      }
+
       const contentScripts = await Promise.all(
         contentScriptJsFileNames.map((input) =>
           regenerateBundle
@@ -68,13 +101,17 @@ export const hybridFormat = (): RPCEPlugin => {
               this,
               {
                 input,
+                // Don't rewrite "this" keyword in IIFEs
+                context: 'this',
+                // Raise warnings to host Rollup instance
+                onwarn: (warning) => this.warn(warning),
                 output: {
                   format: 'iife',
+                  plugins: isViteServe
+                    ? [viteServeImportMetaEnv]
+                    : undefined,
                   sourcemap,
                 },
-                // Don't rewrite this in IIFE's
-                context: 'this',
-                onwarn: (warning) => this.warn(warning),
               },
               bundle,
             )
@@ -197,6 +234,7 @@ export async function regenerateBundle(
   await build.generate({
     ...output,
     plugins: [
+      ...(output.plugins ?? []),
       {
         name: 'get-bundle',
         generateBundle(o, b) {
