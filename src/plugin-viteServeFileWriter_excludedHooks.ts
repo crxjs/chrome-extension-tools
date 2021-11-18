@@ -1,8 +1,8 @@
 import { Plugin as VitePlugin } from 'vite'
-import { RPCEHooks, RPCEPlugin } from './types'
+import { CrxHooks, CrxPlugin } from './types'
 
-// Creates an exhaustive list of RPCEHooks
-const rpceHookRecord: Record<keyof RPCEHooks, 0> = {
+// Creates an exhaustive list of CrxHooks
+const rpceHookRecord: Record<keyof CrxHooks, 0> = {
   renderCrxCss: 0,
   renderCrxHtml: 0,
   renderCrxImage: 0,
@@ -16,7 +16,7 @@ const rpceHookRecord: Record<keyof RPCEHooks, 0> = {
   transformCrxManifest: 0,
   transformCrxRaw: 0,
 }
-// RPCE will run these hooks
+// Crx will run these hooks
 const rpceHooks = Object.keys(rpceHookRecord)
 // These hooks should run on the ViteDevServer
 const serverHooks: (keyof VitePlugin | symbol)[] = [
@@ -33,4 +33,4 @@ const serverHooks: (keyof VitePlugin | symbol)[] = [
 export const excludedHooks = [
   ...serverHooks,
   ...rpceHooks,
-] as (keyof RPCEPlugin)[]
+] as (keyof CrxPlugin)[]

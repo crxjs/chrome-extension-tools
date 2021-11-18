@@ -2,7 +2,7 @@ import CSP from 'csp-dev'
 import { set } from 'lodash'
 import { ViteDevServer } from 'vite'
 import { isUndefined } from './helpers'
-import { isMV2, RPCEPlugin } from './types'
+import { isMV2, CrxPlugin } from './types'
 
 const defaultSrc = ['self']
 
@@ -22,7 +22,7 @@ function addViteServerToScriptSrc(
   return parser.share('string')
 }
 
-export const viteServeCsp = (): RPCEPlugin => {
+export const viteServeCsp = (): CrxPlugin => {
   let server: ViteDevServer | undefined
   return {
     name: 'vite-serve-csp',

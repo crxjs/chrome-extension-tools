@@ -1,6 +1,6 @@
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
-export const xstateCompat = (): RPCEPlugin => {
+export const xstateCompat = (): CrxPlugin => {
   ;(Uint8Array.prototype as any)['toJSON'] = () => 'Uint8Array'
   return {
     name: 'xstate-compat',

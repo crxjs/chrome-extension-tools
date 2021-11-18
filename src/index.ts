@@ -35,8 +35,8 @@ import type {
   CompleteFile,
   ManifestV2,
   ManifestV3,
-  RPCEHookType,
-  RPCEPlugin,
+  CrxHookType,
+  CrxPlugin,
   Writeable,
 } from './types'
 import { waitForState } from './xstate_helpers'
@@ -44,7 +44,7 @@ import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { xstateCompat } from './plugin-xstateCompat'
 
 export { simpleReloader } from './plugins-simpleReloader'
-export type { ManifestV3, ManifestV2, RPCEPlugin, CompleteFile }
+export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
 
 function getAbsolutePath(input: string): string {
   return isAbsolute(input) ? input : join(process.cwd(), input)
@@ -67,7 +67,7 @@ export const chromeExtension = (
   >()
 
   let isViteServe = false
-  const builtins: RPCEPlugin[] = [
+  const builtins: CrxPlugin[] = [
     validateManifest(),
     xstateCompat(),
     viteServeFileWriter(),
@@ -83,17 +83,17 @@ export const chromeExtension = (
     transformIndexHtml(),
     viteServeCsp(),
   ]
-    .filter((x): x is RPCEPlugin => !!x)
+    .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
   let builtinPluginsDone = false
-  function addBuiltinPlugins(plugins: RPCEPlugin[]) {
+  function addBuiltinPlugins(plugins: CrxPlugin[]) {
     if (builtinPluginsDone) return
 
     const [
       validatorPlugin,
       xstatePlugin,
       fileWriterPlugin,
-      ...pluginsAfterRPCE
+      ...pluginsAfterCrx
     ] = builtins
 
     plugins.push(validatorPlugin)
@@ -101,15 +101,15 @@ export const chromeExtension = (
     plugins.unshift(xstatePlugin)
 
     const rpceIndex = plugins.findIndex(isRPCE)
-    plugins.splice(rpceIndex + 1, 0, ...pluginsAfterRPCE)
+    plugins.splice(rpceIndex + 1, 0, ...pluginsAfterCrx)
 
     builtinPluginsDone = true
   }
 
-  const allPlugins = new Set<RPCEPlugin>(builtins)
+  const allPlugins = new Set<CrxPlugin>(builtins)
   function setupPluginsRunner(
     this: PluginContext,
-    hook: RPCEHookType,
+    hook: CrxHookType,
   ) {
     const plugins = Array.from(allPlugins)
     useConfig(service, {
@@ -197,7 +197,7 @@ export const chromeExtension = (
         typeof config.plugins
       >
 
-      // Save user plugins to run RPCE hooks in buildStart
+      // Save user plugins to run Crx hooks in buildStart
       plugins
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
@@ -301,7 +301,7 @@ export const chromeExtension = (
         }
 
         const { plugins = [] } = options
-        addBuiltinPlugins(plugins as RPCEPlugin[])
+        addBuiltinPlugins(plugins as CrxPlugin[])
         options.plugins = plugins
       }
 

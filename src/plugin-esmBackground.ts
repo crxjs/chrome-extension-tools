@@ -3,10 +3,10 @@ import { ViteDevServer } from 'vite'
 import { isUndefined } from './helpers'
 import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
-import { isMV2, isMV3, RPCEPlugin } from './types'
+import { isMV2, isMV3, CrxPlugin } from './types'
 
 /** Adds ESM support for the background page. Emits wrapper files and updates the manifest config. */
-export const esmBackground = (): RPCEPlugin => {
+export const esmBackground = (): CrxPlugin => {
   let server: ViteDevServer | undefined
 
   return {

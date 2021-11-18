@@ -8,14 +8,14 @@ import {
 import { isChunk } from './helpers'
 import { dirname, join, parse, relative } from './path'
 import { generateFileNames } from './plugin_helpers'
-import { CompleteFile, RPCEPlugin } from './types'
+import { CompleteFile, CrxPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
-export const hybridFormat = (): RPCEPlugin => {
+export const hybridFormat = (): CrxPlugin => {
   let isViteServe = false
   let files: Map<string, CompleteFile>
   let root = process.cwd()
-  const plugins = new Set<RPCEPlugin>()
+  const plugins = new Set<CrxPlugin>()
 
   return {
     name: 'hybrid-format',

@@ -2,22 +2,22 @@ import cheerio from 'cheerio'
 import { ViteDevServer } from 'vite'
 import { isNumber } from './helpers'
 import { dirname, join, relative } from './path'
-import { findRPCE } from './plugin_helpers'
-import { RPCEPlugin } from './types'
+import { findCrx } from './plugin_helpers'
+import { CrxPlugin } from './types'
 
-export const htmlPaths = (): RPCEPlugin => {
+export const htmlPaths = (): CrxPlugin => {
   let server: ViteDevServer | undefined
   let root: string
   return {
     name: 'html-paths',
     configResolved({ plugins }) {
-      root = findRPCE(plugins)?.api.root
+      root = findCrx(plugins)?.api.root
     },
     configureServer(s) {
       server = s
     },
     buildStart({ plugins = [] }) {
-      root = root ?? findRPCE(plugins)?.api.root
+      root = root ?? findCrx(plugins)?.api.root
     },
     renderCrxHtml(source, { id }) {
       const $ = cheerio.load(source)

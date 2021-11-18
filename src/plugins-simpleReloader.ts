@@ -1,14 +1,14 @@
 import { code as bgCode } from 'code ./browser/code-simpleReloader-bgCode.ts'
 import { code as csCode } from 'code ./browser/code-simpleReloader-csCode.ts'
 import MagicString from 'magic-string'
-import { isMV2, RPCEPlugin } from './types'
+import { isMV2, CrxPlugin } from './types'
 import { devWarning } from './browser/simpleReloader_helpers'
 import { parse } from './path'
 
 const csFilename = 'simple-reloader--content-script.js'
 const bgFilename = 'simple-reloader--background.js'
 
-export const simpleReloader = (): RPCEPlugin => {
+export const simpleReloader = (): CrxPlugin => {
   let swFilename: string | undefined
 
   return {

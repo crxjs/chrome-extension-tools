@@ -2,9 +2,9 @@ import { code as browserPolyfillExecuteScriptJs } from 'code ./browser/code-exec
 import { readFileSync, readJsonSync } from 'fs-extra'
 import { relative } from './path'
 import { format } from './helpers'
-import { isMV2, RPCEPlugin } from './types'
+import { isMV2, CrxPlugin } from './types'
 
-export const browserPolyfill = (): RPCEPlugin => {
+export const browserPolyfill = (): CrxPlugin => {
   const convert = require('convert-source-map')
   const polyfillPath = require.resolve('webextension-polyfill')
   const src = readFileSync(polyfillPath, 'utf-8')

@@ -1,5 +1,5 @@
 import { join, parse } from './path'
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
 
@@ -15,11 +15,11 @@ export const generateFileNames = (fileName: string) => {
 }
 
 export const isRPCE = (
-  p: RPCEPlugin | null | false | undefined,
+  p: CrxPlugin | null | false | undefined,
 ) => !!(p && p.name === 'chrome-extension')
 
-export function findRPCE(
-  plugins: readonly RPCEPlugin[],
-): RPCEPlugin | undefined {
+export function findCrx(
+  plugins: readonly CrxPlugin[],
+): CrxPlugin | undefined {
   return plugins.find(isRPCE)
 }

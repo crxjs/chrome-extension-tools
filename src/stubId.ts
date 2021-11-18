@@ -1,1 +1,1 @@
-export const stubId = '_stubIdForRPCE'
+export const stubId = '_stubIdForCrx'

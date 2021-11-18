@@ -1,8 +1,8 @@
-import { ChromeExtensionOptions, RPCEPlugin } from './types'
+import { ChromeExtensionOptions, CrxPlugin } from './types'
 
 export const extendManifest = ({
   extendManifest,
-}: ChromeExtensionOptions): RPCEPlugin => ({
+}: ChromeExtensionOptions): CrxPlugin => ({
   name: 'extend-manifest',
   transformCrxManifest(manifest) {
     let newManifest = manifest

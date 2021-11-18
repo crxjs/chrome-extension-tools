@@ -4,7 +4,7 @@ import mem from 'mem'
 import schema from '../schema/manifest-strict.schema.json'
 import schemaMV2 from '../schema/manifest-v2.schema.json'
 import schemaMV3 from '../schema/manifest-v3.schema.json'
-import { Manifest, RPCEPlugin } from './types'
+import { Manifest, CrxPlugin } from './types'
 
 export const ajv = new Ajv({
   schemas: [schema, schemaMV2, schemaMV3],
@@ -73,12 +73,12 @@ const runValidator = mem((manifest: Manifest) => {
   )
 })
 
-export const preValidateManifest = (): RPCEPlugin => ({
+export const preValidateManifest = (): CrxPlugin => ({
   name: 'validate-manifest',
   transformCrxManifest: runValidator,
 })
 
-export const validateManifest = (): RPCEPlugin => ({
+export const validateManifest = (): CrxPlugin => ({
   name: 'validate-manifest',
   renderCrxManifest: runValidator,
 })

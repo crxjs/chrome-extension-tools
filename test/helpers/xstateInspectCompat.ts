@@ -1,7 +1,7 @@
-import { RPCEPlugin } from '$src/types'
+import { CrxPlugin } from '$src/types'
 
 export function xstateInspectCompat() {
-  const plugin: RPCEPlugin = {
+  const plugin: CrxPlugin = {
     name: 'xstate-inspect-compat',
     configureServer(server) {
       ;(server as any).toJSON = () => 'ViteDevServer'
