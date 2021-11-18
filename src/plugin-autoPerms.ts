@@ -2,14 +2,14 @@ import { Manifest } from 'vite'
 import mem from 'mem'
 import { OutputAsset } from 'rollup'
 import * as permTests from './plugin-autoPerms_permTests'
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
 const permTestEntries = Object.entries(permTests).filter(
   // esbuild includes the default export
   ([key]) => key !== 'default',
 )
 
-export const autoPerms = (): RPCEPlugin => {
+export const autoPerms = (): CrxPlugin => {
   const required = new Set<string>() // perms from manifest.permissions
   const excluded = new Set<string>() // except perms that start with "!"
   const optional = new Set<string>() // perms from manifest.optional_permissions

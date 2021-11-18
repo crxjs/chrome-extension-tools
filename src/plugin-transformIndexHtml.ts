@@ -7,9 +7,9 @@ import {
 } from 'vite'
 import { isFunction, isString, isUndefined } from './helpers'
 import { parse } from './path'
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
-export const transformIndexHtml = (): RPCEPlugin => {
+export const transformIndexHtml = (): CrxPlugin => {
   const preHooks = new Set<IndexHtmlTransformHook>()
   const postHooks = new Set<IndexHtmlTransformHook>()
 

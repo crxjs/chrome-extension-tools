@@ -5,7 +5,7 @@ import {
 } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { createModel } from 'xstate/lib/model'
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
 export const pluginsHook = 'configResolved'
 export const serverHook = 'configureServer'
@@ -13,7 +13,7 @@ export const optionsHook = 'buildStart'
 
 interface Context {
   options?: RollupOptions
-  plugins: RPCEPlugin[]
+  plugins: CrxPlugin[]
   server?: ViteDevServer
 }
 
@@ -28,7 +28,7 @@ const context: Context = {
 
 export const model = createModel(context, {
   events: {
-    HOOK_START: (hookName: keyof RPCEPlugin, args: any[]) => ({
+    HOOK_START: (hookName: keyof CrxPlugin, args: any[]) => ({
       hookName,
       args,
     }),

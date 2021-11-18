@@ -128,7 +128,7 @@ export interface CompleteFile {
   source?: string | Uint8Array
 }
 
-interface RPCEHookTypes {
+interface CrxHookTypes {
   manifest?: (
     this: PluginContext,
     source: Manifest,
@@ -159,16 +159,17 @@ interface RPCEHookTypes {
   ) => Promisable<Nullable<RawAsset | Uint8Array>>
 }
 
-export type RPCEHookType = 'transform' | 'render'
+export type CrxHookType = 'transform' | 'render'
 
-type CreateRPCEHooks<THooks> = {
-  [TransformProp in keyof THooks as `${RPCEHookType}Crx${Capitalize<
+type CreateCrxHooks<THooks> = {
+  [TransformProp in keyof THooks as `${CrxHookType}Crx${Capitalize<
     string & TransformProp
   >}`]: THooks[TransformProp]
 }
 
-export type RPCEHooks = CreateRPCEHooks<RPCEHookTypes>
+export type CrxHooks = CreateCrxHooks<CrxHookTypes>
 
+export type CrxPlugin = VitePlugin &
 export type RPCEPlugin = VitePlugin & RPCEHooks
 
 export interface ChromeExtensionOptions {

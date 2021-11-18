@@ -1,4 +1,4 @@
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
 export const chunkFileNames = 'modules/[name]-[hash].js'
 export const entryFileNames = '[name].js'
@@ -9,7 +9,7 @@ export const assetFileNames = 'assets/[name]-[hash].[ext]'
  * This overwrites them with file names that make sense for our purposes
  * TODO: explore relaxing this constraint
  */
-export const fileNames = (): RPCEPlugin => ({
+export const fileNames = (): CrxPlugin => ({
   name: 'file-names',
   outputOptions(options) {
     // Entries must be in original location
