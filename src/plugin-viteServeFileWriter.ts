@@ -132,6 +132,7 @@ export function viteServeFileWriter(): CrxPlugin {
   const pluginName = 'vite-serve-file-writer'
   return {
     name: pluginName,
+    crx: true,
     config(config, { command }) {
       isViteServe = command === 'serve'
     },

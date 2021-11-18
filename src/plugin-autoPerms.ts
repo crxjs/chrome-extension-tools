@@ -24,6 +24,7 @@ export const autoPerms = (): CrxPlugin => {
 
   return {
     name: 'auto-perms',
+    crx: true,
     transformCrxManifest(manifest) {
       const { permissions = [], optional_permissions = [] } =
         manifest

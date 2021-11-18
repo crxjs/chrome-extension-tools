@@ -17,6 +17,7 @@ export const transformIndexHtml = (): CrxPlugin => {
 
   return {
     name: 'transform-index-html',
+    crx: true,
     configResolved({ plugins }) {
       plugins.forEach(({ transformIndexHtml: hook }) => {
         if (isUndefined(hook)) return

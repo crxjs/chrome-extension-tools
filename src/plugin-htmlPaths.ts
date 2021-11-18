@@ -10,6 +10,7 @@ export const htmlPaths = (): CrxPlugin => {
   let root: string
   return {
     name: 'html-paths',
+    crx: true,
     configResolved({ plugins }) {
       root = findCrx(plugins)?.api.root
     },
