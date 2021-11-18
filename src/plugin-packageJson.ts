@@ -1,10 +1,10 @@
 import { startCase } from 'lodash'
 import { readPackageUpAsync as readPkgUp } from 'read-pkg-up'
 import { PackageJson } from 'type-fest'
-import { RPCEPlugin } from './types'
+import { CrxPlugin } from './types'
 
 /** Applies name, version, and description from package.json to the manifest */
-export const packageJson = (): RPCEPlugin => {
+export const packageJson = (): CrxPlugin => {
   let packageJson: PackageJson | undefined
   return {
     name: 'package-json',

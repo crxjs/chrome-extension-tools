@@ -17,7 +17,7 @@ import {
 import { excludedHooks } from './plugin-viteServeFileWriter_excludedHooks'
 import { isRPCE } from './plugin_helpers'
 import { stubId } from './stubId'
-import { RPCEPlugin, Writeable } from './types'
+import { CrxPlugin, Writeable } from './types'
 import { narrowEvent, useConfig } from './xstate_helpers'
 
 const service = interpret(machine, { devTools: true })
@@ -42,7 +42,7 @@ const service = interpret(machine, { devTools: true })
  * These hooks should be excluded from Rollup Watch
  * to avoid duplicate hook calls.
  */
-export function viteServeFileWriter(): RPCEPlugin {
+export function viteServeFileWriter(): CrxPlugin {
   let lastError: unknown
   useConfig(service, {
     actions: {
@@ -65,7 +65,7 @@ export function viteServeFileWriter(): RPCEPlugin {
         } else lastError = error
 
         console.error(lastError)
-        server?.close()
+        // server?.close()
       },
     },
     services: {
@@ -149,7 +149,7 @@ export function viteServeFileWriter(): RPCEPlugin {
        * Rollup Watch will use these plugins to write
        * the files needed for Chrome Extension development
        */
-      const internalPlugins: RPCEPlugin[] = []
+      const internalPlugins: CrxPlugin[] = []
 
       externalPlugins.forEach((plugin, i) => {
         if (
@@ -167,7 +167,7 @@ export function viteServeFileWriter(): RPCEPlugin {
         const externalPlugin = Object.assign(
           {},
           plugin,
-        ) as RPCEPlugin
+        ) as CrxPlugin
         delete externalPlugin.options
         delete externalPlugin.buildStart
         if (Object.keys(externalPlugin).length > 1)
@@ -176,7 +176,7 @@ export function viteServeFileWriter(): RPCEPlugin {
         const internalPlugin = Object.assign(
           {},
           plugin,
-        ) as RPCEPlugin
+        ) as CrxPlugin
         // Internal hooks run inside a Rollup Watch instance
         // Delete hooks that should only run on the Vite server
         for (const hookName of excludedHooks)

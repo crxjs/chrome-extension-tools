@@ -9,9 +9,9 @@ import {
   Manifest,
   ManifestAsset,
   RawAsset,
-  RPCEHooks,
-  RPCEHookType,
-  RPCEPlugin,
+  CrxHooks,
+  CrxHookType,
+  CrxPlugin,
   StringAsset,
 } from './types'
 
@@ -20,9 +20,9 @@ export const structuredClone = <T>(obj: T): T =>
 
 export async function runPlugins(
   this: PluginContext,
-  plugins: RPCEPlugin[],
+  plugins: CrxPlugin[],
   asset: Asset,
-  hook: RPCEHookType,
+  hook: CrxHookType,
 ): Promise<Asset> {
   if (asset.fileType === 'CSS' || asset.fileType === 'HTML') {
     return runStringPlugins.call(this, asset, plugins, hook)
@@ -43,7 +43,7 @@ export async function runPlugins(
 async function runRawPlugins(
   this: PluginContext,
   asset: RawAsset,
-  plugins: RPCEPlugin[],
+  plugins: CrxPlugin[],
   hook: string,
 ) {
   let file = structuredClone(asset)
@@ -51,7 +51,7 @@ async function runRawPlugins(
     const hookName = `${hook}Crx${capitalize(
       asset.fileType,
     )}` as Extract<
-      keyof RPCEHooks,
+      keyof CrxHooks,
       `${typeof hook}Crx${'Raw' | 'Image'}`
     >
     if (!p.hasOwnProperty(hookName)) continue
@@ -71,7 +71,7 @@ async function runRawPlugins(
 async function runManifestPlugins(
   this: PluginContext,
   asset: ManifestAsset,
-  plugins: RPCEPlugin[],
+  plugins: CrxPlugin[],
   hook: string,
 ) {
   const file = structuredClone(asset)
@@ -94,7 +94,7 @@ async function runManifestPlugins(
 async function runJsonPlugins(
   this: PluginContext,
   asset: JsonAsset,
-  plugins: RPCEPlugin[],
+  plugins: CrxPlugin[],
   hook: string,
 ) {
   let file = structuredClone(asset)
@@ -117,7 +117,7 @@ async function runJsonPlugins(
 async function runStringPlugins(
   this: PluginContext,
   asset: StringAsset,
-  plugins: RPCEPlugin[],
+  plugins: CrxPlugin[],
   hook: string,
 ) {
   let file = structuredClone(asset)
@@ -125,7 +125,7 @@ async function runStringPlugins(
     const hookName = `${hook}Crx${capitalize(
       asset.fileType,
     )}` as Extract<
-      keyof RPCEHooks,
+      keyof CrxHooks,
       `${typeof hook}Crx${Capitalize<
         Lowercase<typeof asset.fileType>
       >}`
