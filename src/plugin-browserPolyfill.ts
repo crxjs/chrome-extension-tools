@@ -21,6 +21,7 @@ export const browserPolyfill = (): CrxPlugin => {
 
   return {
     name: 'browser-polyfill',
+    crx: true,
     buildStart({ plugins }) {
       const { api } = plugins.find(
         ({ name }) => name === 'chrome-extension',

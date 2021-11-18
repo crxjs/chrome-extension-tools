@@ -8,6 +8,7 @@ export const packageJson = (): CrxPlugin => {
   let packageJson: PackageJson | undefined
   return {
     name: 'package-json',
+    crx: true,
     api: {
       get packageJson() {
         return packageJson
