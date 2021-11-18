@@ -26,6 +26,7 @@ export const viteServeCsp = (): CrxPlugin => {
   let server: ViteDevServer | undefined
   return {
     name: 'vite-serve-csp',
+    crx: true,
     configureServer(s) {
       server = s
     },

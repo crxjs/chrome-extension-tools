@@ -20,6 +20,7 @@ export const hybridFormat = (): CrxPlugin => {
   return {
     name: 'hybrid-format',
 
+    crx: true,
     configResolved(config) {
       isViteServe = config.command === 'serve'
       config.plugins.forEach((p) => plugins.add(p))

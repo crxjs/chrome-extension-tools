@@ -11,6 +11,7 @@ export const esmBackground = (): CrxPlugin => {
 
   return {
     name: 'esm-background',
+    crx: true,
     configureServer(s) {
       server = s
     },

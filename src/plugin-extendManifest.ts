@@ -4,6 +4,7 @@ export const extendManifest = ({
   extendManifest,
 }: ChromeExtensionOptions): CrxPlugin => ({
   name: 'extend-manifest',
+  crx: true,
   transformCrxManifest(manifest) {
     let newManifest = manifest
     if (typeof extendManifest === 'function') {

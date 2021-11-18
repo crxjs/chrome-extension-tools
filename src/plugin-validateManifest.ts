@@ -75,10 +75,12 @@ const runValidator = mem((manifest: Manifest) => {
 
 export const preValidateManifest = (): CrxPlugin => ({
   name: 'validate-manifest',
+  crx: true,
   transformCrxManifest: runValidator,
 })
 
 export const validateManifest = (): CrxPlugin => ({
   name: 'validate-manifest',
+  crx: true,
   renderCrxManifest: runValidator,
 })

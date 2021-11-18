@@ -13,6 +13,7 @@ export const simpleReloader = (): CrxPlugin => {
 
   return {
     name: 'simple-reloader',
+    crx: true,
     transformCrxManifest(manifest) {
       if (!this.meta.watchMode) return null
 

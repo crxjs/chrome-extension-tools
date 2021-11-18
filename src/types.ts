@@ -170,7 +170,10 @@ type CreateCrxHooks<THooks> = {
 export type CrxHooks = CreateCrxHooks<CrxHookTypes>
 
 export type CrxPlugin = VitePlugin &
-export type RPCEPlugin = VitePlugin & RPCEHooks
+  CrxHooks & {
+    /** This prop is required to ensure during serve mode that written files use the same plugin */
+    crx?: boolean
+  }
 
 export interface ChromeExtensionOptions {
   /**

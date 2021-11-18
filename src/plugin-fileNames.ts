@@ -11,6 +11,7 @@ export const assetFileNames = 'assets/[name]-[hash].[ext]'
  */
 export const fileNames = (): CrxPlugin => ({
   name: 'file-names',
+  crx: true,
   outputOptions(options) {
     // Entries must be in original location
     return {
