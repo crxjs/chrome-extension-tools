@@ -57,7 +57,7 @@ test('writes entry points to disk', async () => {
 
   const contentPath = path.join(outDir, content)
   const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatch("console.log('content script')")
+  expect(contentSource).toMatchSnapshot()
 
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')

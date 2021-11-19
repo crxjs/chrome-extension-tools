@@ -15,7 +15,6 @@ export const hybridFormat = (): CrxPlugin => {
   let isViteServe = false
   let files: Map<string, CompleteFile>
   let root = process.cwd()
-  const plugins = new Set<CrxPlugin>()
 
   return {
     name: 'hybrid-format',
@@ -23,13 +22,10 @@ export const hybridFormat = (): CrxPlugin => {
     crx: true,
     configResolved(config) {
       isViteServe = config.command === 'serve'
-      config.plugins.forEach((p) => plugins.add(p))
     },
 
     buildStart(options) {
-      options.plugins?.forEach((p) => plugins.add(p))
-
-      const { api } = Array.from(plugins).find(
+      const { api } = (options.plugins as CrxPlugin[]).find(
         ({ name }) => name === 'chrome-extension',
       )!
 
