@@ -1,8 +1,4 @@
-import {
-  EmittedFile,
-  RollupOptions,
-  RollupWatcherEvent,
-} from 'rollup'
+import { EmittedFile, RollupWatcherEvent } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { createModel } from 'xstate/lib/model'
 import { CrxPlugin } from './types'
@@ -12,7 +8,7 @@ export const serverHook = 'configureServer'
 export const optionsHook = 'buildStart'
 
 interface Context {
-  options?: RollupOptions
+  /** CrxPlugins to be shared between serve and Rollup watch */
   plugins: CrxPlugin[]
   server?: ViteDevServer
 }
@@ -28,10 +24,9 @@ const context: Context = {
 
 export const model = createModel(context, {
   events: {
-    HOOK_START: (hookName: keyof CrxPlugin, args: any[]) => ({
-      hookName,
-      args,
-    }),
+    /** CrxPlugins to be shared between serve and Rollup watch */
+    PLUGINS: (plugins: CrxPlugin[]) => ({ plugins }),
+    SERVER: (server: ViteDevServer) => ({ server }),
     SERVER_READY: () => ({}),
     BUNDLE_START: (
       event: Extract<
@@ -54,33 +49,18 @@ export const machine = model.createMachine({
   states: {
     configuring: {
       on: {
-        HOOK_START: [
-          {
-            cond: (context, { hookName }) =>
-              hookName === pluginsHook,
-            actions: model.assign({
-              plugins: (context, { args: [{ plugins }] }) =>
-                plugins,
-            }),
-          },
-          {
-            cond: (context, { hookName }) =>
-              hookName === optionsHook,
-            actions: model.assign({
-              options: ({ options }, { args: [opts] }) =>
-                options ?? opts,
-            }),
-          },
-          {
-            cond: (context, { hookName }) =>
-              hookName === serverHook,
-            target: '.waiting',
-            actions: model.assign({
-              server: (context, { args: [server] }) => server,
-            }),
-          },
-        ],
-        SERVER_READY: 'serving',
+        PLUGINS: {
+          actions: model.assign({
+            plugins: (context, { plugins }) => plugins,
+          }),
+        },
+        SERVER: {
+          target: '.waiting',
+          actions: model.assign({
+            server: (context, { server }) => server,
+          }),
+        },
+        SERVER_READY: 'watching',
       },
       initial: 'starting',
       states: {
@@ -90,7 +70,7 @@ export const machine = model.createMachine({
         },
       },
     },
-    serving: {
+    watching: {
       invoke: { src: 'rollupWatch' },
       initial: 'working',
       states: {

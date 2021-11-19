@@ -106,7 +106,7 @@ export const chromeExtension = (
     builtinPluginsDone = true
   }
 
-  const allPlugins = new Set<CrxPlugin>(builtins)
+  const allPlugins = new Set<CrxPlugin>()
   function setupPluginsRunner(
     this: PluginContext,
     hook: CrxHookType,
@@ -196,11 +196,6 @@ export const chromeExtension = (
       const plugins = config.plugins as Writeable<
         typeof config.plugins
       >
-
-      // Save user plugins to run Crx hooks in buildStart
-      plugins
-        .filter(not(isRPCE))
-        .forEach((p) => p && allPlugins.add(p))
 
       // Add plugins to Vite config in serve mode
       // Otherwise, add them to Rollup options
