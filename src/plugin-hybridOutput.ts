@@ -60,37 +60,6 @@ export const hybridFormat = (): CrxPlugin => {
           relative(root, generateFileNames(id).outputFileName),
       )
 
-      /**
-       * Problem: Vite Serve provides environment variables on `import.meta.env` as an object:
-       *
-       * ```javascript
-       * import.meta.env = { ... }
-       * ```
-       *
-       * When Rollup transpiles ESM to IIFE, `import.meta.env` is replaced with `undefined`:
-       *
-       * ```javascript
-       * undefined = { ... } // invalid JavaScript!
-       * ```
-       *
-       * This mini plugin patches that behavior:
-       *
-       * ```javascript
-       * let __importMetaEnv;
-       * __importMetaEnv = { ... }
-       * ```
-       *
-       * REPL: https://replit.com/@jacksteamdev/rollup-repro-plugin-intro#rollup.config.js
-       */
-      const viteServeImportMetaEnv: Plugin = {
-        name: 'fix-vite-serve-import-meta-env',
-        intro: 'let __importMetaEnv;',
-        resolveImportMeta(prop) {
-          if (prop === 'env') return '__importMetaEnv'
-          return null
-        },
-      }
-
       const contentScripts = await Promise.all(
         contentScriptJsFileNames.map((input) =>
           regenerateBundle
@@ -104,9 +73,6 @@ export const hybridFormat = (): CrxPlugin => {
                 onwarn: (warning) => this.warn(warning),
                 output: {
                   format: 'iife',
-                  plugins: isViteServe
-                    ? [viteServeImportMetaEnv]
-                    : undefined,
                   sourcemap,
                 },
               },
