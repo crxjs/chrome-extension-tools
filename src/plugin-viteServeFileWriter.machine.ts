@@ -71,7 +71,7 @@ export const machine = model.createMachine({
       },
     },
     watching: {
-      invoke: { src: 'rollupWatch' },
+      invoke: { src: 'fileWriter' },
       initial: 'working',
       states: {
         working: {
