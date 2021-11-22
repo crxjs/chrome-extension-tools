@@ -2,23 +2,23 @@ import cheerio from 'cheerio'
 import { ViteDevServer } from 'vite'
 import { isNumber } from './helpers'
 import { dirname, join, relative } from './path'
-import { findCrx } from './plugin_helpers'
+import { getRpceAPI } from './plugin_helpers'
 import { CrxPlugin } from './types'
 
 export const htmlPaths = (): CrxPlugin => {
   let server: ViteDevServer | undefined
-  let root: string
+  let root: string | undefined
   return {
     name: 'html-paths',
     crx: true,
     configResolved({ plugins }) {
-      root = findCrx(plugins)?.api.root
+      root = getRpceAPI(plugins)?.root
     },
     configureServer(s) {
       server = s
     },
     buildStart({ plugins = [] }) {
-      root = root ?? findCrx(plugins)?.api.root
+      root = root ?? getRpceAPI(plugins)?.root
     },
     renderCrxHtml(source, { id }) {
       const $ = cheerio.load(source)
@@ -33,7 +33,7 @@ export const htmlPaths = (): CrxPlugin => {
           let result: string
           const { port } = server?.config.server ?? {}
           if (isNumber(port)) {
-            const relPath = relative(root, id)
+            const relPath = relative(root!, id)
             const relDir = dirname(relPath)
             const urlBase = `http://localhost:${port}`
             const urlPath =
