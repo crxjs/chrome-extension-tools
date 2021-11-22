@@ -12,7 +12,6 @@ import { CompleteFile, CrxPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
 export const hybridFormat = (): CrxPlugin => {
-  let isViteServe = false
   let files: Map<string, CompleteFile>
   let root = process.cwd()
 
@@ -20,9 +19,6 @@ export const hybridFormat = (): CrxPlugin => {
     name: 'hybrid-format',
 
     crx: true,
-    configResolved(config) {
-      isViteServe = config.command === 'serve'
-    },
 
     buildStart(options) {
       const { api } = (options.plugins as CrxPlugin[]).find(
