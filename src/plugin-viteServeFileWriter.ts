@@ -22,7 +22,7 @@ import { narrowEvent, useConfig } from './xstate_helpers'
 const service = interpret(
   machine.withConfig({
     services: {
-      rollupWatch:
+      fileWriter:
         ({ plugins: watchPlugins, server }) =>
         (send) => {
           const {
@@ -35,9 +35,13 @@ const service = interpret(
           let watcher: RollupWatcher | undefined
           ;(async () => {
             // get build config
+            console.log(
+              `> Resolving CRX watch config from "${configFile}"`,
+            )
+
             const {
               plugins: buildPlugins,
-              build: { rollupOptions, watchOptions },
+              build: { rollupOptions, watch: watchOptions },
             } = await resolveConfig(
               { configFile },
               'build',
@@ -52,9 +56,15 @@ const service = interpret(
               watchPlugins,
             )
 
-            // replace build RPCE with watch RPCE
-            const watchRPCE = watchPlugins.find(isRPCE)
-            plugins.map((p) => (isRPCE(p) ? watchRPCE : p))
+            const watchRPCE = watchPlugins.find(isRPCE)!
+            plugins.forEach((p, i) => {
+              if (isRPCE(p)) {
+                // replace build RPCE with watch RPCE
+                ;(plugins as CrxPlugin[])[i] = watchRPCE
+                // stop the build RPCE service
+                p.api.service.stop()
+              }
+            })
 
             const options: RollupWatchOptions = {
               ...rollupOptions,
