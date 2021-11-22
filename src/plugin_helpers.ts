@@ -1,5 +1,7 @@
+import { Interpreter } from 'xstate'
+import type { machine } from './files.machine'
 import { join, parse } from './path'
-import { CrxPlugin } from './types'
+import { CompleteFile, CrxPlugin } from './types'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
 
@@ -19,10 +21,19 @@ export const isRPCE = (
 ) => !!(p && p.name === 'chrome-extension')
 
 // TODO: replace this with getCrxApi
-export function findCrx(
-  plugins: readonly CrxPlugin[],
-): CrxPlugin | undefined {
-  return plugins.find(isRPCE)
+export function getRpceAPI(plugins: readonly CrxPlugin[]):
+  | {
+      files: Map<
+        string,
+        CompleteFile & {
+          source?: string | Uint8Array | undefined
+        }
+      >
+      readonly root: string
+      service: Interpreter<typeof machine>
+    }
+  | undefined {
+  return plugins.find(isRPCE)?.api
 }
 
 /**

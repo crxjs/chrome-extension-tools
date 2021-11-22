@@ -7,7 +7,7 @@ import {
 } from 'rollup'
 import { isChunk } from './helpers'
 import { dirname, join, parse, relative } from './path'
-import { generateFileNames } from './plugin_helpers'
+import { generateFileNames, getRpceAPI } from './plugin_helpers'
 import { CompleteFile, CrxPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
@@ -21,9 +21,7 @@ export const hybridFormat = (): CrxPlugin => {
     crx: true,
 
     buildStart(options) {
-      const { api } = (options.plugins as CrxPlugin[]).find(
-        ({ name }) => name === 'chrome-extension',
-      )!
+      const api = getRpceAPI(options.plugins)!
 
       files = api.files
       root = api.root
