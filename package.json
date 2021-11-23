@@ -33,8 +33,10 @@
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.1",
+    "@types/acorn": "^4.0.6",
     "@types/csp-dev": "^1.0.0",
     "@types/lodash": "^4.14.172",
+    "acorn-walk": "^8.2.0",
     "ajv": "^8.6.2",
     "array-flat-polyfill": "^1.0.1",
     "cheerio": "1.0.0-rc.10",
