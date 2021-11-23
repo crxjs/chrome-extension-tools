@@ -11,3 +11,8 @@ exports[`writes entry points to disk 1`] = `
 })();
 "
 `;
+
+exports[`writes entry points to disk 2`] = `
+"console.log(\\"service_worker.js\\");
+"
+`;
