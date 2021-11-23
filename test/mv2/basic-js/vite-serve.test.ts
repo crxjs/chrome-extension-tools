@@ -75,7 +75,5 @@ test('writes entry points to disk', async () => {
     backgroundPath,
     'utf8',
   )
-  expect(backgroundSource).toMatch(
-    `http://localhost:${port}/background.js`,
-  )
+  expect(backgroundSource).toMatch('./background.js')
 })

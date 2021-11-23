@@ -67,7 +67,7 @@ export const chromeExtension = (
     CompleteFile & { source?: string | Uint8Array }
   >()
 
-  let isViteServe = false
+  let isViteServe: boolean
   const builtins: CrxPlugin[] = [
     validateManifest(),
     xstateCompat(),
@@ -138,6 +138,15 @@ export const chromeExtension = (
     })
   }
 
+  // Vite and Jest resolveConfig behavior is different
+  // In Vite, the config module is imported twice as two different modules
+  // In Jest, not only is the config module the same,
+  //   the same plugin return value is used ¯\_(ツ)_/¯
+  // The Vite hooks should only run once, regardless
+  let viteConfigHook: boolean,
+    viteConfigResolvedHook: boolean,
+    viteServerHook: boolean
+
   return {
     name: 'chrome-extension',
 
@@ -152,6 +161,9 @@ export const chromeExtension = (
     },
 
     async config(config, env) {
+      if (viteConfigHook) return
+      else viteConfigHook = true
+
       isViteServe = env.command === 'serve'
 
       // Vite ignores changes to config.plugin, so we add them in configResolved
@@ -168,6 +180,9 @@ export const chromeExtension = (
     },
 
     async configureServer(server) {
+      if (viteServerHook) return
+      else viteServerHook = true
+
       const cbs = new Set<() => void | Promise<void>>()
       for (const b of builtins) {
         const result = await b?.configureServer?.call(
@@ -189,6 +204,9 @@ export const chromeExtension = (
     },
 
     async configResolved(config) {
+      if (viteConfigResolvedHook) return
+      else viteConfigResolvedHook = true
+
       /**
        * Vite ignores replacements of `config.plugins`,
        * so we need to change the array in place.

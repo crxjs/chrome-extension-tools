@@ -35,7 +35,7 @@ test('writes entry points to disk', async () => {
   const manifest = 'manifest.json'
   const popup = 'popup.html'
   const content = 'content.js'
-  const worker = 'service_worker.esm-wrapper.js'
+  const worker = 'service_worker.js'
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
@@ -46,6 +46,7 @@ test('writes entry points to disk', async () => {
     },
     background: {
       service_worker: worker,
+      type: 'module',
     },
     content_scripts: [
       {
@@ -67,7 +68,5 @@ test('writes entry points to disk', async () => {
 
   const workerPath = path.join(outDir, worker)
   const workerSource = await fs.readFile(workerPath, 'utf8')
-  expect(workerSource).toMatch(
-    `import "http://localhost:${port}/service_worker.js"`,
-  )
+  expect(workerSource).toMatchSnapshot()
 })
