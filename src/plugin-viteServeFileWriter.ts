@@ -14,7 +14,11 @@ import {
   machine,
   model,
 } from './plugin-viteServeFileWriter.machine'
-import { combinePlugins, isRPCE } from './plugin_helpers'
+import {
+  combinePlugins,
+  getRpceAPI,
+  isRPCE,
+} from './plugin_helpers'
 import { CrxPlugin } from './types'
 import { narrowEvent, useConfig } from './xstate_helpers'
 
@@ -202,11 +206,9 @@ export function viteServeFileWriter(): CrxPlugin {
       service.start()
 
       // HTML script modules will be served, not emitted
-      config.plugins
-        .find(isRPCE)!
-        .api.service.send(
-          filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
-        )
+      getRpceAPI(config.plugins)!.service.send(
+        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+      )
 
       const watchPlugins: CrxPlugin[] = []
       config.plugins.forEach((servePlugin: CrxPlugin, i) => {
@@ -220,7 +222,7 @@ export function viteServeFileWriter(): CrxPlugin {
           return
         }
 
-        // Don't touch non-crx plugins
+        // Don't touch other non-crx plugins
         if (!servePlugin.crx) return
 
         // Shallow clone crx plugins for Rollup Watch
