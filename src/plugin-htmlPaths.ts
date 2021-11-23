@@ -11,9 +11,7 @@ export const htmlPaths = (): CrxPlugin => {
   return {
     name: 'html-paths',
     crx: true,
-    configResolved({ plugins }) {
-      root = getRpceAPI(plugins)?.root
-    },
+    enforce: 'post',
     configureServer(s) {
       server = s
     },
