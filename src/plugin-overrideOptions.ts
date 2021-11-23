@@ -7,13 +7,11 @@ export const assetFileNames = 'assets/[name]-[hash].[ext]'
 /**
  * Vite sets its own opinionated file names that don't work for a Chrome extension
  * This overwrites them with file names that make sense for our purposes
- * TODO: explore relaxing this constraint
  */
-export const fileNames = (): CrxPlugin => ({
-  name: 'file-names',
+export const overrideOptions = (): CrxPlugin => ({
+  name: 'configure-output-options',
   crx: true,
   outputOptions(options) {
-    // Entries must be in original location
     return {
       ...options,
       assetFileNames,
