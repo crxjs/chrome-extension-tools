@@ -1,7 +1,14 @@
+import CSP from 'csp-dev'
+import { set } from 'lodash'
 import { Interpreter } from 'xstate'
 import type { machine } from './files.machine'
 import { join, parse } from './path'
-import { CompleteFile, CrxPlugin } from './types'
+import {
+  CompleteFile,
+  CrxPlugin,
+  isMV2,
+  Manifest,
+} from './types'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
 
@@ -85,4 +92,36 @@ export function combinePlugins(
   result.push(...postPlugins)
 
   return result
+}
+
+const defaultSrc = ['self']
+export function addToCspScriptSrc(
+  manifest: Manifest,
+  srcs: string[],
+): Manifest {
+  const csp = isMV2(manifest)
+    ? manifest.content_security_policy
+    : manifest.content_security_policy?.extension_pages
+  const parser = new CSP(csp)
+  const scriptSrc =
+    parser.share('json')['script-src'] ?? defaultSrc
+  const objectSrc =
+    parser.share('json')['object-src'] ?? defaultSrc
+
+  parser.newDirective('script-src', [...scriptSrc, ...srcs])
+  parser.newDirective('object-src', objectSrc)
+
+  const result = parser.share('string')
+
+  if (isMV2(manifest)) {
+    set(manifest, 'content_security_policy', result)
+  } else {
+    set(
+      manifest,
+      'content_security_policy.extension_pages',
+      result,
+    )
+  }
+
+  return manifest
 }
