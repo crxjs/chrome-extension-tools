@@ -1,13 +1,13 @@
 import CSP from 'csp-dev'
 import { set } from 'lodash'
-import { ViteDevServer } from 'vite'
+import { HmrOptions } from 'vite'
 import { isUndefined } from './helpers'
-import { isMV2, CrxPlugin } from './types'
+import { CrxPlugin, isMV2 } from './types'
 
 const defaultSrc = ['self']
 
-function addViteServerToScriptSrc(
-  serverUrl: string,
+function addUrlToScriptSrc(
+  url: string,
   csp?: string,
 ): string | undefined {
   const parser = new CSP(csp)
@@ -16,30 +16,40 @@ function addViteServerToScriptSrc(
   const objectSrc =
     parser.share('json')['object-src'] ?? defaultSrc
 
-  parser.newDirective('script-src', [...scriptSrc, serverUrl])
+  parser.newDirective('script-src', [...scriptSrc, url])
   parser.newDirective('object-src', objectSrc)
 
   return parser.share('string')
 }
 
-export const viteServeCsp = (): CrxPlugin => {
-  let server: ViteDevServer | undefined
+/**
+ * Configures the manifest and ViteDevServer for HMR
+ */
+export const configureViteServeHmr = (): CrxPlugin => {
+  let serverPort: number | undefined
   return {
     name: 'vite-serve-csp',
     crx: true,
-    configureServer(s) {
-      server = s
+    configureServer(server) {
+      const { hmr, port } = server.config.server
+      serverPort = port
+
+      // Set host to localhost for HMR websocket
+      // (default is CRX origin, which ofc doesn't work)
+      const hmrConfig: HmrOptions =
+        typeof hmr === 'boolean' || !hmr ? {} : hmr
+      hmrConfig.host = hmrConfig.host ?? 'localhost'
+      server.config.server.hmr = hmrConfig
     },
     renderCrxManifest(manifest) {
-      const { port } = server?.config.server ?? {}
-      if (isUndefined(port)) return manifest
+      if (isUndefined(serverPort)) return manifest
 
-      const serverUrl = `http://localhost:${port}`
+      const serverUrl = `http://localhost:${serverPort}`
       if (isMV2(manifest)) {
         set(
           manifest,
           'content_security_policy',
-          addViteServerToScriptSrc(
+          addUrlToScriptSrc(
             serverUrl,
             manifest.content_security_policy,
           ),
@@ -48,7 +58,7 @@ export const viteServeCsp = (): CrxPlugin => {
         set(
           manifest,
           'content_security_policy.extension_pages',
-          addViteServerToScriptSrc(
+          addUrlToScriptSrc(
             serverUrl,
             manifest.content_security_policy?.extension_pages,
           ),
