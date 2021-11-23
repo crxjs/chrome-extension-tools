@@ -8,8 +8,8 @@ export const assetFileNames = 'assets/[name]-[hash].[ext]'
  * Vite sets its own opinionated file names that don't work for a Chrome extension
  * This overwrites them with file names that make sense for our purposes
  */
-export const overrideOptions = (): CrxPlugin => ({
-  name: 'configure-output-options',
+export const configureRollupOptions = (): CrxPlugin => ({
+  name: 'configure-rollup-options',
   crx: true,
   outputOptions(options) {
     return {
