@@ -42,7 +42,7 @@ import type {
 import { waitForState } from './xstate_helpers'
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { xstateCompat } from './plugin-xstateCompat'
-// import { htmlInlineScripts } from './plugin-htmlInlineScripts'
+import { cspAddInlineScriptHash } from './plugin-cspAddInlineScriptHash'
 
 export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
@@ -83,8 +83,7 @@ export const chromeExtension = (
     htmlScriptSrcUrls(),
     transformIndexHtml(),
     configureViteServeHmr(),
-    // TODO: enable when ready
-    // htmlInlineScripts(),
+    cspAddInlineScriptHash(),
   ]
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
