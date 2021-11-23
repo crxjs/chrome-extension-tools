@@ -5,11 +5,11 @@ import { dirname, join, relative } from './path'
 import { getRpceAPI } from './plugin_helpers'
 import { CrxPlugin } from './types'
 
-export const htmlPaths = (): CrxPlugin => {
+export const htmlScriptSrcUrls = (): CrxPlugin => {
   let server: ViteDevServer | undefined
   let root: string | undefined
   return {
-    name: 'html-paths',
+    name: 'html-script-src-urls',
     crx: true,
     enforce: 'post',
     configureServer(s) {
