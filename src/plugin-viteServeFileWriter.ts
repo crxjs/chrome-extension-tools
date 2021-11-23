@@ -62,7 +62,12 @@ const service = interpret(
 
             const watchRPCE = watchPlugins.find(isRPCE)!
             plugins.forEach((p, i) => {
-              if (isRPCE(p)) {
+              // Vite and Jest resolveConfig behavior is different
+              // In Vite, the config module is imported twice as two different modules
+              // In Jest, not only is the config module the same,
+              //   the same plugin return value is used ¯\_(ツ)_/¯
+              // So we need to check that RPCE is not the same object
+              if (isRPCE(p) && watchRPCE !== p) {
                 // replace build RPCE with watch RPCE
                 ;(plugins as CrxPlugin[])[i] = watchRPCE
                 // stop the build RPCE service
