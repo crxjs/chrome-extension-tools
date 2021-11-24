@@ -1,4 +1,5 @@
 import { filesReady } from '$src/plugin-viteServeFileWriter'
+import { Manifest } from '$src/types'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -36,14 +37,13 @@ test('writes entry points to disk', async () => {
   const popup = 'pages/popup/index.html'
 
   const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
+  const manifestSource: Manifest = await fs.readJson(
+    manifestPath,
+  )
 
-  expect(manifestSource).toMatchObject({
-    browser_action: {
-      default_popup: popup,
-    },
-    content_security_policy: `script-src 'self' http://localhost:${port}; object-src 'self'`,
-  })
+  expect(manifestSource.content_security_policy).toMatch(
+    `script-src 'self' http://localhost:${port} 'sha256-HXMlWsq+oNLZssobp+7fA5nLeXdM2SRYQaP17p5P6Ws='; object-src 'self'`,
+  )
 
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')
@@ -52,7 +52,7 @@ test('writes entry points to disk', async () => {
   )
   expect(popupSource).toMatch(
     `
-import RefreshRuntime from "/@react-refresh"
+import RefreshRuntime from "http://localhost:${port}/@react-refresh"
 RefreshRuntime.injectIntoGlobalHook(window)
 window.$RefreshReg$ = () => {}
 window.$RefreshSig$ = () => (type) => type
