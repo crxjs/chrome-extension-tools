@@ -28,8 +28,6 @@ test('writes entry points to disk', async () => {
 
   await Promise.all([devServer.listen(), filesReady()])
 
-  const { port } = devServer.config.server
-
   expect(fs.existsSync(outDir)).toBe(true)
 
   const manifest = 'manifest.json'
@@ -58,15 +56,13 @@ test('writes entry points to disk', async () => {
 
   const contentPath = path.join(outDir, content)
   const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatchSnapshot()
+  expect(contentSource).toMatchSnapshot(content)
 
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')
-  expect(popupSource).toMatch(
-    `<script src="http://localhost:${port}/popup.jsx" type="module">`,
-  )
+  expect(popupSource).toMatchSnapshot(popup)
 
   const workerPath = path.join(outDir, worker)
   const workerSource = await fs.readFile(workerPath, 'utf8')
-  expect(workerSource).toMatchSnapshot()
+  expect(workerSource).toMatchSnapshot(worker)
 })

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`writes entry points to disk 1`] = `
+exports[`writes entry points to disk: content.js 1`] = `
 "(function () {
   'use strict';
 
@@ -12,7 +12,28 @@ exports[`writes entry points to disk 1`] = `
 "
 `;
 
-exports[`writes entry points to disk 2`] = `
+exports[`writes entry points to disk: popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <script type=\\"module\\" src=\\"/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\" />
+    <meta
+      name=\\"viewport\\"
+      content=\\"width=1000, initial-scale=1.0\\"
+    />
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"popup.jsx\\"></script>
+  </body>
+</html>
+"
+`;
+
+exports[`writes entry points to disk: service_worker.js 1`] = `
 "console.log(\\"service_worker.js\\");
 "
 `;
