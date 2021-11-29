@@ -37,7 +37,7 @@ beforeAll(async () => {
       ],
     },
   )) as ChromiumBrowserContext
-})
+}, 10000)
 
 afterAll(async () => {
   await browserContext?.close()
