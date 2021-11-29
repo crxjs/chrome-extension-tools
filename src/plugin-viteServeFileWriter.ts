@@ -213,12 +213,6 @@ export function viteServeFileWriter(): CrxPlugin {
 
       service.start()
 
-      // HTML script modules will be served, not emitted
-      getRpceAPI(config.plugins)!.service.send(
-        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
-        // TODO: serve html files in MV3?
-      )
-
       const watchPlugins: CrxPlugin[] = []
       config.plugins.forEach((servePlugin: CrxPlugin, i) => {
         if (isRPCE(servePlugin)) {
