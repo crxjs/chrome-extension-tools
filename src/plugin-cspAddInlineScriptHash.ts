@@ -19,11 +19,13 @@ interface AcornLiteral extends Node {
  * One of the main sources of inline script tags is @vitejs/plugin-react,
  * which adds a prelude to HTML pages as an inline script.
  *
- * [FAIL] Replace inline scripts with a script tag `src` attribute,
- * then resolve and load that path on the server.
+ * [MV2] Add a hash to the manifest CSP
  *
- * [IDEA] Add a hash to the manifest CSP, this will work in MV2, but not in MV3
- * [IDEA] Wrap script tags in a dynamic import script that loads them after inline scripts
+ * [MV3 IDEA] Replace inline scripts with a script tag `src` attribute,
+ * then resolve and load that path on the server.
+ * This will require some trickery in the SW to get the timing right.
+ * [MV3 IDEA] Wrap script tags in a dynamic import script that loads them after inline scripts.
+ * Is this implementation specific? Just use it with
  */
 export const cspAddInlineScriptHash = (): CrxPlugin => {
   let server: ViteDevServer

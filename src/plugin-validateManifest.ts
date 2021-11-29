@@ -73,12 +73,18 @@ const runValidator = mem((manifest: Manifest) => {
   )
 })
 
+/**
+ * Validates the manifest before transformation
+ */
 export const preValidateManifest = (): CrxPlugin => ({
   name: 'pre-validate-manifest',
   crx: true,
   transformCrxManifest: runValidator,
 })
 
+/**
+ * Validates the final output manifest
+ */
 export const validateManifest = (): CrxPlugin => ({
   name: 'validate-manifest',
   crx: true,
