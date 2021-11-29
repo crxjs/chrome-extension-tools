@@ -4,7 +4,7 @@ import MagicString from 'magic-string'
 import cheerio from 'cheerio'
 import { createHash } from 'crypto'
 import { addToCspScriptSrc } from './plugin_helpers'
-import { CrxPlugin } from './types'
+import { CrxPlugin, isMV2 } from './types'
 import { ViteDevServer } from 'vite'
 
 interface AcornLiteral extends Node {
@@ -28,6 +28,7 @@ interface AcornLiteral extends Node {
  * Is this implementation specific? Just use it with
  */
 export const cspAddInlineScriptHash = (): CrxPlugin => {
+  let mv2: boolean
   let server: ViteDevServer
   const scripts = new Set<string>()
 
@@ -38,7 +39,13 @@ export const cspAddInlineScriptHash = (): CrxPlugin => {
     configureServer(s) {
       server = s
     },
+    transformCrxManifest(manifest) {
+      mv2 = isMV2(manifest)
+      return null
+    },
     renderCrxHtml(source) {
+      if (!mv2) return
+
       const $ = cheerio.load(source)
 
       $('script[type="module"]')
@@ -75,6 +82,8 @@ export const cspAddInlineScriptHash = (): CrxPlugin => {
       return $.html()
     },
     renderCrxManifest(manifest) {
+      if (!mv2) return null
+
       const hashes = Array.from(scripts).map((script) => {
         const hash = createHash('sha256')
           .update(script)

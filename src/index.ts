@@ -42,7 +42,7 @@ import type {
 import { waitForState } from './xstate_helpers'
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { xstateCompat } from './plugin-xstateCompat'
-import { cspAddInlineScriptHash } from './plugin-cspAddInlineScriptHash'
+import { cspAddInlineScriptHash } from './plugin-htmlInlineScriptHashMV2'
 
 export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
