@@ -154,6 +154,8 @@ const service = interpret(
 // })
 
 /**
+ * Writes extension files during Vite serve.
+ *
  * The Vite dev server doesn't write files to the disk,
  * which is a requirement for Chrome Extension development.
  *
@@ -199,6 +201,7 @@ export function viteServeFileWriter(): CrxPlugin {
               lastError =
                 Error(format`Could not complete bundle because Vite did not pre-bundle a dependency.
               You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.
+
               Original Error: ${error.message}`)
             } else lastError = error
 
@@ -213,14 +216,15 @@ export function viteServeFileWriter(): CrxPlugin {
       // HTML script modules will be served, not emitted
       getRpceAPI(config.plugins)!.service.send(
         filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+        // TODO: serve html files in MV3?
       )
 
       const watchPlugins: CrxPlugin[] = []
       config.plugins.forEach((servePlugin: CrxPlugin, i) => {
         if (isRPCE(servePlugin)) {
-          // RPCE should only run in the inner Rollup Watch
+          // RPCE should only run in the inner Rollup Watch hooks
           watchPlugins.push(servePlugin)
-          // RPCE should not run in ViteDevServer
+          // RPCE should not run in ViteDevServer hooks
           ;(config.plugins as CrxPlugin[])[i] = {
             name: 'chrome-extension-replacement',
           }

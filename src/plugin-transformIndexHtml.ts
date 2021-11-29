@@ -9,6 +9,11 @@ import { isFunction, isString, isUndefined } from './helpers'
 import { parse } from './path'
 import { CrxPlugin } from './types'
 
+/**
+ * Applies Vite HTML hooks to all input HTML files (manifest or RollupOptions.input)
+ *
+ * Borrows heavily from Vite source code
+ */
 export const transformIndexHtml = (): CrxPlugin => {
   const preHooks = new Set<IndexHtmlTransformHook>()
   const postHooks = new Set<IndexHtmlTransformHook>()

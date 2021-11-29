@@ -9,6 +9,16 @@ const permTestEntries = Object.entries(permTests).filter(
   ([key]) => key !== 'default',
 )
 
+/**
+ * Auto Permissions CRX Plugin
+ *
+ * Tracks dynamically used permissions in code.
+ * Permissions used in served files are not currently included.
+ * Updates the manifest manually in generateBundle.
+ *
+ * TODO: Should we use the renderCrxManifest hook?
+ * TODO: Use a watched file to trigger a reload of the manifest?
+ */
 export const autoPerms = (): CrxPlugin => {
   const required = new Set<string>() // perms from manifest.permissions
   const excluded = new Set<string>() // except perms that start with "!"
@@ -40,6 +50,7 @@ export const autoPerms = (): CrxPlugin => {
 
       return manifest
     },
+    // renderChunk does not run in Vite Serve
     renderChunk(code) {
       updateLivePerms(code)
       return null

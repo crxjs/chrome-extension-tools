@@ -3,7 +3,13 @@ import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
 import { CrxPlugin, isMV2, isMV3 } from './types'
 
-/** Adds ESM support for the background page. Emits wrapper files and updates the manifest config. */
+/**
+ * Adds ESM support for the background page, since we want to regenerate as IIFE as few files as possible.
+ *
+ * Emits wrapper files and updates the manifest config.
+ *
+ * TODO: consider regenerating to IIFE for MV2 as option?
+ */
 export const esmBackground = (): CrxPlugin => {
   return {
     name: 'esm-background',

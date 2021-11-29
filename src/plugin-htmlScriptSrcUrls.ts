@@ -5,6 +5,13 @@ import { dirname, join, relative } from './path'
 import { getRpceAPI } from './plugin_helpers'
 import { CrxPlugin } from './types'
 
+/**
+ * Two concerns:
+ * Rewrites HTML script tag file extensions from JSX, TS, or TSX to JS
+ * Reroutes HTML script tags to localhost during Vite Serve
+ *
+ * TODO: separate this into two plugins
+ */
 export const htmlScriptSrcUrls = (): CrxPlugin => {
   let server: ViteDevServer | undefined
   let root: string | undefined

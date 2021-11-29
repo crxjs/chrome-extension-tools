@@ -1,5 +1,8 @@
 import { ChromeExtensionOptions, CrxPlugin } from './types'
 
+/**
+ * Implements plugin option `options.extendManifest`
+ */
 export const extendManifest = ({
   extendManifest,
 }: ChromeExtensionOptions): CrxPlugin => ({
