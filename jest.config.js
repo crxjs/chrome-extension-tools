@@ -33,6 +33,16 @@ module.exports = {
           }`,
         ]),
     ),
+    ...Object.fromEntries(
+      readdirSync(join(__dirname, 'src', 'service-worker'))
+        .filter((filename) => filename.startsWith('code-'))
+        .map((filename) => [
+          `code ./service-worker/${filename}`,
+          `<rootDir>/test/fixtures/${
+            filename.slice(0, -2) + 'js'
+          }`,
+        ]),
+    ),
   },
   reporters: ['default'],
   setupFilesAfterEnv: ['./jest.setup.ts'],

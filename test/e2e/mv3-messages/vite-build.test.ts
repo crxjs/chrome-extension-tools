@@ -1,4 +1,4 @@
-import { jestSetTimeout } from '$test/helpers/timeout'
+import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import {
@@ -50,7 +50,11 @@ test('CRX loads and runs successfully', async () => {
   page = await browserContext.newPage()
   await page.goto('https://google.com')
 
-  await page.waitForSelector('text="Content script loaded"')
+  await Promise.race([
+    page.waitForSelector('text="Content script loaded"'),
+    timeLimit(10000, 'Unable to load Chrome Extension'),
+  ])
+
   await page.waitForSelector('text="Background response"')
   await page.waitForSelector('text="Background OK"')
   await page.waitForSelector('text="Options page OK"')

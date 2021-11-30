@@ -4,7 +4,6 @@ import { Plugin } from 'vite'
 import { interpret } from 'xstate'
 import { machine, model } from './files.machine'
 import { SharedEvent } from './files.sharedEvents'
-import { narrowEvent, useConfig } from './xstate_helpers'
 import {
   getJsFilename,
   isString,
@@ -15,10 +14,14 @@ import { runPlugins } from './index_runPlugins'
 import { basename, isAbsolute, join, parse } from './path'
 import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
+import { configureRollupOptions } from './plugin-configureRollupOptions'
+import { configureViteServeHMRMV2 } from './plugin-configureViteServeHMRMV2'
+import { configureViteServeHMRMV3 } from './plugin-configureViteServeHMRMV3'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
-import { configureRollupOptions } from './plugin-configureRollupOptions'
+import { cspAddInlineScriptHash } from './plugin-htmlInlineScriptHashMV2'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
+import { htmlMapScriptsToLocalhostMV2 } from './plugin-htmlMapScriptsToLocalhostMV2'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
 import { transformIndexHtml } from './plugin-transformIndexHtml'
@@ -26,24 +29,25 @@ import {
   preValidateManifest,
   validateManifest,
 } from './plugin-validateManifest'
-import { configureViteServeHmr } from './plugin-configureViteServeHmr'
+import { viteServeFileWriter } from './plugin-viteServeFileWriter'
+import { xstateCompat } from './plugin-xstateCompat'
 import { isRPCE } from './plugin_helpers'
 import { stubId } from './stubId'
 import type {
   Asset,
   ChromeExtensionOptions,
   CompleteFile,
-  ManifestV2,
-  ManifestV3,
   CrxHookType,
   CrxPlugin,
+  ManifestV2,
+  ManifestV3,
   Writeable,
 } from './types'
-import { waitForState } from './xstate_helpers'
-import { viteServeFileWriter } from './plugin-viteServeFileWriter'
-import { xstateCompat } from './plugin-xstateCompat'
-import { cspAddInlineScriptHash } from './plugin-htmlInlineScriptHashMV2'
-import { htmlMapScriptsToLocalhostMV2 } from './plugin-htmlMapScriptsToLocalhostMV2'
+import {
+  narrowEvent,
+  useConfig,
+  waitForState,
+} from './xstate_helpers'
 
 export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
@@ -84,8 +88,9 @@ export const chromeExtension = (
     htmlMapScriptsToJS(),
     htmlMapScriptsToLocalhostMV2(),
     transformIndexHtml(),
-    configureViteServeHmr(),
+    configureViteServeHMRMV2(),
     cspAddInlineScriptHash(),
+    configureViteServeHMRMV3(),
   ]
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))

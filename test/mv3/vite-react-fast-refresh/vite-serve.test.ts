@@ -1,4 +1,5 @@
 import { filesReady } from '$src/plugin-viteServeFileWriter'
+import { Manifest } from '$src/types'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -32,39 +33,14 @@ test('writes entry points to disk', async () => {
 
   const manifest = 'manifest.json'
   const popup = 'popup.html'
-  const content = 'content.js'
-  const worker = 'service_worker.js'
 
   const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
-
-  expect(manifestSource).toMatchObject({
-    action: {
-      default_popup: popup,
-    },
-    background: {
-      service_worker: worker,
-      type: 'module',
-    },
-    content_scripts: [
-      {
-        js: [content],
-        matches: ['https://a.com/*', 'http://b.com/*'],
-      },
-    ],
-  })
-
-  const contentPath = path.join(outDir, content)
-  const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatchSnapshot(content)
+  const manifestSource: Manifest = await fs.readJson(
+    manifestPath,
+  )
+  expect(manifestSource.content_security_policy).toBeUndefined()
 
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')
-  expect(popupSource).toMatchSnapshot(popup)
-
-  const workerPath = path.join(outDir, worker)
-  const workerSource = await fs.readFile(workerPath, 'utf8')
-  expect(workerSource).toMatch(
-    `const localhostPort = JSON.parse("${devServer.config.server.port}");`,
-  )
+  expect(popupSource).toMatchSnapshot()
 })
