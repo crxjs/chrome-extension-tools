@@ -252,6 +252,7 @@ export function manifestInput(
           finalManifest = updateManifestV3(
             fullManifest,
             options,
+            wrapContentScripts,
             cache,
           )
         } else {

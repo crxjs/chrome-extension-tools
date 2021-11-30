@@ -12,6 +12,7 @@ export function getImportContentScriptFileName(target: string) {
 export function updateManifestV3(
   m: chrome.runtime.ManifestV3,
   options: RollupOptions,
+  wrapContentScripts: boolean,
   cache: ManifestInputPluginCache,
 ) {
   const manifest = cloneObject(m)
@@ -66,13 +67,15 @@ export function updateManifestV3(
         relative(cache.srcDir!, x),
       ),
     ]
-
-    manifest.content_scripts = manifest.content_scripts.map(
-      (c) => ({
-        ...c,
-        js: c.js?.map(getImportContentScriptFileName),
-      }),
-    )
+    
+    if (wrapContentScripts) {
+      manifest.content_scripts = manifest.content_scripts.map(
+        (c) => ({
+          ...c,
+          js: c.js?.map(getImportContentScriptFileName),
+        }),
+      )
+    }
 
     manifest.web_accessible_resources =
       manifest.web_accessible_resources ?? []
