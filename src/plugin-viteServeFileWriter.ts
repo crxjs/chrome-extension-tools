@@ -8,17 +8,12 @@ import {
 import { from } from 'rxjs'
 import { resolveConfig, ViteDevServer } from 'vite'
 import { interpret } from 'xstate'
-import { model as filesModel } from './files.machine'
 import { format } from './helpers'
 import {
   machine,
   model,
 } from './plugin-viteServeFileWriter.machine'
-import {
-  combinePlugins,
-  getRpceAPI,
-  isRPCE,
-} from './plugin_helpers'
+import { combinePlugins, isRPCE } from './plugin_helpers'
 import { CrxPlugin } from './types'
 import { narrowEvent, useConfig } from './xstate_helpers'
 
