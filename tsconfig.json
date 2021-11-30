@@ -11,6 +11,7 @@
     "lib",
     "playground",
     "src/browser",
+    "src/service-worker",
     "test/fixtures"
   ]
   // "typeAcquisition": { "enable": true }
