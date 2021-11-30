@@ -1,20 +1,22 @@
 import { filesReady } from '$src/plugin-viteServeFileWriter'
-import { timeout } from '$test/helpers/timeout'
+import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
-import { chromium, ChromiumBrowserContext } from 'playwright'
+import {
+  chromium,
+  ChromiumBrowserContext,
+  Page,
+} from 'playwright'
 import { createServer, ViteDevServer } from 'vite'
 
-const timeLimit = (ms: number, message: string) =>
-  new Promise((resolve, reject) => {
-    setTimeout(() => reject(new Error(message)), ms)
-  })
+jestSetTimeout(10000)
 
 const outDir = path.join(__dirname, 'dist-vite-serve')
 const dataDir = path.join(__dirname, 'chromium-data-dir-serve')
 
 let browserContext: ChromiumBrowserContext
 let devServer: ViteDevServer
+let page: Page
 beforeAll(async () => {
   await fs.remove(outDir)
 
@@ -46,32 +48,16 @@ afterAll(async () => {
   await fs.remove(dataDir)
 })
 
-test(
-  'MV3 CSP blocks localhost',
-  async () => {
-    const page = await browserContext.newPage()
-    await page.goto('https://google.com')
+test('CRX loads and runs successfully', async () => {
+  page = await browserContext.newPage()
+  await page.goto('https://google.com')
 
-    // await new Promise(() => {})
+  await Promise.race([
+    page.waitForSelector('text="Content script loaded"'),
+    timeLimit(10000, 'Unable to load Chrome Extension'),
+  ])
 
-    try {
-      await Promise.race([
-        page.waitForSelector('text="Content script loaded"'),
-        timeLimit(10000, 'Unable to load Chrome Extension'),
-      ])
-
-      await page.waitForSelector('text="Background response"')
-      await page.waitForSelector('text="Background OK"')
-      await Promise.race([
-        // Chromium Issue: https://bugs.chromium.org/p/chromium/issues/detail?id=1247690
-        page.waitForSelector('text="Options page OK"'),
-        timeLimit(10000, 'MV3 CSP is still broken'),
-      ])
-    } catch (error) {
-      return
-    }
-
-    throw new Error('MV3 CSP is ready!')
-  },
-  Math.max(25000, timeout),
-)
+  await page.waitForSelector('text="Background response"')
+  await page.waitForSelector('text="Background OK"')
+  await page.waitForSelector('text="Options page OK"')
+})

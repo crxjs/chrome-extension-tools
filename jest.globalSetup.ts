@@ -8,6 +8,18 @@ import bundleImports from 'rollup-plugin-bundle-imports'
 import { format } from './src/helpers'
 
 const browserCodeDirname = path.join(__dirname, 'src', 'browser')
+const browserCodeDirFiles = fs
+  .readdirSync(browserCodeDirname)
+  .filter((filename) => filename.startsWith('code-'))
+
+const swCodeDirname = path.join(
+  __dirname,
+  'src',
+  'service-worker',
+)
+const swCodeDirFiles = fs
+  .readdirSync(swCodeDirname)
+  .filter((filename) => filename.startsWith('code-'))
 
 const testFixtureDirname = path.join(
   __dirname,
@@ -15,9 +27,7 @@ const testFixtureDirname = path.join(
   'fixtures',
 )
 
-const entryFiles = fs
-  .readdirSync(browserCodeDirname)
-  .filter((filename) => filename.startsWith('code-'))
+const entryFiles = browserCodeDirFiles.concat(swCodeDirFiles)
 
 const config: RollupOptions = {
   input: entryFiles,
@@ -32,11 +42,17 @@ const config: RollupOptions = {
         return null
       },
       load(id) {
-        if (entryFiles.includes(id)) {
-          const importPath = path.join(browserCodeDirname, id)
-          return format`import { code } from 'code ${importPath}'
-                         export { code }`
+        let importPath: string | undefined
+        if (browserCodeDirFiles.includes(id)) {
+          importPath = path.join(browserCodeDirname, id)
+        } else if (swCodeDirFiles.includes(id)) {
+          importPath = path.join(swCodeDirname, id)
         }
+
+        if (importPath)
+          return format`import { code } from 'code ${importPath}'
+                       export { code }`
+
         return null
       },
     },

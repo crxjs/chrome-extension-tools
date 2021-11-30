@@ -1,17 +1,17 @@
 import { HmrOptions, ViteDevServer } from 'vite'
 import { isUndefined } from './helpers'
 import { addToCspScriptSrc } from './plugin_helpers'
-import { CrxPlugin } from './types'
+import { CrxPlugin, isMV3 } from './types'
 
 /**
  * Configures the manifest and ViteDevServer for HMR
  *
  * TODO: move this to an exported plugin for config purposes
  */
-export const configureViteServeHmr = (): CrxPlugin => {
+export const configureViteServeHMRMV2 = (): CrxPlugin => {
   let server: ViteDevServer
   return {
-    name: 'vite-serve-csp',
+    name: 'configure-vite-serve-hmr-mv2',
     crx: true,
     configureServer(s) {
       server = s
@@ -26,9 +26,8 @@ export const configureViteServeHmr = (): CrxPlugin => {
     },
     renderCrxManifest(manifest) {
       if (isUndefined(server)) return manifest
+      if (isMV3(manifest)) return null
 
-      // FIXME: this only works in MV2.
-      //   In MV3, we need to use the SW to support HMR
       const serverUrl = `http://localhost:${server.config.server.port}`
       addToCspScriptSrc(manifest, [serverUrl])
 
