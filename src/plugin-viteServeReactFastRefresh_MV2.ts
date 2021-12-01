@@ -14,37 +14,31 @@ interface AcornLiteral extends Node {
 }
 
 /**
- * Chrome Extensions don't support inline script tags.
+ * @vitejs/plugin-react adds a Fast Refresh prelude to HTML pages as an inline script.
+ * The prelude must run before any React code. An inline script guarantees this.
  *
- * One of the main sources of inline script tags is @vitejs/plugin-react,
- * which adds a prelude to HTML pages as an inline script.
+ * The Chrome Extension default CSP blocks inline script tags.
  *
- * [MV2] Add a hash to the manifest CSP
- *
- * [MV3 IDEA] Replace inline scripts with a script tag `src` attribute,
- * then resolve and load that path on the server.
- * This will require some trickery in the SW to get the timing right.
- * [MV3 IDEA] Wrap script tags in a dynamic import script that loads them after inline scripts.
- * Is this implementation specific? Just use it with
+ * In MV2, we can add a hash to the CSP to allow a specific script tag.
  */
-export const cspAddInlineScriptHash = (): CrxPlugin => {
-  let mv2: boolean
+export const viteServeReactFastRefresh_MV2 = (): CrxPlugin => {
+  let isDisabled: boolean
   let server: ViteDevServer
   const scripts = new Set<string>()
 
   return {
-    name: 'csp-add-inline-script-hash',
+    name: 'vite-serve-react-fast-refresh-mv2',
     crx: true,
     enforce: 'post',
     configureServer(s) {
       server = s
     },
     transformCrxManifest(manifest) {
-      mv2 = isMV2(manifest)
+      isDisabled = !isMV2(manifest)
       return null
     },
     renderCrxHtml(source) {
-      if (!mv2) return
+      if (isDisabled) return
 
       const $ = cheerio.load(source)
 
@@ -82,7 +76,7 @@ export const cspAddInlineScriptHash = (): CrxPlugin => {
       return $.html()
     },
     renderCrxManifest(manifest) {
-      if (!mv2) return null
+      if (isDisabled) return null
 
       const hashes = Array.from(scripts).map((script) => {
         const hash = createHash('sha256')

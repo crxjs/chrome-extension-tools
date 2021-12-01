@@ -1,13 +1,6 @@
-import {
-  registerInlineScript,
-  waitForInlineScripts,
-} from './handleInlineScripts'
-import { mapRequestsToLocalhost } from './mapRequestsToLocalhost'
-
-const localhostPort = JSON.parse('%VITE_SERVE_PORT%')
-
 // This fixes `self`'s type.
 declare const self: ServiceWorkerGlobalScope
+export {}
 
 self.skipWaiting()
 
@@ -17,26 +10,25 @@ self.addEventListener('fetch', (fetchEvent) => {
   // TODO: support served html files
   if (url.pathname.endsWith('.html')) return
 
-  // TODO: verify that all top level script requests are run before responses start coming in
-  const inlineId = url.searchParams.get('inline')
-  if (inlineId) registerInlineScript(inlineId)
-
-  const delayId = url.searchParams.get('delay')
-  const delay = delayId
-    ? waitForInlineScripts(delayId)
-    : Promise.resolve()
-
-  fetchEvent.respondWith(
-    (async () => {
-      // Point all HTTP requests except HTML to localhost
-      const response = await mapRequestsToLocalhost(
-        url.href,
-        localhostPort,
-      )
-      // Wait until converted inline scripts have loaded
-      // MV3 doesn't allow inline scripts
-      await delay
-      return response
-    })(),
-  )
+  fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
 })
+
+function mapRequestsToLocalhost(
+  requestUrl: string,
+): Response | PromiseLike<Response> {
+  const url = new URL(requestUrl)
+  url.protocol = 'http:'
+  url.host = 'localhost'
+  url.port = JSON.parse('%VITE_SERVE_PORT%')
+
+  return fetch(url.href).then(async (r) => {
+    const body = await r.text()
+    return new Response(body, {
+      headers: {
+        'Content-Type': url.pathname.endsWith('html')
+          ? 'text/html'
+          : 'text/javascript',
+      },
+    })
+  })
+}

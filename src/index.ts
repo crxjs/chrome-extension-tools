@@ -15,11 +15,12 @@ import { basename, isAbsolute, join, parse } from './path'
 import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
-import { configureViteServeHMRMV2 } from './plugin-configureViteServeHMRMV2'
-import { configureViteServeHMRMV3 } from './plugin-configureViteServeHMRMV3'
+import { viteServeHMR_MV2 } from './plugin-viteServeHMR_MV2'
+import { viteServeHMR_MV3 } from './plugin-viteServeHMR_MV3'
 import { esmBackground } from './plugin-esmBackground'
 import { extendManifest } from './plugin-extendManifest'
-import { cspAddInlineScriptHash } from './plugin-htmlInlineScriptHashMV2'
+import { viteServeReactFastRefresh_MV2 } from './plugin-viteServeReactFastRefresh_MV2'
+import { viteServeReactFastRefresh_MV3 } from './plugin-viteServeReactFastRefresh_MV3'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { htmlMapScriptsToLocalhostMV2 } from './plugin-htmlMapScriptsToLocalhostMV2'
 import { hybridFormat } from './plugin-hybridOutput'
@@ -88,9 +89,10 @@ export const chromeExtension = (
     htmlMapScriptsToJS(),
     htmlMapScriptsToLocalhostMV2(),
     transformIndexHtml(),
-    configureViteServeHMRMV2(),
-    cspAddInlineScriptHash(),
-    configureViteServeHMRMV3(),
+    viteServeHMR_MV2(),
+    viteServeReactFastRefresh_MV2(),
+    viteServeReactFastRefresh_MV3(),
+    viteServeHMR_MV3(),
   ]
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))

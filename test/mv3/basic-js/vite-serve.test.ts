@@ -65,6 +65,6 @@ test('writes entry points to disk', async () => {
   const workerPath = path.join(outDir, worker)
   const workerSource = await fs.readFile(workerPath, 'utf8')
   expect(workerSource).toMatch(
-    `const localhostPort = JSON.parse("${devServer.config.server.port}");`,
+    'fetchEvent.respondWith(mapRequestsToLocalhost(url.href))',
   )
 })

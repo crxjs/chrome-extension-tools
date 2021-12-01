@@ -4,11 +4,13 @@ import { addToCspScriptSrc } from './plugin_helpers'
 import { CrxPlugin, isMV3 } from './types'
 
 /**
- * Configures the manifest and ViteDevServer for HMR
+ * The Chrome Extension default CSP blocks remote code.
+ * Vite's version of HMR relies on network requests and module caching.
+ * We need to get our HTML scripts from localhost.
  *
- * TODO: move this to an exported plugin for config purposes
+ * In MV2, this is as simple as allowing localhost in the CSP.
  */
-export const configureViteServeHMRMV2 = (): CrxPlugin => {
+export const viteServeHMR_MV2 = (): CrxPlugin => {
   let server: ViteDevServer
   return {
     name: 'configure-vite-serve-hmr-mv2',
