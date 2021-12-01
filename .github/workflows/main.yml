@@ -59,9 +59,6 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-      - name: Build test fixtures
-        run: pnpm build:test
-
       - uses: willcaul/jest-github-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
