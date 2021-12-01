@@ -2,7 +2,7 @@
 
 exports[`writes entry points to disk 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>
-    <script type=\\"module\\" src=\\"/@vite/client?delay=true\\"></script>
+    <script type=\\"module\\" src=\\"/@vite/client\\"></script>
     <script type=\\"module\\" src=\\"/__inlineScript-eCXTfxjF5k.js\\"></script>
 
     <meta charset=\\"UTF-8\\">
