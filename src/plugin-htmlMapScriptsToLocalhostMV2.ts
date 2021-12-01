@@ -11,6 +11,8 @@ import { CrxPlugin, isMV2 } from './types'
  *
  * This is only useful for MV2 HMR, see this MV3 bug report:
  * https://bugs.chromium.org/p/chromium/issues/detail?id=1247690#c_ts1631117342
+ *
+ * TODO: This should be moved to src/plugin-viteServeHMR_MV2.ts
  */
 export const htmlMapScriptsToLocalhostMV2 = (): CrxPlugin => {
   let disablePlugin: boolean
