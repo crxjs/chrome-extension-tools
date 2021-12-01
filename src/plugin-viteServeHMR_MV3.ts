@@ -8,7 +8,7 @@ import { relative } from './path'
 import { getRpceAPI } from './plugin_helpers'
 import { CrxPlugin, isMV3 } from './types'
 
-const fetchHandlerModule = 'rpce-sw-fetch-handler-for-hmr.js'
+const fetchHandlerModule = 'crx-hmr-service-worker.js'
 
 /**
  * The Chrome Extension default CSP blocks remote code.

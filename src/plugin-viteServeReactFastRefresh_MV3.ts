@@ -6,13 +6,18 @@ import { CrxPlugin, isMV3 } from './types'
 import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScriptMessage.ts'
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
 
-const inlineScriptPrefix = '__inlineScript'
+const reactRegex = /[jt]sx/
+
+const inlineScriptPrefix = '@crx/inlineScript'
+const inlineScriptRegex = new RegExp(
+  `^.*${inlineScriptPrefix}-(.+?)$`,
+)
+
 /** Work with an id as a URL instance */
 const createStubURL = (id: string) => {
   const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
   return new URL('stub://stub' + pathnameAndSearch)
 }
-const reactRegex = /[jt]sx/
 
 /**
  * @vitejs/plugin-react adds a Fast Refresh prelude to HTML pages as an inline script.
@@ -98,7 +103,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
           hashesByScript.set(inlineScript, hash)
         }
 
-        $script.attr('src', `/${inlineScriptPrefix}-${hash}.js`)
+        $script.attr('src', `/${inlineScriptPrefix}-${hash}`)
         $script.html('')
       })
 
@@ -113,10 +118,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
     load(id) {
       if (disablePlugin) return null
       if (id.includes(inlineScriptPrefix)) {
-        const hash = id.replace(
-          new RegExp(`^.*${inlineScriptPrefix}-(.+?).js$`),
-          '$1',
-        )
+        const hash = id.replace(inlineScriptRegex, '$1')
         const script = scriptsByHash.get(hash)
         return script
       }
