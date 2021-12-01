@@ -7,9 +7,5 @@
     "noEmit": false
   },
   "include": ["../src"],
-  "exclude": [
-    "../**/__tests__/**/*",
-    "../src/plugin-reloader-simple/client",
-    "../src/manifest-input/browser"
-  ]
+  "exclude": ["../src/browser", "../src/service-worker"]
 }
