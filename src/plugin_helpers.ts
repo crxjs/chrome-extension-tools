@@ -1,7 +1,7 @@
 import CSP from 'csp-dev'
 import { set } from 'lodash'
 import { Interpreter } from 'xstate'
-import type { machine } from './files.machine'
+import type { machine as filesMachine } from './files.machine'
 import { join, parse } from './path'
 import {
   CompleteFile,
@@ -27,19 +27,23 @@ export const isRPCE = (
   p: CrxPlugin | null | false | undefined,
 ) => !!(p && p.name === 'chrome-extension')
 
-// TODO: replace this with getCrxApi
-export function getRpceAPI(plugins: readonly CrxPlugin[]):
-  | {
-      files: Map<
-        string,
-        CompleteFile & {
-          source?: string | Uint8Array | undefined
-        }
-      >
-      readonly root: string
-      service: Interpreter<typeof machine>
+export type RpceApi = {
+  /** A map of the emitted files */
+  files: Map<
+    string,
+    CompleteFile & {
+      source?: string | Uint8Array | undefined
     }
-  | undefined {
+  >
+  /** The updated root folder, derived from either the Vite config or the manifest dirname */
+  readonly root: string
+  /** The files service, used to send events from other plugins */
+  service: Interpreter<typeof filesMachine>
+}
+
+export function getRpceAPI(
+  plugins: readonly CrxPlugin[],
+): RpceApi | undefined {
   return plugins.find(isRPCE)?.api
 }
 

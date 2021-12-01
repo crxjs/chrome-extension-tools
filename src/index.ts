@@ -22,7 +22,6 @@ import { extendManifest } from './plugin-extendManifest'
 import { viteServeReactFastRefresh_MV2 } from './plugin-viteServeReactFastRefresh_MV2'
 import { viteServeReactFastRefresh_MV3 } from './plugin-viteServeReactFastRefresh_MV3'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
-import { htmlMapScriptsToLocalhostMV2 } from './plugin-htmlMapScriptsToLocalhostMV2'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
 import { transformIndexHtml } from './plugin-transformIndexHtml'
@@ -32,7 +31,7 @@ import {
 } from './plugin-validateManifest'
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { xstateCompat } from './plugin-xstateCompat'
-import { isRPCE } from './plugin_helpers'
+import { isRPCE, RpceApi } from './plugin_helpers'
 import { stubId } from './stubId'
 import type {
   Asset,
@@ -87,12 +86,11 @@ export const chromeExtension = (
     pluginOptions.browserPolyfill && browserPolyfill(),
     configureRollupOptions(),
     htmlMapScriptsToJS(),
-    htmlMapScriptsToLocalhostMV2(),
     transformIndexHtml(),
     viteServeHMR_MV2(),
+    viteServeHMR_MV3(),
     viteServeReactFastRefresh_MV2(),
     viteServeReactFastRefresh_MV3(),
-    viteServeHMR_MV3(),
   ]
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
@@ -155,18 +153,18 @@ export const chromeExtension = (
     viteConfigResolvedHook: boolean,
     viteServerHook: boolean
 
+  const api: RpceApi = {
+    files,
+    get root() {
+      return service.getSnapshot().context.root
+    },
+    service: service as any,
+  }
+
   return {
     name: 'chrome-extension',
 
-    api: {
-      files,
-      /** The updated root folder, derived from either the Vite config or the manifest dirname */
-      get root() {
-        return service.getSnapshot().context.root
-      },
-      /** The files service, used to send events from other plugins */
-      service,
-    },
+    api,
 
     async config(config, env) {
       if (viteConfigHook) return
