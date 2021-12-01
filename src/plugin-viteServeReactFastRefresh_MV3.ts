@@ -12,6 +12,7 @@ const createStubURL = (id: string) => {
   const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
   return new URL('stub://stub' + pathnameAndSearch)
 }
+const reactRegex = /[jt]sx/
 
 /**
  * @vitejs/plugin-react adds a Fast Refresh prelude to HTML pages as an inline script.
@@ -61,6 +62,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
       if ($inlineScripts.length > 0)
         $remoteScripts.attr('src', (i, value) => {
           const url = createStubURL(value)
+          if (!reactRegex.test(url.pathname)) return value
           url.searchParams.set('delay', 'true')
           const newSrc = url.pathname + url.search
           return newSrc
@@ -89,7 +91,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
             .slice(0, 10)
 
           const newScript = [inlineScript, messageCode].join(
-            '\n\n',
+            ';\n\n',
           )
 
           scriptsByHash.set(hash, newScript)
@@ -110,12 +112,13 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
     },
     load(id) {
       if (disablePlugin) return null
-      if (id.startsWith(inlineScriptPrefix)) {
+      if (id.includes(inlineScriptPrefix)) {
         const hash = id.replace(
           new RegExp(`^.*${inlineScriptPrefix}-(.+?).js$`),
-          '$2',
+          '$1',
         )
-        return scriptsByHash.get(hash)
+        const script = scriptsByHash.get(hash)
+        return script
       }
       if (id.includes('delay=true')) {
         const { pathname } = createStubURL(id)
