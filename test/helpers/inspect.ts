@@ -4,7 +4,7 @@
 import { inspect } from '@xstate/inspect/lib/server'
 import { Interpreter } from 'xstate'
 import * as WebSocket from 'ws'
-import { chromium } from 'playwright'
+import { chromium } from 'playwright-chromium'
 
 const xstateVizPort = parseInt(process.env.XSTATE_VIZ_PORT || '')
 if (Number.isInteger(xstateVizPort)) {

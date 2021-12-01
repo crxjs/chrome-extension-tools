@@ -2,7 +2,10 @@ import { filesReady } from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
-import { chromium, ChromiumBrowserContext } from 'playwright'
+import {
+  chromium,
+  ChromiumBrowserContext,
+} from 'playwright-chromium'
 import { createServer, ViteDevServer } from 'vite'
 
 jestSetTimeout(30000)

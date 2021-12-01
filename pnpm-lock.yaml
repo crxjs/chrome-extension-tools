@@ -62,7 +62,7 @@ specifiers:
   magic-string: ^0.25.7
   mem: ^6.0.1
   npm-run-all: ^4.1.5
-  playwright: ^1.13.1
+  playwright-chromium: ^1.17.0
   prettier: ^2.3.2
   react: ^17.0.2
   react-dom: ^17.0.2
@@ -150,7 +150,7 @@ devDependencies:
   jest-html-reporters: 1.2.1
   jest-in-case: 1.0.2
   npm-run-all: 4.1.5
-  playwright: 1.13.1
+  playwright-chromium: 1.17.0
   prettier: 2.3.2
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
@@ -2689,6 +2689,7 @@ packages:
 
   /@types/yauzl/2.9.2:
     resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
+    requiresBuild: true
     dependencies:
       '@types/node': 13.13.52
     dev: true
@@ -3372,9 +3373,9 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /commander/6.2.1:
-    resolution: {integrity: sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==}
-    engines: {node: '>= 6'}
+  /commander/8.3.0:
+    resolution: {integrity: sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==}
+    engines: {node: '>= 12'}
     dev: true
 
   /commondir/1.0.1:
@@ -4502,6 +4503,10 @@ packages:
       get-intrinsic: 1.1.1
       has: 1.0.3
       side-channel: 1.0.4
+    dev: true
+
+  /ip/1.1.5:
+    resolution: {integrity: sha1-vd7XARQpCCjAoDnnLvJfWq7ENUo=}
     dev: true
 
   /is-arrayish/0.2.1:
@@ -5806,13 +5811,25 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /playwright/1.13.1:
-    resolution: {integrity: sha512-pGbILcUV1+Yx0fcRJZBEIsqTDjQSwGYkJ4tVUQUtuAyMuHg5B++Nasl+pIeIJRMqKSWTyvZfPxJuPIGsLJgiFg==}
+  /playwright-chromium/1.17.0:
+    resolution: {integrity: sha512-DTQFbEzPcEWTlY6vNpbBM6P0l5dpXwWhgZ3TGDrfgCQSwLvwyIjlnlR/vcsHKRUDiyLzPHXkpdbuSKkfi6bP/w==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      commander: 6.2.1
+      playwright-core: 1.17.0
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+    dev: true
+
+  /playwright-core/1.17.0:
+    resolution: {integrity: sha512-9ZzKZwmK6G7O9+jtvIurL8efIbJQu3oW0kI4uuNreY3O2jQDWH6xNnD27HCaJN1/tHnw/OmdUC2AmMDZv3vNhQ==}
+    engines: {node: '>=12'}
+    hasBin: true
+    dependencies:
+      commander: 8.3.0
       debug: 4.3.2
       extract-zip: 2.0.1
       https-proxy-agent: 5.0.0
@@ -5823,8 +5840,10 @@ packages:
       proper-lockfile: 4.1.2
       proxy-from-env: 1.1.0
       rimraf: 3.0.2
+      socks-proxy-agent: 6.1.1
       stack-utils: 2.0.3
       ws: 7.5.3
+      yauzl: 2.10.0
       yazl: 2.5.1
     transitivePeerDependencies:
       - bufferutil
@@ -6299,6 +6318,30 @@ packages:
       ansi-styles: 3.2.1
       astral-regex: 1.0.0
       is-fullwidth-code-point: 2.0.0
+    dev: true
+
+  /smart-buffer/4.2.0:
+    resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
+    engines: {node: '>= 6.0.0', npm: '>= 3.0.0'}
+    dev: true
+
+  /socks-proxy-agent/6.1.1:
+    resolution: {integrity: sha512-t8J0kG3csjA4g6FTbsMOWws+7R7vuRC8aQ/wy3/1OWmsgwA68zs/+cExQ0koSitUDXqhufF/YJr9wtNMZHw5Ew==}
+    engines: {node: '>= 10'}
+    dependencies:
+      agent-base: 6.0.2
+      debug: 4.3.2
+      socks: 2.6.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /socks/2.6.1:
+    resolution: {integrity: sha512-kLQ9N5ucj8uIcxrDwjm0Jsqk06xdpBjGNQtpXy4Q8/QY2k+fY7nZH8CARy+hkbG+SGAovmzzuauCpBlb8FrnBA==}
+    engines: {node: '>= 10.13.0', npm: '>= 3.0.0'}
+    dependencies:
+      ip: 1.1.5
+      smart-buffer: 4.2.0
     dev: true
 
   /source-map-js/0.6.2:
