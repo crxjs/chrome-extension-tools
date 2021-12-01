@@ -1,11 +1,11 @@
 import cheerio from 'cheerio'
-import { code as swCode } from 'code ./service-worker/code-fetchHandlerForMV3HMR.ts'
 import { createHash } from 'crypto'
 import { ViteDevServer } from 'vite'
 import { format } from './helpers'
 import { CrxPlugin, isMV3 } from './types'
+import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScriptMessage.ts'
+import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
 
-const fetchHandlerModule = 'rpce-sw-fetch-handler-for-hmr.js'
 const inlineScriptPrefix = '__inlineScript'
 /** Work with an id as a URL instance */
 const createStubURL = (id: string) => {
@@ -38,6 +38,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
   return {
     name: 'configure-vite-serve-hmr-mv3',
     crx: true,
+    enforce: 'post',
     configureServer(s) {
       server = s
     },
@@ -87,7 +88,11 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
             .digest('base64')
             .slice(0, 10)
 
-          scriptsByHash.set(hash, inlineScript)
+          const newScript = [inlineScript, messageCode].join(
+            '\n\n',
+          )
+
+          scriptsByHash.set(hash, newScript)
           hashesByScript.set(inlineScript, hash)
         }
 
@@ -99,22 +104,25 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
     },
     resolveId(source) {
       if (disablePlugin) return null
-      if (source.endsWith(fetchHandlerModule))
-        return fetchHandlerModule
       if (source.startsWith(inlineScriptPrefix)) return source
+      if (source.includes('delay=true')) return source
       return null
     },
     load(id) {
       if (disablePlugin) return null
-      if (id === fetchHandlerModule)
-        return swCode.replace(
-          /%VITE_SERVE_PORT%/,
-          server.config.server.port!.toString(),
-        )
       if (id.startsWith(inlineScriptPrefix)) {
-        const url = createStubURL(id)
-        const hash = url.searchParams.get('hash')
-        return hash && scriptsByHash.get(hash)
+        const hash = id.replace(
+          new RegExp(`^.*${inlineScriptPrefix}-(.+?).js$`),
+          '$2',
+        )
+        return scriptsByHash.get(hash)
+      }
+      if (id.includes('delay=true')) {
+        const { pathname } = createStubURL(id)
+        return remoteScriptWrapper.replace(
+          '%REMOTE_SCRIPT_PATH%',
+          JSON.stringify(pathname),
+        )
       }
       return null
     },
