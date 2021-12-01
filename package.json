@@ -18,7 +18,6 @@
   ],
   "scripts": {
     "build": "rollup -c",
-    "build:test": "rollup -c test/fixtures/rollup.config.js",
     "build:types": "tsc -p tsconfigs/tsconfig-types.json",
     "dev:build": "rollup -c -w",
     "dev:lint": "npm run lint:types -- --watch",
