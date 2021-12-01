@@ -8,8 +8,9 @@ import { relative } from './path'
 import { getRpceAPI } from './plugin_helpers'
 import { CrxPlugin, isMV3 } from './types'
 import { createHash } from 'crypto'
+import { model as filesModel } from './files.machine'
 
-const fetchHandlerModule = '__sw-fetch-handler-for-hmr.js'
+const fetchHandlerModule = 'rpce-sw-fetch-handler-for-hmr.js'
 const inlineScriptPrefix = '__inlineScript'
 /** Work with an id as a URL instance */
 const createStubURL = (id: string) => {
@@ -50,6 +51,10 @@ export const configureViteServeHMRMV3 = (): CrxPlugin => {
         service_worker: fetchHandlerModule,
         type: 'module',
       }
+
+      api?.service.send(
+        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+      )
 
       return manifest
     },
