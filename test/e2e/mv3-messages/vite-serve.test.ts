@@ -6,7 +6,7 @@ import {
   chromium,
   ChromiumBrowserContext,
   Page,
-} from 'playwright'
+} from 'playwright-chromium'
 import { createServer, ViteDevServer } from 'vite'
 
 jestSetTimeout(10000)

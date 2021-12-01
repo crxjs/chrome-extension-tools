@@ -5,7 +5,7 @@ import {
   chromium,
   ChromiumBrowserContext,
   Page,
-} from 'playwright'
+} from 'playwright-chromium'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import config, { outDir } from './rollup.config'
 
