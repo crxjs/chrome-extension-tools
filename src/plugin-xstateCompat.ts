@@ -5,6 +5,7 @@ export const xstateCompat = (): CrxPlugin => {
   return {
     name: 'xstate-compat',
     crx: true,
+    enforce: 'pre',
     configureServer(server) {
       ;(server as any)['toJSON'] = () => 'ViteDevServer'
     },
