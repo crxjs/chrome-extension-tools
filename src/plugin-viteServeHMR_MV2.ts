@@ -1,7 +1,14 @@
 import { HmrOptions, ViteDevServer } from 'vite'
+import { model as filesModel } from './files.machine'
 import { isUndefined } from './helpers'
-import { addToCspScriptSrc } from './plugin_helpers'
-import { CrxPlugin, isMV3 } from './types'
+import { dirname, join, relative } from './path'
+import {
+  addToCspScriptSrc,
+  getRpceAPI,
+  RpceApi,
+} from './plugin_helpers'
+import { CrxPlugin, isMV2 } from './types'
+import cheerio from 'cheerio'
 
 /**
  * The Chrome Extension default CSP blocks remote code.
@@ -11,9 +18,11 @@ import { CrxPlugin, isMV3 } from './types'
  * In MV2, this is as simple as allowing localhost in the CSP.
  */
 export const viteServeHMR_MV2 = (): CrxPlugin => {
+  let disablePlugin = true
   let server: ViteDevServer
+  let api: RpceApi | undefined
   return {
-    name: 'configure-vite-serve-hmr-mv2',
+    name: 'vite-serve-hmr-mv2',
     crx: true,
     configureServer(s) {
       server = s
@@ -26,14 +35,49 @@ export const viteServeHMR_MV2 = (): CrxPlugin => {
       hmrConfig.host = hmrConfig.host ?? 'localhost'
       s.config.server.hmr = hmrConfig
     },
+    buildStart({ plugins = [] }) {
+      api = getRpceAPI(plugins)
+    },
+    transformCrxManifest(manifest) {
+      disablePlugin = !isMV2(manifest) || !server
+      if (disablePlugin) return null
+
+      api?.service.send(
+        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+      )
+
+      return null
+    },
     renderCrxManifest(manifest) {
-      if (isUndefined(server)) return manifest
-      if (isMV3(manifest)) return null
+      if (disablePlugin) return null
 
       const serverUrl = `http://localhost:${server.config.server.port}`
       addToCspScriptSrc(manifest, [serverUrl])
 
       return manifest
+    },
+    renderCrxHtml(source, { id }) {
+      const { port } = server?.config.server ?? {}
+      if (disablePlugin || isUndefined(port)) return null
+
+      const relPath = relative(api!.root, id)
+      const relDir = dirname(relPath)
+      const $ = cheerio.load(source)
+
+      $('script[src]')
+        .not('[data-rollup-asset]')
+        .not('[src^="http:"]')
+        .not('[src^="https:"]')
+        .not('[src^="data:"]')
+        .attr('type', 'module')
+        .attr('src', (i, value) => {
+          const url = new URL(`http://localhost:${port}`)
+          url.pathname =
+            relDir === '.' ? value : join(relDir, value)
+          return url.href
+        })
+
+      return $.html()
     },
   }
 }
