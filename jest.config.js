@@ -12,8 +12,8 @@ module.exports = {
   transformIgnorePatterns: [`node_modules/(?!.*${esModules})`],
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/manifest-input/browser/**/*',
-    '!src/simple-reloader/client/**/*',
+    '!src/browser/**/*',
+    '!src/service-worker/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
   globalSetup: './jest.globalSetup.ts',
