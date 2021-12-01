@@ -31,7 +31,11 @@ import {
 } from './plugin-validateManifest'
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { xstateCompat } from './plugin-xstateCompat'
-import { isRPCE, RpceApi } from './plugin_helpers'
+import {
+  combinePlugins,
+  isRPCE,
+  RpceApi,
+} from './plugin_helpers'
 import { stubId } from './stubId'
 import type {
   Asset,
@@ -72,7 +76,6 @@ export const chromeExtension = (
     CompleteFile & { source?: string | Uint8Array }
   >()
 
-  let isViteServe: boolean
   const builtins: CrxPlugin[] = [
     validateManifest(),
     xstateCompat(),
@@ -95,22 +98,20 @@ export const chromeExtension = (
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
   let builtinPluginsDone = false
+  let isViteServe: boolean
   function addBuiltinPlugins(plugins: CrxPlugin[]) {
     if (builtinPluginsDone) return
 
-    const [
-      validatorPlugin,
-      xstatePlugin,
-      fileWriterPlugin,
-      ...pluginsAfterCrx
-    ] = builtins
+    const prepared = isViteServe
+      ? builtins
+      : builtins.filter(
+          ({ name }) => !name.includes('vite-serve'),
+        )
 
-    plugins.push(validatorPlugin)
-    if (isViteServe) plugins.unshift(fileWriterPlugin)
-    plugins.unshift(xstatePlugin)
+    const combined = combinePlugins(plugins, prepared)
 
-    const rpceIndex = plugins.findIndex(isRPCE)
-    plugins.splice(rpceIndex + 1, 0, ...pluginsAfterCrx)
+    plugins.length = 0
+    plugins.push(...combined)
 
     builtinPluginsDone = true
   }

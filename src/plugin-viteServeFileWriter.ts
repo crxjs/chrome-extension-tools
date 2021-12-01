@@ -170,6 +170,7 @@ export function viteServeFileWriter(): CrxPlugin {
 
   return {
     name: 'vite-serve-file-writer',
+    crx: true,
     enforce: 'pre',
     config(config, { command }) {
       isViteServe = command === 'serve'
