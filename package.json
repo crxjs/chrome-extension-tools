@@ -2,6 +2,17 @@
   "name": "rollup-plugin-chrome-extension",
   "version": "4.0.1-3",
   "description": "Build Chrome Extensions with this Rollup plugin.",
+  "keywords": [
+    "rollup-plugin",
+    "vite-plugin",
+    "chrome",
+    "chrome-extension",
+    "extension",
+    "webext",
+    "webextension",
+    "browser",
+    "browser-extension"
+  ],
   "repository": {
     "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension.git"
   },
@@ -27,8 +38,8 @@
     "prepublishOnly": "run-p build build:types",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "test": "jest",
-    "test:int": "jest --testPathIgnorePatterns=\"/node_modules/|e2e|playground\"",
-    "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|/e2e/\""
+    "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|/e2e/\"",
+    "test:int": "jest --testPathIgnorePatterns=\"/node_modules/|e2e|playground\""
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.1",
@@ -112,12 +123,6 @@
     "vite-plugin-inspect": "^0.3.10",
     "ws": "^8.2.3"
   },
-  "engines": {
-    "node": ">=12.0.0"
-  },
-  "np": {
-    "testScript": "test:ci"
-  },
   "peerDependencies": {
     "rollup": "^2.58.0",
     "vite": "^2.5.10"
@@ -126,5 +131,11 @@
     "vite": {
       "optional": true
     }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "np": {
+    "testScript": "test:ci"
   }
 }
