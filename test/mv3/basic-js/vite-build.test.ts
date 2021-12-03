@@ -1,9 +1,12 @@
 import { isAsset, isChunk } from '$src/helpers'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import fs from 'fs-extra'
 import path from 'path'
 import { RollupOutput } from 'rollup'
 import { build } from 'vite'
+
+jestSetTimeout(30000)
 
 const outDir = path.join(__dirname, 'dist-build')
 
@@ -18,7 +21,7 @@ beforeAll(async () => {
   })) as RollupOutput
 
   output = o
-}, 30000)
+})
 
 test('bundles chunks', async () => {
   // Chunks
