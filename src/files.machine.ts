@@ -26,7 +26,7 @@ const filesContext: FilesContext = {
     {
       fileName: 'manifest.json',
       fileType: 'MANIFEST',
-      id: 'manifest.json',
+      id: process.cwd(),
     },
   ],
   excluded: new Set(),
@@ -97,7 +97,7 @@ export const machine = model.createMachine(
               entries: ({ entries }, { root }) =>
                 entries.map((entry) => ({
                   ...entry,
-                  id: join(root, 'manifest.json'),
+                  id: root, // the loader will start the search here
                 })),
             }),
           },

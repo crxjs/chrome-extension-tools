@@ -13,20 +13,8 @@ import { isScript } from './files.sharedEvents'
 import { htmlParser } from './files_htmlParser'
 import { manifestParser } from './files_manifestParser'
 import { isUndefined } from './helpers'
-import { relative } from './path'
+import { parse, relative } from './path'
 import { Asset, BaseAsset, Script } from './types'
-
-const manifestExplorer = cosmiconfig('manifest', {
-  cache: false,
-  loaders: {
-    '.ts': (filePath: string) => {
-      require('esbuild-runner/register')
-      const result = require(filePath)
-
-      return result.default ?? result
-    },
-  },
-})
 
 export function spawnFile(
   file: BaseAsset | Script,
@@ -114,10 +102,32 @@ function jsonLoader({ id }: Asset) {
   )
 }
 
+const manifestExplorer = cosmiconfig('manifest', {
+  cache: false,
+  loaders: {
+    '.ts': (filePath: string) => {
+      require('esbuild-runner/register')
+      const result = require(filePath)
+
+      return result.default ?? result
+    },
+  },
+  searchPlaces: [
+    'manifest.json',
+    'manifest.ts',
+    'manifest.js',
+    'manifest.yaml',
+    'manifest.yml',
+  ],
+})
+
 function manifestLoader({ id }: Asset) {
+  const { ext } = parse(id)
+  const loadPromise = ext
+    ? manifestExplorer.load(getSystemPath(id))
+    : manifestExplorer.search(id)
   return from(
-    manifestExplorer
-      .load(getSystemPath(id))
+    loadPromise
       .then((result) => {
         if (result === null)
           throw new Error(`Unable to load manifest at ${id}`)

@@ -3,6 +3,8 @@ import { xstateInspectCompat } from '$test/helpers/xstateInspectCompat'
 import path from 'path'
 import { defineConfig } from 'vite'
 
+process.chdir(__dirname)
+
 export default defineConfig({
   root: 'src',
   clearScreen: false,
