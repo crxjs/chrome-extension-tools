@@ -173,15 +173,10 @@ export const chromeExtension = (
 
       isViteServe = env.command === 'serve'
 
-      // Vite ignores changes to config.plugin, so we add them in configResolved
-      // Run the config hook for the builtins here for consistency
       for (const b of builtins) {
         const result = await b?.config?.call(this, config, env)
         config = result ?? config
       }
-
-      if (isString(config.root))
-        service.send(model.events.ROOT(config.root))
 
       return config
     },
@@ -214,6 +209,10 @@ export const chromeExtension = (
       if (viteConfigResolvedHook) return
       else viteConfigResolvedHook = true
 
+      if (isString(config.root)) {
+        service.send(model.events.ROOT(config.root))
+      }
+
       /**
        * Vite ignores replacements of `config.plugins`,
        * so we need to change the array in place.
@@ -238,14 +237,14 @@ export const chromeExtension = (
 
     async options({ input = [], ...options }) {
       let finalInput: RollupOptions['input'] = [stubId]
-      if (isString(input)) {
-        const { ext, dir } = parse(input)
-        const id =
-          ext === '.html' ? join(dir, 'manifest.json') : input
+      if (isString(input) && input.endsWith('index.html')) {
+        // Vite passes "<root>/index.html" as default input
+        // do nothing, the default manifest should work
+      } else if (isString(input) && input.includes('manifest')) {
         service.send(
           model.events.UPDATE_FILES([
             {
-              id: getAbsolutePath(id),
+              id: getAbsolutePath(input),
               fileType: 'MANIFEST',
               fileName: 'manifest.json',
             },
