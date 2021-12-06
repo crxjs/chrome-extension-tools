@@ -1,0 +1,6 @@
+{
+  "manifest_version": 3,
+  "name": "Invalid manifest",
+  "version": "0.1-1",
+  "description": "This is an invalid manifest"
+}

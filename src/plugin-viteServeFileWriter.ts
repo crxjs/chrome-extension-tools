@@ -15,7 +15,11 @@ import {
 } from './plugin-viteServeFileWriter.machine'
 import { combinePlugins, isRPCE } from './plugin_helpers'
 import { CrxPlugin } from './types'
-import { narrowEvent, useConfig } from './xstate_helpers'
+import {
+  narrowEvent,
+  useConfig,
+  waitForState,
+} from './xstate_helpers'
 
 /** The service is used by multiple exports */
 const service = interpret(
@@ -97,21 +101,12 @@ const service = interpret(
             watcher = watch(options)
 
             watcher.on('event', async (event) => {
-              try {
-                if (event.code === 'BUNDLE_END') {
-                  send(model.events.BUNDLE_END(event))
-                } else if (event.code === 'BUNDLE_START') {
-                  send(model.events.BUNDLE_START(event))
-                } else if (event.code === 'ERROR') {
-                  await event.result?.close()
-
-                  const { error } = event
-                  delete error.pluginCode
-                  delete error.frame
-                  throw error
-                }
-              } catch (error) {
-                send(model.events.ERROR(error))
+              if (event.code === 'BUNDLE_END') {
+                send(model.events.BUNDLE_END(event))
+              } else if (event.code === 'BUNDLE_START') {
+                send(model.events.BUNDLE_START(event))
+              } else if (event.code === 'ERROR') {
+                send(model.events.ERROR(event.error))
               }
             })
           })().catch((err) => send(model.events.ERROR(err)))
@@ -140,14 +135,6 @@ const service = interpret(
   { devTools: true },
 )
 
-// In case of an error before the viz can connect
-// service.subscribe((state) => {
-//   console.log(
-//     'vite-serve-file-writer state',
-//     JSON.stringify(state.value),
-//   )
-// })
-
 /**
  * Writes extension files during Vite serve.
  *
@@ -166,7 +153,6 @@ const service = interpret(
  */
 export function viteServeFileWriter(): CrxPlugin {
   let isViteServe: boolean
-  let lastError: unknown
 
   return {
     name: 'vite-serve-file-writer',
@@ -190,19 +176,20 @@ export function viteServeFileWriter(): CrxPlugin {
               `Build completed in ${event.duration} ms`,
             )
           },
-          handleError({ server }, event) {
+          handleError(context, event) {
             const { error } = narrowEvent(event, 'ERROR')
             if (error.message?.includes('is not exported by')) {
-              // TODO: add documentation with example
-              lastError =
-                Error(format`Could not complete bundle because Vite did not pre-bundle a dependency.
-              You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.
+              console.warn(format`Could not complete bundle because Vite did not pre-bundle a dependency.
+              You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.`)
+            }
 
-              Original Error: ${error.message}`)
-            } else lastError = error
-
-            console.error(lastError)
+            console.error(error)
+          },
+          handleFatalError({ server }, event) {
+            const { error } = narrowEvent(event, 'ERROR')
+            console.error(error)
             server?.close()
+            service.stop()
           },
         },
       })
@@ -234,8 +221,6 @@ export function viteServeFileWriter(): CrxPlugin {
         delete servePlugin.buildStart
       })
       service.send(model.events.PLUGINS(watchPlugins))
-
-      if (lastError) throw lastError
     },
     configureServer(server) {
       if (!isViteServe) return
@@ -243,13 +228,6 @@ export function viteServeFileWriter(): CrxPlugin {
       if (service.initialized) {
         service.send(model.events.SERVER(server))
       }
-
-      if (lastError) throw lastError
-    },
-    closeBundle() {
-      if (!isViteServe) return
-
-      service.stop()
     },
   }
 }
@@ -258,26 +236,7 @@ export function viteServeFileWriter(): CrxPlugin {
  * For use in tests. Resolves when file write operation is complete.
  */
 export const filesReady = () =>
-  new Promise<void>((resolve, reject) => {
-    const sub = service.subscribe({
-      next(state) {
-        if (state.matches({ watching: 'ready' })) {
-          sub.unsubscribe()
-          resolve()
-        } else if (state.matches('error')) {
-          const { error, id } = narrowEvent(state.event, 'ERROR')
-          error.id = id
-          sub.unsubscribe()
-          reject(error)
-        }
-      },
-      error(err) {
-        reject(err)
-      },
-      complete() {
-        reject(
-          new Error(`The service "${service.id}" has stopped`),
-        )
-      },
-    })
+  waitForState(service, (state) => {
+    if (state.event.type === 'ERROR') throw state.event.error
+    return state.matches({ watching: 'ready' })
   })
