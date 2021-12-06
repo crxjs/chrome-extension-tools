@@ -5,7 +5,6 @@ import {
   MachineOptions,
   State,
   StateConfig,
-  Subscription,
   Typestate,
 } from 'xstate'
 
