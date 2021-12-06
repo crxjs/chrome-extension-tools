@@ -45,8 +45,11 @@ export const machine = model.createMachine({
   id: 'vite-serve-file-writer',
   context: model.initialContext,
   initial: 'configuring',
-  on: { ERROR: { target: '#error', actions: 'handleError' } },
+  on: {
+    ERROR: { target: '#error', actions: 'handleFatalError' },
+  },
   states: {
+    error: { id: 'error', type: 'final' },
     configuring: {
       on: {
         PLUGINS: {
@@ -73,6 +76,9 @@ export const machine = model.createMachine({
     watching: {
       invoke: { src: 'fileWriter' },
       initial: 'working',
+      on: {
+        ERROR: { target: '.ready', actions: 'handleError' },
+      },
       states: {
         working: {
           on: {
@@ -95,6 +101,5 @@ export const machine = model.createMachine({
         },
       },
     },
-    error: { id: 'error', type: 'final' },
   },
 })

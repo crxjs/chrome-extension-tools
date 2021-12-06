@@ -55,7 +55,12 @@ export const machine = model.createMachine(
   {
     id: 'files',
     context: model.initialContext,
-    on: { ERROR: '#error' },
+    on: {
+      ERROR: {
+        target: '.complete',
+        actions: 'sendAbortToAllFiles',
+      },
+    },
     initial: 'configuring',
     states: {
       configuring: {
@@ -172,29 +177,31 @@ export const machine = model.createMachine(
             actions: [
               'forwardToAllFiles',
               model.assign({
-                entries: ({ root }) => {
-                  return [
-                    {
-                      fileName: 'manifest.json',
-                      fileType: 'MANIFEST',
-                      id: join(root, 'manifest.json'),
-                    },
-                  ]
-                },
-                // filesReady: [],
+                // reset context.entries
+                entries: ({ root }) => [
+                  {
+                    fileName: 'manifest.json',
+                    fileType: 'MANIFEST',
+                    id: join(root, 'manifest.json'),
+                  },
+                ],
               }),
             ],
             target: 'configuring',
           },
         },
       },
-      error: { id: 'error', type: 'final' },
     },
   },
   {
     actions: {
       addEntryFiles: send(({ entries }) =>
         model.events.UPDATE_FILES(entries),
+      ),
+      sendAbortToAllFiles: pure(({ files }) =>
+        files.map((file) =>
+          send(model.events.ABORT(), { to: () => file }),
+        ),
       ),
       forwardToAllFiles: pure(({ files }) =>
         files.map((file) => forwardTo(() => file)),

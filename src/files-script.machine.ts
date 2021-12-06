@@ -12,9 +12,7 @@ const model = createModel(
 export const scriptMachine = model.createMachine(
   {
     context: model.initialContext,
-    on: {
-      ERROR: { actions: 'forwardToParent', target: '#error' },
-    },
+    on: { ERROR: '#error', ABORT: '#error' },
     initial: 'emitting',
     states: {
       emitting: {
@@ -38,7 +36,9 @@ export const scriptMachine = model.createMachine(
       error: {
         id: 'error',
         entry: 'forwardToParent',
-        type: 'final',
+        on: {
+          START: 'emitting',
+        },
       },
     },
   },

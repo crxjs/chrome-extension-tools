@@ -40,7 +40,8 @@ export const assetMachine = model.createMachine(
   {
     context: model.initialContext,
     on: {
-      ERROR: { actions: 'forwardToParent', target: '#error' },
+      ERROR: { target: '#error', actions: 'forwardToParent' },
+      ABORT: '#error',
     },
     initial: 'loading',
     states: {
@@ -144,8 +145,7 @@ export const assetMachine = model.createMachine(
       },
       error: {
         id: 'error',
-        entry: 'forwardToParent',
-        type: 'final',
+        on: { START: 'loading' },
       },
     },
   },

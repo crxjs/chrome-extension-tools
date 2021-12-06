@@ -63,6 +63,7 @@ export const sharedEventCreators = {
     source?: string | Uint8Array
   }) => data,
   FILE_ID: (input: { id: string; fileId: string }) => input,
+  ABORT: () => ({}),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
     id,
     ...change,

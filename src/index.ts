@@ -362,12 +362,7 @@ export const chromeExtension = (
 
       service.send(model.events.START())
       await waitForState(service, (state) => {
-        if (
-          state.matches('error') &&
-          state.event.type === 'ERROR'
-        )
-          throw state.event.error
-
+        if (state.event.type === 'ERROR') throw state.event.error
         return state.matches('ready')
       })
     },
@@ -424,5 +419,10 @@ export const chromeExtension = (
       files.clear()
       service.send(model.events.CHANGE(id, change))
     },
+
+    // closeWatcher() {
+    //   console.log('closeWatcher')
+    //   // service.stop()
+    // },
   }
 }

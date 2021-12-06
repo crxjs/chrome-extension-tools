@@ -68,11 +68,6 @@ export const useConfig = <TContext, TEvent extends EventObject>(
   Object.assign(service.machine.options.delays, delays)
 }
 
-const matchSubs = new Set<Subscription>()
-function clearMatchSubs() {
-  matchSubs.forEach((sub) => sub.unsubscribe())
-  matchSubs.clear()
-}
 export const waitForState = <
   TContext,
   TEvent extends EventObject,
@@ -92,24 +87,22 @@ export const waitForState = <
         try {
           if (!matcher(state)) return
 
-          clearMatchSubs()
           resolve(state)
+          sub.unsubscribe()
         } catch (error) {
-          clearMatchSubs()
           reject(error)
+          sub.unsubscribe()
         }
       },
       error: (error) => {
-        clearMatchSubs()
         reject(error)
+        sub.unsubscribe()
       },
       complete: () => {
-        clearMatchSubs()
         reject(new Error(`${service.id} has stopped`))
+        sub.unsubscribe()
       },
     })
-
-    matchSubs.add(sub)
   })
 
 // export function debugHelper<
