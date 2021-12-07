@@ -1,14 +1,32 @@
 import cheerio from 'cheerio'
 import { code as swCode } from 'code ./service-worker/code-fetchHandlerForMV3HMR.ts'
+import getEtag from 'etag'
 import MagicString from 'magic-string'
+import { PluginContext } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { model as filesModel } from './files.machine'
-import { isUndefined } from './helpers'
+import { format, isUndefined } from './helpers'
+import { runPlugins } from './index_runPlugins'
 import { relative } from './path'
-import { getRpceAPI } from './plugin_helpers'
-import { CrxPlugin, isMV3 } from './types'
+import { createStubURL, getRpceAPI } from './plugin_helpers'
+import {
+  Asset,
+  AssetType,
+  CrxPlugin,
+  isMV3,
+  StringAsset,
+} from './types'
 
 const fetchHandlerModule = 'crx-hmr-service-worker.js'
+
+const mimeTypes: Record<
+  Exclude<AssetType, 'MANIFEST' | 'IMAGE' | 'JSON' | 'RAW'>,
+  string
+> = {
+  HTML: 'text/html' as const,
+  CSS: 'text/css' as const,
+}
+const servedTypes = Object.keys(mimeTypes)
 
 /**
  * The Chrome Extension default CSP blocks remote code.
@@ -23,6 +41,9 @@ const fetchHandlerModule = 'crx-hmr-service-worker.js'
  * We can use the MV3 service worker to circumvent the MV3 CSP using a fetch handler.
  */
 export const viteServeHMR_MV3 = (): CrxPlugin => {
+  const assetCache = new Map<string, Asset>()
+  const crxPlugins: CrxPlugin[] = []
+
   let disablePlugin = true
   let server: ViteDevServer
   let api: ReturnType<typeof getRpceAPI>
@@ -33,9 +54,23 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
     crx: true,
     buildStart({ plugins }) {
       api = getRpceAPI(plugins)
+      api?.service.onEvent((event) => {
+        if (event.type === 'PLUGINS_RESULT') {
+          const { type, ...asset } = event as Asset & {
+            type: string
+          }
+          assetCache.set(`/${asset.fileName}`, asset)
+        }
+      })
+
+      for (const plugin of plugins as CrxPlugin[]) {
+        if (plugin.crx) crxPlugins.push(plugin)
+      }
     },
     configureServer(s) {
       server = s
+
+      useCrxFilesMiddleware(server, assetCache, crxPlugins)
     },
     transformCrxManifest(manifest) {
       disablePlugin = !(isMV3(manifest) && server)
@@ -53,7 +88,8 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
 
       return manifest
     },
-    transformCrxHtml(source) {
+    renderCrxHtml(source) {
+      if (disablePlugin) return null
       const $ = cheerio.load(source)
 
       $('script[src]')
@@ -62,6 +98,12 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
         .not('[src^="https:"]')
         .not('[src^="data:"]')
         .attr('type', 'module')
+        .attr('src', (i, value) => {
+          if (value.startsWith('/@')) return value
+          const url = createStubURL(value)
+          url.searchParams.set('t', Date.now().toString())
+          return url.pathname + url.search
+        })
 
       return $.html()
     },
@@ -104,4 +146,54 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
       return null
     },
   }
+}
+
+function useCrxFilesMiddleware(
+  server: ViteDevServer,
+  assetCache: Map<string, Asset>,
+  crxPlugins: CrxPlugin[],
+) {
+  server.middlewares.use(async (req, res, next) => {
+    const url = createStubURL(req.url)
+    const asset = assetCache.get(url.pathname)
+
+    if (!asset || !servedTypes.includes(asset.fileType)) {
+      next()
+      return
+    }
+
+    if (res.writableEnded) {
+      return
+    }
+
+    const result = (await runPlugins.call(
+      new Proxy({} as PluginContext, {
+        get() {
+          throw new Error(
+            format`CRX render hooks plugin context not implemented for ${servedTypes.join(
+              ', ',
+            )} in serve mode.
+                Consider using a transformCrx hook or \`generateBundle\``,
+          )
+        },
+      }),
+      crxPlugins,
+      asset,
+      'render',
+    )) as StringAsset
+
+    const etag = getEtag(result.source, { weak: true })
+    if (req.headers['if-none-match'] === etag) {
+      res.statusCode = 304
+      return res.end()
+    }
+
+    res.setHeader('Content-Type', mimeTypes[result.fileType])
+    res.setHeader('Cache-Control', 'no-cache')
+    res.setHeader('Etag', etag)
+    res.setHeader('Access-Control-Allow-Origin', '*')
+
+    res.statusCode = 200
+    return res.end(result.source)
+  })
 }
