@@ -29,7 +29,7 @@ export const isRPCE = (
 
 export type RpceApi = {
   /** A map of the emitted files */
-  files: Map<
+  emittedFiles: Map<
     string,
     CompleteFile & {
       source?: string | Uint8Array | undefined

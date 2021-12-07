@@ -23,7 +23,7 @@ export const hybridFormat = (): CrxPlugin => {
     buildStart(options) {
       const api = getRpceAPI(options.plugins)!
 
-      files = api.files
+      files = api.emittedFiles
       root = api.root
     },
 
