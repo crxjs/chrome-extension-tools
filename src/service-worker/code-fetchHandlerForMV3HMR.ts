@@ -19,13 +19,13 @@ const supported = [
 ]
 
 self.addEventListener('fetch', (fetchEvent) => {
-  const { pathname, href } = new URL(fetchEvent.request.url)
+  const url = new URL(fetchEvent.request.url)
   if (
-    pathname === '/__vite_ping' ||
-    pathname.startsWith('/@') ||
-    supported.some((ext) => pathname.endsWith(ext))
+    url.pathname === '/__vite_ping' ||
+    url.pathname.startsWith('/@') ||
+    supported.some((ext) => url.pathname.endsWith(ext))
   ) {
-    fetchEvent.respondWith(mapRequestsToLocalhost(href))
+    fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
   }
 })
 

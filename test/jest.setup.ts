@@ -29,3 +29,5 @@ if (process.env.npm_config_argv) {
     process.env.npm_config_argv,
   ).original.includes('--watch')
 }
+
+Date.now = jest.fn(() => new Date('2021-12-07').getTime())
