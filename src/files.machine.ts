@@ -182,7 +182,7 @@ export const machine = model.createMachine(
                   {
                     fileName: 'manifest.json',
                     fileType: 'MANIFEST',
-                    id: join(root, 'manifest.json'),
+                    id: root,
                   },
                 ],
               }),
