@@ -21,6 +21,7 @@ specifiers:
   '@types/acorn': ^4.0.6
   '@types/chrome': ^0.0.152
   '@types/csp-dev': ^1.0.0
+  '@types/etag': ^1.8.1
   '@types/fs-extra': ^8.0.1
   '@types/glob': ^7.1.1
   '@types/jest': ^25.1.2
@@ -49,6 +50,7 @@ specifiers:
   esbuild-runner: ^2.2.0
   eslint: ^6.8.0
   eslint-plugin-react: ^7.22.0
+  etag: ^1.8.1
   fs-extra: ^8.1.0
   glob: ^7.1.6
   jest: ^27.1.0
@@ -84,6 +86,7 @@ dependencies:
   '@rollup/pluginutils': 4.1.1
   '@types/acorn': 4.0.6
   '@types/csp-dev': 1.0.0
+  '@types/etag': 1.8.1
   '@types/lodash': 4.14.172
   acorn-walk: 8.2.0
   ajv: 8.6.2
@@ -94,6 +97,7 @@ dependencies:
   csp-dev: 1.0.1
   esbuild: 0.12.24
   esbuild-runner: 2.2.1_esbuild@0.12.24
+  etag: 1.8.1
   fs-extra: 8.1.0
   glob: 7.1.6
   json-ptr: 2.2.0
@@ -2469,6 +2473,12 @@ packages:
   /@types/estree/0.0.47:
     resolution: {integrity: sha512-c5ciR06jK8u9BstrmJyO97m+klJrrhCf9u3rLu3DEAJBirxRqSCvDQoYKmxuYwQI5SZChAWu+tq9oVlGRuzPAg==}
 
+  /@types/etag/1.8.1:
+    resolution: {integrity: sha512-bsKkeSqN7HYyYntFRAmzcwx/dKW4Wa+KVMTInANlI72PWLQmOpZu96j0OqHZGArW4VQwCmJPteQlXaUDeOB0WQ==}
+    dependencies:
+      '@types/node': 13.13.52
+    dev: false
+
   /@types/filesystem/0.0.29:
     resolution: {integrity: sha512-85/1KfRedmfPGsbK8YzeaQUyV1FQAvMPMTuWFQ5EkLd2w7szhNO96bk3Rh/SKmOfd9co2rCLf0Voy4o7ECBOvw==}
     dependencies:
@@ -2593,7 +2603,6 @@ packages:
 
   /@types/node/13.13.52:
     resolution: {integrity: sha512-s3nugnZumCC//n4moGGe6tkNMyYEdaDBitVjwPxXmR5lnMG5dHePinH2EdxkG3Rh1ghFHHixAG4NJhpJW1rthQ==}
-    dev: true
 
   /@types/normalize-package-data/2.4.0:
     resolution: {integrity: sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==}
@@ -4059,6 +4068,11 @@ packages:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
     dev: true
+
+  /etag/1.8.1:
+    resolution: {integrity: sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=}
+    engines: {node: '>= 0.6'}
+    dev: false
 
   /execa/5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}

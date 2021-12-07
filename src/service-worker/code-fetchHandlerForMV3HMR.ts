@@ -4,13 +4,29 @@ export {}
 
 self.skipWaiting()
 
+// TODO: make this configurable
+const supported = [
+  '.html',
+  '.js',
+  '.jsx',
+  '.mjs',
+  '.ts',
+  '.tsx',
+  '.svelte',
+  '.css',
+  '.scss',
+  '.sass',
+]
+
 self.addEventListener('fetch', (fetchEvent) => {
-  const url = new URL(fetchEvent.request.url)
-
-  // TODO: support served html files
-  if (url.pathname.endsWith('.html')) return
-
-  fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
+  const { pathname, href } = new URL(fetchEvent.request.url)
+  if (
+    pathname === '/__vite_ping' ||
+    pathname.startsWith('/@') ||
+    supported.some((ext) => pathname.endsWith(ext))
+  ) {
+    fetchEvent.respondWith(mapRequestsToLocalhost(href))
+  }
 })
 
 function mapRequestsToLocalhost(
