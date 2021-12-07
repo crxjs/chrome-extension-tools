@@ -16,7 +16,13 @@ export const model = createModel(
   {
     events: {
       ...sharedEventCreators,
-      LOADED: ({ source }: { source: any }) => ({ source }),
+      LOADED: ({
+        source,
+        id,
+      }: {
+        source: any
+        id?: string
+      }) => ({ source, id }),
       PARSED: (files: (BaseAsset | Script)[]) => ({
         files: new Map(files.map((file) => [file.id, file])),
       }),
@@ -51,6 +57,7 @@ export const assetMachine = model.createMachine(
           LOADED: {
             actions: assign({
               source: (context, { source }) => source,
+              id: ({ id }, { id: newId }) => newId ?? id,
             }),
             target: 'transforming',
           },

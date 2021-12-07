@@ -7,7 +7,7 @@ import {
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
 import { spawnFile } from './files_spawnFile'
-import { dirname, resolve } from './path'
+import { dirname, join, resolve } from './path'
 import { BaseAsset, FileType, Script } from './types'
 import { narrowEvent } from './xstate_helpers'
 
@@ -26,7 +26,8 @@ const filesContext: FilesContext = {
     {
       fileName: 'manifest.json',
       fileType: 'MANIFEST',
-      id: process.cwd(),
+      id: join(process.cwd(), 'manifest.json'),
+      dirname: process.cwd(),
     },
   ],
   excluded: new Set(),
@@ -100,10 +101,15 @@ export const machine = model.createMachine(
             actions: model.assign({
               root: (context, { root }) => root,
               entries: ({ entries }, { root }) =>
-                entries.map((entry) => ({
-                  ...entry,
-                  id: root, // the loader will start the search here
-                })),
+                entries.map((entry) =>
+                  entry.fileType === 'MANIFEST'
+                    ? {
+                        ...entry,
+                        dirname: root, // the loader will start the search here
+                        id: join(root, 'manifest.json'),
+                      }
+                    : entry,
+                ),
             }),
           },
           START: {
@@ -211,15 +217,30 @@ export const machine = model.createMachine(
           'FILE_ID',
           'PLUGINS_RESULT',
         ])
-        return files.find((f) => f.id === id)!
+        return files.find(
+          // TODO: need to stop using actor ids, use context id instead
+          (f) => f.getSnapshot()?.context.id === id,
+        )!
       }),
       updateFiles: assign({
         files: ({ files, root, excluded }, event) => {
           const { added } = narrowEvent(event, 'UPDATE_FILES')
+          const manifest = files.find(
+            (f) =>
+              f.getSnapshot()?.context.fileType === 'MANIFEST',
+          )
 
           const newFiles = added
+            // Do not re-add manifest, since manifest can have different id here
+            .filter(({ fileType }) =>
+              manifest ? fileType !== 'MANIFEST' : true,
+            )
             // File does not exist
-            .filter(({ id }) => files.every((f) => f.id !== id))
+            .filter(({ id }) =>
+              files.every(
+                (f) => f.getSnapshot()?.context.id !== id,
+              ),
+            )
             // File type is not excluded
             .filter(({ fileType }) => !excluded.has(fileType))
             .map((file) => spawnFile(file, root))

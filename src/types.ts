@@ -92,6 +92,8 @@ export interface BaseAsset {
   fileName: string
   /* File id from Rollup emitFile */
   fileId?: string
+  /* Directory of source file, only manifest supported now */
+  dirname?: string
 }
 
 export interface StringAsset extends BaseAsset {
