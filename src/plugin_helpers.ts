@@ -129,3 +129,9 @@ export function addToCspScriptSrc(
 
   return manifest
 }
+
+/** Work with an id as a URL instance */
+export const createStubURL = (id = '') => {
+  const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
+  return new URL('stub://stub' + pathnameAndSearch)
+}

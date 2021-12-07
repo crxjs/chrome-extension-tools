@@ -5,6 +5,7 @@ import { format } from './helpers'
 import { CrxPlugin, isMV3 } from './types'
 import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScriptMessage.ts'
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
+import { createStubURL } from './plugin_helpers'
 
 const reactRegex = /[jt]sx/
 
@@ -12,12 +13,6 @@ const inlineScriptPrefix = '@crx/inlineScript'
 const inlineScriptRegex = new RegExp(
   `^.*${inlineScriptPrefix}-(.+?)$`,
 )
-
-/** Work with an id as a URL instance */
-const createStubURL = (id: string) => {
-  const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
-  return new URL('stub://stub' + pathnameAndSearch)
-}
 
 /**
  * @vitejs/plugin-react adds a Fast Refresh prelude to HTML pages as an inline script.
