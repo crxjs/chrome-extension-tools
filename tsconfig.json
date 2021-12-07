@@ -1,12 +1,6 @@
 {
   "extends": "./tsconfigs/tsconfig-base.json",
-  "include": [
-    "jest.globalSetup.ts",
-    "jest.setup.ts",
-    "src",
-    "test/**/*.ts",
-    "test/**/*.tsx"
-  ],
+  "include": ["src", "test/**/*.ts", "test/**/*.tsx"],
   "exclude": [
     "lib",
     "playground",

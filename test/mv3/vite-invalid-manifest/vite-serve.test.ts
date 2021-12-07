@@ -3,6 +3,9 @@ import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
+import { errorSpy } from '$test/helpers/consoleSpies'
+
+errorSpy.mockImplementation()
 
 jestSetTimeout(5000)
 
@@ -26,5 +29,5 @@ test('validation errors rise', async () => {
     Promise.all([devServer.listen(), filesReady()]),
   ).rejects.toThrow()
 
-  expect(console.error).toBeCalled()
+  expect(errorSpy).toBeCalled()
 })
