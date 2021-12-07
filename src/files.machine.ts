@@ -13,14 +13,12 @@ import { narrowEvent } from './xstate_helpers'
 
 export interface FilesContext {
   files: ReturnType<typeof spawnFile>[]
-  // filesReady: string[]
   root: string
   entries: (BaseAsset | Script)[]
   excluded: Set<FileType>
 }
 const filesContext: FilesContext = {
   files: [],
-  // filesReady: [],
   root: process.cwd(),
   entries: [
     {
@@ -101,15 +99,18 @@ export const machine = model.createMachine(
             actions: model.assign({
               root: (context, { root }) => root,
               entries: ({ entries }, { root }) =>
-                entries.map((entry) =>
-                  entry.fileType === 'MANIFEST'
-                    ? {
-                        ...entry,
-                        dirname: root, // the loader will start the search here
-                        id: join(root, 'manifest.json'),
-                      }
-                    : entry,
-                ),
+                entries.map((entry) => {
+                  if (entry.fileType === 'MANIFEST') {
+                    const dir = resolve(process.cwd(), root)
+                    return {
+                      ...entry,
+                      id: join(dir, 'manifest.json'),
+                      dirname: dir,
+                    }
+                  }
+
+                  return entry
+                }),
             }),
           },
           START: {
