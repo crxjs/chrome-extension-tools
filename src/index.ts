@@ -71,7 +71,8 @@ export const chromeExtension = (
   })
   service.start()
 
-  const files = new Map<
+  /* Emitted file data by emitted file id*/
+  const emittedFiles = new Map<
     string,
     CompleteFile & { source?: string | Uint8Array }
   >()
@@ -155,7 +156,7 @@ export const chromeExtension = (
     viteServerHook: boolean
 
   const api: RpceApi = {
-    files,
+    emittedFiles: emittedFiles,
     get root() {
       return service.getSnapshot().context.root
     },
@@ -346,12 +347,15 @@ export const chromeExtension = (
               if (file.type === 'chunk')
                 file.fileName = getJsFilename(file.fileName)
 
-              const fileId = this.emitFile(file)
+              const emittedFileId = this.emitFile(file)
               service.send(
-                model.events.FILE_ID({ id: file.id, fileId }),
+                model.events.FILE_ID({
+                  id: file.id,
+                  fileId: emittedFileId,
+                }),
               )
 
-              files.set(fileId, file)
+              emittedFiles.set(emittedFileId, file)
               this.addWatchFile(file.id)
             } catch (error) {
               service.send(model.events.ERROR(error))
@@ -394,7 +398,7 @@ export const chromeExtension = (
               if (isUndefined(source)) return
 
               this.setAssetSource(fileId, source)
-              const file = files.get(fileId)!
+              const file = emittedFiles.get(fileId)!
               file.source = source
             } catch (error) {
               service.send(model.events.ERROR(error))
@@ -416,17 +420,16 @@ export const chromeExtension = (
     },
 
     watchChange(id, change) {
-      files.clear()
+      emittedFiles.clear()
       service.send(model.events.CHANGE(id, change))
     },
 
     closeBundle() {
-      console.log('closeBundle')
-      service.stop()
+      if (!this.meta.watchMode) service.stop()
     },
 
     closeWatcher() {
-      console.log('closeWatcher')
+      service.stop()
     },
   }
 }

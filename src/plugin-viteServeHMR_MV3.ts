@@ -70,7 +70,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
       if (id.endsWith(fetchHandlerModule)) return null
 
       if (isUndefined(swFilename)) {
-        const files = Array.from(api!.files.values())
+        const files = Array.from(api!.emittedFiles.values())
         const { id } = files.find(
           ({ fileType }) => fileType === 'BACKGROUND',
         )!
