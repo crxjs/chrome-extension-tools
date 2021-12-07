@@ -95,11 +95,9 @@ export const waitForState = <
       },
       error: (error) => {
         reject(error)
-        sub.unsubscribe()
       },
       complete: () => {
         reject(new Error(`${service.id} has stopped`))
-        sub.unsubscribe()
       },
     })
   })
