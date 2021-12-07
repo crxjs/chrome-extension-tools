@@ -92,7 +92,7 @@
     "@types/chrome": "^0.0.152",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
-    "@types/jest": "^25.1.2",
+    "@types/jest": "27",
     "@types/jest-in-case": "^1.0.3",
     "@types/lodash.difference": "^4.5.6",
     "@types/lodash.flatten": "^4.4.6",
