@@ -71,10 +71,12 @@ export const sharedEventCreators = {
   ERROR: (error: unknown) => ({ error }),
   START: (manifest = false) => ({ manifest }),
   READY: (id: string) => ({ id }),
-  PLUGINS_START: (asset: Omit<Required<Asset>, 'fileId'>) =>
-    asset,
-  PLUGINS_RESULT: (asset: Omit<Required<Asset>, 'fileId'>) =>
-    asset,
+  PLUGINS_START: (
+    asset: Omit<Required<Asset>, 'fileId' | 'dirname'>,
+  ) => asset,
+  PLUGINS_RESULT: (
+    asset: Omit<Required<Asset>, 'fileId' | 'dirname'>,
+  ) => asset,
 }
 export type SharedEvent = EventFrom<typeof sharedEventModel>
 export const sharedEventModel = createModel(

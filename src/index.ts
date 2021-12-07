@@ -420,9 +420,13 @@ export const chromeExtension = (
       service.send(model.events.CHANGE(id, change))
     },
 
-    // closeWatcher() {
-    //   console.log('closeWatcher')
-    //   // service.stop()
-    // },
+    closeBundle() {
+      console.log('closeBundle')
+      service.stop()
+    },
+
+    closeWatcher() {
+      console.log('closeWatcher')
+    },
   }
 }

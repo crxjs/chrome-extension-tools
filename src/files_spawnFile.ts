@@ -13,7 +13,7 @@ import { isScript } from './files.sharedEvents'
 import { htmlParser } from './files_htmlParser'
 import { manifestParser } from './files_manifestParser'
 import { isUndefined } from './helpers'
-import { parse, relative } from './path'
+import { relative } from './path'
 import { Asset, BaseAsset, Script } from './types'
 
 export function spawnFile(
@@ -121,22 +121,21 @@ const manifestExplorer = cosmiconfig('manifest', {
   ],
 })
 
-function manifestLoader({ id }: Asset) {
-  const { ext } = parse(id)
-  const loadPromise = ext
-    ? manifestExplorer.load(getSystemPath(id))
-    : manifestExplorer.search(id)
+function manifestLoader({ id, dirname }: Asset) {
+  const loadPromise = dirname
+    ? manifestExplorer.search(getSystemPath(dirname))
+    : manifestExplorer.load(getSystemPath(id))
   return from(
     loadPromise
       .then((result) => {
         if (result === null)
           throw new Error(`Unable to load manifest at ${id}`)
-        const { config: source, isEmpty } = result
+        const { config: source, isEmpty, filepath } = result
         if (isEmpty)
           throw new Error(
             `Manifest appears to be empty at ${id}`,
           )
-        return model.events.LOADED({ source })
+        return model.events.LOADED({ source, id: filepath })
       })
       .catch(model.events.ERROR),
   )
