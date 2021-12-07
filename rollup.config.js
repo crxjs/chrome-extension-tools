@@ -63,12 +63,10 @@ export default [
       {
         file: 'lib/index-esm.js',
         format: 'esm',
-        sourcemap: 'inline',
       },
       {
         file: 'lib/index-cjs.js',
         format: 'cjs',
-        sourcemap: 'inline',
       },
     ],
     external,
