@@ -16,7 +16,7 @@ module.exports = {
     '!src/service-worker/**/*',
   ],
   coverageReporters: ['json-summary', 'text', 'lcov'],
-  globalSetup: './jest.globalSetup.ts',
+  globalSetup: './test/jest.globalSetup.ts',
   moduleNameMapper: {
     // aliases
     '^\\$src(.+)$': '<rootDir>/src$1',
@@ -45,7 +45,7 @@ module.exports = {
     ),
   },
   reporters: ['default'],
-  setupFilesAfterEnv: ['./jest.setup.ts'],
+  setupFilesAfterEnv: ['./test/jest.setup.ts'],
   testPathIgnorePatterns: [
     '/node_modules/',
     '/playground/',

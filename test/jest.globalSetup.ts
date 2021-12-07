@@ -5,15 +5,21 @@ import fs from 'fs'
 import path from 'path'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import bundleImports from 'rollup-plugin-bundle-imports'
-import { format } from './src/helpers'
+import { format } from '../src/helpers'
 
-const browserCodeDirname = path.join(__dirname, 'src', 'browser')
+const rootDirname = path.resolve(__dirname, '..')
+
+const browserCodeDirname = path.join(
+  rootDirname,
+  'src',
+  'browser',
+)
 const browserCodeDirFiles = fs
   .readdirSync(browserCodeDirname)
   .filter((filename) => filename.startsWith('code-'))
 
 const swCodeDirname = path.join(
-  __dirname,
+  rootDirname,
   'src',
   'service-worker',
 )
@@ -21,11 +27,7 @@ const swCodeDirFiles = fs
   .readdirSync(swCodeDirname)
   .filter((filename) => filename.startsWith('code-'))
 
-const testFixtureDirname = path.join(
-  __dirname,
-  'test',
-  'fixtures',
-)
+const testFixtureDirname = path.join(__dirname, 'fixtures')
 
 const entryFiles = browserCodeDirFiles.concat(swCodeDirFiles)
 

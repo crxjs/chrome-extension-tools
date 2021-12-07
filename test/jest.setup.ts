@@ -1,14 +1,16 @@
 /* eslint-env jest */
 
 import 'array-flat-polyfill'
-import { join } from 'path'
-import './test/helpers/inspect'
-import { jestSetTimeout } from './test/helpers/timeout'
+import { warnSpy } from './helpers/consoleSpies'
+import './helpers/inspect'
+import { jestSetTimeout } from './helpers/timeout'
+
+warnSpy.mockImplementation()
 
 jestSetTimeout(5000)
 
 // For testing package detection
-process.chdir(join(__dirname, 'test'))
+process.chdir(__dirname)
 
 // Jest attempts to sandbox globals, but it doesn't work with `instanceof`
 // https://github.com/facebook/jest/issues/2549
@@ -27,7 +29,3 @@ if (process.env.npm_config_argv) {
     process.env.npm_config_argv,
   ).original.includes('--watch')
 }
-
-jest.spyOn(console, 'log')
-jest.spyOn(console, 'error')
-jest.spyOn(console, 'warn').mockImplementation()
