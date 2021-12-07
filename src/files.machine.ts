@@ -7,7 +7,7 @@ import {
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
 import { spawnFile } from './files_spawnFile'
-import { dirname, join, resolve } from './path'
+import { dirname, resolve } from './path'
 import { BaseAsset, FileType, Script } from './types'
 import { narrowEvent } from './xstate_helpers'
 
