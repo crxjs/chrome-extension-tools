@@ -1,6 +1,9 @@
+import { errorSpy } from '$test/helpers/consoleSpies'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import path from 'path'
 import { build } from 'vite'
+
+errorSpy.mockImplementation()
 
 jestSetTimeout(5000)
 
@@ -14,4 +17,6 @@ test('validation errors rise', async () => {
       build: { outDir },
     }),
   ).rejects.toThrow()
+
+  expect(errorSpy).toBeCalled()
 })
