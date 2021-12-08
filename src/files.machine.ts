@@ -1,12 +1,14 @@
 import {
   assign,
   forwardTo,
+  log,
   pure,
   send,
 } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
 import { spawnFile } from './files_spawnFile'
+import { Unpacked } from './helpers'
 import { dirname, join, resolve } from './path'
 import { BaseAsset, FileType, Script } from './types'
 import { narrowEvent } from './xstate_helpers'
@@ -59,17 +61,19 @@ export const machine = model.createMachine(
         target: '.complete',
         actions: 'sendAbortToAllFiles',
       },
+      EXCLUDE_FILE_TYPE: {
+        actions:
+          // TODO: may want to filter out files
+          model.assign({
+            excluded: ({ excluded }, { fileType }) =>
+              new Set(excluded).add(fileType),
+          }),
+      },
     },
     initial: 'configuring',
     states: {
       configuring: {
         on: {
-          EXCLUDE_FILE_TYPE: {
-            actions: model.assign({
-              excluded: ({ excluded }, { fileType }) =>
-                new Set(excluded).add(fileType),
-            }),
-          },
           UPDATE_FILES: [
             {
               cond: (context, { added }) =>
@@ -88,10 +92,18 @@ export const machine = model.createMachine(
             },
             {
               actions: model.assign({
-                entries: ({ entries }, { added }) => [
-                  ...entries,
-                  ...added,
-                ],
+                entries: ({ entries }, { added }) => {
+                  const map = new Map<
+                    string,
+                    Unpacked<typeof added>
+                  >()
+
+                  for (const entry of [...entries, ...added]) {
+                    map.set(entry.id, entry)
+                  }
+
+                  return [...map.values()]
+                },
               }),
             },
           ],
@@ -129,24 +141,6 @@ export const machine = model.createMachine(
           PLUGINS_START: { actions: forwardTo('pluginsRunner') },
           READY: { cond: 'allFilesReady', target: 'ready' },
           UPDATE_FILES: { actions: 'updateFiles' },
-        },
-        initial: 'preparingFiles',
-        states: {
-          preparingFiles: {
-            on: {
-              EXCLUDE_FILE_TYPE: {
-                actions: model.assign({
-                  excluded: ({ excluded }, { fileType }) =>
-                    new Set(excluded).add(fileType),
-                }),
-              },
-              PLUGINS_RESULT: {
-                actions: 'forwardToFile',
-                target: 'emittingFiles',
-              },
-            },
-          },
-          emittingFiles: {},
         },
       },
       ready: {
@@ -225,6 +219,7 @@ export const machine = model.createMachine(
       }),
       updateFiles: assign({
         files: ({ files, root, excluded }, event) => {
+          console.log('updateFiles', excluded)
           const { added } = narrowEvent(event, 'UPDATE_FILES')
           const manifest = files.find(
             (f) =>
