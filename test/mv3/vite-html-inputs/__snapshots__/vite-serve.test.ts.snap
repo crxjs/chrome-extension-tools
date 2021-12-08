@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`writes entry points to disk: devtools.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+  <script type=\\"module\\" src=\\"/@vite/client\\"></script>
+
+  <meta charset=\\"UTF-8\\">
+  <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+  <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+  <title>DevTools</title>
+</head>
+<body>
+  <script src=\\"/devtools.ts?t=1638835200000\\" type=\\"module\\"></script>
+
+</body></html>"
+`;
+
+exports[`writes entry points to disk: test1.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <script type=\\"module\\" src=\\"/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Test Panel 1</h1>
+  
+
+</body></html>"
+`;
+
+exports[`writes entry points to disk: test2.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <script type=\\"module\\" src=\\"/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Test Panel 2</h1>
+  
+
+</body></html>"
+`;
