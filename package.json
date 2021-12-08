@@ -38,7 +38,7 @@
     "prepublishOnly": "run-p build build:types",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "test": "jest",
-    "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|/e2e/\"",
+    "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|/e2e/\" --forceExit",
     "test:int": "jest --testPathIgnorePatterns=\"/node_modules/|e2e|playground\""
   },
   "dependencies": {
