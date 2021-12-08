@@ -45,13 +45,10 @@ export const sharedEventCreators = {
   ROOT: (root: string) => ({ root }),
   /** All paths are normalized here to use posix */
   REMOVE_FILE: (id: string) => ({ id }),
-  UPDATE_FILES: (
-    added: (BaseAsset | Script)[],
-    removed?: (BaseAsset | Script)[],
-  ) => ({
-    added: added.map(normalizeFilePaths),
-    removed: removed?.map(normalizeFilePaths),
+  ENQUEUE_FILES: (files: (BaseAsset | Script)[]) => ({
+    files: files.map(normalizeFilePaths),
   }),
+  SPAWN_FILE: (file: BaseAsset | Script) => ({ file }),
   EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
   EMIT_FILE: (
     file: Omit<CompleteFile, 'source' | 'fileId'>,
@@ -72,10 +69,10 @@ export const sharedEventCreators = {
   START: (manifest = false) => ({ manifest }),
   READY: (id: string) => ({ id }),
   PLUGINS_START: (
-    asset: Omit<Required<Asset>, 'fileId' | 'dirname'>,
+    asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
   ) => asset,
   PLUGINS_RESULT: (
-    asset: Omit<Required<Asset>, 'fileId' | 'dirname'>,
+    asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
   ) => asset,
 }
 export type SharedEvent = EventFrom<typeof sharedEventModel>

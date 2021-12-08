@@ -121,9 +121,9 @@ const manifestExplorer = cosmiconfig('manifest', {
   ],
 })
 
-function manifestLoader({ id, dirname }: Asset) {
-  const loadPromise = dirname
-    ? manifestExplorer.search(getSystemPath(dirname))
+function manifestLoader({ id, dirName }: Asset) {
+  const loadPromise = dirName
+    ? manifestExplorer.search(getSystemPath(dirName))
     : manifestExplorer.load(getSystemPath(id))
   return from(
     loadPromise

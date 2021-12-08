@@ -1,7 +1,8 @@
 import { createFilter } from '@rollup/pluginutils'
-import { PluginContext, RollupOptions } from 'rollup'
+import { PluginContext } from 'rollup'
 import { Plugin } from 'vite'
 import { interpret } from 'xstate'
+import { categorizeInput } from './index_categorizeInput'
 import { machine, model } from './files.machine'
 import { SharedEvent } from './files.sharedEvents'
 import {
@@ -11,7 +12,7 @@ import {
   not,
 } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { basename, isAbsolute, join } from './path'
+import { basename } from './path'
 import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
@@ -56,15 +57,9 @@ import {
 export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
 
-function getAbsolutePath(input: string): string {
-  return isAbsolute(input) ? input : join(process.cwd(), input)
-}
-
 export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
 ): Plugin => {
-  const isHtml = createFilter(['**/*.html'])
-
   const service = interpret(machine, {
     deferEvents: true,
     devTools: true,
@@ -237,92 +232,23 @@ export const chromeExtension = (
     },
 
     async options({ input = [], ...options }) {
-      let finalInput: RollupOptions['input'] = [stubId]
-      if (isString(input) && input.endsWith('index.html')) {
-        // Vite passes "<root>/index.html" as default input
-        // do nothing, the default manifest should work
-      } else if (isString(input) && input.includes('manifest')) {
-        service.send(
-          model.events.UPDATE_FILES([
-            {
-              id: getAbsolutePath(input),
-              fileType: 'MANIFEST',
-              fileName: 'manifest.json',
-            },
-          ]),
-        )
-      } else if (Array.isArray(input)) {
-        // Don't include html or manifest files
-        const result: string[] = []
-        input.forEach((id) => {
-          if (isHtml(id))
-            service.send(
-              model.events.UPDATE_FILES([
-                {
-                  id: getAbsolutePath(id),
-                  fileType: 'HTML',
-                  fileName: id,
-                },
-              ]),
-            )
-          else if (basename(id).startsWith('manifest'))
-            service.send(
-              model.events.UPDATE_FILES([
-                {
-                  id: getAbsolutePath(id),
-                  fileType: 'MANIFEST',
-                  fileName: 'manifest.json',
-                },
-              ]),
-            )
-          else {
-            result.push(id)
-          }
-        })
+      const { crxFiles, finalInput } = categorizeInput(input, {
+        HTML: createFilter(['**/*.html']),
+        MANIFEST: (id: string) =>
+          basename(id).startsWith('manifest'),
+      })
 
-        if (result.length) finalInput = result
-      } else {
-        const result: [string, string][] = []
-        Object.entries(input).forEach(([fileName, id]) => {
-          if (isHtml(id))
-            service.send(
-              model.events.UPDATE_FILES([
-                {
-                  id: getAbsolutePath(id),
-                  fileType: 'HTML',
-                  fileName: fileName.endsWith('.html')
-                    ? fileName
-                    : fileName + '.html',
-                },
-              ]),
-            )
-          else if (basename(id).startsWith('manifest'))
-            service.send(
-              model.events.UPDATE_FILES([
-                {
-                  id: getAbsolutePath(id),
-                  fileType: 'MANIFEST',
-                  fileName: 'manifest.json',
-                },
-              ]),
-            )
-          else {
-            result.push([fileName, id])
-          }
-        })
-
-        if (result.length)
-          finalInput = Object.fromEntries(result)
-      }
+      if (crxFiles.length)
+        service.send(model.events.ENQUEUE_FILES(crxFiles))
 
       // Vite will run this hook for all our added plugins,
       // but we still need to add builtin plugins for Rollup
-      // TODO: check if this needs to be done in Rollup watch mode
-      if (!isViteServe) {
+      if (!builtinPluginsDone) {
         for (const b of builtins) {
           await b?.options?.call(this, options)
         }
 
+        // Guard against Vite's possibly undefined plugins[]
         const { plugins = [] } = options
         addBuiltinPlugins(plugins as CrxPlugin[])
         options.plugins = plugins

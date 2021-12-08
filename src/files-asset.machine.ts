@@ -82,10 +82,7 @@ export const assetMachine = model.createMachine(
         invoke: { src: 'parser' },
         on: {
           PARSED: {
-            actions: [
-              'updateOwnChildren',
-              'sendUpdateFilesToParent',
-            ],
+            actions: ['updateOwnChildren', 'sendFilesToParent'],
             target: 'emitting',
           },
         },
@@ -187,25 +184,19 @@ export const assetMachine = model.createMachine(
           })
         },
       ),
-      sendUpdateFilesToParent: pure(
-        ({ prevChildren }, event) => {
-          const { files } = narrowEvent(event, 'PARSED')
+      sendFilesToParent: pure(({ prevChildren }, event) => {
+        const { files } = narrowEvent(event, 'PARSED')
 
-          const addedFiles = Array.from(files.values()).filter(
-            (file) => {
-              return !prevChildren?.has(file.id)
-            },
-          )
+        const addedFiles = Array.from(files.values()).filter(
+          (file) => {
+            return !prevChildren?.has(file.id)
+          },
+        )
 
-          // TODO: remove files in watch mode
-          // const removedFiles = Array.from(children.values())
-          //   .filter((child) => !files.has(child.id))
-
-          return sendParent(
-            model.events.UPDATE_FILES(addedFiles),
-          )
-        },
-      ),
+        return addedFiles.map((file) =>
+          sendParent(model.events.SPAWN_FILE(file)),
+        )
+      }),
       sendEmitFileToParent: sendParent(({ source, ...rest }) =>
         model.events.EMIT_FILE({
           type: 'asset',

@@ -26,7 +26,7 @@ const filesContext: FilesContext = {
       fileName: 'manifest.json',
       fileType: 'MANIFEST',
       id: join(process.cwd(), 'manifest.json'),
-      dirname: process.cwd(),
+      dirName: process.cwd(),
     },
   ],
   excluded: new Set(),
@@ -73,50 +73,42 @@ export const machine = model.createMachine(
     states: {
       configuring: {
         on: {
-          UPDATE_FILES: [
-            {
-              cond: (context, { added }) =>
-                added.some(
+          ENQUEUE_FILES: {
+            actions: model.assign({
+              entries: ({ entries }, { files }) => {
+                const map = new Map<
+                  string,
+                  Unpacked<typeof files>
+                >()
+
+                for (const entry of [...entries, ...files]) {
+                  map.set(entry.fileName, entry)
+                }
+
+                return [...map.values()]
+              },
+              root: ({ root }, { files }) => {
+                const manifest = files.find(
                   ({ fileType }) => fileType === 'MANIFEST',
-                ),
-              actions: model.assign({
-                entries: (context, { added }) => added,
-                root: (context, { added }) => {
-                  const { id } = added.find(
-                    ({ fileType }) => fileType === 'MANIFEST',
-                  )!
-                  return resolve(process.cwd(), dirname(id))
-                },
-              }),
-            },
-            {
-              actions: model.assign({
-                entries: ({ entries }, { added }) => {
-                  const map = new Map<
-                    string,
-                    Unpacked<typeof added>
-                  >()
+                ) as BaseAsset
 
-                  for (const entry of [...entries, ...added]) {
-                    map.set(entry.id, entry)
-                  }
-
-                  return [...map.values()]
-                },
-              }),
-            },
-          ],
+                if (manifest?.dirName) return manifest.dirName
+                if (manifest?.id) return dirname(manifest.id)
+                return root
+              },
+            }),
+          },
           ROOT: {
             actions: model.assign({
               root: (context, { root }) => root,
               entries: ({ entries }, { root }) =>
                 entries.map((entry) => {
                   if (entry.fileType === 'MANIFEST') {
-                    const dir = resolve(process.cwd(), root)
+                    const dirName = resolve(process.cwd(), root)
                     return {
                       ...entry,
-                      id: join(dir, 'manifest.json'),
-                      dirname: dir,
+                      id: join(dirName, 'manifest.json'),
+                      dirName,
                     }
                   }
 
@@ -132,14 +124,34 @@ export const machine = model.createMachine(
       },
       parsing: {
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
-        entry: 'addEntryFiles',
+        entry: 'spawnManifest',
         on: {
           EMIT_FILE: { actions: 'handleFile' },
           FILE_ID: { actions: 'forwardToFile' },
           PLUGINS_RESULT: { actions: 'forwardToFile' },
-          PLUGINS_START: { actions: forwardTo('pluginsRunner') },
+          PLUGINS_START: [
+            {
+              cond: (context, { fileType }) =>
+                fileType === 'MANIFEST',
+              actions: [
+                'spawnEntryFiles',
+                forwardTo('pluginsRunner'),
+              ],
+            },
+            { actions: forwardTo('pluginsRunner') },
+          ],
           READY: { cond: 'allFilesReady', target: 'ready' },
-          UPDATE_FILES: { actions: 'updateFiles' },
+          SPAWN_FILE: [
+            {
+              cond: ({ files }, { file: { fileName } }) =>
+                files.every(
+                  (f) =>
+                    f.getSnapshot()?.context.fileName !==
+                    fileName,
+                ),
+              actions: 'spawnFile',
+            },
+          ],
         },
       },
       ready: {
@@ -195,9 +207,6 @@ export const machine = model.createMachine(
   },
   {
     actions: {
-      addEntryFiles: send(({ entries }) =>
-        model.events.UPDATE_FILES(entries),
-      ),
       sendAbortToAllFiles: pure(({ files }) =>
         files.map((file) =>
           send(model.events.ABORT(), { to: () => file }),
@@ -216,39 +225,24 @@ export const machine = model.createMachine(
           (f) => f.getSnapshot()?.context.id === id,
         )!
       }),
-      updateFiles: assign({
-        files: ({ files, root, excluded }, event) => {
-          console.log('updateFiles', excluded)
-          const { added } = narrowEvent(event, 'UPDATE_FILES')
-          const manifest = files.find(
-            (f) =>
-              f.getSnapshot()?.context.fileType === 'MANIFEST',
-          )
+      spawnManifest: send(({ entries }) => {
+        const manifest = entries.find(
+          ({ fileType }) => fileType === 'MANIFEST',
+        )
 
-          const newFiles = added
-            // Do not re-add manifest, since manifest can have different id here
-            .filter(({ fileType }) =>
-              manifest ? fileType !== 'MANIFEST' : true,
-            )
-            // File does not exist
-            .filter(({ id }) =>
-              files.every(
-                (f) => f.getSnapshot()?.context.id !== id,
-              ),
-            )
-            // File type is not excluded
-            .filter(({ fileType }) => !excluded.has(fileType))
-            .map((file) => spawnFile(file, root))
-
-          return [...files, ...newFiles]
+        return model.events.SPAWN_FILE(manifest!)
+      }),
+      spawnEntryFiles: pure(({ entries }) =>
+        entries
+          .filter(({ fileType }) => fileType !== 'MANIFEST')
+          .map((file) => send(model.events.SPAWN_FILE(file))),
+      ),
+      spawnFile: assign({
+        files: ({ files, root }, event) => {
+          const { file } = narrowEvent(event, 'SPAWN_FILE')
+          return [...files, spawnFile(file, root)]
         },
       }),
-      // updateFilesReady: assign({
-      //   filesReady: ({ filesReady }, event) => {
-      //     const { id } = narrowEvent(event, 'READY')
-      //     return [...filesReady, id]
-      //   },
-      // }),
       renderManifest: send(model.events.START(true), {
         to: ({ files }) =>
           files.find(
