@@ -87,17 +87,20 @@ export const waitForState = <
           if (!matcher(state)) return
 
           resolve(state)
-          sub.unsubscribe()
+          // this can happen before sub is initialized, causing a ReferenceError
+          setImmediate(() => sub.unsubscribe())
         } catch (error) {
           reject(error)
-          sub.unsubscribe()
+          setImmediate(() => sub.unsubscribe())
         }
       },
       error: (error) => {
         reject(error)
+        setImmediate(() => sub.unsubscribe())
       },
       complete: () => {
         reject(new Error(`${service.id} has stopped`))
+        setImmediate(() => sub.unsubscribe())
       },
     })
   })
