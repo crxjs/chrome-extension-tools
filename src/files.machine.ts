@@ -1,7 +1,6 @@
 import {
   assign,
   forwardTo,
-  log,
   pure,
   send,
 } from 'xstate/lib/actions'
