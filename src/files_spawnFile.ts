@@ -37,7 +37,7 @@ export function spawnFile(
   }
 
   let parser: (context: Asset) => Observable<AssetEvent> = () =>
-    of(model.events.PARSED([]))
+    of(model.events.PARSE_RESULT([]))
   if (file.fileType === 'HTML') {
     parser = htmlParser(root)
   } else if (file.fileType === 'MANIFEST') {

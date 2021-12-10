@@ -1,18 +1,13 @@
 import { of } from 'rxjs'
 import { assign, EventFrom, sendParent } from 'xstate'
-import { pure } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
 import { isUndefined } from './helpers'
-import { Asset, BaseAsset, Script } from './types'
+import { Asset } from './types'
 import { narrowEvent } from './xstate_helpers'
 
 export const model = createModel(
-  {} as Asset & {
-    /** Used to track added/removed child files */
-    children?: Map<string, BaseAsset | Script>
-    prevChildren?: Map<string, BaseAsset | Script>
-  },
+  {} as Asset & { originalSource?: Asset['source'] },
   {
     events: {
       ...sharedEventCreators,
@@ -22,9 +17,9 @@ export const model = createModel(
       }: {
         source: any
         id?: string
-      }) => ({ source, id }),
-      PARSED: (files: (BaseAsset | Script)[]) => ({
-        files: new Map(files.map((file) => [file.id, file])),
+      }) => ({
+        source,
+        id,
       }),
     },
   },
@@ -56,7 +51,7 @@ export const assetMachine = model.createMachine(
         on: {
           LOADED: {
             actions: assign({
-              source: (context, { source }) => source,
+              originalSource: (context, { source }) => source,
               id: ({ id }, { id: newId }) => newId ?? id,
             }),
             target: 'transforming',
@@ -64,15 +59,19 @@ export const assetMachine = model.createMachine(
         },
       },
       transforming: {
-        entry: 'sendPluginsStartToParent',
+        entry: sendParent(
+          ({ originalSource, source, ...rest }) =>
+            model.events.PLUGINS_START({
+              source: originalSource!,
+              ...rest,
+            }),
+        ),
         on: {
           PLUGINS_RESULT: {
-            cond: ({ id }, event) => {
-              return id === event.id
-            },
+            cond: ({ id }, event) => id === event.id,
             actions: assign({
-              source: (context, { source }) => source as any,
-              fileName: (context, { fileName }) => fileName,
+              // @ts-expect-error it's the same type
+              source: (context, { source }) => source,
             }),
             target: 'parsing',
           },
@@ -81,11 +80,14 @@ export const assetMachine = model.createMachine(
       parsing: {
         invoke: { src: 'parser' },
         on: {
-          PARSED: {
-            actions: ['updateOwnChildren', 'sendFilesToParent'],
-            target: 'emitting',
+          PARSE_RESULT: {
+            actions: 'forwardToParent',
+            target: 'parsed',
           },
         },
+      },
+      parsed: {
+        on: { EMIT_START: 'emitting' },
       },
       emitting: {
         entry: 'sendEmitFileToParent',
@@ -101,27 +103,26 @@ export const assetMachine = model.createMachine(
             }),
             target: 'ready',
           },
+          FILE_EXCLUDED: 'excluded',
         },
       },
       ready: {
         entry: 'sendReadyToParent',
         on: {
-          START: [
-            {
-              cond: ({ fileType }, { manifest }) =>
-                fileType === 'MANIFEST' && manifest,
-              target: 'rendering',
-            },
-            {
-              cond: ({ fileType }, { manifest }) =>
-                fileType !== 'MANIFEST' && !manifest,
-              target: 'rendering',
-            },
-          ],
+          RENDER_START: {
+            cond: ({ fileType }) => fileType !== 'MANIFEST',
+            target: 'rendering',
+          },
+          RENDER_MANIFEST: {
+            cond: ({ fileType }) => fileType === 'MANIFEST',
+            target: 'rendering',
+          },
         },
       },
       rendering: {
-        entry: 'sendPluginsStartToParent',
+        entry: sendParent(({ originalSource, ...rest }) =>
+          model.events.PLUGINS_START(rest),
+        ),
         on: {
           PLUGINS_RESULT: {
             actions: 'sendCompleteToParent',
@@ -130,6 +131,7 @@ export const assetMachine = model.createMachine(
         },
       },
       complete: {
+        id: 'complete',
         on: {
           CHANGE: [
             {
@@ -142,14 +144,17 @@ export const assetMachine = model.createMachine(
         },
       },
       changed: {
-        on: { START: 'loading' },
+        on: { BUILD_START: 'loading' },
       },
       unchanged: {
-        on: { START: 'emitting' },
+        on: { BUILD_START: 'transforming' },
       },
       error: {
         id: 'error',
-        on: { START: 'loading' },
+        on: { BUILD_START: 'loading' },
+      },
+      excluded: {
+        entry: 'sendReadyToParent',
       },
     },
   },
@@ -184,38 +189,15 @@ export const assetMachine = model.createMachine(
           })
         },
       ),
-      sendFilesToParent: pure(({ prevChildren }, event) => {
-        const { files } = narrowEvent(event, 'PARSED')
-
-        const addedFiles = Array.from(files.values()).filter(
-          (file) => {
-            return !prevChildren?.has(file.id)
-          },
-        )
-
-        return addedFiles.map((file) =>
-          sendParent(model.events.SPAWN_FILE(file)),
-        )
-      }),
       sendEmitFileToParent: sendParent(({ source, ...rest }) =>
         model.events.EMIT_FILE({
           type: 'asset',
           ...rest,
         }),
       ),
-      sendPluginsStartToParent: sendParent((context) =>
-        model.events.PLUGINS_START(context),
-      ),
       sendReadyToParent: sendParent(({ id }) =>
         model.events.READY(id),
       ),
-      updateOwnChildren: assign({
-        children: (context, event) => {
-          const { files } = narrowEvent(event, 'PARSED')
-          return files
-        },
-        prevChildren: ({ children }) => children,
-      }),
     },
     services: {
       loader: ({ id }) =>

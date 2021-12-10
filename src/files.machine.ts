@@ -1,7 +1,9 @@
+import { SendAction } from 'xstate'
 import {
   assign,
   forwardTo,
   pure,
+  respond,
   send,
 } from 'xstate/lib/actions'
 import { createModel } from 'xstate/lib/model'
@@ -13,13 +15,15 @@ import { BaseAsset, FileType, Script } from './types'
 import { narrowEvent } from './xstate_helpers'
 
 export interface FilesContext {
-  files: ReturnType<typeof spawnFile>[]
+  filesById: Map<string, ReturnType<typeof spawnFile>>
+  filesByName: Map<string, ReturnType<typeof spawnFile>>
   root: string
   entries: (BaseAsset | Script)[]
   excluded: Set<FileType>
 }
 const filesContext: FilesContext = {
-  files: [],
+  filesById: new Map(),
+  filesByName: new Map(),
   root: process.cwd(),
   entries: [
     {
@@ -60,14 +64,6 @@ export const machine = model.createMachine(
         target: '.complete',
         actions: 'sendAbortToAllFiles',
       },
-      EXCLUDE_FILE_TYPE: {
-        actions:
-          // TODO: may want to filter out files
-          model.assign({
-            excluded: ({ excluded }, { fileType }) =>
-              new Set(excluded).add(fileType),
-          }),
-      },
     },
     initial: 'configuring',
     states: {
@@ -98,6 +94,9 @@ export const machine = model.createMachine(
               },
             }),
           },
+          EXCLUDE_FILE_TYPE: {
+            actions: 'updateExcludedFiles',
+          },
           ROOT: {
             actions: model.assign({
               root: (context, { root }) => root,
@@ -116,50 +115,76 @@ export const machine = model.createMachine(
                 }),
             }),
           },
-          START: {
-            actions: 'forwardToAllFiles',
-            target: 'parsing',
-          },
+          BUILD_START: 'transforming',
         },
       },
-      parsing: {
+      transforming: {
         invoke: { id: 'pluginsRunner', src: 'pluginsRunner' },
-        entry: 'spawnManifest',
         on: {
-          EMIT_FILE: { actions: 'handleFile' },
-          FILE_ID: { actions: 'forwardToFile' },
-          PLUGINS_RESULT: { actions: 'forwardToFile' },
-          PLUGINS_START: [
-            {
-              cond: (context, { fileType }) =>
-                fileType === 'MANIFEST',
-              actions: [
-                'spawnEntryFiles',
-                forwardTo('pluginsRunner'),
+          PLUGINS_START: { actions: forwardTo('pluginsRunner') },
+          SPAWN_FILE: {
+            cond: ({ filesByName }, { file: { fileName } }) =>
+              !filesByName.has(fileName),
+            actions: 'spawnFile',
+          },
+        },
+        initial: 'manifest',
+        states: {
+          manifest: {
+            entry: 'startManifest',
+            on: {
+              EXCLUDE_FILE_TYPE: {
+                actions: 'updateExcludedFiles',
+              },
+              PLUGINS_RESULT: {
+                actions: 'forwardToFile',
+                target: 'assets',
+              },
+            },
+          },
+          assets: {
+            entry: 'startAssets',
+            on: {
+              EXCLUDE_FILE_TYPE: {
+                actions: 'updateExcludedFiles',
+              },
+              PLUGINS_RESULT: { actions: 'forwardToFile' },
+              PARSE_RESULT: [
+                {
+                  cond: 'allFilesParsed',
+                  target: 'emitting',
+                },
+                {
+                  actions: 'spawnParsedFiles',
+                },
               ],
             },
-            { actions: forwardTo('pluginsRunner') },
-          ],
-          READY: { cond: 'allFilesReady', target: 'ready' },
-          SPAWN_FILE: [
-            {
-              cond: ({ files }, { file: { fileName } }) =>
-                files.every(
-                  (f) =>
-                    f.getSnapshot()?.context.fileName !==
-                    fileName,
-                ),
-              actions: 'spawnFile',
+          },
+          emitting: {
+            entry: 'sendEmitStartToAllFiles',
+            on: {
+              EMIT_FILE: [
+                {
+                  cond: ({ excluded }, { file: { fileType } }) =>
+                    excluded.has(fileType),
+                  actions: respond((context, { file: { id } }) =>
+                    model.events.FILE_EXCLUDED(id),
+                  ),
+                },
+                {
+                  actions: 'handleFile',
+                },
+              ],
+              FILE_ID: { actions: 'forwardToFile' },
+              READY: { cond: 'allFilesReady', target: '#ready' },
             },
-          ],
+          },
         },
       },
       ready: {
+        id: 'ready',
         on: {
-          START: {
-            actions: 'forwardToAllFiles',
-            target: 'rendering',
-          },
+          RENDER_START: 'rendering',
         },
       },
       rendering: {
@@ -167,23 +192,37 @@ export const machine = model.createMachine(
         on: {
           PLUGINS_START: { actions: forwardTo('pluginsRunner') },
           PLUGINS_RESULT: { actions: 'forwardToFile' },
-          COMPLETE_FILE: [
-            {
-              cond: 'readyForManifest',
-              actions: ['renderManifest', 'handleFile'],
+        },
+        initial: 'assets',
+        states: {
+          assets: {
+            entry: 'renderAssets',
+            on: {
+              COMPLETE_FILE: [
+                {
+                  cond: 'readyForManifest',
+                  actions: 'handleFile',
+                  target: 'manifest',
+                },
+                {
+                  actions: 'handleFile',
+                },
+              ],
             },
-            {
-              cond: 'allFilesComplete',
-              actions: 'handleFile',
-              target: 'complete',
+          },
+          manifest: {
+            entry: 'renderManifest',
+            on: {
+              COMPLETE_FILE: {
+                actions: 'handleFile',
+                target: '#complete',
+              },
             },
-            {
-              actions: 'handleFile',
-            },
-          ],
+          },
         },
       },
       complete: {
+        id: 'complete',
         on: {
           CHANGE: {
             actions: [
@@ -207,69 +246,126 @@ export const machine = model.createMachine(
   },
   {
     actions: {
-      sendAbortToAllFiles: pure(({ files }) =>
-        files.map((file) =>
+      sendAbortToAllFiles: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
           send(model.events.ABORT(), { to: () => file }),
         ),
       ),
-      forwardToAllFiles: pure(({ files }) =>
-        files.map((file) => forwardTo(() => file)),
+      sendEmitStartToAllFiles: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
+          send(model.events.EMIT_START(), { to: () => file }),
+        ),
       ),
-      forwardToFile: forwardTo(({ files }, event) => {
+      forwardToAllFiles: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
+          forwardTo(() => file),
+        ),
+      ),
+      forwardToFile: forwardTo(({ filesById }, event) => {
         const { id } = narrowEvent(event, [
           'FILE_ID',
           'PLUGINS_RESULT',
         ])
-        return files.find(
-          // TODO: need to stop using actor ids, use context id instead
-          (f) => f.getSnapshot()?.context.id === id,
-        )!
+        return filesById.get(id)!
       }),
-      spawnManifest: send(({ entries }) => {
-        const manifest = entries.find(
-          ({ fileType }) => fileType === 'MANIFEST',
+      startManifest: pure(({ entries, filesByName }) => {
+        if (filesByName.has('manifest.json')) {
+          const manifest = filesByName.get('manifest.json')!
+          return send(model.events.BUILD_START(), {
+            to: () => manifest,
+          })
+        } else {
+          const manifest = entries.find(
+            ({ fileType }) => fileType === 'MANIFEST',
+          )!
+          return send(model.events.SPAWN_FILE(manifest))
+        }
+      }),
+      startAssets: pure(({ entries, filesById }) => {
+        const spawnEvents = entries
+          .filter(({ fileType }) => fileType !== 'MANIFEST')
+          .map((file) => send(model.events.SPAWN_FILE(file)))
+        const buildEvents = [...filesById.values()].map((file) =>
+          send(model.events.BUILD_START(), { to: () => file }),
         )
 
-        return model.events.SPAWN_FILE(manifest!)
+        return [...spawnEvents, ...buildEvents] as any[]
       }),
-      spawnEntryFiles: pure(({ entries }) =>
-        entries
-          .filter(({ fileType }) => fileType !== 'MANIFEST')
-          .map((file) => send(model.events.SPAWN_FILE(file))),
-      ),
-      spawnFile: assign({
-        files: ({ files, root }, event) => {
+      spawnParsedFiles: pure((context, event) => {
+        const { children } = narrowEvent(event, 'PARSE_RESULT')
+        return children.map((file) =>
+          send(model.events.SPAWN_FILE(file)),
+        )
+      }),
+      spawnFile: assign(
+        ({ filesById, filesByName, root }, event) => {
           const { file } = narrowEvent(event, 'SPAWN_FILE')
-          return [...files, spawnFile(file, root)]
+          const actor = spawnFile(file, root)
+          return {
+            filesById: new Map(filesById).set(file.id, actor),
+            filesByName: new Map(filesByName).set(
+              file.fileName,
+              actor,
+            ),
+          }
         },
-      }),
-      renderManifest: send(model.events.START(true), {
-        to: ({ files }) =>
-          files.find(
-            (f) =>
-              f.getSnapshot()?.context.fileType === 'MANIFEST',
-          )!,
+      ),
+      renderAssets: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
+          send(model.events.RENDER_START(), {
+            to: () => file,
+          }),
+        ),
+      ),
+      renderManifest: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
+          send(model.events.RENDER_MANIFEST(), {
+            to: () => file,
+          }),
+        ),
+      ),
+      updateExcludedFiles: assign({
+        excluded: ({ excluded }, event) => {
+          const { fileType } = narrowEvent(
+            event,
+            'EXCLUDE_FILE_TYPE',
+          )
+
+          return new Set(excluded).add(fileType)
+        },
       }),
     },
     guards: {
-      // allFilesReady: ({ files, filesReady }, event) => {
-      //   narrowEvent(event, 'READY')
-      //   return files.length === filesReady.length + 1
-      // },
-      allFilesReady: ({ files }) =>
-        files.every((file) =>
-          file.getSnapshot()?.matches('ready'),
-        ),
-      allFilesComplete: ({ files }) =>
-        files.every((file) =>
-          file.getSnapshot()?.matches('complete'),
-        ),
-      readyForManifest: ({ files }) =>
-        files.every((file) => {
-          const snap = file.getSnapshot()
-          if (snap?.context.fileType === 'MANIFEST')
-            return snap?.matches('ready')
-          return snap?.matches('complete')
+      allFilesParsed: ({ filesById }, event) => {
+        const { children } = narrowEvent(event, 'PARSE_RESULT')
+
+        return (
+          children.length === 0 &&
+          [...filesById.values()].every((file) => {
+            const state = file.getSnapshot()
+            return (
+              state?.matches('parsed') ||
+              state?.matches('excluded')
+            )
+          })
+        )
+      },
+      allFilesReady: ({ filesById }) =>
+        [...filesById.values()].every((file) => {
+          const state = file.getSnapshot()
+          return (
+            state?.matches('ready') || state?.matches('excluded')
+          )
+        }),
+      readyForManifest: ({ filesById }) =>
+        [...filesById.values()].every((file) => {
+          const state = file.getSnapshot()
+          if (state?.context.fileType === 'MANIFEST')
+            return state?.matches('ready')
+          return (
+            state?.matches('complete') ||
+            state?.matches('excluded')
+          )
         }),
     },
   },
