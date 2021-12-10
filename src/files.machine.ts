@@ -1,4 +1,3 @@
-import { SendAction } from 'xstate'
 import {
   assign,
   forwardTo,
@@ -9,30 +8,32 @@ import {
 import { createModel } from 'xstate/lib/model'
 import { sharedEventCreators } from './files.sharedEvents'
 import { spawnFile } from './files_spawnFile'
-import { Unpacked } from './helpers'
 import { dirname, join, resolve } from './path'
-import { BaseAsset, FileType, Script } from './types'
+import {
+  BaseAsset,
+  FileType,
+  ManifestAsset,
+  Script,
+} from './types'
 import { narrowEvent } from './xstate_helpers'
 
 export interface FilesContext {
   filesById: Map<string, ReturnType<typeof spawnFile>>
   filesByName: Map<string, ReturnType<typeof spawnFile>>
   root: string
-  entries: (BaseAsset | Script)[]
+  inputsByName: Map<string, BaseAsset | Script>
   excluded: Set<FileType>
 }
 const filesContext: FilesContext = {
   filesById: new Map(),
   filesByName: new Map(),
   root: process.cwd(),
-  entries: [
-    {
-      fileName: 'manifest.json',
-      fileType: 'MANIFEST',
-      id: join(process.cwd(), 'manifest.json'),
-      dirName: process.cwd(),
-    },
-  ],
+  inputsByName: new Map().set('manifest.json', {
+    fileName: 'manifest.json',
+    fileType: 'MANIFEST',
+    id: join(process.cwd(), 'manifest.json'),
+    dirName: process.cwd(),
+  }),
   excluded: new Set(),
 }
 
@@ -71,17 +72,14 @@ export const machine = model.createMachine(
         on: {
           ENQUEUE_FILES: {
             actions: model.assign({
-              entries: ({ entries }, { files }) => {
-                const map = new Map<
-                  string,
-                  Unpacked<typeof files>
-                >()
+              inputsByName: ({ inputsByName }, { files }) => {
+                const map = new Map(inputsByName)
 
-                for (const entry of [...entries, ...files]) {
-                  map.set(entry.fileName, entry)
+                for (const file of files) {
+                  map.set(file.fileName, file)
                 }
 
-                return [...map.values()]
+                return map
               },
               root: ({ root }, { files }) => {
                 const manifest = files.find(
@@ -100,19 +98,16 @@ export const machine = model.createMachine(
           ROOT: {
             actions: model.assign({
               root: (context, { root }) => root,
-              entries: ({ entries }, { root }) =>
-                entries.map((entry) => {
-                  if (entry.fileType === 'MANIFEST') {
-                    const dirName = resolve(process.cwd(), root)
-                    return {
-                      ...entry,
-                      id: join(dirName, 'manifest.json'),
-                      dirName,
-                    }
-                  }
+              inputsByName: ({ inputsByName }, { root }) => {
+                const dirName = resolve(process.cwd(), root)
+                const manifest = inputsByName.get(
+                  'manifest.json',
+                ) as ManifestAsset
+                manifest.id = join(dirName, 'manifest.json')
+                manifest.dirName = dirName
 
-                  return entry
-                }),
+                return inputsByName
+              },
             }),
           },
           BUILD_START: 'transforming',
@@ -225,19 +220,7 @@ export const machine = model.createMachine(
         id: 'complete',
         on: {
           CHANGE: {
-            actions: [
-              'forwardToAllFiles',
-              model.assign({
-                // reset context.entries
-                entries: ({ root }) => [
-                  {
-                    fileName: 'manifest.json',
-                    fileType: 'MANIFEST',
-                    id: root,
-                  },
-                ],
-              }),
-            ],
+            actions: 'forwardToAllFiles',
             target: 'configuring',
           },
         },
@@ -268,25 +251,31 @@ export const machine = model.createMachine(
         ])
         return filesById.get(id)!
       }),
-      startManifest: pure(({ entries, filesByName }) => {
+      startManifest: pure(({ inputsByName, filesByName }) => {
         if (filesByName.has('manifest.json')) {
           const manifest = filesByName.get('manifest.json')!
           return send(model.events.BUILD_START(), {
             to: () => manifest,
           })
         } else {
-          const manifest = entries.find(
-            ({ fileType }) => fileType === 'MANIFEST',
-          )!
+          const manifest = inputsByName.get('manifest.json')!
           return send(model.events.SPAWN_FILE(manifest))
         }
       }),
-      startAssets: pure(({ entries, filesById }) => {
-        const spawnEvents = entries
-          .filter(({ fileType }) => fileType !== 'MANIFEST')
-          .map((file) => send(model.events.SPAWN_FILE(file)))
-        const buildEvents = [...filesById.values()].map((file) =>
-          send(model.events.BUILD_START(), { to: () => file }),
+      startAssets: pure(({ inputsByName, filesByName }) => {
+        const assetEntries = new Map(inputsByName)
+        assetEntries.delete('manifest.json')
+        const spawnEvents = [...assetEntries.values()].map(
+          (file) => send(model.events.SPAWN_FILE(file)),
+        )
+
+        const assetFiles = new Map(filesByName)
+        assetFiles.delete('manifest.json')
+        const buildEvents = [...assetFiles.values()].map(
+          (file) =>
+            send(model.events.BUILD_START(), {
+              to: () => file,
+            }),
         )
 
         return [...spawnEvents, ...buildEvents] as any[]
@@ -310,20 +299,19 @@ export const machine = model.createMachine(
           }
         },
       ),
-      renderAssets: pure(({ filesById }) =>
-        [...filesById.values()].map((file) =>
+      renderAssets: pure(({ filesByName }) => {
+        const assetsByName = new Map(filesByName)
+        assetsByName.delete('manifest.json')
+        return [...assetsByName.values()].map((file) =>
           send(model.events.RENDER_START(), {
             to: () => file,
           }),
-        ),
-      ),
-      renderManifest: pure(({ filesById }) =>
-        [...filesById.values()].map((file) =>
-          send(model.events.RENDER_MANIFEST(), {
-            to: () => file,
-          }),
-        ),
-      ),
+        )
+      }),
+      renderManifest: send(model.events.RENDER_START(), {
+        to: ({ filesByName }) =>
+          filesByName.get('manifest.json')!,
+      }),
       updateExcludedFiles: assign({
         excluded: ({ excluded }, event) => {
           const { fileType } = narrowEvent(

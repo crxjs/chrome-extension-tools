@@ -109,14 +109,7 @@ export const assetMachine = model.createMachine(
       ready: {
         entry: 'sendReadyToParent',
         on: {
-          RENDER_START: {
-            cond: ({ fileType }) => fileType !== 'MANIFEST',
-            target: 'rendering',
-          },
-          RENDER_MANIFEST: {
-            cond: ({ fileType }) => fileType === 'MANIFEST',
-            target: 'rendering',
-          },
+          RENDER_START: 'rendering',
         },
       },
       rendering: {
