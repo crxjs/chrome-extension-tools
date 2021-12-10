@@ -34,6 +34,7 @@ test('writes entry points to disk', async () => {
   const popup = 'popup.html'
   const content = 'content.js'
   const worker = 'service_worker.js'
+  const popupJs = 'popup.js'
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
@@ -67,4 +68,7 @@ test('writes entry points to disk', async () => {
   expect(workerSource).toMatch(
     'fetchEvent.respondWith(mapRequestsToLocalhost(url.href))',
   )
+
+  const popupJsPath = path.join(outDir, popupJs)
+  expect(fs.existsSync(popupJsPath)).toBe(false)
 })

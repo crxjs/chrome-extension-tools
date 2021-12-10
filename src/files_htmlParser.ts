@@ -38,7 +38,7 @@ export function htmlParser(
         }),
       )
 
-      return of(model.events.PARSED(files))
+      return of(model.events.PARSE_RESULT(files))
     } catch (error) {
       return of(model.events.ERROR(error))
     }

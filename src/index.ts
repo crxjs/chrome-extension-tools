@@ -93,10 +93,10 @@ export const chromeExtension = (
   ]
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
-  let builtinPluginsDone = false
   let isViteServe: boolean
-  function addBuiltinPlugins(plugins: CrxPlugin[]) {
-    if (builtinPluginsDone) return
+  let setupPluginsDone = false
+  function setupPlugins(plugins: CrxPlugin[]) {
+    if (setupPluginsDone) return
 
     const prepared = isViteServe
       ? builtins
@@ -109,7 +109,7 @@ export const chromeExtension = (
     plugins.length = 0
     plugins.push(...combined)
 
-    builtinPluginsDone = true
+    setupPluginsDone = true
   }
 
   const allPlugins = new Set<CrxPlugin>()
@@ -220,9 +220,7 @@ export const chromeExtension = (
         typeof config.plugins
       >
 
-      // Add plugins to Vite config in serve mode
-      // Otherwise, add them to Rollup options
-      if (isViteServe) addBuiltinPlugins(plugins)
+      setupPlugins(plugins)
 
       // Run possibly async builtins last
       // After this, Vite will take over
@@ -243,14 +241,14 @@ export const chromeExtension = (
 
       // Vite will run this hook for all our added plugins,
       // but we still need to add builtin plugins for Rollup
-      if (!builtinPluginsDone) {
+      if (!setupPluginsDone) {
         for (const b of builtins) {
           await b?.options?.call(this, options)
         }
 
         // Guard against Vite's possibly undefined plugins[]
         const { plugins = [] } = options
-        addBuiltinPlugins(plugins as CrxPlugin[])
+        setupPlugins(plugins as CrxPlugin[])
         options.plugins = plugins
       }
 
@@ -290,7 +288,7 @@ export const chromeExtension = (
         },
       })
 
-      service.send(model.events.START())
+      service.send(model.events.BUILD_START())
       await waitForState(service, (state) => {
         if (state.event.type === 'ERROR') throw state.event.error
         return state.matches('ready')
@@ -333,7 +331,7 @@ export const chromeExtension = (
         },
       })
 
-      service.send(model.events.START())
+      service.send(model.events.RENDER_START())
       await waitForState(service, (state) => {
         if (
           state.matches('error') &&

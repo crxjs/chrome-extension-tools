@@ -42,38 +42,47 @@ function normalizeFilePaths({
 }
 
 export const sharedEventCreators = {
-  ROOT: (root: string) => ({ root }),
-  /** All paths are normalized here to use posix */
-  REMOVE_FILE: (id: string) => ({ id }),
-  ENQUEUE_FILES: (files: (BaseAsset | Script)[]) => ({
-    files: files.map(normalizeFilePaths),
+  ABORT: () => ({}),
+  BUILD_MANIFEST: () => ({}),
+  BUILD_START: () => ({}),
+  CHANGE: (id: string, change: { event: ChangeEvent }) => ({
+    id,
+    ...change,
   }),
-  SPAWN_FILE: (file: BaseAsset | Script) => ({ file }),
-  EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
-  EMIT_FILE: (
-    file: Omit<CompleteFile, 'source' | 'fileId'>,
-  ) => ({ file }),
-  SCRIPT_COMPLETE: (id: string) => ({ id }),
   COMPLETE_FILE: (data: {
     id: string
     fileId: string
     source?: string | Uint8Array
   }) => data,
-  FILE_ID: (input: { id: string; fileId: string }) => input,
-  ABORT: () => ({}),
-  CHANGE: (id: string, change: { event: ChangeEvent }) => ({
-    id,
-    ...change,
+  EMIT_FILE: (
+    file: Omit<CompleteFile, 'source' | 'fileId'>,
+  ) => ({ file }),
+  EMIT_START: (manifest = false) => ({ manifest }),
+  ENQUEUE_FILES: (files: (BaseAsset | Script)[]) => ({
+    files: files.map(normalizeFilePaths),
   }),
   ERROR: (error: unknown) => ({ error }),
-  START: (manifest = false) => ({ manifest }),
-  READY: (id: string) => ({ id }),
-  PLUGINS_START: (
-    asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
-  ) => asset,
+  EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
+  FILE_EXCLUDED: (id: string) => ({ id }),
+  FILE_ID: (input: { id: string; fileId: string }) => input,
+  PARSE_RESULT: (files: (BaseAsset | Script)[]) => ({
+    children: [
+      ...new Map(files.map((file) => [file.id, file])).values(),
+    ],
+  }),
   PLUGINS_RESULT: (
     asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
   ) => asset,
+  PLUGINS_START: (
+    asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
+  ) => asset,
+  READY: (id: string) => ({ id }),
+  REMOVE_FILE: (id: string) => ({ id }),
+  RENDER_START: () => ({}),
+  RENDER_MANIFEST: () => ({}),
+  ROOT: (root: string) => ({ root }),
+  SCRIPT_COMPLETE: (id: string) => ({ id }),
+  SPAWN_FILE: (file: BaseAsset | Script) => ({ file }),
 }
 export type SharedEvent = EventFrom<typeof sharedEventModel>
 export const sharedEventModel = createModel(

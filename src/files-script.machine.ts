@@ -13,33 +13,41 @@ export const scriptMachine = model.createMachine(
   {
     context: model.initialContext,
     on: { ERROR: '#error', ABORT: '#error' },
-    initial: 'emitting',
+    initial: 'parsed',
     states: {
+      parsed: {
+        entry: sendParent(model.events.PARSE_RESULT([])),
+        on: {
+          EMIT_START: 'emitting',
+        },
+      },
       emitting: {
         entry: 'sendEmitFileToParent',
         on: {
           FILE_ID: 'ready',
+          FILE_EXCLUDED: 'excluded',
         },
       },
       ready: {
         entry: 'sendReadyToParent',
         on: {
-          START: 'complete',
+          RENDER_START: 'complete',
         },
       },
       complete: {
         entry: 'sendCompleteToParent',
         on: {
-          START: 'emitting',
+          BUILD_START: 'parsed',
         },
       },
       error: {
         id: 'error',
         entry: 'forwardToParent',
         on: {
-          START: 'emitting',
+          BUILD_START: 'parsed',
         },
       },
+      excluded: {},
     },
   },
   {
