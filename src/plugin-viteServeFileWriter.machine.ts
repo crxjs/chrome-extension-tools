@@ -7,7 +7,7 @@ export const pluginsHook = 'configResolved'
 export const serverHook = 'configureServer'
 export const optionsHook = 'buildStart'
 
-interface Context {
+export interface FileWriterContext {
   /** CrxPlugins to be shared between serve and Rollup watch */
   plugins: CrxPlugin[]
   server?: ViteDevServer
@@ -18,7 +18,7 @@ export const getEmittedFileId = (file: EmittedFile): string =>
     ? file.fileName ?? file.name ?? 'fake asset id'
     : file.id
 
-const context: Context = {
+const context: FileWriterContext = {
   plugins: [],
 }
 
