@@ -22,7 +22,7 @@ export function spawnFile(
 ) {
   if (isScript(file))
     return spawn(scriptMachine.withContext(file), {
-      name: file.id,
+      name: file.fileName,
     })
 
   let loader: (context: Asset) => Observable<AssetEvent>
@@ -37,7 +37,7 @@ export function spawnFile(
   }
 
   let parser: (context: Asset) => Observable<AssetEvent> = () =>
-    of(model.events.PARSE_RESULT([]))
+    of(model.events.PARSE_RESULT(file.fileName, []))
   if (file.fileType === 'HTML') {
     parser = htmlParser(root)
   } else if (file.fileType === 'MANIFEST') {
@@ -58,7 +58,7 @@ export function spawnFile(
         },
       })
       .withContext(file as Asset),
-    { name: file.id },
+    { name: file.fileName },
   )
 }
 

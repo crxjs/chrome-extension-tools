@@ -41,7 +41,9 @@ export function manifestParser(
           'Manifest must define at least one entry file',
         )
 
-      return of(model.events.PARSE_RESULT(files))
+      return of(
+        model.events.PARSE_RESULT('manifest.json', files),
+      )
     } catch (error) {
       return of(model.events.ERROR(error))
     }

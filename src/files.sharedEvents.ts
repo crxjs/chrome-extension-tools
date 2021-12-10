@@ -65,7 +65,12 @@ export const sharedEventCreators = {
   EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
   FILE_EXCLUDED: (id: string) => ({ id }),
   FILE_ID: (input: { id: string; fileId: string }) => input,
-  PARSE_RESULT: (files: (BaseAsset | Script)[]) => ({
+  GENERATE_BUNDLE: () => ({}),
+  PARSE_RESULT: (
+    fileName: string,
+    files: (BaseAsset | Script)[],
+  ) => ({
+    fileName,
     children: [
       ...new Map(files.map((file) => [file.id, file])).values(),
     ],
@@ -78,8 +83,7 @@ export const sharedEventCreators = {
   ) => asset,
   READY: (id: string) => ({ id }),
   REMOVE_FILE: (id: string) => ({ id }),
-  RENDER_START: () => ({}),
-  RENDER_MANIFEST: () => ({}),
+  RENDER_START: (fileName: string) => ({ fileName }),
   ROOT: (root: string) => ({ root }),
   SCRIPT_COMPLETE: (id: string) => ({ id }),
   SPAWN_FILE: (file: BaseAsset | Script) => ({ file }),

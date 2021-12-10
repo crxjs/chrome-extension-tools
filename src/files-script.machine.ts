@@ -16,7 +16,9 @@ export const scriptMachine = model.createMachine(
     initial: 'parsed',
     states: {
       parsed: {
-        entry: sendParent(model.events.PARSE_RESULT([])),
+        entry: sendParent(({ fileName }) =>
+          model.events.PARSE_RESULT(fileName, []),
+        ),
         on: {
           EMIT_START: 'emitting',
         },
