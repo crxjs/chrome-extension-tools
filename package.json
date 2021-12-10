@@ -39,7 +39,8 @@
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "test": "jest",
     "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|/e2e/\" --forceExit",
-    "test:int": "jest --testPathIgnorePatterns=\"/node_modules/|e2e|playground\""
+    "test:int": "jest --testPathIgnorePatterns=\"/node_modules/|e2e|playground\"",
+    "test:e2e": "jest --runInBand --forceExit e2e"
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.1",
@@ -70,7 +71,7 @@
     "slash": "^3.0.0",
     "type-fest": "^2.2.0",
     "webextension-polyfill": "^0.6.0",
-    "xstate": "^4.25.0"
+    "xstate": "^4.26.1"
   },
   "devDependencies": {
     "@babel/core": "^7.15.8",
@@ -119,8 +120,8 @@
     "react-dom": "^17.0.2",
     "rollup": "^2.58.0",
     "rollup-plugin-bundle-imports": "^1.5.1",
-    "tslib": "^2.3.0",
-    "typescript": "^4.3.5",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.3",
     "vite": "^2.7.1",
     "vite-plugin-inspect": "^0.3.10",
     "ws": "^8.2.3"
