@@ -150,7 +150,7 @@ export const machine = model.createMachine(
                   target: 'emitting',
                 },
                 {
-                  actions: 'spawnParsedFiles',
+                  actions: 'startParsedFiles',
                 },
               ],
             },
@@ -179,7 +179,7 @@ export const machine = model.createMachine(
       ready: {
         id: 'ready',
         on: {
-          RENDER_START: 'rendering',
+          GENERATE_BUNDLE: 'rendering',
         },
       },
       rendering: {
@@ -263,32 +263,35 @@ export const machine = model.createMachine(
         }
       }),
       startAssets: pure(({ inputsByName, filesByName }) => {
-        const assetEntries = new Map(inputsByName)
-        assetEntries.delete('manifest.json')
-        const spawnEvents = [...assetEntries.values()].map(
-          (file) => send(model.events.SPAWN_FILE(file)),
-        )
+        const assetInputs = new Map(inputsByName)
+        assetInputs.delete('manifest.json')
 
-        const assetFiles = new Map(filesByName)
-        assetFiles.delete('manifest.json')
-        const buildEvents = [...assetFiles.values()].map(
-          (file) =>
-            send(model.events.BUILD_START(), {
-              to: () => file,
-            }),
+        return [...assetInputs.entries()].map(
+          ([fileName, input]) => {
+            const file = filesByName.get(fileName)
+            if (file)
+              return send(model.events.BUILD_START(), {
+                to: () => file,
+              })
+            return send(model.events.SPAWN_FILE(input))
+          },
         )
-
-        return [...spawnEvents, ...buildEvents] as any[]
       }),
-      spawnParsedFiles: pure((context, event) => {
+      startParsedFiles: pure(({ filesByName }, event) => {
         const { children } = narrowEvent(event, 'PARSE_RESULT')
-        return children.map((file) =>
-          send(model.events.SPAWN_FILE(file)),
-        )
+        return children.map((child) => {
+          const file = filesByName.get(child.fileName)
+          if (file)
+            return send(model.events.BUILD_START(), {
+              to: () => file,
+            })
+          return send(model.events.SPAWN_FILE(child))
+        })
       }),
       spawnFile: assign(
         ({ filesById, filesByName, root }, event) => {
           const { file } = narrowEvent(event, 'SPAWN_FILE')
+          if (filesByName.has(file.fileName)) return {}
           const actor = spawnFile(file, root)
           return {
             filesById: new Map(filesById).set(file.id, actor),
@@ -302,16 +305,20 @@ export const machine = model.createMachine(
       renderAssets: pure(({ filesByName }) => {
         const assetsByName = new Map(filesByName)
         assetsByName.delete('manifest.json')
-        return [...assetsByName.values()].map((file) =>
-          send(model.events.RENDER_START(), {
-            to: () => file,
-          }),
+        return [...assetsByName.entries()].map(
+          ([fileName, file]) =>
+            send(model.events.RENDER_START(fileName), {
+              to: () => file,
+            }),
         )
       }),
-      renderManifest: send(model.events.RENDER_START(), {
-        to: ({ filesByName }) =>
-          filesByName.get('manifest.json')!,
-      }),
+      renderManifest: send(
+        model.events.RENDER_START('manifest.json'),
+        {
+          to: ({ filesByName }) =>
+            filesByName.get('manifest.json')!,
+        },
+      ),
       updateExcludedFiles: assign({
         excluded: ({ excluded }, event) => {
           const { fileType } = narrowEvent(
@@ -324,11 +331,13 @@ export const machine = model.createMachine(
       }),
     },
     guards: {
-      allFilesParsed: ({ filesById }, event) => {
+      allFilesParsed: ({ filesById, excluded }, event) => {
         const { children } = narrowEvent(event, 'PARSE_RESULT')
 
         return (
-          children.length === 0 &&
+          children.filter(
+            ({ fileType }) => !excluded.has(fileType),
+          ).length === 0 &&
           [...filesById.values()].every((file) => {
             const state = file.getSnapshot()
             return (

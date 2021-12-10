@@ -5,9 +5,8 @@ import MagicString from 'magic-string'
 import { PluginContext } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { model as filesModel } from './files.machine'
-import { format, isUndefined } from './helpers'
+import { format } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { relative } from './path'
 import { createStubURL, getRpceAPI } from './plugin_helpers'
 import {
   Asset,
@@ -47,7 +46,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
   let disablePlugin = true
   let server: ViteDevServer
   let api: ReturnType<typeof getRpceAPI>
-  let swFilename: string | undefined
+  let swFilename: string
 
   return {
     name: 'vite-serve-hmr-mv3',
@@ -75,12 +74,14 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
     transformCrxManifest(manifest) {
       disablePlugin = !(isMV3(manifest) && server)
 
-      if (disablePlugin) return null
+      if (disablePlugin || !isMV3(manifest)) return null
 
       manifest.background = manifest.background ?? {
         service_worker: fetchHandlerModule,
         type: 'module',
       }
+
+      swFilename = manifest.background.service_worker
 
       api?.service.send(
         filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
@@ -109,17 +110,9 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
     },
     transform(code, id) {
       if (disablePlugin) return null
-      if (id.endsWith(fetchHandlerModule)) return null
+      if (id.includes(fetchHandlerModule)) return null
 
-      if (isUndefined(swFilename)) {
-        const files = Array.from(api!.emittedFiles.values())
-        const { id } = files.find(
-          ({ fileType }) => fileType === 'BACKGROUND',
-        )!
-        swFilename = id && relative(api!.root, id)
-      }
-
-      if (id.endsWith(swFilename!)) {
+      if (id.includes(swFilename)) {
         const magic = new MagicString(code)
         magic.prepend(`import "${fetchHandlerModule}";\n`)
         return {

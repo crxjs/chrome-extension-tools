@@ -14,7 +14,7 @@ import { Asset, BaseAsset, FileType, Script } from './types'
 export function htmlParser(
   root: string,
 ): (context: Asset) => Observable<AssetEvent> {
-  return ({ id: htmlId, source }) => {
+  return ({ id: htmlId, source, fileName }) => {
     try {
       const htmlDir = dirname(htmlId)
 
@@ -38,7 +38,7 @@ export function htmlParser(
         }),
       )
 
-      return of(model.events.PARSE_RESULT(files))
+      return of(model.events.PARSE_RESULT(fileName, files))
     } catch (error) {
       return of(model.events.ERROR(error))
     }

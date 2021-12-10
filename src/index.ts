@@ -331,7 +331,7 @@ export const chromeExtension = (
         },
       })
 
-      service.send(model.events.RENDER_START())
+      service.send(model.events.GENERATE_BUNDLE())
       await waitForState(service, (state) => {
         if (
           state.matches('error') &&
