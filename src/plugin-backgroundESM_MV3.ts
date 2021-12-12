@@ -3,21 +3,22 @@ import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
 import { CrxPlugin, isMV3 } from './types'
 
-export const swWrapperName = 'service-worker-esm-wrapper.js'
-
-export const swComment = format`/**
+export const swWrapperName = 'root-scope-service-worker.js'
+export const swComment = format`
+/**
  * rollup-plugin-chrome-extension enables HMR during Vite serve mode
- * by intercepting fetch requests and routing them to the dev server
+ * by intercepting fetch requests and routing them to the dev server.
  * 
  * Service workers can only intercept requests inside their scope (folder),
  * so the service worker must be located at the root of the Chrome Extension
- * https://stackoverflow.com/a/35780776/4842857
+ * to handle all use cases.
+ * 
+ * See https://stackoverflow.com/a/35780776/4842857 for more details.
  * 
  * This import wrapper at the root of the Chrome Extension guarantees that
  * the background service worker will behave the same during
  * development and production.
- */
-`
+ */`
 
 /**
  * Adds ESM support for the background page, for two reasons:
@@ -54,10 +55,8 @@ export const backgroundESM_MV3 = (): CrxPlugin => {
           this.emitFile({
             type: 'asset',
             fileName: swWrapperName,
-            source: format`
-            ${swComment}
-            import './${outputFileName}'
-            `.trim(),
+            source: format`${swComment}
+            import './${outputFileName}'`,
           })
         }
 
