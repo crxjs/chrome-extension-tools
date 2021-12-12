@@ -98,12 +98,13 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
         .not('[src^="http:"]')
         .not('[src^="https:"]')
         .not('[src^="data:"]')
+        .not('[src^="/@"]')
         .attr('type', 'module')
         .attr('src', (i, value) => {
-          if (value.startsWith('/@')) return value
           const url = createStubURL(value)
           url.searchParams.set('t', Date.now().toString())
-          return url.pathname + url.search
+          const result = url.pathname + url.search
+          return value.startsWith('/') ? result : result.slice(1)
         })
 
       return $.html()
