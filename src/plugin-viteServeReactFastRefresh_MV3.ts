@@ -64,8 +64,9 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
           const url = createStubURL(value)
           if (!reactRegex.test(url.pathname)) return value
           url.searchParams.set('delay', 'true')
-          const newSrc = url.pathname + url.search
-          return newSrc
+          const result = url.pathname + url.search
+          // Don't change relative paths to absolute
+          return value.startsWith('/') ? result : result.slice(1)
         })
 
       if ($inlineScripts.length > 1) {
