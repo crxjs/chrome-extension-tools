@@ -10,7 +10,7 @@ exports[`writes entry points to disk: devtools.html 1`] = `
   <title>DevTools</title>
 </head>
 <body>
-  <script src=\\"/devtools.ts?t=1638835200000\\" type=\\"module\\"></script>
+  <script src=\\"devtools.ts?t=1638835200000\\" type=\\"module\\"></script>
 
 </body></html>"
 `;

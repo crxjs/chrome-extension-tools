@@ -1,18 +1,18 @@
 import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
 import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
-import { CrxPlugin, isMV2, isMV3 } from './types'
+import { CrxPlugin, isMV2 } from './types'
 
 /**
- * Adds ESM support for the background page, since we want to regenerate as IIFE as few files as possible.
+ * Adds ESM support for the background page, for two reasons:
+ * - We want to avoid regenerating unnecessary IIFEs
+ * - Vite serve support requires ESM
  *
  * Emits wrapper files and updates the manifest config.
- *
- * TODO: consider regenerating to IIFE for MV2 as option?
  */
-export const esmBackground = (): CrxPlugin => {
+export const backgroundESM_MV2 = (): CrxPlugin => {
   return {
-    name: 'esm-background',
+    name: 'background-esm-mv2',
     crx: true,
     renderCrxManifest(manifest) {
       if (isMV2(manifest) && manifest.background?.scripts) {
@@ -38,15 +38,6 @@ export const esmBackground = (): CrxPlugin => {
             return wrapperFileName
           },
         )
-      } else if (
-        isMV3(manifest) &&
-        manifest.background?.service_worker
-      ) {
-        const { service_worker: sw } = manifest.background
-        const { outputFileName } = generateFileNames(sw)
-
-        manifest.background.service_worker = outputFileName
-        manifest.background.type = 'module'
       }
 
       return manifest

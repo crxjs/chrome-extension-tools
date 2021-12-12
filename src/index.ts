@@ -16,7 +16,8 @@ import { basename } from './path'
 import { autoPerms } from './plugin-autoPerms'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
-import { esmBackground } from './plugin-esmBackground'
+import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
+import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
 import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
@@ -80,7 +81,8 @@ export const chromeExtension = (
     extendManifest(pluginOptions),
     autoPerms(),
     preValidateManifest(),
-    esmBackground(),
+    backgroundESM_MV2(),
+    backgroundESM_MV3(),
     hybridFormat(),
     pluginOptions.browserPolyfill && browserPolyfill(),
     configureRollupOptions(),
