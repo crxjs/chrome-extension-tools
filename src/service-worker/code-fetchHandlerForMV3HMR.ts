@@ -4,29 +4,9 @@ export {}
 
 self.skipWaiting()
 
-// TODO: make this configurable
-const supported = [
-  '.html',
-  '.js',
-  '.jsx',
-  '.mjs',
-  '.ts',
-  '.tsx',
-  '.svelte',
-  '.css',
-  '.scss',
-  '.sass',
-]
-
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
-  if (
-    url.pathname === '/__vite_ping' ||
-    url.pathname.startsWith('/@') ||
-    supported.some((ext) => url.pathname.endsWith(ext))
-  ) {
-    fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
-  }
+  fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
 })
 
 function mapRequestsToLocalhost(
@@ -39,11 +19,12 @@ function mapRequestsToLocalhost(
 
   return fetch(url.href).then(async (r) => {
     const body = await r.text()
+    const contentType =
+      r.headers.get('Content-Type') ?? 'text/javascript'
+
     return new Response(body, {
       headers: {
-        'Content-Type': url.pathname.endsWith('html')
-          ? 'text/html'
-          : 'text/javascript',
+        'Content-Type': contentType,
       },
     })
   })
