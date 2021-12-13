@@ -5,7 +5,12 @@ import { format } from './helpers'
 import { CrxPlugin, isMV3 } from './types'
 import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScriptMessage.ts'
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
-import { createStubURL } from './plugin_helpers'
+import {
+  createStubURL,
+  getRpceAPI,
+  RpceApi,
+} from './plugin_helpers'
+import { relative } from './path'
 
 const reactRegex = /[jt]sx/
 
@@ -32,6 +37,7 @@ const inlineScriptRegex = new RegExp(
 export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
   let disablePlugin = true
   let server: ViteDevServer
+  let api: RpceApi
 
   const scriptsByHash = new Map<string, string>()
   const hashesByScript = new Map<string, string>()
@@ -42,6 +48,9 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
     enforce: 'post',
     configureServer(s) {
       server = s
+    },
+    buildStart({ plugins }) {
+      api = getRpceAPI(plugins)!
     },
     transformCrxManifest(manifest) {
       disablePlugin = !isMV3(manifest) || !server
@@ -119,7 +128,10 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
         return script
       }
       if (id.includes('delay=true')) {
-        const { pathname } = createStubURL(id)
+        const { root } = api
+        const relId = relative(root, id)
+        const { pathname } = createStubURL(relId)
+
         return remoteScriptWrapper.replace(
           '%REMOTE_SCRIPT_PATH%',
           JSON.stringify(pathname),
