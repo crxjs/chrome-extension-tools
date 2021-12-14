@@ -67,6 +67,7 @@
     "magic-string": "^0.25.7",
     "mem": "^6.0.1",
     "read-pkg-up": "^8.0.0",
+    "rollup": "^2.61.1",
     "rxjs": "^7.3.0",
     "slash": "^3.0.0",
     "type-fest": "^2.2.0",
@@ -118,7 +119,6 @@
     "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "rollup": "^2.58.0",
     "rollup-plugin-bundle-imports": "^1.5.1",
     "tslib": "^2.3.1",
     "typescript": "^4.5.3",
@@ -127,7 +127,6 @@
     "ws": "^8.2.3"
   },
   "peerDependencies": {
-    "rollup": "^2.58.0",
     "vite": "^2.5.10"
   },
   "peerDependenciesMeta": {
