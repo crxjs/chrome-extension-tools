@@ -8,23 +8,42 @@
 <a href="https://www.extend-chrome.dev/rollup-plugin" rel="noopener">
   <img width=200px height=200px src="https://imgur.com/wEXnCYK.png" alt="rollup-plugin-chrome-extension logo"></a>
 
-A feature-rich solution for bundled Chrome Extensions, brought to
-you by [Extend Chrome](https://extend-chrome.dev).
-
-Build Chrome extensions using
-[Rollup](https://rollupjs.org/guide/en/), with
-[minimal configuration](https://www.extend-chrome.dev/rollup-plugin#usage).
-Now with MV3 support.
+The bundler configuration for a Chrome Extension can be pretty
+complex.
 
 Use `manifest.json` as the input. Every file in the manifest will
 be bundled or copied to the output folder.
 
-> Vite support is in beta! [See the PR for details](https://github.com/extend-chrome/rollup-plugin-chrome-extension/pull/117).
+RPCE simplifies project config and supports many of Vite's
+features in the Chrome Extension evironment, including HMR.
 
-## [Documentation](https://www.extend-chrome.dev/rollup-plugin)
+## Vite Usage
+
+Vite support is in beta! Check out this
+[90 second getting started guide]().
+
+```sh
+npm i rollup-plugin-chrome-extension@beta -D
+```
+
+```javascript
+// vite.config.js
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { chromeExtension } from 'rollup-plugin-chrome-extension'
+
+export default defineConfig({
+  plugins: [react(), chromeExtension()],
+})
+```
+
+Just add new features to your manifest and RPCE does the rest.
+
+## [Documentation for v3](https://www.extend-chrome.dev/rollup-plugin)
 
 We have
-[boilerplates](https://www.extend-chrome.dev/rollup-plugin#chrome-extension-boilerplates)
+[v3 boilerplates](https://www.extend-chrome.dev/rollup-plugin#chrome-extension-boilerplates)
 for
 [React JavaScript](https://github.com/extend-chrome/js-react-boilerplate),
 [React TypeScript](https://github.com/extend-chrome/ts-react-boilerplate)
@@ -42,15 +61,17 @@ usage and how to get started.
 
 Your help is super welcome!
 
+🎯 Ongoing developement is for v4+ only.
+
 👀 Be sure to take a look at the issues before starting to work
 on a new feature.
 
 🙏 Please update the tests to cover bug fixes or new features.
 
-📕 If you want to update the docs, you can find the docs repo
-over here:
+📕 Documentation for v4 has not yet begun, but you can open an
+issue for help.
 
-https://github.com/jacksteamdev/extend-chrome-docs
+✨ If you enjoy using RPCE, please help spread the word!
 
 ## Development
 
