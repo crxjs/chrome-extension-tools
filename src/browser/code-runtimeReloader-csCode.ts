@@ -3,7 +3,7 @@ import {
   devWarning,
   reloadStream,
   sendUpdateVersion,
-} from './simpleReloader_helpers'
+} from './runtimeReloader_helpers'
 
 console.log(devWarning)
 

@@ -1,3 +1,4 @@
+import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import { filesReady } from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
@@ -49,7 +50,7 @@ test('writes entry points to disk', async () => {
     },
     content_scripts: [
       {
-        js: [content],
+        js: [runtimeReloaderCS, content],
         matches: ['https://a.com/*', 'http://b.com/*'],
       },
     ],
