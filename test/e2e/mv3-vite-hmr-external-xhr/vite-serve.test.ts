@@ -26,15 +26,6 @@ beforeAll(async () => {
     build: { outDir },
   })
 
-  devServer.middlewares.use(
-    '/api/ok',
-    function MockApiHandler(req, res, next) {
-      res.write('ok')
-      next()
-    },
-  )
-  console.log(devServer.middlewares)
-
   await Promise.all([devServer.listen(), filesReady()])
 
   browserContext = (await chromium.launchPersistentContext(
