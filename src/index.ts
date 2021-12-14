@@ -41,6 +41,15 @@ export const chromeExtension = (
     // For testing
     _plugins: { manifest, html, validate },
 
+    config: () => {
+      console.warn(
+        'Please run `npm i rollup-plugin-chrome-extension@beta` to use with Vite.',
+      )
+      throw new Error(
+        '[chrome-extension] Vite support is for RPCE v4 and above. This is RPCE v3.6.7.',
+      )
+    },
+
     options(options) {
       try {
         return [manifest, html].reduce((opts, plugin) => {

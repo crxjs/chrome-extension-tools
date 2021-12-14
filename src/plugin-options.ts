@@ -64,6 +64,8 @@ export type ChromeExtensionPlugin = Pick<
     html: HtmlInputsPlugin
     validate: ValidateNamesPlugin
   }
+  // to warn v3 doesn't support Vite
+  config: () => void
 }
 
 /* --------- MANIFEST INPUT PLUGIN OPTIONS --------- */
