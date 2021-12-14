@@ -1,6 +1,6 @@
 # [rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
 
-[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
+[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension/beta.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
 [![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
 ![GitHub action badge](https://github.com/extend-chrome/rollup-plugin-chrome-extension/actions/workflows/main.yml/badge.svg)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
@@ -9,7 +9,7 @@
   <img width=200px height=200px src="https://imgur.com/wEXnCYK.png" alt="rollup-plugin-chrome-extension logo"></a>
 
 The bundler configuration for a Chrome Extension can be pretty
-complex.
+complex. This plugin makes it simple.
 
 Use `manifest.json` as the input. Every file in the manifest will
 be bundled or copied to the output folder.
