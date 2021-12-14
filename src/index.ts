@@ -2,26 +2,28 @@ import { createFilter } from '@rollup/pluginutils'
 import { PluginContext } from 'rollup'
 import { Plugin } from 'vite'
 import { interpret } from 'xstate'
-import { categorizeInput } from './index_categorizeInput'
 import { machine, model } from './files.machine'
 import { SharedEvent } from './files.sharedEvents'
 import {
+  format,
   getJsFilename,
   isString,
   isUndefined,
   not,
 } from './helpers'
+import { categorizeInput } from './index_categorizeInput'
 import { runPlugins } from './index_runPlugins'
 import { basename } from './path'
 import { autoPerms } from './plugin-autoPerms'
+import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
+import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
-import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
-import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
 import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
 import { packageJson } from './plugin-packageJson'
+import { runtimeReloader } from './plugin-runtimeReloader'
 import { transformIndexHtml } from './plugin-transformIndexHtml'
 import {
   preValidateManifest,
@@ -55,8 +57,16 @@ import {
   waitForState,
 } from './xstate_helpers'
 
-export { simpleReloader } from './plugins-simpleReloader'
 export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
+
+export const simpleReloader = (): Plugin => ({
+  name: 'simple-reloader',
+  buildStart() {
+    this.warn(format`
+    The simpleReloader has been integrated into RPCE.
+    You can remove it from your config file.`)
+  },
+})
 
 export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
@@ -92,6 +102,7 @@ export const chromeExtension = (
     viteServeHMR_MV3(),
     viteServeReactFastRefresh_MV2(),
     viteServeReactFastRefresh_MV3(),
+    runtimeReloader(),
   ]
     .filter((x): x is CrxPlugin => !!x)
     .map((p) => ({ ...p, name: `crx:${p.name}` }))
