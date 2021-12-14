@@ -1,5 +1,5 @@
 import { filesReady } from '$src/plugin-viteServeFileWriter'
-import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import {
@@ -9,7 +9,7 @@ import {
 } from 'playwright-chromium'
 import { createServer, ViteDevServer } from 'vite'
 
-jestSetTimeout(180000)
+jestSetTimeout(30000)
 
 const outDir = path.join(__dirname, 'dist-vite-serve')
 const dataDir = path.join(__dirname, 'chromium-data-dir-serve')
