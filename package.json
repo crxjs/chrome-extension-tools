@@ -2,6 +2,17 @@
   "name": "rollup-plugin-chrome-extension",
   "version": "3.6.6",
   "description": "Build Chrome Extensions with this Rollup plugin.",
+  "keywords": [
+    "rollup-plugin",
+    "vite-plugin",
+    "chrome",
+    "chrome-extension",
+    "extension",
+    "webext",
+    "webextension",
+    "browser",
+    "browser-extension"
+  ],
   "repository": {
     "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension.git"
   },
