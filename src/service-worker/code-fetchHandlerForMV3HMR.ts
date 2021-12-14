@@ -6,7 +6,9 @@ self.skipWaiting()
 
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
-  fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
+  if (url.protocol === 'chrome-extension:') {
+    fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
+  }
 })
 
 function mapRequestsToLocalhost(
