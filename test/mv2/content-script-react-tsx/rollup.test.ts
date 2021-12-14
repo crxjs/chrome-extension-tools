@@ -3,7 +3,7 @@ import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 
-jestSetTimeout(30000)
+jestSetTimeout(45000)
 
 test('bundles chunks', async () => {
   const { output } = await getRollupOutput(

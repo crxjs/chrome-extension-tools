@@ -208,10 +208,20 @@ export const machine = model.createMachine(
           manifest: {
             entry: 'renderManifest',
             on: {
-              COMPLETE_FILE: {
-                actions: 'handleFile',
-                target: '#complete',
-              },
+              COMPLETE_FILE: [
+                {
+                  cond: ({ filesByName }) =>
+                    !!filesByName
+                      .get('manifest.json')
+                      ?.getSnapshot()
+                      ?.matches('complete'),
+                  actions: 'handleFile',
+                  target: '#complete',
+                },
+                {
+                  actions: 'handleFile',
+                },
+              ],
             },
           },
         },
@@ -354,8 +364,8 @@ export const machine = model.createMachine(
             state?.matches('ready') || state?.matches('excluded')
           )
         }),
-      readyForManifest: ({ filesById }) =>
-        [...filesById.values()].every((file) => {
+      readyForManifest: ({ filesById }) => {
+        const result = [...filesById.values()].every((file) => {
           const state = file.getSnapshot()
           if (state?.context.fileType === 'MANIFEST')
             return state?.matches('ready')
@@ -363,7 +373,9 @@ export const machine = model.createMachine(
             state?.matches('complete') ||
             state?.matches('excluded')
           )
-        }),
+        })
+        return result
+      },
     },
   },
 )
