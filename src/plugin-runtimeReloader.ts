@@ -1,8 +1,11 @@
 import { code as bgCode } from 'code ./browser/code-runtimeReloader-bgCode.ts'
 import { code as csCode } from 'code ./browser/code-runtimeReloader-csCode.ts'
 import MagicString from 'magic-string'
-import { isMV2, CrxPlugin } from './types'
-import { devWarning } from './browser/runtimeReloader_helpers'
+import { isMV2, CrxPlugin, isMV3 } from './types'
+import {
+  applyDevWarning,
+  createDevWarning,
+} from './browser/runtimeReloader_helpers'
 import { parse } from './path'
 
 export const runtimeReloaderCS =
@@ -19,10 +22,17 @@ export const runtimeReloader = (): CrxPlugin => {
     transformCrxManifest(manifest) {
       if (!this.meta.watchMode) return null
 
+      if (isMV3(manifest)) {
+        swFilename = manifest.background?.service_worker
+      }
+
       return manifest
     },
     renderCrxManifest(manifest) {
       if (!this.meta.watchMode) return null
+
+      manifest.description = createDevWarning()
+      manifest.version_name = new Date().toISOString()
 
       if (isMV2(manifest)) {
         manifest.background = manifest.background ?? {}
@@ -34,20 +44,19 @@ export const runtimeReloader = (): CrxPlugin => {
         this.emitFile({
           type: 'asset',
           fileName: runtimeReloaderBG,
-          source: bgCode,
+          source: applyDevWarning(bgCode),
         })
       } else if (!manifest.background) {
         manifest.background = {
           service_worker: runtimeReloaderBG,
+          type: 'module',
         }
 
         this.emitFile({
           type: 'asset',
           fileName: runtimeReloaderBG,
-          source: bgCode,
+          source: applyDevWarning(bgCode),
         })
-      } else {
-        swFilename = manifest.background.service_worker
       }
 
       const scripts = manifest.content_scripts ?? []
@@ -69,22 +78,23 @@ export const runtimeReloader = (): CrxPlugin => {
       this.emitFile({
         type: 'asset',
         fileName: runtimeReloaderCS,
-        source: csCode,
+        source: applyDevWarning(csCode),
       })
-
-      manifest.description = devWarning
-      manifest.version_name = new Date().toISOString()
 
       return manifest
     },
     resolveId(source) {
       if (!this.meta.watchMode) return null
-      if (source.includes(runtimeReloaderBG)) return source
+      if (source.includes(runtimeReloaderBG))
+        return runtimeReloaderBG
       return null
     },
     load(id) {
       if (!this.meta.watchMode) return null
-      if (id.includes(runtimeReloaderBG)) return bgCode
+      if (id === runtimeReloaderBG) {
+        return applyDevWarning(bgCode)
+      }
+
       return null
     },
     transform(code, id) {

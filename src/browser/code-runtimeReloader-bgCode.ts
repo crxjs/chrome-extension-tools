@@ -1,4 +1,3 @@
-import { isNumber, isUndefined } from '../helpers'
 import {
   delay,
   filter,
@@ -14,14 +13,15 @@ import {
   throttleTime,
 } from 'rxjs'
 import { fromFetch } from 'rxjs/fetch'
+import { isNumber, isUndefined } from '../helpers'
 import { Manifest } from '../types'
 import {
-  devWarning,
+  getDevWarning,
   sendReload,
   updateVersionStream,
 } from './runtimeReloader_helpers'
 
-console.log(devWarning)
+console.log(getDevWarning())
 
 const reloadStream = merge(
   updateVersionStream,
