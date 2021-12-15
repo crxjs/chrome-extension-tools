@@ -20,7 +20,7 @@ features in the Chrome Extension environment, including HMR.
 ## Vite Usage
 
 Vite support is in beta! Check out this
-[90 second getting started guide]().
+[90 second getting started guide](https://dev.to/jacksteamdev/create-a-vite-react-chrome-extension-in-90-seconds-3df7).
 
 ```sh
 npm i rollup-plugin-chrome-extension@beta -D
