@@ -15,7 +15,7 @@ Use `manifest.json` as the input. Every file in the manifest will
 be bundled or copied to the output folder.
 
 RPCE simplifies project config and supports many of Vite's
-features in the Chrome Extension evironment, including HMR.
+features in the Chrome Extension environment, including HMR.
 
 ## Vite Usage
 
@@ -38,7 +38,7 @@ export default defineConfig({
 })
 ```
 
-Just add new features to your manifest and RPCE does the rest.
+Just add new features to your manifest, and RPCE does the rest.
 
 ## [Documentation for v3](https://www.extend-chrome.dev/rollup-plugin)
 
@@ -51,7 +51,7 @@ and
 [Svelte](https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate),
 as well as
 [instructions](https://www.extend-chrome.dev/rollup-plugin#usage)
-for setting up your own project.
+for setting up your project.
 
 See the
 [documentation](https://www.extend-chrome.dev/rollup-plugin) for
@@ -61,7 +61,7 @@ usage and how to get started.
 
 Your help is super welcome!
 
-🎯 Ongoing developement is for v4+ only.
+🎯 Ongoing development is for v4+ only.
 
 👀 Be sure to take a look at the issues before starting to work
 on a new feature.
@@ -78,6 +78,6 @@ issue for help.
 Our preferred package manager is [pnpm](https://pnpm.io/), but
 npm or Yarn should work.
 
-If you're using VSCode you can run the default build task
+If you're using VSCode, you can run the default build task
 (Ctrl+Shift+B or ⇧⌘B for Mac) to start building and type
 checking.
