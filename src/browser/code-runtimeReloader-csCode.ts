@@ -1,11 +1,11 @@
 import { delay, interval, mergeMap, retry } from 'rxjs'
 import {
-  devWarning,
+  getDevWarning,
   reloadStream,
   sendUpdateVersion,
 } from './runtimeReloader_helpers'
 
-console.log(devWarning)
+console.log(getDevWarning())
 
 const { name } = chrome.runtime.getManifest()
 
