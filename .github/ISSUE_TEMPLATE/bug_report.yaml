@@ -23,8 +23,6 @@ body:
       options:
       - label: In the browser
       - label: In the terminal
-    validations:
-      required: true
   - type: textarea
     id: bug-description
     attributes:
