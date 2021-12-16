@@ -370,5 +370,3 @@ export const chromeExtension = (
     },
   }
 }
-
-export default chromeExtension
