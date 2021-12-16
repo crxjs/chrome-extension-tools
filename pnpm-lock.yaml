@@ -19,7 +19,7 @@ specifiers:
   '@testing-library/dom': 6.16.0
   '@testing-library/jest-dom': 5.16.1
   '@types/acorn': ^4.0.6
-  '@types/chrome': 0.0.152
+  '@types/chrome': 0.0.171
   '@types/csp-dev': ^1.0.0
   '@types/etag': ^1.8.1
   '@types/fs-extra': 8.1.2
@@ -131,7 +131,7 @@ devDependencies:
   '@sucrase/jest-plugin': 2.2.0
   '@testing-library/dom': 6.16.0
   '@testing-library/jest-dom': 5.16.1
-  '@types/chrome': 0.0.152
+  '@types/chrome': 0.0.171
   '@types/fs-extra': 8.1.2
   '@types/glob': 7.2.0
   '@types/jest': 27.0.3
@@ -1900,8 +1900,8 @@ packages:
       '@types/har-format': 1.2.5
     dev: true
 
-  /@types/chrome/0.0.152:
-    resolution: {integrity: sha512-QrdSrlqQW+vFFmYGK8ZsBmH9SpldWc59XwKbwnetRerJ0JvTG6JtafSPL6qQFYSPRSwMK7H1qbeT7HGly87zLw==}
+  /@types/chrome/0.0.171:
+    resolution: {integrity: sha512-CnCwFKI3COygib3DNJrCjePeoU2OCDGGbUcmftXtQ3loMABsLgwpG8z+LxV4kjQJFzmJDqOyhCSsbY9yyEfapQ==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.7
@@ -1933,17 +1933,13 @@ packages:
   /@types/filesystem/0.0.29:
     resolution: {integrity: sha512-85/1KfRedmfPGsbK8YzeaQUyV1FQAvMPMTuWFQ5EkLd2w7szhNO96bk3Rh/SKmOfd9co2rCLf0Voy4o7ECBOvw==}
     dependencies:
-      '@types/filewriter': 0.0.28
+      '@types/filewriter': 0.0.29
     dev: true
 
   /@types/filesystem/0.0.32:
     resolution: {integrity: sha512-Yuf4jR5YYMR2DVgwuCiP11s0xuVRyPKmz8vo6HBY3CGdeMj8af93CFZX+T82+VD1+UqHOxTq31lO7MI7lepBtQ==}
     dependencies:
       '@types/filewriter': 0.0.29
-    dev: true
-
-  /@types/filewriter/0.0.28:
-    resolution: {integrity: sha1-wFTor02d11205jq8dviFFocU1LM=}
     dev: true
 
   /@types/filewriter/0.0.29:

@@ -91,7 +91,7 @@
     "@sucrase/jest-plugin": "2.2.0",
     "@testing-library/dom": "6.16.0",
     "@testing-library/jest-dom": "5.16.1",
-    "@types/chrome": "0.0.152",
+    "@types/chrome": "0.0.171",
     "@types/fs-extra": "8.1.2",
     "@types/glob": "7.2.0",
     "@types/jest": "27.0.3",
