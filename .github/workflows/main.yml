@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
 # Controls when the workflow will run
@@ -59,9 +57,5 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-      - uses: willcaul/jest-github-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          # this is just an example, this could be any command that will trigger jest
-          test-command: "pnpm test:ci"
+      - name: Run tests
+        run: pnpm test:ci
