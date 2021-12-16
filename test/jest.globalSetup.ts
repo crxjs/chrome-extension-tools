@@ -1,5 +1,4 @@
 import json from '@rollup/plugin-json'
-// @ts-expect-error doesn't matter here
 import sucrase from '@rollup/plugin-sucrase'
 import fs from 'fs'
 import path from 'path'
@@ -39,6 +38,7 @@ const config: RollupOptions = {
   },
   plugins: [
     {
+      name: 'virtual code import files',
       resolveId(source, importer) {
         if (!importer) return source
         return null
