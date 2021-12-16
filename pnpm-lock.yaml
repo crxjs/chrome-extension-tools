@@ -54,7 +54,7 @@ specifiers:
   fs-extra: ^8.1.0
   glob: ^7.1.6
   jest: 27.4.5
-  jest-chrome: 0.7.0
+  jest-chrome: 0.7.2
   jest-html-reporters: 1.2.1
   jest-in-case: 1.0.2
   json-ptr: ^3.0.0
@@ -151,7 +151,7 @@ devDependencies:
   eslint: 6.8.0
   eslint-plugin-react: 7.27.1_eslint@6.8.0
   jest: 27.4.5
-  jest-chrome: 0.7.0_jest@27.4.5
+  jest-chrome: 0.7.2_jest@27.4.5
   jest-html-reporters: 1.2.1
   jest-in-case: 1.0.2
   npm-run-all: 4.1.5
@@ -1896,8 +1896,8 @@ packages:
   /@types/chrome/0.0.114:
     resolution: {integrity: sha512-i7qRr74IrxHtbnrZSKUuP5Uvd5EOKwlwJq/yp7+yTPihOXnPhNQO4Z5bqb1XTnrjdbUKEJicaVVbhcgtRijmLA==}
     dependencies:
-      '@types/filesystem': 0.0.29
-      '@types/har-format': 1.2.5
+      '@types/filesystem': 0.0.32
+      '@types/har-format': 1.2.7
     dev: true
 
   /@types/chrome/0.0.171:
@@ -1930,12 +1930,6 @@ packages:
       '@types/node': 13.13.52
     dev: false
 
-  /@types/filesystem/0.0.29:
-    resolution: {integrity: sha512-85/1KfRedmfPGsbK8YzeaQUyV1FQAvMPMTuWFQ5EkLd2w7szhNO96bk3Rh/SKmOfd9co2rCLf0Voy4o7ECBOvw==}
-    dependencies:
-      '@types/filewriter': 0.0.29
-    dev: true
-
   /@types/filesystem/0.0.32:
     resolution: {integrity: sha512-Yuf4jR5YYMR2DVgwuCiP11s0xuVRyPKmz8vo6HBY3CGdeMj8af93CFZX+T82+VD1+UqHOxTq31lO7MI7lepBtQ==}
     dependencies:
@@ -1963,10 +1957,6 @@ packages:
     resolution: {integrity: sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==}
     dependencies:
       '@types/node': 13.13.52
-    dev: true
-
-  /@types/har-format/1.2.5:
-    resolution: {integrity: sha512-IG8AE1m2pWtPqQ7wXhFhy6Q59bwwnLwO36v5Rit2FrbXCIp8Sk8E2PfUCreyrdo17STwFSKDAkitVuVYbpEHvQ==}
     dev: true
 
   /@types/har-format/1.2.7:
@@ -4126,10 +4116,10 @@ packages:
       throat: 6.0.1
     dev: true
 
-  /jest-chrome/0.7.0_jest@27.4.5:
-    resolution: {integrity: sha512-afOzmTh3Nzr1FDKU/nsfIi/OmyScl6Pd6+jdqaBoRNwdGdYnMEWgZKW73KesdcywnLBEHRCKO4ftY+VTbqgPww==}
+  /jest-chrome/0.7.2_jest@27.4.5:
+    resolution: {integrity: sha512-RSRDi8qNX54Q3ltSC2rW25+47nwY4DoruHOjHR0JZxijITS2PZrQ3j0jZPP3ywC0GuX0JNNwsKD3+iaKzOJEAA==}
     peerDependencies:
-      jest: ^24.9.0
+      jest: ^26.0.1 || ^27.0.0
     dependencies:
       '@types/chrome': 0.0.114
       jest: 27.4.5
