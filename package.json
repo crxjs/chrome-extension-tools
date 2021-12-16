@@ -65,7 +65,7 @@
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
     "magic-string": "^0.25.7",
-    "mem": "^6.0.1",
+    "mem": "^9.0.1",
     "read-pkg-up": "^8.0.0",
     "rollup": "^2.61.1",
     "rxjs": "^7.3.0",
