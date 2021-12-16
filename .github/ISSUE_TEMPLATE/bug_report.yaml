@@ -1,11 +1,30 @@
-name: "Vite Usage Bug"
-description: Using RPCE with Vite?
-labels: ["triage: bug", "vite"]
+name: "Bug Report"
+description: Report an issue with RPCE
+labels: ["triage: bug"]
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+  - type: dropdown
+    id: build-tool
+    attributes:
+      label: Build tool
+      description: What build tool are you using?
+      options:
+      - Rollup
+      - Vite
+    validations:
+      required: true
+  - type: checkboxes
+    id: environment
+    attributes:
+      label: Where do you see the problem?
+      options:
+      - label: In the browser
+      - label: In the terminal
+    validations:
+      required: true
   - type: textarea
     id: bug-description
     attributes:
