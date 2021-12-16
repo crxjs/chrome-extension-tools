@@ -4,9 +4,10 @@ export {}
 
 self.skipWaiting()
 
+const ownOrigin = new URL(chrome.runtime.getURL('/')).origin
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
-  if (url.protocol === 'chrome-extension:') {
+  if (url.origin === ownOrigin) {
     fetchEvent.respondWith(mapRequestsToLocalhost(url.href))
   }
 })
