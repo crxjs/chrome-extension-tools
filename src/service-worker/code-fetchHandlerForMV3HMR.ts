@@ -20,12 +20,11 @@ function mapRequestsToLocalhost(
   url.host = 'localhost'
   url.port = JSON.parse('%VITE_SERVE_PORT%')
 
-  return fetch(url.href).then(async (r) => {
-    const body = await r.text()
+  return fetch(url.href).then((r) => {
     const contentType =
       r.headers.get('Content-Type') ?? 'text/javascript'
 
-    return new Response(body, {
+    return new Response(r.body, {
       headers: {
         'Content-Type': contentType,
       },
