@@ -51,13 +51,8 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
-      - name: Install dependencies and update lockfile
-        run: pnpm i --frozen-lockfile=false
-        if: ${{ github.actor == "dependabot[bot]" }}
-
       - name: Install dependencies
-        run: pnpm install
-        if: ${{ github.actor != "dependabot[bot]" }}
+        run: pnpm i
 
       - name: Lint files
         run: pnpm lint
