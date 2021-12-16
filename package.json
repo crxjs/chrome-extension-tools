@@ -100,7 +100,7 @@
     "@types/lodash.flatten": "^4.4.6",
     "@types/lodash.get": "^4.4.6",
     "@types/node": "^13.7.0",
-    "@types/prettier": "^1.19.0",
+    "@types/prettier": "^2.4.2",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
     "@types/ws": "^8.2.0",
