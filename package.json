@@ -60,7 +60,7 @@
     "etag": "^1.8.1",
     "fs-extra": "^8.1.0",
     "glob": "^7.1.6",
-    "json-ptr": "^2.2.0",
+    "json-ptr": "^3.0.0",
     "jsonpath-plus": "^4.0.0",
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
