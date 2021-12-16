@@ -31,7 +31,7 @@ npm i rollup-plugin-chrome-extension@beta -D
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import chromeExtension from 'rollup-plugin-chrome-extension'
+import { chromeExtension } from 'rollup-plugin-chrome-extension'
 
 export default defineConfig({
   plugins: [react(), chromeExtension()],
