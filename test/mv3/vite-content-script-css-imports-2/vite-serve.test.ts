@@ -2,7 +2,6 @@ import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import { filesReady } from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
-import glob from 'glob'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
 
