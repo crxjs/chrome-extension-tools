@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`writes entry points to disk 1`] = `
+"(function () {
+	'use strict';
+
+	console.log(\\"imported file\\");
+
+	console.log(\\"content1\\");
+
+})();
+"
+`;
+
+exports[`writes entry points to disk 2`] = `
+"(function () {
+	'use strict';
+
+	console.log(\\"imported file\\");
+
+	console.log(\\"content2\\");
+
+})();
+"
+`;
+
+exports[`writes entry points to disk 3`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`writes entry points to disk 4`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`writes entry points to disk 5`] = `
+"h1 {
+  color: green;
+}
+"
+`;
