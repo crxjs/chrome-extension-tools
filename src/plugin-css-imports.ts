@@ -20,20 +20,22 @@ export const cssImports = (): CrxPlugin => {
     },
     buildStart({ plugins }) {
       if (disablePlugin) return
+      // We only want to replace the hook once in watch mode
+      //  otherwise it becomes a 😖 nested function
+      disablePlugin = true
 
       const viteManifest = plugins.find(
         ({ name }) => name === 'vite:manifest',
       )!
 
-      const { generateBundle } = viteManifest
-      if (!generateBundle) return
+      const realHook = viteManifest.generateBundle!
       viteManifest.generateBundle = async function (
         options,
         bundle,
         isWrite,
       ) {
         let filesData: ViteFilesManifest | undefined
-        await generateBundle.call(
+        await realHook.call(
           {
             ...this,
             /**
