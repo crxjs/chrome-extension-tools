@@ -29,11 +29,7 @@ const service = interpret(
         ({ plugins: watchPlugins, server }) =>
         (send) => {
           const {
-            config: {
-              configFile,
-              mode,
-              build: { outDir },
-            },
+            config: { configFile, mode, build },
           } = server!
           let watcher: RollupWatcher | undefined
           ;(async () => {
@@ -46,7 +42,7 @@ const service = interpret(
               plugins: buildPlugins,
               build: { rollupOptions, watch: watchOptions },
             } = await resolveConfig(
-              { configFile },
+              { configFile, build },
               'build',
               mode,
             )
@@ -81,7 +77,7 @@ const service = interpret(
               context: 'this',
               output: {
                 ...(rollupOptions?.output as OutputOptions),
-                dir: outDir,
+                dir: build.outDir,
               },
               plugins: plugins as Plugin[],
               watch: {
