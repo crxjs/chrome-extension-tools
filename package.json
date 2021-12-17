@@ -71,7 +71,7 @@
     "rxjs": "^7.3.0",
     "slash": "^3.0.0",
     "type-fest": "^2.2.0",
-    "webextension-polyfill": "^0.6.0",
+    "webextension-polyfill": "^0.8.0",
     "xstate": "^4.26.1"
   },
   "devDependencies": {
