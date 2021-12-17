@@ -1,8 +1,7 @@
-import { Manifest } from 'vite'
 import mem from 'mem'
 import { OutputAsset } from 'rollup'
 import * as permTests from './plugin-autoPerms_permTests'
-import { CrxPlugin } from './types'
+import { CrxPlugin, Manifest } from './types'
 
 const permTestEntries = Object.entries(permTests).filter(
   // esbuild includes the default export
