@@ -72,7 +72,7 @@ specifiers:
   rollup: ^2.61.1
   rollup-plugin-bundle-imports: 1.5.1
   rxjs: ^7.3.0
-  slash: ^3.0.0
+  slash: ^4.0.0
   tslib: 2.3.1
   type-fest: ^2.2.0
   typescript: 4.5.4
@@ -109,7 +109,7 @@ dependencies:
   read-pkg-up: 8.0.0
   rollup: 2.61.1
   rxjs: 7.3.0
-  slash: 3.0.0
+  slash: 4.0.0
   type-fest: 2.2.0
   webextension-polyfill: 0.8.0
   xstate: 4.26.1
@@ -5832,6 +5832,12 @@ packages:
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+    dev: true
+
+  /slash/4.0.0:
+    resolution: {integrity: sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==}
+    engines: {node: '>=12'}
+    dev: false
 
   /slice-ansi/2.1.0:
     resolution: {integrity: sha512-Qu+VC3EwYLldKa1fCxuuvULvSJOKEgk9pi8dZeCVK7TqBfUNTH4sFkk4joj8afVSfAYgJoSOetjx9QWOJ5mYoQ==}
