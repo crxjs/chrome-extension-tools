@@ -92,7 +92,7 @@
     "@testing-library/dom": "6.16.0",
     "@testing-library/jest-dom": "5.16.1",
     "@types/chrome": "0.0.171",
-    "@types/fs-extra": "8.1.2",
+    "@types/fs-extra": "9.0.13",
     "@types/glob": "7.2.0",
     "@types/jest": "27.0.3",
     "@types/jest-in-case": "1.0.5",
