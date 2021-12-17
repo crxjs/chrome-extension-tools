@@ -19,6 +19,7 @@ export const hybridFormat = (): CrxPlugin => {
     name: 'hybrid-format',
 
     crx: true,
+    enforce: 'post',
 
     buildStart(options) {
       const api = getRpceAPI(options.plugins)!
