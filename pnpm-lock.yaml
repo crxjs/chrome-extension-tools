@@ -31,7 +31,7 @@ specifiers:
   '@types/lodash.flatten': 4.4.6
   '@types/lodash.get': 4.4.6
   '@types/node': 13.13.52
-  '@types/prettier': 1.19.1
+  '@types/prettier': 2.4.2
   '@types/react': 17.0.37
   '@types/react-dom': 17.0.11
   '@types/ws': 8.2.2
@@ -140,7 +140,7 @@ devDependencies:
   '@types/lodash.flatten': 4.4.6
   '@types/lodash.get': 4.4.6
   '@types/node': 13.13.52
-  '@types/prettier': 1.19.1
+  '@types/prettier': 2.4.2
   '@types/react': 17.0.37
   '@types/react-dom': 17.0.11
   '@types/ws': 8.2.2
@@ -2040,12 +2040,8 @@ packages:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: false
 
-  /@types/prettier/1.19.1:
-    resolution: {integrity: sha512-5qOlnZscTn4xxM5MeGXAMOsIOIKIbh9e85zJWfBRVPlRMEVawzoPhINYbRGkBZCI8LxvBe7tJCdWiarA99OZfQ==}
-    dev: true
-
-  /@types/prettier/2.3.2:
-    resolution: {integrity: sha512-eI5Yrz3Qv4KPUa/nSIAi0h+qX0XyewOliug5F2QAtuRg6Kjg6jfmxe1GIwoIRhZspD1A0RP8ANrPwvEXXtRFog==}
+  /@types/prettier/2.4.2:
+    resolution: {integrity: sha512-ekoj4qOQYp7CvjX8ZDBgN86w3MqQhLE1hczEJbEIjgFEumDy+na/4AJAbLXfgEWFNB2pKadM5rPFtuSGMWK7xA==}
     dev: true
 
   /@types/prop-types/15.7.3:
@@ -4547,7 +4543,7 @@ packages:
       '@jest/transform': 27.4.5
       '@jest/types': 27.4.2
       '@types/babel__traverse': 7.14.2
-      '@types/prettier': 2.3.2
+      '@types/prettier': 2.4.2
       babel-preset-current-node-syntax: 1.0.1_@babel+core@7.16.5
       chalk: 4.1.2
       expect: 27.4.2
