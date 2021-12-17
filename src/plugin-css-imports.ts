@@ -5,6 +5,7 @@ import type {
   ManifestChunk,
 } from 'vite'
 import { format } from './helpers'
+import { basename } from './path'
 import { CrxPlugin, Manifest } from './types'
 
 export const cssImports = (): CrxPlugin => {
@@ -62,10 +63,25 @@ export const cssImports = (): CrxPlugin => {
 
         const files = Object.values(filesData)
         if (!files.length) return
+
         const filesByName = files.reduce(
           (map, file) => map.set(file.file, file),
           new Map<string, ManifestChunk>(),
         )
+        const filesByBase = files.reduce(
+          (map, file) =>
+            map.set(`_${basename(file.file)}`, file),
+          new Map<string, ManifestChunk>(),
+        )
+        const getAllCss = (name: string): string[] => {
+          const file =
+            filesByName.get(name) ?? filesByBase.get(name)
+          const { css = [], imports = [] } = file ?? {}
+          const result: string[] = [...css]
+          for (const imp of imports)
+            result.push(...getAllCss(imp))
+          return result
+        }
 
         const manifestAsset = bundle[
           'manifest.json'
@@ -77,11 +93,11 @@ export const cssImports = (): CrxPlugin => {
         const { content_scripts: scripts = [] } = manifest
         for (const script of scripts) {
           for (const name of script.js ?? []) {
-            const file = filesByName.get(name)
-            const { css = [] } = file ?? {}
+            const css = getAllCss(name)
             if (css.length) {
-              script.css = script.css ?? []
-              script.css!.push(...css)
+              const set = new Set(script.css)
+              css.forEach((x) => set.add(x))
+              script.css = [...set]
             }
           }
         }
