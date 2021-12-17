@@ -1,6 +1,9 @@
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { OutputAsset } from 'rollup'
 import { byFileName } from '$test/helpers/utils'
+import { jestSetTimeout } from '$test/helpers/timeout'
+
+jestSetTimeout(15000)
 
 test('Handles background html page', async () => {
   const { output } = await getRollupOutput(

@@ -1,6 +1,9 @@
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset, OutputChunk } from 'rollup'
+
+jestSetTimeout(15000)
 
 // TODO: test input objects with MV3
 test('Handles config with input object', async () => {
