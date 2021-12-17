@@ -1,3 +1,4 @@
+import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import { filesReady } from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
@@ -31,27 +32,9 @@ test('writes entry points to disk', async () => {
 
   expect(fs.existsSync(outDir)).toBe(true)
 
-  const cssFiles = glob.sync(`${outDir}/assets/*.css`, {
-    cwd: outDir,
-  })
-  expect(cssFiles.length).toBe(1)
-
-  const [styles] = cssFiles
+  const styles = 'assets/content-89281590.css'
   const manifest = 'manifest.json'
   const content = 'content.js'
-
-  const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
-
-  expect(manifestSource).toMatchObject({
-    content_scripts: [
-      {
-        matches: ['http://*/*', 'https://*/*'],
-        js: ['content.js'],
-        css: [styles],
-      },
-    ],
-  })
 
   const contentPath = path.join(outDir, content)
   const contentSource = await fs.readFile(contentPath, 'utf8')
@@ -60,4 +43,16 @@ test('writes entry points to disk', async () => {
   const stylesPath = path.join(outDir, styles)
   const stylesSource = await fs.readFile(stylesPath, 'utf8')
   expect(stylesSource).toMatchSnapshot(styles)
+
+  const manifestPath = path.join(outDir, manifest)
+  const manifestSource = await fs.readJson(manifestPath)
+  expect(manifestSource).toMatchObject({
+    content_scripts: [
+      {
+        css: [styles],
+        js: [runtimeReloaderCS, 'content.js'],
+        matches: ['http://*/*', 'https://*/*'],
+      },
+    ],
+  })
 })

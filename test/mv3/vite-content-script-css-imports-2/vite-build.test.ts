@@ -1,10 +1,11 @@
 import { isAsset, isChunk } from '$src/helpers'
+import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import { Manifest } from '$src/types'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import fs from 'fs-extra'
 import path from 'path'
-import { RollupOutput } from 'rollup'
+import { OutputAsset, RollupOutput } from 'rollup'
 import { build } from 'vite'
 
 jestSetTimeout(30000)
@@ -25,24 +26,22 @@ beforeAll(async () => {
 })
 
 test('bundles chunks and assets', async () => {
-  // Chunks
-  const chunks = output.filter(isChunk)
-  expect(chunks.find(byFileName('content.js'))).toBeDefined()
-  expect(chunks.length).toBe(1)
+  const content1 = 'content1/index.js'
+  const content2 = 'content2/index.js'
+  const styles1 = 'assets/index-5f7d7b6f.css'
+  const styles2 = 'assets/index-5dfee6cc.css'
+  const manifest = 'manifest.json'
 
-  // Assets
-  const assets = output.filter(isAsset)
+  expect(output.find(byFileName(content1))).toBeDefined()
+  expect(output.find(byFileName(content2))).toBeDefined()
+  expect(output.find(byFileName(styles1))).toBeDefined()
+  expect(output.find(byFileName(styles2))).toBeDefined()
+  expect(output.filter(isChunk).length).toBe(2)
+  expect(output.filter(isAsset).length).toBe(3)
 
-  const styles1Asset = assets.find(({ fileName }) =>
-    fileName.endsWith('css'),
-  )!
-  expect(styles1Asset).toBeDefined()
-  const styles2Asset = assets.find(({ fileName }) =>
-    fileName.endsWith('css'),
-  )!
-  expect(styles2Asset).toBeDefined()
-
-  const manifestAsset = assets.find(byFileName('manifest.json'))!
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
   expect(manifestAsset).toBeDefined()
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
@@ -50,17 +49,15 @@ test('bundles chunks and assets', async () => {
   expect(manifestSource).toMatchObject({
     content_scripts: [
       {
+        css: [styles1],
+        js: [content1],
         matches: ['http://*/*', 'https://*/*'],
-        js: ['content1/index.js'],
-        css: [styles1Asset.fileName],
       },
       {
+        css: [styles2],
+        js: [content2],
         matches: ['http://*/*', 'https://*/*'],
-        js: ['content2/index.js'],
-        css: [styles2Asset.fileName],
       },
     ],
   })
-
-  expect(assets.length).toBe(2)
 })
