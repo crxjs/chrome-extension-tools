@@ -29,7 +29,11 @@ const service = interpret(
         ({ plugins: watchPlugins, server }) =>
         (send) => {
           const {
-            config: { configFile, mode, build },
+            config: {
+              configFile,
+              mode,
+              build: { terserOptions, ...build },
+            },
           } = server!
           let watcher: RollupWatcher | undefined
           ;(async () => {
