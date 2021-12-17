@@ -19,6 +19,7 @@ import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
 import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
+import { cssImports } from './plugin-css-imports'
 import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
@@ -93,11 +94,12 @@ export const chromeExtension = (
     preValidateManifest(),
     backgroundESM_MV2(),
     backgroundESM_MV3(),
-    hybridFormat(),
     pluginOptions.browserPolyfill && browserPolyfill(),
     configureRollupOptions(),
-    htmlMapScriptsToJS(),
     transformIndexHtml(),
+    cssImports(),
+    htmlMapScriptsToJS(),
+    hybridFormat(),
     viteServeHMR_MV2(),
     viteServeHMR_MV3(),
     viteServeReactFastRefresh_MV2(),

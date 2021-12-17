@@ -1,5 +1,4 @@
 import { isAsset, isChunk } from '$src/helpers'
-import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import { Manifest } from '$src/types'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
