@@ -22,7 +22,7 @@ specifiers:
   '@types/chrome': 0.0.171
   '@types/csp-dev': ^1.0.0
   '@types/etag': ^1.8.1
-  '@types/fs-extra': 8.1.2
+  '@types/fs-extra': 9.0.13
   '@types/glob': 7.2.0
   '@types/jest': 27.0.3
   '@types/jest-in-case': 1.0.5
@@ -132,7 +132,7 @@ devDependencies:
   '@testing-library/dom': 6.16.0
   '@testing-library/jest-dom': 5.16.1
   '@types/chrome': 0.0.171
-  '@types/fs-extra': 8.1.2
+  '@types/fs-extra': 9.0.13
   '@types/glob': 7.2.0
   '@types/jest': 27.0.3
   '@types/jest-in-case': 1.0.5
@@ -1940,8 +1940,8 @@ packages:
     resolution: {integrity: sha512-BsPXH/irW0ht0Ji6iw/jJaK8Lj3FJemon2gvEqHKpCdDCeemHa+rI3WBGq5z7cDMZgoLjY40oninGxqk+8NzNQ==}
     dev: true
 
-  /@types/fs-extra/8.1.2:
-    resolution: {integrity: sha512-SvSrYXfWSc7R4eqnOzbQF4TZmfpNSM9FrSWLU3EUnWBuyZqNBOrv1B1JA3byUDPUl9z4Ab3jeZG2eDdySlgNMg==}
+  /@types/fs-extra/9.0.13:
+    resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
     dependencies:
       '@types/node': 13.13.52
     dev: true
