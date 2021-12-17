@@ -12,7 +12,7 @@ specifiers:
   '@rollup/plugin-commonjs': 21.0.1
   '@rollup/plugin-json': 4.1.0
   '@rollup/plugin-node-resolve': 13.1.1
-  '@rollup/plugin-sucrase': 3.1.1
+  '@rollup/plugin-sucrase': 4.0.1
   '@rollup/plugin-typescript': 8.3.0
   '@rollup/pluginutils': ^4.1.1
   '@sucrase/jest-plugin': 2.2.0
@@ -126,7 +126,7 @@ devDependencies:
   '@rollup/plugin-commonjs': 21.0.1_rollup@2.61.1
   '@rollup/plugin-json': 4.1.0_rollup@2.61.1
   '@rollup/plugin-node-resolve': 13.1.1_rollup@2.61.1
-  '@rollup/plugin-sucrase': 3.1.1_rollup@2.61.1
+  '@rollup/plugin-sucrase': 4.0.1_rollup@2.61.1
   '@rollup/plugin-typescript': 8.3.0_3bb347879280457c0420527ae9f527b5
   '@sucrase/jest-plugin': 2.2.0
   '@testing-library/dom': 8.11.1
@@ -1724,13 +1724,13 @@ packages:
       rollup: 2.61.1
     dev: true
 
-  /@rollup/plugin-sucrase/3.1.1_rollup@2.61.1:
-    resolution: {integrity: sha512-ifMWKtajaNvR2ybaJbBMkGZXxIUj0tovg5ARvlQHbAG7leJXe48D7TrZ7HIc8ROE/zs1Zh3UOXWmkNdjPGutZg==}
-    engines: {node: '>=8.0.0'}
+  /@rollup/plugin-sucrase/4.0.1_rollup@2.61.1:
+    resolution: {integrity: sha512-VDVLl+civWOw8eLBa6jOh1SeOBWCUKTyubmi4T+Ab1eFgxUG0OqdNPXVYJbsKAOqfS+Scj5oMHXvzyJmwoJAPQ==}
+    engines: {node: '>=12.0.0'}
     peerDependencies:
-      rollup: ^1.20.0 || ^2.0.0
+      rollup: ^2.53.1
     dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.61.1
+      '@rollup/pluginutils': 4.1.1
       rollup: 2.61.1
       sucrase: 3.20.0
     dev: true
