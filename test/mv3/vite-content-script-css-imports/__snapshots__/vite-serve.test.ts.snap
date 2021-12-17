@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`writes entry points to disk: assets/content-89281590.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`writes entry points to disk: content.js 1`] = `
+"(function () {
+	'use strict';
+
+	console.log(\\"content.ts\\");
+
+})();
+"
+`;

@@ -4,7 +4,7 @@ import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import fs from 'fs-extra'
 import path from 'path'
-import { RollupOutput } from 'rollup'
+import { OutputAsset, RollupOutput } from 'rollup'
 import { build } from 'vite'
 
 jestSetTimeout(30000)
@@ -25,20 +25,18 @@ beforeAll(async () => {
 })
 
 test('bundles chunks and assets', async () => {
-  // Chunks
-  const chunks = output.filter(isChunk)
-  expect(chunks.find(byFileName('content.js'))).toBeDefined()
-  expect(chunks.length).toBe(1)
+  const content = 'content.js'
+  const styles = 'assets/content-89281590.css'
+  const manifest = 'manifest.json'
 
-  // Assets
-  const assets = output.filter(isAsset)
+  expect(output.find(byFileName(content))).toBeDefined()
+  expect(output.find(byFileName(styles))).toBeDefined()
+  expect(output.filter(isChunk).length).toBe(1)
+  expect(output.filter(isAsset).length).toBe(2)
 
-  const stylesAsset = assets.find(({ fileName }) =>
-    fileName.endsWith('css'),
-  )!
-  expect(stylesAsset).toBeDefined()
-
-  const manifestAsset = assets.find(byFileName('manifest.json'))!
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
   expect(manifestAsset).toBeDefined()
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
@@ -46,12 +44,10 @@ test('bundles chunks and assets', async () => {
   expect(manifestSource).toMatchObject({
     content_scripts: [
       {
+        css: [styles],
+        js: [content],
         matches: ['http://*/*', 'https://*/*'],
-        js: ['content.js'],
-        css: [stylesAsset.fileName],
       },
     ],
   })
-
-  expect(assets.length).toBe(2)
 })
