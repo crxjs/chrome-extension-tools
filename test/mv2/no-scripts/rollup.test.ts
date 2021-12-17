@@ -1,7 +1,10 @@
 import { stubId } from '$src/stubId'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import { OutputAsset } from 'rollup'
+
+jestSetTimeout(15000)
 
 test('Handles extension with no scripts at all', async () => {
   const { output } = await getRollupOutput(
