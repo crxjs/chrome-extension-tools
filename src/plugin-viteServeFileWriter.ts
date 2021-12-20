@@ -22,7 +22,7 @@ import {
 } from './xstate_helpers'
 
 /** The service is used by multiple exports */
-const service = interpret(
+export const service = interpret(
   machine.withConfig({
     services: {
       fileWriter:
@@ -57,7 +57,12 @@ const service = interpret(
                 ({ crx }) => !crx,
               ),
               watchPlugins,
-            )
+            ).concat({
+              name: 'crx:file-writer-error-reporter',
+              buildEnd(error) {
+                if (error) send(model.events.ERROR(error))
+              },
+            })
 
             const watchRPCE = watchPlugins.find(isRPCE)!
             plugins.forEach((p, i) => {
@@ -111,7 +116,9 @@ const service = interpret(
             })
           })().catch((err) => send(model.events.ERROR(err)))
 
-          return () => watcher?.close()
+          return () => {
+            watcher?.close()
+          }
         },
       waitForServer: ({ server }) =>
         from(
@@ -237,6 +244,17 @@ export function viteServeFileWriter(): CrxPlugin {
  */
 export const filesReady = () =>
   waitForState(service, (state) => {
-    if (state.event.type === 'ERROR') throw state.event.error
+    if (state.matches({ watching: 'error' }))
+      throw (
+        state.context.lastError ||
+        new TypeError(
+          'file writer error, but lastError was unset',
+        )
+      )
     return state.matches({ watching: 'ready' })
   })
+
+/**
+ * For use in tests. Stops the file writer service.
+ */
+export const stopFileWriter = () => service.stop()

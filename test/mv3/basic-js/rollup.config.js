@@ -1,4 +1,4 @@
-import { chromeExtension, simpleReloader } from '$src'
+import { chromeExtension } from '$src'
 import babel from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
@@ -13,8 +13,6 @@ export default {
   },
   plugins: [
     chromeExtension(),
-    // Adds a Chrome extension reloader during watch mode
-    simpleReloader(),
     babel({
       // Do not transpile dependencies
       ignore: [path.resolve(__dirname, '../../../node_modules')],
@@ -24,11 +22,6 @@ export default {
     resolve({
       extensions: ['.mjs', '.js', '.json', '.node', '.jsx'],
     }),
-    commonjs({
-      namedExports: {
-        react: Object.keys(require('react')),
-        'react-dom': Object.keys(require('react-dom')),
-      },
-    }),
+    commonjs(),
   ],
 }

@@ -1,4 +1,7 @@
-import { filesReady } from '$src/plugin-viteServeFileWriter'
+import {
+  filesReady,
+  stopFileWriter,
+} from '$src/plugin-viteServeFileWriter'
 import { Manifest } from '$src/types'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
@@ -21,6 +24,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  stopFileWriter()
   await devServer.close()
 })
 

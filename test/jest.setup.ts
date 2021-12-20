@@ -1,11 +1,15 @@
 /* eslint-env jest */
 
 import 'array-flat-polyfill'
-import { warnSpy } from './helpers/consoleSpies'
+import { logSpy } from './helpers/consoleSpies'
 import './helpers/inspect'
 import { jestSetTimeout } from './helpers/timeout'
 
-warnSpy.mockImplementation()
+if (process.env.LOG_LEVEL === 'debug') {
+  // all console methods are enabled
+} else {
+  logSpy.mockImplementation()
+}
 
 jestSetTimeout(5000)
 

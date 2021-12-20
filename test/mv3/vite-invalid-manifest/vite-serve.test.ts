@@ -1,9 +1,12 @@
-import { filesReady } from '$src/plugin-viteServeFileWriter'
+import {
+  filesReady,
+  stopFileWriter,
+} from '$src/plugin-viteServeFileWriter'
+import { errorSpy } from '$test/helpers/consoleSpies'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
-import { errorSpy } from '$test/helpers/consoleSpies'
 
 errorSpy.mockImplementation()
 
@@ -20,6 +23,11 @@ beforeAll(async () => {
     envFile: false,
     build: { outDir },
   })
+})
+
+afterAll(async () => {
+  stopFileWriter()
+  await devServer.close()
 })
 
 test('validation errors rise', async () => {

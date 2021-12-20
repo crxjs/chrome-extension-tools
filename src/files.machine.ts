@@ -23,6 +23,7 @@ export interface FilesContext {
   root: string
   inputsByName: Map<string, BaseAsset | Script>
   excluded: Set<FileType>
+  lastError?: Error
 }
 const filesContext: FilesContext = {
   filesById: new Map(),
@@ -63,7 +64,12 @@ export const machine = model.createMachine(
     on: {
       ERROR: {
         target: '.complete',
-        actions: 'sendAbortToAllFiles',
+        actions: [
+          model.assign({
+            lastError: (context, { error }) => error as Error,
+          }),
+          'sendAbortToAllFiles',
+        ],
       },
     },
     initial: 'configuring',

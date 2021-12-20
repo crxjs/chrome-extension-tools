@@ -1,4 +1,4 @@
-import { chromeExtension, simpleReloader } from '$src'
+import { chromeExtension } from '$src'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
@@ -13,15 +13,8 @@ export default {
   },
   plugins: [
     chromeExtension(),
-    // Adds a Chrome extension reloader during watch mode
-    simpleReloader(),
     resolve(),
-    commonjs({
-      namedExports: {
-        react: Object.keys(require('react')),
-        'react-dom': Object.keys(require('react-dom')),
-      },
-    }),
+    commonjs(),
     typescript(),
   ],
 }

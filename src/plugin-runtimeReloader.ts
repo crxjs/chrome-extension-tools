@@ -1,4 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { code as bgCode } from 'code ./browser/code-runtimeReloader-bgCode.ts'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { code as csCode } from 'code ./browser/code-runtimeReloader-csCode.ts'
 import MagicString from 'magic-string'
 import { isMV2, CrxPlugin, isMV3 } from './types'

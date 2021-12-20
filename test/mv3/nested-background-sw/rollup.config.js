@@ -1,4 +1,4 @@
-import { chromeExtension, simpleReloader } from '$src'
+import { chromeExtension } from '$src'
 import babel from '@rollup/plugin-babel'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
@@ -11,11 +11,5 @@ export default {
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
   },
-  plugins: [
-    chromeExtension(),
-    // Adds a Chrome extension reloader during watch mode
-    simpleReloader(),
-    resolve(),
-    commonjs(),
-  ],
+  plugins: [chromeExtension(), resolve(), commonjs()],
 }

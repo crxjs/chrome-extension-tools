@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { code as browserPolyfillExecuteScriptJs } from 'code ./browser/code-executeScriptPolyfill.ts'
 import { readFileSync, readJsonSync } from 'fs-extra'
 import { relative } from './path'

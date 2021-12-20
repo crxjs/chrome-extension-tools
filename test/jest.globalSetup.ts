@@ -52,7 +52,10 @@ const config: RollupOptions = {
         }
 
         if (importPath)
-          return format`import { code } from 'code ${importPath}'
+          return format`
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          import { code } from 'code ${importPath}'
                        export { code }`
 
         return null

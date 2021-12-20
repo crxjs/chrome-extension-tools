@@ -363,10 +363,6 @@ export const chromeExtension = (
       service.send(model.events.CHANGE(id, change))
     },
 
-    closeBundle() {
-      if (!this.meta.watchMode) service.stop()
-    },
-
     closeWatcher() {
       service.stop()
     },

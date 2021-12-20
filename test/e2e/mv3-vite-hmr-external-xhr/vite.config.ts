@@ -10,7 +10,6 @@ export default defineConfig(() => ({
   build: {
     minify: false,
     emptyOutDir: true,
-    sourcemap: 'inline',
   },
   plugins: [chromeExtension(), react()],
   cacheDir: path.join(__dirname, '.vite'),

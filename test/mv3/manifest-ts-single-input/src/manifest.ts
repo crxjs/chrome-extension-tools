@@ -1,4 +1,4 @@
-import { ManifestV3 } from '$src/index'
+import type { ManifestV3 } from '$src/index'
 
 const config: ManifestV3 = {
   action: {

@@ -2,7 +2,10 @@ import {
   runtimeReloaderBG,
   runtimeReloaderCS,
 } from '$src/plugin-runtimeReloader'
-import { filesReady } from '$src/plugin-viteServeFileWriter'
+import {
+  filesReady,
+  stopFileWriter,
+} from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -24,6 +27,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  stopFileWriter()
   await devServer.close()
 })
 

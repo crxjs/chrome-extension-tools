@@ -10,7 +10,6 @@ export default defineConfig({
   build: {
     emptyOutDir: true,
     minify: false,
-    sourcemap: 'inline',
     outDir: path.join(__dirname, 'dist'),
     rollupOptions: {
       input: path.join(__dirname, 'src', 'manifest.json'),

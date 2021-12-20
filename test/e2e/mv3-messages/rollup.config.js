@@ -12,17 +12,11 @@ export default {
     dir: outDir,
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
-    sourcemap: 'inline',
   },
   plugins: [
     chromeExtension(),
     typescript(),
     resolve(),
-    commonjs({
-      namedExports: {
-        react: Object.keys(require('react')),
-        'react-dom': Object.keys(require('react-dom')),
-      },
-    }),
+    commonjs(),
   ],
 }

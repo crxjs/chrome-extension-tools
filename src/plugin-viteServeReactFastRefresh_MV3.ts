@@ -3,7 +3,11 @@ import { createHash } from 'crypto'
 import { ViteDevServer } from 'vite'
 import { format } from './helpers'
 import { CrxPlugin, isMV3 } from './types'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScriptMessage.ts'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
 import {
   createStubURL,

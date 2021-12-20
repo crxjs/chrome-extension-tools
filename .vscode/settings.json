@@ -1,9 +1,14 @@
 {
   "jestrunner.debugOptions": {
+    "args": ["--no-cache"],
+    "sourcemaps": "inline",
+    "disableOptimisticBPs": true,
     "env": {
       "JEST_TIMEOUT": 6000000,
-      "XSTATE_VIZ_PORT": 5858
+      "XSTATE_VIZ_PORT": 5858,
+      "LOG_LEVEL": "debug"
     }
   },
+  "jestrunner.jestPath": "node_modules/jest/bin/jest.js",
   "typescript.tsdk": "node_modules/typescript/lib"
 }

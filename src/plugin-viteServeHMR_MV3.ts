@@ -1,4 +1,6 @@
 import cheerio from 'cheerio'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { code as swCode } from 'code ./service-worker/code-fetchHandlerForMV3HMR.ts'
 import getEtag from 'etag'
 import MagicString from 'magic-string'

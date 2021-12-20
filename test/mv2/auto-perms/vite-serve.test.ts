@@ -1,4 +1,7 @@
-import { filesReady } from '$src/plugin-viteServeFileWriter'
+import {
+  filesReady,
+  stopFileWriter,
+} from '$src/plugin-viteServeFileWriter'
 import fs from 'fs-extra'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
@@ -19,6 +22,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
+  stopFileWriter()
   await devServer.close()
 })
 

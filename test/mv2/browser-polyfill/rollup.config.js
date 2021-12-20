@@ -4,15 +4,16 @@ import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import path from 'path'
 
+const outDir = path.join(__dirname)
 export default {
   input: path.join(__dirname, 'manifest.json'),
   output: {
-    dir: path.join(__dirname),
+    dir: outDir,
     format: 'esm',
   },
   plugins: [
     chromeExtension({ verbose: false, browserPolyfill: true }),
-    typescript(),
+    typescript({ outDir, sourceMap: false }),
     resolve(),
     commonjs(),
   ],
