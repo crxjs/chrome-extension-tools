@@ -116,7 +116,10 @@ export const machine = model.createMachine(
               },
             }),
           },
-          BUILD_START: 'transforming',
+          BUILD_START: {
+            actions: 'startManifest',
+            target: 'transforming.manifest',
+          },
         },
       },
       transforming: {
@@ -129,22 +132,20 @@ export const machine = model.createMachine(
             actions: 'spawnFile',
           },
         },
-        initial: 'manifest',
+        initial: 'assets',
         states: {
           manifest: {
-            entry: 'startManifest',
             on: {
               EXCLUDE_FILE_TYPE: {
                 actions: 'updateExcludedFiles',
               },
               PLUGINS_RESULT: {
-                actions: 'forwardToFile',
+                actions: ['forwardToFile', 'startAssets'],
                 target: 'assets',
               },
             },
           },
           assets: {
-            entry: 'startAssets',
             on: {
               EXCLUDE_FILE_TYPE: {
                 actions: 'updateExcludedFiles',
