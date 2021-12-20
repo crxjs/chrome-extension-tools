@@ -76,7 +76,7 @@ specifiers:
   tslib: 2.3.1
   type-fest: ^2.2.0
   typescript: 4.5.4
-  vite: 2.7.3
+  vite: 2.7.4
   vite-plugin-inspect: 0.3.11
   webextension-polyfill: ^0.8.0
   ws: 8.3.0
@@ -162,8 +162,8 @@ devDependencies:
   rollup-plugin-bundle-imports: 1.5.1_1d9817bdbee8e0eebd47d63443af5b3e
   tslib: 2.3.1
   typescript: 4.5.4
-  vite: 2.7.3
-  vite-plugin-inspect: 0.3.11_vite@2.7.3
+  vite: 2.7.4
+  vite-plugin-inspect: 0.3.11_vite@2.7.4
   ws: 8.3.0
 
 packages:
@@ -5395,13 +5395,13 @@ packages:
     engines: {node: '>=10.13.0'}
     dev: true
 
-  /postcss/8.3.11:
-    resolution: {integrity: sha512-hCmlUAIlUiav8Xdqw3Io4LcpA1DOt7h3LSTAC4G6JGHFFaWzI6qvFt9oilvl8BmkbBRX1IhM90ZAmpk68zccQA==}
+  /postcss/8.4.5:
+    resolution: {integrity: sha512-jBDboWM8qpaqwkMwItqTQTiFikhs/67OYVvblFFTM7MrZjt6yMKd6r2kgXizEbTTljacm4NldIlZnhbjr84QYg==}
     engines: {node: ^10 || ^12 || >=14}
     dependencies:
       nanoid: 3.1.30
       picocolors: 1.0.0
-      source-map-js: 0.6.2
+      source-map-js: 1.0.1
     dev: true
 
   /prelude-ls/1.1.2:
@@ -5872,8 +5872,8 @@ packages:
       smart-buffer: 4.2.0
     dev: true
 
-  /source-map-js/0.6.2:
-    resolution: {integrity: sha512-/3GptzWzu0+0MBQFrDKzw/DvvMTUORvgY6k6jd/VS6iCR4RDTKWH6v6WPwQoUO8667uQEf9Oe38DxAYWY5F/Ug==}
+  /source-map-js/1.0.1:
+    resolution: {integrity: sha512-4+TN2b3tqOCd/kaGRJ/sTYA0tR0mdXx26ipdolxcwtJVqEnqNYvlCAt1q3ypy4QMlYus+Zh34RNtYLoq2oQ4IA==}
     engines: {node: '>=0.10.0'}
     dev: true
 
@@ -6317,7 +6317,7 @@ packages:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
 
-  /vite-plugin-inspect/0.3.11_vite@2.7.3:
+  /vite-plugin-inspect/0.3.11_vite@2.7.4:
     resolution: {integrity: sha512-YsaV4bhJ++EULZamWVudMsq0VTugR/0slgbSj/A9JI9KmsGsXBCN4zBx0ptd0TkKrRniLbqO7iQqdZaybuLGvQ==}
     peerDependencies:
       vite: ^2.0.0
@@ -6325,13 +6325,13 @@ packages:
       debug: 4.3.2
       sirv: 1.0.18
       ufo: 0.7.9
-      vite: 2.7.3
+      vite: 2.7.4
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite/2.7.3:
-    resolution: {integrity: sha512-GAY1P+9fLJOju1SRm8+hykVnEXog+E+KXuqqyMBQDriKCUIKzWnPn142yNNhSdf/ixYGYdUa5ce3A8WaEajzGw==}
+  /vite/2.7.4:
+    resolution: {integrity: sha512-f+0426k9R/roz5mRNwJlQ+6UOnhCwIypJSbfgCmsVzVJe9jTTM5iRX2GWYUean+iqPBWaU/dYLryx9AoH2pmrw==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:
@@ -6347,7 +6347,7 @@ packages:
         optional: true
     dependencies:
       esbuild: 0.13.14
-      postcss: 8.3.11
+      postcss: 8.4.5
       resolve: 1.20.0
       rollup: 2.61.1
     optionalDependencies:
