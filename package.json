@@ -38,7 +38,10 @@
     "prepublishOnly": "run-p build build:types",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "test": "jest --testPathIgnorePatterns=\"/node_modules/|e2e|mv2\"",
-    "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\"",
+    "test:ci": "run-s test:ci:*",
+    "test:ci:src": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"src\"",
+    "test:ci:mv2": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"mv2\"",
+    "test:ci:mv3": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"mv3\"",
     "test:full": "jest --testPathIgnorePatterns=\"/node_modules/|e2e\"",
     "test:mv2": "jest test.mv2",
     "test:e2e": "jest --runInBand e2e"

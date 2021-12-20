@@ -57,5 +57,11 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-      - name: Run tests
-        run: pnpm test:ci
+      - name: Run unit tests
+        run: pnpm test:ci:src
+
+      - name: Run MV2 integration tests
+        run: pnpm test:ci:mv2
+
+      - name: Run MV3 integration tests
+        run: pnpm test:ci:mv3
