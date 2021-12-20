@@ -76,7 +76,7 @@ export const machine = model.createMachine(
     states: {
       configuring: {
         on: {
-          ENQUEUE_FILES: {
+          ADD_FILES: {
             actions: model.assign({
               inputsByName: ({ inputsByName }, { files }) => {
                 const map = new Map(inputsByName)

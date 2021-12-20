@@ -252,7 +252,7 @@ export const chromeExtension = (
       })
 
       if (crxFiles.length)
-        service.send(model.events.ENQUEUE_FILES(crxFiles))
+        service.send(model.events.ADD_FILES(crxFiles))
 
       // Vite will run this hook for all our added plugins,
       // but we still need to add builtin plugins for Rollup

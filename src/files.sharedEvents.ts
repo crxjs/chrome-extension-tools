@@ -43,6 +43,9 @@ function normalizeFilePaths({
 
 export const sharedEventCreators = {
   ABORT: () => ({}),
+  ADD_FILES: (files: (BaseAsset | Script)[]) => ({
+    files: files.map(normalizeFilePaths),
+  }),
   BUILD_MANIFEST: () => ({}),
   BUILD_START: () => ({}),
   CHANGE: (id: string, change: { event: ChangeEvent }) => ({
@@ -58,9 +61,6 @@ export const sharedEventCreators = {
     file: Omit<CompleteFile, 'source' | 'fileId'>,
   ) => ({ file }),
   EMIT_START: (manifest = false) => ({ manifest }),
-  ENQUEUE_FILES: (files: (BaseAsset | Script)[]) => ({
-    files: files.map(normalizeFilePaths),
-  }),
   ERROR: (error: unknown) => ({ error }),
   EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
   FILE_EXCLUDED: (id: string) => ({ id }),
