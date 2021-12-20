@@ -37,5 +37,11 @@ test('validation errors rise', async () => {
     Promise.all([devServer.listen(), filesReady()]),
   ).rejects.toThrow()
 
+  // We can safely ignore this, it happens when a service is stopped
+  // https://github.com/statelyai/xstate/issues/1792
+  // expect(warnSpy).toBeCalledWith(
+  //   "Warning: No implementation found for action type 'xstate.assign'",
+  // )
+
   expect(errorSpy).toBeCalled()
 })
