@@ -1,0 +1,12 @@
+{
+  "background": {
+    "service_worker": "background.ts"
+  },
+  "content_scripts": [
+    {
+      "js": ["content.ts"],
+      "matches": ["https://*/*", "http://*/*"]
+    }
+  ],
+  "manifest_version": 3
+}
