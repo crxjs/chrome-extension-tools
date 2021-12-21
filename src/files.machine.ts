@@ -187,6 +187,10 @@ export const machine = model.createMachine(
         id: 'ready',
         on: {
           GENERATE_BUNDLE: 'rendering',
+          ADD_FILES: {
+            actions: 'startImportedFiles',
+            target: 'transforming',
+          },
         },
       },
       rendering: {
@@ -239,6 +243,22 @@ export const machine = model.createMachine(
           CHANGE: {
             actions: 'forwardToAllFiles',
             target: 'configuring',
+          },
+          ADD_FILES: {
+            cond: ({ filesByName }, { files }) =>
+              files.some(
+                ({ fileName }) => !filesByName.has(fileName),
+              ),
+            actions: [
+              'triggerRebuild',
+              assign({
+                inputsByName: ({ inputsByName }, { files }) =>
+                  files.reduce(
+                    (r, file) => r.set(file.fileName, file),
+                    new Map(inputsByName),
+                  ),
+              }),
+            ],
           },
         },
       },
@@ -293,6 +313,12 @@ export const machine = model.createMachine(
             return send(model.events.SPAWN_FILE(input))
           },
         )
+      }),
+      startImportedFiles: pure(({ filesByName }, event) => {
+        const { files } = narrowEvent(event, 'ADD_FILES')
+        return files
+          .filter(({ fileName }) => !filesByName.has(fileName))
+          .map((file) => send(model.events.SPAWN_FILE(file)))
       }),
       startParsedFiles: pure(({ filesByName }, event) => {
         const { children } = narrowEvent(event, 'PARSE_RESULT')
