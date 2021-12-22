@@ -27,7 +27,7 @@ afterAll(async () => {
   await devServer.close()
 })
 
-test.skip('writes files to disk', async () => {
+test('writes files to disk', async () => {
   expect(fs.existsSync(outDir)).toBe(false)
 
   await Promise.all([devServer.listen(), filesReady()])

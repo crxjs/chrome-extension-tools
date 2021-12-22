@@ -5,7 +5,7 @@ import { byFileName } from '$test/helpers/utils'
 
 jestSetTimeout(30000)
 
-test.skip('bundles chunks and assets', async () => {
+test('bundles chunks and assets', async () => {
   const { output } = await getRollupOutput(
     __dirname,
     'rollup.config.js',
