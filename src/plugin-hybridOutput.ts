@@ -8,11 +8,11 @@ import {
 import { isChunk } from './helpers'
 import { dirname, join, parse, relative } from './path'
 import { generateFileNames, getRpceAPI } from './plugin_helpers'
-import { CompleteFile, CrxPlugin } from './types'
+import { EmittedFile, CrxPlugin } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
 export const hybridFormat = (): CrxPlugin => {
-  let files: Map<string, CompleteFile>
+  let files: Map<string, EmittedFile>
   let root = process.cwd()
 
   return {
@@ -24,7 +24,7 @@ export const hybridFormat = (): CrxPlugin => {
     buildStart(options) {
       const api = getRpceAPI(options.plugins)!
 
-      files = api.emittedFiles
+      files = api.files
       root = api.root
     },
 
@@ -46,7 +46,8 @@ export const hybridFormat = (): CrxPlugin => {
       const entryFileNames = '[name].js'
 
       const filesForIIFE = Array.from(files.values()).filter(
-        ({ fileType }) => fileType === 'CONTENT',
+        ({ fileType, fileName }) =>
+          fileType === 'CONTENT' && !!bundle[fileName],
       )
 
       // Regenerate content scripts as IIFE

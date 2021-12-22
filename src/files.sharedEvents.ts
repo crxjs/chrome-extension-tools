@@ -5,7 +5,7 @@ import { createModel } from 'xstate/lib/model'
 import {
   Asset,
   BaseAsset,
-  CompleteFile,
+  EmittedFile,
   FileType,
   Script,
 } from './types'
@@ -54,17 +54,18 @@ export const sharedEventCreators = {
   }),
   COMPLETE_FILE: (data: {
     id: string
-    fileId: string
+    refId: string
     source?: string | Uint8Array
   }) => data,
   EMIT_FILE: (
-    file: Omit<CompleteFile, 'source' | 'fileId'>,
-  ) => ({ file }),
+    file: Omit<EmittedFile, 'source' | 'fileId' | 'refId'>,
+  ) => ({
+    file,
+  }),
   EMIT_START: (manifest = false) => ({ manifest }),
   ERROR: (error: unknown) => ({ error }),
   EXCLUDE_FILE_TYPE: (fileType: FileType) => ({ fileType }),
   FILE_EXCLUDED: (id: string) => ({ id }),
-  FILE_ID: (input: { id: string; fileId: string }) => input,
   GENERATE_BUNDLE: () => ({}),
   PARSE_RESULT: (
     fileName: string,
@@ -76,12 +77,13 @@ export const sharedEventCreators = {
     ],
   }),
   PLUGINS_RESULT: (
-    asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
+    asset: Omit<Required<Asset>, 'refId' | 'dirName'>,
   ) => asset,
   PLUGINS_START: (
-    asset: Omit<Required<Asset>, 'fileId' | 'dirName'>,
+    asset: Omit<Required<Asset>, 'refId' | 'dirName'>,
   ) => asset,
   READY: (id: string) => ({ id }),
+  REF_ID: (input: { id: string; fileId: string }) => input,
   REMOVE_FILE: (id: string) => ({ id }),
   RENDER_START: (fileName: string) => ({ fileName }),
   ROOT: (root: string) => ({ root }),

@@ -3,8 +3,13 @@ import jsesc from 'jsesc'
 import MagicString from 'magic-string'
 import { OutputChunk } from 'rollup'
 import { isChunk } from './helpers'
-import { dirname, parse, resolve } from './path'
-import { getRpceAPI, RpceApi, StubURL } from './plugin_helpers'
+import { dirname, parse, relative, resolve } from './path'
+import {
+  generateFileNames,
+  getRpceAPI,
+  RpceApi,
+  StubURL,
+} from './plugin_helpers'
 import { CrxPlugin } from './types'
 
 const importScriptPrefix = '\0importedScript'
@@ -17,6 +22,7 @@ export const importScripts = (): CrxPlugin => {
   return {
     name: 'import-scripts',
     enforce: 'pre',
+    apply: 'build',
     buildStart({ plugins }) {
       if (plugins) api = getRpceAPI(plugins)!
     },
@@ -34,20 +40,25 @@ export const importScripts = (): CrxPlugin => {
 
       return null
     },
-    async load(id) {
-      if (!id.startsWith(importScriptPrefix)) return null
+    async load(_id) {
+      if (!_id.startsWith(importScriptPrefix)) return null
 
-      const url = StubURL(id.slice(importScriptPrefix.length))
-      const refId = this.emitFile({
-        id: url.pathname,
-        type: 'chunk',
-      })
+      const url = StubURL(_id.slice(importScriptPrefix.length))
+      const id = url.pathname
+      const fileName = generateFileNames(
+        relative(api.root, id),
+      ).outputFileName
+      const files = await api.addFiles.call(this, [
+        { id, fileName, fileType: 'CONTENT' },
+      ])
+
+      const { refId } = files.get(fileName)!
 
       if (url.searchParams.has('text')) {
-        textImportRefIds.set(id, refId)
+        textImportRefIds.set(_id, refId)
         return `export default "%TEXT_${refId}%"`
       } else {
-        fileImportRefIds.set(id, refId)
+        fileImportRefIds.set(_id, refId)
         return `export default "%FILE_${refId}%"`
       }
     },

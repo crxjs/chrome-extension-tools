@@ -1,13 +1,16 @@
 import CSP from 'csp-dev'
 import { set } from 'lodash'
+import { PluginContext } from 'rollup'
 import { Interpreter } from 'xstate'
 import type { machine as filesMachine } from './files.machine'
 import { join, parse } from './path'
 import {
-  CompleteFile,
+  BaseAsset,
+  EmittedFile,
   CrxPlugin,
   isMV2,
   Manifest,
+  Script,
 } from './types'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
@@ -28,13 +31,13 @@ export const isRPCE = (
 ) => !!(p && p.name === 'chrome-extension')
 
 export type RpceApi = {
-  /** A map of the emitted files */
-  emittedFiles: Map<
-    string,
-    CompleteFile & {
-      source?: string | Uint8Array | undefined
-    }
-  >
+  /** A map of the emitted files by fileName */
+  files: Map<string, EmittedFile>
+  /** Returns a map of the newly emitted files */
+  addFiles: (
+    this: PluginContext,
+    files: (BaseAsset | Script)[],
+  ) => Promise<Map<string, EmittedFile>>
   /** The updated root folder, derived from either the Vite config or the manifest dirname */
   readonly root: string
   /** The files service, used to send events from other plugins */

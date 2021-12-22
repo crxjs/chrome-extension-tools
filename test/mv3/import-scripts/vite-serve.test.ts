@@ -38,7 +38,7 @@ test('writes files to disk', async () => {
   const background = 'background.js'
   const content = 'content.js'
   const inline = 'inline-script.js'
-  const dynamic = 'modules/dynamic-script-a5443c7a.js'
+  const dynamic = 'dynamic-script.js'
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)

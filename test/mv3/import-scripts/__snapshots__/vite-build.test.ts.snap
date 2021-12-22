@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`bundles chunks 1`] = `
-"var scriptFileName = \\"modules/dynamic-script-a5443c7a.js\\";
+"var scriptFileName = \\"dynamic-script.js\\";
 console.log(\\"service_worker.ts\\");
 chrome.tabs.query({
   active: true,

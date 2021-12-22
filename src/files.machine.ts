@@ -131,6 +131,7 @@ export const machine = model.createMachine(
               !filesByName.has(fileName),
             actions: 'spawnFile',
           },
+          ADD_FILES: { actions: 'startImportedFiles' },
         },
         initial: 'assets',
         states: {
@@ -177,7 +178,7 @@ export const machine = model.createMachine(
                   actions: 'handleFile',
                 },
               ],
-              FILE_ID: { actions: 'forwardToFile' },
+              REF_ID: { actions: 'forwardToFile' },
               READY: { cond: 'allFilesReady', target: '#ready' },
             },
           },
@@ -283,7 +284,7 @@ export const machine = model.createMachine(
       ),
       forwardToFile: forwardTo(({ filesById }, event) => {
         const { id } = narrowEvent(event, [
-          'FILE_ID',
+          'REF_ID',
           'PLUGINS_RESULT',
         ])
         return filesById.get(id)!
@@ -376,27 +377,31 @@ export const machine = model.createMachine(
     guards: {
       allFilesParsed: ({ filesById, excluded }, event) => {
         const { children } = narrowEvent(event, 'PARSE_RESULT')
-
-        return (
+        const noChildren =
           children.filter(
             ({ fileType }) => !excluded.has(fileType),
-          ).length === 0 &&
+          ).length === 0
+        const result =
+          noChildren &&
           [...filesById.values()].every((file) => {
             const state = file.getSnapshot()
             return (
+              state?.matches('ready') ||
               state?.matches('parsed') ||
               state?.matches('excluded')
             )
           })
-        )
+        return result
       },
-      allFilesReady: ({ filesById }) =>
-        [...filesById.values()].every((file) => {
+      allFilesReady: ({ filesById }) => {
+        const result = [...filesById.values()].every((file) => {
           const state = file.getSnapshot()
           return (
             state?.matches('ready') || state?.matches('excluded')
           )
-        }),
+        })
+        return result
+      },
       readyForManifest: ({ filesById }) => {
         const result = [...filesById.values()].every((file) => {
           const state = file.getSnapshot()

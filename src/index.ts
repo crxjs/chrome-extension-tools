@@ -22,13 +22,15 @@ import {
 import { stubId } from './stubId'
 import type {
   Asset,
+  BaseAsset,
   ChromeExtensionOptions,
-  CompleteFile,
+  EmittedFile,
   CrxHookType,
   CrxPlugin,
   InternalCrxPlugin,
   ManifestV2,
   ManifestV3,
+  Script,
   Writeable,
 } from './types'
 import {
@@ -37,7 +39,12 @@ import {
   waitForState,
 } from './xstate_helpers'
 
-export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
+export type {
+  ManifestV3,
+  ManifestV2,
+  CrxPlugin,
+  EmittedFile as CompleteFile,
+}
 
 export const simpleReloader = (): Plugin => ({
   name: 'simple-reloader',
@@ -56,10 +63,8 @@ export const chromeExtension = (
   })
 
   /* Emitted file data by emitted file id*/
-  const emittedFiles = new Map<
-    string,
-    CompleteFile & { source?: string | Uint8Array }
-  >()
+  const filesByRefId = new Map<string, EmittedFile>()
+  const filesByFileName = new Map<string, EmittedFile>()
 
   const allPlugins = new Set<InternalCrxPlugin>()
   function setupPluginsRunner(
@@ -90,11 +95,67 @@ export const chromeExtension = (
     })
   }
 
+  function setupFileEmitter(this: PluginContext) {
+    useConfig(service, {
+      actions: {
+        handleFile: (context, event) => {
+          try {
+            const { file: f } = narrowEvent(event, 'EMIT_FILE')
+            const file = Object.assign({}, f)
+
+            if (file.type === 'chunk')
+              file.fileName = getJsFilename(file.fileName)
+
+            const refId = this.emitFile(file)
+            service.send(
+              model.events.REF_ID({
+                id: file.id,
+                fileId: refId,
+              }),
+            )
+
+            const emittedFile = { ...file, refId }
+            filesByRefId.set(refId, emittedFile)
+            filesByFileName.set(file.fileName, emittedFile)
+
+            this.addWatchFile(file.id)
+          } catch (error) {
+            service.send(model.events.ERROR(error))
+          }
+        },
+      },
+    })
+  }
+
+  async function addFiles(
+    this: PluginContext,
+    files: (BaseAsset | Script)[],
+  ): Promise<Map<string, EmittedFile>> {
+    setupPluginsRunner.call(this, 'transform')
+    setupFileEmitter.call(this)
+
+    const prevNames = new Set(filesByFileName.keys())
+
+    service.send(model.events.ADD_FILES(files))
+    await waitForState(service, (state) => {
+      if (state.event.type === 'ERROR') throw state.event.error
+      return state.matches('ready')
+    })
+
+    const result = new Map(filesByFileName)
+    for (const fileName of prevNames) {
+      result.delete(fileName)
+    }
+
+    return result
+  }
+
   let builtins: CrxPlugin[] | undefined
   let pluginSetupDone: boolean
 
   const api: RpceApi = {
-    emittedFiles: emittedFiles,
+    files: filesByRefId,
+    addFiles,
     get root() {
       return service.getSnapshot().context.root
     },
@@ -221,32 +282,7 @@ export const chromeExtension = (
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
       setupPluginsRunner.call(this, 'transform')
-      useConfig(service, {
-        actions: {
-          handleFile: (context, event) => {
-            try {
-              const { file: f } = narrowEvent(event, 'EMIT_FILE')
-              const file = Object.assign({}, f)
-
-              if (file.type === 'chunk')
-                file.fileName = getJsFilename(file.fileName)
-
-              const emittedFileId = this.emitFile(file)
-              service.send(
-                model.events.FILE_ID({
-                  id: file.id,
-                  fileId: emittedFileId,
-                }),
-              )
-
-              emittedFiles.set(emittedFileId, file)
-              this.addWatchFile(file.id)
-            } catch (error) {
-              service.send(model.events.ERROR(error))
-            }
-          },
-        },
-      })
+      setupFileEmitter.call(this)
 
       service.send(model.events.BUILD_START())
       await waitForState(service, (state) => {
@@ -273,7 +309,7 @@ export const chromeExtension = (
         actions: {
           handleFile: (context, event) => {
             try {
-              const { fileId, source } = narrowEvent(
+              const { refId, source } = narrowEvent(
                 event,
                 'COMPLETE_FILE',
               )
@@ -281,8 +317,8 @@ export const chromeExtension = (
               // This is a script, do nothing for now
               if (isUndefined(source)) return
 
-              this.setAssetSource(fileId, source)
-              const file = emittedFiles.get(fileId)!
+              this.setAssetSource(refId, source)
+              const file = filesByRefId.get(refId)!
               file.source = source
             } catch (error) {
               service.send(model.events.ERROR(error))
@@ -314,7 +350,7 @@ export const chromeExtension = (
     },
 
     watchChange(id, change) {
-      emittedFiles.clear()
+      filesByRefId.clear()
       service.send(model.events.CHANGE(id, change))
     },
 

@@ -16,7 +16,7 @@ test('bundles chunks and assets', async () => {
   const background = 'background.js'
   const content = 'content.js'
   const inline = 'inline-script.js'
-  const dynamic = 'modules/dynamic-script-026f4aed.js'
+  const dynamic = 'dynamic-script.js'
 
   // Chunks
   const chunks = output.filter(isChunk)
