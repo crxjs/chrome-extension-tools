@@ -24,6 +24,7 @@ export const viteServeHMR_MV2 = (): CrxPlugin => {
   return {
     name: 'vite-serve-hmr-mv2',
     crx: true,
+    apply: 'serve',
     configureServer(s) {
       server = s
       const { hmr } = s.config.server

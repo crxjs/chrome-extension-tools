@@ -7,7 +7,7 @@ import { build } from 'vite'
 
 jestSetTimeout(30000)
 
-test('bundles chunks', async () => {
+test.skip('bundles chunks', async () => {
   const { output } = (await build({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,

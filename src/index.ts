@@ -1,5 +1,5 @@
 import { createFilter } from '@rollup/pluginutils'
-import { PluginContext } from 'rollup'
+import { InputOptions, PluginContext } from 'rollup'
 import { Plugin } from 'vite'
 import { interpret } from 'xstate'
 import { machine, model } from './files.machine'
@@ -7,35 +7,13 @@ import { SharedEvent } from './files.sharedEvents'
 import {
   format,
   getJsFilename,
-  isString,
   isUndefined,
   not,
 } from './helpers'
 import { categorizeInput } from './index_categorizeInput'
+import { hijackHooks, startBuiltins } from './index_setupPlugins'
 import { runPlugins } from './index_runPlugins'
 import { basename } from './path'
-import { autoPerms } from './plugin-autoPerms'
-import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
-import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
-import { browserPolyfill } from './plugin-browserPolyfill'
-import { configureRollupOptions } from './plugin-configureRollupOptions'
-import { cssImports } from './plugin-css-imports'
-import { extendManifest } from './plugin-extendManifest'
-import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
-import { hybridFormat } from './plugin-hybridOutput'
-import { packageJson } from './plugin-packageJson'
-import { runtimeReloader } from './plugin-runtimeReloader'
-import { transformIndexHtml } from './plugin-transformIndexHtml'
-import {
-  preValidateManifest,
-  validateManifest,
-} from './plugin-validateManifest'
-import { viteServeFileWriter } from './plugin-viteServeFileWriter'
-import { viteServeHMR_MV2 } from './plugin-viteServeHMR_MV2'
-import { viteServeHMR_MV3 } from './plugin-viteServeHMR_MV3'
-import { viteServeReactFastRefresh_MV2 } from './plugin-viteServeReactFastRefresh_MV2'
-import { viteServeReactFastRefresh_MV3 } from './plugin-viteServeReactFastRefresh_MV3'
-import { xstateCompat } from './plugin-xstateCompat'
 import {
   combinePlugins,
   isRPCE,
@@ -48,6 +26,7 @@ import type {
   CompleteFile,
   CrxHookType,
   CrxPlugin,
+  InternalCrxPlugin,
   ManifestV2,
   ManifestV3,
   Writeable,
@@ -73,10 +52,8 @@ export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
 ): Plugin => {
   const service = interpret(machine, {
-    deferEvents: true,
     devTools: true,
   })
-  service.start()
 
   /* Emitted file data by emitted file id*/
   const emittedFiles = new Map<
@@ -84,50 +61,7 @@ export const chromeExtension = (
     CompleteFile & { source?: string | Uint8Array }
   >()
 
-  const builtins: CrxPlugin[] = [
-    validateManifest(),
-    xstateCompat(),
-    viteServeFileWriter(),
-    packageJson(),
-    extendManifest(pluginOptions),
-    autoPerms(),
-    preValidateManifest(),
-    backgroundESM_MV2(),
-    backgroundESM_MV3(),
-    pluginOptions.browserPolyfill && browserPolyfill(),
-    configureRollupOptions(),
-    transformIndexHtml(),
-    cssImports(),
-    htmlMapScriptsToJS(),
-    hybridFormat(),
-    viteServeHMR_MV2(),
-    viteServeHMR_MV3(),
-    viteServeReactFastRefresh_MV2(),
-    viteServeReactFastRefresh_MV3(),
-    runtimeReloader(),
-  ]
-    .filter((x): x is CrxPlugin => !!x)
-    .map((p) => ({ ...p, name: `crx:${p.name}` }))
-  let isViteServe: boolean
-  let setupPluginsDone = false
-  function setupPlugins(plugins: CrxPlugin[]) {
-    if (setupPluginsDone) return
-
-    const prepared = isViteServe
-      ? builtins
-      : builtins.filter(
-          ({ name }) => !name.includes('vite-serve'),
-        )
-
-    const combined = combinePlugins(plugins, prepared)
-
-    plugins.length = 0
-    plugins.push(...combined)
-
-    setupPluginsDone = true
-  }
-
-  const allPlugins = new Set<CrxPlugin>()
+  const allPlugins = new Set<InternalCrxPlugin>()
   function setupPluginsRunner(
     this: PluginContext,
     hook: CrxHookType,
@@ -156,14 +90,8 @@ export const chromeExtension = (
     })
   }
 
-  // Vite and Jest resolveConfig behavior is different
-  // In Vite, the config module is imported twice as two different modules
-  // In Jest, not only is the config module the same,
-  //   the same plugin return value is used ¯\_(ツ)_/¯
-  // The Vite hooks should only run once, regardless
-  let viteConfigHook: boolean,
-    viteConfigResolvedHook: boolean,
-    viteServerHook: boolean
+  let builtins: CrxPlugin[] | undefined
+  let pluginSetupDone: boolean
 
   const api: RpceApi = {
     emittedFiles: emittedFiles,
@@ -179,11 +107,7 @@ export const chromeExtension = (
     api,
 
     async config(config, env) {
-      if (viteConfigHook) return
-      else viteConfigHook = true
-
-      isViteServe = env.command === 'serve'
-
+      builtins = startBuiltins(pluginOptions, env.command)
       for (const b of builtins) {
         const result = await b?.config?.call(this, config, env)
         config = result ?? config
@@ -193,11 +117,8 @@ export const chromeExtension = (
     },
 
     async configureServer(server) {
-      if (viteServerHook) return
-      else viteServerHook = true
-
       const cbs = new Set<() => void | Promise<void>>()
-      for (const b of builtins) {
+      for (const b of builtins!) {
         const result = await b?.configureServer?.call(
           this,
           server,
@@ -217,13 +138,6 @@ export const chromeExtension = (
     },
 
     async configResolved(config) {
-      if (viteConfigResolvedHook) return
-      else viteConfigResolvedHook = true
-
-      if (isString(config.root)) {
-        service.send(model.events.ROOT(config.root))
-      }
-
       /**
        * Vite ignores replacements of `config.plugins`,
        * so we need to change the array in place.
@@ -235,16 +149,33 @@ export const chromeExtension = (
         typeof config.plugins
       >
 
-      setupPlugins(plugins)
+      const preAliasPlugins = plugins.splice(
+        0,
+        plugins.findIndex(({ name }) => name === 'alias') + 1,
+      )
+      const combined = combinePlugins(plugins, builtins!)
+      const hijacked = hijackHooks(combined)
+      plugins.length = 0
+      plugins.push(...preAliasPlugins)
+      plugins.push(...hijacked)
+      pluginSetupDone = true
+
+      service.send(model.events.ROOT(config.root))
 
       // Run possibly async builtins last
       // After this, Vite will take over
-      for (const b of builtins) {
+      for (const b of builtins!) {
         await b?.configResolved?.call(this, config)
       }
     },
 
-    async options({ input = [], ...options }) {
+    async options(options) {
+      service.start()
+
+      const input = options.input ?? []
+      const plugins = (options.plugins ??
+        []) as InternalCrxPlugin[]
+
       const { crxFiles, finalInput } = categorizeInput(input, {
         HTML: createFilter(['**/*.html']),
         MANIFEST: (id: string) =>
@@ -256,25 +187,39 @@ export const chromeExtension = (
 
       // Vite will run this hook for all our added plugins,
       // but we still need to add builtin plugins for Rollup
-      if (!setupPluginsDone) {
-        for (const b of builtins) {
-          await b?.options?.call(this, options)
-        }
+      if (!pluginSetupDone) {
+        builtins =
+          builtins ?? startBuiltins(pluginOptions, 'build')
+        const combined = combinePlugins(plugins, builtins)
+        const hijacked = hijackHooks(combined)
+        plugins.length = 0
+        plugins.push(...hijacked)
 
-        // Guard against Vite's possibly undefined plugins[]
-        const { plugins = [] } = options
-        setupPlugins(plugins as CrxPlugin[])
-        options.plugins = plugins
+        service.start()
+        pluginSetupDone = true
       }
 
-      return { input: finalInput, ...options }
+      let result: InputOptions = {
+        ...options,
+        plugins,
+        input: finalInput,
+      }
+      for (const plugin of plugins as InternalCrxPlugin[]) {
+        const r = await plugin?.crxOptions?.call(this, result)
+        result = r ?? result
+      }
+      return result
     },
 
-    async buildStart({ plugins: rollupPlugins = [] }) {
-      rollupPlugins
+    async buildStart(options) {
+      const plugins: InternalCrxPlugin[] = options.plugins!
+      await Promise.all(
+        plugins.map((p) => p.crxBuildStart?.call(this, options)),
+      )
+
+      plugins
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
-
       setupPluginsRunner.call(this, 'transform')
       useConfig(service, {
         actions: {
@@ -320,7 +265,7 @@ export const chromeExtension = (
       return null
     },
 
-    async generateBundle(options, bundle) {
+    async generateBundle(options, bundle, isWrite) {
       delete bundle[stubId + '.js']
 
       setupPluginsRunner.call(this, 'render')
@@ -356,6 +301,16 @@ export const chromeExtension = (
 
         return state.matches('complete')
       })
+
+      for (const p of allPlugins) {
+        if (p.enforce === 'post') continue
+        await p.crxGenerateBundle?.call(
+          this,
+          options,
+          bundle,
+          isWrite,
+        )
+      }
     },
 
     watchChange(id, change) {
@@ -364,7 +319,7 @@ export const chromeExtension = (
     },
 
     closeWatcher() {
-      service.stop()
+      if (service.initialized) service.stop()
     },
   }
 }

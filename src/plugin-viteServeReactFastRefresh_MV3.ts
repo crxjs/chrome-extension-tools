@@ -47,9 +47,10 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
   const hashesByScript = new Map<string, string>()
 
   return {
-    name: 'vite-serve-hmr-mv3',
+    name: 'vite-serve-react-fast-refresh-mv3',
     crx: true,
     enforce: 'post',
+    apply: 'serve',
     configureServer(s) {
       server = s
     },

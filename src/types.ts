@@ -177,6 +177,12 @@ export type CrxPlugin = VitePlugin &
     crx?: boolean
   }
 
+export type InternalCrxPlugin = CrxPlugin & {
+  crxOptions?: CrxPlugin['options']
+  crxBuildStart?: CrxPlugin['buildStart']
+  crxGenerateBundle?: CrxPlugin['generateBundle']
+}
+
 export interface ChromeExtensionOptions {
   /**
    * @deprecated This is not supported for MV3, use this instead:

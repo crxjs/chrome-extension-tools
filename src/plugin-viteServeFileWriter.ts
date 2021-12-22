@@ -15,15 +15,36 @@ import {
 } from './plugin-viteServeFileWriter.machine'
 import { combinePlugins, isRPCE } from './plugin_helpers'
 import { CrxPlugin } from './types'
-import {
-  narrowEvent,
-  useConfig,
-  waitForState,
-} from './xstate_helpers'
+import { narrowEvent, waitForState } from './xstate_helpers'
 
 /** The service is used by multiple exports */
-export const service = interpret(
+const service = interpret(
   machine.withConfig({
+    actions: {
+      handleBundleStart(context, _event) {
+        narrowEvent(_event, 'BUNDLE_START')
+        console.log('Building Chrome Extension files...')
+      },
+      handleBundleEnd(context, _event) {
+        const { event } = narrowEvent(_event, 'BUNDLE_END')
+        console.log(`Build completed in ${event.duration} ms`)
+      },
+      handleError(context, event) {
+        const { error } = narrowEvent(event, 'ERROR')
+        if (error.message?.includes('is not exported by')) {
+          console.warn(format`Could not complete bundle because Vite did not pre-bundle a dependency.
+          You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.`)
+        }
+
+        console.error(error)
+      },
+      handleFatalError({ server }, event) {
+        const { error } = narrowEvent(event, 'ERROR')
+        console.error(error)
+        server?.close()
+        if (service.initialized) service.stop()
+      },
+    },
     services: {
       fileWriter:
         ({ plugins: watchPlugins, server }) =>
@@ -43,7 +64,7 @@ export const service = interpret(
             )
 
             const {
-              plugins: buildPlugins,
+              plugins: _buildPlugins,
               build: { rollupOptions, watch: watchOptions },
             } = await resolveConfig(
               { configFile, build },
@@ -51,33 +72,28 @@ export const service = interpret(
               mode,
             )
 
-            // replace build crx plugins with watch crx plugins
-            const plugins = combinePlugins(
-              (buildPlugins as CrxPlugin[]).filter(
-                ({ crx }) => !crx,
-              ),
-              watchPlugins,
-            ).concat({
-              name: 'crx:file-writer-error-reporter',
-              buildEnd(error) {
-                if (error) send(model.events.ERROR(error))
-              },
-            })
+            const buildPlugins = (_buildPlugins as CrxPlugin[])
+              .filter(
+                (p) => !p.crx && p.name !== 'chrome-extension',
+              )
+              .concat({
+                name: 'crx:file-writer-error-reporter',
+                buildEnd(error) {
+                  if (error) send(model.events.ERROR(error))
+                },
+              })
 
-            const watchRPCE = watchPlugins.find(isRPCE)!
-            plugins.forEach((p, i) => {
-              // Vite and Jest resolveConfig behavior is different
-              // In Vite, the config module is imported twice as two different modules
-              // In Jest, not only is the config module the same,
-              //   the same plugin return value is used ¯\_(ツ)_/¯
-              // So we need to check that RPCE is not the same object
-              if (isRPCE(p) && watchRPCE !== p) {
-                // replace build RPCE with watch RPCE
-                ;(plugins as CrxPlugin[])[i] = watchRPCE
-                // stop the build RPCE service
-                p.api.service.stop()
-              }
-            })
+            const preAliasPlugins = buildPlugins.splice(
+              0,
+              buildPlugins.findIndex(
+                ({ name }) => name === 'alias',
+              ) + 1,
+            )
+            // replace build crx plugins with watch crx plugins
+            const plugins = [
+              ...preAliasPlugins,
+              ...combinePlugins(watchPlugins, buildPlugins),
+            ]
 
             const options: RollupWatchOptions = {
               ...rollupOptions,
@@ -103,8 +119,8 @@ export const service = interpret(
                 },
               },
             }
-            watcher = watch(options)
 
+            watcher = watch(options)
             watcher.on('event', async (event) => {
               if (event.code === 'BUNDLE_END') {
                 send(model.events.BUNDLE_END(event))
@@ -158,83 +174,33 @@ export const service = interpret(
  * These hooks should be excluded from Rollup Watch
  * to avoid duplicate hook calls.
  */
-export function viteServeFileWriter(): CrxPlugin {
-  let isViteServe: boolean
-
+export const viteServeFileWriter = (): CrxPlugin => {
   return {
     name: 'vite-serve-file-writer',
     crx: true,
     enforce: 'pre',
-    config(config, { command }) {
-      isViteServe = command === 'serve'
-    },
+    apply: 'serve',
     configResolved(config) {
-      if (!isViteServe) return
-
-      useConfig(service, {
-        actions: {
-          handleBundleStart(context, _event) {
-            narrowEvent(_event, 'BUNDLE_START')
-            console.log('Building Chrome Extension files...')
-          },
-          handleBundleEnd(context, _event) {
-            const { event } = narrowEvent(_event, 'BUNDLE_END')
-            console.log(
-              `Build completed in ${event.duration} ms`,
-            )
-          },
-          handleError(context, event) {
-            const { error } = narrowEvent(event, 'ERROR')
-            if (error.message?.includes('is not exported by')) {
-              console.warn(format`Could not complete bundle because Vite did not pre-bundle a dependency.
-              You may need to add this dependency to your Vite config under \`optimizeDeps.include\`.`)
-            }
-
-            console.error(error)
-          },
-          handleFatalError({ server }, event) {
-            const { error } = narrowEvent(event, 'ERROR')
-            console.error(error)
-            server?.close()
-            service.stop()
-          },
-        },
+      const configPlugins = config.plugins as CrxPlugin[]
+      const watchPlugins: CrxPlugin[] = []
+      let rpceIndex = -1
+      configPlugins.forEach((plugin: CrxPlugin, i) => {
+        if (plugin.crx) {
+          watchPlugins.push(plugin)
+        } else if (isRPCE(plugin)) {
+          watchPlugins.push(plugin)
+          rpceIndex = i
+        }
       })
+
+      // RPCE should only run in the inner Rollup Watch hooks
+      configPlugins.splice(rpceIndex, 1)
 
       service.start()
-
-      const watchPlugins: CrxPlugin[] = []
-      config.plugins.forEach((servePlugin: CrxPlugin, i) => {
-        if (isRPCE(servePlugin)) {
-          // RPCE should only run in the inner Rollup Watch hooks
-          watchPlugins.push(servePlugin)
-          // RPCE should not run in ViteDevServer hooks
-          ;(config.plugins as CrxPlugin[])[i] = {
-            name: 'chrome-extension-replacement',
-          }
-          return
-        }
-
-        // Don't touch other non-crx plugins
-        if (!servePlugin.crx) return
-
-        // Shallow clone crx plugins for Rollup Watch
-        // b/c we're going to remove some hooks from the originals
-        const watchPlugin = { ...servePlugin }
-        watchPlugins.push(watchPlugin)
-
-        // These hooks should only run in watch mode for CRX plugins
-        delete servePlugin.options
-        delete servePlugin.buildStart
-      })
       service.send(model.events.PLUGINS(watchPlugins))
     },
     configureServer(server) {
-      if (!isViteServe) return
-
-      if (service.initialized) {
-        service.send(model.events.SERVER(server))
-      }
+      service.send(model.events.SERVER(server))
     },
   }
 }
@@ -257,4 +223,6 @@ export const filesReady = () =>
 /**
  * For use in tests. Stops the file writer service.
  */
-export const stopFileWriter = () => service.stop()
+export const stopFileWriter = () => {
+  if (service.initialized) service.stop()
+}

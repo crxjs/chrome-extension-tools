@@ -85,8 +85,8 @@ export const preValidateManifest = (): CrxPlugin => ({
 /**
  * Validates the final output manifest
  */
-export const validateManifest = (): CrxPlugin => ({
-  name: 'validate-manifest',
+export const postValidateManifest = (): CrxPlugin => ({
+  name: 'post-validate-manifest',
   crx: true,
   enforce: 'post',
   renderCrxManifest: runValidator,

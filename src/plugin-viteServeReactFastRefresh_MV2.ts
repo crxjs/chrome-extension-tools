@@ -30,6 +30,7 @@ export const viteServeReactFastRefresh_MV2 = (): CrxPlugin => {
     name: 'vite-serve-react-fast-refresh-mv2',
     crx: true,
     enforce: 'post',
+    apply: 'serve',
     configureServer(s) {
       server = s
     },

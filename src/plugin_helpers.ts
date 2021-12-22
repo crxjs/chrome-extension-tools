@@ -47,57 +47,6 @@ export function getRpceAPI(
   return plugins.find(isRPCE)?.api
 }
 
-/**
- * Sorts plugins into categories by `plugin.crx` and `plugin.enforce`
- * RPCE is not a CrxPlugin itself, so it is included in `basePlugins`
- */
-export function categorizePlugins(plugins: CrxPlugin[]): {
-  basePlugins: CrxPlugin[]
-  prePlugins: CrxPlugin[]
-  postPlugins: CrxPlugin[]
-  normalPlugins: CrxPlugin[]
-} {
-  const basePlugins: CrxPlugin[] = []
-  const prePlugins: CrxPlugin[] = []
-  const postPlugins: CrxPlugin[] = []
-  const normalPlugins: CrxPlugin[] = []
-  for (const p of plugins) {
-    if (!p.crx) basePlugins.push(p)
-    else if (p.enforce === 'pre') prePlugins.push(p)
-    else if (p.enforce === 'post') postPlugins.push(p)
-    else normalPlugins.push(p)
-  }
-
-  return {
-    basePlugins,
-    prePlugins,
-    postPlugins,
-    normalPlugins,
-  }
-}
-
-export function combinePlugins(
-  basePlugins: CrxPlugin[],
-  crxPlugins: CrxPlugin[],
-): CrxPlugin[] {
-  const baseRpceIndex = basePlugins.findIndex(isRPCE)
-  if (baseRpceIndex < 0)
-    throw new Error('Could not find base RPCE plugin')
-
-  const { normalPlugins, postPlugins, prePlugins } =
-    categorizePlugins(crxPlugins)
-
-  const result: CrxPlugin[] = [...basePlugins]
-  // Add normal crx plugins
-  result.splice(baseRpceIndex + 1, 0, ...normalPlugins)
-  // Add pre crx plugins
-  result.splice(1, 0, ...prePlugins)
-  // Add post crx plugins
-  result.push(...postPlugins)
-
-  return result
-}
-
 const defaultSrc = ['self']
 export function addToCspScriptSrc(
   manifest: Manifest,
@@ -134,4 +83,33 @@ export function addToCspScriptSrc(
 export const createStubURL = (id = '') => {
   const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
   return new URL('stub://stub' + pathnameAndSearch)
+}
+
+export function splitPlugins(plugins: CrxPlugin[]) {
+  const pre: CrxPlugin[] = []
+  const mid: CrxPlugin[] = []
+  const post: CrxPlugin[] = []
+  for (const p of plugins) {
+    if (p.enforce === 'pre') pre.push(p)
+    else if (p.enforce === 'post') post.push(p)
+    else mid.push(p)
+  }
+  return { pre, mid, post }
+}
+
+export function combinePlugins(
+  pluginsA: CrxPlugin[],
+  pluginsB: CrxPlugin[],
+) {
+  const a = splitPlugins(pluginsA)
+  const b = splitPlugins(pluginsB)
+
+  return [
+    ...a.pre,
+    ...b.pre,
+    ...a.mid,
+    ...b.mid,
+    ...a.post,
+    ...b.post,
+  ]
 }

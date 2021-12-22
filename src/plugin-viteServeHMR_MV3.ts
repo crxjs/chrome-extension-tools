@@ -53,6 +53,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
   return {
     name: 'vite-serve-hmr-mv3',
     crx: true,
+    apply: 'serve',
     buildStart({ plugins }) {
       api = getRpceAPI(plugins)
       api?.service.onEvent((event) => {

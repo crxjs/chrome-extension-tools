@@ -8,21 +8,21 @@ import { format } from './helpers'
 import { basename } from './path'
 import { CrxPlugin, Manifest } from './types'
 
-export const cssImports = (): CrxPlugin => {
+export const importCSS = (): CrxPlugin => {
   let disablePlugin = true
   return {
-    name: 'css-imports',
-    crx: true,
+    name: 'import-css',
+    apply: 'build',
     config(config) {
       disablePlugin = false
       set(config, 'build.manifest', true)
       return config
     },
-    buildStart({ plugins }) {
-      if (disablePlugin) return
+    configResolved({ plugins }) {
       // We only want to replace the hook once in watch mode
-      //  otherwise it becomes a 😖 nested function
-      disablePlugin = true
+      // otherwise it becomes a 😖 nested function
+      if (disablePlugin) return
+      else disablePlugin = true
 
       const viteManifest = plugins.find(
         ({ name }) => name === 'vite:manifest',
