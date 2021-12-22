@@ -26,6 +26,7 @@ specifiers:
   '@types/glob': 7.2.0
   '@types/jest': 27.0.3
   '@types/jest-in-case': 1.0.5
+  '@types/jsesc': ^3.0.1
   '@types/lodash': ^4.14.172
   '@types/lodash.difference': 4.5.6
   '@types/lodash.flatten': 4.4.6
@@ -57,6 +58,7 @@ specifiers:
   jest-chrome: 0.7.2
   jest-html-reporters: 2.1.6
   jest-in-case: 1.0.2
+  jsesc: ^3.0.2
   json-ptr: ^3.0.0
   jsonpath-plus: ^6.0.0
   localforage: ^1.9.0
@@ -87,6 +89,7 @@ dependencies:
   '@types/acorn': 4.0.6
   '@types/csp-dev': 1.0.0
   '@types/etag': 1.8.1
+  '@types/jsesc': 3.0.1
   '@types/lodash': 4.14.172
   acorn-walk: 8.2.0
   ajv: 8.6.2
@@ -100,6 +103,7 @@ dependencies:
   etag: 1.8.1
   fs-extra: 10.0.0
   glob: 7.1.6
+  jsesc: 3.0.2
   json-ptr: 3.0.1
   jsonpath-plus: 6.0.1
   localforage: 1.9.0
@@ -1959,6 +1963,10 @@ packages:
       jest-diff: 27.4.2
       pretty-format: 27.4.2
     dev: true
+
+  /@types/jsesc/3.0.1:
+    resolution: {integrity: sha512-F2g93pJlhV0RlW9uSUAM/hIxywlwlZcuRB/nZ82GaMPaO8mdexYbJ8Qt3UGbUS1M19YFQykEetrWW004M+vPCg==}
+    dev: false
 
   /@types/json-schema/7.0.9:
     resolution: {integrity: sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==}
@@ -4770,6 +4778,12 @@ packages:
     engines: {node: '>=4'}
     hasBin: true
     dev: true
+
+  /jsesc/3.0.2:
+    resolution: {integrity: sha512-xKqzzWXDttJuOcawBt4KnKHHIf5oQ/Cxax+0PWFG+DFDgHNAdi+TXECADI+RYiFUMmx8792xsMbbgXj4CwnP4g==}
+    engines: {node: '>=6'}
+    hasBin: true
+    dev: false
 
   /json-parse-better-errors/1.0.2:
     resolution: {integrity: sha512-mrqyZKfX5EhL7hvqcV6WG1yYjnjeuYDzDhhcAAUrq8Po85NBQBJP+ZDUT75qZQ98IkUoBqdkExkukOU7Ts2wrw==}

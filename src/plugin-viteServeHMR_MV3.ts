@@ -9,7 +9,7 @@ import { ViteDevServer } from 'vite'
 import { model as filesModel } from './files.machine'
 import { format } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { createStubURL, getRpceAPI } from './plugin_helpers'
+import { StubURL, getRpceAPI } from './plugin_helpers'
 import {
   Asset,
   AssetType,
@@ -104,7 +104,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
         .not('[src^="/@"]')
         .attr('type', 'module')
         .attr('src', (i, value) => {
-          const url = createStubURL(value)
+          const url = StubURL(value)
           url.searchParams.set('t', Date.now().toString())
           const result = url.pathname + url.search
           return value.startsWith('/') ? result : result.slice(1)
@@ -151,7 +151,7 @@ function useCrxFilesMiddleware(
   crxPlugins: CrxPlugin[],
 ) {
   server.middlewares.use(async (req, res, next) => {
-    const url = createStubURL(req.url)
+    const url = StubURL(req.url)
     const asset = assetCache.get(url.pathname)
 
     if (!asset || !servedTypes.includes(asset.fileType)) {

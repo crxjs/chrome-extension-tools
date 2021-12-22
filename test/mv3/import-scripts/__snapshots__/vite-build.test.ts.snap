@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`bundles chunks 1`] = `
+"var scriptFileName = \\"modules/dynamic-script-a5443c7a.js\\";
+console.log(\\"service_worker.ts\\");
+chrome.tabs.query({
+  active: true,
+  currentWindow: true
+}).then(([tab]) => {
+  if (tab == null ? void 0 : tab.id)
+    chrome.scripting.executeScript({
+      files: [scriptFileName],
+      target: { tabId: tab.id }
+    });
+});
+"
+`;
+
+exports[`bundles chunks 2`] = `
+"(function () {
+	'use strict';
+
+	var text = \\"console.log(\\\\\\"inline-script.ts\\\\\\");\\\\n\\";
+	console.log(\\"content script\\");
+	const script = document.createElement(\\"script\\");
+	script.text = text;
+	document.head.prepend(script);
+
+})();
+"
+`;

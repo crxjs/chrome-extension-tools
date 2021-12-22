@@ -9,11 +9,7 @@ import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScrip
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
-import {
-  createStubURL,
-  getRpceAPI,
-  RpceApi,
-} from './plugin_helpers'
+import { StubURL, getRpceAPI, RpceApi } from './plugin_helpers'
 import { relative } from './path'
 
 const reactRegex = /[jt]sx/
@@ -75,7 +71,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
 
       if ($inlineScripts.length > 0)
         $remoteScripts.attr('src', (i, value) => {
-          const url = createStubURL(value)
+          const url = StubURL(value)
           if (!reactRegex.test(url.pathname)) return value
           url.searchParams.set('delay', 'true')
           const result = url.pathname + url.search
@@ -135,7 +131,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
       if (id.includes('delay=true')) {
         const { root } = api
         const relId = relative(root, id)
-        const { pathname } = createStubURL(relId)
+        const { pathname } = StubURL(relId)
 
         return remoteScriptWrapper.replace(
           '%REMOTE_SCRIPT_PATH%',

@@ -7,6 +7,7 @@ import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
 import { importCSS } from './plugin-importCSS'
+import { importScripts } from './plugin-importScripts'
 import { packageJson } from './plugin-packageJson'
 import { postHijackedHooks } from './plugin-postHijackedHooks'
 import { runtimeReloader } from './plugin-runtimeReloader'
@@ -47,6 +48,7 @@ export function startBuiltins(
     configureRollupOptions,
     transformIndexHtml,
     importCSS,
+    importScripts,
     htmlMapScriptsToJS,
     hybridFormat,
     viteServeHMR_MV2,

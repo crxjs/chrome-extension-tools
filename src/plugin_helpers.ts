@@ -80,9 +80,8 @@ export function addToCspScriptSrc(
 }
 
 /** Work with an id as a URL instance */
-export const createStubURL = (id = '') => {
-  const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
-  return new URL('stub://stub' + pathnameAndSearch)
+export const StubURL = (id = '') => {
+  return new URL(id, 'stub://stub')
 }
 
 export function splitPlugins(plugins: CrxPlugin[]) {

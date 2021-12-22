@@ -16,15 +16,15 @@ test('bundles chunks and assets', async () => {
   const background = 'background.js'
   const content = 'content.js'
   const inline = 'inline-script.js'
-  const dynamic = 'dynamic-script.js'
+  const dynamic = 'modules/dynamic-script-026f4aed.js'
 
   // Chunks
   const chunks = output.filter(isChunk)
   expect(chunks.find(byFileName(background))).toBeDefined()
   expect(chunks.find(byFileName(content))).toBeDefined()
-  expect(chunks.find(byFileName(inline))).toBeDefined()
   expect(chunks.find(byFileName(dynamic))).toBeDefined()
-  expect(chunks.length).toBe(4)
+  expect(chunks.find(byFileName(inline))).not.toBeDefined()
+  expect(chunks.length).toBe(3)
 
   // Assets
   const assets = output.filter(isAsset)

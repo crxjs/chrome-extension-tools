@@ -38,7 +38,7 @@ test('writes files to disk', async () => {
   const background = 'background.js'
   const content = 'content.js'
   const inline = 'inline-script.js'
-  const dynamic = 'dynamic-script.js'
+  const dynamic = 'modules/dynamic-script-a5443c7a.js'
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
@@ -48,7 +48,10 @@ test('writes files to disk', async () => {
     },
     content_scripts: [
       {
-        js: ['content.js'],
+        js: [
+          'runtime-reloader--content-script.js',
+          'content.js',
+        ],
         matches: ['https://*/*', 'http://*/*'],
       },
     ],
@@ -63,11 +66,10 @@ test('writes files to disk', async () => {
   const csSource = await fs.readFile(csPath, 'utf8')
   expect(csSource).toMatchSnapshot(content)
 
-  const icsPath = path.join(outDir, inline)
-  const icsSource = await fs.readFile(icsPath, 'utf8')
-  expect(icsSource).toMatchSnapshot(inline)
-
   const dcsPath = path.join(outDir, dynamic)
   const dcsSource = await fs.readFile(dcsPath, 'utf8')
   expect(dcsSource).toMatchSnapshot(dynamic)
+
+  const icsPath = path.join(outDir, inline)
+  expect(fs.existsSync(icsPath)).toBe(false)
 })

@@ -11,7 +11,7 @@ import {
   not,
 } from './helpers'
 import { categorizeInput } from './index_categorizeInput'
-import { hijackHooks, startBuiltins } from './index_setupPlugins'
+import { hijackHooks, startBuiltins } from './index_addPlugins'
 import { runPlugins } from './index_runPlugins'
 import { basename } from './path'
 import {
