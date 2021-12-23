@@ -1,4 +1,4 @@
-import text from './inline-script?script&text'
+import text from './dynamic-script?script&esm'
 
 console.log('content script')
 

@@ -1,7 +1,6 @@
 import { existsSync } from 'fs'
 import jsesc from 'jsesc'
 import MagicString from 'magic-string'
-import { OutputChunk } from 'rollup'
 import { isChunk } from './helpers'
 import { dirname, parse, relative, resolve } from './path'
 import {
@@ -15,7 +14,6 @@ import { CrxPlugin } from './types'
 const importScriptPrefix = '\0importedScript'
 
 export const importScripts = (): CrxPlugin => {
-  const textImportRefIds = new Map<string, string>()
   const fileImportRefIds = new Map<string, string>()
   let api: RpceApi
 
@@ -48,45 +46,27 @@ export const importScripts = (): CrxPlugin => {
       const fileName = generateFileNames(
         relative(api.root, id),
       ).outputFileName
+
       const files = await api.addFiles.call(this, [
         { id, fileName, fileType: 'CONTENT' },
       ])
 
       const { refId } = files.get(fileName)!
+      fileImportRefIds.set(_id, refId)
 
-      if (url.searchParams.has('text')) {
-        textImportRefIds.set(_id, refId)
-        return `export default "%TEXT_${refId}%"`
-      } else {
-        fileImportRefIds.set(_id, refId)
-        return `export default "%FILE_${refId}%"`
-      }
+      return `export default "%SCRIPT_${refId}%"`
     },
     generateBundle(options, bundle) {
       for (const chunk of Object.values(bundle)) {
         if (!isChunk(chunk)) continue
 
-        for (const [id, refId] of textImportRefIds) {
-          if (!chunk.modules[id]) continue
-          const fileName = this.getFileName(refId)
-          const { code: text } = bundle[fileName] as OutputChunk
-          const placeholder = `%TEXT_${refId}%`
-          const index = chunk.code.indexOf(placeholder)
-          const magic = new MagicString(chunk.code)
-          magic.overwrite(
-            index,
-            index + placeholder.length,
-            jsesc(text, { quotes: 'double' }),
-          )
-          const replaced = magic.toString()
-          chunk.code = replaced
-          if (chunk.map) chunk.map = magic.generateMap()
-        }
-
         for (const [id, refId] of fileImportRefIds) {
           if (!chunk.modules[id]) continue
           const fileName = this.getFileName(refId)
-          const placeholder = `%FILE_${refId}%`
+          // TODO: if chunk is manifest content script
+          // - add fileName to webAccRes
+          // - use same match pattern array
+          const placeholder = `%SCRIPT_${refId}%`
           const index = chunk.code.indexOf(placeholder)
           const magic = new MagicString(chunk.code)
           magic.overwrite(
@@ -98,11 +78,6 @@ export const importScripts = (): CrxPlugin => {
           chunk.code = replaced
           if (chunk.map) chunk.map = magic.generateMap()
         }
-      }
-
-      for (const [, refId] of textImportRefIds) {
-        const fileName = this.getFileName(refId)
-        delete bundle[fileName]
       }
     },
   }

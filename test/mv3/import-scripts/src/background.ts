@@ -1,4 +1,4 @@
-import scriptFileName from './dynamic-script?script'
+import scriptFileName from './executed-script?script'
 
 console.log('service_worker.ts')
 

@@ -4,7 +4,6 @@ import type {
   Manifest as ViteFilesManifest,
   ManifestChunk,
 } from 'vite'
-import { format } from './helpers'
 import { basename } from './path'
 import { CrxPlugin, Manifest } from './types'
 
@@ -19,6 +18,7 @@ export const importCSS = (): CrxPlugin => {
       return config
     },
     configResolved({ plugins }) {
+      // TODO: this may not be needed in configResolved
       // We only want to replace the hook once in watch mode
       // otherwise it becomes a 😖 nested function
       if (disablePlugin) return
@@ -55,15 +55,7 @@ export const importCSS = (): CrxPlugin => {
           isWrite,
         )
 
-        if (!filesData) {
-          this.warn(
-            format`CSS files will not be emitted for content scripts.
-            This is an unknown bug, please report it to RPCE on GitHub.`,
-          )
-          return
-        }
-
-        const files = Object.values(filesData)
+        const files = Object.values(filesData!)
         if (!files.length) return
 
         const filesByName = files.reduce(
