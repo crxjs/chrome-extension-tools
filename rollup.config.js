@@ -2,7 +2,7 @@
 
 // import typescript from '@rollup/plugin-typescript'
 import json from '@rollup/plugin-json'
-import sucrase from '@rollup/plugin-sucrase'
+import esbuild from 'rollup-plugin-esbuild'
 import alias from '@rollup/plugin-alias'
 import fs from 'fs-extra'
 import path from 'path'
@@ -45,9 +45,7 @@ const plugins = [
   resolve(),
   commonjs(),
   json(),
-  sucrase({
-    transforms: ['typescript'],
-  }),
+  esbuild(),
   bundleImports({
     useVirtualModule: true,
     options: {

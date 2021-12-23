@@ -1,5 +1,5 @@
 import { chromeExtension } from '$src'
-import babel from '@rollup/plugin-babel'
+import esbuild from 'rollup-plugin-esbuild'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import path from 'path'
