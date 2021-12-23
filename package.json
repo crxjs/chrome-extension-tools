@@ -103,7 +103,7 @@
     "@types/lodash.difference": "4.5.6",
     "@types/lodash.flatten": "4.4.6",
     "@types/lodash.get": "4.4.6",
-    "@types/node": "16.11.15",
+    "@types/node": "16.11.17",
     "@types/prettier": "2.4.2",
     "@types/react": "17.0.37",
     "@types/react-dom": "17.0.11",
