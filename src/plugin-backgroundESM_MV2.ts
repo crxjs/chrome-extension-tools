@@ -1,6 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
+import jsesc from 'jsesc'
 import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
 import { CrxPlugin, isMV2 } from './types'
@@ -33,7 +34,7 @@ export const backgroundESM_MV2 = (): CrxPlugin => {
               fileName: wrapperFileName,
               source: backgroundEsmWrapper.replace(
                 '%PATH%',
-                JSON.stringify(importPath),
+                jsesc(importPath),
               ),
             })
 

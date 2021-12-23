@@ -11,6 +11,7 @@ import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScrip
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
 import { StubURL, getRpceAPI, RpceApi } from './plugin_helpers'
 import { relative } from './path'
+import jsesc from 'jsesc'
 
 const reactRegex = /[jt]sx/
 
@@ -135,7 +136,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
 
         return remoteScriptWrapper.replace(
           '%REMOTE_SCRIPT_PATH%',
-          JSON.stringify(pathname),
+          jsesc(pathname),
         )
       }
       return null
