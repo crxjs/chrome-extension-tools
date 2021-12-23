@@ -32,7 +32,7 @@ specifiers:
   '@types/lodash.get': 4.4.6
   '@types/node': 16.11.17
   '@types/prettier': 2.4.2
-  '@types/react': 17.0.37
+  '@types/react': 17.0.38
   '@types/react-dom': 17.0.11
   '@types/ws': 8.2.2
   '@typescript-eslint/eslint-plugin': 4.33.0
@@ -141,7 +141,7 @@ devDependencies:
   '@types/lodash.get': 4.4.6
   '@types/node': 16.11.17
   '@types/prettier': 2.4.2
-  '@types/react': 17.0.37
+  '@types/react': 17.0.38
   '@types/react-dom': 17.0.11
   '@types/ws': 8.2.2
   '@typescript-eslint/eslint-plugin': 4.33.0_ff465297bb7b8c732fd450bd1d5e7728
@@ -2015,11 +2015,11 @@ packages:
   /@types/react-dom/17.0.11:
     resolution: {integrity: sha512-f96K3k+24RaLGVu/Y2Ng3e1EbZ8/cVJvypZWd7cy0ofCBaf2lcM46xNhycMZ2xGwbBjRql7hOlZ+e2WlJ5MH3Q==}
     dependencies:
-      '@types/react': 17.0.37
+      '@types/react': 17.0.38
     dev: true
 
-  /@types/react/17.0.37:
-    resolution: {integrity: sha512-2FS1oTqBGcH/s0E+CjrCCR9+JMpsu9b69RTFO+40ua43ZqP5MmQ4iUde/dMjWR909KxZwmOQIFq6AV6NjEG5xg==}
+  /@types/react/17.0.38:
+    resolution: {integrity: sha512-SI92X1IA+FMnP3qM5m4QReluXzhcmovhZnLNm3pyeQlooi02qI7sLiepEYqT678uNiyc25XfCqxREFpy3W7YhQ==}
     dependencies:
       '@types/prop-types': 15.7.3
       '@types/scheduler': 0.16.1
