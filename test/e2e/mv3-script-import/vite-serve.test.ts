@@ -2,7 +2,8 @@ import {
   filesReady,
   stopFileWriter,
 } from '$src/plugin-viteServeFileWriter'
-import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
+import forever from '$test/helpers/forever'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import {
@@ -12,14 +13,16 @@ import {
 } from 'playwright-chromium'
 import { createServer, ViteDevServer } from 'vite'
 
-jestSetTimeout(10000)
+jestSetTimeout(15000)
+
+const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))
 
 const outDir = path.join(__dirname, 'dist-vite-serve')
 const dataDir = path.join(__dirname, 'chromium-data-dir-serve')
 
 let browserContext: ChromiumBrowserContext
 let devServer: ViteDevServer
-let page: Page
 beforeAll(async () => {
   await fs.remove(outDir)
 
@@ -30,6 +33,8 @@ beforeAll(async () => {
   })
 
   await Promise.all([devServer.listen(), filesReady()])
+
+  await delay(1000)
 
   browserContext = (await chromium.launchPersistentContext(
     dataDir,
@@ -54,15 +59,26 @@ afterAll(async () => {
 })
 
 test('CRX loads and runs successfully', async () => {
-  page = await browserContext.newPage()
-  await page.goto('https://google.com')
+  async function getPage(included: string) {
+    let count = 0
+    let page: Page | undefined
+    while (!page && count < 5) {
+      page = browserContext
+        .pages()
+        .find((p) => p.url().includes(included))
+      if (!page) await new Promise((r) => setTimeout(r, 100))
+      count++
+    }
+    return page
+  }
 
-  await Promise.race([
-    page.waitForSelector('text="Content script loaded"'),
-    timeLimit(10000, 'Unable to load Chrome Extension'),
-  ])
+  const options = await getPage('chrome-extension')
+  let google = await getPage('google')
+  if (!google) {
+    await options?.reload()
+    google = await getPage('google')
+  }
 
-  await page.waitForSelector('text="Background response"')
-  await page.waitForSelector('text="Background OK"')
-  await page.waitForSelector('text="Options page OK"')
+  await options!.waitForSelector('.ok', { timeout: 10000 })
+  // await google.waitForSelector('.ok', { timeout: 10000 })
 })

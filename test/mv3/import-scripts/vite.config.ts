@@ -10,4 +10,7 @@ export default defineConfig({
     minify: false,
   },
   plugins: [chromeExtension()],
+  optimizeDeps: {
+    include: [],
+  },
 })

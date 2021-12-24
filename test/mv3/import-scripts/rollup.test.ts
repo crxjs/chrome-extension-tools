@@ -15,7 +15,7 @@ test('bundles chunks and assets', async () => {
   const manifest = 'manifest.json'
   const background = 'background.js'
   const content = 'content.js'
-  const inline = 'inline-script.js'
+  const executed = 'executed-script.js'
   const dynamic = 'dynamic-script.js'
 
   // Chunks
@@ -23,8 +23,8 @@ test('bundles chunks and assets', async () => {
   expect(chunks.find(byFileName(background))).toBeDefined()
   expect(chunks.find(byFileName(content))).toBeDefined()
   expect(chunks.find(byFileName(dynamic))).toBeDefined()
-  expect(chunks.find(byFileName(inline))).not.toBeDefined()
-  expect(chunks.length).toBe(3)
+  expect(chunks.find(byFileName(executed))).toBeDefined()
+  expect(chunks.length).toBe(4)
 
   // Assets
   const assets = output.filter(isAsset)

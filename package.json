@@ -44,7 +44,7 @@
     "test:ci:mv3": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"mv3\"",
     "test:full": "jest --testPathIgnorePatterns=\"/node_modules/|e2e\"",
     "test:mv2": "jest test.mv2",
-    "test:e2e": "jest --runInBand e2e"
+    "test:e2e": "jest --runInBand --forceExit e2e"
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.1",

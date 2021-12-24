@@ -123,6 +123,8 @@ const service = interpret(
             watcher = watch(options)
             watcher.on('event', async (event) => {
               if (event.code === 'BUNDLE_END') {
+                ;(event.result as any).toJSON = () =>
+                  'EventResult'
                 send(model.events.BUNDLE_END(event))
               } else if (event.code === 'BUNDLE_START') {
                 send(model.events.BUNDLE_START(event))
@@ -194,7 +196,8 @@ export const viteServeFileWriter = (): CrxPlugin => {
       })
 
       // RPCE should only run in the inner Rollup Watch hooks
-      configPlugins.splice(rpceIndex, 1)
+      const { name, api } = configPlugins[rpceIndex]
+      configPlugins[rpceIndex] = { name, api }
 
       service.start()
       service.send(model.events.PLUGINS(watchPlugins))
@@ -205,11 +208,14 @@ export const viteServeFileWriter = (): CrxPlugin => {
   }
 }
 
+const delay = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))
+
 /**
  * For use in tests. Resolves when file write operation is complete.
  */
-export const filesReady = () =>
-  waitForState(service, (state) => {
+export const filesReady = async () => {
+  await waitForState(service, (state) => {
     if (state.matches({ watching: 'error' }))
       throw (
         state.context.lastError ||
@@ -219,6 +225,10 @@ export const filesReady = () =>
       )
     return state.matches({ watching: 'ready' })
   })
+
+  // Allow time for fs to catch up
+  await delay(50)
+}
 
 /**
  * For use in tests. Stops the file writer service.

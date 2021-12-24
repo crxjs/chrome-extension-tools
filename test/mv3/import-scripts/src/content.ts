@@ -1,7 +1,7 @@
-import text from './dynamic-script?script&esm'
+import fileName from './dynamic-script?script'
 
 console.log('content script')
 
 const script = document.createElement('script')
-script.text = text
+script.src = chrome.runtime.getURL(fileName)
 document.head.prepend(script)

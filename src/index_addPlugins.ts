@@ -9,7 +9,7 @@ import { hybridFormat } from './plugin-hybridOutput'
 import { importCSS } from './plugin-importCSS'
 import { importScripts } from './plugin-importScripts'
 import { packageJson } from './plugin-packageJson'
-import { postHijackedHooks } from './plugin-postHijackedHooks'
+import { runHijackedHooks } from './plugin-runHijackedHooks'
 import { runtimeReloader } from './plugin-runtimeReloader'
 import { transformIndexHtml } from './plugin-transformIndexHtml'
 import {
@@ -19,6 +19,7 @@ import {
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { viteServeHMR_MV2 } from './plugin-viteServeHMR_MV2'
 import { viteServeHMR_MV3 } from './plugin-viteServeHMR_MV3'
+import { viteServeImportScripts } from './plugin-viteServeImportScripts'
 import { viteServeReactFastRefresh_MV2 } from './plugin-viteServeReactFastRefresh_MV2'
 import { viteServeReactFastRefresh_MV3 } from './plugin-viteServeReactFastRefresh_MV3'
 import { xstateCompat } from './plugin-xstateCompat'
@@ -49,6 +50,7 @@ export function startBuiltins(
     transformIndexHtml,
     importCSS,
     importScripts,
+    viteServeImportScripts,
     htmlMapScriptsToJS,
     hybridFormat,
     viteServeHMR_MV2,
@@ -56,13 +58,13 @@ export function startBuiltins(
     viteServeReactFastRefresh_MV2,
     viteServeReactFastRefresh_MV3,
     runtimeReloader,
-    postHijackedHooks,
+    runHijackedHooks,
     postValidateManifest,
   ]
 
   const builtins = pluginFns
     .filter((fn): fn is CrxPluginFn => typeof fn === 'function')
-    .map((fn) => fn(options))
+    .flatMap((fn) => fn(options))
     .filter(({ apply }) => {
       return !apply || apply === command
     })

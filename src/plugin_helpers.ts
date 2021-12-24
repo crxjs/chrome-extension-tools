@@ -37,6 +37,7 @@ export type RpceApi = {
   addFiles: (
     this: PluginContext,
     files: (BaseAsset | Script)[],
+    command: 'build' | 'serve',
   ) => Promise<Map<string, EmittedFile>>
   /** The updated root folder, derived from either the Vite config or the manifest dirname */
   readonly root: string

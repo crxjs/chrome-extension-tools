@@ -1,4 +1,7 @@
-import { filesReady } from '$src/plugin-viteServeFileWriter'
+import {
+  filesReady,
+  stopFileWriter,
+} from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -42,6 +45,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await browserContext?.close()
+  stopFileWriter()
+  await devServer.close()
 
   // MV3 service worker is unresponsive if this directory exists from a previous run
   await fs.remove(dataDir)

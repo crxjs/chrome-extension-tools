@@ -13,7 +13,7 @@ import {
 import { categorizeInput } from './index_categorizeInput'
 import { hijackHooks, startBuiltins } from './index_addPlugins'
 import { runPlugins } from './index_runPlugins'
-import { basename } from './path'
+import { basename, join } from './path'
 import {
   combinePlugins,
   isRPCE,
@@ -38,6 +38,8 @@ import {
   useConfig,
   waitForState,
 } from './xstate_helpers'
+import { outputFile, outputFileSync } from 'fs-extra'
+import path from 'path'
 
 export type {
   ManifestV3,
@@ -130,16 +132,29 @@ export const chromeExtension = (
   async function addFiles(
     this: PluginContext,
     files: (BaseAsset | Script)[],
+    command: 'build' | 'serve',
   ): Promise<Map<string, EmittedFile>> {
-    setupPluginsRunner.call(this, 'transform')
-    setupFileEmitter.call(this)
+    if (command === 'build') {
+      // We can add files on the fly in build
+      setupPluginsRunner.call(this, 'transform')
+      setupFileEmitter.call(this)
+    } else {
+      // Need to wait for full build in serve
+      await waitForState(service, (state) => {
+        if (state.event.type === 'ERROR') throw state.event.error
+        return state.matches('complete')
+      })
+    }
 
     const prevNames = new Set(filesByFileName.keys())
 
     service.send(model.events.ADD_FILES(files))
+
     await waitForState(service, (state) => {
       if (state.event.type === 'ERROR') throw state.event.error
-      return state.matches('ready')
+      return command === 'build'
+        ? state.matches('ready')
+        : state.matches('complete')
     })
 
     const result = new Map(filesByFileName)
@@ -147,11 +162,16 @@ export const chromeExtension = (
       result.delete(fileName)
     }
 
+    // allow time for fs to catch up
+    if (command === 'serve')
+      await new Promise((r) => setTimeout(r, 50))
+
     return result
   }
 
   let builtins: CrxPlugin[] | undefined
   let pluginSetupDone: boolean
+  let invalidationPath: string
 
   const api: RpceApi = {
     files: filesByRefId,
@@ -228,6 +248,28 @@ export const chromeExtension = (
       for (const b of builtins!) {
         await b?.configResolved?.call(this, config)
       }
+
+      if (config.command === 'serve') {
+        invalidationPath = path.join(
+          config.cacheDir!,
+          'invalidateBuild.txt',
+        )
+        useConfig(service, {
+          actions: {
+            invalidateBuild: () => {
+              try {
+                outputFileSync(
+                  invalidationPath,
+                  Date.now().toString(),
+                )
+              } catch (error) {
+                console.warn('could not invalidate build')
+                console.error(error)
+              }
+            },
+          },
+        })
+      }
     },
 
     async options(options) {
@@ -273,6 +315,8 @@ export const chromeExtension = (
     },
 
     async buildStart(options) {
+      this.addWatchFile(invalidationPath)
+
       const plugins: InternalCrxPlugin[] = options.plugins!
       await Promise.all(
         plugins.map((p) => p.crxBuildStart?.call(this, options)),

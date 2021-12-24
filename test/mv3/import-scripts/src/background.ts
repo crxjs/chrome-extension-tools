@@ -2,15 +2,10 @@ import scriptFileName from './executed-script?script'
 
 console.log('service_worker.ts')
 
-chrome.tabs
-  .query({
-    active: true,
-    currentWindow: true,
-  })
-  .then(([tab]) => {
-    if (tab?.id)
-      chrome.scripting.executeScript({
-        files: [scriptFileName],
-        target: { tabId: tab.id },
-      })
-  })
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id)
+    chrome.scripting.executeScript({
+      files: [scriptFileName],
+      target: { tabId: tab.id },
+    })
+})

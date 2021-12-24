@@ -251,7 +251,6 @@ export const machine = model.createMachine(
                 ({ fileName }) => !filesByName.has(fileName),
               ),
             actions: [
-              'triggerRebuild',
               assign({
                 inputsByName: ({ inputsByName }, { files }) =>
                   files.reduce(
@@ -259,7 +258,10 @@ export const machine = model.createMachine(
                     new Map(inputsByName),
                   ),
               }),
+              'invalidateBuild',
+              'sendChangeToAllFiles',
             ],
+            target: 'configuring',
           },
         },
       },
@@ -270,6 +272,16 @@ export const machine = model.createMachine(
       sendAbortToAllFiles: pure(({ filesById }) =>
         [...filesById.values()].map((file) =>
           send(model.events.ABORT(), { to: () => file }),
+        ),
+      ),
+      sendChangeToAllFiles: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
+          send(
+            model.events.CHANGE('invalidateBuild.txt', {
+              event: 'update',
+            }),
+            { to: () => file },
+          ),
         ),
       ),
       sendEmitStartToAllFiles: pure(({ filesById }) =>

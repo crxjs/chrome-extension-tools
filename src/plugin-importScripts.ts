@@ -11,7 +11,8 @@ import {
 } from './plugin_helpers'
 import { CrxPlugin } from './types'
 
-const importScriptPrefix = '\0importedScript'
+export const prefix = 'importedScript'
+export const resolvedPrefix = '\0' + prefix
 
 export const importScripts = (): CrxPlugin => {
   const fileImportRefIds = new Map<string, string>()
@@ -33,23 +34,25 @@ export const importScripts = (): CrxPlugin => {
           : ['.ts', '.tsx', '.js', '.jsx', '.mjs']
               .map((x) => resolved + x)
               .find((x) => existsSync(x)) ?? resolved
-        return importScriptPrefix + [id, query].join('?')
+        return prefix + [id, query].join('?')
       }
 
       return null
     },
     async load(_id) {
-      if (!_id.startsWith(importScriptPrefix)) return null
+      if (!_id.startsWith(prefix)) return null
 
-      const url = StubURL(_id.slice(importScriptPrefix.length))
+      const url = StubURL(_id.slice(prefix.length))
       const id = url.pathname
       const fileName = generateFileNames(
         relative(api.root, id),
       ).outputFileName
 
-      const files = await api.addFiles.call(this, [
-        { id, fileName, fileType: 'CONTENT' },
-      ])
+      const files = await api.addFiles.call(
+        this,
+        [{ id, fileName, fileType: 'CONTENT' }],
+        'build',
+      )
 
       const { refId } = files.get(fileName)!
       fileImportRefIds.set(_id, refId)

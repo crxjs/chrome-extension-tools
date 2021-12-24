@@ -1,13 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`bundles chunks 1`] = `
-"var scriptFileName = \\"dynamic-script.js\\";
+"var scriptFileName = \\"executed-script.js\\";
 console.log(\\"service_worker.ts\\");
-chrome.tabs.query({
-  active: true,
-  currentWindow: true
-}).then(([tab]) => {
-  if (tab == null ? void 0 : tab.id)
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id)
     chrome.scripting.executeScript({
       files: [scriptFileName],
       target: { tabId: tab.id }
@@ -20,10 +17,10 @@ exports[`bundles chunks 2`] = `
 "(function () {
 	'use strict';
 
-	var text = \\"console.log(\\\\\\"inline-script.ts\\\\\\");\\\\n\\";
+	var fileName = \\"dynamic-script.js\\";
 	console.log(\\"content script\\");
 	const script = document.createElement(\\"script\\");
-	script.text = text;
+	script.src = chrome.runtime.getURL(fileName);
 	document.head.prepend(script);
 
 })();

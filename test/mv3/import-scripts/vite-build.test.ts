@@ -7,16 +7,20 @@ import { build } from 'vite'
 
 jestSetTimeout(30000)
 
+const configFile = path.join(__dirname, 'vite.config.ts')
+const outDir = path.join(__dirname, 'dist-serve')
+
 test('bundles chunks', async () => {
   const { output } = (await build({
-    configFile: path.join(__dirname, 'vite.config.ts'),
+    configFile,
     envFile: false,
+    build: { outDir, emptyOutDir: true },
   })) as RollupOutput
 
   const manifest = 'manifest.json'
   const background = 'background.js'
   const content = 'content.js'
-  const inline = 'inline-script.js'
+  const executed = 'executed-script.js'
   const dynamic = 'dynamic-script.js'
 
   // Chunks
@@ -31,9 +35,9 @@ test('bundles chunks', async () => {
   expect(csChunk.code).toMatchSnapshot()
 
   expect(chunks.find(byFileName(dynamic))).toBeDefined()
-  expect(chunks.find(byFileName(inline))).not.toBeDefined()
+  expect(chunks.find(byFileName(executed))).toBeDefined()
 
-  expect(chunks.length).toBe(3)
+  expect(chunks.length).toBe(4)
 
   // Assets
   const assets = output.filter(isAsset)

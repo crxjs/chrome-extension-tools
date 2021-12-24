@@ -1,7 +1,3 @@
-import {
-  filesReady,
-  stopFileWriter,
-} from '$src/plugin-viteServeFileWriter'
 import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
@@ -10,29 +6,28 @@ import {
   ChromiumBrowserContext,
   Page,
 } from 'playwright-chromium'
-import { createServer, ViteDevServer } from 'vite'
+import { build } from 'vite'
 
-jestSetTimeout(10000)
+jestSetTimeout(30000)
 
-const outDir = path.join(__dirname, 'dist-vite-serve')
-const dataDir = path.join(__dirname, 'chromium-data-dir-serve')
+const outDir = path.join(__dirname, 'dist-vite-build')
+const dataDirPath = path.join(
+  __dirname,
+  'chromium-data-dir-build',
+)
 
 let browserContext: ChromiumBrowserContext
-let devServer: ViteDevServer
 let page: Page
-beforeAll(async () => {
-  await fs.remove(outDir)
 
-  devServer = await createServer({
+beforeAll(async () => {
+  await build({
     configFile: path.join(__dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir },
   })
 
-  await Promise.all([devServer.listen(), filesReady()])
-
   browserContext = (await chromium.launchPersistentContext(
-    dataDir,
+    dataDirPath,
     {
       headless: false,
       slowMo: 100,
@@ -42,15 +37,13 @@ beforeAll(async () => {
       ],
     },
   )) as ChromiumBrowserContext
-})
+}, 60000)
 
 afterAll(async () => {
   await browserContext?.close()
-  stopFileWriter()
-  await devServer.close()
 
   // MV3 service worker is unresponsive if this directory exists from a previous run
-  await fs.remove(dataDir)
+  await fs.remove(dataDirPath)
 })
 
 test('CRX loads and runs successfully', async () => {
