@@ -116,7 +116,7 @@
     "eslint-plugin-react": "7.28.0",
     "jest": "27.4.5",
     "jest-chrome": "0.7.2",
-    "jest-html-reporters": "2.1.6",
+    "jest-html-reporters": "2.1.7",
     "jest-in-case": "1.0.2",
     "npm-run-all": "4.1.5",
     "playwright-chromium": "1.17.1",

@@ -55,7 +55,7 @@ specifiers:
   glob: ^7.1.6
   jest: 27.4.5
   jest-chrome: 0.7.2
-  jest-html-reporters: 2.1.6
+  jest-html-reporters: 2.1.7
   jest-in-case: 1.0.2
   json-ptr: ^3.0.0
   jsonpath-plus: ^6.0.0
@@ -152,7 +152,7 @@ devDependencies:
   eslint-plugin-react: 7.28.0_eslint@6.8.0
   jest: 27.4.5
   jest-chrome: 0.7.2_jest@27.4.5
-  jest-html-reporters: 2.1.6
+  jest-html-reporters: 2.1.7
   jest-in-case: 1.0.2
   npm-run-all: 4.1.5
   playwright-chromium: 1.17.1
@@ -4406,8 +4406,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /jest-html-reporters/2.1.6:
-    resolution: {integrity: sha512-L81yXCctu0clmRl2rDeq5nWdH6Sy1U0IJgf+wy6wUTPcCmfg3JIfJnTug0mWSgQqtk0I5IMZ7Z+c4317uMNgMw==}
+  /jest-html-reporters/2.1.7:
+    resolution: {integrity: sha512-qYly47l7Q59bjVWpGQ9grSYaNIAtS1L+l8jQrC24iXWKRy3N/pkKTklGtcdqsZ8hhiGQPI9skByl/63GNj0UeQ==}
     dependencies:
       fs-extra: 9.1.0
       open: 8.4.0
