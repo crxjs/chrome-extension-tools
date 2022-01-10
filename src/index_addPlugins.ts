@@ -7,7 +7,10 @@ import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
 import { importCSS } from './plugin-importCSS'
-import { importScripts } from './plugin-importScripts'
+import {
+  importScripts,
+  viteServeImportScripts,
+} from './plugin-importScripts'
 import { packageJson } from './plugin-packageJson'
 import { publicDir } from './plugin-publicDir'
 import { runHijackedHooks } from './plugin-runHijackedHooks'
@@ -20,7 +23,6 @@ import {
 import { viteServeFileWriter } from './plugin-viteServeFileWriter'
 import { viteServeHMR_MV2 } from './plugin-viteServeHMR_MV2'
 import { viteServeHMR_MV3 } from './plugin-viteServeHMR_MV3'
-import { viteServeImportScripts } from './plugin-viteServeImportScripts'
 import { viteServeReactFastRefresh_MV2 } from './plugin-viteServeReactFastRefresh_MV2'
 import { viteServeReactFastRefresh_MV3 } from './plugin-viteServeReactFastRefresh_MV3'
 import { xstateCompat } from './plugin-xstateCompat'
@@ -51,8 +53,8 @@ export function startBuiltins(
     transformIndexHtml,
     importCSS,
     importScripts,
-    publicDir,
     viteServeImportScripts,
+    publicDir,
     htmlMapScriptsToJS,
     hybridFormat,
     viteServeHMR_MV2,
