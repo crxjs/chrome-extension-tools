@@ -8,7 +8,6 @@ import {
   StubURL,
 } from './plugin_helpers'
 import { CrxPlugin } from './types'
-import { waitForState } from './xstate_helpers'
 
 export const viteServeImportScripts = (): CrxPlugin => {
   let api: RpceApi
