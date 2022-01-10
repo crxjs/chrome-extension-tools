@@ -47,8 +47,10 @@ export type RpceApi = {
 
 export function getRpceAPI(
   plugins: readonly CrxPlugin[],
-): RpceApi | undefined {
-  return plugins.find(isRPCE)?.api
+): RpceApi {
+  const api = plugins.find(isRPCE)?.api
+  if (!api) throw new Error('Could not get RPCE API')
+  return api
 }
 
 const defaultSrc = ['self']

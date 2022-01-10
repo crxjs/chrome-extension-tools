@@ -20,7 +20,7 @@ import cheerio from 'cheerio'
 export const viteServeHMR_MV2 = (): CrxPlugin => {
   let disablePlugin = true
   let server: ViteDevServer
-  let api: RpceApi | undefined
+  let api: RpceApi
   return {
     name: 'vite-serve-hmr-mv2',
     crx: true,
@@ -61,7 +61,7 @@ export const viteServeHMR_MV2 = (): CrxPlugin => {
       const { port } = server?.config.server ?? {}
       if (disablePlugin || isUndefined(port)) return null
 
-      const relPath = relative(api!.root, id)
+      const relPath = relative(api.root, id)
       const relDir = dirname(relPath)
       const $ = cheerio.load(source)
 

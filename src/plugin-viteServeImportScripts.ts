@@ -17,7 +17,7 @@ export const viteServeImportScripts = (): CrxPlugin => {
     enforce: 'pre',
     apply: 'serve',
     configResolved({ plugins }) {
-      if (plugins) api = getRpceAPI(plugins)!
+      if (plugins) api = getRpceAPI(plugins)
     },
     resolveId(source, importer) {
       if (

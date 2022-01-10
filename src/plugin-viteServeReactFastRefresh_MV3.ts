@@ -52,7 +52,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
       server = s
     },
     buildStart({ plugins }) {
-      api = getRpceAPI(plugins)!
+      api = getRpceAPI(plugins)
     },
     transformCrxManifest(manifest) {
       disablePlugin = !isMV3(manifest) || !server

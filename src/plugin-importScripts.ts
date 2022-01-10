@@ -23,7 +23,7 @@ export const importScripts = (): CrxPlugin => {
     enforce: 'pre',
     apply: 'build',
     buildStart({ plugins }) {
-      if (plugins) api = getRpceAPI(plugins)!
+      if (plugins) api = getRpceAPI(plugins)
     },
     resolveId(source, importer) {
       if (importer && source.includes('?script')) {

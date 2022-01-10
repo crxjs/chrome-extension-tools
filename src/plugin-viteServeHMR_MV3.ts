@@ -9,7 +9,7 @@ import { ViteDevServer } from 'vite'
 import { model as filesModel } from './files.machine'
 import { format } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { StubURL, getRpceAPI } from './plugin_helpers'
+import { StubURL, getRpceAPI, RpceApi } from './plugin_helpers'
 import {
   Asset,
   AssetType,
@@ -47,7 +47,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
 
   let disablePlugin = true
   let server: ViteDevServer
-  let api: ReturnType<typeof getRpceAPI>
+  let api: RpceApi
   let swFilename: string
 
   return {
@@ -56,7 +56,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
     apply: 'serve',
     buildStart({ plugins }) {
       api = getRpceAPI(plugins)
-      api?.service.onEvent((event) => {
+      api.service.onEvent((event) => {
         if (event.type === 'PLUGINS_RESULT') {
           const { type, ...asset } = event as Asset & {
             type: string
@@ -86,7 +86,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
 
       swFilename = manifest.background.service_worker
 
-      api?.service.send(
+      api.service.send(
         filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
       )
 
