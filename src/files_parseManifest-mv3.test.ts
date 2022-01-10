@@ -22,8 +22,6 @@ test('gets correct scripts', () => {
 
   expect(result.CONTENT).toEqual([contentJs])
   expect(result.BACKGROUND).toEqual([serviceWorkerJs])
-
-  expect(result.MODULE).toEqual([])
 })
 
 test('gets correct html', () => {
@@ -58,10 +56,4 @@ test('gets match pattern for locales folder', () => {
   const result = parseManifest(manifest)
 
   expect(result.JSON).toEqual(['_locales/**/messages.json'])
-})
-
-test('gets match pattern for raw files', () => {
-  const result = parseManifest(manifest)
-
-  expect(result.RAW).toEqual(['fonts/*.ttf', 'fonts/*.otf'])
 })

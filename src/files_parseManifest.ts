@@ -1,10 +1,5 @@
-import { difference as diff, get } from 'lodash'
-import {
-  htmlRegex,
-  imageRegex,
-  isString,
-  jsRegex,
-} from './helpers'
+import { get } from 'lodash'
+import { isString } from './helpers'
 import {
   AssetType,
   ContentScript,
@@ -24,7 +19,8 @@ function dedupe(ary: any[]) {
 export function parseManifest(
   manifest: Manifest,
 ): Record<
-  ScriptType | Exclude<AssetType, 'MANIFEST'>,
+  | Exclude<ScriptType, 'MODULE'>
+  | Exclude<AssetType, 'MANIFEST' | 'RAW'>,
   string[]
 > {
   if (manifest.manifest_version === 3) {
@@ -50,12 +46,6 @@ export function deriveFilesMV3(
 
   const json = locales.concat(rulesets.map(({ path }) => path))
 
-  const files = get(
-    manifest,
-    'web_accessible_resources',
-    [] as Required<typeof manifest>['web_accessible_resources'],
-  ).flatMap(({ resources }) => resources)
-
   const contentScripts = get(
     manifest,
     'content_scripts',
@@ -66,10 +56,7 @@ export function deriveFilesMV3(
     get(manifest, 'background.service_worker'),
   ]
 
-  const js = files.filter((f) => jsRegex.test(f))
-
   const html = [
-    ...files.filter((f) => htmlRegex.test(f)),
     get(manifest, 'options_page'),
     get(manifest, 'options_ui.page'),
     get(manifest, 'devtools_page'),
@@ -77,37 +64,25 @@ export function deriveFilesMV3(
     ...Object.values(get(manifest, 'chrome_url_overrides', {})),
   ]
 
-  const css = [
-    ...files.filter((f) => f.endsWith('.css')),
-    ...get(
-      manifest,
-      'content_scripts',
-      [] as ContentScript[],
-    ).reduce(
-      (r, { css = [] }) => [...r, ...css],
-      [] as string[],
-    ),
-  ]
+  const css = get(
+    manifest,
+    'content_scripts',
+    [] as ContentScript[],
+  ).reduce((r, { css = [] }) => [...r, ...css], [] as string[])
 
   const img = [
-    ...files.filter((f) => imageRegex.test(f)),
     ...(Object.values(get(manifest, 'icons', {})) as string[]),
     ...(Object.values(
       get(manifest, 'action.default_icon', {}),
     ) as string[]),
   ]
 
-  // Files like fonts, things that are not expected
-  const others = diff(files, css, js, html, img)
-
   return {
     BACKGROUND: dedupe(background),
     CONTENT: dedupe(contentScripts),
-    MODULE: dedupe(js),
     CSS: dedupe(css),
     HTML: dedupe(html),
     IMAGE: dedupe(img),
-    RAW: dedupe(others),
     JSON: dedupe(json),
   }
 }
@@ -128,12 +103,6 @@ export function deriveFilesMV2(
 
   const json = locales.concat(rulesets.map(({ path }) => path))
 
-  const files = get(
-    manifest,
-    'web_accessible_resources',
-    [] as Required<typeof manifest>['web_accessible_resources'],
-  )
-
   const contentScripts = get(
     manifest,
     'content_scripts',
@@ -146,10 +115,7 @@ export function deriveFilesMV2(
     [] as string[],
   )
 
-  const js = files.filter((f) => jsRegex.test(f))
-
   const html = [
-    ...files.filter((f) => htmlRegex.test(f)),
     get(manifest, 'background.page'),
     get(manifest, 'options_page'),
     get(manifest, 'options_ui.page'),
@@ -160,7 +126,6 @@ export function deriveFilesMV2(
   ]
 
   const css = [
-    ...files.filter((f) => f.endsWith('.css')),
     ...get(
       manifest,
       'content_scripts',
@@ -192,21 +157,15 @@ export function deriveFilesMV2(
 
   const img = [
     ...actionIconSet,
-    ...files.filter((f) => imageRegex.test(f)),
     ...Object.values(get(manifest, 'icons', {})),
   ]
-
-  // Files like fonts, things that are not expected
-  const others = diff(files, css, contentScripts, js, html, img)
 
   return {
     BACKGROUND: dedupe(background),
     CONTENT: dedupe(contentScripts),
-    MODULE: dedupe(js),
     CSS: dedupe(css),
     HTML: dedupe(html),
     IMAGE: dedupe(img),
-    RAW: dedupe(others),
     JSON: dedupe(json),
   }
 }

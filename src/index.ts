@@ -1,4 +1,6 @@
 import { createFilter } from '@rollup/pluginutils'
+import { outputFileSync } from 'fs-extra'
+import path from 'path'
 import { InputOptions, PluginContext } from 'rollup'
 import { Plugin } from 'vite'
 import { interpret } from 'xstate'
@@ -10,10 +12,10 @@ import {
   isUndefined,
   not,
 } from './helpers'
-import { categorizeInput } from './index_categorizeInput'
 import { hijackHooks, startBuiltins } from './index_addPlugins'
+import { categorizeInput } from './index_categorizeInput'
 import { runPlugins } from './index_runPlugins'
-import { basename, join } from './path'
+import { basename } from './path'
 import {
   combinePlugins,
   isRPCE,
@@ -24,9 +26,9 @@ import type {
   Asset,
   BaseAsset,
   ChromeExtensionOptions,
-  EmittedFile,
   CrxHookType,
   CrxPlugin,
+  EmittedFile,
   InternalCrxPlugin,
   ManifestV2,
   ManifestV3,
@@ -38,8 +40,6 @@ import {
   useConfig,
   waitForState,
 } from './xstate_helpers'
-import { outputFile, outputFileSync } from 'fs-extra'
-import path from 'path'
 
 export type {
   ManifestV3,
