@@ -1,0 +1,9 @@
+{
+  "action": {
+    "default_popup": "src/popup.html"
+  },
+  "manifest_version": 3,
+  "name": "public dir test extension",
+  "version": "1.0.0",
+  "description": "Chrome Extension with a public dir"
+}

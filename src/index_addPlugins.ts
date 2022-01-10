@@ -9,6 +9,7 @@ import { hybridFormat } from './plugin-hybridOutput'
 import { importCSS } from './plugin-importCSS'
 import { importScripts } from './plugin-importScripts'
 import { packageJson } from './plugin-packageJson'
+import { publicDir } from './plugin-publicDir'
 import { runHijackedHooks } from './plugin-runHijackedHooks'
 import { runtimeReloader } from './plugin-runtimeReloader'
 import { transformIndexHtml } from './plugin-transformIndexHtml'
@@ -50,6 +51,7 @@ export function startBuiltins(
     transformIndexHtml,
     importCSS,
     importScripts,
+    publicDir,
     viteServeImportScripts,
     htmlMapScriptsToJS,
     hybridFormat,

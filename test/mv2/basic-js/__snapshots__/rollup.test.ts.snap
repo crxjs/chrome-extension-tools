@@ -19,7 +19,7 @@ exports[`bundles chunks 1`] = `
     }, []) : [];
   }
 
-  const importPath = /* @__PURE__ */ JSON.parse(\\"\\"./background.js\\"\\");
+  const importPath = \\"./background.js\\";
 
   const events = getDeepMatches(chrome, (x) => typeof x === \\"object\\" && \\"addListener\\" in x, [\\"webRequest\\", \\"extension\\"]);
   const triggerEvents = captureEvents(events);

@@ -106,8 +106,11 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
         .attr('src', (i, value) => {
           const url = StubURL(value)
           url.searchParams.set('t', Date.now().toString())
-          const result = url.pathname + url.search
-          return value.startsWith('/') ? result : result.slice(1)
+          const result =
+            (value.startsWith('/') ? '/' : './') +
+            url.pathname.slice(1) +
+            url.search
+          return result
         })
 
       return $.html()
