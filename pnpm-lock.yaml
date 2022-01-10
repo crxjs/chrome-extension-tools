@@ -19,7 +19,7 @@ specifiers:
   '@testing-library/dom': 8.11.1
   '@testing-library/jest-dom': 5.16.1
   '@types/acorn': ^4.0.6
-  '@types/chrome': 0.0.171
+  '@types/chrome': 0.0.176
   '@types/csp-dev': ^1.0.0
   '@types/etag': ^1.8.1
   '@types/fs-extra': 9.0.13
@@ -131,7 +131,7 @@ devDependencies:
   '@sucrase/jest-plugin': 2.2.0
   '@testing-library/dom': 8.11.1
   '@testing-library/jest-dom': 5.16.1
-  '@types/chrome': 0.0.171
+  '@types/chrome': 0.0.176
   '@types/fs-extra': 9.0.13
   '@types/glob': 7.2.0
   '@types/jest': 27.0.3
@@ -1867,8 +1867,8 @@ packages:
       '@types/har-format': 1.2.7
     dev: true
 
-  /@types/chrome/0.0.171:
-    resolution: {integrity: sha512-CnCwFKI3COygib3DNJrCjePeoU2OCDGGbUcmftXtQ3loMABsLgwpG8z+LxV4kjQJFzmJDqOyhCSsbY9yyEfapQ==}
+  /@types/chrome/0.0.176:
+    resolution: {integrity: sha512-LOveFOMIUhMJjvRzZv5whGBpncP/gdJ4hcxeAqg94wGi6CyKaCmLgFSofgItf85GuLTl/0BQ6J/Y1e8BqZWfEg==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.7
