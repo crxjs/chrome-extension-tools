@@ -79,10 +79,10 @@
     "xstate": "^4.26.1"
   },
   "devDependencies": {
-    "@babel/core": "7.16.5",
-    "@babel/plugin-proposal-class-properties": "7.16.5",
-    "@babel/preset-env": "7.16.5",
-    "@babel/preset-react": "7.16.5",
+    "@babel/core": "7.16.7",
+    "@babel/plugin-proposal-class-properties": "7.16.7",
+    "@babel/preset-env": "7.16.8",
+    "@babel/preset-react": "7.16.7",
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
     "@rollup/plugin-alias": "3.1.8",
