@@ -7,12 +7,12 @@ import {
   generateFileNames,
   getRpceAPI,
   RpceApi,
-  StubURL,
+  stubUrl,
 } from './plugin_helpers'
 import { CrxPlugin } from './types'
 
-export const prefix = 'importedScript'
-export const resolvedPrefix = '\0' + prefix
+export const importedScriptPrefix = 'importedScript'
+export const resolvedScriptPrefix = '\0' + importedScriptPrefix
 
 export const importScripts = (): CrxPlugin => {
   const fileImportRefIds = new Map<string, string>()
@@ -34,15 +34,15 @@ export const importScripts = (): CrxPlugin => {
           : ['.ts', '.tsx', '.js', '.jsx', '.mjs']
               .map((x) => resolved + x)
               .find((x) => existsSync(x)) ?? resolved
-        return prefix + [id, query].join('?')
+        return importedScriptPrefix + [id, query].join('?')
       }
 
       return null
     },
     async load(_id) {
-      if (!_id.startsWith(prefix)) return null
+      if (!_id.startsWith(importedScriptPrefix)) return null
 
-      const url = StubURL(_id.slice(prefix.length))
+      const url = stubUrl(_id.slice(importedScriptPrefix.length))
       const id = url.pathname
       const fileName = generateFileNames(
         relative(api.root, id),
@@ -100,7 +100,7 @@ export const viteServeImportScripts = (): CrxPlugin => {
       if (
         importer &&
         source.includes('?script') &&
-        !source.includes(prefix)
+        !source.includes(importedScriptPrefix)
       ) {
         const [preId, query] = source.split('?')
         const resolved = resolve(dirname(importer), preId)
@@ -109,15 +109,15 @@ export const viteServeImportScripts = (): CrxPlugin => {
           : ['.ts', '.tsx', '.js', '.jsx', '.mjs']
               .map((x) => resolved + x)
               .find((x) => existsSync(x)) ?? resolved
-        return resolvedPrefix + [id, query].join('?')
+        return resolvedScriptPrefix + [id, query].join('?')
       }
 
       return null
     },
     async load(_id) {
-      if (!_id.startsWith(resolvedPrefix)) return null
+      if (!_id.startsWith(resolvedScriptPrefix)) return null
 
-      const url = StubURL(_id.slice(resolvedPrefix.length))
+      const url = stubUrl(_id.slice(resolvedScriptPrefix.length))
       const id = url.pathname
       const fileName = generateFileNames(
         relative(api.root, id),

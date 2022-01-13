@@ -86,7 +86,7 @@ export function addToCspScriptSrc(
 }
 
 /** Work with an id as a URL instance */
-export const StubURL = (id = '') => {
+export const stubUrl = (id = '') => {
   return new URL(id, 'stub://stub')
 }
 

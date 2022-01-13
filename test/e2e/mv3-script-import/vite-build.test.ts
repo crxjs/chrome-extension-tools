@@ -1,12 +1,12 @@
-import { jestSetTimeout, timeLimit } from '$test/helpers/timeout'
+import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
 import {
   chromium,
   ChromiumBrowserContext,
-  Page,
 } from 'playwright-chromium'
 import { build } from 'vite'
+import { getPage } from '../helper-getPage'
 
 jestSetTimeout(30000)
 
@@ -16,8 +16,7 @@ const dataDirPath = path.join(
   'chromium-data-dir-build',
 )
 
-let browserContext: ChromiumBrowserContext
-let page: Page
+let browser: ChromiumBrowserContext
 
 beforeAll(async () => {
   await build({
@@ -26,7 +25,7 @@ beforeAll(async () => {
     build: { outDir },
   })
 
-  browserContext = (await chromium.launchPersistentContext(
+  browser = (await chromium.launchPersistentContext(
     dataDirPath,
     {
       headless: false,
@@ -40,22 +39,16 @@ beforeAll(async () => {
 }, 60000)
 
 afterAll(async () => {
-  await browserContext?.close()
+  await browser?.close()
 
   // MV3 service worker is unresponsive if this directory exists from a previous run
   await fs.remove(dataDirPath)
 })
 
 test('CRX loads and runs successfully', async () => {
-  page = await browserContext.newPage()
-  await page.goto('https://google.com')
+  const options = await getPage(browser, 'chrome-extension')
+  const google = await getPage(browser, 'google')
 
-  await Promise.race([
-    page.waitForSelector('text="Content script loaded"'),
-    timeLimit(10000, 'Unable to load Chrome Extension'),
-  ])
-
-  await page.waitForSelector('text="Background response"')
-  await page.waitForSelector('text="Background OK"')
-  await page.waitForSelector('text="Options page OK"')
+  await options.waitForSelector('.ok', { timeout: 10000 })
+  await google.waitForSelector('.ok', { timeout: 10000 })
 })

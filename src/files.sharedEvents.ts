@@ -76,12 +76,10 @@ export const sharedEventCreators = {
       ...new Map(files.map((file) => [file.id, file])).values(),
     ],
   }),
-  PLUGINS_RESULT: (
-    asset: Omit<Required<Asset>, 'refId' | 'dirName'>,
-  ) => asset,
-  PLUGINS_START: (
-    asset: Omit<Required<Asset>, 'refId' | 'dirName'>,
-  ) => asset,
+  PLUGINS_RESULT: (asset: Omit<Asset, 'refId' | 'dirName'>) =>
+    asset,
+  PLUGINS_START: (asset: Omit<Asset, 'refId' | 'dirName'>) =>
+    asset,
   READY: (id: string) => ({ id }),
   REF_ID: (input: { id: string; fileId: string }) => input,
   REMOVE_FILE: (id: string) => ({ id }),

@@ -9,3 +9,13 @@ interface ImportMetaEnv
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+declare module '*.html' {
+  const src: string
+  export default src
+}
+
+declare module '*?script' {
+  const src: string
+  export default src
+}

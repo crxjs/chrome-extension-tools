@@ -6,7 +6,7 @@ import { configureRollupOptions } from './plugin-configureRollupOptions'
 import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
-import { importCSS } from './plugin-importCSS'
+import { contentScriptResources } from './plugin-contentScriptResources'
 import {
   importScripts,
   viteServeImportScripts,
@@ -51,7 +51,7 @@ export function startBuiltins(
     options.browserPolyfill && browserPolyfill,
     configureRollupOptions,
     transformIndexHtml,
-    importCSS,
+    contentScriptResources,
     importScripts,
     viteServeImportScripts,
     publicDir,

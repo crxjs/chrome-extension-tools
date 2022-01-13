@@ -34,11 +34,5 @@
   "name": "__MSG_extName__",
   "options_page": "options.html",
   "permissions": ["webRequest", "webRequestBlocking"],
-  "version": "1.0.0",
-  "web_accessible_resources": [
-    {
-      "matches": ["<all_urls>"],
-      "resources": ["options.jpg", "fonts/*.ttf", "fonts/*.otf"]
-    }
-  ]
+  "version": "1.0.0"
 }
