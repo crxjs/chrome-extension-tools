@@ -50,11 +50,11 @@ export const importedResources = (): CrxPlugin => {
         _id.slice(importedResourcePrefix.length),
       )
       const id = url.pathname
+      const relpath = relative(api.root, id)
       const isHtml = url.searchParams.has('html')
       const fileName = isHtml
-        ? relative(api.root, id)
-        : generateFileNames(relative(api.root, id))
-            .outputFileName
+        ? relpath
+        : generateFileNames(relpath).outputFileName
 
       const files = await api.addFiles.call(
         this,
@@ -109,11 +109,10 @@ export const viteServeImportScripts = (): CrxPlugin => {
       if (plugins) api = getRpceAPI(plugins)
     },
     resolveId(source, importer) {
-      if (
-        importer &&
-        source.includes('?script') &&
-        !source.includes(importedResourcePrefix)
-      ) {
+      if (!importer || source.includes(importedResourcePrefix))
+        return null
+
+      if (source.includes('?script')) {
         const [preId, query] = source.split('?')
         const resolved = resolve(dirname(importer), preId)
         const id = parse(resolved).ext
@@ -122,6 +121,9 @@ export const viteServeImportScripts = (): CrxPlugin => {
               .map((x) => resolved + x)
               .find((x) => existsSync(x)) ?? resolved
         return resolvedResourcePrefix + [id, query].join('?')
+      } else if (source.endsWith('.html')) {
+        const resolved = resolve(dirname(importer), source)
+        return resolvedResourcePrefix + resolved + '?html'
       }
 
       return null
@@ -133,13 +135,21 @@ export const viteServeImportScripts = (): CrxPlugin => {
         _id.slice(resolvedResourcePrefix.length),
       )
       const id = url.pathname
-      const fileName = generateFileNames(
-        relative(api.root, id),
-      ).outputFileName
+      const relpath = relative(api.root, id)
+      const isHtml = url.searchParams.has('html')
+      const fileName = isHtml
+        ? relpath
+        : generateFileNames(relpath).outputFileName
 
       await api.addFiles.call(
         this,
-        [{ id, fileName, fileType: 'CONTENT' }],
+        [
+          {
+            id,
+            fileName,
+            fileType: isHtml ? 'HTML' : 'CONTENT',
+          },
+        ],
         'serve',
       )
 

@@ -1,0 +1,5 @@
+{
+  "manifest_version": 3,
+  "background": { "service_worker": "background.ts" },
+  "options_page": "options.html"
+}

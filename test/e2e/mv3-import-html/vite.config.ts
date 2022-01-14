@@ -1,15 +1,15 @@
 import { chromeExtension } from '$src'
+import path from 'path'
 import { defineConfig } from 'vite'
 
-process.chdir(__dirname)
-
 export default defineConfig({
-  root: 'src',
+  root: path.join(__dirname, 'src'),
   clearScreen: false,
   logLevel: 'error',
   build: {
-    minify: false,
     emptyOutDir: true,
+    minify: false,
   },
   plugins: [chromeExtension()],
+  cacheDir: path.join(__dirname, '.vite'),
 })
