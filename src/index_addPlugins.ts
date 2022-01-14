@@ -8,9 +8,9 @@ import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
 import { hybridFormat } from './plugin-hybridOutput'
 import { contentScriptResources } from './plugin-contentScriptResources'
 import {
-  importScripts,
+  importedResources,
   viteServeImportScripts,
-} from './plugin-importScripts'
+} from './plugin-importedResources'
 import { packageJson } from './plugin-packageJson'
 import { publicDir } from './plugin-publicDir'
 import { runHijackedHooks } from './plugin-runHijackedHooks'
@@ -52,7 +52,7 @@ export function startBuiltins(
     configureRollupOptions,
     transformIndexHtml,
     contentScriptResources,
-    importScripts,
+    importedResources,
     viteServeImportScripts,
     publicDir,
     htmlMapScriptsToJS,

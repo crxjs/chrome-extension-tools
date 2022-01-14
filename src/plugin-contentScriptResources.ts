@@ -4,8 +4,9 @@ import type {
   Manifest as ViteFilesManifest,
   ManifestChunk,
 } from 'vite'
-import { isChunk, isPresent } from './helpers'
-import { importedScriptPrefix } from './plugin-importScripts'
+import { isChunk } from './helpers'
+import { relative } from './path'
+import { importedResourcePrefix } from './plugin-importedResources'
 import { getRpceAPI, stubUrl } from './plugin_helpers'
 import { CrxPlugin, FileType, isMV2, Manifest } from './types'
 
@@ -94,22 +95,32 @@ export const contentScriptResources = (): CrxPlugin => {
           (map, [, file]) => map.set(file.file, file),
           new Map<string, ManifestChunk>(),
         )
-        const filesById = Object.entries(bundle).reduce(
-          (map, [name, chunk]) =>
-            isChunk(chunk) && chunk.facadeModuleId
-              ? map.set(chunk.facadeModuleId, name)
-              : map,
+        const chunksById = Object.entries(bundle).reduce(
+          (map, [outputName, chunk]) => {
+            return isChunk(chunk) && chunk.facadeModuleId
+              ? map.set(chunk.facadeModuleId, outputName)
+              : map
+          },
           new Map<string, string>(),
         )
-        const getImportedScripts = (
+        const getCrxImportsFromBundle = (
           modules: OutputChunk['modules'],
-        ) =>
-          Object.keys(modules)
-            .filter((m) => m.startsWith(importedScriptPrefix))
-            .map((m) => m.slice(importedScriptPrefix.length))
+        ) => {
+          const resources = Object.keys(modules)
+            .filter((m) => m.startsWith(importedResourcePrefix))
+            .map((m) => m.slice(importedResourcePrefix.length))
             .map((m) => stubUrl(m).pathname)
-            .map((id) => filesById.get(id))
-            .filter(isPresent)
+
+          const chunks = []
+          const assets = []
+          for (const id of resources) {
+            const chunk = chunksById.get(id)
+            if (chunk) chunks.push(chunk)
+            else assets.push(relative(api.root, id))
+          }
+
+          return { chunks, assets }
+        }
 
         // recurse through content script imports
         type Resources = {
@@ -136,16 +147,17 @@ export const contentScriptResources = (): CrxPlugin => {
           ({} as ViteFilesManifest) // if script is OutputAsset
 
           const chunk = bundle[file]
-          const scripts = isChunk(chunk)
-            ? getImportedScripts(chunk.modules)
-            : []
+          const crxImports = isChunk(chunk)
+            ? getCrxImportsFromBundle(chunk.modules)
+            : { chunks: [], assets: [] }
 
-          for (const a of assets) sets.assets.add(a)
+          for (const a of [...assets, ...crxImports.assets])
+            sets.assets.add(a)
           for (const c of css) sets.css.add(c)
           for (const i of [
             ...dynamicImports,
             ...imports,
-            ...scripts,
+            ...crxImports.chunks,
           ]) {
             sets.imports.add(i)
             getResources(i, sets)
@@ -241,7 +253,10 @@ export const contentScriptResources = (): CrxPlugin => {
           )
           .map(({ refId }) => this.getFileName(refId))
           .map((fileName) => bundle[fileName] as OutputChunk)
-          .flatMap(({ modules }) => getImportedScripts(modules))
+          .flatMap(
+            ({ modules }) =>
+              getCrxImportsFromBundle(modules).chunks,
+          )
 
         const dynamicScriptResources = new Map<
           string,

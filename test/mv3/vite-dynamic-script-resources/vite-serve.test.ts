@@ -38,7 +38,7 @@ test('writes entry points to disk', async () => {
   const content2 = 'content2.js'
   const script = 'script.js'
   const font = 'assets/font.bb6bc8d6.otf'
-  // const html = 'assets/iframe.html'
+  const html = 'iframe.html'
   const image = 'assets/image.51f8fe9d.png'
   const manifest = 'manifest.json'
 
@@ -54,9 +54,9 @@ test('writes entry points to disk', async () => {
   const scriptSource = await fs.readFile(scriptPath, 'utf8')
   expect(scriptSource).toMatchSnapshot(script)
 
-  // const htmlPath = path.join(outDir, html)
-  // const htmlSource = await fs.readFile(htmlPath, 'utf8')
-  // expect(htmlSource).toMatchSnapshot(html)
+  const htmlPath = path.join(outDir, html)
+  const htmlSource = await fs.readFile(htmlPath, 'utf8')
+  expect(htmlSource).toMatchSnapshot(html)
 
   const fontPath = path.join(outDir, font)
   expect(fs.existsSync(fontPath)).toBe(true)
@@ -73,7 +73,7 @@ test('writes entry points to disk', async () => {
           'https://google.com/*',
           'https://github.com/*',
         ],
-        resources: [image, script, font],
+        resources: [image, script, font, html],
       },
     ],
   })

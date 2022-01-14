@@ -30,7 +30,7 @@ test('bundles chunks and assets', async () => {
   const content2 = 'content2.js'
   const script = 'script.js'
   const font = 'assets/font.bb6bc8d6.otf'
-  // const html = 'assets/iframe.html'
+  const html = 'iframe.html'
   const image = 'assets/image.51f8fe9d.png'
   const manifest = 'manifest.json'
 
@@ -38,10 +38,10 @@ test('bundles chunks and assets', async () => {
   expect(output.find(byFileName(content1))).toBeDefined()
   expect(output.find(byFileName(content2))).toBeDefined()
   expect(output.find(byFileName(script))).toBeDefined()
-  // expect(output.find(byFileName(html))).toBeDefined()
+  expect(output.find(byFileName(html))).toBeDefined()
   expect(output.find(byFileName(font))).toBeDefined()
   expect(output.filter(isChunk).length).toBe(4)
-  expect(output.filter(isAsset).length).toBe(3)
+  expect(output.filter(isAsset).length).toBe(4)
 
   const manifestAsset = output.find(
     byFileName(manifest),
@@ -60,7 +60,7 @@ test('bundles chunks and assets', async () => {
           'https://google.com/*',
           'https://github.com/*',
         ],
-        resources: [image, script, font],
+        resources: [image, script, font, html],
       },
     ],
   })

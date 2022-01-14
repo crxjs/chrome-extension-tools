@@ -1,7 +1,12 @@
 import { chromeExtension } from '$src'
 import { defineConfig } from 'vite'
+import inspectFn from 'vite-plugin-inspect'
 
 process.chdir(__dirname)
+
+const inspect = inspectFn()
+// @ts-expect-error don't worry
+inspect.crx = true
 
 export default defineConfig({
   root: 'src',
@@ -11,5 +16,5 @@ export default defineConfig({
     minify: false,
     emptyOutDir: true,
   },
-  plugins: [chromeExtension()],
+  plugins: [chromeExtension(), inspect],
 })
