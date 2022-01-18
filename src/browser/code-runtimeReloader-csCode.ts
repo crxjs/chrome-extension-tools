@@ -16,7 +16,7 @@ interval(1000)
   )
   .subscribe({
     error(err) {
-      if (err.message.includes('context invalidated'))
+      if (err?.message?.includes('context invalidated'))
         console.log(`Reload the page to reconnect to ${name}.`)
       else console.error(err)
     },
