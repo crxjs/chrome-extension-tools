@@ -2,7 +2,7 @@ import { existsSync } from 'fs'
 import jsesc from 'jsesc'
 import MagicString from 'magic-string'
 import { isChunk } from './helpers'
-import { dirname, join, parse, relative, resolve } from './path'
+import { dirname, parse, relative, resolve } from './path'
 import {
   generateFileNames,
   getRpceAPI,
