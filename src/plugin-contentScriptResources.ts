@@ -7,8 +7,18 @@ import type {
 import { isChunk } from './helpers'
 import { relative } from './path'
 import { importedResourcePrefix } from './plugin-importedResources'
-import { getRpceAPI, stubUrl } from './plugin_helpers'
-import { CrxPlugin, FileType, isMV2, Manifest } from './types'
+import { runtimeReloaderCS } from './plugin-runtimeReloader'
+import {
+  generateFileNames,
+  getRpceAPI,
+  stubUrl,
+} from './plugin_helpers'
+import {
+  ChromeExtensionOptions,
+  CrxPlugin,
+  isMV2,
+  Manifest,
+} from './types'
 
 /**
  * Content script resources like CSS and image files must be declared
@@ -38,7 +48,9 @@ export const dynamicScriptPlaceholder = '<dynamic_scripts>'
  * - Adds imported CSS files to content scripts in manifest
  * - Adds imported assets and scripts to web_accessible_resources
  */
-export const contentScriptResources = (): CrxPlugin => {
+export const contentScriptResources = ({
+  contentScriptFormat,
+}: ChromeExtensionOptions): CrxPlugin => {
   return {
     name: 'content-script-resources',
     apply: 'build',
@@ -174,6 +186,8 @@ export const contentScriptResources = (): CrxPlugin => {
         >()
         for (const script of scripts) {
           for (const name of script.js ?? []) {
+            if (name === runtimeReloaderCS) continue
+
             const { assets, css, imports } =
               declaredScriptResources.get(name) ??
               getResources(name)
@@ -183,6 +197,11 @@ export const contentScriptResources = (): CrxPlugin => {
               imports,
             })
 
+            if (contentScriptFormat !== 'iife') {
+              const { outputFileName } = generateFileNames(name)
+              imports.add(outputFileName)
+            }
+
             if (css.size) {
               script.css = script.css ?? []
               script.css.push(...css)
@@ -190,7 +209,10 @@ export const contentScriptResources = (): CrxPlugin => {
 
             if (assets.size === 0) continue
             else if (isMV2(manifest)) {
-              manifest.web_accessible_resources!.push(...assets)
+              manifest.web_accessible_resources!.push(
+                ...assets,
+                ...imports,
+              )
             } else {
               manifest.web_accessible_resources!.push({
                 // script.matches is always defined
@@ -243,13 +265,9 @@ export const contentScriptResources = (): CrxPlugin => {
          * ```
          */
 
-        const executorFileTypes: FileType[] = [
-          'BACKGROUND',
-          'MODULE',
-        ]
         const dynamicScripts = [...api.files.values()]
           .filter(({ fileType }) =>
-            executorFileTypes.includes(fileType),
+            ['BACKGROUND', 'MODULE'].includes(fileType),
           )
           .map(({ refId }) => this.getFileName(refId))
           .map((fileName) => bundle[fileName] as OutputChunk)
@@ -276,6 +294,11 @@ export const contentScriptResources = (): CrxPlugin => {
           for (const a of assets) resourceSet.add(a)
           for (const c of css) resourceSet.add(c)
           for (const i of imports) resourceSet.add(i)
+
+          if (contentScriptFormat !== 'iife') {
+            const { outputFileName } = generateFileNames(script)
+            resourceSet.add(outputFileName)
+          }
         }
 
         if (resourceSet.size) {
