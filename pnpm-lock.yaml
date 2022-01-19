@@ -71,7 +71,7 @@ specifiers:
   tslib: 2.3.1
   type-fest: ^2.2.0
   typescript: 4.5.4
-  vite: 2.7.6
+  vite: 2.7.13
   vite-plugin-inspect: 0.3.11
   webextension-polyfill: ^0.8.0
   ws: 8.4.0
@@ -152,8 +152,8 @@ devDependencies:
   rollup-plugin-esbuild: 4.7.2_esbuild@0.14.5+rollup@2.61.1
   tslib: 2.3.1
   typescript: 4.5.4
-  vite: 2.7.6
-  vite-plugin-inspect: 0.3.11_vite@2.7.6
+  vite: 2.7.13
+  vite-plugin-inspect: 0.3.11_vite@2.7.13
   ws: 8.4.0
 
 packages:
@@ -5241,7 +5241,7 @@ packages:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
 
-  /vite-plugin-inspect/0.3.11_vite@2.7.6:
+  /vite-plugin-inspect/0.3.11_vite@2.7.13:
     resolution: {integrity: sha512-YsaV4bhJ++EULZamWVudMsq0VTugR/0slgbSj/A9JI9KmsGsXBCN4zBx0ptd0TkKrRniLbqO7iQqdZaybuLGvQ==}
     peerDependencies:
       vite: ^2.0.0
@@ -5249,13 +5249,13 @@ packages:
       debug: 4.3.2
       sirv: 1.0.18
       ufo: 0.7.9
-      vite: 2.7.6
+      vite: 2.7.13
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite/2.7.6:
-    resolution: {integrity: sha512-PBNoc87rDYLtkpFU9dbVeGdbcyKzz6c34oScqivE3FEa3BhVa4ASupCzcz0eDIiSECovfLcQnLUJt9vhiEU08g==}
+  /vite/2.7.13:
+    resolution: {integrity: sha512-Mq8et7f3aK0SgSxjDNfOAimZGW9XryfHRa/uV0jseQSilg+KhYDSoNb9h1rknOy6SuMkvNDLKCYAYYUMCE+IgQ==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:
