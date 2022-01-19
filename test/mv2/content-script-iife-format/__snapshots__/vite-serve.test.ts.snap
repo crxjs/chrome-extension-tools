@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`writes entry points to disk 1`] = `
+"(function () {
+	'use strict';
+
+	console.log(\\"content script\\");
+
+})();
+"
+`;
