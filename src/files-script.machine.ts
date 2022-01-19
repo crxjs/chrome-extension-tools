@@ -26,7 +26,7 @@ export const scriptMachine = model.createMachine(
       emitting: {
         entry: 'sendEmitFileToParent',
         on: {
-          FILE_ID: 'ready',
+          REF_ID: 'ready',
           FILE_EXCLUDED: 'excluded',
         },
       },
@@ -60,8 +60,8 @@ export const scriptMachine = model.createMachine(
           ...context,
         }),
       ),
-      sendCompleteToParent: sendParent(({ id, fileId }) =>
-        model.events.COMPLETE_FILE({ id, fileId: fileId! }),
+      sendCompleteToParent: sendParent(({ id, refId: fileId }) =>
+        model.events.COMPLETE_FILE({ id, refId: fileId! }),
       ),
       sendReadyToParent: sendParent(({ id }) =>
         model.events.READY(id),

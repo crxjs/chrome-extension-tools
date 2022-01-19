@@ -2,7 +2,7 @@ import { EmittedFile, RollupWatcherEvent } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { assign } from 'xstate'
 import { createModel } from 'xstate/lib/model'
-import { CrxPlugin } from './types'
+import { CrxPlugin, InternalCrxPlugin } from './types'
 import { narrowEvent } from './xstate_helpers'
 
 export const pluginsHook = 'configResolved'
@@ -11,7 +11,7 @@ export const optionsHook = 'buildStart'
 
 export interface FileWriterContext {
   /** CrxPlugins to be shared between serve and Rollup watch */
-  plugins: CrxPlugin[]
+  plugins: InternalCrxPlugin[]
   server?: ViteDevServer
   lastError?: Error | null
 }

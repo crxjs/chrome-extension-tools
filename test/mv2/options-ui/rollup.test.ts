@@ -69,18 +69,8 @@ test('bundles chunks', async () => {
     output.find(byFileName('images/favicon.png')),
   ).toBeDefined()
 
-  expect(
-    output.find(byFileName('fonts/NotoSans-Light.ttf')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('fonts/NotoSans-Black.ttf')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('fonts/Missaali-Regular.otf')),
-  ).toBeDefined()
-
   // 17 assets + 2 wrapper scripts
-  expect(assets.length).toBe(18)
+  expect(assets.length).toBe(15)
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),

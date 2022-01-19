@@ -22,8 +22,6 @@ test('gets correct scripts', () => {
 
   expect(result.CONTENT).toEqual([contentJs])
   expect(result.BACKGROUND).toEqual([backgroundJs])
-
-  expect(result.MODULE).toEqual([])
 })
 
 test('gets correct html', () => {

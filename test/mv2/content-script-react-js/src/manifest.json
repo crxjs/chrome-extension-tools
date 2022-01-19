@@ -1,7 +1,7 @@
 {
   "content_scripts": [
     {
-      "js": ["content1/index.js"],
+      "js": ["content1/index.jsx"],
       "matches": ["https://*/*", "http://*/*"]
     },
     {

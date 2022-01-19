@@ -1,5 +1,7 @@
 import { createFilter } from '@rollup/pluginutils'
-import { PluginContext } from 'rollup'
+import { outputFileSync } from 'fs-extra'
+import path from 'path'
+import { InputOptions, PluginContext } from 'rollup'
 import { Plugin } from 'vite'
 import { interpret } from 'xstate'
 import { machine, model } from './files.machine'
@@ -7,35 +9,13 @@ import { SharedEvent } from './files.sharedEvents'
 import {
   format,
   getJsFilename,
-  isString,
   isUndefined,
   not,
 } from './helpers'
+import { hijackHooks, startBuiltins } from './index_addPlugins'
 import { categorizeInput } from './index_categorizeInput'
 import { runPlugins } from './index_runPlugins'
 import { basename } from './path'
-import { autoPerms } from './plugin-autoPerms'
-import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
-import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
-import { browserPolyfill } from './plugin-browserPolyfill'
-import { configureRollupOptions } from './plugin-configureRollupOptions'
-import { cssImports } from './plugin-css-imports'
-import { extendManifest } from './plugin-extendManifest'
-import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
-import { hybridFormat } from './plugin-hybridOutput'
-import { packageJson } from './plugin-packageJson'
-import { runtimeReloader } from './plugin-runtimeReloader'
-import { transformIndexHtml } from './plugin-transformIndexHtml'
-import {
-  preValidateManifest,
-  validateManifest,
-} from './plugin-validateManifest'
-import { viteServeFileWriter } from './plugin-viteServeFileWriter'
-import { viteServeHMR_MV2 } from './plugin-viteServeHMR_MV2'
-import { viteServeHMR_MV3 } from './plugin-viteServeHMR_MV3'
-import { viteServeReactFastRefresh_MV2 } from './plugin-viteServeReactFastRefresh_MV2'
-import { viteServeReactFastRefresh_MV3 } from './plugin-viteServeReactFastRefresh_MV3'
-import { xstateCompat } from './plugin-xstateCompat'
 import {
   combinePlugins,
   isRPCE,
@@ -44,12 +24,15 @@ import {
 import { stubId } from './stubId'
 import type {
   Asset,
+  BaseAsset,
   ChromeExtensionOptions,
-  CompleteFile,
   CrxHookType,
   CrxPlugin,
+  EmittedFile,
+  InternalCrxPlugin,
   ManifestV2,
   ManifestV3,
+  Script,
   Writeable,
 } from './types'
 import {
@@ -58,7 +41,12 @@ import {
   waitForState,
 } from './xstate_helpers'
 
-export type { ManifestV3, ManifestV2, CrxPlugin, CompleteFile }
+export type {
+  ManifestV3,
+  ManifestV2,
+  CrxPlugin,
+  EmittedFile as CompleteFile,
+}
 
 export const simpleReloader = (): Plugin => ({
   name: 'simple-reloader',
@@ -73,61 +61,14 @@ export const chromeExtension = (
   pluginOptions: ChromeExtensionOptions = {},
 ): Plugin => {
   const service = interpret(machine, {
-    deferEvents: true,
     devTools: true,
   })
-  service.start()
 
   /* Emitted file data by emitted file id*/
-  const emittedFiles = new Map<
-    string,
-    CompleteFile & { source?: string | Uint8Array }
-  >()
+  const filesByRefId = new Map<string, EmittedFile>()
+  const filesByFileName = new Map<string, EmittedFile>()
 
-  const builtins: CrxPlugin[] = [
-    validateManifest(),
-    xstateCompat(),
-    viteServeFileWriter(),
-    packageJson(),
-    extendManifest(pluginOptions),
-    autoPerms(),
-    preValidateManifest(),
-    backgroundESM_MV2(),
-    backgroundESM_MV3(),
-    pluginOptions.browserPolyfill && browserPolyfill(),
-    configureRollupOptions(),
-    transformIndexHtml(),
-    cssImports(),
-    htmlMapScriptsToJS(),
-    hybridFormat(),
-    viteServeHMR_MV2(),
-    viteServeHMR_MV3(),
-    viteServeReactFastRefresh_MV2(),
-    viteServeReactFastRefresh_MV3(),
-    runtimeReloader(),
-  ]
-    .filter((x): x is CrxPlugin => !!x)
-    .map((p) => ({ ...p, name: `crx:${p.name}` }))
-  let isViteServe: boolean
-  let setupPluginsDone = false
-  function setupPlugins(plugins: CrxPlugin[]) {
-    if (setupPluginsDone) return
-
-    const prepared = isViteServe
-      ? builtins
-      : builtins.filter(
-          ({ name }) => !name.includes('vite-serve'),
-        )
-
-    const combined = combinePlugins(plugins, prepared)
-
-    plugins.length = 0
-    plugins.push(...combined)
-
-    setupPluginsDone = true
-  }
-
-  const allPlugins = new Set<CrxPlugin>()
+  const allPlugins = new Set<InternalCrxPlugin>()
   function setupPluginsRunner(
     this: PluginContext,
     hook: CrxHookType,
@@ -156,17 +97,85 @@ export const chromeExtension = (
     })
   }
 
-  // Vite and Jest resolveConfig behavior is different
-  // In Vite, the config module is imported twice as two different modules
-  // In Jest, not only is the config module the same,
-  //   the same plugin return value is used ¯\_(ツ)_/¯
-  // The Vite hooks should only run once, regardless
-  let viteConfigHook: boolean,
-    viteConfigResolvedHook: boolean,
-    viteServerHook: boolean
+  function setupFileEmitter(this: PluginContext) {
+    useConfig(service, {
+      actions: {
+        handleFile: (context, event) => {
+          try {
+            const { file: f } = narrowEvent(event, 'EMIT_FILE')
+            const file = Object.assign({}, f)
+
+            if (file.type === 'chunk')
+              file.fileName = getJsFilename(file.fileName)
+
+            const refId = this.emitFile(file)
+            service.send(
+              model.events.REF_ID({
+                id: file.id,
+                fileId: refId,
+              }),
+            )
+
+            const emittedFile = { ...file, refId }
+            filesByRefId.set(refId, emittedFile)
+            filesByFileName.set(file.fileName, emittedFile)
+
+            this.addWatchFile(file.id)
+          } catch (error) {
+            service.send(model.events.ERROR(error))
+          }
+        },
+      },
+    })
+  }
+
+  async function addFiles(
+    this: PluginContext,
+    files: (BaseAsset | Script)[],
+    command: 'build' | 'serve',
+  ): Promise<Map<string, EmittedFile>> {
+    if (command === 'build') {
+      // We can add files on the fly in build
+      setupPluginsRunner.call(this, 'transform')
+      setupFileEmitter.call(this)
+    } else {
+      // Need to wait for full build in serve
+      await waitForState(service, (state) => {
+        if (state.event.type === 'ERROR') throw state.event.error
+        return state.matches('complete')
+      })
+    }
+
+    const prevNames = new Set(filesByFileName.keys())
+
+    service.send(model.events.ADD_FILES(files))
+
+    await waitForState(service, (state) => {
+      if (state.event.type === 'ERROR') throw state.event.error
+      return command === 'build'
+        ? state.matches('ready')
+        : state.matches('complete')
+    })
+
+    const result = new Map(filesByFileName)
+    for (const fileName of prevNames) {
+      result.delete(fileName)
+    }
+
+    // allow time for fs to catch up
+    if (command === 'serve')
+      await new Promise((r) => setTimeout(r, 50))
+
+    return result
+  }
+
+  let builtins: CrxPlugin[] | undefined
+  let pluginSetupDone: boolean
+  let invalidationPath: string
 
   const api: RpceApi = {
-    emittedFiles: emittedFiles,
+    files: filesByRefId,
+    addFiles,
     get root() {
       return service.getSnapshot().context.root
     },
@@ -179,11 +188,7 @@ export const chromeExtension = (
     api,
 
     async config(config, env) {
-      if (viteConfigHook) return
-      else viteConfigHook = true
-
-      isViteServe = env.command === 'serve'
-
+      builtins = startBuiltins(pluginOptions, env.command)
       for (const b of builtins) {
         const result = await b?.config?.call(this, config, env)
         config = result ?? config
@@ -193,11 +198,8 @@ export const chromeExtension = (
     },
 
     async configureServer(server) {
-      if (viteServerHook) return
-      else viteServerHook = true
-
       const cbs = new Set<() => void | Promise<void>>()
-      for (const b of builtins) {
+      for (const b of builtins!) {
         const result = await b?.configureServer?.call(
           this,
           server,
@@ -217,13 +219,6 @@ export const chromeExtension = (
     },
 
     async configResolved(config) {
-      if (viteConfigResolvedHook) return
-      else viteConfigResolvedHook = true
-
-      if (isString(config.root)) {
-        service.send(model.events.ROOT(config.root))
-      }
-
       /**
        * Vite ignores replacements of `config.plugins`,
        * so we need to change the array in place.
@@ -235,16 +230,55 @@ export const chromeExtension = (
         typeof config.plugins
       >
 
-      setupPlugins(plugins)
+      const preAliasPlugins = plugins.splice(
+        0,
+        plugins.findIndex(({ name }) => name === 'alias') + 1,
+      )
+      const combined = combinePlugins(plugins, builtins!)
+      const hijacked = hijackHooks(combined)
+      plugins.length = 0
+      plugins.push(...preAliasPlugins)
+      plugins.push(...hijacked)
+      pluginSetupDone = true
+
+      service.send(model.events.ROOT(config.root))
 
       // Run possibly async builtins last
       // After this, Vite will take over
-      for (const b of builtins) {
+      for (const b of builtins!) {
         await b?.configResolved?.call(this, config)
+      }
+
+      if (config.command === 'serve') {
+        invalidationPath = path.join(
+          config.cacheDir!,
+          'invalidateBuild.txt',
+        )
+        useConfig(service, {
+          actions: {
+            invalidateBuild: () => {
+              try {
+                outputFileSync(
+                  invalidationPath,
+                  Date.now().toString(),
+                )
+              } catch (error) {
+                console.warn('could not invalidate build')
+                console.error(error)
+              }
+            },
+          },
+        })
       }
     },
 
-    async options({ input = [], ...options }) {
+    async options(options) {
+      service.start()
+
+      const input = options.input ?? []
+      const plugins = (options.plugins ??
+        []) as InternalCrxPlugin[]
+
       const { crxFiles, finalInput } = categorizeInput(input, {
         HTML: createFilter(['**/*.html']),
         MANIFEST: (id: string) =>
@@ -252,56 +286,47 @@ export const chromeExtension = (
       })
 
       if (crxFiles.length)
-        service.send(model.events.ENQUEUE_FILES(crxFiles))
+        service.send(model.events.ADD_FILES(crxFiles))
 
       // Vite will run this hook for all our added plugins,
       // but we still need to add builtin plugins for Rollup
-      if (!setupPluginsDone) {
-        for (const b of builtins) {
-          await b?.options?.call(this, options)
-        }
+      if (!pluginSetupDone) {
+        builtins =
+          builtins ?? startBuiltins(pluginOptions, 'build')
+        const combined = combinePlugins(plugins, builtins)
+        const hijacked = hijackHooks(combined)
+        plugins.length = 0
+        plugins.push(...hijacked)
 
-        // Guard against Vite's possibly undefined plugins[]
-        const { plugins = [] } = options
-        setupPlugins(plugins as CrxPlugin[])
-        options.plugins = plugins
+        service.start()
+        pluginSetupDone = true
       }
 
-      return { input: finalInput, ...options }
+      let result: InputOptions = {
+        ...options,
+        plugins,
+        input: finalInput,
+      }
+      for (const plugin of plugins as InternalCrxPlugin[]) {
+        const r = await plugin?.crxOptions?.call(this, result)
+        result = r ?? result
+      }
+      return result
     },
 
-    async buildStart({ plugins: rollupPlugins = [] }) {
-      rollupPlugins
+    async buildStart(options) {
+      this.addWatchFile(invalidationPath)
+
+      const plugins: InternalCrxPlugin[] = options.plugins!
+      await Promise.all(
+        plugins.map((p) => p.crxBuildStart?.call(this, options)),
+      )
+
+      plugins
         .filter(not(isRPCE))
         .forEach((p) => p && allPlugins.add(p))
-
       setupPluginsRunner.call(this, 'transform')
-      useConfig(service, {
-        actions: {
-          handleFile: (context, event) => {
-            try {
-              const { file: f } = narrowEvent(event, 'EMIT_FILE')
-              const file = Object.assign({}, f)
-
-              if (file.type === 'chunk')
-                file.fileName = getJsFilename(file.fileName)
-
-              const emittedFileId = this.emitFile(file)
-              service.send(
-                model.events.FILE_ID({
-                  id: file.id,
-                  fileId: emittedFileId,
-                }),
-              )
-
-              emittedFiles.set(emittedFileId, file)
-              this.addWatchFile(file.id)
-            } catch (error) {
-              service.send(model.events.ERROR(error))
-            }
-          },
-        },
-      })
+      setupFileEmitter.call(this)
 
       service.send(model.events.BUILD_START())
       await waitForState(service, (state) => {
@@ -320,7 +345,7 @@ export const chromeExtension = (
       return null
     },
 
-    async generateBundle(options, bundle) {
+    async generateBundle(options, bundle, isWrite) {
       delete bundle[stubId + '.js']
 
       setupPluginsRunner.call(this, 'render')
@@ -328,7 +353,7 @@ export const chromeExtension = (
         actions: {
           handleFile: (context, event) => {
             try {
-              const { fileId, source } = narrowEvent(
+              const { refId, source } = narrowEvent(
                 event,
                 'COMPLETE_FILE',
               )
@@ -336,8 +361,8 @@ export const chromeExtension = (
               // This is a script, do nothing for now
               if (isUndefined(source)) return
 
-              this.setAssetSource(fileId, source)
-              const file = emittedFiles.get(fileId)!
+              this.setAssetSource(refId, source)
+              const file = filesByRefId.get(refId)!
               file.source = source
             } catch (error) {
               service.send(model.events.ERROR(error))
@@ -356,15 +381,25 @@ export const chromeExtension = (
 
         return state.matches('complete')
       })
+
+      for (const p of allPlugins) {
+        if (p.enforce === 'post') continue
+        await p.crxGenerateBundle?.call(
+          this,
+          options,
+          bundle,
+          isWrite,
+        )
+      }
     },
 
     watchChange(id, change) {
-      emittedFiles.clear()
+      filesByRefId.clear()
       service.send(model.events.CHANGE(id, change))
     },
 
     closeWatcher() {
-      service.stop()
+      if (service.initialized) service.stop()
     },
   }
 }

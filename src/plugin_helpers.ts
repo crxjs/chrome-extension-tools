@@ -1,13 +1,16 @@
 import CSP from 'csp-dev'
 import { set } from 'lodash'
+import { PluginContext } from 'rollup'
 import { Interpreter } from 'xstate'
 import type { machine as filesMachine } from './files.machine'
 import { join, parse } from './path'
 import {
-  CompleteFile,
+  BaseAsset,
+  EmittedFile,
   CrxPlugin,
   isMV2,
   Manifest,
+  Script,
 } from './types'
 
 export const esmImportWrapperFileNameExt = '.esm-wrapper.js'
@@ -28,13 +31,14 @@ export const isRPCE = (
 ) => !!(p && p.name === 'chrome-extension')
 
 export type RpceApi = {
-  /** A map of the emitted files */
-  emittedFiles: Map<
-    string,
-    CompleteFile & {
-      source?: string | Uint8Array | undefined
-    }
-  >
+  /** A map of the emitted files by fileName */
+  files: Map<string, EmittedFile>
+  /** Returns a map of the newly emitted files */
+  addFiles: (
+    this: PluginContext,
+    files: (BaseAsset | Script)[],
+    command: 'build' | 'serve',
+  ) => Promise<Map<string, EmittedFile>>
   /** The updated root folder, derived from either the Vite config or the manifest dirname */
   readonly root: string
   /** The files service, used to send events from other plugins */
@@ -43,59 +47,10 @@ export type RpceApi = {
 
 export function getRpceAPI(
   plugins: readonly CrxPlugin[],
-): RpceApi | undefined {
-  return plugins.find(isRPCE)?.api
-}
-
-/**
- * Sorts plugins into categories by `plugin.crx` and `plugin.enforce`
- * RPCE is not a CrxPlugin itself, so it is included in `basePlugins`
- */
-export function categorizePlugins(plugins: CrxPlugin[]): {
-  basePlugins: CrxPlugin[]
-  prePlugins: CrxPlugin[]
-  postPlugins: CrxPlugin[]
-  normalPlugins: CrxPlugin[]
-} {
-  const basePlugins: CrxPlugin[] = []
-  const prePlugins: CrxPlugin[] = []
-  const postPlugins: CrxPlugin[] = []
-  const normalPlugins: CrxPlugin[] = []
-  for (const p of plugins) {
-    if (!p.crx) basePlugins.push(p)
-    else if (p.enforce === 'pre') prePlugins.push(p)
-    else if (p.enforce === 'post') postPlugins.push(p)
-    else normalPlugins.push(p)
-  }
-
-  return {
-    basePlugins,
-    prePlugins,
-    postPlugins,
-    normalPlugins,
-  }
-}
-
-export function combinePlugins(
-  basePlugins: CrxPlugin[],
-  crxPlugins: CrxPlugin[],
-): CrxPlugin[] {
-  const baseRpceIndex = basePlugins.findIndex(isRPCE)
-  if (baseRpceIndex < 0)
-    throw new Error('Could not find base RPCE plugin')
-
-  const { normalPlugins, postPlugins, prePlugins } =
-    categorizePlugins(crxPlugins)
-
-  const result: CrxPlugin[] = [...basePlugins]
-  // Add normal crx plugins
-  result.splice(baseRpceIndex + 1, 0, ...normalPlugins)
-  // Add pre crx plugins
-  result.splice(1, 0, ...prePlugins)
-  // Add post crx plugins
-  result.push(...postPlugins)
-
-  return result
+): RpceApi {
+  const api = plugins.find(isRPCE)?.api
+  if (!api) throw new Error('Could not get RPCE API')
+  return api
 }
 
 const defaultSrc = ['self']
@@ -131,7 +86,35 @@ export function addToCspScriptSrc(
 }
 
 /** Work with an id as a URL instance */
-export const createStubURL = (id = '') => {
-  const pathnameAndSearch = id.startsWith('/') ? id : `/${id}`
-  return new URL('stub://stub' + pathnameAndSearch)
+export const stubUrl = (id = '') => {
+  return new URL(id, 'stub://stub')
+}
+
+export function splitPlugins(plugins: CrxPlugin[]) {
+  const pre: CrxPlugin[] = []
+  const mid: CrxPlugin[] = []
+  const post: CrxPlugin[] = []
+  for (const p of plugins) {
+    if (p.enforce === 'pre') pre.push(p)
+    else if (p.enforce === 'post') post.push(p)
+    else mid.push(p)
+  }
+  return { pre, mid, post }
+}
+
+export function combinePlugins(
+  pluginsA: CrxPlugin[],
+  pluginsB: CrxPlugin[],
+) {
+  const a = splitPlugins(pluginsA)
+  const b = splitPlugins(pluginsB)
+
+  return [
+    ...a.pre,
+    ...b.pre,
+    ...a.mid,
+    ...b.mid,
+    ...a.post,
+    ...b.post,
+  ]
 }

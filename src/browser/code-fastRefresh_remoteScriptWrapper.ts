@@ -19,7 +19,7 @@ import { eventName } from './fastRefresh_helpers'
  * or immediately if it is present.
  */
 
-const importPath = JSON.parse('%REMOTE_SCRIPT_PATH%')
+const importPath = '%REMOTE_SCRIPT_PATH%'
 const importHandler = () => {
   window.removeEventListener(eventName, importHandler)
   import(/* @vite-ignore */ importPath).catch((err) => {

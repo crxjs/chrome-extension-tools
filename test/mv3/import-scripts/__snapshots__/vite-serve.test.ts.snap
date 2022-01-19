@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`writes files to disk: content.js 1`] = `
+"(function () {
+	'use strict';
+
+	var fileName = \\"dynamic-script.js\\";
+	console.log(\\"content script\\");
+	const script = document.createElement(\\"script\\");
+	script.src = chrome.runtime.getURL(fileName);
+	document.head.prepend(script);
+
+})();
+"
+`;
+
+exports[`writes files to disk: dynamic-script.js 1`] = `
+"(function () {
+	'use strict';
+
+	console.log(\\"dynamic-script.ts\\");
+
+})();
+"
+`;
+
+exports[`writes files to disk: executed-script.js 1`] = `
+"(function () {
+	'use strict';
+
+	console.log(\\"executed-script.ts\\");
+
+})();
+"
+`;

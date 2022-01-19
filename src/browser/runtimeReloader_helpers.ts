@@ -1,5 +1,6 @@
 import { format } from '../helpers'
 import { getMessage } from '@extend-chrome/messages'
+import jsesc from 'jsesc'
 
 export const [sendReload, reloadStream] = getMessage('RELOAD')
 export const [sendUpdateVersion, updateVersionStream] =
@@ -10,10 +11,6 @@ DEVELOPMENT build with simple auto-reloader
 [${new Date().toLocaleTimeString()}] Waiting for changes...`
 
 export const applyDevWarning = (code: string) =>
-  code.replace(
-    '%DEV_WARNING%',
-    JSON.stringify(createDevWarning()).replace('\\n', '\\\\n'),
-  )
+  code.replace('%DEV_WARNING%', jsesc(createDevWarning()))
 
-export const getDevWarning = () =>
-  JSON.parse('%DEV_WARNING%') as string
+export const getDevWarning = () => '%DEV_WARNING%'

@@ -9,12 +9,9 @@ import { code as messageCode } from 'code ./browser/code-fastRefresh_inlineScrip
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { code as remoteScriptWrapper } from 'code ./browser/code-fastRefresh_remoteScriptWrapper.ts'
-import {
-  createStubURL,
-  getRpceAPI,
-  RpceApi,
-} from './plugin_helpers'
+import { stubUrl, getRpceAPI, RpceApi } from './plugin_helpers'
 import { relative } from './path'
+import jsesc from 'jsesc'
 
 const reactRegex = /[jt]sx/
 
@@ -47,14 +44,15 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
   const hashesByScript = new Map<string, string>()
 
   return {
-    name: 'vite-serve-hmr-mv3',
+    name: 'vite-serve-react-fast-refresh-mv3',
     crx: true,
     enforce: 'post',
+    apply: 'serve',
     configureServer(s) {
       server = s
     },
     buildStart({ plugins }) {
-      api = getRpceAPI(plugins)!
+      api = getRpceAPI(plugins)
     },
     transformCrxManifest(manifest) {
       disablePlugin = !isMV3(manifest) || !server
@@ -74,7 +72,7 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
 
       if ($inlineScripts.length > 0)
         $remoteScripts.attr('src', (i, value) => {
-          const url = createStubURL(value)
+          const url = stubUrl(value)
           if (!reactRegex.test(url.pathname)) return value
           url.searchParams.set('delay', 'true')
           const result = url.pathname + url.search
@@ -134,11 +132,11 @@ export const viteServeReactFastRefresh_MV3 = (): CrxPlugin => {
       if (id.includes('delay=true')) {
         const { root } = api
         const relId = relative(root, id)
-        const { pathname } = createStubURL(relId)
+        const { pathname } = stubUrl(relId)
 
         return remoteScriptWrapper.replace(
           '%REMOTE_SCRIPT_PATH%',
-          JSON.stringify(pathname),
+          jsesc(pathname),
         )
       }
       return null

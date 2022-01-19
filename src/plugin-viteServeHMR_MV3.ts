@@ -9,7 +9,7 @@ import { ViteDevServer } from 'vite'
 import { model as filesModel } from './files.machine'
 import { format } from './helpers'
 import { runPlugins } from './index_runPlugins'
-import { createStubURL, getRpceAPI } from './plugin_helpers'
+import { stubUrl, getRpceAPI, RpceApi } from './plugin_helpers'
 import {
   Asset,
   AssetType,
@@ -47,15 +47,16 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
 
   let disablePlugin = true
   let server: ViteDevServer
-  let api: ReturnType<typeof getRpceAPI>
+  let api: RpceApi
   let swFilename: string
 
   return {
     name: 'vite-serve-hmr-mv3',
     crx: true,
+    apply: 'serve',
     buildStart({ plugins }) {
       api = getRpceAPI(plugins)
-      api?.service.onEvent((event) => {
+      api.service.onEvent((event) => {
         if (event.type === 'PLUGINS_RESULT') {
           const { type, ...asset } = event as Asset & {
             type: string
@@ -85,7 +86,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
 
       swFilename = manifest.background.service_worker
 
-      api?.service.send(
+      api.service.send(
         filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
       )
 
@@ -103,10 +104,13 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
         .not('[src^="/@"]')
         .attr('type', 'module')
         .attr('src', (i, value) => {
-          const url = createStubURL(value)
+          const url = stubUrl(value)
           url.searchParams.set('t', Date.now().toString())
-          const result = url.pathname + url.search
-          return value.startsWith('/') ? result : result.slice(1)
+          const result =
+            (value.startsWith('/') ? '/' : './') +
+            url.pathname.slice(1) +
+            url.search
+          return result
         })
 
       return $.html()
@@ -150,7 +154,7 @@ function useCrxFilesMiddleware(
   crxPlugins: CrxPlugin[],
 ) {
   server.middlewares.use(async (req, res, next) => {
-    const url = createStubURL(req.url)
+    const url = stubUrl(req.url)
     const asset = assetCache.get(url.pathname)
 
     if (!asset || !servedTypes.includes(asset.fileType)) {

@@ -80,8 +80,8 @@ export interface Script {
   id: string
   /* Output file name, relative to outDir */
   fileName: string
-  /* File id from Rollup emitFile */
-  fileId?: string
+  /* File ref id from Rollup emitFile */
+  refId?: string
 }
 
 export interface BaseAsset {
@@ -90,8 +90,8 @@ export interface BaseAsset {
   id: string
   /* Output file name, relative to outDir */
   fileName: string
-  /* File id from Rollup emitFile */
-  fileId?: string
+  /* File ref id from Rollup emitFile */
+  refId?: string
   /* Directory of source file, only manifest supported now */
   dirName?: string
 }
@@ -122,11 +122,12 @@ export type Asset =
   | JsonAsset
   | ManifestAsset
 
-export interface CompleteFile {
+export interface EmittedFile {
   fileType: FileType
   fileName: string
   id: string
   type: 'chunk' | 'asset'
+  refId: string
   source?: string | Uint8Array
 }
 
@@ -176,6 +177,12 @@ export type CrxPlugin = VitePlugin &
     /** This prop is required to ensure during serve mode that written files use the same plugin */
     crx?: boolean
   }
+
+export type InternalCrxPlugin = CrxPlugin & {
+  crxOptions?: CrxPlugin['options']
+  crxBuildStart?: CrxPlugin['buildStart']
+  crxGenerateBundle?: CrxPlugin['generateBundle']
+}
 
 export interface ChromeExtensionOptions {
   /**

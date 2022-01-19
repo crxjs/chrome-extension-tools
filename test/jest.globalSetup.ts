@@ -1,10 +1,10 @@
 import json from '@rollup/plugin-json'
-import sucrase from '@rollup/plugin-sucrase'
 import fs from 'fs'
 import path from 'path'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import { format } from '../src/helpers'
+import esbuild from 'rollup-plugin-esbuild'
 
 const rootDirname = path.resolve(__dirname, '..')
 
@@ -62,9 +62,7 @@ const config: RollupOptions = {
       },
     },
     json(),
-    sucrase({
-      transforms: ['typescript'],
-    }),
+    esbuild(),
     bundleImports({
       useVirtualModule: true,
       // @ts-expect-error need to fix these types

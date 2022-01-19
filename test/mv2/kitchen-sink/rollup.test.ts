@@ -77,23 +77,13 @@ test('bundles chunks and assets', async () => {
   expect(output.find(byFileName('options.jpg'))).toBeDefined()
 
   expect(
-    output.find(byFileName('fonts/NotoSans-Light.ttf')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('fonts/NotoSans-Black.ttf')),
-  ).toBeDefined()
-  expect(
-    output.find(byFileName('fonts/Missaali-Regular.otf')),
-  ).toBeDefined()
-
-  expect(
     output.find(byFileName('_locales/en/messages.json')),
   ).toBeDefined()
   expect(
     output.find(byFileName('_locales/es/messages.json')),
   ).toBeDefined()
 
-  expect(assets.length).toBe(20)
+  expect(assets.length).toBe(17)
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),

@@ -76,7 +76,7 @@ export const machine = model.createMachine(
     states: {
       configuring: {
         on: {
-          ENQUEUE_FILES: {
+          ADD_FILES: {
             actions: model.assign({
               inputsByName: ({ inputsByName }, { files }) => {
                 const map = new Map(inputsByName)
@@ -116,7 +116,10 @@ export const machine = model.createMachine(
               },
             }),
           },
-          BUILD_START: 'transforming',
+          BUILD_START: {
+            actions: 'startManifest',
+            target: 'transforming.manifest',
+          },
         },
       },
       transforming: {
@@ -128,23 +131,22 @@ export const machine = model.createMachine(
               !filesByName.has(fileName),
             actions: 'spawnFile',
           },
+          ADD_FILES: { actions: 'startImportedFiles' },
         },
-        initial: 'manifest',
+        initial: 'assets',
         states: {
           manifest: {
-            entry: 'startManifest',
             on: {
               EXCLUDE_FILE_TYPE: {
                 actions: 'updateExcludedFiles',
               },
               PLUGINS_RESULT: {
-                actions: 'forwardToFile',
+                actions: ['forwardToFile', 'startAssets'],
                 target: 'assets',
               },
             },
           },
           assets: {
-            entry: 'startAssets',
             on: {
               EXCLUDE_FILE_TYPE: {
                 actions: 'updateExcludedFiles',
@@ -176,7 +178,7 @@ export const machine = model.createMachine(
                   actions: 'handleFile',
                 },
               ],
-              FILE_ID: { actions: 'forwardToFile' },
+              REF_ID: { actions: 'forwardToFile' },
               READY: { cond: 'allFilesReady', target: '#ready' },
             },
           },
@@ -186,6 +188,10 @@ export const machine = model.createMachine(
         id: 'ready',
         on: {
           GENERATE_BUNDLE: 'rendering',
+          ADD_FILES: {
+            actions: 'startImportedFiles',
+            target: 'transforming',
+          },
         },
       },
       rendering: {
@@ -239,6 +245,24 @@ export const machine = model.createMachine(
             actions: 'forwardToAllFiles',
             target: 'configuring',
           },
+          ADD_FILES: {
+            cond: ({ filesByName }, { files }) =>
+              files.some(
+                ({ fileName }) => !filesByName.has(fileName),
+              ),
+            actions: [
+              assign({
+                inputsByName: ({ inputsByName }, { files }) =>
+                  files.reduce(
+                    (r, file) => r.set(file.fileName, file),
+                    new Map(inputsByName),
+                  ),
+              }),
+              'invalidateBuild',
+              'sendChangeToAllFiles',
+            ],
+            target: 'configuring',
+          },
         },
       },
     },
@@ -248,6 +272,16 @@ export const machine = model.createMachine(
       sendAbortToAllFiles: pure(({ filesById }) =>
         [...filesById.values()].map((file) =>
           send(model.events.ABORT(), { to: () => file }),
+        ),
+      ),
+      sendChangeToAllFiles: pure(({ filesById }) =>
+        [...filesById.values()].map((file) =>
+          send(
+            model.events.CHANGE('invalidateBuild.txt', {
+              event: 'update',
+            }),
+            { to: () => file },
+          ),
         ),
       ),
       sendEmitStartToAllFiles: pure(({ filesById }) =>
@@ -262,7 +296,7 @@ export const machine = model.createMachine(
       ),
       forwardToFile: forwardTo(({ filesById }, event) => {
         const { id } = narrowEvent(event, [
-          'FILE_ID',
+          'REF_ID',
           'PLUGINS_RESULT',
         ])
         return filesById.get(id)!
@@ -292,6 +326,12 @@ export const machine = model.createMachine(
             return send(model.events.SPAWN_FILE(input))
           },
         )
+      }),
+      startImportedFiles: pure(({ filesByName }, event) => {
+        const { files } = narrowEvent(event, 'ADD_FILES')
+        return files
+          .filter(({ fileName }) => !filesByName.has(fileName))
+          .map((file) => send(model.events.SPAWN_FILE(file)))
       }),
       startParsedFiles: pure(({ filesByName }, event) => {
         const { children } = narrowEvent(event, 'PARSE_RESULT')
@@ -349,27 +389,31 @@ export const machine = model.createMachine(
     guards: {
       allFilesParsed: ({ filesById, excluded }, event) => {
         const { children } = narrowEvent(event, 'PARSE_RESULT')
-
-        return (
+        const noChildren =
           children.filter(
             ({ fileType }) => !excluded.has(fileType),
-          ).length === 0 &&
+          ).length === 0
+        const result =
+          noChildren &&
           [...filesById.values()].every((file) => {
             const state = file.getSnapshot()
             return (
+              state?.matches('ready') ||
               state?.matches('parsed') ||
               state?.matches('excluded')
             )
           })
-        )
+        return result
       },
-      allFilesReady: ({ filesById }) =>
-        [...filesById.values()].every((file) => {
+      allFilesReady: ({ filesById }) => {
+        const result = [...filesById.values()].every((file) => {
           const state = file.getSnapshot()
           return (
             state?.matches('ready') || state?.matches('excluded')
           )
-        }),
+        })
+        return result
+      },
       readyForManifest: ({ filesById }) => {
         const result = [...filesById.values()].every((file) => {
           const state = file.getSnapshot()

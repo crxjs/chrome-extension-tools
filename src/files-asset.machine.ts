@@ -92,12 +92,12 @@ export const assetMachine = model.createMachine(
       emitting: {
         entry: 'sendEmitFileToParent',
         on: {
-          FILE_ID: {
+          REF_ID: {
             cond: ({ id }, event) => {
               return id === event.id
             },
             actions: assign({
-              fileId: (context, { fileId }) => {
+              refId: (context, { fileId }) => {
                 return fileId
               },
             }),
@@ -155,7 +155,7 @@ export const assetMachine = model.createMachine(
     actions: {
       forwardToParent: sendParent((context, event) => event),
       sendCompleteToParent: sendParent(
-        ({ id, fileId }, event) => {
+        ({ id, refId: fileId }, event) => {
           const { type, ...r } = narrowEvent(
             event,
             'PLUGINS_RESULT',
@@ -177,7 +177,7 @@ export const assetMachine = model.createMachine(
 
           return model.events.COMPLETE_FILE({
             id,
-            fileId,
+            refId: fileId,
             source,
           })
         },
