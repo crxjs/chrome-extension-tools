@@ -5,7 +5,7 @@ import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
 import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
-import { hybridFormat } from './plugin-hybridOutput'
+import { hybridFormat } from './plugin-outputHybridFormat'
 import { contentScriptResources } from './plugin-contentScriptResources'
 import {
   importedResources,

@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { code as backgroundEsmWrapper } from 'code ./browser/code-backgroundEsmWrapper.ts'
+import { code as backgroundEsmWrapper } from 'code ./browser/code-MV2_backgroundEsmWrapper.ts'
 import jsesc from 'jsesc'
 import { parse } from './path'
 import { generateFileNames } from './plugin_helpers'
