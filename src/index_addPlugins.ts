@@ -32,6 +32,7 @@ import {
   CrxPlugin,
   InternalCrxPlugin,
 } from './types'
+import { esmFormat } from './plugin-outputEsmFormat'
 
 type CrxPluginFn = (options: ChromeExtensionOptions) => CrxPlugin
 
@@ -56,7 +57,9 @@ export function startBuiltins(
     viteServeImportScripts,
     publicDir,
     htmlMapScriptsToJS,
-    hybridFormat,
+    options.contentScriptFormat === 'iife'
+      ? hybridFormat
+      : esmFormat,
     viteServeHMR_MV2,
     viteServeHMR_MV3,
     viteServeReactFastRefresh_MV2,

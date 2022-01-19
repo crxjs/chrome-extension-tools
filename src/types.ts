@@ -208,4 +208,10 @@ export interface ChromeExtensionOptions {
     name: string
     version: string
   }
+  /**
+   * Content scripts use ES modules by default.
+   * Set to 'iife' if you need content scripts not to use ESM.
+   * Note that content script HMR is only compatible with ESM.
+   */
+  contentScriptFormat?: 'iife' | 'esm'
 }
