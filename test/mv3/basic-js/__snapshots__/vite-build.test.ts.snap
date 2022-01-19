@@ -1,6 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`writes entry points to disk 1`] = `
+exports[`bundles chunks and assets 1`] = `
+"console.log(\\"service_worker.js\\");
+"
+`;
+
+exports[`bundles chunks and assets 2`] = `
+"console.log(\\"content script\\");
+"
+`;
+
+exports[`bundles chunks and assets 3`] = `
+"import { R as React, a as ReactDOM } from \\"./modules/vendor-1bbb6c82.js\\";
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+};
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`bundles chunks and assets 4`] = `
 Object {
   "action": Object {
     "default_popup": "popup.html",
@@ -12,7 +33,6 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "runtime-reloader--content-script.js",
         "assets/content.esm-wrapper-a6ac6bbe.js",
       ],
       "matches": Array [
@@ -21,8 +41,7 @@ Object {
       ],
     },
   ],
-  "description": "DEVELOPMENT build with simple auto-reloader
-[6:00:00 PM] Waiting for changes...",
+  "description": "Basic MV3 Chrome Extension",
   "host_permissions": Array [
     "https://c.com/*",
   ],
@@ -30,17 +49,7 @@ Object {
   "name": "mv3-basic-js",
   "permissions": Array [],
   "version": "1.0.0",
-  "version_name": "2021-12-07T00:00:00.000Z",
   "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "https://a.com/*",
-        "http://b.com/*",
-      ],
-      "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
     Object {
       "matches": Array [
         "https://a.com/*",
@@ -54,27 +63,15 @@ Object {
 }
 `;
 
-exports[`writes entry points to disk: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
-"console.log(\\"content script\\");
-"
-`;
-
-exports[`writes entry points to disk: content.js 1`] = `
-"console.log(\\"content script\\");
-"
-`;
-
-exports[`writes entry points to disk: popup.html 1`] = `
+exports[`bundles chunks and assets 5`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>
-    <script type=\\"module\\" src=\\"/@vite/client\\"></script>
-
     <meta charset=\\"UTF-8\\">
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
     <title>Popup Page</title>
   </head>
   <body>
     <div id=\\"root\\"></div>
-    <script src=\\"./popup.jsx?t=1638835200000\\" type=\\"module\\"></script>
+    <script src=\\"popup.js\\" type=\\"module\\"></script>
   
 
 </body></html>"

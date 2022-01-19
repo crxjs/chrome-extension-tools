@@ -3,7 +3,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "service_worker": "service_worker.ts"
+    "service_worker": "background.ts"
   },
   "content_scripts": [
     {

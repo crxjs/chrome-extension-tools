@@ -1,4 +1,3 @@
-import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import {
   filesReady,
   stopFileWriter,
@@ -39,9 +38,13 @@ test('writes entry points to disk', async () => {
   const content2 = 'content2.js'
   const script = 'script.js'
   const font = 'assets/font.bb6bc8d6.otf'
-  // const html = 'assets/iframe.html'
+  const html = 'iframe.html'
   const image = 'assets/image.51f8fe9d.png'
   const manifest = 'manifest.json'
+
+  const manifestPath = path.join(outDir, manifest)
+  const manifestSource = await fs.readJson(manifestPath)
+  expect(manifestSource).toMatchSnapshot(manifest)
 
   const content1Path = path.join(outDir, content1)
   const content1Source = await fs.readFile(content1Path, 'utf8')
@@ -55,41 +58,13 @@ test('writes entry points to disk', async () => {
   const scriptSource = await fs.readFile(scriptPath, 'utf8')
   expect(scriptSource).toMatchSnapshot(script)
 
-  // const htmlPath = path.join(outDir, html)
-  // const htmlSource = await fs.readFile(htmlPath, 'utf8')
-  // expect(htmlSource).toMatchSnapshot(html)
+  const htmlPath = path.join(outDir, html)
+  const htmlSource = await fs.readFile(htmlPath, 'utf8')
+  expect(htmlSource).toMatchSnapshot(html)
 
   const fontPath = path.join(outDir, font)
   expect(fs.existsSync(fontPath)).toBe(true)
 
   const imagePath = path.join(outDir, image)
   expect(fs.existsSync(imagePath)).toBe(true)
-
-  const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
-  expect(manifestSource).toMatchObject({
-    content_scripts: [
-      {
-        js: [runtimeReloaderCS, content1],
-        matches: ['https://google.com/*'],
-      },
-      {
-        js: [runtimeReloaderCS, content2],
-        matches: ['https://bing.com/*'],
-      },
-    ],
-    web_accessible_resources: [
-      {
-        matches: ['https://google.com/*'],
-        resources: [image, script],
-      },
-      {
-        matches: ['https://bing.com/*'],
-        resources: [
-          // html,
-          font,
-        ],
-      },
-    ],
-  })
 })

@@ -36,7 +36,7 @@ test('bundles chunks and assets', async () => {
   expect(output.find(byFileName(styles1))).toBeDefined()
   expect(output.find(byFileName(styles2))).toBeDefined()
   expect(output.filter(isChunk).length).toBe(2)
-  expect(output.filter(isAsset).length).toBe(3)
+  expect(output.filter(isAsset).length).toBe(5)
 
   const manifestAsset = output.find(
     byFileName(manifest),
@@ -45,18 +45,5 @@ test('bundles chunks and assets', async () => {
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
   ) as Manifest
-  expect(manifestSource).toMatchObject({
-    content_scripts: [
-      {
-        css: [styles1],
-        js: [content1],
-        matches: ['http://*/*', 'https://*/*'],
-      },
-      {
-        css: [styles2],
-        js: [content2],
-        matches: ['http://*/*', 'https://*/*'],
-      },
-    ],
-  })
+  expect(manifestSource).toMatchSnapshot()
 })

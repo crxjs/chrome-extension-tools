@@ -1,26 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`writes entry points to disk 1`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"imported file\\");
-
-	console.log(\\"content1\\");
-
-})();
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content1\\");
 "
 `;
 
 exports[`writes entry points to disk 2`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"imported file\\");
-
-	console.log(\\"content2\\");
-
-})();
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content2\\");
 "
 `;
 
@@ -43,4 +33,90 @@ exports[`writes entry points to disk 5`] = `
   color: green;
 }
 "
+`;
+
+exports[`writes entry points to disk 6`] = `
+Object {
+  "background": Object {
+    "service_worker": "crx-hmr-service-worker.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/index-5f7d7b6f.css",
+        "assets/import-3b031dc7.css",
+      ],
+      "js": Array [
+        "runtime-reloader--content-script.js",
+        "assets/index.esm-wrapper-523b95ce.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "css": Array [
+        "assets/index-5dfee6cc.css",
+        "assets/import-3b031dc7.css",
+      ],
+      "js": Array [
+        "runtime-reloader--content-script.js",
+        "assets/index.esm-wrapper-8958fd4e.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "description": "DEVELOPMENT build with simple auto-reloader
+[6:00:00 PM] Waiting for changes...",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "version_name": "2021-12-07T00:00:00.000Z",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "runtime-reloader--content-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content1/index.js",
+        "_import-8167e8d6.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "runtime-reloader--content-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content2/index.js",
+        "_import-8167e8d6.js",
+      ],
+    },
+  ],
+}
 `;

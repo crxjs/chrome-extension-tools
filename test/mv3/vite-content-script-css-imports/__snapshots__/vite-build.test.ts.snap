@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`bundles chunks and assets 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/content-89281590.css",
+      ],
+      "js": Array [
+        "assets/content.esm-wrapper-a8bec302.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "description": "integration tests",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content.js",
+      ],
+    },
+  ],
+}
+`;

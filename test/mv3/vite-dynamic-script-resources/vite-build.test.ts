@@ -40,6 +40,7 @@ test('bundles chunks and assets', async () => {
   expect(output.find(byFileName(script))).toBeDefined()
   expect(output.find(byFileName(html))).toBeDefined()
   expect(output.find(byFileName(font))).toBeDefined()
+  expect(output.find(byFileName(image))).toBeDefined()
   expect(output.filter(isChunk).length).toBe(4)
   expect(output.filter(isAsset).length).toBe(4)
 
@@ -50,18 +51,5 @@ test('bundles chunks and assets', async () => {
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
   ) as Manifest
-  expect(manifestSource).toMatchObject({
-    background: {
-      service_worker: background,
-    },
-    web_accessible_resources: [
-      {
-        matches: [
-          'https://google.com/*',
-          'https://github.com/*',
-        ],
-        resources: [image, script, font, html],
-      },
-    ],
-  })
+  expect(manifestSource).toMatchSnapshot()
 })

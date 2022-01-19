@@ -16,13 +16,13 @@ test('bundles chunks and assets', async () => {
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('script.js'))).toBeDefined()
 
-  // 2 entries and 1 content script wrapper
+  // 2 entries
   expect(chunks.length).toBe(2)
 
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
 
-  // 1 manifest
-  expect(assets.length).toBe(1)
+  // manifest + content script wrapper
+  expect(assets.length).toBe(2)
 })

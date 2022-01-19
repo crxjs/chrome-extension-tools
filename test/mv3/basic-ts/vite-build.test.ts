@@ -16,19 +16,18 @@ test('bundles chunks', async () => {
   // Chunks
   const chunks = output.filter(isChunk)
 
-  expect(
-    chunks.find(byFileName('service_worker.js')),
-  ).toBeDefined()
+  expect(chunks.find(byFileName('background.js'))).toBeDefined()
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
-  expect(chunks.length).toBe(3)
+  // 3 entries + 1 vendor chunk
+  expect(chunks.length).toBe(4)
 
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
 
-  // 1 html file and 1 manifest
-  expect(assets.length).toBe(2)
+  // html file, content script wrapper, and manifest
+  expect(assets.length).toBe(3)
 })

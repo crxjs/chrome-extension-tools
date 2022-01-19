@@ -42,21 +42,7 @@ test('writes files to disk', async () => {
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
-  expect(manifestSource).toMatchObject({
-    background: {
-      service_worker: 'background.js',
-    },
-    content_scripts: [
-      {
-        js: [
-          'runtime-reloader--content-script.js',
-          'content.js',
-        ],
-        matches: ['https://*/*', 'http://*/*'],
-      },
-    ],
-    manifest_version: 3,
-  })
+  expect(manifestSource).toMatchSnapshot()
 
   const bgPath = path.join(outDir, background)
   expect(fs.existsSync(bgPath)).toBe(true)

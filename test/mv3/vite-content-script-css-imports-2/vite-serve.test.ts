@@ -59,18 +59,5 @@ test('writes entry points to disk', async () => {
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
-  expect(manifestSource).toMatchObject({
-    content_scripts: [
-      {
-        css: [styles1],
-        js: [runtimeReloaderCS, content1],
-        matches: ['http://*/*', 'https://*/*'],
-      },
-      {
-        css: [styles2],
-        js: [runtimeReloaderCS, content2],
-        matches: ['http://*/*', 'https://*/*'],
-      },
-    ],
-  })
+  expect(manifestSource).toMatchSnapshot()
 })

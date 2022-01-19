@@ -23,20 +23,16 @@ beforeAll(async () => {
   output = o
 })
 
-test('bundles chunks', async () => {
+test('bundles chunks and assets', async () => {
   // Chunks
   const chunks = output.filter(isChunk)
 
-  expect(
-    chunks.find(byFileName('service_worker.js')),
-  ).toBeDefined()
+  expect(chunks.find(byFileName('background.js'))).toBeDefined()
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
   expect(chunks.length).toBe(3)
-})
 
-test('bundles assets', async () => {
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()

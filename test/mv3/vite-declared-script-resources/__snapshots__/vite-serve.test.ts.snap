@@ -1,34 +1,110 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`writes entry points to disk: content1.js 1`] = `
-"(function () {
-	'use strict';
-
-	var icon = \\"/assets/image.51f8fe9d.png\\";
-	var script = \\"script.js\\";
-	console.log(\\"content.ts\\", { icon, script });
-
-})();
+"var icon = \\"/assets/image.51f8fe9d.png\\";
+var script = \\"script.js\\";
+console.log(\\"content.ts\\", { icon, script });
 "
 `;
 
 exports[`writes entry points to disk: content2.js 1`] = `
-"(function () {
-	'use strict';
-
-	var font = \\"/assets/font.bb6bc8d6.otf\\";
-	console.log(\\"content2.ts\\", { html: \\"todo\\", font });
-
-})();
+"var html = \\"iframe.html\\";
+var font = \\"/assets/font.bb6bc8d6.otf\\";
+console.log(\\"content2.ts\\", { html, font });
 "
 `;
 
+exports[`writes entry points to disk: iframe.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <script type=\\"module\\" src=\\"/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    IFR
+  
+
+</body></html>"
+`;
+
+exports[`writes entry points to disk: manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "crx-hmr-service-worker.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "runtime-reloader--content-script.js",
+        "assets/content1.esm-wrapper-108a94d4.js",
+      ],
+      "matches": Array [
+        "https://google.com/*",
+      ],
+    },
+    Object {
+      "js": Array [
+        "runtime-reloader--content-script.js",
+        "assets/content2.esm-wrapper-c289b262.js",
+      ],
+      "matches": Array [
+        "https://bing.com/*",
+      ],
+    },
+  ],
+  "description": "DEVELOPMENT build with simple auto-reloader
+[6:00:00 PM] Waiting for changes...",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "version_name": "2021-12-07T00:00:00.000Z",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://google.com/*",
+      ],
+      "resources": Array [
+        "runtime-reloader--content-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "https://google.com/*",
+      ],
+      "resources": Array [
+        "assets/image.51f8fe9d.png",
+        "content1.js",
+        "script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "https://bing.com/*",
+      ],
+      "resources": Array [
+        "runtime-reloader--content-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "https://bing.com/*",
+      ],
+      "resources": Array [
+        "assets/font.bb6bc8d6.otf",
+        "iframe.html",
+        "content2.js",
+      ],
+    },
+  ],
+}
+`;
+
 exports[`writes entry points to disk: script.js 1`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"main world script\\");
-
-})();
+"console.log(\\"main world script\\");
 "
 `;

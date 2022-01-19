@@ -13,17 +13,12 @@ test('bundles chunks and assets', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(
-    chunks.find(byFileName('service_worker.js')),
-  ).toBeDefined()
+  expect(chunks.find(byFileName('background.js'))).toBeDefined()
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
   // 3 scripts
   expect(chunks.length).toBe(3)
-
-  // TODO: assert that content.js is IIFE format
-  // TODO: assert that popup.js is ESM format
 
   // Assets
   const assets = output.filter(isAsset)

@@ -13,9 +13,7 @@ test('bundles chunks and assets', async () => {
 
   // Chunks
   const chunks = output.filter(isChunk)
-  expect(
-    chunks.find(byFileName('service_worker.js')),
-  ).toBeDefined()
+  expect(chunks.find(byFileName('background.js'))).toBeDefined()
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
@@ -28,5 +26,5 @@ test('bundles chunks and assets', async () => {
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
 
   // 1 html file and 1 manifest
-  expect(assets.length).toBe(2)
+  expect(assets.length).toBe(3)
 })

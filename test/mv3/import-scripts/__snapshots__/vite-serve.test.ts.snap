@@ -1,35 +1,78 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`writes files to disk 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "background.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "runtime-reloader--content-script.js",
+        "assets/content.esm-wrapper-a8bec302.js",
+      ],
+      "matches": Array [
+        "https://*/*",
+        "http://*/*",
+      ],
+    },
+  ],
+  "description": "DEVELOPMENT build with simple auto-reloader
+[6:00:00 PM] Waiting for changes...",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "version_name": "2021-12-07T00:00:00.000Z",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://*/*",
+        "http://*/*",
+      ],
+      "resources": Array [
+        "runtime-reloader--content-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "https://*/*",
+        "http://*/*",
+      ],
+      "resources": Array [
+        "content.js",
+        "dynamic-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "executed-script.js",
+      ],
+    },
+  ],
+}
+`;
+
 exports[`writes files to disk: content.js 1`] = `
-"(function () {
-	'use strict';
-
-	var fileName = \\"dynamic-script.js\\";
-	console.log(\\"content script\\");
-	const script = document.createElement(\\"script\\");
-	script.src = chrome.runtime.getURL(fileName);
-	document.head.prepend(script);
-
-})();
+"var fileName = \\"dynamic-script.js\\";
+console.log(\\"content script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+document.head.prepend(script);
 "
 `;
 
 exports[`writes files to disk: dynamic-script.js 1`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"dynamic-script.ts\\");
-
-})();
+"console.log(\\"dynamic-script.ts\\");
 "
 `;
 
 exports[`writes files to disk: executed-script.js 1`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"executed-script.ts\\");
-
-})();
+"console.log(\\"executed-script.ts\\");
 "
 `;

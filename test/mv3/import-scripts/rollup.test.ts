@@ -29,5 +29,6 @@ test('bundles chunks and assets', async () => {
   // Assets
   const assets = output.filter(isAsset)
   expect(assets.find(byFileName(manifest))).toBeDefined()
-  expect(assets.length).toBe(1)
+  // manifest + content script wrapper
+  expect(assets.length).toBe(2)
 })

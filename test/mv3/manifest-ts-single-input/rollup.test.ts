@@ -27,6 +27,6 @@ test('bundles chunks and assets', async () => {
   expect(assets.find(byFileName('manifest.json'))).toBeDefined()
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
 
-  // 1 html file and 1 manifest
-  expect(assets.length).toBe(2)
+  // html file, content script wrapper, and manifest
+  expect(assets.length).toBe(3)
 })

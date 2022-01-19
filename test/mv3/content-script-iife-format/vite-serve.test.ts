@@ -38,7 +38,7 @@ test('writes entry points to disk', async () => {
   const manifest = 'manifest.json'
   const popup = 'popup.html'
   const content = 'content.js'
-  const worker = 'service_worker.js'
+  const background = 'background.js'
   const popupJs = 'popup.js'
 
   const manifestPath = path.join(outDir, manifest)
@@ -49,7 +49,7 @@ test('writes entry points to disk', async () => {
       default_popup: popup,
     },
     background: {
-      service_worker: worker,
+      service_worker: background,
       type: 'module',
     },
     content_scripts: [
@@ -68,7 +68,7 @@ test('writes entry points to disk', async () => {
   const popupSource = await fs.readFile(popupPath, 'utf8')
   expect(popupSource).toMatchSnapshot(popup)
 
-  const workerPath = path.join(outDir, worker)
+  const workerPath = path.join(outDir, background)
   const workerSource = await fs.readFile(workerPath, 'utf8')
   expect(workerSource).toMatch(
     'fetchEvent.respondWith(mapRequestsToLocalhost(url.href))',
