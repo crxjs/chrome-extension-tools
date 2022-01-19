@@ -1,6 +1,14 @@
 // TODO: if process.env.CI, build for production and test against the build
 // - add global setup file to build
 // - update moduleNameMapper to point $src to pkg.main
+// TODO: find way to programmatically break tests into smaller chunks
+// - using vite with jest creates a memory leak
+//   - the leak seems to come from `source-map-support`
+//   - it uses two caches that baloon as more vite tests run
+//   - debug following this article:
+//   - https://chanind.github.io/javascript/2019/10/12/jest-tests-memory-leak.html
+// - can use a custom test sequencer
+//   - https://github.com/facebook/jest/issues/11252#issuecomment-813494558
 
 const esModules = ['read-pkg'].map((x) => `(${x})`).join('|')
 
