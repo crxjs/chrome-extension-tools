@@ -51,5 +51,5 @@ test('bundles chunks and assets', async () => {
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
   ) as Manifest
-  expect(manifestSource).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot(manifest)
 })

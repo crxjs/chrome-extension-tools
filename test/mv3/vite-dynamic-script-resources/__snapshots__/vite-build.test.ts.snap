@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets 1`] = `
+exports[`bundles chunks and assets: manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "background.js",
@@ -14,8 +14,8 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://google.com/*",
         "https://github.com/*",
+        "https://google.com/*",
       ],
       "resources": Array [
         "assets/image.51f8fe9d.png",

@@ -1,27 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets 1`] = `
+exports[`bundles chunks and assets: background.js 1`] = `
 "console.log(\\"service_worker.js\\");
 "
 `;
 
-exports[`bundles chunks and assets 2`] = `
+exports[`bundles chunks and assets: content.js 1`] = `
 "console.log(\\"content script\\");
 "
 `;
 
-exports[`bundles chunks and assets 3`] = `
-"import { R as React, a as ReactDOM } from \\"./modules/vendor-1bbb6c82.js\\";
-const App = () => {
-  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
-};
-console.log(\\"popup script\\");
-const root = document.querySelector(\\"#root\\");
-ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
-"
-`;
-
-exports[`bundles chunks and assets 4`] = `
+exports[`bundles chunks and assets: manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "popup.html",
@@ -36,8 +25,8 @@ Object {
         "assets/content.esm-wrapper-a6ac6bbe.js",
       ],
       "matches": Array [
-        "https://a.com/*",
         "http://b.com/*",
+        "https://a.com/*",
       ],
     },
   ],
@@ -52,8 +41,8 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://a.com/*",
         "http://b.com/*",
+        "https://a.com/*",
       ],
       "resources": Array [
         "content.js",
@@ -63,7 +52,7 @@ Object {
 }
 `;
 
-exports[`bundles chunks and assets 5`] = `
+exports[`bundles chunks and assets: popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>
     <meta charset=\\"UTF-8\\">
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
@@ -75,4 +64,15 @@ exports[`bundles chunks and assets 5`] = `
   
 
 </body></html>"
+`;
+
+exports[`bundles chunks and assets: popup.js 1`] = `
+"import { R as React, a as ReactDOM } from \\"./modules/vendor-1bbb6c82.js\\";
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+};
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
 `;

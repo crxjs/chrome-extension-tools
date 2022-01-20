@@ -87,15 +87,6 @@ Object {
       "resources": Array [
         "import-8167e8d6.js",
         "content1/index.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "import-8167e8d6.js",
         "content2/index.js",
       ],
     },

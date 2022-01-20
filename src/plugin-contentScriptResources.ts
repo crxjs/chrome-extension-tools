@@ -334,6 +334,25 @@ export const contentScriptResources = ({
           manifest.web_accessible_resources = [
             ...new Set(manifest.web_accessible_resources),
           ]
+        } else {
+          // TODO: consolidate resources with same match patterns
+          // TODO: sort match patterns and stringify
+          const map = new Map<string, Set<string>>()
+          for (const {
+            matches,
+            resources,
+          } of manifest.web_accessible_resources!) {
+            const key = JSON.stringify(matches.sort())
+            const set = map.get(key) ?? new Set()
+            resources.forEach((r) => set.add(r))
+            map.set(key, set)
+          }
+          manifest.web_accessible_resources = [...map].map(
+            ([key, set]) => ({
+              matches: JSON.parse(key),
+              resources: [...set],
+            }),
+          )
         }
 
         manifestAsset.source = JSON.stringify(manifest)

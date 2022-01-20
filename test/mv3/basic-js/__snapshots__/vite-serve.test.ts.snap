@@ -16,8 +16,8 @@ Object {
         "assets/content.esm-wrapper-a6ac6bbe.js",
       ],
       "matches": Array [
-        "https://a.com/*",
         "http://b.com/*",
+        "https://a.com/*",
       ],
     },
   ],
@@ -34,8 +34,8 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://a.com/*",
         "http://b.com/*",
+        "https://a.com/*",
       ],
       "resources": Array [
         "content.js",

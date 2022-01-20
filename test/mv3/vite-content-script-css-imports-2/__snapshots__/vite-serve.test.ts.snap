@@ -75,14 +75,6 @@ Object {
       ],
       "resources": Array [
         "content1/index.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
         "content2/index.js",
       ],
     },

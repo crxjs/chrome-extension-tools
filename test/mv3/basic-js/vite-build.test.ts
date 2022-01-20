@@ -28,33 +28,38 @@ test('bundles chunks and assets', async () => {
   // Chunks
   const chunks = output.filter(isChunk)
 
-  const backgroundJs = chunks.find(byFileName('background.js'))!
+  const background = 'background.js'
+  const backgroundJs = chunks.find(byFileName(background))!
   expect(backgroundJs).toBeDefined()
-  expect(backgroundJs.code).toMatchSnapshot()
+  expect(backgroundJs.code).toMatchSnapshot(background)
 
-  const contentJs = chunks.find(byFileName('content.js'))!
+  const content = 'content.js'
+  const contentJs = chunks.find(byFileName(content))!
   expect(contentJs).toBeDefined()
-  expect(contentJs.code).toMatchSnapshot()
+  expect(contentJs.code).toMatchSnapshot(content)
 
-  const popupJs = chunks.find(byFileName('popup.js'))!
+  const popup = 'popup.js'
+  const popupJs = chunks.find(byFileName(popup))!
   expect(popupJs).toBeDefined()
-  expect(popupJs.code).toMatchSnapshot()
+  expect(popupJs.code).toMatchSnapshot(popup)
 
   // 3 scripts + vendors chunk
   expect(chunks.length).toBe(4)
 
   // Assets
   const assets = output.filter(isAsset)
-  const manifestJson = assets.find(byFileName('manifest.json'))!
+  const manifest = 'manifest.json'
+  const manifestJson = assets.find(byFileName(manifest))!
   expect(manifestJson).toBeDefined()
-  const manifest = JSON.parse(
+  const manifestSource = JSON.parse(
     manifestJson.source as string,
   ) as ManifestV3
-  expect(manifest).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot(manifest)
 
-  const popupHtml = assets.find(byFileName('popup.html'))!
-  expect(popupHtml).toBeDefined()
-  expect(popupHtml.source!).toMatchSnapshot()
+  const popupHtml = 'popup.html'
+  const popupHtmlAsset = assets.find(byFileName(popupHtml))!
+  expect(popupHtmlAsset).toBeDefined()
+  expect(popupHtmlAsset.source!).toMatchSnapshot(popupHtml)
 
   // html file, content script wrapper, and the manifest
   expect(assets.length).toBe(3)
