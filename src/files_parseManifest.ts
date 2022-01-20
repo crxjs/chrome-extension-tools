@@ -4,7 +4,6 @@ import {
   AssetType,
   ContentScript,
   DeclarativeNetRequestResource,
-  Manifest,
   ScriptType,
 } from './types'
 
@@ -17,7 +16,8 @@ function dedupe(ary: any[]) {
  * to the manifest, which must be in the root folder.
  */
 export function parseManifest(
-  manifest: Manifest,
+  // Using chrome types b/c TS craps out on deep props for our Manifest
+  manifest: chrome.runtime.Manifest,
 ): Record<
   | Exclude<ScriptType, 'MODULE'>
   | Exclude<AssetType, 'MANIFEST' | 'RAW'>,
