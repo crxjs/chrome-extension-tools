@@ -43,11 +43,15 @@ export const esmFormat = (): CrxPlugin => {
           if (files.has(file)) return
           files.add(file)
 
-          const { wrapperFileName } = generateFileNames(file)
+          const { wrapperFileName, outputFileName } =
+            generateFileNames(file)
           const { base } = parse(wrapperFileName)
           const refId = this.emitFile({
             type: 'asset',
-            source: esmWrapper.replace(importPath, jsesc(file)),
+            source: esmWrapper.replace(
+              importPath,
+              jsesc(outputFileName),
+            ),
             name: base,
           })
           script.js![i] = this.getFileName(refId)
