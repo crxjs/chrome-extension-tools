@@ -3,11 +3,19 @@ import jsesc from 'jsesc'
 import { OutputAsset } from 'rollup'
 import { importPath } from './browser/placeholders'
 import { parse } from './path'
+import {
+  browserPolyfillName,
+  browserPolyfillExecuteScriptName,
+} from './plugin-browserPolyfill'
 import { runtimeReloaderCS } from './plugin-runtimeReloader'
 import { generateFileNames } from './plugin_helpers'
 import { CrxPlugin, Manifest } from './types'
 
-const excluded: string[] = [runtimeReloaderCS]
+export const helperScripts: string[] = [
+  runtimeReloaderCS,
+  browserPolyfillName,
+  browserPolyfillExecuteScriptName,
+]
 
 export const esmFormat = (): CrxPlugin => {
   const files = new Set<string>()
@@ -31,7 +39,7 @@ export const esmFormat = (): CrxPlugin => {
 
       for (const script of manifest.content_scripts ?? []) {
         script.js?.forEach((file, i) => {
-          if (excluded.includes(file)) return
+          if (helperScripts.includes(file)) return
           if (files.has(file)) return
           files.add(file)
 

@@ -7,7 +7,7 @@ import type {
 import { isChunk } from './helpers'
 import { relative } from './path'
 import { importedResourcePrefix } from './plugin-importedResources'
-import { runtimeReloaderCS } from './plugin-runtimeReloader'
+import { helperScripts } from './plugin-outputEsmFormat'
 import {
   generateFileNames,
   getRpceAPI,
@@ -171,7 +171,7 @@ export const contentScriptResources = ({
             ...imports,
             ...crxImports.chunks,
           ]) {
-            sets.imports.add(i)
+            sets.imports.add(i.replace(/^_+/, ''))
             getResources(i, sets)
           }
 
@@ -186,7 +186,7 @@ export const contentScriptResources = ({
         >()
         for (const script of scripts) {
           for (const name of script.js ?? []) {
-            if (name === runtimeReloaderCS) continue
+            if (helperScripts.includes(name)) continue
 
             const { assets, css, imports } =
               declaredScriptResources.get(name) ??
@@ -207,7 +207,7 @@ export const contentScriptResources = ({
               script.css.push(...css)
             }
 
-            if (assets.size === 0) continue
+            if (!assets.size && !imports.size) continue
             else if (isMV2(manifest)) {
               manifest.web_accessible_resources!.push(
                 ...assets,
@@ -281,12 +281,12 @@ export const contentScriptResources = ({
           Resources
         >()
         const resourceSet = new Set<string>()
-        for (const script of dynamicScripts) {
-          if (dynamicScriptResources.has(script)) continue
+        for (const name of dynamicScripts) {
+          if (dynamicScriptResources.has(name)) continue
           const { assets, css, imports } =
-            declaredScriptResources.get(script) ??
-            getResources(script)
-          dynamicScriptResources.set(script, {
+            declaredScriptResources.get(name) ??
+            getResources(name)
+          dynamicScriptResources.set(name, {
             assets,
             css,
             imports,
@@ -296,7 +296,7 @@ export const contentScriptResources = ({
           for (const i of imports) resourceSet.add(i)
 
           if (contentScriptFormat !== 'iife') {
-            const { outputFileName } = generateFileNames(script)
+            const { outputFileName } = generateFileNames(name)
             resourceSet.add(outputFileName)
           }
         }
