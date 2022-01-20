@@ -20,20 +20,21 @@ exports[`bundles chunks and assets: assets/content.esm-wrapper-a6ac6bbe.js 1`] =
 `;
 
 exports[`bundles chunks and assets: background.js 1`] = `
-"console.log(\\"service_worker.js\\");
-"
-`;
+"var scriptFileName = \\"executed-script.js\\";
 
-exports[`bundles chunks and assets: content.js 1`] = `
-"console.log(\\"content script\\");
+console.log(\\"service_worker.ts\\");
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id)
+    chrome.scripting.executeScript({
+      files: [scriptFileName],
+      target: { tabId: tab.id }
+    });
+});
 "
 `;
 
 exports[`bundles chunks and assets: manifest.json 1`] = `
 Object {
-  "action": Object {
-    "default_popup": "popup.html",
-  },
   "background": Object {
     "service_worker": "background.js",
     "type": "module",
@@ -49,15 +50,21 @@ Object {
       ],
     },
   ],
-  "description": "Basic MV3 Chrome Extension",
-  "host_permissions": Array [
-    "https://c.com/*",
-  ],
+  "description": "integration tests",
   "manifest_version": 3,
-  "name": "mv3-basic-js",
+  "name": "Test",
   "permissions": Array [],
   "version": "1.0.0",
   "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "executed-script.js",
+      ],
+    },
     Object {
       "matches": Array [
         "http://b.com/*",
@@ -71,35 +78,17 @@ Object {
 }
 `;
 
-exports[`bundles chunks and assets: parsed html 1`] = `Array []`;
-
 exports[`bundles chunks and assets: parsed manifest 1`] = `
-Object {
-  "BACKGROUND": Array [
+Array [
+  Array [
     "background.js",
   ],
-  "CONTENT": Array [
+  Array [
     "assets/content.esm-wrapper-a6ac6bbe.js",
   ],
-  "CSS": Array [],
-  "HTML": Array [
-    "popup.html",
-  ],
-  "IMAGE": Array [],
-  "JSON": Array [],
-}
-`;
-
-exports[`bundles chunks and assets: popup.html 1`] = `
-"<!DOCTYPE html><html lang=\\"en\\"><head>
-    <meta charset=\\"UTF-8\\">
-    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
-    <title>Popup Page</title>
-  </head>
-  <body>
-    <div id=\\"root\\"></div>
-    <script src=\\"popup.js\\" type=\\"module\\"></script>
-  
-
-</body></html>"
+  Array [],
+  Array [],
+  Array [],
+  Array [],
+]
 `;

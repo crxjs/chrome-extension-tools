@@ -1,10 +1,11 @@
-import { ManifestV3 } from '$src'
+import { parseHtml } from '$src/files_htmlParser'
+import { parseManifest } from '$src/files_parseManifest'
 import { isAsset, isChunk } from '$src/helpers'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import fs from 'fs-extra'
 import path from 'path'
-import { RollupOutput } from 'rollup'
+import { OutputAsset, RollupOutput } from 'rollup'
 import { build } from 'vite'
 
 jestSetTimeout(30000)
@@ -25,42 +26,35 @@ beforeAll(async () => {
 })
 
 test('bundles chunks and assets', async () => {
-  // Chunks
-  const chunks = output.filter(isChunk)
-
-  const background = 'background.js'
-  const backgroundJs = chunks.find(byFileName(background))!
-  expect(backgroundJs).toBeDefined()
-  expect(backgroundJs.code).toMatchSnapshot(background)
-
-  const content = 'content.js'
-  const contentJs = chunks.find(byFileName(content))!
-  expect(contentJs).toBeDefined()
-  expect(contentJs.code).toMatchSnapshot(content)
-
-  const popup = 'popup.js'
-  const popupJs = chunks.find(byFileName(popup))!
-  expect(popupJs).toBeDefined()
-  expect(popupJs.code).toMatchSnapshot(popup)
-
-  // 3 scripts + vendors chunk
-  expect(chunks.length).toBe(4)
-
-  // Assets
-  const assets = output.filter(isAsset)
   const manifest = 'manifest.json'
-  const manifestJson = assets.find(byFileName(manifest))!
-  expect(manifestJson).toBeDefined()
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
+  expect(manifestAsset).toBeDefined()
   const manifestSource = JSON.parse(
-    manifestJson.source as string,
-  ) as ManifestV3
+    manifestAsset.source as string,
+  ) as chrome.runtime.Manifest
   expect(manifestSource).toMatchSnapshot(manifest)
 
-  const popupHtml = 'popup.html'
-  const popupHtmlAsset = assets.find(byFileName(popupHtml))!
-  expect(popupHtmlAsset).toBeDefined()
-  expect(popupHtmlAsset.source!).toMatchSnapshot(popupHtml)
+  const parsed = parseManifest(manifestSource)
+  expect(parsed).toMatchSnapshot('parsed manifest')
+  const parsedHtml = parsed.HTML.map(parseHtml).flatMap((x) =>
+    Object.values(x).flatMap((x) => x),
+  )
+  expect(parsedHtml).toMatchSnapshot('parsed html')
 
-  // html file, content script wrapper, and the manifest
-  expect(assets.length).toBe(3)
+  const files = Object.values(parsed)
+    .flatMap((x) => x)
+    .concat(parsedHtml)
+    .concat('content.js')
+  for (const filename of files) {
+    const file = output.find(byFileName(filename))!
+    const source = isChunk(file) ? file.code : file.source
+    expect(source).toMatchSnapshot(filename)
+  }
+
+  // 3 scripts + vendors chunk
+  expect(output.filter(isChunk).length).toBe(4)
+  // html file, content script wrapper + manifest
+  expect(output.filter(isAsset).length).toBe(3)
 })

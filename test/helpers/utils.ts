@@ -3,9 +3,9 @@ import { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 
 export const testDir = path.resolve(__dirname, '..')
 
-export function byFileName(n: string) {
+export function byFileName(n: string | RegExp) {
   return ({ fileName }: OutputAsset | OutputChunk): boolean =>
-    fileName === n
+    n instanceof RegExp ? n.test(fileName) : fileName === n
 }
 
 /**

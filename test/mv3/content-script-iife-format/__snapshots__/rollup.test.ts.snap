@@ -1,31 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
-"(function () {
-  'use strict';
-
-  const importPath = \\"content.js\\";
-
-  const url = chrome.runtime.getURL(importPath);
-  import(
-    /* @vite-ignore */
-    url
-  ).catch((err) => {
-    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
-    console.error(err);
-  });
-
-})();
-"
-`;
-
 exports[`bundles chunks and assets: background.js 1`] = `
 "console.log(\\"service_worker.js\\");
 "
 `;
 
 exports[`bundles chunks and assets: content.js 1`] = `
-"console.log(\\"content script\\");
+"(function () {
+  'use strict';
+
+  (function() {
+    console.log(\\"content script\\");
+  })();
+
+})();
 "
 `;
 
@@ -41,11 +29,11 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content.esm-wrapper-a6ac6bbe.js",
+        "content.js",
       ],
       "matches": Array [
-        "http://b.com/*",
         "https://a.com/*",
+        "http://b.com/*",
       ],
     },
   ],
@@ -57,37 +45,24 @@ Object {
   "name": "mv3-basic-js",
   "permissions": Array [],
   "version": "1.0.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
-      ],
-      "resources": Array [
-        "content.js",
-      ],
-    },
-  ],
 }
 `;
 
-exports[`bundles chunks and assets: parsed html 1`] = `Array []`;
-
 exports[`bundles chunks and assets: parsed manifest 1`] = `
-Object {
-  "BACKGROUND": Array [
+Array [
+  Array [
     "background.js",
   ],
-  "CONTENT": Array [
-    "assets/content.esm-wrapper-a6ac6bbe.js",
+  Array [
+    "content.js",
   ],
-  "CSS": Array [],
-  "HTML": Array [
+  Array [],
+  Array [
     "popup.html",
   ],
-  "IMAGE": Array [],
-  "JSON": Array [],
-}
+  Array [],
+  Array [],
+]
 `;
 
 exports[`bundles chunks and assets: popup.html 1`] = `

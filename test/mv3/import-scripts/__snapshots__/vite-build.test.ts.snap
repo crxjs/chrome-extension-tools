@@ -1,6 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks 1`] = `
+exports[`bundles chunks: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`bundles chunks: background.js 1`] = `
 "var scriptFileName = \\"executed-script.js\\";
 console.log(\\"service_worker.ts\\");
 chrome.action.onClicked.addListener((tab) => {
@@ -13,11 +32,63 @@ chrome.action.onClicked.addListener((tab) => {
 "
 `;
 
-exports[`bundles chunks 2`] = `
-"var fileName = \\"dynamic-script.js\\";
-console.log(\\"content script\\");
-const script = document.createElement(\\"script\\");
-script.src = chrome.runtime.getURL(fileName);
-document.head.prepend(script);
-"
+exports[`bundles chunks: manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "background.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.esm-wrapper-a6ac6bbe.js",
+      ],
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+    },
+  ],
+  "description": "integration tests",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "executed-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+      "resources": Array [
+        "dynamic-script.js",
+        "content.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`bundles chunks: parsed manifest 1`] = `
+Array [
+  Array [
+    "background.js",
+  ],
+  Array [
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
+  Array [],
+  Array [],
+  Array [],
+  Array [],
+]
 `;

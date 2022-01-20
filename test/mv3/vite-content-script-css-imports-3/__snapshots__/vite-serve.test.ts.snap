@@ -1,41 +1,79 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`writes entry points to disk 1`] = `
-"import \\"../modules/import-8167e8d6.js\\";
-var styles = \\"\\";
-console.log(\\"content1\\");
-"
-`;
-
-exports[`writes entry points to disk 2`] = `
-"import \\"../modules/import-8167e8d6.js\\";
-var styles = \\"\\";
-console.log(\\"content2\\");
-"
-`;
-
-exports[`writes entry points to disk 3`] = `
-"body {
-  color: red;
-}
-"
-`;
-
-exports[`writes entry points to disk 4`] = `
-"body {
-  color: blue;
-}
-"
-`;
-
-exports[`writes entry points to disk 5`] = `
+exports[`writes entry points to disk: assets/import-3b031dc7.css 1`] = `
 "h1 {
   color: green;
 }
 "
 `;
 
-exports[`writes entry points to disk 6`] = `
+exports[`writes entry points to disk: assets/index.esm-wrapper-72fbbdd0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`writes entry points to disk: assets/index.esm-wrapper-600ffb76.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`writes entry points to disk: assets/index-5dfee6cc.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`writes entry points to disk: assets/index-5f7d7b6f.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`writes entry points to disk: content2/index.js 1`] = `
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content1\\");
+"
+`;
+
+exports[`writes entry points to disk: content2/index.js 2`] = `
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content2\\");
+"
+`;
+
+exports[`writes entry points to disk: manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "crx-hmr-service-worker.js",
@@ -49,7 +87,7 @@ Object {
       ],
       "js": Array [
         "runtime-reloader--content-script.js",
-        "assets/index.esm-wrapper-523b95ce.js",
+        "assets/index.esm-wrapper-600ffb76.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -63,7 +101,7 @@ Object {
       ],
       "js": Array [
         "runtime-reloader--content-script.js",
-        "assets/index.esm-wrapper-8958fd4e.js",
+        "assets/index.esm-wrapper-72fbbdd0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -85,7 +123,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "import-8167e8d6.js",
+        "modules/import-8167e8d6.js",
         "content1/index.js",
         "content2/index.js",
       ],

@@ -1,6 +1,67 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets 1`] = `
+exports[`bundles chunks and assets: assets/index.esm-wrapper-72fbbdd0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`bundles chunks and assets: assets/index.esm-wrapper-600ffb76.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`bundles chunks and assets: assets/index-5dfee6cc.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`bundles chunks and assets: assets/index-5f7d7b6f.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`bundles chunks and assets: files 1`] = `
+Array [
+  "assets/index.esm-wrapper-600ffb76.js",
+  "assets/index.esm-wrapper-72fbbdd0.js",
+  "assets/index-5f7d7b6f.css",
+  "assets/index-5dfee6cc.css",
+]
+`;
+
+exports[`bundles chunks and assets: manifest.json 1`] = `
 Object {
   "content_scripts": Array [
     Object {
@@ -8,7 +69,7 @@ Object {
         "assets/index-5f7d7b6f.css",
       ],
       "js": Array [
-        "assets/index.esm-wrapper-523b95ce.js",
+        "assets/index.esm-wrapper-600ffb76.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -20,7 +81,7 @@ Object {
         "assets/index-5dfee6cc.css",
       ],
       "js": Array [
-        "assets/index.esm-wrapper-8958fd4e.js",
+        "assets/index.esm-wrapper-72fbbdd0.js",
       ],
       "matches": Array [
         "http://*/*",

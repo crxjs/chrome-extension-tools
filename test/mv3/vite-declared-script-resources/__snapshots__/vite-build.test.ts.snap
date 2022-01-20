@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content1.esm-wrapper-108a94d4.js",
+        "assets/content1.esm-wrapper-8914532e.js",
       ],
       "matches": Array [
         "https://google.com/*",
@@ -13,7 +13,7 @@ Object {
     },
     Object {
       "js": Array [
-        "assets/content2.esm-wrapper-c289b262.js",
+        "assets/content2.esm-wrapper-c8db90d0.js",
       ],
       "matches": Array [
         "https://bing.com/*",

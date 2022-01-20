@@ -41,6 +41,8 @@ test('writes entry points to disk', async () => {
   const html = 'iframe.html'
   const image = 'assets/image.51f8fe9d.png'
   const manifest = 'manifest.json'
+  const wrapper1 = 'assets/content1.esm-wrapper-8914532e.js'
+  const wrapper2 = 'assets/content2.esm-wrapper-c8db90d0.js'
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
@@ -53,6 +55,14 @@ test('writes entry points to disk', async () => {
   const content2Path = path.join(outDir, content2)
   const content2Source = await fs.readFile(content2Path, 'utf8')
   expect(content2Source).toMatchSnapshot(content2)
+
+  const wrapper1Path = path.join(outDir, wrapper1)
+  const wrapper1Source = await fs.readFile(wrapper1Path, 'utf8')
+  expect(wrapper1Source).toMatchSnapshot(wrapper1)
+
+  const wrapper2Path = path.join(outDir, wrapper2)
+  const wrapper2Source = await fs.readFile(wrapper2Path, 'utf8')
+  expect(wrapper2Source).toMatchSnapshot(wrapper2)
 
   const scriptPath = path.join(outDir, script)
   const scriptSource = await fs.readFile(scriptPath, 'utf8')

@@ -1,4 +1,4 @@
-import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
+import { parseManifest } from '$src/files_parseManifest'
 import {
   filesReady,
   stopFileWriter,
@@ -35,19 +35,29 @@ test('writes entry points to disk', async () => {
 
   expect(fs.existsSync(outDir)).toBe(true)
 
-  const styles = 'assets/content-89281590.css'
   const manifest = 'manifest.json'
-  const content = 'content.js'
-
-  const contentPath = path.join(outDir, content)
-  const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatchSnapshot(content)
-
-  const stylesPath = path.join(outDir, styles)
-  const stylesSource = await fs.readFile(stylesPath, 'utf8')
-  expect(stylesSource).toMatchSnapshot(styles)
-
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
-  expect(manifestSource).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot(manifest)
+
+  const files = Object.values(
+    parseManifest(manifestSource),
+  ).flatMap((x) => x)
+
+  expect(files).toMatchSnapshot('files')
+
+  for (const file of files) {
+    const filepath = path.join(outDir, file)
+    const source = await fs.readFile(filepath, 'utf8')
+    if (file === 'background.js') {
+      expect(
+        source.replace(
+          /url\.port = JSON\.parse\("\d{4}"\);/,
+          'url.port = JSON.parse("3000");',
+        ),
+      ).toMatchSnapshot(file)
+    } else {
+      expect(source).toMatchSnapshot(file)
+    }
+  }
 })

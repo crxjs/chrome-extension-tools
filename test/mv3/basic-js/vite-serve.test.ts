@@ -1,4 +1,3 @@
-import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
 import {
   filesReady,
   stopFileWriter,

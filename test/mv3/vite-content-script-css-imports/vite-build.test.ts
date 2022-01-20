@@ -25,13 +25,14 @@ beforeAll(async () => {
 })
 
 test('bundles chunks and assets', async () => {
+  const wrapper = /assets\/content\.esm-wrapper-.{8}\.js/
+  const styles = /assets\/content-.{8}\.css/
+
   const content = 'content.js'
-  const wrapper = 'assets/content.esm-wrapper-a8bec302.js'
-  const styles = 'assets/content-89281590.css'
   const manifest = 'manifest.json'
 
-  expect(output.find(byFileName(content))).toBeDefined()
   expect(output.find(byFileName(wrapper))).toBeDefined()
+  expect(output.find(byFileName(content))).toBeDefined()
   expect(output.find(byFileName(styles))).toBeDefined()
   expect(output.filter(isChunk).length).toBe(1)
   expect(output.filter(isAsset).length).toBe(3)
@@ -43,5 +44,13 @@ test('bundles chunks and assets', async () => {
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
   ) as Manifest
-  expect(manifestSource).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot({
+    content_scripts: [
+      {
+        css: [expect.stringMatching(styles)],
+        js: [expect.stringMatching(wrapper)],
+        matches: ['http://*/*', 'https://*/*'],
+      },
+    ],
+  })
 })

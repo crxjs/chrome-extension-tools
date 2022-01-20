@@ -1,8 +1,9 @@
+import { parseManifest } from '$src/files_parseManifest'
 import { isAsset, isChunk } from '$src/helpers'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import path from 'path'
-import { RollupOutput } from 'rollup'
+import { OutputAsset, RollupOutput } from 'rollup'
 import { build } from 'vite'
 
 jestSetTimeout(30000)
@@ -13,21 +14,28 @@ test('bundles chunks', async () => {
     envFile: false,
   })) as RollupOutput
 
-  // Chunks
-  const chunks = output.filter(isChunk)
+  const manifest = 'manifest.json'
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
+  expect(manifestAsset).toBeDefined()
+  const manifestSource = JSON.parse(
+    manifestAsset.source as string,
+  ) as chrome.runtime.Manifest
+  expect(manifestSource).toMatchSnapshot(manifest)
 
-  expect(chunks.find(byFileName('background.js'))).toBeDefined()
-  expect(chunks.find(byFileName('content.js'))).toBeDefined()
-  expect(chunks.find(byFileName('popup.js'))).toBeDefined()
+  const parsed = Object.values(parseManifest(manifestSource))
+  expect(parsed).toMatchSnapshot('parsed manifest')
 
-  // 3 entries + 1 vendor chunk
-  expect(chunks.length).toBe(4)
+  const files = Object.values(parsed).flatMap((x) => x)
+  for (const filename of files) {
+    const file = output.find(byFileName(filename))!
+    const source = isChunk(file) ? file.code : file.source
+    expect(source).toMatchSnapshot(filename)
+  }
 
-  // Assets
-  const assets = output.filter(isAsset)
-  expect(assets.find(byFileName('manifest.json'))).toBeDefined()
-  expect(assets.find(byFileName('popup.html'))).toBeDefined()
-
-  // html file, content script wrapper, and manifest
-  expect(assets.length).toBe(3)
+  // 3 scripts + vendors chunk
+  expect(output.filter(isChunk).length).toBe(4)
+  // html file, content script wrapper + manifest
+  expect(output.filter(isAsset).length).toBe(3)
 })

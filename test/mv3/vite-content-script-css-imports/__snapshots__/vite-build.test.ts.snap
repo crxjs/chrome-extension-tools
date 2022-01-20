@@ -5,10 +5,10 @@ Object {
   "content_scripts": Array [
     Object {
       "css": Array [
-        "assets/content-89281590.css",
+        StringMatching /assets\\\\/content-\\.\\{8\\}\\\\\\.css/,
       ],
       "js": Array [
-        "assets/content.esm-wrapper-a8bec302.js",
+        StringMatching /assets\\\\/content\\\\\\.esm-wrapper-\\.\\{8\\}\\\\\\.js/,
       ],
       "matches": Array [
         "http://*/*",

@@ -1,3 +1,4 @@
+import { parseManifest } from '$src/files_parseManifest'
 import { isAsset, isChunk } from '$src/helpers'
 import { Manifest } from '$src/types'
 import { jestSetTimeout } from '$test/helpers/timeout'
@@ -25,19 +26,7 @@ beforeAll(async () => {
 })
 
 test('bundles chunks and assets', async () => {
-  const content1 = 'content1/index.js'
-  const content2 = 'content2/index.js'
-  const styles1 = 'assets/index-5f7d7b6f.css'
-  const styles2 = 'assets/index-5dfee6cc.css'
   const manifest = 'manifest.json'
-
-  expect(output.find(byFileName(content1))).toBeDefined()
-  expect(output.find(byFileName(content2))).toBeDefined()
-  expect(output.find(byFileName(styles1))).toBeDefined()
-  expect(output.find(byFileName(styles2))).toBeDefined()
-  expect(output.filter(isChunk).length).toBe(2)
-  expect(output.filter(isAsset).length).toBe(5)
-
   const manifestAsset = output.find(
     byFileName(manifest),
   ) as OutputAsset
@@ -45,5 +34,20 @@ test('bundles chunks and assets', async () => {
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
   ) as Manifest
-  expect(manifestSource).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot(manifest)
+
+  const files = Object.values(
+    parseManifest(manifestSource),
+  ).reduce((r, x) => [...r, ...x], [] as string[])
+
+  expect(files).toMatchSnapshot('files')
+
+  for (const filename of files) {
+    const file = output.find(byFileName(filename))!
+    const source = isChunk(file) ? file.code : file.source
+    expect(source).toMatchSnapshot(filename)
+  }
+
+  expect(output.filter(isChunk).length).toBe(2)
+  expect(output.filter(isAsset).length).toBe(5)
 })

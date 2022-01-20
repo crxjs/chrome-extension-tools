@@ -1,7 +1,9 @@
+import { parseManifest } from '$src/files_parseManifest'
 import { isAsset, isChunk } from '$src/helpers'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
+import { OutputAsset } from 'rollup'
 
 jestSetTimeout(30000)
 
@@ -11,24 +13,28 @@ test('bundles chunks and assets', async () => {
     'rollup.config.js',
   )
 
-  // Chunks
   const manifest = 'manifest.json'
-  const background = 'background.js'
-  const content = 'content.js'
-  const executed = 'executed-script.js'
-  const dynamic = 'dynamic-script.js'
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
+  expect(manifestAsset).toBeDefined()
+  const manifestSource = JSON.parse(
+    manifestAsset.source as string,
+  ) as chrome.runtime.Manifest
+  expect(manifestSource).toMatchSnapshot(manifest)
 
-  // Chunks
-  const chunks = output.filter(isChunk)
-  expect(chunks.find(byFileName(background))).toBeDefined()
-  expect(chunks.find(byFileName(content))).toBeDefined()
-  expect(chunks.find(byFileName(dynamic))).toBeDefined()
-  expect(chunks.find(byFileName(executed))).toBeDefined()
-  expect(chunks.length).toBe(4)
+  const parsed = Object.values(parseManifest(manifestSource))
+  expect(parsed).toMatchSnapshot('parsed manifest')
 
-  // Assets
-  const assets = output.filter(isAsset)
-  expect(assets.find(byFileName(manifest))).toBeDefined()
-  // manifest + content script wrapper
-  expect(assets.length).toBe(2)
+  const files = Object.values(parsed).flatMap((x) => x)
+  for (const filename of files) {
+    const file = output.find(byFileName(filename))!
+    const source = isChunk(file) ? file.code : file.source
+    expect(source).toMatchSnapshot(filename)
+  }
+
+  // 4 scripts
+  expect(output.filter(isChunk).length).toBe(4)
+  // content script wrapper + manifest
+  expect(output.filter(isAsset).length).toBe(2)
 })

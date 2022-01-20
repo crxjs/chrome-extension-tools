@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets 1`] = `
+exports[`bundles chunks and assets: manifest.json 1`] = `
 Object {
   "content_scripts": Array [
     Object {
@@ -9,7 +9,7 @@ Object {
         "assets/import-3b031dc7.css",
       ],
       "js": Array [
-        "assets/index.esm-wrapper-523b95ce.js",
+        "assets/index.esm-wrapper-600ffb76.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -22,7 +22,7 @@ Object {
         "assets/import-3b031dc7.css",
       ],
       "js": Array [
-        "assets/index.esm-wrapper-8958fd4e.js",
+        "assets/index.esm-wrapper-72fbbdd0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -42,7 +42,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "import-8167e8d6.js",
+        "modules/import-8167e8d6.js",
         "content1/index.js",
         "content2/index.js",
       ],

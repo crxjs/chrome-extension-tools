@@ -1,3 +1,4 @@
+import { parseManifest } from '$src/files_parseManifest'
 import {
   filesReady,
   stopFileWriter,
@@ -35,27 +36,32 @@ test('writes files to disk', async () => {
   expect(fs.existsSync(outDir)).toBe(true)
 
   const manifest = 'manifest.json'
-  const background = 'background.js'
-  const content = 'content.js'
   const executed = 'executed-script.js'
   const dynamic = 'dynamic-script.js'
 
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
-  expect(manifestSource).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot(manifest)
 
-  const bgPath = path.join(outDir, background)
-  expect(fs.existsSync(bgPath)).toBe(true)
+  const files = Object.values(parseManifest(manifestSource))
+    .flatMap((x) => x)
+    .concat([dynamic, executed])
 
-  const csPath = path.join(outDir, content)
-  const csSource = await fs.readFile(csPath, 'utf8')
-  expect(csSource).toMatchSnapshot(content)
+  expect(files).toMatchSnapshot('files')
 
-  const dcsPath = path.join(outDir, dynamic)
-  const dcsSource = await fs.readFile(dcsPath, 'utf8')
-  expect(dcsSource).toMatchSnapshot(dynamic)
+  for (const file of files) {
+    const filepath = path.join(outDir, file)
+    const source = await fs.readFile(filepath, 'utf8')
 
-  const xcsPath = path.join(outDir, executed)
-  const xcsSource = await fs.readFile(xcsPath, 'utf8')
-  expect(xcsSource).toMatchSnapshot(executed)
+    if (file === 'background.js') {
+      expect(
+        source.replace(
+          /url\.port = JSON\.parse\("\d{4}"\);/,
+          'url.port = JSON.parse("3000");',
+        ),
+      ).toMatchSnapshot(file)
+    } else {
+      expect(source).toMatchSnapshot(file)
+    }
+  }
 })

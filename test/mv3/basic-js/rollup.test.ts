@@ -1,8 +1,10 @@
-import { ManifestV3 } from '$src'
+import { parseManifest } from '$src/files_parseManifest'
 import { isAsset, isChunk } from '$src/helpers'
+import { Manifest } from '$src/types'
 import { getRollupOutput } from '$test/helpers/getRollupOutput'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
+import { OutputAsset } from 'rollup'
 
 jestSetTimeout(30000)
 
@@ -12,37 +14,26 @@ test('bundles chunks and assets', async () => {
     'rollup.config.js',
   )
 
-  // Chunks
-  const chunks = output.filter(isChunk)
+  const manifest = 'manifest.json'
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
+  expect(manifestAsset).toBeDefined()
+  const manifestSource = JSON.parse(
+    manifestAsset.source as string,
+  ) as Manifest
+  expect(manifestSource).toMatchSnapshot(manifest)
 
-  const backgroundJs = chunks.find(byFileName('background.js'))!
-  expect(backgroundJs).toBeDefined()
-  expect(backgroundJs.code).toMatchSnapshot()
+  const parsed = Object.values(parseManifest(manifestSource))
+  expect(parsed).toMatchSnapshot('parsed manifest')
 
-  const contentJs = chunks.find(byFileName('content.js'))!
-  expect(contentJs).toBeDefined()
-  expect(contentJs.code).toMatchSnapshot()
+  const files = Object.values(parsed).flatMap((x) => x)
+  for (const filename of files) {
+    const file = output.find(byFileName(filename))!
+    const source = isChunk(file) ? file.code : file.source
+    expect(source).toMatchSnapshot(filename)
+  }
 
-  const popupJs = chunks.find(byFileName('popup.js'))!
-  expect(popupJs).toBeDefined()
-  expect(popupJs.code).toMatchSnapshot()
-
-  // 3 scripts
-  expect(chunks.length).toBe(3)
-
-  // Assets
-  const assets = output.filter(isAsset)
-  const manifestJson = assets.find(byFileName('manifest.json'))!
-  expect(manifestJson).toBeDefined()
-  const manifest = JSON.parse(
-    manifestJson.source as string,
-  ) as ManifestV3
-  expect(manifest).toMatchSnapshot()
-
-  const popupHtml = assets.find(byFileName('popup.html'))!
-  expect(popupHtml).toBeDefined()
-  expect(popupHtml.source!).toMatchSnapshot()
-
-  // html file, content script wrapper, and the manifest
-  expect(assets.length).toBe(3)
+  expect(output.filter(isChunk).length).toBe(3)
+  expect(output.filter(isAsset).length).toBe(3)
 })

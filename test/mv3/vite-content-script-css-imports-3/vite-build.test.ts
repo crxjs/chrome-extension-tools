@@ -26,26 +26,26 @@ beforeAll(async () => {
 
 test('bundles chunks and assets', async () => {
   const content1 = 'content1/index.js'
-  const wrapper1 = 'assets/index.esm-wrapper-523b95ce.js'
   const content2 = 'content2/index.js'
-  const wrapper2 = 'assets/index.esm-wrapper-8958fd4e.js'
   const shared = 'modules/import-8167e8d6.js'
   const styles1 = 'assets/index-5f7d7b6f.css'
   const styles2 = 'assets/index-5dfee6cc.css'
   const styles3 = 'assets/import-3b031dc7.css'
-  const manifest = 'manifest.json'
+  const wrapper1 = 'assets/index.esm-wrapper-72fbbdd0.js'
+  const wrapper2 = 'assets/index.esm-wrapper-600ffb76.js'
 
   expect(output.find(byFileName(content1))).toBeDefined()
-  expect(output.find(byFileName(wrapper1))).toBeDefined()
   expect(output.find(byFileName(content2))).toBeDefined()
-  expect(output.find(byFileName(wrapper2))).toBeDefined()
   expect(output.find(byFileName(shared))).toBeDefined()
   expect(output.find(byFileName(styles1))).toBeDefined()
   expect(output.find(byFileName(styles2))).toBeDefined()
   expect(output.find(byFileName(styles3))).toBeDefined()
+  expect(output.find(byFileName(wrapper1))).toBeDefined()
+  expect(output.find(byFileName(wrapper2))).toBeDefined()
   expect(output.filter(isChunk).length).toBe(3)
   expect(output.filter(isAsset).length).toBe(6)
 
+  const manifest = 'manifest.json'
   const manifestAsset = output.find(
     byFileName(manifest),
   ) as OutputAsset
@@ -53,5 +53,5 @@ test('bundles chunks and assets', async () => {
   const manifestSource = JSON.parse(
     manifestAsset.source as string,
   ) as Manifest
-  expect(manifestSource).toMatchSnapshot()
+  expect(manifestSource).toMatchSnapshot(manifest)
 })

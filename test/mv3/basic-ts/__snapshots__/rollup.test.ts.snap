@@ -20,12 +20,7 @@ exports[`bundles chunks and assets: assets/content.esm-wrapper-a6ac6bbe.js 1`] =
 `;
 
 exports[`bundles chunks and assets: background.js 1`] = `
-"console.log(\\"service_worker.js\\");
-"
-`;
-
-exports[`bundles chunks and assets: content.js 1`] = `
-"console.log(\\"content script\\");
+"console.log(\\"service_worker.ts\\");
 "
 `;
 
@@ -44,24 +39,21 @@ Object {
         "assets/content.esm-wrapper-a6ac6bbe.js",
       ],
       "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
+        "http://*/*",
+        "https://*/*",
       ],
     },
   ],
-  "description": "Basic MV3 Chrome Extension",
-  "host_permissions": Array [
-    "https://c.com/*",
-  ],
+  "description": "integration tests",
   "manifest_version": 3,
-  "name": "mv3-basic-js",
+  "name": "Test",
   "permissions": Array [],
   "version": "1.0.0",
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
+        "http://*/*",
+        "https://*/*",
       ],
       "resources": Array [
         "content.js",
@@ -71,23 +63,21 @@ Object {
 }
 `;
 
-exports[`bundles chunks and assets: parsed html 1`] = `Array []`;
-
 exports[`bundles chunks and assets: parsed manifest 1`] = `
-Object {
-  "BACKGROUND": Array [
+Array [
+  Array [
     "background.js",
   ],
-  "CONTENT": Array [
+  Array [
     "assets/content.esm-wrapper-a6ac6bbe.js",
   ],
-  "CSS": Array [],
-  "HTML": Array [
+  Array [],
+  Array [
     "popup.html",
   ],
-  "IMAGE": Array [],
-  "JSON": Array [],
-}
+  Array [],
+  Array [],
+]
 `;
 
 exports[`bundles chunks and assets: popup.html 1`] = `

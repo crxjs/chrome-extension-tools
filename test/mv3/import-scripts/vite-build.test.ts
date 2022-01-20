@@ -1,8 +1,9 @@
+import { parseManifest } from '$src/files_parseManifest'
 import { isAsset, isChunk } from '$src/helpers'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import { byFileName } from '$test/helpers/utils'
 import path from 'path'
-import { RollupOutput } from 'rollup'
+import { OutputAsset, RollupOutput } from 'rollup'
 import { build } from 'vite'
 
 jestSetTimeout(30000)
@@ -18,30 +19,27 @@ test('bundles chunks', async () => {
   })) as RollupOutput
 
   const manifest = 'manifest.json'
-  const background = 'background.js'
-  const content = 'content.js'
-  const executed = 'executed-script.js'
-  const dynamic = 'dynamic-script.js'
+  const manifestAsset = output.find(
+    byFileName(manifest),
+  ) as OutputAsset
+  expect(manifestAsset).toBeDefined()
+  const manifestSource = JSON.parse(
+    manifestAsset.source as string,
+  ) as chrome.runtime.Manifest
+  expect(manifestSource).toMatchSnapshot(manifest)
 
-  // Chunks
-  const chunks = output.filter(isChunk)
+  const parsed = Object.values(parseManifest(manifestSource))
+  expect(parsed).toMatchSnapshot('parsed manifest')
 
-  const bgChunk = chunks.find(byFileName(background))!
-  expect(bgChunk).toBeDefined()
-  expect(bgChunk.code).toMatchSnapshot()
+  const files = Object.values(parsed).flatMap((x) => x)
+  for (const filename of files) {
+    const file = output.find(byFileName(filename))!
+    const source = isChunk(file) ? file.code : file.source
+    expect(source).toMatchSnapshot(filename)
+  }
 
-  const csChunk = chunks.find(byFileName(content))!
-  expect(csChunk).toBeDefined()
-  expect(csChunk.code).toMatchSnapshot()
-
-  expect(chunks.find(byFileName(dynamic))).toBeDefined()
-  expect(chunks.find(byFileName(executed))).toBeDefined()
-
-  expect(chunks.length).toBe(4)
-
-  // Assets
-  const assets = output.filter(isAsset)
-  expect(assets.find(byFileName(manifest))).toBeDefined()
-  // manifest + content script wrapper
-  expect(assets.length).toBe(2)
+  // 4 scripts
+  expect(output.filter(isChunk).length).toBe(4)
+  // content script wrapper + manifest
+  expect(output.filter(isAsset).length).toBe(2)
 })
