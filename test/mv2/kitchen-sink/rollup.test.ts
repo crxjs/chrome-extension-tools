@@ -83,7 +83,8 @@ test('bundles chunks and assets', async () => {
     output.find(byFileName('_locales/es/messages.json')),
   ).toBeDefined()
 
-  expect(assets.length).toBe(17)
+  // assets above + content wrapper script
+  expect(assets.length).toBe(18)
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),

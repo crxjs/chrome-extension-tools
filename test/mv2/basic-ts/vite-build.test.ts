@@ -29,7 +29,8 @@ test('bundles chunks', async () => {
     chunks.find(byFileName('pages/popup/index.js')),
   ).toBeDefined()
 
-  expect(chunks.length).toBe(3)
+  // 3 entries + 1 chunk
+  expect(chunks.length).toBe(4)
 
   // Assets
   const assets = output.filter(isAsset)
@@ -41,6 +42,6 @@ test('bundles chunks', async () => {
     assets.find(byFileName('pages/popup/index.html')),
   ).toBeDefined()
 
-  // 1 esm wrapper, 1 html file and 1 manifest
-  expect(assets.length).toBe(3)
+  // 2 esm wrappers, 1 html file and 1 manifest
+  expect(assets.length).toBe(4)
 })

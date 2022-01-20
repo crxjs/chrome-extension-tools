@@ -85,17 +85,8 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
+        "import-8167e8d6.js",
         "content1/index.js",
-        "_import-8167e8d6.js",
       ],
     },
     Object {
@@ -104,17 +95,8 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
+        "import-8167e8d6.js",
         "content2/index.js",
-        "_import-8167e8d6.js",
       ],
     },
   ],

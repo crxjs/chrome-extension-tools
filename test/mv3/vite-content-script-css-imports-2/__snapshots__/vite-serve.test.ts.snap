@@ -74,25 +74,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
         "content1/index.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "runtime-reloader--content-script.js",
       ],
     },
     Object {

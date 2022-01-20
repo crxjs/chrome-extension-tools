@@ -13,8 +13,8 @@ Object {
         "assets/content.esm-wrapper-a8bec302.js",
       ],
       "matches": Array [
-        "https://*/*",
-        "http://*/*",
+        "https://a.com/*",
+        "http://b.com/*",
       ],
     },
   ],
@@ -28,21 +28,12 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://*/*",
-        "http://*/*",
+        "https://a.com/*",
+        "http://b.com/*",
       ],
       "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "https://*/*",
-        "http://*/*",
-      ],
-      "resources": Array [
-        "content.js",
         "dynamic-script.js",
+        "content.js",
       ],
     },
     Object {

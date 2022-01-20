@@ -1,8 +1,4 @@
 import {
-  runtimeReloaderBG,
-  runtimeReloaderCS,
-} from '$src/plugin-runtimeReloader'
-import {
   filesReady,
   stopFileWriter,
 } from '$src/plugin-viteServeFileWriter'
@@ -50,24 +46,18 @@ test('writes entry points to disk', async () => {
   const manifestPath = path.join(outDir, manifest)
   const manifestSource = await fs.readJson(manifestPath)
 
-  expect(manifestSource).toMatchObject({
-    browser_action: {
-      default_popup: popup,
+  expect(manifestSource).toMatchSnapshot(
+    {
+      content_security_policy: expect.stringMatching(
+        /script-src 'self' http:\/\/localhost:\d{4}; object-src 'self'/,
+      ),
     },
-    background: {
-      scripts: [runtimeReloaderBG, background],
-    },
-    content_scripts: [
-      {
-        js: [runtimeReloaderCS, content],
-        matches: ['https://a.com/*', 'http://b.com/*'],
-      },
-    ],
-  })
+    manifest,
+  )
 
   const contentPath = path.join(outDir, content)
   const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatchSnapshot()
+  expect(contentSource).toMatchSnapshot(content)
 
   const popupPath = path.join(outDir, popup)
   const popupSource = await fs.readFile(popupPath, 'utf8')

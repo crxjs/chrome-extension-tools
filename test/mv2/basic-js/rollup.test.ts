@@ -34,6 +34,6 @@ test('bundles chunks', async () => {
   expect(backgroundEsmWrapper).toBeDefined()
   expect(backgroundEsmWrapper?.source).toMatchSnapshot()
 
-  // 1 dynamic import wrapper, an html file, and the manifest
-  expect(assets.length).toBe(3)
+  // 2 import wrappers, an html file, and the manifest
+  expect(assets.length).toBe(4)
 })

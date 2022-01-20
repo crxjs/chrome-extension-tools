@@ -5,7 +5,7 @@
   "content_scripts": [
     {
       "js": ["content.ts"],
-      "matches": ["https://*/*", "http://*/*"]
+      "matches": ["https://a.com/*", "http://b.com/*"]
     }
   ],
   "manifest_version": 3

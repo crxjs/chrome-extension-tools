@@ -38,15 +38,6 @@ Object {
         "http://b.com/*",
       ],
       "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "https://a.com/*",
-        "http://b.com/*",
-      ],
-      "resources": Array [
         "content.js",
       ],
     },

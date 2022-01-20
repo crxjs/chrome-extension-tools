@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`bundles extended manifest 1`] = `
+Object {
+  "background": Object {
+    "scripts": Array [
+      "background.esm-wrapper.js",
+    ],
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.esm-wrapper-a6ac6bbe.js",
+      ],
+      "matches": Array [
+        "https://www.google.com/*",
+      ],
+    },
+  ],
+  "description": "properties from options.extendManifest are preferred",
+  "icons": Object {
+    "128": "images/icon-main-128.png",
+    "16": "images/icon-main-16.png",
+    "48": "images/icon-main-48.png",
+  },
+  "manifest_version": 2,
+  "name": "options.extendManifest as object",
+  "permissions": Array [
+    "storage",
+    "contextMenus",
+  ],
+  "version": "1.0.0",
+}
+`;

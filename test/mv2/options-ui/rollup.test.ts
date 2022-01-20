@@ -69,8 +69,8 @@ test('bundles chunks', async () => {
     output.find(byFileName('images/favicon.png')),
   ).toBeDefined()
 
-  // 17 assets + 2 wrapper scripts
-  expect(assets.length).toBe(15)
+  // 14 assets + 2 wrapper scripts
+  expect(assets.length).toBe(16)
 
   const manifestAsset = output.find(
     byFileName('manifest.json'),

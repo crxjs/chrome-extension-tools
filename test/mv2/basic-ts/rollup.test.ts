@@ -36,6 +36,6 @@ test('bundles chunks', async () => {
     assets.find(byFileName('pages/popup/index.html')),
   ).toBeDefined()
 
-  // 1 background esm wrapper, an html file, and the manifest
-  expect(assets.length).toBe(3)
+  // 2 esm wrappers, manifest, popup
+  expect(assets.length).toBe(4)
 })

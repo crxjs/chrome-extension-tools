@@ -30,7 +30,8 @@ test('bundles chunks', async () => {
   expect(chunks.find(byFileName('content.js'))).toBeDefined()
   expect(chunks.find(byFileName('popup.js'))).toBeDefined()
 
-  expect(chunks.length).toBe(3)
+  // 3 entries + 1 chunk
+  expect(chunks.length).toBe(4)
 })
 
 test('bundles assets', async () => {
@@ -41,6 +42,6 @@ test('bundles assets', async () => {
   expect(assets.find(byFileName('popup.html'))).toBeDefined()
   expect(assets.find(byFileName('background.esm-wrapper.js')))
 
-  // 1 dyanmic import wrapper, an html file and the manifest
-  expect(assets.length).toBe(3)
+  // 2 import wrappers, an html file and the manifest
+  expect(assets.length).toBe(4)
 })

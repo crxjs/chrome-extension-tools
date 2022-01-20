@@ -42,8 +42,8 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
+        "import-8167e8d6.js",
         "content1/index.js",
-        "_import-8167e8d6.js",
       ],
     },
     Object {
@@ -52,8 +52,8 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
+        "import-8167e8d6.js",
         "content2/index.js",
-        "_import-8167e8d6.js",
       ],
     },
   ],

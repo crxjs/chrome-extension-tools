@@ -31,15 +31,6 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "runtime-reloader--content-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
         "assets/image.51f8fe9d.png",
         "script.js",
         "content1.js",

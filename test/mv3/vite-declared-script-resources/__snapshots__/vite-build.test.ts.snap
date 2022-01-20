@@ -32,8 +32,8 @@ Object {
       ],
       "resources": Array [
         "assets/image.51f8fe9d.png",
-        "content1.js",
         "script.js",
+        "content1.js",
       ],
     },
     Object {

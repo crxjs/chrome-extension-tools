@@ -39,8 +39,8 @@ test('bundles chunks', async () => {
     output.find(byFileName('browser-polyfill-executeScript.js')),
   ).toBeDefined()
 
-  // 11 assets + 1 wrapper script + 2 browser polyfills
-  expect(assets.length).toBe(14)
+  // 12 assets + wrapper script + 2 browser polyfills
+  expect(assets.length).toBe(15)
 
   // TODO: test browser polyfill in MV3 variant
 

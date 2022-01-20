@@ -15,35 +15,7 @@ test('bundles extended manifest', async () => {
   const manifest = JSON.parse(
     manifestAsset.source as string,
   ) as chrome.runtime.Manifest
-
-  // Changes from extendManifest
-  expect(manifest).toMatchObject({
-    content_scripts: [
-      expect.objectContaining({
-        // Content script is IIFE
-        js: ['content.js'],
-        matches: ['https://www.google.com/*'],
-      }),
-    ],
-    description:
-      'properties from options.extendManifest are preferred',
-  })
-
-  // Original data from manifest.json
-  expect(manifest).toMatchObject({
-    background: {
-      // Background script ESM wrapper
-      scripts: ['background.esm-wrapper.js'],
-    },
-    icons: {
-      '16': 'images/icon-main-16.png',
-      '48': 'images/icon-main-48.png',
-      '128': 'images/icon-main-128.png',
-    },
-    manifest_version: 2,
-    name: 'options.extendManifest as object',
-    version: '1.0.0',
-  })
+  expect(manifest).toMatchSnapshot()
 
   // Chunks
   const chunks = output.filter(isChunk)
@@ -51,8 +23,8 @@ test('bundles extended manifest', async () => {
   expect(output.find(byFileName('background.js'))).toBeDefined()
   expect(output.find(byFileName('content.js'))).toBeDefined()
 
-  // 2 chunks
-  expect(chunks.length).toBe(2)
+  // 2 entries + 1 chunk
+  expect(chunks.length).toBe(3)
 
   // Assets
   const assets = output.filter(isAsset)
@@ -72,5 +44,6 @@ test('bundles extended manifest', async () => {
     output.find(byFileName('images/icon-main-128.png')),
   ).toBeDefined()
 
-  expect(assets.length).toBe(5)
+  // 2 esm wrappers, manifest, 3 images
+  expect(assets.length).toBe(6)
 })

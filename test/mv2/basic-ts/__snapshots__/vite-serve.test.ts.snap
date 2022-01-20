@@ -1,26 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`writes entry points to disk: content.js 1`] = `
-"console.log(\\"content script\\");
-"
-`;
-
 exports[`writes entry points to disk: manifest.json 1`] = `
 Object {
   "background": Object {
     "scripts": Array [
       "runtime-reloader--background.js",
-      "background.esm-wrapper.js",
+      "background/index.esm-wrapper.js",
     ],
   },
   "browser_action": Object {
-    "default_popup": "popup.html",
+    "default_popup": "pages/popup/index.html",
   },
   "content_scripts": Array [
     Object {
       "js": Array [
         "runtime-reloader--content-script.js",
-        "assets/content.esm-wrapper-a6ac6bbe.js",
+        "assets/index.esm-wrapper-697db59d.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -37,7 +32,7 @@ Object {
   "version": "1.0.0",
   "version_name": "2021-12-07T00:00:00.000Z",
   "web_accessible_resources": Array [
-    "content.js",
+    "content/index.js",
   ],
 }
 `;
