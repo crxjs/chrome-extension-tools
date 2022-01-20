@@ -191,11 +191,17 @@ export interface ChromeExtensionOptions {
    * import browser from 'webextension-polyfill'
    * ```
    */
-  browserPolyfill?:
+  browserPolyfill:
     | boolean
     | {
         executeScript: boolean
       }
+  /**
+   * Content scripts use ES modules by default.
+   * Set to 'iife' if you need content scripts not to use ESM.
+   * Note that content script HMR is only compatible with ESM.
+   */
+  contentScriptFormat: 'iife' | 'esm'
   /**
    * @deprecated Use a dynamic manifest instead.
    * TODO: add link to docs
@@ -208,10 +214,4 @@ export interface ChromeExtensionOptions {
     name: string
     version: string
   }
-  /**
-   * Content scripts use ES modules by default.
-   * Set to 'iife' if you need content scripts not to use ESM.
-   * Note that content script HMR is only compatible with ESM.
-   */
-  contentScriptFormat?: 'iife' | 'esm'
 }

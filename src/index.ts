@@ -58,8 +58,14 @@ export const simpleReloader = (): Plugin => ({
 })
 
 export const chromeExtension = (
-  pluginOptions: ChromeExtensionOptions = {},
+  _pluginOptions: Partial<ChromeExtensionOptions> = {},
 ): Plugin => {
+  const pluginOptions: ChromeExtensionOptions = {
+    browserPolyfill: false,
+    contentScriptFormat: 'esm',
+    ..._pluginOptions,
+  }
+
   const service = interpret(machine, {
     devTools: true,
   })
