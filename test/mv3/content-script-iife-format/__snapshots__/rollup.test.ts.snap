@@ -58,6 +58,14 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "background.js": true,
+  "content.js": true,
+  "popup.html": true,
+}
+`;
+
 exports[`manifest vs output: background.js 1`] = `
 "console.log(\\"service_worker.js\\");
 "

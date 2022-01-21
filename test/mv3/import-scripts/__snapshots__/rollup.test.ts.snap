@@ -71,6 +71,13 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/content.esm-wrapper-a6ac6bbe.js": true,
+  "background.js": true,
+}
+`;
+
 exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
 "(function () {
   'use strict';

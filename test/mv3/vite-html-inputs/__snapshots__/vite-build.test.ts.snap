@@ -34,6 +34,12 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "devtools.html": true,
+}
+`;
+
 exports[`manifest vs output: devtools.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>
   <meta charset=\\"UTF-8\\">

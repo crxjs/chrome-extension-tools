@@ -83,6 +83,16 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/import-3b031dc7.css": true,
+  "assets/index-5dfee6cc.css": true,
+  "assets/index-5f7d7b6f.css": true,
+  "assets/index.esm-wrapper-600ffb76.js": true,
+  "assets/index.esm-wrapper-72fbbdd0.js": true,
+}
+`;
+
 exports[`manifest vs output: assets/import-3b031dc7.css 1`] = `
 "h1 {
   color: green;

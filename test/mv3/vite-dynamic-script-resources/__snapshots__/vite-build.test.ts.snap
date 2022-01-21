@@ -56,6 +56,12 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "background.js": true,
+}
+`;
+
 exports[`manifest vs output: background.js 1`] = `
 "var content1 = \\"content1.js\\";
 var content2 = \\"content2.js\\";

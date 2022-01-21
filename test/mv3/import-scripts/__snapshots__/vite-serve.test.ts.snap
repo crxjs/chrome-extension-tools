@@ -77,6 +77,14 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/content.esm-wrapper-a6ac6bbe.js": true,
+  "background.js": true,
+  "runtime-reloader--content-script.js": true,
+}
+`;
+
 exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
 "(function () {
   'use strict';
@@ -2067,8 +2075,6 @@ exports[`manifest vs output: executed-script.js 1`] = `
 "console.log(\\"executed-script.ts\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"runtime-reloader--content-script.js\\",\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"]}],\\"manifest_version\\":3,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\",\\"permissions\\":[],\\"version_name\\":\\"2021-12-07T00:00:00.000Z\\",\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"executed-script.js\\"]},{\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"],\\"resources\\":[\\"dynamic-script.js\\",\\"content.js\\"]}]}"`;
 
 exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 "(function () {

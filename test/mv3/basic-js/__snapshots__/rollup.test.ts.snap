@@ -65,9 +65,18 @@ Array [
   "background.js",
   "content.js",
   "manifest.json",
+  "modules/vendor-e336c7a6.js",
   "popup.html",
   "popup.js",
 ]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/content.esm-wrapper-a6ac6bbe.js": true,
+  "background.js": true,
+  "popup.html": true,
+}
 `;
 
 exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
@@ -101,21 +110,7 @@ exports[`manifest vs output: content.js 1`] = `
 
 exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"]}],\\"host_permissions\\":[\\"https://c.com/*\\"],\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"Basic MV3 Chrome Extension\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"],\\"resources\\":[\\"content.js\\"]}]}"`;
 
-exports[`manifest vs output: popup.html 1`] = `
-"<!DOCTYPE html><html lang=\\"en\\"><head>
-    <meta charset=\\"UTF-8\\">
-    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
-    <title>Popup Page</title>
-  </head>
-  <body>
-    <div id=\\"root\\"></div>
-    <script src=\\"popup.js\\" type=\\"module\\"></script>
-  
-
-</body></html>"
-`;
-
-exports[`manifest vs output: popup.js 1`] = `
+exports[`manifest vs output: modules/vendor-e336c7a6.js 1`] = `
 "var react = {exports: {}};
 
 var react_production_min = {};
@@ -30194,6 +30189,27 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 var ReactDOM = reactDom.exports;
+
+export { React as R, ReactDOM as a };
+"
+`;
+
+exports[`manifest vs output: popup.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"popup.js\\" type=\\"module\\"></script>
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: popup.js 1`] = `
+"import { R as React, a as ReactDOM } from './modules/vendor-e336c7a6.js';
 
 const App = () => {
   return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));

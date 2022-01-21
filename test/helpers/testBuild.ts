@@ -12,11 +12,15 @@ import {
 } from 'rollup'
 import { build } from 'vite'
 import fs from 'fs-extra'
+import glob from 'glob'
+import { SpecialFilesMap } from './testServe'
 
 const isOutputOptions = (x: unknown): x is OutputOptions =>
   !isUndefined(x) && !Array.isArray(x)
 
 export async function getRollupOutput(dirname: string) {
+  process.chdir(dirname)
+
   const configFile = path.join(dirname, 'rollup.config.js')
   const { output, ...config } = require(configFile)
     .default as RollupOptions
@@ -35,6 +39,8 @@ export async function getRollupOutput(dirname: string) {
 }
 
 export async function getViteBuildOutput(dirname: string) {
+  process.chdir(dirname)
+
   const outDir = path.join(dirname, 'dist-build')
 
   // Need to remove old outDir
@@ -51,14 +57,11 @@ export async function getViteBuildOutput(dirname: string) {
 
 export async function testBuildOutput(
   output: RollupOutput['output'],
-  specialFiles: Map<
-    string | RegExp,
-    (source: string, snapshotName: string) => void
-  > = new Map(),
+  specialFiles: SpecialFilesMap = new Map(),
 ) {
   const specialTests = [...specialFiles.keys()]
-  const isSpecial = (name: string) =>
-    specialTests.some((x) =>
+  const findSpecial = (name: string) =>
+    specialTests.find((x) =>
       x instanceof RegExp ? x.test(name) : x === name,
     )
 
@@ -66,8 +69,13 @@ export async function testBuildOutput(
     byFileName('manifest.json'),
   ) as Asset & { source: string }
   const manifest: Manifest = JSON.parse(source)
+
   // Manifest has not changed
-  expect(manifest).toMatchSnapshot('00 - manifest')
+  if (specialFiles.has('manifest.json')) {
+    specialFiles.get('manifest.json')!(source, '00 - manifest')
+  } else {
+    expect(manifest).toMatchSnapshot('00 - manifest')
+  }
 
   // Manifest files have not changed
   const parsed = parseManifest(manifest)
@@ -83,15 +91,23 @@ export async function testBuildOutput(
     const source = isChunk(file) ? file.code : file.source
     if (source instanceof Uint8Array) continue
 
-    if (isSpecial(fileName)) {
-      specialFiles.get(fileName)!(source, fileName)
+    // Output files have not changed
+    const key = findSpecial(fileName)
+    if (key) {
+      specialFiles.get(key)!(source, fileName)
     } else {
       expect(source).toMatchSnapshot(fileName)
     }
   }
 
   // All files in manifest are in output files
-  for (const file of Object.values(parsed).flatMap((x) => x)) {
-    expect(files.includes(file)).toBe(true)
+  const manifestFiles = new Map()
+  for (const file of Object.values(parsed).flat().sort()) {
+    if (glob.hasMagic(file)) continue
+    manifestFiles.set(file, files.includes(file))
   }
+  expect(Object.fromEntries(manifestFiles)).toMatchSnapshot(
+    '03 - manifest files match output',
+  )
+  expect([...manifestFiles.values()].every((x) => x)).toBe(true)
 }

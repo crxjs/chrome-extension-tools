@@ -33,6 +33,7 @@ import {
   InternalCrxPlugin,
 } from './types'
 import { esmFormat } from './plugin-outputEsmFormat'
+import { rollupVendorsChunk } from './plugin-rollupVendorsChunk'
 
 type CrxPluginFn = (options: ChromeExtensionOptions) => CrxPlugin
 
@@ -56,6 +57,7 @@ export function startBuiltins(
     importedResources,
     viteServeImportScripts,
     publicDir,
+    rollupVendorsChunk,
     htmlMapScriptsToJS,
     options.contentScriptFormat === 'iife'
       ? hybridFormat

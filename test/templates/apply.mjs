@@ -5,22 +5,37 @@ import { fileURLToPath } from 'node:url'
 
 const excluded = ['invalid-manifest']
 
-const testName = 'vite-serve.test.ts'
-const testType = 'mv3'
+const testNames = [
+  'rollup.test.ts',
+  'vite-build.test.ts',
+  'vite-serve.test.ts',
+]
 
-const dirname = path.dirname(fileURLToPath(import.meta.url))
-const templatePath = path.join(dirname, testName)
-const template = fs.readFileSync(templatePath, 'utf8')
+for (const testName of testNames) {
+  applyTestTemplate(testName, 'mv2')
+  applyTestTemplate(testName, 'mv3')
+}
 
-const testsDir = path.resolve(dirname, '..', testType)
-const files = glob.sync(`**/${testName}`, {
-  cwd: testsDir,
-  absolute: true,
-})
+function applyTestTemplate(testName, testType) {
+  const dirname = path.dirname(fileURLToPath(import.meta.url))
+  const templatePath = path.join(dirname, testName)
+  const template = fs.readFileSync(templatePath, 'utf8')
 
-for (const file of files) {
-  if (excluded.some((x) => file.includes(x))) continue
+  const testsDir = path.resolve(dirname, '..', testType)
+  const files = glob.sync(`**/${testName}`, {
+    cwd: testsDir,
+    absolute: true,
+  })
 
-  fs.writeFileSync(file, template)
-  console.log('updated\n', file)
+  for (const file of files) {
+    if (excluded.some((x) => file.includes(x))) continue
+
+    fs.writeFileSync(file, template)
+  }
+
+  console.log(
+    files.length.toString().padStart(2, '0'),
+    testType,
+    testName,
+  )
 }

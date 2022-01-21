@@ -71,6 +71,15 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/content-89281590.css": true,
+  "assets/content.esm-wrapper-a6ac6bbe.js": true,
+  "crx-hmr-service-worker.js": true,
+  "runtime-reloader--content-script.js": true,
+}
+`;
+
 exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
 "(function () {
   'use strict';
@@ -2046,8 +2055,6 @@ exports[`manifest vs output: crx-hmr-service-worker.js 1`] = `
 })();
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"content_scripts\\":[{\\"js\\":[\\"runtime-reloader--content-script.js\\",\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"css\\":[\\"assets/content-89281590.css\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\",\\"permissions\\":[],\\"background\\":{\\"service_worker\\":\\"crx-hmr-service-worker.js\\",\\"type\\":\\"module\\"},\\"version_name\\":\\"2021-12-07T00:00:00.000Z\\",\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"content.js\\"]}]}"`;
 
 exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 "(function () {

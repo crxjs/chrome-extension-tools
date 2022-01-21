@@ -4,7 +4,7 @@ import {
   stopFileWriter,
 } from '$src/plugin-viteServeFileWriter'
 import fs from 'fs-extra'
-import globCb from 'glob'
+import globCb, { hasMagic } from 'glob'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
 
@@ -25,11 +25,13 @@ export const glob = (
   })
 
 export function setupViteServe({
-  __dirname,
+  dirname,
 }: {
-  __dirname: string
+  dirname: string
 }) {
-  const outDir = path.join(__dirname, 'dist-serve')
+  process.chdir(dirname)
+
+  const outDir = path.join(dirname, 'dist-serve')
 
   const shared: {
     devServer?: ViteDevServer
@@ -40,7 +42,7 @@ export function setupViteServe({
     await fs.remove(outDir)
 
     shared.devServer = await createServer({
-      configFile: path.join(__dirname, 'vite.config.ts'),
+      configFile: path.join(dirname, 'vite.config.ts'),
       envFile: false,
       build: { outDir },
     })
@@ -56,7 +58,8 @@ export function setupViteServe({
 
 export type SpecialFilesMap = Map<
   string | RegExp,
-  (filename: string, source: string) => void
+  // TODO: make sure these files are the same
+  (source: string, snapshotName: string) => void
 >
 
 export async function testViteServe(
@@ -70,8 +73,8 @@ export async function testViteServe(
   specialFiles: SpecialFilesMap = new Map(),
 ) {
   const specialTests = [...specialFiles.keys()]
-  const isSpecial = (name: string) =>
-    specialTests.some((x) =>
+  const findSpecial = (name: string) =>
+    specialTests.find((x) =>
       x instanceof RegExp ? x.test(name) : x === name,
     )
 
@@ -84,26 +87,36 @@ export async function testViteServe(
 
   const manifestPath = path.join(outDir, 'manifest.json')
   const manifest = await fs.readJson(manifestPath)
+
   // Manifest has not changed
-  expect(manifest).toMatchSnapshot('00 - manifest')
+  if (specialFiles.has('manifest.json')) {
+    const source = JSON.stringify(manifest)
+    specialFiles.get('manifest.json')!(source, '00 - manifest')
+  } else {
+    expect(manifest).toMatchSnapshot('00 - manifest')
+  }
 
   // Manifest files have not changed
   const parsed = parseManifest(manifest)
   expect(parsed).toMatchSnapshot('01 - files from manifest')
 
+  // Output files have not changed
   const filepaths: string[] = await glob(`${outDir}/**/*`, {
     nodir: true,
   })
   filepaths.sort()
   const files = new Set()
   for (const filepath of filepaths) {
-    const source = await fs.readFile(filepath, 'utf8')
     const fileName = path.relative(outDir, filepath)
     files.add(fileName)
 
-    // Output files have not changed
-    if (isSpecial(fileName)) {
-      specialFiles.get(fileName)!(fileName, source)
+    if (filepath === manifestPath) continue
+
+    const source = await fs.readFile(filepath, 'utf8')
+
+    const key = findSpecial(fileName)
+    if (key) {
+      specialFiles.get(key)!(source, fileName)
     } else {
       expect(source).toMatchSnapshot(fileName)
     }
@@ -113,7 +126,13 @@ export async function testViteServe(
   expect([...files]).toMatchSnapshot('02 - files from outDir')
 
   // All files in manifest are in output files
-  for (const file of Object.values(parsed).flatMap((x) => x)) {
-    expect(files.has(file)).toBe(true)
+  const manifestFiles = new Map()
+  for (const file of Object.values(parsed).flat().sort()) {
+    if (hasMagic(file)) continue
+    manifestFiles.set(file, files.has(file))
   }
+  expect(Object.fromEntries(manifestFiles)).toMatchSnapshot(
+    '03 - manifest files match output',
+  )
+  expect([...manifestFiles.values()].every((x) => x)).toBe(true)
 }

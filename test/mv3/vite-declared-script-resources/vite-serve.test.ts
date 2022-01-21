@@ -1,26 +1,54 @@
 import { hmrServiceWorkerName } from '$src/plugin-viteServeHMR_MV3'
 import {
+  testViteServe,
   setupViteServe,
   SpecialFilesMap,
-  testViteServe,
 } from '$test/helpers/testServe'
 import { jestSetTimeout } from '$test/helpers/timeout'
+import jsesc from 'jsesc'
 
 jestSetTimeout(30000)
 
-const shared = setupViteServe({ __dirname })
+const shared = setupViteServe({ dirname: __dirname })
 
 test('manifest vs output', async () => {
   const specialFiles: SpecialFilesMap = new Map()
-  specialFiles.set(hmrServiceWorkerName, (filename, source) => {
+  specialFiles.set(
+    new RegExp(
+      `${jsesc('background.js')}|${jsesc(hmrServiceWorkerName)}`,
+    ),
+    (source, name) => {
+      const port = shared.devServer!.config.server.port!
+      expect(
+        source.replace(
+          `url.port = JSON.parse("${port}");`,
+          'url.port = JSON.parse("3000");',
+        ),
+      ).toMatchSnapshot(name)
+    },
+  )
+  specialFiles.set(/\.html$/, (source, name) => {
+    const port = shared.devServer!.config.server.port!
+    expect(typeof port).toBe('number')
     expect(
       source.replace(
-        `url.port = JSON.parse("${
-          shared.devServer!.config.server.port
-        }");`,
-        'url.port = JSON.parse("3000");',
+        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        'http://localhost:3000',
       ),
-    ).toMatchSnapshot(filename)
+    ).toMatchSnapshot(name)
+  })
+  specialFiles.set('manifest.json', (source, name) => {
+    const port = shared.devServer!.config.server.port!
+    expect(typeof port).toBe('number')
+
+    const manifest = JSON.parse(
+      source.replace(
+        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        'http://localhost:3000',
+      ),
+    )
+
+    expect(manifest).toMatchSnapshot(name)
   })
 
   await testViteServe(shared, specialFiles)

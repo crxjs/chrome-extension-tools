@@ -57,6 +57,14 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "crx-hmr-service-worker.js": true,
+  "runtime-reloader--content-script.js": true,
+  "src/popup.html": true,
+}
+`;
+
 exports[`manifest vs output: crx-hmr-service-worker.js 1`] = `
 "(function() {
   /*! *****************************************************************************
@@ -2019,8 +2027,6 @@ exports[`manifest vs output: favicon.svg 1`] = `
 </svg>
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"src/popup.html\\"},\\"manifest_version\\":3,\\"name\\":\\"public dir test extension\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\",\\"permissions\\":[],\\"background\\":{\\"service_worker\\":\\"crx-hmr-service-worker.js\\",\\"type\\":\\"module\\"},\\"version_name\\":\\"2021-12-07T00:00:00.000Z\\",\\"content_scripts\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"runtime-reloader--content-script.js\\"]}]}"`;
 
 exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 "(function () {

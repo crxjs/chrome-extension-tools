@@ -51,6 +51,13 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "root-scope-service-worker.js": true,
+  "runtime-reloader--content-script.js": true,
+}
+`;
+
 exports[`manifest vs output: background/sw.js 1`] = `
 "(function() {
   self.skipWaiting();
@@ -80,8 +87,6 @@ exports[`manifest vs output: background/sw.js 1`] = `
 console.log(\\"background/sw.js\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\",\\"background\\":{\\"service_worker\\":\\"root-scope-service-worker.js\\",\\"type\\":\\"module\\"},\\"permissions\\":[],\\"version_name\\":\\"2021-12-07T00:00:00.000Z\\",\\"content_scripts\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"runtime-reloader--content-script.js\\"]}]}"`;
 
 exports[`manifest vs output: root-scope-service-worker.js 1`] = `
 "/**

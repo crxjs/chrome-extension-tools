@@ -62,6 +62,15 @@ Array [
 ]
 `;
 
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "background.js": true,
+  "content.js": true,
+  "popup.html": true,
+  "runtime-reloader--content-script.js": true,
+}
+`;
+
 exports[`manifest vs output: background.js 1`] = `
 "(function() {
   self.skipWaiting();
@@ -2018,8 +2027,6 @@ exports[`manifest vs output: content.js 1`] = `
 })();
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"matches\\":[\\"https://a.com/*\\",\\"http://b.com/*\\"],\\"js\\":[\\"runtime-reloader--content-script.js\\",\\"content.js\\"]}],\\"host_permissions\\":[\\"https://c.com/*\\"],\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\",\\"permissions\\":[],\\"version_name\\":\\"2021-12-07T00:00:00.000Z\\"}"`;
 
 exports[`manifest vs output: popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>
