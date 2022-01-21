@@ -1,39 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
-"(function () {
-  'use strict';
-
-  const importPath = \\"content.js\\";
-
-  const url = chrome.runtime.getURL(importPath);
-  import(
-    /* @vite-ignore */
-    url
-  ).catch((err) => {
-    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
-    console.error(err);
-  });
-
-})();
-"
-`;
-
-exports[`bundles chunks and assets: background.js 1`] = `
-"var scriptFileName = \\"executed-script.js\\";
-
-console.log(\\"service_worker.ts\\");
-chrome.action.onClicked.addListener((tab) => {
-  if (tab.id)
-    chrome.scripting.executeScript({
-      files: [scriptFileName],
-      target: { tabId: tab.id }
-    });
-});
-"
-`;
-
-exports[`bundles chunks and assets: manifest.json 1`] = `
+exports[`manifest vs output: 00 - manifest 1`] = `
 Object {
   "background": Object {
     "service_worker": "background.js",
@@ -78,17 +45,83 @@ Object {
 }
 `;
 
-exports[`bundles chunks and assets: parsed manifest 1`] = `
-Array [
-  Array [
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "BACKGROUND": Array [
     "background.js",
   ],
-  Array [
+  "CONTENT": Array [
     "assets/content.esm-wrapper-a6ac6bbe.js",
   ],
-  Array [],
-  Array [],
-  Array [],
-  Array [],
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "background.js",
+  "content.js",
+  "executed-script.js",
+  "dynamic-script.js",
+  "manifest.json",
+  "assets/content.esm-wrapper-a6ac6bbe.js",
 ]
 `;
+
+exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: background.js 1`] = `
+"var scriptFileName = \\"executed-script.js\\";
+
+console.log(\\"service_worker.ts\\");
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id)
+    chrome.scripting.executeScript({
+      files: [scriptFileName],
+      target: { tabId: tab.id }
+    });
+});
+"
+`;
+
+exports[`manifest vs output: content.js 1`] = `
+"var fileName = \\"dynamic-script.js\\";
+
+console.log(\\"content script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+document.head.prepend(script);
+"
+`;
+
+exports[`manifest vs output: dynamic-script.js 1`] = `
+"console.log(\\"dynamic-script.ts\\");
+"
+`;
+
+exports[`manifest vs output: executed-script.js 1`] = `
+"console.log(\\"executed-script.ts\\");
+"
+`;
+
+exports[`manifest vs output: manifest.json 1`] = `"{\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"]}],\\"manifest_version\\":3,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"executed-script.js\\"]},{\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"],\\"resources\\":[\\"content.js\\"]}]}"`;

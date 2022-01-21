@@ -6,38 +6,46 @@ Object {
     "default_popup": "popup.html",
   },
   "background": Object {
-    "service_worker": "background.js",
+    "service_worker": "service_worker.js",
     "type": "module",
   },
   "content_scripts": Array [
     Object {
       "js": Array [
-        "content.js",
+        "assets/content.esm-wrapper-a6ac6bbe.js",
       ],
       "matches": Array [
-        "https://a.com/*",
-        "http://b.com/*",
+        "http://*/*",
+        "https://*/*",
       ],
     },
   ],
-  "description": "Basic MV3 Chrome Extension",
-  "host_permissions": Array [
-    "https://c.com/*",
-  ],
+  "description": "integration tests",
   "manifest_version": 3,
-  "name": "mv3-basic-js",
+  "name": "Test",
   "permissions": Array [],
   "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content.js",
+      ],
+    },
+  ],
 }
 `;
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
   "BACKGROUND": Array [
-    "background.js",
+    "service_worker.js",
   ],
   "CONTENT": Array [
-    "content.js",
+    "assets/content.esm-wrapper-a6ac6bbe.js",
   ],
   "CSS": Array [],
   "HTML": Array [
@@ -50,32 +58,40 @@ Object {
 
 exports[`manifest vs output: 02 - files from output 1`] = `
 Array [
-  "background.js",
-  "popup.js",
+  "service_worker.js",
   "content.js",
+  "popup.js",
   "manifest.json",
   "popup.html",
+  "assets/content.esm-wrapper-a6ac6bbe.js",
 ]
 `;
 
-exports[`manifest vs output: background.js 1`] = `
-"console.log(\\"service_worker.js\\");
-"
-`;
-
-exports[`manifest vs output: content.js 1`] = `
+exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
 "(function () {
   'use strict';
 
-  (function() {
-    console.log(\\"content script\\");
-  })();
+  const importPath = \\"content.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
 
 })();
 "
 `;
 
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"matches\\":[\\"https://a.com/*\\",\\"http://b.com/*\\"],\\"js\\":[\\"content.js\\"]}],\\"host_permissions\\":[\\"https://c.com/*\\"],\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"Basic MV3 Chrome Extension\\",\\"permissions\\":[]}"`;
+exports[`manifest vs output: content.js 1`] = `
+"console.log(\\"content script\\");
+"
+`;
+
+exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"service_worker.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"]}],\\"manifest_version\\":3,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"content.js\\"]}]}"`;
 
 exports[`manifest vs output: popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>
@@ -2874,6 +2890,9 @@ var UserBlockingPriority = 2;
 var NormalPriority = 3;
 var LowPriority = 4;
 var IdlePriority = 5;
+
+function markTaskErrored(task, ms) {
+}
 
 /* eslint-disable no-var */
 // Math.pow(2, 30) - 1
@@ -30166,14 +30185,17 @@ if (process.env.NODE_ENV === 'production') {
   reactDom.exports = reactDom_development;
 }
 
-var ReactDOM = reactDom.exports;
-
 const App = () => {
   return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
 };
 
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
-ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`manifest vs output: service_worker.js 1`] = `
+"console.log(\\"service_worker.ts\\");
 "
 `;

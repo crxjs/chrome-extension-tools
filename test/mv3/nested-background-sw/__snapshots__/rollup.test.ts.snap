@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "background/sw.js",
+    "type": "module",
+  },
+  "description": "CRX with nested background service worker",
+  "manifest_version": 3,
+  "name": "mv3-basic-js",
+  "permissions": Array [],
+  "version": "1.0.0",
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "BACKGROUND": Array [
+    "background/sw.js",
+  ],
+  "CONTENT": Array [],
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "background/sw.js",
+  "manifest.json",
+]
+`;
+
+exports[`manifest vs output: background/sw.js 1`] = `
+"console.log('background/sw.js');
+"
+`;
+
+exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"CRX with nested background service worker\\",\\"background\\":{\\"service_worker\\":\\"background/sw.js\\",\\"type\\":\\"module\\"},\\"permissions\\":[]}"`;
