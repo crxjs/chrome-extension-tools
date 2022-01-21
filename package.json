@@ -39,6 +39,7 @@
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "test": "jest test.mv3",
     "test:mv2": "jest test.mv2",
+    "test:full": "jest --testPathIgnorePatterns=\"/node_modules/|/test/templates/|e2e\"",
     "test:e2e": "jest --testPathIgnorePatterns=\"/node_modules/|/test/templates/\" --runInBand --forceExit e2e",
     "test:ci": "run-s test:ci:*",
     "test:ci:src": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e|/test/templates/\" --testPathPattern=\"src\"",
