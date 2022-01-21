@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets: manifest.json 1`] = `
+exports[`manifest vs output: 00 - manifest 1`] = `
 Object {
   "content_scripts": Array [
     Object {
@@ -49,4 +49,117 @@ Object {
     },
   ],
 }
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "BACKGROUND": Array [],
+  "CONTENT": Array [
+    "assets/index.esm-wrapper-600ffb76.js",
+    "assets/index.esm-wrapper-72fbbdd0.js",
+  ],
+  "CSS": Array [
+    "assets/index-5f7d7b6f.css",
+    "assets/import-3b031dc7.css",
+    "assets/index-5dfee6cc.css",
+  ],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "content1/index.js",
+  "content2/index.js",
+  "modules/import-8167e8d6.js",
+  "manifest.json",
+  "assets/index-5f7d7b6f.css",
+  "assets/import-3b031dc7.css",
+  "assets/index-5dfee6cc.css",
+  "assets/index.esm-wrapper-600ffb76.js",
+  "assets/index.esm-wrapper-72fbbdd0.js",
+]
+`;
+
+exports[`manifest vs output: assets/import-3b031dc7.css 1`] = `
+"h1 {
+  color: green;
+}
+"
+`;
+
+exports[`manifest vs output: assets/index.esm-wrapper-72fbbdd0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/index.esm-wrapper-600ffb76.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/index-5dfee6cc.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`manifest vs output: assets/index-5f7d7b6f.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`manifest vs output: content1/index.js 1`] = `
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content1\\");
+"
+`;
+
+exports[`manifest vs output: content2/index.js 1`] = `
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content2\\");
+"
+`;
+
+exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"content_scripts\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"assets/index.esm-wrapper-600ffb76.js\\"],\\"css\\":[\\"assets/index-5f7d7b6f.css\\",\\"assets/import-3b031dc7.css\\"]},{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"assets/index.esm-wrapper-72fbbdd0.js\\"],\\"css\\":[\\"assets/index-5dfee6cc.css\\",\\"assets/import-3b031dc7.css\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"modules/import-8167e8d6.js\\",\\"content1/index.js\\",\\"content2/index.js\\"]}]}"`;
+
+exports[`manifest vs output: modules/import-8167e8d6.js 1`] = `
+"var styles = \\"\\";
+console.log(\\"imported file\\");
+"
 `;

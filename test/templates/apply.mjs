@@ -1,9 +1,9 @@
+import fs from 'fs-extra'
 import glob from 'glob'
 import path from 'node:path'
-import fs from 'fs-extra'
 import { fileURLToPath } from 'node:url'
 
-const testName = 'rollup.test.ts'
+const testName = 'vite-build.test.ts'
 const testType = 'mv3'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -17,6 +17,8 @@ const files = glob.sync(`**/${testName}`, {
 })
 
 for (const file of files) {
+  if (file.includes('invalid-manifest')) continue
+
   fs.writeFileSync(file, template)
 }
 

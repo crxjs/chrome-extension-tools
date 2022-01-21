@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`bundles chunks and assets: manifest.json 1`] = `
+exports[`manifest vs output: 00 - manifest 1`] = `
 Object {
   "content_scripts": Array [
     Object {
@@ -48,4 +48,105 @@ Object {
     },
   ],
 }
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "BACKGROUND": Array [],
+  "CONTENT": Array [
+    "assets/content1.esm-wrapper-8914532e.js",
+    "assets/content2.esm-wrapper-c8db90d0.js",
+  ],
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "content1.js",
+  "content2.js",
+  "script.js",
+  "manifest.json",
+  "iframe.html",
+  "assets/image.51f8fe9d.png",
+  "assets/font.bb6bc8d6.otf",
+  "assets/content1.esm-wrapper-8914532e.js",
+  "assets/content2.esm-wrapper-c8db90d0.js",
+]
+`;
+
+exports[`manifest vs output: assets/content1.esm-wrapper-8914532e.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/content2.esm-wrapper-c8db90d0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: content1.js 1`] = `
+"var icon = \\"/assets/image.51f8fe9d.png\\";
+var script = \\"script.js\\";
+console.log(\\"content.ts\\", { icon, script });
+"
+`;
+
+exports[`manifest vs output: content2.js 1`] = `
+"var html = \\"iframe.html\\";
+var font = \\"/assets/font.bb6bc8d6.otf\\";
+console.log(\\"content2.ts\\", { html, font });
+"
+`;
+
+exports[`manifest vs output: iframe.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    IFR
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"content_scripts\\":[{\\"matches\\":[\\"https://google.com/*\\"],\\"js\\":[\\"assets/content1.esm-wrapper-8914532e.js\\"]},{\\"matches\\":[\\"https://bing.com/*\\"],\\"js\\":[\\"assets/content2.esm-wrapper-c8db90d0.js\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"https://google.com/*\\"],\\"resources\\":[\\"assets/image.51f8fe9d.png\\",\\"script.js\\",\\"content1.js\\"]},{\\"matches\\":[\\"https://bing.com/*\\"],\\"resources\\":[\\"assets/font.bb6bc8d6.otf\\",\\"iframe.html\\",\\"content2.js\\"]}]}"`;
+
+exports[`manifest vs output: script.js 1`] = `
+"console.log(\\"main world script\\");
+"
 `;
