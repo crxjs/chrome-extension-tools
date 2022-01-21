@@ -67,13 +67,13 @@ Object {
 
 exports[`manifest vs output: 02 - files from output 1`] = `
 Array [
+  "assets/index-5dfee6cc.css",
+  "assets/index-5f7d7b6f.css",
+  "assets/index.esm-wrapper-600ffb76.js",
+  "assets/index.esm-wrapper-72fbbdd0.js",
   "content1/index.js",
   "content2/index.js",
   "manifest.json",
-  "assets/index-5f7d7b6f.css",
-  "assets/index-5dfee6cc.css",
-  "assets/index.esm-wrapper-600ffb76.js",
-  "assets/index.esm-wrapper-72fbbdd0.js",
 ]
 `;
 

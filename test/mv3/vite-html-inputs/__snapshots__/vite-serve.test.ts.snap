@@ -1985,7 +1985,7 @@ exports[`manifest vs output: crx-hmr-service-worker.js 1`] = `
     const url = new URL(requestUrl);
     url.protocol = \\"http:\\";
     url.host = \\"localhost\\";
-    url.port = JSON.parse(\\"3003\\");
+    url.port = JSON.parse(\\"3000\\");
     return fetch(url.href).then((r) => {
       var _a;
       const contentType = (_a = r.headers.get(\\"Content-Type\\")) != null ? _a : \\"text/javascript\\";

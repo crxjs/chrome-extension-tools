@@ -63,12 +63,12 @@ Object {
 
 exports[`manifest vs output: 02 - files from output 1`] = `
 Array [
+  "assets/content.esm-wrapper-a6ac6bbe.js",
   "background.js",
   "content.js",
-  "executed-script.js",
   "dynamic-script.js",
+  "executed-script.js",
   "manifest.json",
-  "assets/content.esm-wrapper-a6ac6bbe.js",
 ]
 `;
 

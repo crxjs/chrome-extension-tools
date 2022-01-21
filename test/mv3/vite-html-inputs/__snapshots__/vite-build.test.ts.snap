@@ -26,11 +26,11 @@ Object {
 
 exports[`manifest vs output: 02 - files from output 1`] = `
 Array [
+  "devtools.html",
   "devtools.js",
   "manifest.json",
   "test1.html",
   "test2.html",
-  "devtools.html",
 ]
 `;
 

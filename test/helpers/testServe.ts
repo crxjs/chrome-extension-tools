@@ -94,6 +94,7 @@ export async function testViteServe(
   const filepaths: string[] = await glob(`${outDir}/**/*`, {
     nodir: true,
   })
+  filepaths.sort()
   const files = new Set()
   for (const filepath of filepaths) {
     const source = await fs.readFile(filepath, 'utf8')

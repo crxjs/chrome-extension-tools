@@ -58,6 +58,8 @@ module.exports = {
     '/node_modules/',
     '/playground/',
     '/dist/',
+    '/test/templates/',
+    '/test/e2e/'
   ],
   transform: {
     '\\.[tj]sx?$': 'esbuild-runner/jest',

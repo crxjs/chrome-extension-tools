@@ -1,3 +1,4 @@
+import { hmrServiceWorkerName } from '$src/plugin-viteServeHMR_MV3'
 import {
   testViteServe,
   setupViteServe,
@@ -11,7 +12,7 @@ const shared = setupViteServe({ __dirname })
 
 test('manifest vs output', async () => {
   const specialFiles: SpecialFilesMap = new Map()
-  specialFiles.set('background.js', (filename, source) => {
+  specialFiles.set(hmrServiceWorkerName, (filename, source) => {
     expect(
       source.replace(
         `url.port = JSON.parse("${

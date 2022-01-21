@@ -74,7 +74,7 @@ export async function testBuildOutput(
   expect(parsed).toMatchSnapshot('01 - files from manifest')
 
   // Output files list has not changed
-  const files = output.map(({ fileName }) => fileName)
+  const files = output.map(({ fileName }) => fileName).sort()
   expect(files).toMatchSnapshot('02 - files from output')
 
   // All files in output have not changed

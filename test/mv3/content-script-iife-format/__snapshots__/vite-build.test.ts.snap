@@ -51,10 +51,10 @@ Object {
 exports[`manifest vs output: 02 - files from output 1`] = `
 Array [
   "background.js",
-  "popup.js",
   "content.js",
   "manifest.json",
   "popup.html",
+  "popup.js",
 ]
 `;
 
