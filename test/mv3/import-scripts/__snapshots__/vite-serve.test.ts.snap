@@ -1,6 +1,83 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`writes files to disk: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "background.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "runtime-reloader--content-script.js",
+        "assets/content.esm-wrapper-a6ac6bbe.js",
+      ],
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+    },
+  ],
+  "description": "DEVELOPMENT build with simple auto-reloader
+[6:00:00 PM] Waiting for changes...",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "version_name": "2021-12-07T00:00:00.000Z",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "executed-script.js",
+      ],
+    },
+    Object {
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+      "resources": Array [
+        "dynamic-script.js",
+        "content.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "BACKGROUND": Array [
+    "background.js",
+  ],
+  "CONTENT": Array [
+    "runtime-reloader--content-script.js",
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from outDir 1`] = `
+Array [
+  "assets/content.esm-wrapper-a6ac6bbe.js",
+  "background.js",
+  "content.js",
+  "dynamic-script.js",
+  "executed-script.js",
+  "manifest.json",
+  "runtime-reloader--content-script.js",
+]
+`;
+
+exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
 "(function () {
   'use strict';
 
@@ -19,7 +96,7 @@ exports[`writes files to disk: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
 "
 `;
 
-exports[`writes files to disk: background.js 1`] = `
+exports[`manifest vs output: background.js 1`] = `
 "(function() {
   /*! *****************************************************************************
       Copyright (c) Microsoft Corporation.
@@ -1972,76 +2049,28 @@ chrome.action.onClicked.addListener((tab) => {
 "
 `;
 
-exports[`writes files to disk: dynamic-script.js 1`] = `
+exports[`manifest vs output: content.js 1`] = `
+"var fileName = \\"dynamic-script.js\\";
+console.log(\\"content script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+document.head.prepend(script);
+"
+`;
+
+exports[`manifest vs output: dynamic-script.js 1`] = `
 "console.log(\\"dynamic-script.ts\\");
 "
 `;
 
-exports[`writes files to disk: executed-script.js 1`] = `
+exports[`manifest vs output: executed-script.js 1`] = `
 "console.log(\\"executed-script.ts\\");
 "
 `;
 
-exports[`writes files to disk: files 1`] = `
-Array [
-  "background.js",
-  "runtime-reloader--content-script.js",
-  "assets/content.esm-wrapper-a6ac6bbe.js",
-  "dynamic-script.js",
-  "executed-script.js",
-]
-`;
+exports[`manifest vs output: manifest.json 1`] = `"{\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"runtime-reloader--content-script.js\\",\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"]}],\\"manifest_version\\":3,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\",\\"permissions\\":[],\\"version_name\\":\\"2021-12-07T00:00:00.000Z\\",\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"executed-script.js\\"]},{\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"],\\"resources\\":[\\"dynamic-script.js\\",\\"content.js\\"]}]}"`;
 
-exports[`writes files to disk: manifest.json 1`] = `
-Object {
-  "background": Object {
-    "service_worker": "background.js",
-    "type": "module",
-  },
-  "content_scripts": Array [
-    Object {
-      "js": Array [
-        "runtime-reloader--content-script.js",
-        "assets/content.esm-wrapper-a6ac6bbe.js",
-      ],
-      "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
-      ],
-    },
-  ],
-  "description": "DEVELOPMENT build with simple auto-reloader
-[6:00:00 PM] Waiting for changes...",
-  "manifest_version": 3,
-  "name": "Test",
-  "permissions": Array [],
-  "version": "1.0.0",
-  "version_name": "2021-12-07T00:00:00.000Z",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "executed-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
-      ],
-      "resources": Array [
-        "dynamic-script.js",
-        "content.js",
-      ],
-    },
-  ],
-}
-`;
-
-exports[`writes files to disk: runtime-reloader--content-script.js 1`] = `
+exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 "(function () {
     'use strict';
 

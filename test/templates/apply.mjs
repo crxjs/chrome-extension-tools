@@ -3,7 +3,9 @@ import glob from 'glob'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const testName = 'vite-build.test.ts'
+const excluded = ['invalid-manifest']
+
+const testName = 'vite-serve.test.ts'
 const testType = 'mv3'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -17,9 +19,8 @@ const files = glob.sync(`**/${testName}`, {
 })
 
 for (const file of files) {
-  if (file.includes('invalid-manifest')) continue
+  if (excluded.some((x) => file.includes(x))) continue
 
   fs.writeFileSync(file, template)
+  console.log('updated\n', file)
 }
-
-console.log('updated files', files)
