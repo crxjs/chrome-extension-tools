@@ -1,9 +1,12 @@
 import fileName from './main-world?script'
 
-console.log('content.ts', fileName)
+const url = chrome.runtime.getURL(fileName)
+
+console.log('content.ts')
+console.log('main world script url', url)
 
 const script = document.createElement('script')
-script.src = chrome.runtime.getURL(fileName)
+script.src = url
 document.body.append(script)
 
 chrome.runtime.sendMessage({ type: 'ok' })
