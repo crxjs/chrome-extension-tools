@@ -36,6 +36,15 @@ Object {
         "content.js",
       ],
     },
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "executed-script.js",
+      ],
+    },
   ],
 }
 `;
@@ -59,6 +68,8 @@ Object {
 exports[`manifest vs output: 02 - files from outDir 1`] = `
 Array [
   "assets/content.esm-wrapper-a6ac6bbe.js",
+  "assets/dynamic-script.esm-wrapper-744b534a.js",
+  "assets/executed-script.esm-wrapper-3454cf82.js",
   "background.js",
   "content.js",
   "dynamic-script.js",
@@ -81,6 +92,44 @@ exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
   'use strict';
 
   const importPath = \\"content.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/dynamic-script.esm-wrapper-744b534a.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"dynamic-script.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/executed-script.esm-wrapper-3454cf82.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"executed-script.js\\";
 
   const url = chrome.runtime.getURL(importPath);
   import(

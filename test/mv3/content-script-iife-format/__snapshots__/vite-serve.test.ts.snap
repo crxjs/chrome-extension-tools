@@ -2017,7 +2017,12 @@ console.log(\\"service_worker.js\\");
 `;
 
 exports[`manifest vs output: content.js 1`] = `
-"console.log(\\"content script\\");
+"(function () {
+	'use strict';
+
+	console.log(\\"content script\\");
+
+})();
 "
 `;
 

@@ -72,7 +72,12 @@ exports[`manifest vs output: background.js 1`] = `
 `;
 
 exports[`manifest vs output: content.js 1`] = `
-"console.log(\\"content script\\");
+"(function () {
+	'use strict';
+
+	console.log(\\"content script\\");
+
+})();
 "
 `;
 

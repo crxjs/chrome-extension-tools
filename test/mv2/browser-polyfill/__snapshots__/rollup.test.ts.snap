@@ -31,7 +31,7 @@ Object {
       ],
       "js": Array [
         "browser-polyfill.js",
-        "scripts/content.js",
+        "assets/content.esm-wrapper-2cdcf244.js",
       ],
       "matches": Array [
         "https://www.yahoo.com/*",
@@ -82,7 +82,6 @@ Object {
   "SCRIPT_DECLARED": Array [
     "browser-polyfill.js",
     "assets/content.esm-wrapper-2cdcf244.js",
-    "scripts/content.js",
   ],
 }
 `;
@@ -124,7 +123,6 @@ Object {
   "popup/popup.html": true,
   "scripts/background.esm-wrapper.js": true,
   "scripts/content.css": true,
-  "scripts/content.js": true,
 }
 `;
 

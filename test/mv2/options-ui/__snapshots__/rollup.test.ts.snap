@@ -27,7 +27,7 @@ Object {
         "content.css",
       ],
       "js": Array [
-        "content.js",
+        "assets/content.esm-wrapper-a6ac6bbe.js",
       ],
       "matches": Array [
         "https://www.yahoo.com/*",
@@ -84,7 +84,6 @@ Object {
   ],
   "SCRIPT_DECLARED": Array [
     "assets/content.esm-wrapper-a6ac6bbe.js",
-    "content.js",
   ],
 }
 `;
@@ -125,7 +124,6 @@ Object {
   "assets/content.esm-wrapper-a6ac6bbe.js": true,
   "background.esm-wrapper.js": true,
   "content.css": true,
-  "content.js": true,
   "devtools/devtools.html": true,
   "images/icon-main-128.png": true,
   "images/icon-main-16.png": true,

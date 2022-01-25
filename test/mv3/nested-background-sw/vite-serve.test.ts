@@ -18,32 +18,26 @@ test('manifest vs output', async () => {
       `${jsesc('background.js')}|${jsesc(hmrServiceWorkerName)}`,
     ),
     (source, name) => {
-      const port = shared.devServer!.config.server.port!
       expect(
         source.replace(
-          `url.port = JSON.parse("${port}");`,
+          /url\.port = JSON\.parse\("\d{4}"\);/,
           'url.port = JSON.parse("3000");',
         ),
       ).toMatchSnapshot(name)
     },
   )
   specialFiles.set(/\.html$/, (source, name) => {
-    const port = shared.devServer!.config.server.port!
-    expect(typeof port).toBe('number')
     expect(
       source.replace(
-        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        /http:\/\/localhost:\d{4}/g,
         'http://localhost:3000',
       ),
     ).toMatchSnapshot(name)
   })
   specialFiles.set('manifest.json', (source, name) => {
-    const port = shared.devServer!.config.server.port!
-    expect(typeof port).toBe('number')
-
     const manifest = JSON.parse(
       source.replace(
-        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        /http:\/\/localhost:\d{4}/g,
         'http://localhost:3000',
       ),
     )

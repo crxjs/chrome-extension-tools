@@ -11,6 +11,22 @@ Object {
   "name": "Test",
   "permissions": Array [],
   "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content1.js",
+        "assets/image.51f8fe9d.png",
+        "script.js",
+        "content2.js",
+        "assets/font.bb6bc8d6.otf",
+        "iframe.html",
+      ],
+    },
+  ],
 }
 `;
 
@@ -29,8 +45,11 @@ Object {
 
 exports[`manifest vs output: 02 - files from output 1`] = `
 Array [
+  "assets/content1.esm-wrapper-8914532e.js",
+  "assets/content2.esm-wrapper-c8db90d0.js",
   "assets/font.bb6bc8d6.otf",
   "assets/image.51f8fe9d.png",
+  "assets/script.esm-wrapper-d7eff7fc.js",
   "background.js",
   "content1.js",
   "content2.js",
@@ -44,6 +63,63 @@ exports[`manifest vs output: 03 - manifest files match output 1`] = `
 Object {
   "background.js": true,
 }
+`;
+
+exports[`manifest vs output: assets/content1.esm-wrapper-8914532e.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/content2.esm-wrapper-c8db90d0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/script.esm-wrapper-d7eff7fc.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"script.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
 `;
 
 exports[`manifest vs output: background.js 1`] = `
