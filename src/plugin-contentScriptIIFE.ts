@@ -10,7 +10,11 @@ import { isContentScript } from './files.sharedEvents'
 import { isChunk } from './helpers'
 import { dirname, join, parse } from './path'
 import { helperScripts } from './plugin-contentScriptESM'
-import { getRpceAPI, RpceApi } from './plugin_helpers'
+import {
+  generateFileNames,
+  getRpceAPI,
+  RpceApi,
+} from './plugin_helpers'
 import { CrxPlugin, Manifest } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
@@ -113,8 +117,11 @@ export const contentScriptIIFE = (): CrxPlugin => {
       for (const script of manifest.content_scripts ?? []) {
         script.js?.forEach((name, i) => {
           if (helperScripts.includes(name)) return
-          script.js![i] =
-            api.filesByFileName.get(name)!.fileName!
+          const { outputFileName } = generateFileNames(name)
+          const { refId } =
+            api.filesByFileName.get(outputFileName)!
+          // to support dynamic file names later
+          script.js![i] = this.getFileName(refId)
         })
       }
 

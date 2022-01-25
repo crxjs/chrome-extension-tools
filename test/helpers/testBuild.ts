@@ -1,22 +1,22 @@
 import { parseManifest } from '$src/files_parseManifest'
-import { isChunk, isUndefined } from '$src/helpers'
+import { isChunk, isOutputOptions } from '$src/helpers'
 import type { Manifest } from '$src/types'
 import { byFileName } from '$test/helpers/utils'
+import fs from 'fs-extra'
+import glob from 'glob'
 import path from 'path'
 import {
   OutputAsset as Asset,
-  OutputOptions,
   rollup,
   RollupOptions,
   RollupOutput,
 } from 'rollup'
 import { build } from 'vite'
-import fs from 'fs-extra'
-import glob from 'glob'
+import { stubDate } from './stubDate'
 import { SpecialFilesMap } from './testServe'
 
-const isOutputOptions = (x: unknown): x is OutputOptions =>
-  !isUndefined(x) && !Array.isArray(x)
+/* ------------------ SETUP TESTS ------------------ */
+stubDate()
 
 export async function getRollupOutput(dirname: string) {
   process.chdir(dirname)
@@ -26,7 +26,9 @@ export async function getRollupOutput(dirname: string) {
     .default as RollupOptions
 
   if (!isOutputOptions(output))
-    throw new TypeError(`config.output missing: ${configFile}`)
+    throw new TypeError(
+      `config.output missing or malformed: ${configFile}`,
+    )
 
   // Rollup doesn't write to fs
   // const outDir = path.join(path.dirname(configFile), output.dir!)

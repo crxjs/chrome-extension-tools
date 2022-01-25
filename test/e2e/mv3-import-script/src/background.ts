@@ -1,9 +1,9 @@
 // This fixes `self`'s type.
 declare const self: ServiceWorkerGlobalScope
 export {}
-
-chrome.runtime.onInstalled.addListener(async ({ reason }) => {
+;(async () => {
   await self.skipWaiting()
-  if (reason === chrome.runtime.OnInstalledReason.INSTALL)
-    chrome.runtime.openOptionsPage()
-})
+  // if we open the options page now the SW won't reroute fetches
+  await new Promise((r) => setTimeout(r, 100))
+  chrome.runtime.openOptionsPage()
+})()

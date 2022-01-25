@@ -18,12 +18,13 @@ export function isErrorLike(x: unknown): x is Error {
   return typeof x === 'object' && x !== null && 'message' in x
 }
 
-export function isOutputOptions(x: any): x is OutputOptions {
+export function isOutputOptions(x: unknown): x is OutputOptions {
   return (
+    !!x &&
     typeof x === 'object' &&
     !Array.isArray(x) &&
-    typeof x.format === 'string' &&
-    ['iife', 'es'].includes(x.format)
+    typeof (x as any).format === 'string' &&
+    ['iife', 'es', 'esm'].includes((x as any).format)
   )
 }
 
