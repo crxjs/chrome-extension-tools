@@ -15,7 +15,7 @@ test('manifest vs output', async () => {
   const specialFiles: SpecialFilesMap = new Map()
   specialFiles.set(
     new RegExp(
-      `${jsesc('background.js')}|${jsesc(hmrServiceWorkerName)}`,
+      `${jsesc('background')}|${jsesc(hmrServiceWorkerName)}`,
     ),
     (source, name) => {
       const port = shared.devServer!.config.server.port!

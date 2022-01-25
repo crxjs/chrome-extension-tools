@@ -15,7 +15,7 @@ test('manifest vs output', async () => {
   const specialFiles: SpecialFilesMap = new Map()
   specialFiles.set(
     new RegExp(
-      `${jsesc('background.js')}|${jsesc(hmrServiceWorkerName)}`,
+      `${jsesc('background')}|${jsesc(hmrServiceWorkerName)}`,
     ),
     (source, name) => {
       const port = shared.devServer!.config.server.port!
@@ -48,14 +48,7 @@ test('manifest vs output', async () => {
       ),
     )
 
-    expect(manifest).toMatchSnapshot(
-      {
-        content_security_policy: expect.stringMatching(
-          /script-src 'self' http:\/\/localhost:3000 'sha256-.+?'; object-src 'self'/,
-        ),
-      },
-      name,
-    )
+    expect(manifest).toMatchSnapshot(name)
   })
 
   await testViteServe(shared, specialFiles)
