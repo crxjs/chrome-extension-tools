@@ -168,7 +168,7 @@ export const chromeExtension = (
       result.delete(fileName)
     }
 
-    // allow time for fs to catch up
+    // allow time for fs to catch up after `writeBundle`
     if (command === 'serve')
       await new Promise((r) => setTimeout(r, 50))
 
@@ -180,7 +180,8 @@ export const chromeExtension = (
   let invalidationPath: string
 
   const api: RpceApi = {
-    files: filesByRefId,
+    filesByRefId,
+    filesByFileName,
     addFiles,
     get root() {
       return service.getSnapshot().context.root

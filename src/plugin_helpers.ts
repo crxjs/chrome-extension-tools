@@ -6,8 +6,8 @@ import type { machine as filesMachine } from './files.machine'
 import { join, parse } from './path'
 import {
   BaseAsset,
-  EmittedFile,
   CrxPlugin,
+  EmittedFile,
   isMV2,
   Manifest,
   Script,
@@ -31,9 +31,11 @@ export const isRPCE = (
 ) => !!(p && p.name === 'chrome-extension')
 
 export type RpceApi = {
-  /** A map of the emitted files by fileName */
-  files: Map<string, EmittedFile>
-  /** Returns a map of the newly emitted files */
+  /** A map of the emitted files by refId */
+  filesByRefId: Map<string, EmittedFile>
+  /** A map of the emitted files by file name */
+  filesByFileName: Map<string, EmittedFile>
+  /** Returns a map of the newly emitted files by file name */
   addFiles: (
     this: PluginContext,
     files: (BaseAsset | Script)[],

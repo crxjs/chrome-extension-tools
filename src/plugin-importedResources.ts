@@ -153,7 +153,11 @@ export const viteServeImportScripts = (): CrxPlugin => {
         'serve',
       )
 
-      return `export default "${fileName}"`
+      // TODO: could probably combine build and serve plugins
+      // - if wrapperName is defined, it's vite serve (no generateBundle)
+      // - otherwise, generateBundle will take care of the wrapper name
+      const { wrapperName } = files.get(fileName)!
+      return `export default "${wrapperName}"`
     },
   }
 }

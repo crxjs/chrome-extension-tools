@@ -3,16 +3,18 @@ import { backgroundESM_MV2 } from './plugin-backgroundESM_MV2'
 import { backgroundESM_MV3 } from './plugin-backgroundESM_MV3'
 import { browserPolyfill } from './plugin-browserPolyfill'
 import { configureRollupOptions } from './plugin-configureRollupOptions'
+import { contentScriptESM } from './plugin-contentScriptESM'
+import { contentScriptIIFE } from './plugin-contentScriptIIFE'
+import { contentScriptResources } from './plugin-contentScriptResources'
 import { extendManifest } from './plugin-extendManifest'
 import { htmlMapScriptsToJS } from './plugin-htmlMapScriptsToJS'
-import { hybridFormat } from './plugin-outputHybridFormat'
-import { contentScriptResources } from './plugin-contentScriptResources'
 import {
   importedResources,
   viteServeImportScripts,
 } from './plugin-importedResources'
 import { packageJson } from './plugin-packageJson'
 import { publicDir } from './plugin-publicDir'
+import { rollupVendorsChunk } from './plugin-rollupVendorsChunk'
 import { runHijackedHooks } from './plugin-runHijackedHooks'
 import { runtimeReloader } from './plugin-runtimeReloader'
 import { transformIndexHtml } from './plugin-transformIndexHtml'
@@ -32,8 +34,6 @@ import {
   CrxPlugin,
   InternalCrxPlugin,
 } from './types'
-import { esmFormat } from './plugin-outputEsmFormat'
-import { rollupVendorsChunk } from './plugin-rollupVendorsChunk'
 
 type CrxPluginFn = (options: ChromeExtensionOptions) => CrxPlugin
 
@@ -59,9 +59,9 @@ export function startBuiltins(
     publicDir,
     rollupVendorsChunk,
     htmlMapScriptsToJS,
-    options.contentScriptFormat === 'iife'
-      ? hybridFormat
-      : esmFormat,
+    options.contentScriptFormat === 'esm'
+      ? contentScriptESM
+      : contentScriptIIFE,
     viteServeHMR_MV2,
     viteServeHMR_MV3,
     viteServeReactFastRefresh_MV2,
