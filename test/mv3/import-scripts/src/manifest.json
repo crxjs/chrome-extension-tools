@@ -4,7 +4,7 @@
   },
   "content_scripts": [
     {
-      "js": ["content.ts"],
+      "js": ["declared-script.ts"],
       "matches": ["https://a.com/*", "http://b.com/*"]
     }
   ],

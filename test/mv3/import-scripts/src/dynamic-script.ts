@@ -1,1 +1,1 @@
-console.log('dynamic-script.ts')
+console.log('dynamic script')

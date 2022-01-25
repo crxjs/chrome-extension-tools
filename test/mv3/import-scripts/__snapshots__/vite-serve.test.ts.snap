@@ -10,7 +10,7 @@ Object {
     Object {
       "js": Array [
         "runtime-reloader--content-script.js",
-        "assets/content.esm-wrapper-a6ac6bbe.js",
+        "assets/declared-script.esm-wrapper-696b6e19.js",
       ],
       "matches": Array [
         "http://b.com/*",
@@ -32,8 +32,8 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "dynamic-script.js",
-        "content.js",
+        "main-world.js",
+        "declared-script.js",
       ],
     },
     Object {
@@ -42,7 +42,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "executed-script.js",
+        "dynamic-script.js",
       ],
     },
   ],
@@ -60,20 +60,20 @@ Object {
   ],
   "SCRIPT_DECLARED": Array [
     "runtime-reloader--content-script.js",
-    "assets/content.esm-wrapper-a6ac6bbe.js",
+    "assets/declared-script.esm-wrapper-696b6e19.js",
   ],
 }
 `;
 
 exports[`manifest vs output: 02 - files from outDir 1`] = `
 Array [
-  "assets/content.esm-wrapper-a6ac6bbe.js",
+  "assets/declared-script.esm-wrapper-696b6e19.js",
   "assets/dynamic-script.esm-wrapper-744b534a.js",
-  "assets/executed-script.esm-wrapper-3454cf82.js",
+  "assets/main-world.esm-wrapper-a8f2b1f3.js",
   "background.js",
-  "content.js",
+  "declared-script.js",
   "dynamic-script.js",
-  "executed-script.js",
+  "main-world.js",
   "manifest.json",
   "runtime-reloader--content-script.js",
 ]
@@ -81,17 +81,17 @@ Array [
 
 exports[`manifest vs output: 03 - manifest files match output 1`] = `
 Object {
-  "assets/content.esm-wrapper-a6ac6bbe.js": true,
+  "assets/declared-script.esm-wrapper-696b6e19.js": true,
   "background.js": true,
   "runtime-reloader--content-script.js": true,
 }
 `;
 
-exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
+exports[`manifest vs output: assets/declared-script.esm-wrapper-696b6e19.js 1`] = `
 "(function () {
   'use strict';
 
-  const importPath = \\"content.js\\";
+  const importPath = \\"declared-script.js\\";
 
   const url = chrome.runtime.getURL(importPath);
   import(
@@ -125,11 +125,11 @@ exports[`manifest vs output: assets/dynamic-script.esm-wrapper-744b534a.js 1`] =
 "
 `;
 
-exports[`manifest vs output: assets/executed-script.esm-wrapper-3454cf82.js 1`] = `
+exports[`manifest vs output: assets/main-world.esm-wrapper-a8f2b1f3.js 1`] = `
 "(function () {
   'use strict';
 
-  const importPath = \\"executed-script.js\\";
+  const importPath = \\"main-world.js\\";
 
   const url = chrome.runtime.getURL(importPath);
   import(
@@ -2085,8 +2085,8 @@ exports[`manifest vs output: background.js 1`] = `
     });
   }
 })();
-var scriptFileName = \\"executed-script.js\\";
-console.log(\\"service_worker.ts\\");
+var scriptFileName = \\"dynamic-script.js\\";
+console.log(\\"background.ts\\");
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id)
     chrome.scripting.executeScript({
@@ -2097,9 +2097,9 @@ chrome.action.onClicked.addListener((tab) => {
 "
 `;
 
-exports[`manifest vs output: content.js 1`] = `
-"var fileName = \\"dynamic-script.js\\";
-console.log(\\"content script\\");
+exports[`manifest vs output: declared-script.js 1`] = `
+"var fileName = \\"main-world.js\\";
+console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);
 document.head.prepend(script);
@@ -2107,12 +2107,12 @@ document.head.prepend(script);
 `;
 
 exports[`manifest vs output: dynamic-script.js 1`] = `
-"console.log(\\"dynamic-script.ts\\");
+"console.log(\\"dynamic script\\");
 "
 `;
 
-exports[`manifest vs output: executed-script.js 1`] = `
-"console.log(\\"executed-script.ts\\");
+exports[`manifest vs output: main-world.js 1`] = `
+"console.log(\\"main world script\\");
 "
 `;
 

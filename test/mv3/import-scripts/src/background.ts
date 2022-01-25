@@ -1,6 +1,6 @@
-import scriptFileName from './executed-script?script'
+import scriptFileName from './dynamic-script?script'
 
-console.log('service_worker.ts')
+console.log('background.ts')
 
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id)
