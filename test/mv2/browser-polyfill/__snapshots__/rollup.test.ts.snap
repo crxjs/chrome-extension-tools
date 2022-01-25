@@ -54,6 +54,7 @@ Object {
   ],
   "version": "1.0.0",
   "web_accessible_resources": Array [
+    "modules/shared-c31d88bd.js",
     "scripts/content.js",
   ],
 }

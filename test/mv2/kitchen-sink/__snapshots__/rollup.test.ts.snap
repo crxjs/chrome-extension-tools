@@ -63,6 +63,7 @@ Object {
     "options.jpg",
     "fonts/*.ttf",
     "fonts/*.otf",
+    "modules/imported-fc5abad3.js",
     "content.js",
   ],
 }

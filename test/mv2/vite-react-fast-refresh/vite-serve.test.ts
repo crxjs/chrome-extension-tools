@@ -48,7 +48,13 @@ test('manifest vs output', async () => {
       ),
     )
 
-    expect(manifest).toMatchSnapshot(name)
+    expect(manifest).toMatchSnapshot(
+      {
+        content_security_policy:
+          /script-src 'self' http:\/\/localhost:3000 'sha256-.+?'; object-src 'self'/,
+      },
+      name,
+    )
   })
 
   await testViteServe(shared, specialFiles)

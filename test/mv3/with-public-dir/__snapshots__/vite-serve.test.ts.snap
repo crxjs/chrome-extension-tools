@@ -27,6 +27,18 @@ Object {
   "permissions": Array [],
   "version": "1.0.0",
   "version_name": "2021-12-07T00:00:00.000Z",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "**/*",
+        "*",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
 }
 `;
 

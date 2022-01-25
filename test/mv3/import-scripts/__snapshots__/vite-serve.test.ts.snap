@@ -13,8 +13,8 @@ Object {
         "assets/declared-script.esm-wrapper-696b6e19.js",
       ],
       "matches": Array [
-        "http://b.com/*",
         "https://a.com/*",
+        "http://b.com/*",
       ],
     },
   ],
@@ -28,22 +28,13 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
+        "<all_urls>",
       ],
       "resources": Array [
-        "main-world.js",
-        "declared-script.js",
+        "**/*",
+        "*",
       ],
-    },
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "dynamic-script.js",
-      ],
+      "use_dynamic_url": true,
     },
   ],
 }

@@ -22,6 +22,7 @@ Object {
   "permissions": Array [],
   "version": "1.0.0",
   "web_accessible_resources": Array [
+    "modules/vendor-43eada06.js",
     "content/index.js",
   ],
 }

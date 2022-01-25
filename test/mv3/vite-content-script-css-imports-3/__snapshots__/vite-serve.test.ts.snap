@@ -8,10 +8,6 @@ Object {
   },
   "content_scripts": Array [
     Object {
-      "css": Array [
-        "assets/index-5f7d7b6f.css",
-        "assets/import-3b031dc7.css",
-      ],
       "js": Array [
         "runtime-reloader--content-script.js",
         "assets/index.esm-wrapper-600ffb76.js",
@@ -22,10 +18,6 @@ Object {
       ],
     },
     Object {
-      "css": Array [
-        "assets/index-5dfee6cc.css",
-        "assets/import-3b031dc7.css",
-      ],
       "js": Array [
         "runtime-reloader--content-script.js",
         "assets/index.esm-wrapper-72fbbdd0.js",
@@ -46,14 +38,13 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "http://*/*",
-        "https://*/*",
+        "<all_urls>",
       ],
       "resources": Array [
-        "modules/import-8167e8d6.js",
-        "content1/index.js",
-        "content2/index.js",
+        "**/*",
+        "*",
       ],
+      "use_dynamic_url": true,
     },
   ],
 }
@@ -61,11 +52,7 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "CSS": Array [
-    "assets/index-5f7d7b6f.css",
-    "assets/import-3b031dc7.css",
-    "assets/index-5dfee6cc.css",
-  ],
+  "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
@@ -98,9 +85,6 @@ Array [
 
 exports[`manifest vs output: 03 - manifest files match output 1`] = `
 Object {
-  "assets/import-3b031dc7.css": true,
-  "assets/index-5dfee6cc.css": true,
-  "assets/index-5f7d7b6f.css": true,
   "assets/index.esm-wrapper-600ffb76.js": true,
   "assets/index.esm-wrapper-72fbbdd0.js": true,
   "crx-hmr-service-worker.js": true,

@@ -8,9 +8,6 @@ Object {
   },
   "content_scripts": Array [
     Object {
-      "css": Array [
-        "assets/content-89281590.css",
-      ],
       "js": Array [
         "runtime-reloader--content-script.js",
         "assets/content.esm-wrapper-a6ac6bbe.js",
@@ -31,12 +28,13 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "http://*/*",
-        "https://*/*",
+        "<all_urls>",
       ],
       "resources": Array [
-        "content.js",
+        "**/*",
+        "*",
       ],
+      "use_dynamic_url": true,
     },
   ],
 }
@@ -44,9 +42,7 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "CSS": Array [
-    "assets/content-89281590.css",
-  ],
+  "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
@@ -73,7 +69,6 @@ Array [
 
 exports[`manifest vs output: 03 - manifest files match output 1`] = `
 Object {
-  "assets/content-89281590.css": true,
   "assets/content.esm-wrapper-a6ac6bbe.js": true,
   "crx-hmr-service-worker.js": true,
   "runtime-reloader--content-script.js": true,

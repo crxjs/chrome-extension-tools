@@ -68,7 +68,7 @@ function getChunksById(bundle: OutputBundle) {
 }
 
 function getCrxImportsFromBundle(
-  modules: OutputChunk['modules'],
+  { modules, imports, dynamicImports }: OutputChunk,
   chunksById: Map<string, string>,
   { root }: RpceApi,
 ) {
@@ -77,7 +77,7 @@ function getCrxImportsFromBundle(
     .map((m) => m.slice(importedResourcePrefix.length))
     .map((m) => stubUrl(m).pathname)
 
-  const chunks = []
+  const chunks = [...imports, ...dynamicImports]
   const assets = []
   for (const id of resources) {
     const chunk = chunksById.get(id)
@@ -285,6 +285,10 @@ export const contentScriptResources = ({
         bundle,
         isWrite,
       ) {
+        if (this.meta.watchMode) return
+
+        /* ---------------- VITE BUILD ONLY ---------------- */
+        // generates a very specific resource list
         let filesData: ViteFilesManifest
         await realHook.call(
           {
@@ -334,11 +338,7 @@ export const contentScriptResources = ({
 
           const chunk = bundle[file]
           const crxImports = isChunk(chunk)
-            ? getCrxImportsFromBundle(
-                chunk.modules,
-                chunksById,
-                api,
-              )
+            ? getCrxImportsFromBundle(chunk, chunksById, api)
             : { chunks: [], assets: [] }
 
           for (const a of [...assets, ...crxImports.assets])
@@ -377,9 +377,38 @@ export const contentScriptResources = ({
 
       api = getRpceAPI(plugins)
     },
-    // rollup only, doesn't support static asset imports
     generateBundle(options, bundle) {
+      if (this.meta.watchMode) {
+        /* ---------- VITE SERVE AND ROLLUP WATCH ---------- */
+        // use generic resources for file writer / watch mode
+
+        const manifestAsset = bundle[
+          'manifest.json'
+        ] as OutputAsset
+        const manifest: Manifest = JSON.parse(
+          manifestAsset.source as string,
+        )
+
+        manifest.web_accessible_resources =
+          manifest.web_accessible_resources ?? []
+        if (isMV2(manifest)) {
+          manifest.web_accessible_resources!.push('**/*', '*')
+        } else {
+          manifest.web_accessible_resources!.push({
+            matches: ['<all_urls>'],
+            resources: ['**/*', '*'],
+            // @ts-expect-error @types/chrome is out of date
+            use_dynamic_url: true,
+          })
+        }
+
+        manifestAsset.source = JSON.stringify(manifest)
+      }
+
       if (isVite) return
+
+      /* --------------- ROLLUP BUILD ONLY --------------- */
+      // rollup doesn't support static asset imports
 
       const chunksById = getChunksById(bundle)
       const getResources = (
@@ -393,11 +422,7 @@ export const contentScriptResources = ({
         const { outputFileName } = generateFileNames(name)
         const chunk = bundle[outputFileName]
         const { assets, chunks } = isChunk(chunk)
-          ? getCrxImportsFromBundle(
-              chunk.modules,
-              chunksById,
-              api,
-            )
+          ? getCrxImportsFromBundle(chunk, chunksById, api)
           : { chunks: [], assets: [] }
 
         for (const a of assets) sets.assets.add(a)

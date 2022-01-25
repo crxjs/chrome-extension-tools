@@ -31,6 +31,7 @@ Object {
   "permissions": Array [],
   "version": "1.0.0",
   "web_accessible_resources": Array [
+    "modules/vendor-2d05c7ae.js",
     "content1/index.js",
     "content2/index.js",
   ],
