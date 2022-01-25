@@ -87,7 +87,7 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
       swFilename = manifest.background.service_worker
 
       api.service.send(
-        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+        filesModel.events.EXCLUDE_FILE_TYPE('SCRIPT_HTML'),
       )
 
       return manifest

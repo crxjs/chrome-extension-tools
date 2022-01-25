@@ -65,7 +65,11 @@ export type AssetType =
   | 'MANIFEST'
   | 'RAW'
 
-export type ScriptType = 'BACKGROUND' | 'CONTENT' | 'MODULE'
+export type ScriptType =
+  | 'SCRIPT_BACKGROUND'
+  | 'SCRIPT_DECLARED'
+  | 'SCRIPT_DYNAMIC'
+  | 'SCRIPT_HTML'
 
 export type FileType = AssetType | ScriptType
 
@@ -129,6 +133,7 @@ export interface EmittedFile {
   type: 'chunk' | 'asset'
   refId: string
   source?: string | Uint8Array
+  wrapperName?: string
 }
 
 interface CrxHookTypes {

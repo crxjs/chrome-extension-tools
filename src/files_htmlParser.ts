@@ -54,13 +54,18 @@ export function parseHtml(
 ): Record<
   Exclude<
     FileType,
-    'MANIFEST' | 'HTML' | 'JSON' | 'BACKGROUND' | 'CONTENT'
+    | 'MANIFEST'
+    | 'HTML'
+    | 'JSON'
+    | 'SCRIPT_BACKGROUND'
+    | 'SCRIPT_DECLARED'
+    | 'SCRIPT_DYNAMIC'
   >,
   string[]
 > {
   const $ = cheerio.load(source)
   return {
-    MODULE: getScriptSrc($),
+    SCRIPT_HTML: getScriptSrc($),
     CSS: getCssHrefs($),
     IMAGE: getImgSrcs($),
     RAW: getJsAssets($),

@@ -20,8 +20,8 @@ const manifest = readJSONSync(join(srcDir, manifestJson))
 test('gets correct scripts', () => {
   const result = parseManifest(manifest)
 
-  expect(result.CONTENT).toEqual([contentJs])
-  expect(result.BACKGROUND).toEqual([serviceWorkerJs])
+  expect(result.SCRIPT_DECLARED).toEqual([contentJs])
+  expect(result.SCRIPT_BACKGROUND).toEqual([serviceWorkerJs])
 })
 
 test('gets correct html', () => {

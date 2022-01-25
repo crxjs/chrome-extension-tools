@@ -62,7 +62,7 @@ export const importedResources = (): CrxPlugin => {
           {
             id,
             fileName,
-            fileType: isHtml ? 'HTML' : 'CONTENT',
+            fileType: isHtml ? 'HTML' : 'SCRIPT_DYNAMIC',
           },
         ],
         'build',
@@ -141,13 +141,13 @@ export const viteServeImportScripts = (): CrxPlugin => {
         ? relpath
         : generateFileNames(relpath).outputFileName
 
-      await api.addFiles.call(
+      const files = await api.addFiles.call(
         this,
         [
           {
             id,
             fileName,
-            fileType: isHtml ? 'HTML' : 'CONTENT',
+            fileType: isHtml ? 'HTML' : 'SCRIPT_DYNAMIC',
           },
         ],
         'serve',
