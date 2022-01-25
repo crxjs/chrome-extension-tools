@@ -61,16 +61,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "browser-polyfill.js",
-    "browser-polyfill-executeScript.js",
-    "scripts/background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [
-    "browser-polyfill.js",
-    "assets/content.esm-wrapper-2cdcf244.js",
-    "scripts/content.js",
-  ],
   "CSS": Array [
     "scripts/content.css",
   ],
@@ -84,6 +74,16 @@ Object {
     "images/icon-main-128.png",
   ],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "browser-polyfill.js",
+    "browser-polyfill-executeScript.js",
+    "scripts/background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "browser-polyfill.js",
+    "assets/content.esm-wrapper-2cdcf244.js",
+    "scripts/content.js",
+  ],
 }
 `;
 
@@ -1460,8 +1460,6 @@ exports[`manifest vs output: browser-polyfill-executeScript.js 1`] = `
 })();
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"name\\":\\"browser polyfill\\",\\"description\\":\\"chrome extension with browser polyfill\\",\\"manifest_version\\":2,\\"version\\":\\"1.0.0\\",\\"icons\\":{\\"16\\":\\"images/icon-main-16.png\\",\\"48\\":\\"images/icon-main-48.png\\",\\"128\\":\\"images/icon-main-128.png\\"},\\"background\\":{\\"scripts\\":[\\"browser-polyfill.js\\",\\"browser-polyfill-executeScript.js\\",\\"scripts/background.esm-wrapper.js\\"]},\\"content_scripts\\":[{\\"js\\":[\\"browser-polyfill.js\\",\\"assets/content.esm-wrapper-2cdcf244.js\\"],\\"matches\\":[\\"https://www.google.com/*\\"]},{\\"js\\":[\\"browser-polyfill.js\\",\\"scripts/content.js\\"],\\"css\\":[\\"scripts/content.css\\"],\\"matches\\":[\\"https://www.yahoo.com/*\\"]}],\\"options_page\\":\\"options/options.html\\",\\"browser_action\\":{\\"default_icon\\":{\\"16\\":\\"images/icon-main-16.png\\"},\\"default_popup\\":\\"popup/popup.html\\"},\\"permissions\\":[\\"storage\\",\\"contextMenus\\",\\"bookmarks\\"],\\"web_accessible_resources\\":[\\"scripts/content.js\\"]}"`;
 
 exports[`manifest vs output: modules/shared-c31d88bd.js 1`] = `
 "const x = \\"x\\";

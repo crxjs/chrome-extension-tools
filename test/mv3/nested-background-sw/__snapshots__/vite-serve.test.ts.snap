@@ -29,16 +29,16 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "root-scope-service-worker.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-  ],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "root-scope-service-worker.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+  ],
 }
 `;
 

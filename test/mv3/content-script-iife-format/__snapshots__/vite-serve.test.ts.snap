@@ -36,19 +36,19 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-    "content.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+    "content.js",
+  ],
 }
 `;
 
@@ -2017,14 +2017,7 @@ console.log(\\"service_worker.js\\");
 `;
 
 exports[`manifest vs output: content.js 1`] = `
-"(function () {
-  'use strict';
-
-  (function() {
-    console.log(\\"content script\\");
-  })();
-
-})();
+"console.log(\\"content script\\");
 "
 `;
 

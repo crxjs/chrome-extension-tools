@@ -21,7 +21,7 @@ Object {
       ],
     },
   ],
-  "content_security_policy": "script-src 'self' http://localhost:3000 'sha256-c+50ddhHD1EM2L8MdDjFaSi7HfTWO4HRtM/MF5di+0o='; object-src 'self'",
+  "content_security_policy": StringMatching /script-src 'self' http:\\\\/\\\\/localhost:3000 'sha256-\\.\\+\\?'; object-src 'self'/,
   "description": "DEVELOPMENT build with simple auto-reloader
 [6:00:00 PM] Waiting for changes...",
   "manifest_version": 2,
@@ -34,18 +34,18 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "runtime-reloader--background.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "pages/popup/index.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "runtime-reloader--background.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+  ],
 }
 `;
 

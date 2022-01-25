@@ -33,18 +33,18 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.js",
-  ],
-  "CONTENT": Array [
-    "content.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "content.js",
+  ],
 }
 `;
 
@@ -72,18 +72,9 @@ exports[`manifest vs output: background.js 1`] = `
 `;
 
 exports[`manifest vs output: content.js 1`] = `
-"(function () {
-  'use strict';
-
-  (function() {
-    console.log(\\"content script\\");
-  })();
-
-})();
+"console.log(\\"content script\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"matches\\":[\\"https://a.com/*\\",\\"http://b.com/*\\"],\\"js\\":[\\"content.js\\"]}],\\"host_permissions\\":[\\"https://c.com/*\\"],\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"Basic MV3 Chrome Extension\\",\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>

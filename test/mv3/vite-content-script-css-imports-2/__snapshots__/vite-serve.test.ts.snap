@@ -58,14 +58,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "crx-hmr-service-worker.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-    "assets/index.esm-wrapper-600ffb76.js",
-    "assets/index.esm-wrapper-72fbbdd0.js",
-  ],
   "CSS": Array [
     "assets/index-5f7d7b6f.css",
     "assets/index-5dfee6cc.css",
@@ -73,6 +65,14 @@ Object {
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "crx-hmr-service-worker.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+    "assets/index.esm-wrapper-600ffb76.js",
+    "assets/index.esm-wrapper-72fbbdd0.js",
+  ],
 }
 `;
 

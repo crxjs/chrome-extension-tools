@@ -16,14 +16,14 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "root-scope-service-worker.js",
-  ],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "root-scope-service-worker.js",
+  ],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -45,8 +45,6 @@ exports[`manifest vs output: background/sw.js 1`] = `
 "console.log(\\"background/sw.js\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"CRX with nested background service worker\\",\\"background\\":{\\"service_worker\\":\\"root-scope-service-worker.js\\",\\"type\\":\\"module\\"},\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: root-scope-service-worker.js 1`] = `
 "/**

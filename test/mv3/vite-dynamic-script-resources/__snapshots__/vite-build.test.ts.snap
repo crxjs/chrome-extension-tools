@@ -18,12 +18,7 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "assets/image.51f8fe9d.png",
-        "script.js",
-        "content1.js",
-        "assets/font.bb6bc8d6.otf",
-        "iframe.html",
-        "content2.js",
+        "<dynamic_scripts>",
       ],
     },
   ],
@@ -32,14 +27,14 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.js",
-  ],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.js",
+  ],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -99,8 +94,6 @@ exports[`manifest vs output: iframe.html 1`] = `
 
 </body></html>"
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"web_accessible_resources\\":[{\\"matches\\":[\\"https://github.com/*\\",\\"https://google.com/*\\"],\\"resources\\":[\\"assets/image.51f8fe9d.png\\",\\"script.js\\",\\"content1.js\\",\\"assets/font.bb6bc8d6.otf\\",\\"iframe.html\\",\\"content2.js\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: script.js 1`] = `
 "console.log(\\"main world script\\");

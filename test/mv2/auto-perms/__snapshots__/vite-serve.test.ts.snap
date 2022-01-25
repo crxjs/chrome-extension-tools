@@ -44,20 +44,20 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "runtime-reloader--background.js",
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-    "assets/content.esm-wrapper-a6ac6bbe.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "runtime-reloader--background.js",
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
 }
 `;
 

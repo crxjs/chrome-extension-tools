@@ -28,15 +28,6 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "executed-script.js",
-      ],
-    },
-    Object {
-      "matches": Array [
         "http://b.com/*",
         "https://a.com/*",
       ],
@@ -51,17 +42,17 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-    "assets/content.esm-wrapper-a6ac6bbe.js",
-  ],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
 }
 `;
 

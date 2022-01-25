@@ -17,14 +17,14 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -162,5 +162,3 @@ exports[`manifest vs output: index.js 1`] = `
 "console.log('index.js');
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"name\\":\\"input-array\\",\\"description\\":\\"input-array chrome extension\\",\\"manifest_version\\":2,\\"version\\":\\"0.1.0\\",\\"background\\":{\\"scripts\\":[\\"background.esm-wrapper.js\\"]},\\"permissions\\":[]}"`;

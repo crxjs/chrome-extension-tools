@@ -31,18 +31,18 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [
-    "content.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "content.js",
+  ],
 }
 `;
 
@@ -159,16 +159,9 @@ exports[`manifest vs output: background.js 1`] = `
 `;
 
 exports[`manifest vs output: content.js 1`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"content script\\");
-
-})();
+"console.log(\\"content script\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"background\\":{\\"scripts\\":[\\"background.esm-wrapper.js\\"]},\\"content_scripts\\":[{\\"matches\\":[\\"https://a.com/*\\",\\"http://b.com/*\\"],\\"js\\":[\\"content.js\\"]}],\\"browser_action\\":{\\"default_popup\\":\\"popup.html\\"},\\"manifest_version\\":2,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>

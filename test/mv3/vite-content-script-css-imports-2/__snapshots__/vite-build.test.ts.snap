@@ -50,11 +50,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [
-    "assets/index.esm-wrapper-600ffb76.js",
-    "assets/index.esm-wrapper-72fbbdd0.js",
-  ],
   "CSS": Array [
     "assets/index-5f7d7b6f.css",
     "assets/index-5dfee6cc.css",
@@ -62,6 +57,11 @@ Object {
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [
+    "assets/index.esm-wrapper-600ffb76.js",
+    "assets/index.esm-wrapper-72fbbdd0.js",
+  ],
 }
 `;
 
@@ -149,5 +149,3 @@ exports[`manifest vs output: content2/index.js 1`] = `
 console.log(\\"content2\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"content_scripts\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"assets/index.esm-wrapper-600ffb76.js\\"],\\"css\\":[\\"assets/index-5f7d7b6f.css\\"]},{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"assets/index.esm-wrapper-72fbbdd0.js\\"],\\"css\\":[\\"assets/index-5dfee6cc.css\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"content1/index.js\\",\\"content2/index.js\\"]}]}"`;

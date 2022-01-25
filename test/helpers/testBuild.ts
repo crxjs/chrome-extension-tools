@@ -88,6 +88,7 @@ export async function testBuildOutput(
   // All files in output have not changed
   for (const file of output) {
     const { fileName } = file
+    if (fileName === 'manifest.json') continue
     const source = isChunk(file) ? file.code : file.source
     if (source instanceof Uint8Array) continue
 

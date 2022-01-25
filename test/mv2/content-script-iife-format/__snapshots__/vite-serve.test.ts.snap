@@ -36,20 +36,20 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "runtime-reloader--background.js",
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [
-    "runtime-reloader--content-script.js",
-    "content.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "runtime-reloader--background.js",
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "runtime-reloader--content-script.js",
+    "content.js",
+  ],
 }
 `;
 
@@ -169,12 +169,7 @@ exports[`manifest vs output: background.js 1`] = `
 `;
 
 exports[`manifest vs output: content.js 1`] = `
-"(function () {
-	'use strict';
-
-	console.log(\\"content script\\");
-
-})();
+"console.log(\\"content script\\");
 "
 `;
 

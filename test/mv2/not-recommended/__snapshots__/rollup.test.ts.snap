@@ -26,8 +26,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [],
   "CSS": Array [
     "content.css",
   ],
@@ -36,6 +34,8 @@ Object {
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -82,5 +82,3 @@ exports[`manifest vs output: content.css 1`] = `
   }
   "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"name\\":\\"not-recommended\\",\\"description\\":\\"not-recommended chrome extension\\",\\"manifest_version\\":2,\\"version\\":\\"0.1.0\\",\\"background\\":{\\"page\\":\\"background.html\\"},\\"content_scripts\\":[{\\"css\\":[\\"content.css\\"],\\"matches\\":[\\"https://www.google.com/*\\"]}],\\"content_security_policy\\":\\"script-src 'self'; object-src 'self'\\",\\"permissions\\":[]}"`;

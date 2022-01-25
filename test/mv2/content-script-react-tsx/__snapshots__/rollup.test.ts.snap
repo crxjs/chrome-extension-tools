@@ -29,16 +29,16 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [
-    "assets/index.esm-wrapper-40d0d90d.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "pages/popup/index.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [
+    "assets/index.esm-wrapper-40d0d90d.js",
+  ],
 }
 `;
 
@@ -89,8 +89,6 @@ document.body.append(root);
 reactDom.exports.render(/* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Hello World!\\"), root);
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"content_scripts\\":[{\\"js\\":[\\"assets/index.esm-wrapper-40d0d90d.js\\"],\\"matches\\":[\\"https://*/*\\",\\"http://*/*\\"]}],\\"browser_action\\":{\\"default_popup\\":\\"pages/popup/index.html\\"},\\"manifest_version\\":2,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[\\"content/index.js\\"]}"`;
 
 exports[`manifest vs output: modules/vendor-43eada06.js 1`] = `
 "var react = {exports: {}};

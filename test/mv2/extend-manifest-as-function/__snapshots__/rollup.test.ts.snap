@@ -27,10 +27,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [
     "options.html",
@@ -41,6 +37,10 @@ Object {
     "images/icon-main-128.png",
   ],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -169,8 +169,6 @@ console.log('background.js');
 chrome.storage.local.clear();
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":2,\\"version\\":\\"1.0.0\\",\\"icons\\":{\\"16\\":\\"images/icon-main-16.png\\",\\"48\\":\\"images/icon-main-48.png\\",\\"128\\":\\"images/icon-main-128.png\\"},\\"name\\":\\"options.extendManifest as function123\\",\\"description\\":\\"noitcnuf sa tsefinaMdnetxe.snoitpo rof elpmaxe tset\\",\\"background\\":{\\"scripts\\":[\\"background.esm-wrapper.js\\"],\\"persistent\\":true},\\"options_page\\":\\"options.html\\",\\"permissions\\":[\\"storage\\",\\"bookmarks\\"]}"`;
 
 exports[`manifest vs output: modules/imported-bc5aae30.js 1`] = `
 "const x = 'x';

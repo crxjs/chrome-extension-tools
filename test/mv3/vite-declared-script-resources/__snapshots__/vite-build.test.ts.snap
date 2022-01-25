@@ -52,15 +52,15 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [
-    "assets/content1.esm-wrapper-8914532e.js",
-    "assets/content2.esm-wrapper-c8db90d0.js",
-  ],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [
+    "assets/content1.esm-wrapper-8914532e.js",
+    "assets/content2.esm-wrapper-c8db90d0.js",
+  ],
 }
 `;
 
@@ -150,8 +150,6 @@ exports[`manifest vs output: iframe.html 1`] = `
 
 </body></html>"
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"content_scripts\\":[{\\"matches\\":[\\"https://google.com/*\\"],\\"js\\":[\\"assets/content1.esm-wrapper-8914532e.js\\"]},{\\"matches\\":[\\"https://bing.com/*\\"],\\"js\\":[\\"assets/content2.esm-wrapper-c8db90d0.js\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"https://google.com/*\\"],\\"resources\\":[\\"assets/image.51f8fe9d.png\\",\\"script.js\\",\\"content1.js\\"]},{\\"matches\\":[\\"https://bing.com/*\\"],\\"resources\\":[\\"assets/font.bb6bc8d6.otf\\",\\"iframe.html\\",\\"content2.js\\"]}]}"`;
 
 exports[`manifest vs output: script.js 1`] = `
 "console.log(\\"main world script\\");

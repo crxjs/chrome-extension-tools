@@ -15,14 +15,14 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [
     "src/popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -40,8 +40,6 @@ Object {
   "src/popup.html": true,
 }
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"src/popup.html\\"},\\"manifest_version\\":3,\\"name\\":\\"public dir test extension\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"Chrome Extension with a public dir\\",\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: src/popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>

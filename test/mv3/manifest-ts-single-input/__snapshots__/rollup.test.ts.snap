@@ -41,18 +41,18 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "service_worker.js",
-  ],
-  "CONTENT": Array [
-    "assets/content.esm-wrapper-a6ac6bbe.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "service_worker.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
 }
 `;
 
@@ -99,8 +99,6 @@ exports[`manifest vs output: content.js 1`] = `
 "console.log(\\"content script\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"service_worker.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"]}],\\"manifest_version\\":3,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"content.js\\"]}]}"`;
 
 exports[`manifest vs output: modules/vendor-43eada06.js 1`] = `
 "var react = {exports: {}};

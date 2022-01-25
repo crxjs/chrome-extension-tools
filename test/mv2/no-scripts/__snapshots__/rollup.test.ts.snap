@@ -17,14 +17,14 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [],
   "IMAGE": Array [
     "images/icon-main-16.png",
   ],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -40,5 +40,3 @@ Object {
   "images/icon-main-16.png": true,
 }
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"name\\":\\"no-scripts\\",\\"description\\":\\"no-scripts chrome extension\\",\\"manifest_version\\":2,\\"version\\":\\"0.1.0\\",\\"browser_action\\":{\\"default_icon\\":{\\"16\\":\\"images/icon-main-16.png\\"}},\\"permissions\\":[]}"`;

@@ -19,8 +19,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [
     "devtools/devtools.html",
@@ -30,6 +28,8 @@ Object {
     "images/icon-main-16.png",
   ],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -61,8 +61,6 @@ exports[`manifest vs output: devtools/devtools.html 1`] = `
 
 </body></html>"
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"name\\":\\"html-only\\",\\"description\\":\\"html-only chrome extension\\",\\"manifest_version\\":2,\\"version\\":\\"0.1.0\\",\\"browser_action\\":{\\"default_icon\\":{\\"16\\":\\"images/icon-main-16.png\\"},\\"default_popup\\":\\"popup/popup.html\\"},\\"devtools_page\\":\\"devtools/devtools.html\\",\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: popup/popup.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>

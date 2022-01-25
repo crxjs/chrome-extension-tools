@@ -13,14 +13,14 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [],
   "CSS": Array [],
   "HTML": Array [
     "devtools.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
 }
 `;
 
@@ -60,8 +60,6 @@ chrome.devtools.panels.create(\\"test\\", \\"icon-48.png\\", \\"test.html\\", (p
 });
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"version\\":\\"0.0.2\\",\\"name\\":\\"Explore DevTools\\",\\"devtools_page\\":\\"devtools.html\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[]}"`;
 
 exports[`manifest vs output: test1.html 1`] = `
 "<!DOCTYPE html><html lang=\\"en\\"><head>

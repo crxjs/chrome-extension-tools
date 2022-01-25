@@ -70,13 +70,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [
-    "assets/content.esm-wrapper-a6ac6bbe.js",
-    "content.js",
-  ],
   "CSS": Array [
     "content.css",
   ],
@@ -92,6 +85,13 @@ Object {
   ],
   "JSON": Array [
     "_locales/**/messages.json",
+  ],
+  "SCRIPT_BACKGROUND": Array [
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+    "content.js",
   ],
 }
 `;
@@ -301,8 +301,6 @@ console.log(\\"background.js\\");
 chrome.storage.local.clear();
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"name\\":\\"mv2-kitchen-sink\\",\\"description\\":\\"mv2-kitchen-sink chrome extension\\",\\"manifest_version\\":2,\\"version\\":\\"1.0.0\\",\\"icons\\":{\\"16\\":\\"images/icon-main-16.png\\",\\"48\\":\\"images/icon-main-48.png\\",\\"128\\":\\"images/icon-main-128.png\\"},\\"default_locale\\":\\"en\\",\\"devtools_page\\":\\"devtools/devtools.html\\",\\"background\\":{\\"scripts\\":[\\"background.esm-wrapper.js\\"]},\\"permissions\\":[\\"webRequest\\",\\"webRequestBlocking\\",\\"storage\\",\\"contextMenus\\",\\"bookmarks\\",\\"cookies\\"],\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"https://www.google.com/*\\"]},{\\"js\\":[\\"content.js\\"],\\"css\\":[\\"content.css\\"],\\"matches\\":[\\"https://www.yahoo.com/*\\"]}],\\"options_page\\":\\"options.html\\",\\"browser_action\\":{\\"default_icon\\":{\\"16\\":\\"images/icon-main-16.png\\"},\\"default_popup\\":\\"popup/popup.html\\"},\\"web_accessible_resources\\":[\\"options.jpg\\",\\"fonts/*.ttf\\",\\"fonts/*.otf\\",\\"content.js\\"],\\"content_security_policy\\":\\"script-src 'self'; object-src 'self'\\"}"`;
 
 exports[`manifest vs output: modules/imported-fc5abad3.js 1`] = `
 "const x = \\"x\\";

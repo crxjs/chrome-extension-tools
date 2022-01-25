@@ -53,11 +53,6 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [],
-  "CONTENT": Array [
-    "assets/index.esm-wrapper-600ffb76.js",
-    "assets/index.esm-wrapper-72fbbdd0.js",
-  ],
   "CSS": Array [
     "assets/index-5f7d7b6f.css",
     "assets/import-3b031dc7.css",
@@ -66,6 +61,11 @@ Object {
   "HTML": Array [],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [
+    "assets/index.esm-wrapper-600ffb76.js",
+    "assets/index.esm-wrapper-72fbbdd0.js",
+  ],
 }
 `;
 
@@ -165,8 +165,6 @@ var styles = \\"\\";
 console.log(\\"content2\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"manifest_version\\":3,\\"content_scripts\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"assets/index.esm-wrapper-600ffb76.js\\"],\\"css\\":[\\"assets/index-5f7d7b6f.css\\",\\"assets/import-3b031dc7.css\\"]},{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"js\\":[\\"assets/index.esm-wrapper-72fbbdd0.js\\"],\\"css\\":[\\"assets/index-5dfee6cc.css\\",\\"assets/import-3b031dc7.css\\"]}],\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://*/*\\",\\"https://*/*\\"],\\"resources\\":[\\"modules/import-8167e8d6.js\\",\\"content1/index.js\\",\\"content2/index.js\\"]}]}"`;
 
 exports[`manifest vs output: modules/import-8167e8d6.js 1`] = `
 "var styles = \\"\\";

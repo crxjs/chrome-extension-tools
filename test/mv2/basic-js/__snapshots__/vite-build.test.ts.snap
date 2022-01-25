@@ -34,18 +34,18 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.esm-wrapper.js",
-  ],
-  "CONTENT": Array [
-    "assets/content.esm-wrapper-a6ac6bbe.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
 }
 `;
 
@@ -186,8 +186,6 @@ exports[`manifest vs output: content.js 1`] = `
 "console.log(\\"content script\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"background\\":{\\"scripts\\":[\\"background.esm-wrapper.js\\"]},\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"https://a.com/*\\",\\"http://b.com/*\\"]}],\\"browser_action\\":{\\"default_popup\\":\\"popup.html\\"},\\"manifest_version\\":2,\\"name\\":\\"Test\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"integration tests\\",\\"permissions\\":[],\\"web_accessible_resources\\":[\\"content.js\\"]}"`;
 
 exports[`manifest vs output: modules/vendor-1bbb6c82.js 1`] = `
 "var react = { exports: {} };

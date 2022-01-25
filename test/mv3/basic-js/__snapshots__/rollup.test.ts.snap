@@ -44,18 +44,18 @@ Object {
 
 exports[`manifest vs output: 01 - files from manifest 1`] = `
 Object {
-  "BACKGROUND": Array [
-    "background.js",
-  ],
-  "CONTENT": Array [
-    "assets/content.esm-wrapper-a6ac6bbe.js",
-  ],
   "CSS": Array [],
   "HTML": Array [
     "popup.html",
   ],
   "IMAGE": Array [],
   "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
 }
 `;
 
@@ -107,8 +107,6 @@ exports[`manifest vs output: content.js 1`] = `
 "console.log(\\"content script\\");
 "
 `;
-
-exports[`manifest vs output: manifest.json 1`] = `"{\\"action\\":{\\"default_popup\\":\\"popup.html\\"},\\"background\\":{\\"service_worker\\":\\"background.js\\",\\"type\\":\\"module\\"},\\"content_scripts\\":[{\\"js\\":[\\"assets/content.esm-wrapper-a6ac6bbe.js\\"],\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"]}],\\"host_permissions\\":[\\"https://c.com/*\\"],\\"manifest_version\\":3,\\"name\\":\\"mv3-basic-js\\",\\"version\\":\\"1.0.0\\",\\"description\\":\\"Basic MV3 Chrome Extension\\",\\"permissions\\":[],\\"web_accessible_resources\\":[{\\"matches\\":[\\"http://b.com/*\\",\\"https://a.com/*\\"],\\"resources\\":[\\"content.js\\"]}]}"`;
 
 exports[`manifest vs output: modules/vendor-e336c7a6.js 1`] = `
 "var react = {exports: {}};
