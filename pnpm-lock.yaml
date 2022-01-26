@@ -8,7 +8,7 @@ specifiers:
   '@rollup/plugin-json': 4.1.0
   '@rollup/plugin-node-resolve': 13.1.1
   '@rollup/pluginutils': 4.1.1
-  '@testing-library/dom': 8.11.1
+  '@testing-library/dom': 8.11.3
   '@testing-library/jest-dom': 5.16.1
   '@types/acorn': 4.0.6
   '@types/chrome': 0.0.176
@@ -118,7 +118,7 @@ devDependencies:
   '@rollup/plugin-commonjs': 21.0.1_rollup@2.61.1
   '@rollup/plugin-json': 4.1.0_rollup@2.61.1
   '@rollup/plugin-node-resolve': 13.1.1_rollup@2.61.1
-  '@testing-library/dom': 8.11.1
+  '@testing-library/dom': 8.11.3
   '@testing-library/jest-dom': 5.16.1
   '@types/chrome': 0.0.176
   '@types/fs-extra': 9.0.13
@@ -873,8 +873,8 @@ packages:
       '@sinonjs/commons': 1.8.3
     dev: true
 
-  /@testing-library/dom/8.11.1:
-    resolution: {integrity: sha512-3KQDyx9r0RKYailW2MiYrSSKEfH0GTkI51UGEvJenvcoDoeRYs0PZpi2SXqtnMClQvCqdtTTpOfFETDTVADpAg==}
+  /@testing-library/dom/8.11.3:
+    resolution: {integrity: sha512-9LId28I+lx70wUiZjLvi1DB/WT2zGOxUh46glrSNMaWVx849kKAluezVzZrXJfTKKoQTmEOutLes/bHg4Bj3aA==}
     engines: {node: '>=12'}
     dependencies:
       '@babel/code-frame': 7.16.0
