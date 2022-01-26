@@ -1,5 +1,4 @@
 import { parseManifest } from '$src/files_parseManifest'
-import { format } from '$src/helpers'
 import {
   filesReady,
   stopFileWriter,
@@ -7,7 +6,6 @@ import {
 import { isMV2 } from '$src/types'
 import fs from 'fs-extra'
 import globCb, { hasMagic } from 'glob'
-import jsesc from 'jsesc'
 import path from 'path'
 import { createServer, Manifest, ViteDevServer } from 'vite'
 import { mockDate } from './mockDate'
