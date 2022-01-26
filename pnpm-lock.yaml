@@ -3,7 +3,7 @@ lockfileVersion: 5.3
 specifiers:
   '@extend-chrome/messages': 1.2.2
   '@extend-chrome/storage': 1.5.0
-  '@rollup/plugin-alias': 3.1.8
+  '@rollup/plugin-alias': 3.1.9
   '@rollup/plugin-commonjs': 21.0.1
   '@rollup/plugin-json': 4.1.0
   '@rollup/plugin-node-resolve': 13.1.1
@@ -114,7 +114,7 @@ dependencies:
 devDependencies:
   '@extend-chrome/messages': 1.2.2
   '@extend-chrome/storage': 1.5.0
-  '@rollup/plugin-alias': 3.1.8_rollup@2.61.1
+  '@rollup/plugin-alias': 3.1.9_rollup@2.61.1
   '@rollup/plugin-commonjs': 21.0.1_rollup@2.61.1
   '@rollup/plugin-json': 4.1.0_rollup@2.61.1
   '@rollup/plugin-node-resolve': 13.1.1_rollup@2.61.1
@@ -792,8 +792,8 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
 
-  /@rollup/plugin-alias/3.1.8_rollup@2.61.1:
-    resolution: {integrity: sha512-tf7HeSs/06wO2LPqKNY3Ckbvy0JRe7Jyn98bXnt/gfrxbe+AJucoNJlsEVi9sdgbQtXemjbakCpO/76JVgnHpA==}
+  /@rollup/plugin-alias/3.1.9_rollup@2.61.1:
+    resolution: {integrity: sha512-QI5fsEvm9bDzt32k39wpOwZhVzRcL5ydcffUHMyLVaVaLeC70I8TJZ17F1z1eMoLu4E/UOcH9BWVkKpIKdrfiw==}
     engines: {node: '>=8.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0
