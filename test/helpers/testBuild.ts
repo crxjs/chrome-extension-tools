@@ -12,7 +12,7 @@ import {
   RollupOutput,
 } from 'rollup'
 import { build } from 'vite'
-import { mockDate } from './stubDate'
+import { mockDate } from './mockDate'
 import { SpecialFilesMap } from './testServe'
 
 /* ------------------ SETUP TESTS ------------------ */
@@ -71,7 +71,12 @@ export async function testBuildOutput(
   const { source } = output.find(
     byFileName('manifest.json'),
   ) as Asset & { source: string }
-  const manifest: Manifest = JSON.parse(source)
+  const manifest: Manifest = JSON.parse(
+    source.replace(
+      /http:\/\/localhost:\d{4}/g,
+      'http://localhost:3000',
+    ),
+  )
 
   // Manifest has not changed
   if (specialFiles.has('manifest.json')) {

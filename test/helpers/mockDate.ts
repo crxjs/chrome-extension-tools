@@ -1,4 +1,4 @@
-export const mockedDate = '2021-12-07T03:24:00'
+export const mockedDate = '2022-01-26T00:00:00.000Z'
 export const mockedNow = jest.fn(() =>
   new Date(mockedDate).getTime(),
 )

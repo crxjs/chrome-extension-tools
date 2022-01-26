@@ -37,19 +37,6 @@ test('manifest vs output', async () => {
       ),
     ).toMatchSnapshot(name)
   })
-  specialFiles.set('manifest.json', (source, name) => {
-    const port = shared.devServer!.config.server.port!
-    expect(typeof port).toBe('number')
-
-    const manifest = JSON.parse(
-      source.replace(
-        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
-        'http://localhost:3000',
-      ),
-    )
-
-    expect(manifest).toMatchSnapshot(name)
-  })
 
   await testViteServe(shared, specialFiles)
 })

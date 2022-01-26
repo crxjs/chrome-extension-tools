@@ -17,13 +17,12 @@ Object {
       ],
     },
   ],
-  "description": "DEVELOPMENT build with simple auto-reloader
-[3:24:00 AM] Waiting for changes...",
+  "description": StringMatching /\\\\\\[\\.\\+\\?\\\\\\] Waiting/,
   "manifest_version": 3,
   "name": "mv3-basic-js",
   "permissions": Array [],
   "version": "1.0.0",
-  "version_name": "2021-12-07T09:24:00.000Z",
+  "version_name": "2022-01-26T00:00:00.000Z",
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
@@ -1803,7 +1802,7 @@ exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 
     const [sendReload, reloadStream] = getMessage(\\"RELOAD\\");
     const [sendUpdateVersion, updateVersionStream] = getMessage(\\"UPDATE_VERSION\\");
-    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[3:24:00 AM] Waiting for changes...\\";
+    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[TIMESTAMP] Waiting for changes...\\";
 
     console.log(getDevWarning());
     const { name } = chrome.runtime.getManifest();

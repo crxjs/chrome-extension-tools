@@ -1,13 +1,16 @@
 import { parseManifest } from '$src/files_parseManifest'
+import { format } from '$src/helpers'
 import {
   filesReady,
   stopFileWriter,
 } from '$src/plugin-viteServeFileWriter'
+import { isMV2 } from '$src/types'
 import fs from 'fs-extra'
 import globCb, { hasMagic } from 'glob'
+import jsesc from 'jsesc'
 import path from 'path'
-import { createServer, ViteDevServer } from 'vite'
-import { mockDate } from './stubDate'
+import { createServer, Manifest, ViteDevServer } from 'vite'
+import { mockDate } from './mockDate'
 
 /* ------------------ SETUP TESTS ------------------ */
 mockDate()
@@ -63,7 +66,11 @@ export function setupViteServe({
 export type SpecialFilesMap = Map<
   string | RegExp,
   // TODO: make sure these files are the same
-  (source: string, snapshotName: string) => void
+  (
+    source: string,
+    snapshotName: string,
+    matcher?: Record<string, any>,
+  ) => void
 >
 
 export async function testViteServe(
@@ -92,12 +99,28 @@ export async function testViteServe(
   const manifestPath = path.join(outDir, 'manifest.json')
   const manifest = await fs.readJson(manifestPath)
 
+  const desc: Partial<Manifest> = {
+    description: expect.stringMatching(/\[.+?\] Waiting/),
+  }
+  const csp: Partial<Manifest> = isMV2(manifest)
+    ? {
+        content_security_policy: expect.stringMatching(
+          /script-src 'self' http:\/\/localhost:\d{4}; object-src 'self'/,
+        ),
+      }
+    : {}
+  const matcher: Partial<Manifest> = { ...desc, ...csp }
+
   // Manifest has not changed
   if (specialFiles.has('manifest.json')) {
     const source = JSON.stringify(manifest)
-    specialFiles.get('manifest.json')!(source, '00 - manifest')
+    specialFiles.get('manifest.json')!(
+      source,
+      '00 - manifest',
+      matcher,
+    )
   } else {
-    expect(manifest).toMatchSnapshot('00 - manifest')
+    expect(manifest).toMatchSnapshot(matcher, '00 - manifest')
   }
 
   // Manifest files have not changed
@@ -117,12 +140,16 @@ export async function testViteServe(
     if (filepath === manifestPath) continue
 
     const source = await fs.readFile(filepath, 'utf8')
+    const replaced = source.replace(
+      /auto-reloader\\n\[.+?\] Waiting/g,
+      'auto-reloader\\n[TIMESTAMP] Waiting',
+    )
 
     const key = findSpecial(fileName)
     if (key) {
-      specialFiles.get(key)!(source, fileName)
+      specialFiles.get(key)!(replaced, fileName)
     } else {
-      expect(source).toMatchSnapshot(fileName)
+      expect(replaced).toMatchSnapshot(fileName)
     }
   }
 

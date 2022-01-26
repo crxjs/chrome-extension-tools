@@ -37,21 +37,13 @@ test('manifest vs output', async () => {
       ),
     ).toMatchSnapshot(name)
   })
-  specialFiles.set('manifest.json', (source, name) => {
-    const port = shared.devServer!.config.server.port!
-    expect(typeof port).toBe('number')
-
-    const manifest = JSON.parse(
-      source.replace(
-        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
-        'http://localhost:3000',
-      ),
-    )
-
+  specialFiles.set('manifest.json', (source, name, matcher) => {
+    const manifest = JSON.parse(source)
     expect(manifest).toMatchSnapshot(
       {
+        ...matcher,
         content_security_policy: expect.stringMatching(
-          /script-src 'self' http:\/\/localhost:3000 'sha256-.+?'; object-src 'self'/,
+          /script-src 'self' http:\/\/localhost:\d{4} 'sha256-.+?'; object-src 'self'/,
         ),
       },
       name,
