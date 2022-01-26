@@ -25,7 +25,7 @@ Object {
   ],
   "content_security_policy": "script-src 'self' http://localhost:3000; object-src 'self'",
   "description": "DEVELOPMENT build with simple auto-reloader
-[6:00:00 PM] Waiting for changes...",
+[3:24:00 AM] Waiting for changes...",
   "manifest_version": 2,
   "name": "Test",
   "optional_permissions": Array [
@@ -35,7 +35,7 @@ Object {
     "notifications",
   ],
   "version": "1.0.0",
-  "version_name": "2021-12-07T00:00:00.000Z",
+  "version_name": "2021-12-07T09:24:00.000Z",
   "web_accessible_resources": Array [
     "**/*",
     "*",
@@ -2146,7 +2146,7 @@ exports[`manifest vs output: runtime-reloader--background.js 1`] = `
 
     const [sendReload, reloadStream$1] = getMessage(\\"RELOAD\\");
     const [sendUpdateVersion, updateVersionStream] = getMessage(\\"UPDATE_VERSION\\");
-    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\";
+    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[3:24:00 AM] Waiting for changes...\\";
 
     console.log(getDevWarning());
     const reloadStream = merge(updateVersionStream, interval(1e3)).pipe(throttleTime(1e3), mergeMap(() => fromFetch(\\"manifest.json\\")), mergeMap((r) => r.json()), retry(), filter((m) => !isUndefined(m)), map(({ version_name }) => version_name), pairwise(), filter(([prev, next]) => prev !== next));
@@ -3841,7 +3841,7 @@ exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 
     const [sendReload, reloadStream] = getMessage(\\"RELOAD\\");
     const [sendUpdateVersion, updateVersionStream] = getMessage(\\"UPDATE_VERSION\\");
-    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\";
+    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[3:24:00 AM] Waiting for changes...\\";
 
     console.log(getDevWarning());
     const { name } = chrome.runtime.getManifest();

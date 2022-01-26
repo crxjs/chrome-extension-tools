@@ -12,11 +12,11 @@ import {
   RollupOutput,
 } from 'rollup'
 import { build } from 'vite'
-import { stubDate } from './stubDate'
+import { mockDate } from './stubDate'
 import { SpecialFilesMap } from './testServe'
 
 /* ------------------ SETUP TESTS ------------------ */
-stubDate()
+mockDate()
 
 export async function getRollupOutput(dirname: string) {
   process.chdir(dirname)

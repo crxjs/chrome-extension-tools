@@ -7,10 +7,10 @@ import fs from 'fs-extra'
 import globCb, { hasMagic } from 'glob'
 import path from 'path'
 import { createServer, ViteDevServer } from 'vite'
-import { stubDate } from './stubDate'
+import { mockDate } from './stubDate'
 
 /* ------------------ SETUP TESTS ------------------ */
-stubDate()
+mockDate()
 
 export const glob = (
   pattern: string,

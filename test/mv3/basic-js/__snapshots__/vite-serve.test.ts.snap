@@ -22,7 +22,7 @@ Object {
     },
   ],
   "description": "DEVELOPMENT build with simple auto-reloader
-[6:00:00 PM] Waiting for changes...",
+[3:24:00 AM] Waiting for changes...",
   "host_permissions": Array [
     "https://c.com/*",
   ],
@@ -30,7 +30,7 @@ Object {
   "name": "mv3-basic-js",
   "permissions": Array [],
   "version": "1.0.0",
-  "version_name": "2021-12-07T00:00:00.000Z",
+  "version_name": "2021-12-07T09:24:00.000Z",
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
@@ -2039,7 +2039,7 @@ exports[`manifest vs output: background.js 1`] = `
   const { getMessage } = messages;
   const [sendReload, reloadStream$1] = getMessage(\\"RELOAD\\");
   const [sendUpdateVersion, updateVersionStream] = getMessage(\\"UPDATE_VERSION\\");
-  const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\";
+  const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[3:24:00 AM] Waiting for changes...\\";
   console.log(getDevWarning());
   const reloadStream = merge(updateVersionStream, interval(1e3)).pipe(throttleTime(1e3), mergeMap(() => fromFetch(\\"manifest.json\\")), mergeMap((r) => r.json()), retry(), filter((m) => !isUndefined(m)), map(({ version_name }) => version_name), pairwise(), filter(([prev, next]) => prev !== next));
   updateVersionStream.pipe(startWith([void 0, { tab: { id: void 0 } }]), scan((tabIds, [, { tab = {} }]) => isNumber(tab == null ? void 0 : tab.id) ? tabIds.add(tab.id) : tabIds, /* @__PURE__ */ new Set()), sample(reloadStream), map((set) => Array.from(set)), mergeMap((ids) => Promise.all(ids.map((tabId) => sendReload(void 0, { tabId })))), delay(100)).subscribe(() => chrome.runtime.reload());
@@ -2063,7 +2063,7 @@ exports[`manifest vs output: popup.html 1`] = `
   </head>
   <body>
     <div id=\\"root\\"></div>
-    <script src=\\"./popup.jsx?t=1638835200000\\" type=\\"module\\"></script>
+    <script src=\\"./popup.jsx?t=1638869040000\\" type=\\"module\\"></script>
   
 
 </body></html>"
@@ -3754,7 +3754,7 @@ exports[`manifest vs output: runtime-reloader--content-script.js 1`] = `
 
     const [sendReload, reloadStream] = getMessage(\\"RELOAD\\");
     const [sendUpdateVersion, updateVersionStream] = getMessage(\\"UPDATE_VERSION\\");
-    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[6:00:00 PM] Waiting for changes...\\";
+    const getDevWarning = () => \\"DEVELOPMENT build with simple auto-reloader\\\\n[3:24:00 AM] Waiting for changes...\\";
 
     console.log(getDevWarning());
     const { name } = chrome.runtime.getManifest();
