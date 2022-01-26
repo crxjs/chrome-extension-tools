@@ -1,9 +1,9 @@
-export const mockedDate = '2021-12-07'
+export const mockedDate = '2022-01-26T00:00:00.000Z'
 export const mockedNow = jest.fn(() =>
   new Date(mockedDate).getTime(),
 )
 
-export const stubDate = () => {
+export const mockDate = () => {
   Date.now = mockedNow
 
   /**
@@ -20,11 +20,4 @@ export const stubDate = () => {
       return new MockedRealDate(mockedDate)
     }
   }
-
-  /**
-   * Reset global.Date to original Date (MockedRealDate) after every test
-   */
-  afterEach(() => {
-    global.Date = MockedRealDate
-  })
 }

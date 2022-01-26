@@ -65,7 +65,11 @@ export type AssetType =
   | 'MANIFEST'
   | 'RAW'
 
-export type ScriptType = 'BACKGROUND' | 'CONTENT' | 'MODULE'
+export type ScriptType =
+  | 'SCRIPT_BACKGROUND'
+  | 'SCRIPT_DECLARED'
+  | 'SCRIPT_DYNAMIC'
+  | 'SCRIPT_HTML'
 
 export type FileType = AssetType | ScriptType
 
@@ -129,6 +133,7 @@ export interface EmittedFile {
   type: 'chunk' | 'asset'
   refId: string
   source?: string | Uint8Array
+  wrapperName?: string
 }
 
 interface CrxHookTypes {
@@ -191,11 +196,17 @@ export interface ChromeExtensionOptions {
    * import browser from 'webextension-polyfill'
    * ```
    */
-  browserPolyfill?:
+  browserPolyfill:
     | boolean
     | {
         executeScript: boolean
       }
+  /**
+   * Content scripts use ES modules by default.
+   * Set to 'iife' if you need content scripts not to use ESM.
+   * Note that content script HMR is only compatible with ESM.
+   */
+  contentScriptFormat: 'iife' | 'esm'
   /**
    * @deprecated Use a dynamic manifest instead.
    * TODO: add link to docs

@@ -1,14 +1,32 @@
 import { set } from 'lodash'
-import { OutputAsset, OutputChunk } from 'rollup'
+import { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 import type {
   Manifest as ViteFilesManifest,
   ManifestChunk,
 } from 'vite'
 import { isChunk } from './helpers'
 import { relative } from './path'
+import { helperScripts } from './plugin-contentScriptESM'
 import { importedResourcePrefix } from './plugin-importedResources'
-import { getRpceAPI, stubUrl } from './plugin_helpers'
-import { CrxPlugin, FileType, isMV2, Manifest } from './types'
+import {
+  generateFileNames,
+  getRpceAPI,
+  RpceApi,
+  stubUrl,
+} from './plugin_helpers'
+import {
+  ChromeExtensionOptions,
+  CrxPlugin,
+  isMV2,
+  Manifest,
+} from './types'
+
+// recurse through content script imports
+type Resources = {
+  assets: Set<string>
+  css: Set<string>
+  imports: Set<string>
+}
 
 /**
  * Content script resources like CSS and image files must be declared
@@ -32,22 +50,225 @@ import { CrxPlugin, FileType, isMV2, Manifest } from './types'
  */
 export const dynamicScriptPlaceholder = '<dynamic_scripts>'
 
+function getChunksById(bundle: OutputBundle) {
+  return Object.entries(bundle).reduce(
+    (map, [outputName, chunk]) => {
+      if (isChunk(chunk) && chunk.facadeModuleId)
+        map.set(chunk.facadeModuleId, outputName)
+      return map
+    },
+    new Map<string, string>(),
+  )
+}
+
+function getCrxImportsFromBundle(
+  { modules, imports, dynamicImports }: OutputChunk,
+  chunksById: Map<string, string>,
+  { root }: RpceApi,
+) {
+  const resources = Object.keys(modules)
+    .filter((m) => m.startsWith(importedResourcePrefix))
+    .map((m) => m.slice(importedResourcePrefix.length))
+    .map((m) => stubUrl(m).pathname)
+
+  const chunks = [...imports, ...dynamicImports]
+  const assets = []
+  for (const id of resources) {
+    const chunk = chunksById.get(id)
+    if (chunk) chunks.push(chunk)
+    else assets.push(relative(root, id))
+  }
+
+  return { chunks, assets }
+}
+
+/**
+ * Dynamic content script strategy
+ *
+ * Imported CSS in dynamic content script:
+ * - add file to web_accessible_resources
+ * - add client code to importer
+ *   - create style tag
+ *   - support css modules
+ *   - support HMR for css
+ *
+ * Use Cases:
+ * - imported script is executed by a background page
+ *   - importer is SCRIPT_BACKGROUND
+ * - imported script is executed by a script on an HTML page
+ *   - importer is SCRIPT_HTML
+ * - imported script is executed by a script in main world
+ *   - importer is SCRIPT_DYNAMIC or SCRIPT_DECLARED
+ *   - is included in importer resources
+ *   - covered by `getResources`
+ *
+ * Strategy:
+ * - correlate emitted files to bundle chunks
+ * - find imported scripts in those chunks
+ * - run `getResources`
+ * - MV2: just add the resources to web_accessible_resources
+ * - MV3: use special placeholder in web_accessible_resources#resources
+ *   - eg, "<dynamic_scripts>"
+ *   - warn if placeholder is not found
+ *   - could support a list of match patterns if needed
+ *     - should be relative to root
+ *     - eg, "<dynamic_scripts>:src/script1.ts,src/scripts/*.ts"
+ *
+ * ```jsonc
+ * {
+ *   web_accessible_resources: [{
+ *     resources: ["<dynamic_scripts>"],
+ *     matches: ["https://*", "file:///*.mp3", "..."]
+ *   }]
+ * }
+ * ```
+ */
+function updateContentScriptResources(
+  api: RpceApi,
+  manifest: Manifest,
+  isESM: boolean,
+  /** Recursively gets script imports */
+  getResources: (name: string) => Resources,
+): Manifest {
+  // set default value
+  manifest.web_accessible_resources =
+    manifest.web_accessible_resources ?? []
+
+  // update declared scripts resources
+  const mainWorldScripts = new Set<string>()
+  for (const script of manifest.content_scripts ?? []) {
+    for (const name of script.js ?? []) {
+      if (helperScripts.includes(name)) continue
+
+      const { assets, css, imports } = getResources(name)
+
+      for (const i of imports) {
+        const file = api.filesByFileName.get(i)
+        if (file?.fileType === 'SCRIPT_DYNAMIC') {
+          mainWorldScripts.add(file.fileName)
+        }
+      }
+
+      const { outputFileName } = generateFileNames(name)
+
+      if (isESM) imports.add(outputFileName)
+
+      if (css.size) {
+        script.css = script.css ?? []
+        script.css.push(...css)
+      }
+
+      if (assets.size + imports.size) {
+        if (isMV2(manifest)) {
+          manifest.web_accessible_resources?.push(
+            ...assets,
+            ...imports,
+          )
+        } else {
+          manifest.web_accessible_resources?.push({
+            // script.matches is always defined
+            matches: script.matches!,
+            resources: [...assets, ...imports],
+          })
+        }
+      }
+    }
+  }
+
+  // update dynamic script resources
+  // - exclude main world scripts used by declared scripts
+  const dynamicResources = new Set<string>()
+  for (const file of api.filesByFileName.values()) {
+    if (
+      file.fileType === 'SCRIPT_DYNAMIC' &&
+      !mainWorldScripts.has(file.fileName)
+    ) {
+      const { assets, css, imports } = getResources(
+        file.fileName,
+      )
+
+      if (isESM) dynamicResources.add(file.fileName)
+      for (const a of assets) dynamicResources.add(a)
+      for (const c of css) dynamicResources.add(c)
+      for (const i of imports) dynamicResources.add(i)
+    }
+  }
+
+  // update manifest.web_accessible_resources
+  if (dynamicResources.size) {
+    if (isMV2(manifest)) {
+      manifest.web_accessible_resources!.push(
+        ...dynamicResources,
+      )
+    } else {
+      let resource = manifest.web_accessible_resources!.find(
+        ({ resources: [r] }) => r === dynamicScriptPlaceholder,
+      )
+      if (!resource) {
+        resource = {
+          resources: [dynamicScriptPlaceholder],
+          matches: ['http://*/*', 'https://*/*'],
+        }
+        manifest.web_accessible_resources!.push(resource)
+      }
+
+      resource.resources = [...dynamicResources]
+    }
+  }
+
+  // clean up manifest
+  if (!manifest.web_accessible_resources?.length) {
+    // array is empty or undefined
+    delete manifest.web_accessible_resources
+  } else if (isMV2(manifest)) {
+    // remove duplicates
+    manifest.web_accessible_resources = [
+      ...new Set(manifest.web_accessible_resources),
+    ]
+  } else {
+    // remove duplicate match patterns
+    const map = new Map<string, Set<string>>()
+    for (const {
+      matches,
+      resources,
+    } of manifest.web_accessible_resources!) {
+      const key = JSON.stringify(matches.sort())
+      const set = map.get(key) ?? new Set()
+      resources.forEach((r) => set.add(r))
+      map.set(key, set)
+    }
+    manifest.web_accessible_resources = [...map].map(
+      ([key, set]) => ({
+        matches: JSON.parse(key),
+        resources: [...set],
+      }),
+    )
+  }
+
+  return manifest
+}
+
 /**
  * Handles imported resources for content scripts.
  * - Supports both declared and dynamic content scripts
  * - Adds imported CSS files to content scripts in manifest
  * - Adds imported assets and scripts to web_accessible_resources
  */
-export const contentScriptResources = (): CrxPlugin => {
+export const contentScriptResources = ({
+  contentScriptFormat,
+}: ChromeExtensionOptions): CrxPlugin => {
+  let isVite: boolean
+  let api: RpceApi
   return {
     name: 'content-script-resources',
     apply: 'build',
     config(config) {
+      isVite = true
       set(config, 'build.manifest', true)
       return config
     },
     configResolved({ plugins }) {
-      const api = getRpceAPI(plugins)
+      api = getRpceAPI(plugins)
       const viteManifest = plugins.find(
         ({ name }) => name === 'vite:manifest',
       )!
@@ -58,6 +279,10 @@ export const contentScriptResources = (): CrxPlugin => {
         bundle,
         isWrite,
       ) {
+        if (this.meta.watchMode) return
+
+        /* ---------------- VITE BUILD ONLY ---------------- */
+        // generates a very specific resource list
         let filesData: ViteFilesManifest
         await realHook.call(
           {
@@ -79,15 +304,6 @@ export const contentScriptResources = (): CrxPlugin => {
           isWrite,
         )
 
-        const manifestAsset = bundle[
-          'manifest.json'
-        ] as OutputAsset
-        const manifest: Manifest = JSON.parse(
-          manifestAsset.source as string,
-        )
-        manifest.web_accessible_resources =
-          manifest.web_accessible_resources ?? []
-
         const files = Object.entries(filesData!)
         if (!files.length) return
 
@@ -95,46 +311,14 @@ export const contentScriptResources = (): CrxPlugin => {
           (map, [, file]) => map.set(file.file, file),
           new Map<string, ManifestChunk>(),
         )
-        const chunksById = Object.entries(bundle).reduce(
-          (map, [outputName, chunk]) => {
-            return isChunk(chunk) && chunk.facadeModuleId
-              ? map.set(chunk.facadeModuleId, outputName)
-              : map
-          },
-          new Map<string, string>(),
-        )
-        const getCrxImportsFromBundle = (
-          modules: OutputChunk['modules'],
-        ) => {
-          const resources = Object.keys(modules)
-            .filter((m) => m.startsWith(importedResourcePrefix))
-            .map((m) => m.slice(importedResourcePrefix.length))
-            .map((m) => stubUrl(m).pathname)
-
-          const chunks = []
-          const assets = []
-          for (const id of resources) {
-            const chunk = chunksById.get(id)
-            if (chunk) chunks.push(chunk)
-            else assets.push(relative(api.root, id))
-          }
-
-          return { chunks, assets }
-        }
-
-        // recurse through content script imports
-        type Resources = {
-          assets: Set<string>
-          css: Set<string>
-          imports: Set<string>
-        }
+        const chunksById = getChunksById(bundle)
         const getResources = (
           name: string,
-          sets = {
+          sets: Resources = {
             assets: new Set(),
             css: new Set(),
             imports: new Set(),
-          } as Resources,
+          },
         ): Resources => {
           const {
             assets = [],
@@ -148,173 +332,115 @@ export const contentScriptResources = (): CrxPlugin => {
 
           const chunk = bundle[file]
           const crxImports = isChunk(chunk)
-            ? getCrxImportsFromBundle(chunk.modules)
+            ? getCrxImportsFromBundle(chunk, chunksById, api)
             : { chunks: [], assets: [] }
 
           for (const a of [...assets, ...crxImports.assets])
             sets.assets.add(a)
           for (const c of css) sets.css.add(c)
-          for (const i of [
-            ...dynamicImports,
-            ...imports,
-            ...crxImports.chunks,
-          ]) {
+          for (const key of [...dynamicImports, ...imports]) {
+            const i = filesData[key].file
             sets.imports.add(i)
-            getResources(i, sets)
+            getResources(key, sets)
+          }
+          for (const chunk of crxImports.chunks) {
+            sets.imports.add(chunk)
+            getResources(chunk, sets)
           }
 
           return sets
         }
 
-        // content scripts in the manifest
-        const { content_scripts: scripts = [] } = manifest
-        const declaredScriptResources = new Map<
-          string,
-          Resources
-        >()
-        for (const script of scripts) {
-          for (const name of script.js ?? []) {
-            const { assets, css, imports } =
-              declaredScriptResources.get(name) ??
-              getResources(name)
-            declaredScriptResources.set(name, {
-              assets,
-              css,
-              imports,
-            })
+        const manifestAsset = bundle[
+          'manifest.json'
+        ] as OutputAsset
+        const manifest: Manifest = JSON.parse(
+          manifestAsset.source as string,
+        )
+        const result = updateContentScriptResources(
+          api,
+          manifest,
+          contentScriptFormat === 'esm',
+          getResources,
+        )
+        manifestAsset.source = JSON.stringify(result)
+      }
+    },
+    buildStart({ plugins }) {
+      if (isVite) return
 
-            if (css.size) {
-              script.css = script.css ?? []
-              script.css.push(...css)
-            }
+      api = getRpceAPI(plugins)
+    },
+    generateBundle(options, bundle) {
+      if (this.meta.watchMode) {
+        /* ---------- VITE SERVE AND ROLLUP WATCH ---------- */
+        // use generic resources for file writer / watch mode
 
-            if (assets.size === 0) continue
-            else if (isMV2(manifest)) {
-              manifest.web_accessible_resources!.push(...assets)
-            } else {
-              manifest.web_accessible_resources!.push({
-                // script.matches is always defined
-                matches: script.matches!,
-                resources: [...assets, ...imports],
-              })
-            }
-          }
-        }
+        const manifestAsset = bundle[
+          'manifest.json'
+        ] as OutputAsset
+        const manifest: Manifest = JSON.parse(
+          manifestAsset.source as string,
+        )
 
-        /**
-         * Dynamic content scripts
-         *
-         * Imported CSS in dynamic content script:
-         * - add file to web_accessible_resources
-         * - add client code to importer
-         *   - create style tag
-         *   - support css modules
-         *   - support HMR for css
-         *
-         * Use Cases:
-         * - imported script is executed by a background page
-         *   - importer is BACKGROUND
-         * - imported script is executed by a script on an HTML page
-         *   - importer is MODULE
-         * - imported script is executed by a script in main world
-         *   - importer is SCRIPT
-         *   - is included in importer resources
-         *   - covered by `getResources`
-         *
-         * Strategy:
-         * - correlate emitted files to bundle chunks
-         * - find imported scripts in those chunks
-         * - run `getResources`
-         * - MV2: just add the resources to web_accessible_resources
-         * - MV3: use special placeholder in web_accessible_resources#resources
-         *   - eg, "<dynamic_scripts>"
-         *   - warn if placeholder is not found
-         *   - could support a list of match patterns if needed
-         *     - should be relative to root
-         *     - eg, "<dynamic_scripts>:src/script1.ts,src/scripts/*.ts"
-         *
-         * ```jsonc
-         * {
-         *   web_accessible_resources: [{
-         *     resources: ["<dynamic_scripts>"],
-         *     matches: ["https://*", "file:///*.mp3", "..."]
-         *   }]
-         * }
-         * ```
-         */
-
-        const executorFileTypes: FileType[] = [
-          'BACKGROUND',
-          'MODULE',
-        ]
-        const dynamicScripts = [...api.files.values()]
-          .filter(({ fileType }) =>
-            executorFileTypes.includes(fileType),
-          )
-          .map(({ refId }) => this.getFileName(refId))
-          .map((fileName) => bundle[fileName] as OutputChunk)
-          .flatMap(
-            ({ modules }) =>
-              getCrxImportsFromBundle(modules).chunks,
-          )
-
-        const dynamicScriptResources = new Map<
-          string,
-          Resources
-        >()
-        const resourceSet = new Set<string>()
-        for (const script of dynamicScripts) {
-          if (dynamicScriptResources.has(script)) continue
-          const { assets, css, imports } =
-            declaredScriptResources.get(script) ??
-            getResources(script)
-          dynamicScriptResources.set(script, {
-            assets,
-            css,
-            imports,
+        manifest.web_accessible_resources =
+          manifest.web_accessible_resources ?? []
+        if (isMV2(manifest)) {
+          manifest.web_accessible_resources!.push('**/*', '*')
+        } else {
+          manifest.web_accessible_resources!.push({
+            matches: ['<all_urls>'],
+            resources: ['**/*', '*'],
+            // @ts-expect-error @types/chrome is out of date
+            use_dynamic_url: true,
           })
-          for (const a of assets) resourceSet.add(a)
-          for (const c of css) resourceSet.add(c)
-          for (const i of imports) resourceSet.add(i)
-        }
-
-        if (resourceSet.size) {
-          if (isMV2(manifest)) {
-            manifest.web_accessible_resources!.push(
-              ...resourceSet,
-            )
-          } else {
-            let resource =
-              manifest.web_accessible_resources!.find(
-                ({ resources: [r] }) =>
-                  r === dynamicScriptPlaceholder,
-              )
-            if (!resource) {
-              this.warn(
-                'Using default match pattern for dynamic script resources',
-              )
-              resource = {
-                resources: [dynamicScriptPlaceholder],
-                matches: ['http://*/*', 'https://*/*'],
-              }
-              manifest.web_accessible_resources!.push(resource)
-            }
-
-            resource.resources = [...resourceSet]
-          }
-        }
-
-        // Clean up manifest
-        if (!manifest.web_accessible_resources.length) {
-          delete manifest.web_accessible_resources
-        } else if (isMV2(manifest)) {
-          manifest.web_accessible_resources = [
-            ...new Set(manifest.web_accessible_resources),
-          ]
         }
 
         manifestAsset.source = JSON.stringify(manifest)
       }
+
+      if (isVite) return
+
+      /* --------------- ROLLUP BUILD ONLY --------------- */
+      // rollup doesn't support static asset imports
+
+      const chunksById = getChunksById(bundle)
+      const getResources = (
+        name: string,
+        sets: Resources = {
+          assets: new Set(),
+          css: new Set(),
+          imports: new Set(),
+        },
+      ): Resources => {
+        const { outputFileName } = generateFileNames(name)
+        const chunk = bundle[outputFileName]
+        const { assets, chunks } = isChunk(chunk)
+          ? getCrxImportsFromBundle(chunk, chunksById, api)
+          : { chunks: [], assets: [] }
+
+        for (const a of assets) sets.assets.add(a)
+        for (const chunk of chunks) {
+          sets.imports.add(chunk)
+          getResources(chunk, sets)
+        }
+
+        return sets
+      }
+
+      const manifestAsset = bundle[
+        'manifest.json'
+      ] as OutputAsset
+      const manifest: Manifest = JSON.parse(
+        manifestAsset.source as string,
+      )
+      const result = updateContentScriptResources(
+        api,
+        manifest,
+        contentScriptFormat === 'esm',
+        getResources,
+      )
+      manifestAsset.source = JSON.stringify(result)
     },
   }
 }

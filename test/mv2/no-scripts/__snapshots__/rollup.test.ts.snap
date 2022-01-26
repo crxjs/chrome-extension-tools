@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "browser_action": Object {
+    "default_icon": Object {
+      "16": "images/icon-main-16.png",
+    },
+  },
+  "description": "no-scripts chrome extension",
+  "manifest_version": 2,
+  "name": "no-scripts",
+  "permissions": Array [],
+  "version": "0.1.0",
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [
+    "images/icon-main-16.png",
+  ],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "images/icon-main-16.png",
+  "manifest.json",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "images/icon-main-16.png": true,
+}
+`;

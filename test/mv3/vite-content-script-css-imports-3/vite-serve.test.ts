@@ -1,81 +1,42 @@
-import { runtimeReloaderCS } from '$src/plugin-runtimeReloader'
+import { hmrServiceWorkerName } from '$src/plugin-viteServeHMR_MV3'
 import {
-  filesReady,
-  stopFileWriter,
-} from '$src/plugin-viteServeFileWriter'
+  testViteServe,
+  setupViteServe,
+  SpecialFilesMap,
+} from '$test/helpers/testServe'
 import { jestSetTimeout } from '$test/helpers/timeout'
-import fs from 'fs-extra'
-import path from 'path'
-import { createServer, ViteDevServer } from 'vite'
+import jsesc from 'jsesc'
 
 jestSetTimeout(30000)
 
-const outDir = path.join(__dirname, 'dist-serve')
+const shared = setupViteServe({ dirname: __dirname })
 
-let devServer: ViteDevServer
-beforeAll(async () => {
-  await fs.remove(outDir)
-
-  devServer = await createServer({
-    configFile: path.join(__dirname, 'vite.config.ts'),
-    envFile: false,
-    build: { outDir },
+test('manifest vs output', async () => {
+  const specialFiles: SpecialFilesMap = new Map()
+  specialFiles.set(
+    new RegExp(
+      `${jsesc('background')}|${jsesc(hmrServiceWorkerName)}`,
+    ),
+    (source, name) => {
+      const port = shared.devServer!.config.server.port!
+      expect(
+        source.replace(
+          `url.port = JSON.parse("${port}");`,
+          'url.port = JSON.parse("3000");',
+        ),
+      ).toMatchSnapshot(name)
+    },
+  )
+  specialFiles.set(/\.html$/, (source, name) => {
+    const port = shared.devServer!.config.server.port!
+    expect(typeof port).toBe('number')
+    expect(
+      source.replace(
+        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        'http://localhost:3000',
+      ),
+    ).toMatchSnapshot(name)
   })
-})
 
-afterAll(async () => {
-  stopFileWriter()
-  await devServer.close()
-})
-
-test('writes entry points to disk', async () => {
-  expect(fs.existsSync(outDir)).toBe(false)
-
-  await Promise.all([devServer.listen(), filesReady()])
-
-  expect(fs.existsSync(outDir)).toBe(true)
-
-  const content1 = 'content1/index.js'
-  const content2 = 'content2/index.js'
-  const manifest = 'manifest.json'
-  const styles1 = 'assets/index-5f7d7b6f.css'
-  const styles2 = 'assets/index-5dfee6cc.css'
-  const styles3 = 'assets/import-3b031dc7.css'
-
-  const content1Path = path.join(outDir, content1)
-  const content1Source = await fs.readFile(content1Path, 'utf8')
-  expect(content1Source).toMatchSnapshot()
-
-  const content2Path = path.join(outDir, content2)
-  const content2Source = await fs.readFile(content2Path, 'utf8')
-  expect(content2Source).toMatchSnapshot()
-
-  const styles1Path = path.join(outDir, styles1)
-  const styles1Source = await fs.readFile(styles1Path, 'utf8')
-  expect(styles1Source).toMatchSnapshot()
-
-  const styles2Path = path.join(outDir, styles2)
-  const styles2Source = await fs.readFile(styles2Path, 'utf8')
-  expect(styles2Source).toMatchSnapshot()
-
-  const styles3Path = path.join(outDir, styles3)
-  const styles3Source = await fs.readFile(styles3Path, 'utf8')
-  expect(styles3Source).toMatchSnapshot()
-
-  const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
-  expect(manifestSource).toMatchObject({
-    content_scripts: [
-      {
-        css: [styles1, styles3],
-        js: [runtimeReloaderCS, content1],
-        matches: ['http://*/*', 'https://*/*'],
-      },
-      {
-        css: [styles2, styles3],
-        js: [runtimeReloaderCS, content2],
-        matches: ['http://*/*', 'https://*/*'],
-      },
-    ],
-  })
+  await testViteServe(shared, specialFiles)
 })

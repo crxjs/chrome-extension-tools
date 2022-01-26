@@ -13,8 +13,59 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  test:
+  # Runs linter and unit tests in src folder
+  basic:
+    name: Lint and Unit Tests
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Setup PNPM
+        # You may pin to the exact commit or the version.
+        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          # Version of PNPM to install
+          version: 6.3.0
+          # Where to store PNPM files
+          # dest: # optional, default is ~/setup-pnpm
+          # If specified, run `pnpm install`
+          # run_install: true
+
+      - name: Check CWD
+        run: node -e "console.log('cwd', process.cwd())"
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Lint files
+        run: pnpm lint
+
+      - name: Run unit tests
+        run: pnpm test:ci:src
+
+  # Runs integration tests for MV3
+  mv2:
+    name: MV2 Integration Tests
+
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -54,14 +105,63 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Lint files
-        run: pnpm lint
+      - name: Run MV2 rollup tests
+        run: pnpm test:ci:mv2:rollup
 
-      - name: Run unit tests
-        run: pnpm test:ci:src
+      - name: Run MV2 Vite build tests
+        run: pnpm test:ci:mv2:build
 
-      - name: Run MV2 integration tests
-        run: pnpm test:ci:mv2
+      - name: Run MV2 Vite serve tests
+        run: pnpm test:ci:mv2:serve
 
-      - name: Run MV3 integration tests
-        run: pnpm test:ci:mv3
+  # Runs integration tests for MV3
+  mv3:
+    name: MV3 Integration Tests
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Setup PNPM
+        # You may pin to the exact commit or the version.
+        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          # Version of PNPM to install
+          version: 6.3.0
+          # Where to store PNPM files
+          # dest: # optional, default is ~/setup-pnpm
+          # If specified, run `pnpm install`
+          # run_install: true
+
+      - name: Check CWD
+        run: node -e "console.log('cwd', process.cwd())"
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Run MV3 rollup tests
+        run: pnpm test:ci:mv3:rollup
+
+      - name: Run MV3 Vite build tests
+        run: pnpm test:ci:mv3:build
+
+      - name: Run MV3 Vite serve tests
+        run: pnpm test:ci:mv3:serve

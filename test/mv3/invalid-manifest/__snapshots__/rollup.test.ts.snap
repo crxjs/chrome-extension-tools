@@ -1,0 +1,6 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`errors if the manifest is invalid: error 1`] = `
+[Error: There were problems with the extension manifest.
+- ["service_worker.js"] at "manifest.background.service_worker" must be string]
+`;

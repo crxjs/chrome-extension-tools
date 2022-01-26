@@ -12,7 +12,7 @@ import {
 import { createServer, ViteDevServer } from 'vite'
 import { getPage } from '../helper-getPage'
 
-jestSetTimeout(15000)
+jestSetTimeout(30000)
 
 const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms))

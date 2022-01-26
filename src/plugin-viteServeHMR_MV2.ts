@@ -44,7 +44,7 @@ export const viteServeHMR_MV2 = (): CrxPlugin => {
       if (disablePlugin) return null
 
       api?.service.send(
-        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+        filesModel.events.EXCLUDE_FILE_TYPE('SCRIPT_HTML'),
       )
 
       return null

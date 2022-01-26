@@ -4,8 +4,8 @@
   },
   "content_scripts": [
     {
-      "js": ["content.ts"],
-      "matches": ["https://*/*", "http://*/*"]
+      "js": ["declared-script.ts"],
+      "matches": ["https://a.com/*", "http://b.com/*"]
     }
   ],
   "manifest_version": 3

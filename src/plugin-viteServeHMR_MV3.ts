@@ -18,7 +18,7 @@ import {
   StringAsset,
 } from './types'
 
-const fetchHandlerModule = 'crx-hmr-service-worker.js'
+export const hmrServiceWorkerName = 'crx-hmr-service-worker.js'
 
 const mimeTypes: Record<
   Exclude<AssetType, 'MANIFEST' | 'IMAGE' | 'JSON' | 'RAW'>,
@@ -80,14 +80,14 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
       if (disablePlugin || !isMV3(manifest)) return null
 
       manifest.background = manifest.background ?? {
-        service_worker: fetchHandlerModule,
+        service_worker: hmrServiceWorkerName,
         type: 'module',
       }
 
       swFilename = manifest.background.service_worker
 
       api.service.send(
-        filesModel.events.EXCLUDE_FILE_TYPE('MODULE'),
+        filesModel.events.EXCLUDE_FILE_TYPE('SCRIPT_HTML'),
       )
 
       return manifest
@@ -117,11 +117,11 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
     },
     transform(code, id) {
       if (disablePlugin) return null
-      if (id.includes(fetchHandlerModule)) return null
+      if (id.includes(hmrServiceWorkerName)) return null
 
       if (id.includes(swFilename)) {
         const magic = new MagicString(code)
-        magic.prepend(`import "${fetchHandlerModule}";\n`)
+        magic.prepend(`import "${hmrServiceWorkerName}";\n`)
         return {
           code: magic.toString(),
           map: magic.generateMap(),
@@ -132,13 +132,13 @@ export const viteServeHMR_MV3 = (): CrxPlugin => {
     },
     resolveId(source) {
       if (disablePlugin) return null
-      if (source.endsWith(fetchHandlerModule))
-        return fetchHandlerModule
+      if (source.endsWith(hmrServiceWorkerName))
+        return hmrServiceWorkerName
       return null
     },
     load(id) {
       if (disablePlugin) return null
-      if (id === fetchHandlerModule)
+      if (id === hmrServiceWorkerName)
         return swCode.replace(
           /%VITE_SERVE_PORT%/,
           server.config.server.port!.toString(),

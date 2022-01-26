@@ -62,7 +62,7 @@ export const importedResources = (): CrxPlugin => {
           {
             id,
             fileName,
-            fileType: isHtml ? 'HTML' : 'CONTENT',
+            fileType: isHtml ? 'HTML' : 'SCRIPT_DYNAMIC',
           },
         ],
         'build',
@@ -141,19 +141,23 @@ export const viteServeImportScripts = (): CrxPlugin => {
         ? relpath
         : generateFileNames(relpath).outputFileName
 
-      await api.addFiles.call(
+      const files = await api.addFiles.call(
         this,
         [
           {
             id,
             fileName,
-            fileType: isHtml ? 'HTML' : 'CONTENT',
+            fileType: isHtml ? 'HTML' : 'SCRIPT_DYNAMIC',
           },
         ],
         'serve',
       )
 
-      return `export default "${fileName}"`
+      // TODO: could probably combine build and serve plugins
+      // - if wrapperName is defined, it's vite serve (no generateBundle)
+      // - otherwise, generateBundle will take care of the wrapper name
+      const { wrapperName } = files.get(fileName)!
+      return `export default "${wrapperName ?? fileName}"`
     },
   }
 }

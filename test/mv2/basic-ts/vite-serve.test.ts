@@ -1,82 +1,42 @@
+import { hmrServiceWorkerName } from '$src/plugin-viteServeHMR_MV3'
 import {
-  runtimeReloaderBG,
-  runtimeReloaderCS,
-} from '$src/plugin-runtimeReloader'
-import {
-  filesReady,
-  stopFileWriter,
-} from '$src/plugin-viteServeFileWriter'
+  testViteServe,
+  setupViteServe,
+  SpecialFilesMap,
+} from '$test/helpers/testServe'
 import { jestSetTimeout } from '$test/helpers/timeout'
-import fs from 'fs-extra'
-import path from 'path'
-import { createServer, ViteDevServer } from 'vite'
+import jsesc from 'jsesc'
 
 jestSetTimeout(30000)
 
-const outDir = path.join(__dirname, 'dist-serve')
+const shared = setupViteServe({ dirname: __dirname })
 
-let devServer: ViteDevServer
-beforeAll(async () => {
-  await fs.remove(outDir)
-
-  devServer = await createServer({
-    configFile: path.join(__dirname, 'vite.config.ts'),
-    envFile: false,
-    build: { outDir },
-  })
-})
-
-afterAll(async () => {
-  stopFileWriter()
-  await devServer.close()
-})
-
-test('writes entry points to disk', async () => {
-  expect(fs.existsSync(outDir)).toBe(false)
-
-  await Promise.all([devServer.listen(), filesReady()])
-
-  const { port } = devServer.config.server
-
-  expect(fs.existsSync(outDir)).toBe(true)
-
-  const manifest = 'manifest.json'
-  const popup = 'pages/popup/index.html'
-  const content = 'content/index.js'
-  const background = 'background/index.esm-wrapper.js'
-
-  const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
-
-  expect(manifestSource).toMatchObject({
-    browser_action: {
-      default_popup: popup,
+test('manifest vs output', async () => {
+  const specialFiles: SpecialFilesMap = new Map()
+  specialFiles.set(
+    new RegExp(
+      `${jsesc('background')}|${jsesc(hmrServiceWorkerName)}`,
+    ),
+    (source, name) => {
+      const port = shared.devServer!.config.server.port!
+      expect(
+        source.replace(
+          `url.port = JSON.parse("${port}");`,
+          'url.port = JSON.parse("3000");',
+        ),
+      ).toMatchSnapshot(name)
     },
-    background: {
-      scripts: [runtimeReloaderBG, background],
-    },
-    content_scripts: [
-      {
-        js: [runtimeReloaderCS, content],
-        matches: ['https://a.com/*', 'http://b.com/*'],
-      },
-    ],
+  )
+  specialFiles.set(/\.html$/, (source, name) => {
+    const port = shared.devServer!.config.server.port!
+    expect(typeof port).toBe('number')
+    expect(
+      source.replace(
+        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        'http://localhost:3000',
+      ),
+    ).toMatchSnapshot(name)
   })
 
-  const contentPath = path.join(outDir, content)
-  const contentSource = await fs.readFile(contentPath, 'utf8')
-  expect(contentSource).toMatch('console.log("content script");')
-
-  const popupPath = path.join(outDir, popup)
-  const popupSource = await fs.readFile(popupPath, 'utf8')
-  expect(popupSource).toMatch(
-    `http://localhost:${port}/pages/popup/index.tsx`,
-  )
-
-  const backgroundPath = path.join(outDir, background)
-  const backgroundSource = await fs.readFile(
-    backgroundPath,
-    'utf8',
-  )
-  expect(backgroundSource).toMatch('./index.js')
+  await testViteServe(shared, specialFiles)
 })

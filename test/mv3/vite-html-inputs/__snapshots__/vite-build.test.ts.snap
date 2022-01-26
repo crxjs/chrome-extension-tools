@@ -1,0 +1,90 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "description": "integration tests",
+  "devtools_page": "devtools.html",
+  "manifest_version": 3,
+  "name": "Explore DevTools",
+  "permissions": Array [],
+  "version": "0.0.2",
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [
+    "devtools.html",
+  ],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "devtools.html",
+  "devtools.js",
+  "manifest.json",
+  "test1.html",
+  "test2.html",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "devtools.html": true,
+}
+`;
+
+exports[`manifest vs output: devtools.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+  <meta charset=\\"UTF-8\\">
+  <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+  <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+  <title>DevTools</title>
+</head>
+<body>
+  <script src=\\"devtools.js\\" type=\\"module\\"></script>
+
+</body></html>"
+`;
+
+exports[`manifest vs output: devtools.js 1`] = `
+"console.log(\\"devtools.ts\\");
+chrome.devtools.panels.create(\\"test\\", \\"icon-48.png\\", \\"test.html\\", (panel) => {
+  console.log(\\"panel created\\", panel);
+});
+"
+`;
+
+exports[`manifest vs output: test1.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Test Panel 1</h1>
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: test2.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Test Panel 2</h1>
+  
+
+</body></html>"
+`;

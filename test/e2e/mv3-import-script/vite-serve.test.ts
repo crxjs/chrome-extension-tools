@@ -12,7 +12,7 @@ import {
 import { createServer, ViteDevServer } from 'vite'
 import { getPage } from '../helper-getPage'
 
-jestSetTimeout(15000)
+jestSetTimeout(60000)
 
 const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms))
@@ -55,9 +55,29 @@ afterAll(async () => {
 })
 
 test('CRX loads and runs successfully', async () => {
-  const options = await getPage(browser, 'chrome-extension')
-  const google = await getPage(browser, 'google')
+  const options1 = await getPage(browser, 'chrome-extension')
+  const google1 = await getPage(browser, 'google')
 
-  await options.waitForSelector('.ok', { timeout: 10000 })
-  await google.waitForSelector('.ok', { timeout: 10000 })
+  const branch = await Promise.race([
+    // it might work the first time
+    options1.waitForSelector('.ok').then(() => 0),
+    // crx may reload b/c imported script has changed the manifest
+    options1.waitForEvent('close').then(() => 1),
+  ])
+
+  if (branch === 0) {
+    await google1.waitForSelector('.ok')
+  } else {
+    // options page will open again when crx reloads
+    const options2 = await getPage(browser, 'chrome-extension')
+
+    // close the old google window
+    await google1.close()
+
+    // we want the new google window with the new content script
+    const google2 = await getPage(browser, 'google')
+    await google2.waitForSelector('.ok')
+
+    await options2.waitForSelector('.ok')
+  }
 })

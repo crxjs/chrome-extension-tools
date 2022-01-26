@@ -1,0 +1,173 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/index-5f7d7b6f.css",
+        "assets/import-3b031dc7.css",
+      ],
+      "js": Array [
+        "assets/index.esm-wrapper-600ffb76.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "css": Array [
+        "assets/index-5dfee6cc.css",
+        "assets/import-3b031dc7.css",
+      ],
+      "js": Array [
+        "assets/index.esm-wrapper-72fbbdd0.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "description": "integration tests",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content1/index.js",
+        "content2/index.js",
+        "modules/import-8167e8d6.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [
+    "assets/index-5f7d7b6f.css",
+    "assets/import-3b031dc7.css",
+    "assets/index-5dfee6cc.css",
+  ],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [
+    "assets/index.esm-wrapper-600ffb76.js",
+    "assets/index.esm-wrapper-72fbbdd0.js",
+  ],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "assets/import-3b031dc7.css",
+  "assets/index-5dfee6cc.css",
+  "assets/index-5f7d7b6f.css",
+  "assets/index.esm-wrapper-600ffb76.js",
+  "assets/index.esm-wrapper-72fbbdd0.js",
+  "content1/index.js",
+  "content2/index.js",
+  "manifest.json",
+  "modules/import-8167e8d6.js",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/import-3b031dc7.css": true,
+  "assets/index-5dfee6cc.css": true,
+  "assets/index-5f7d7b6f.css": true,
+  "assets/index.esm-wrapper-600ffb76.js": true,
+  "assets/index.esm-wrapper-72fbbdd0.js": true,
+}
+`;
+
+exports[`manifest vs output: assets/import-3b031dc7.css 1`] = `
+"h1 {
+  color: green;
+}
+"
+`;
+
+exports[`manifest vs output: assets/index.esm-wrapper-72fbbdd0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/index.esm-wrapper-600ffb76.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/index-5dfee6cc.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`manifest vs output: assets/index-5f7d7b6f.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`manifest vs output: content1/index.js 1`] = `
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content1\\");
+"
+`;
+
+exports[`manifest vs output: content2/index.js 1`] = `
+"import \\"../modules/import-8167e8d6.js\\";
+var styles = \\"\\";
+console.log(\\"content2\\");
+"
+`;
+
+exports[`manifest vs output: modules/import-8167e8d6.js 1`] = `
+"var styles = \\"\\";
+console.log(\\"imported file\\");
+"
+`;

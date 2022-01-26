@@ -6,6 +6,10 @@ import { relative } from './path'
 import { format } from './helpers'
 import { isMV2, CrxPlugin } from './types'
 
+export const browserPolyfillName = 'browser-polyfill.js'
+export const browserPolyfillExecuteScriptName =
+  'browser-polyfill-executeScript.js'
+
 export const browserPolyfill = (): CrxPlugin => {
   const convert = require('convert-source-map')
   const polyfillPath = require.resolve('webextension-polyfill')
@@ -37,8 +41,8 @@ export const browserPolyfill = (): CrxPlugin => {
             fileNames.add(script),
           )
           manifest.background.scripts.unshift(
-            'browser-polyfill.js',
-            'browser-polyfill-executeScript.js',
+            browserPolyfillName,
+            browserPolyfillExecuteScriptName,
           )
         }
       } else {
@@ -49,12 +53,12 @@ export const browserPolyfill = (): CrxPlugin => {
         this.emitFile({
           type: 'asset',
           source: browserPolyfillJs,
-          fileName: 'browser-polyfill.js',
+          fileName: browserPolyfillName,
         })
         this.emitFile({
           type: 'asset',
           source: browserPolyfillExecuteScriptJs,
-          fileName: 'browser-polyfill-executeScript.js',
+          fileName: browserPolyfillExecuteScriptName,
         })
       }
 
@@ -62,7 +66,7 @@ export const browserPolyfill = (): CrxPlugin => {
         manifest.content_scripts = manifest.content_scripts.map(
           ({ js, ...rest }) =>
             Array.isArray(js)
-              ? { js: ['browser-polyfill.js', ...js], ...rest }
+              ? { js: [browserPolyfillName, ...js], ...rest }
               : rest,
         )
 

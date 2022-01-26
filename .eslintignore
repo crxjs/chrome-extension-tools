@@ -5,6 +5,7 @@
 **/*.js
 **/*.jsx
 **/*.cjs
+**/*.mjs
 
 rollup.config.js
 jest.config.js

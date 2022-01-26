@@ -1,0 +1,215 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "background": Object {
+    "scripts": Array [
+      "background/index.esm-wrapper.js",
+    ],
+  },
+  "browser_action": Object {
+    "default_popup": "pages/popup/index.html",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/index.esm-wrapper-40d0d90d.js",
+      ],
+      "matches": Array [
+        "https://a.com/*",
+        "http://b.com/*",
+      ],
+    },
+  ],
+  "description": "integration tests",
+  "manifest_version": 2,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    "content/index.js",
+  ],
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [
+    "pages/popup/index.html",
+  ],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background/index.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [
+    "assets/index.esm-wrapper-40d0d90d.js",
+  ],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "assets/index.esm-wrapper-40d0d90d.js",
+  "background/index.esm-wrapper.js",
+  "background/index.js",
+  "content/index.js",
+  "manifest.json",
+  "pages/popup/index.html",
+  "pages/popup/index.js",
+  "vendor chunk",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/index.esm-wrapper-40d0d90d.js": true,
+  "background/index.esm-wrapper.js": true,
+  "pages/popup/index.html": true,
+}
+`;
+
+exports[`manifest vs output: assets/index.esm-wrapper-40d0d90d.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content/index.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: background/index.esm-wrapper.js 1`] = `
+"(function () {
+  'use strict';
+
+  function getDeepMatches(object, pred, excludeKeys) {
+    const keys = typeof object === \\"object\\" && object ? Object.keys(object) : [];
+    return keys.length ? keys.filter((key) => !excludeKeys.includes(key)).reduce((r, key) => {
+      const target = object[key];
+      if (target && pred(target)) {
+        return [...r, target];
+      } else {
+        return [
+          ...r,
+          ...getDeepMatches(target, pred, excludeKeys)
+        ];
+      }
+    }, []) : [];
+  }
+
+  const importPath = \\"./index.js\\";
+
+  const events = getDeepMatches(chrome, (x) => typeof x === \\"object\\" && \\"addListener\\" in x, [\\"webRequest\\", \\"extension\\"]);
+  const triggerEvents = captureEvents(events);
+  import(importPath).then(async () => {
+    triggerEvents();
+  });
+  function captureEvents(events2) {
+    const captured = events2.map(captureEvent);
+    return () => captured.forEach((t) => t());
+    function captureEvent(event) {
+      let isCapturePhase = true;
+      const callbacks = /* @__PURE__ */ new Map();
+      const eventArgs = /* @__PURE__ */ new Set();
+      event.addListener(handleEvent);
+      function handleEvent(...args) {
+        if (isCapturePhase) {
+          eventArgs.add(args);
+          if (typeof args[2] === \\"function\\") {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return callListeners(...args);
+        }
+      }
+      function callListeners(...args) {
+        let isAsyncCallback = false;
+        callbacks.forEach((options, cb) => {
+          try {
+            isAsyncCallback = cb(...args) || isAsyncCallback;
+          } catch (error) {
+            console.error(error);
+          }
+        });
+        if (!isAsyncCallback && typeof args[2] === \\"function\\") {
+          args[2]();
+        }
+        return isAsyncCallback;
+      }
+      function triggerEvents2() {
+        eventArgs.forEach((args) => {
+          callListeners(...args);
+        });
+        isCapturePhase = false;
+        eventArgs.clear();
+      }
+      event.addListener = function addListener(cb, ...options) {
+        callbacks.set(cb, options);
+      };
+      event.hasListeners = function hasListeners() {
+        return callbacks.size > 0;
+      };
+      event.hasListener = function hasListener(cb) {
+        return callbacks.has(cb);
+      };
+      event.removeListener = function removeListener(cb) {
+        callbacks.delete(cb);
+      };
+      event.__isCapturedEvent = true;
+      return triggerEvents2;
+    }
+  }
+
+})();
+"
+`;
+
+exports[`manifest vs output: background/index.js 1`] = `
+"console.log(\\"background script\\");
+"
+`;
+
+exports[`manifest vs output: content/index.js 1`] = `
+"console.log(\\"content script\\");
+"
+`;
+
+exports[`manifest vs output: pages/popup/index.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"index.js\\" type=\\"module\\"></script>
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: pages/popup/index.js 1`] = `
+"import { R as React, r as reactDom } from '../../vendor-chunk.js';
+
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+};
+
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;

@@ -1,0 +1,164 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "background": Object {
+    "scripts": Array [
+      "background.esm-wrapper.js",
+    ],
+  },
+  "description": "input-array chrome extension",
+  "manifest_version": 2,
+  "name": "input-array",
+  "permissions": Array [],
+  "version": "0.1.0",
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.esm-wrapper.js",
+  ],
+  "SCRIPT_DECLARED": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "background.esm-wrapper.js",
+  "background.js",
+  "index.html",
+  "index.js",
+  "manifest.json",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "background.esm-wrapper.js": true,
+}
+`;
+
+exports[`manifest vs output: background.esm-wrapper.js 1`] = `
+"(function () {
+  'use strict';
+
+  function getDeepMatches(object, pred, excludeKeys) {
+    const keys = typeof object === \\"object\\" && object ? Object.keys(object) : [];
+    return keys.length ? keys.filter((key) => !excludeKeys.includes(key)).reduce((r, key) => {
+      const target = object[key];
+      if (target && pred(target)) {
+        return [...r, target];
+      } else {
+        return [
+          ...r,
+          ...getDeepMatches(target, pred, excludeKeys)
+        ];
+      }
+    }, []) : [];
+  }
+
+  const importPath = \\"./background.js\\";
+
+  const events = getDeepMatches(chrome, (x) => typeof x === \\"object\\" && \\"addListener\\" in x, [\\"webRequest\\", \\"extension\\"]);
+  const triggerEvents = captureEvents(events);
+  import(importPath).then(async () => {
+    triggerEvents();
+  });
+  function captureEvents(events2) {
+    const captured = events2.map(captureEvent);
+    return () => captured.forEach((t) => t());
+    function captureEvent(event) {
+      let isCapturePhase = true;
+      const callbacks = /* @__PURE__ */ new Map();
+      const eventArgs = /* @__PURE__ */ new Set();
+      event.addListener(handleEvent);
+      function handleEvent(...args) {
+        if (isCapturePhase) {
+          eventArgs.add(args);
+          if (typeof args[2] === \\"function\\") {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return callListeners(...args);
+        }
+      }
+      function callListeners(...args) {
+        let isAsyncCallback = false;
+        callbacks.forEach((options, cb) => {
+          try {
+            isAsyncCallback = cb(...args) || isAsyncCallback;
+          } catch (error) {
+            console.error(error);
+          }
+        });
+        if (!isAsyncCallback && typeof args[2] === \\"function\\") {
+          args[2]();
+        }
+        return isAsyncCallback;
+      }
+      function triggerEvents2() {
+        eventArgs.forEach((args) => {
+          callListeners(...args);
+        });
+        isCapturePhase = false;
+        eventArgs.clear();
+      }
+      event.addListener = function addListener(cb, ...options) {
+        callbacks.set(cb, options);
+      };
+      event.hasListeners = function hasListeners() {
+        return callbacks.size > 0;
+      };
+      event.hasListener = function hasListener(cb) {
+        return callbacks.has(cb);
+      };
+      event.removeListener = function removeListener(cb) {
+        callbacks.delete(cb);
+      };
+      event.__isCapturedEvent = true;
+      return triggerEvents2;
+    }
+  }
+
+})();
+"
+`;
+
+exports[`manifest vs output: background.js 1`] = `
+"console.log('background.js');
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL('index.html'),
+  });
+});
+"
+`;
+
+exports[`manifest vs output: index.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"ie=edge\\">
+    <title>Index Array</title>
+  </head>
+  <body>
+    <h1>Index</h1>
+    <script src=\\"index.js\\" type=\\"module\\"></script>
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: index.js 1`] = `
+"console.log('index.js');
+"
+`;

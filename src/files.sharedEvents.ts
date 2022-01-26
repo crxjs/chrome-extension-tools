@@ -17,17 +17,23 @@ export const fileTypes: FileType[] = [
   'JSON',
   'MANIFEST',
   'RAW',
-  'MODULE',
-  'BACKGROUND',
-  'CONTENT',
+  'SCRIPT_HTML',
+  'SCRIPT_BACKGROUND',
+  'SCRIPT_DECLARED',
+  'SCRIPT_DYNAMIC',
 ]
 
 export const isScript = (file: {
   fileType: string
 }): file is Script =>
-  file.fileType === 'BACKGROUND' ||
-  file.fileType === 'CONTENT' ||
-  file.fileType === 'MODULE'
+  file.fileType === 'SCRIPT_BACKGROUND' ||
+  file.fileType === 'SCRIPT_DECLARED' ||
+  file.fileType === 'SCRIPT_DYNAMIC' ||
+  file.fileType === 'SCRIPT_HTML'
+
+export const isContentScript = (file: EmittedFile) =>
+  file.fileType === 'SCRIPT_DECLARED' ||
+  file.fileType === 'SCRIPT_DYNAMIC'
 
 function normalizeFilePaths({
   fileName,

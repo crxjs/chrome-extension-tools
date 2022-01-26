@@ -1,63 +1,44 @@
 import {
+  OutputAsset,
   OutputBundle,
   Plugin,
   PluginContext,
   rollup,
   RollupOptions,
 } from 'rollup'
+import { isContentScript } from './files.sharedEvents'
 import { isChunk } from './helpers'
-import { dirname, join, parse, relative } from './path'
-import { generateFileNames, getRpceAPI } from './plugin_helpers'
-import { EmittedFile, CrxPlugin } from './types'
+import { dirname, join, parse } from './path'
+import { helperScripts } from './plugin-contentScriptESM'
+import {
+  generateFileNames,
+  getRpceAPI,
+  RpceApi,
+} from './plugin_helpers'
+import { CrxPlugin, Manifest } from './types'
 
 /** Transforms the pure ESM output bundle into a hybrid ESM/IIFE bundle */
-export const hybridFormat = (): CrxPlugin => {
-  let files: Map<string, EmittedFile>
-  let root = process.cwd()
+export const contentScriptIIFE = (): CrxPlugin => {
+  let api: RpceApi
 
   return {
-    name: 'hybrid-format',
-
-    crx: true,
+    name: 'content-script-IIFE',
+    apply: 'build',
     enforce: 'post',
-
     buildStart(options) {
-      const api = getRpceAPI(options.plugins)!
-
-      files = api.files
-      root = api.root
+      api = getRpceAPI(options.plugins)!
     },
-
-    renderCrxManifest(manifest) {
-      manifest.content_scripts = manifest.content_scripts?.map(
-        ({ js, ...rest }) => ({
-          ...rest,
-          js: js?.map((x) => {
-            const { name, dir } = parse(x)
-            return join(dir, `${name}.js`)
-          }),
-        }),
-      )
-
-      return manifest
-    },
-
     async generateBundle({ sourcemap, chunkFileNames }, bundle) {
-      const entryFileNames = '[name].js'
+      const iifeFileNames = new Set<string>()
+      for (const file of api.filesByRefId.values()) {
+        if (isContentScript(file)) {
+          const fileName = this.getFileName(file.refId)
+          iifeFileNames.add(fileName)
+        }
+      }
 
-      const filesForIIFE = Array.from(files.values()).filter(
-        ({ fileType, fileName }) =>
-          fileType === 'CONTENT' && !!bundle[fileName],
-      )
-
-      // Regenerate content scripts as IIFE
-      const contentScriptJsFileNames = filesForIIFE.map(
-        ({ id }) =>
-          relative(root, generateFileNames(id).outputFileName),
-      )
-
-      const contentScripts = await Promise.all(
-        contentScriptJsFileNames.map((input) =>
+      const iifeFiles = await Promise.all(
+        [...iifeFileNames].map((input) =>
           regenerateBundle
             .call(
               this,
@@ -86,43 +67,20 @@ export const hybridFormat = (): CrxPlugin => {
         ),
       )
 
-      /**
-       * Regenerating to different formats can be kinda slow
-       *
-       * TODO: implement a cache to only regenerate changed files
-       * - reconcile original bundle chunk modules to iife chunk modules
-       * - look up changed iife's by reconciled chunk module names
-       * - changed id -> bundle[chunk].modules -> iifeChunk.modules
-       *
-       * for (const [key, chunk] of Object.entries(bundle).filter(
-       *   (x): x is [string, OutputChunk] => x[1].type === 'chunk',
-       * )) {
-       *   // This output file was changed
-       *   console.log(
-       *     key,
-       *     // When one of these modules changed
-       *     Object.keys(chunk.modules).filter(
-       *       (k) => !k.includes('node_modules'),
-       *     ),
-       *   )
-       * }
-       *
-       * Cache iifeBundle and delete the changed chunk,
-       * then only build the changed file
-       */
-      const iifeBundle = Object.assign({}, ...contentScripts)
+      const iifeBundle = Object.assign({}, ...iifeFiles)
 
       const esmInputs = Object.entries(bundle)
         .filter(([, file]) => {
           return (
             isChunk(file) &&
             file.isEntry &&
-            !contentScriptJsFileNames.includes(file.fileName)
+            !iifeFileNames.has(file.fileName)
           )
         })
         .map(([key]) => key)
 
       // Regenerate everything else as a new ESM bundle
+      // This removes unused code and re-chunks files
       const esmBundle = await regenerateBundle.call(
         this,
         {
@@ -131,14 +89,14 @@ export const hybridFormat = (): CrxPlugin => {
             format: 'esm',
             sourcemap,
             chunkFileNames,
-            entryFileNames,
+            entryFileNames: '[name].js',
           },
           onwarn: (warning) => this.warn(warning),
         },
         bundle,
       )
 
-      // Remove the original chunks
+      // Remove chunks, leaving only assets
       Object.entries(bundle)
         .filter(([, v]) => isChunk(v))
         .forEach(([key]) => {
@@ -147,6 +105,27 @@ export const hybridFormat = (): CrxPlugin => {
 
       // Refill bundle with our new mixed format files
       Object.assign(bundle, esmBundle, iifeBundle)
+
+      // update manifest content scripts with output names
+      const manifestAsset = bundle[
+        'manifest.json'
+      ] as OutputAsset
+      const manifest: Manifest = JSON.parse(
+        manifestAsset.source as string,
+      )
+
+      for (const script of manifest.content_scripts ?? []) {
+        script.js?.forEach((name, i) => {
+          if (helperScripts.includes(name)) return
+          const { outputFileName } = generateFileNames(name)
+          const { refId } =
+            api.filesByFileName.get(outputFileName)!
+          // to support dynamic file names later
+          script.js![i] = this.getFileName(refId)
+        })
+      }
+
+      manifestAsset.source = JSON.stringify(manifest)
     },
   }
 }

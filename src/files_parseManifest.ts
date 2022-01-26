@@ -4,7 +4,6 @@ import {
   AssetType,
   ContentScript,
   DeclarativeNetRequestResource,
-  Manifest,
   ScriptType,
 } from './types'
 
@@ -17,9 +16,10 @@ function dedupe(ary: any[]) {
  * to the manifest, which must be in the root folder.
  */
 export function parseManifest(
-  manifest: Manifest,
+  // Using chrome types b/c TS craps out on deep props for our Manifest
+  manifest: chrome.runtime.Manifest,
 ): Record<
-  | Exclude<ScriptType, 'MODULE'>
+  | Exclude<ScriptType, 'SCRIPT_HTML' | 'SCRIPT_DYNAMIC'>
   | Exclude<AssetType, 'MANIFEST' | 'RAW'>,
   string[]
 > {
@@ -78,8 +78,8 @@ export function deriveFilesMV3(
   ]
 
   return {
-    BACKGROUND: dedupe(background),
-    CONTENT: dedupe(contentScripts),
+    SCRIPT_BACKGROUND: dedupe(background),
+    SCRIPT_DECLARED: dedupe(contentScripts),
     CSS: dedupe(css),
     HTML: dedupe(html),
     IMAGE: dedupe(img),
@@ -161,8 +161,8 @@ export function deriveFilesMV2(
   ]
 
   return {
-    BACKGROUND: dedupe(background),
-    CONTENT: dedupe(contentScripts),
+    SCRIPT_BACKGROUND: dedupe(background),
+    SCRIPT_DECLARED: dedupe(contentScripts),
     CSS: dedupe(css),
     HTML: dedupe(html),
     IMAGE: dedupe(img),

@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "description": "Chrome Extension with a public dir",
+  "manifest_version": 3,
+  "name": "public dir test extension",
+  "permissions": Array [],
+  "version": "1.0.0",
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [
+    "src/popup.html",
+  ],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "favicon.svg",
+  "manifest.json",
+  "src/popup.html",
+  "src/popup.js",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "src/popup.html": true,
+}
+`;
+
+exports[`manifest vs output: src/popup.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\">
+    <link rel=\\"icon\\" type=\\"image/svg+xml\\" href=\\"/favicon.svg\\">
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"./popup.js\\" type=\\"module\\"></script>
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: src/popup.js 1`] = `
+"console.log(\\"popup script\\");
+"
+`;

@@ -4,7 +4,6 @@ import 'array-flat-polyfill'
 import { logSpy } from './helpers/consoleSpies'
 import './helpers/inspect'
 import { jestSetTimeout } from './helpers/timeout'
-import { stubDate } from './helpers/stubDate'
 
 if (process.env.LOG_LEVEL === 'debug') {
   // all console methods are enabled
@@ -34,5 +33,3 @@ if (process.env.npm_config_argv) {
     process.env.npm_config_argv,
   ).original.includes('--watch')
 }
-
-stubDate()

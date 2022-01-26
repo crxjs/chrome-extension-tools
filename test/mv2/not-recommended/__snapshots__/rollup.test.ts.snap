@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "background": Object {
+    "page": "background.html",
+  },
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "content.css",
+      ],
+      "matches": Array [
+        "https://www.google.com/*",
+      ],
+    },
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "description": "not-recommended chrome extension",
+  "manifest_version": 2,
+  "name": "not-recommended",
+  "permissions": Array [],
+  "version": "0.1.0",
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [
+    "content.css",
+  ],
+  "HTML": Array [
+    "background.html",
+  ],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "background.html",
+  "background.js",
+  "content.css",
+  "manifest.json",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "background.html": true,
+  "content.css": true,
+}
+`;
+
+exports[`manifest vs output: background.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"ie=edge\\">
+    <title>Background</title>
+  </head>
+
+  <body>
+    <h1>Background Page</h1>
+    <script src=\\"./background.js\\" type=\\"module\\"></script>
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: background.js 1`] = `
+"console.log('background.js');
+"
+`;
+
+exports[`manifest vs output: content.css 1`] = `
+"body {
+    color: red;
+  }
+  "
+`;

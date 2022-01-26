@@ -1,60 +1,42 @@
-import { swWrapperName } from '$src/plugin-backgroundESM_MV3'
+import { hmrServiceWorkerName } from '$src/plugin-viteServeHMR_MV3'
 import {
-  filesReady,
-  stopFileWriter,
-} from '$src/plugin-viteServeFileWriter'
+  testViteServe,
+  setupViteServe,
+  SpecialFilesMap,
+} from '$test/helpers/testServe'
 import { jestSetTimeout } from '$test/helpers/timeout'
-import fs from 'fs-extra'
-import path from 'path'
-import { createServer, ViteDevServer } from 'vite'
+import jsesc from 'jsesc'
 
 jestSetTimeout(30000)
 
-const outDir = path.join(__dirname, 'dist-serve')
+const shared = setupViteServe({ dirname: __dirname })
 
-let devServer: ViteDevServer
-beforeAll(async () => {
-  await fs.remove(outDir)
-
-  devServer = await createServer({
-    configFile: path.join(__dirname, 'vite.config.ts'),
-    envFile: false,
-    build: { outDir },
-  })
-})
-
-afterAll(async () => {
-  stopFileWriter()
-  await devServer.close()
-})
-
-test('writes entry points to disk', async () => {
-  expect(fs.existsSync(outDir)).toBe(false)
-
-  await Promise.all([devServer.listen(), filesReady()])
-
-  expect(fs.existsSync(outDir)).toBe(true)
-
-  const manifest = 'manifest.json'
-  const worker = 'background/sw.js'
-
-  const manifestPath = path.join(outDir, manifest)
-  const manifestSource = await fs.readJson(manifestPath)
-
-  expect(manifestSource).toMatchObject({
-    background: {
-      service_worker: swWrapperName,
-      type: 'module',
+test('manifest vs output', async () => {
+  const specialFiles: SpecialFilesMap = new Map()
+  specialFiles.set(
+    new RegExp(
+      `${jsesc('background')}|${jsesc(hmrServiceWorkerName)}`,
+    ),
+    (source, name) => {
+      const port = shared.devServer!.config.server.port!
+      expect(
+        source.replace(
+          `url.port = JSON.parse("${port}");`,
+          'url.port = JSON.parse("3000");',
+        ),
+      ).toMatchSnapshot(name)
     },
+  )
+  specialFiles.set(/\.html$/, (source, name) => {
+    const port = shared.devServer!.config.server.port!
+    expect(typeof port).toBe('number')
+    expect(
+      source.replace(
+        new RegExp(jsesc(`http://localhost:${port}`), 'g'),
+        'http://localhost:3000',
+      ),
+    ).toMatchSnapshot(name)
   })
 
-  const workerPath = path.join(outDir, worker)
-  const workerSource = await fs.readFile(workerPath, 'utf8')
-  expect(workerSource).toMatch(
-    'fetchEvent.respondWith(mapRequestsToLocalhost(url.href))',
-  )
-
-  const wrapperPath = path.join(outDir, swWrapperName)
-  const wrapperSource = await fs.readFile(wrapperPath, 'utf8')
-  expect(wrapperSource).toMatch(`import './${worker}'`)
+  await testViteServe(shared, specialFiles)
 })

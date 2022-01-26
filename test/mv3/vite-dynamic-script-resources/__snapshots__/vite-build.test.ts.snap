@@ -1,0 +1,166 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "background.js",
+    "type": "module",
+  },
+  "description": "integration tests",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://github.com/*",
+        "https://google.com/*",
+      ],
+      "resources": Array [
+        "assets/font.bb6bc8d6.otf",
+        "assets/image.51f8fe9d.png",
+        "content1.js",
+        "content2.js",
+        "iframe.html",
+        "script.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [
+    "background.js",
+  ],
+  "SCRIPT_DECLARED": Array [],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "assets/content1.esm-wrapper-8914532e.js",
+  "assets/content2.esm-wrapper-c8db90d0.js",
+  "assets/font.bb6bc8d6.otf",
+  "assets/image.51f8fe9d.png",
+  "assets/script.esm-wrapper-d7eff7fc.js",
+  "background.js",
+  "content1.js",
+  "content2.js",
+  "iframe.html",
+  "manifest.json",
+  "script.js",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "background.js": true,
+}
+`;
+
+exports[`manifest vs output: assets/content1.esm-wrapper-8914532e.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content1.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/content2.esm-wrapper-c8db90d0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content2.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: assets/script.esm-wrapper-d7eff7fc.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"script.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: background.js 1`] = `
+"var content1 = \\"content1.js\\";
+var content2 = \\"content2.js\\";
+chrome.scripting.executeScript({
+  files: [content1, content2],
+  target: { tabId: 1 }
+});
+"
+`;
+
+exports[`manifest vs output: content1.js 1`] = `
+"var icon = \\"/assets/image.51f8fe9d.png\\";
+var script = \\"script.js\\";
+console.log(\\"content.ts\\", { icon, script });
+"
+`;
+
+exports[`manifest vs output: content2.js 1`] = `
+"var html = \\"iframe.html\\";
+var font = \\"/assets/font.bb6bc8d6.otf\\";
+console.log(\\"content2.ts\\", { html, font });
+"
+`;
+
+exports[`manifest vs output: iframe.html 1`] = `
+"<!DOCTYPE html><html lang=\\"en\\"><head>
+    <meta charset=\\"UTF-8\\">
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
+    <title>Document</title>
+  </head>
+  <body>
+    IFR
+  
+
+</body></html>"
+`;
+
+exports[`manifest vs output: script.js 1`] = `
+"console.log(\\"main world script\\");
+"
+`;

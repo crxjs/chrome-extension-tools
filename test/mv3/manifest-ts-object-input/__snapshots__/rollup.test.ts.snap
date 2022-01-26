@@ -1,0 +1,90 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`manifest vs output: 00 - manifest 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.esm-wrapper-a6ac6bbe.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "description": "integration tests",
+  "manifest_version": 3,
+  "name": "Test",
+  "permissions": Array [],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "content.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`manifest vs output: 01 - files from manifest 1`] = `
+Object {
+  "CSS": Array [],
+  "HTML": Array [],
+  "IMAGE": Array [],
+  "JSON": Array [],
+  "SCRIPT_BACKGROUND": Array [],
+  "SCRIPT_DECLARED": Array [
+    "assets/content.esm-wrapper-a6ac6bbe.js",
+  ],
+}
+`;
+
+exports[`manifest vs output: 02 - files from output 1`] = `
+Array [
+  "assets/content.esm-wrapper-a6ac6bbe.js",
+  "content.js",
+  "manifest.json",
+  "script.js",
+]
+`;
+
+exports[`manifest vs output: 03 - manifest files match output 1`] = `
+Object {
+  "assets/content.esm-wrapper-a6ac6bbe.js": true,
+}
+`;
+
+exports[`manifest vs output: assets/content.esm-wrapper-a6ac6bbe.js 1`] = `
+"(function () {
+  'use strict';
+
+  const importPath = \\"content.js\\";
+
+  const url = chrome.runtime.getURL(importPath);
+  import(
+    /* @vite-ignore */
+    url
+  ).catch((err) => {
+    console.warn(\`Could not import \${importPath} from \${chrome.runtime.getManifest().name}\`);
+    console.error(err);
+  });
+
+})();
+"
+`;
+
+exports[`manifest vs output: content.js 1`] = `
+"console.log(\\"content script\\");
+"
+`;
+
+exports[`manifest vs output: script.js 1`] = `
+"console.log(\\"script\\");
+"
+`;

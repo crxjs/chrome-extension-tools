@@ -4,7 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "jsx": "react",
-    "lib": ["DOM", "es2020"],
+    "lib": ["DOM", "es2020", "WebWorker"],
     "module": "esnext",
     "moduleResolution": "node",
     "noEmit": true,

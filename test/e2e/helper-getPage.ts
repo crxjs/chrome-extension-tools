@@ -11,7 +11,7 @@ export async function getPage(
   let count = 0
   let page: Page | undefined
 
-  while (!page && count < 10) {
+  while (!page && count < 50) {
     page = browserContext
       .pages()
       .find((p) => p.url().includes(included))
