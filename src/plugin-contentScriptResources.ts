@@ -1,15 +1,9 @@
 import { set } from 'lodash'
-import {
-  EmittedFile,
-  OutputAsset,
-  OutputBundle,
-  OutputChunk,
-} from 'rollup'
+import { OutputAsset, OutputBundle, OutputChunk } from 'rollup'
 import type {
   Manifest as ViteFilesManifest,
   ManifestChunk,
 } from 'vite'
-import { isContentScript } from './files.sharedEvents'
 import { isChunk } from './helpers'
 import { relative } from './path'
 import { helperScripts } from './plugin-contentScriptESM'

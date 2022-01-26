@@ -2,7 +2,6 @@ import {
   filesReady,
   stopFileWriter,
 } from '$src/plugin-viteServeFileWriter'
-import forever from '$test/helpers/forever'
 import { jestSetTimeout } from '$test/helpers/timeout'
 import fs from 'fs-extra'
 import path from 'path'
