@@ -43,7 +43,7 @@
     "test:e2e": "jest --testPathIgnorePatterns=\"/node_modules/|/test/templates/\" --runInBand --forceExit e2e",
     "test:ci": "run-s test:ci:*",
     "test:ci:src": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e|/test/templates/\" --testPathPattern=\"src\"",
-    "test:ci:mv2": "run-s test:ci:mv3:*",
+    "test:ci:mv2": "run-s test:ci:mv2:*",
     "test:ci:mv2:rollup": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"mv2.+?rollup\"",
     "test:ci:mv2:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"mv2.+?build\"",
     "test:ci:mv2:serve": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --testPathIgnorePatterns=\"/node_modules/|e2e\" --testPathPattern=\"mv2.+?serve\"",
