@@ -58,8 +58,8 @@ Object {
   ],
   "version": "1.0.0",
   "web_accessible_resources": Array [
-    "modules/imported-fc5abad3.js",
     "content.js",
+    "modules/imported-fc5abad3.js",
   ],
 }
 `;

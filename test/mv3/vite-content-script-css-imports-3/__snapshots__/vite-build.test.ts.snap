@@ -42,9 +42,9 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "modules/import-8167e8d6.js",
         "content1/index.js",
         "content2/index.js",
+        "modules/import-8167e8d6.js",
       ],
     },
   ],

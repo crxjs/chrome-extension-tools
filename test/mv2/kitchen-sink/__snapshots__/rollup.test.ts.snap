@@ -60,11 +60,11 @@ Object {
   ],
   "version": "1.0.0",
   "web_accessible_resources": Array [
-    "options.jpg",
-    "fonts/*.ttf",
-    "fonts/*.otf",
-    "modules/imported-fc5abad3.js",
     "content.js",
+    "fonts/*.otf",
+    "fonts/*.ttf",
+    "modules/imported-fc5abad3.js",
+    "options.jpg",
   ],
 }
 `;

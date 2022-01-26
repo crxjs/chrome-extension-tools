@@ -29,8 +29,8 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "main-world.js",
         "declared-script.js",
+        "main-world.js",
       ],
     },
     Object {

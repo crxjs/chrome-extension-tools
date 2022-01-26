@@ -31,8 +31,8 @@ Object {
   ],
   "version": "1.0.0",
   "web_accessible_resources": Array [
-    "modules/imported-bc5aae30.js",
     "content.js",
+    "modules/imported-bc5aae30.js",
   ],
 }
 `;

@@ -1,6 +1,6 @@
 import { parseManifest } from '$src/files_parseManifest'
 import { isChunk, isOutputOptions } from '$src/helpers'
-import type { Manifest } from '$src/types'
+import { isMV2, Manifest } from '$src/types'
 import { byFileName } from '$test/helpers/utils'
 import fs from 'fs-extra'
 import glob from 'glob'
@@ -57,6 +57,7 @@ export async function getViteBuildOutput(dirname: string) {
   return output
 }
 
+const isVendorChunk = (x: string) => /vendor-.{8}\.js$/.test(x)
 export async function testBuildOutput(
   output: RollupOutput['output'],
   specialFiles: SpecialFilesMap = new Map(),
@@ -75,7 +76,22 @@ export async function testBuildOutput(
   // Manifest has not changed
   if (specialFiles.has('manifest.json')) {
     specialFiles.get('manifest.json')!(source, '00 - manifest')
+  } else if (!manifest.web_accessible_resources) {
+    expect(manifest).toMatchSnapshot('00 - manifest')
+  } else if (isMV2(manifest)) {
+    manifest.web_accessible_resources =
+      manifest.web_accessible_resources
+        ?.map((x) => (isVendorChunk(x) ? 'vendor chunk' : x))
+        .sort()
+
+    expect(manifest).toMatchSnapshot('00 - manifest')
   } else {
+    for (const x of manifest.web_accessible_resources) {
+      x.resources = x.resources
+        .map((x) => (isVendorChunk(x) ? 'vendor chunk' : x))
+        .sort()
+    }
+
     expect(manifest).toMatchSnapshot('00 - manifest')
   }
 
@@ -84,29 +100,44 @@ export async function testBuildOutput(
   expect(parsed).toMatchSnapshot('01 - files from manifest')
 
   // Output files list has not changed
-  const files = output.map(({ fileName }) => fileName).sort()
+  let vendorChunk: string | undefined
+  const files = output
+    .map(({ fileName }) => {
+      if (isVendorChunk(fileName)) {
+        vendorChunk = fileName
+        return 'vendor chunk'
+      }
+      return fileName
+    })
+    .sort()
   expect(files).toMatchSnapshot('02 - files from output')
 
   // All files in output have not changed
   for (const file of output) {
     const { fileName } = file
-    if (fileName === 'manifest.json') continue
+    if (fileName === 'manifest.json' || isVendorChunk(fileName))
+      continue
+
     const source = isChunk(file) ? file.code : file.source
     if (source instanceof Uint8Array) continue
+
+    const replaced = vendorChunk
+      ? source.replace(vendorChunk, 'vendor-chunk.js')
+      : source
 
     // Output files have not changed
     const key = findSpecial(fileName)
     if (key) {
-      specialFiles.get(key)!(source, fileName)
+      specialFiles.get(key)!(replaced, fileName)
     } else {
-      expect(source).toMatchSnapshot(fileName)
+      expect(replaced).toMatchSnapshot(fileName)
     }
   }
 
   // All files in manifest are in output files
   const manifestFiles = new Map()
   for (const file of Object.values(parsed).flat().sort()) {
-    if (glob.hasMagic(file)) continue
+    if (glob.hasMagic(file) || isVendorChunk(file)) continue
     manifestFiles.set(file, files.includes(file))
   }
   expect(Object.fromEntries(manifestFiles)).toMatchSnapshot(

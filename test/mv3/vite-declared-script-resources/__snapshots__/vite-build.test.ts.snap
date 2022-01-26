@@ -32,8 +32,8 @@ Object {
       ],
       "resources": Array [
         "assets/image.51f8fe9d.png",
-        "script.js",
         "content1.js",
+        "script.js",
       ],
     },
     Object {
@@ -42,8 +42,8 @@ Object {
       ],
       "resources": Array [
         "assets/font.bb6bc8d6.otf",
-        "iframe.html",
         "content2.js",
+        "iframe.html",
       ],
     },
   ],
