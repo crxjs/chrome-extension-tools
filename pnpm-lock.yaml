@@ -24,7 +24,7 @@ specifiers:
   '@types/lodash.flatten': 4.4.6
   '@types/lodash.get': 4.4.6
   '@types/node': 16.11.17
-  '@types/prettier': 2.4.2
+  '@types/prettier': 2.4.4
   '@types/react': 17.0.38
   '@types/react-dom': 17.0.11
   '@types/ws': 8.2.2
@@ -129,7 +129,7 @@ devDependencies:
   '@types/lodash.flatten': 4.4.6
   '@types/lodash.get': 4.4.6
   '@types/node': 16.11.17
-  '@types/prettier': 2.4.2
+  '@types/prettier': 2.4.4
   '@types/react': 17.0.38
   '@types/react-dom': 17.0.11
   '@types/ws': 8.2.2
@@ -1094,8 +1094,8 @@ packages:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: false
 
-  /@types/prettier/2.4.2:
-    resolution: {integrity: sha512-ekoj4qOQYp7CvjX8ZDBgN86w3MqQhLE1hczEJbEIjgFEumDy+na/4AJAbLXfgEWFNB2pKadM5rPFtuSGMWK7xA==}
+  /@types/prettier/2.4.4:
+    resolution: {integrity: sha512-ReVR2rLTV1kvtlWFyuot+d1pkpG2Fw/XKE3PDAdj57rbM97ttSp9JZ2UsP+2EHTylra9cUf6JA7tGwW1INzUrA==}
     dev: true
 
   /@types/prop-types/15.7.3:
@@ -3639,7 +3639,7 @@ packages:
       '@jest/transform': 27.4.5
       '@jest/types': 27.4.2
       '@types/babel__traverse': 7.14.2
-      '@types/prettier': 2.4.2
+      '@types/prettier': 2.4.4
       babel-preset-current-node-syntax: 1.0.1_@babel+core@7.16.5
       chalk: 4.1.2
       expect: 27.4.2
