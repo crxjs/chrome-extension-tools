@@ -14,8 +14,8 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Runs linter and unit tests in src folder
-  basic:
-    name: Lint and Unit Tests
+  lint:
+    name: Run Lint
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -59,12 +59,9 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-      - name: Run unit tests
-        run: pnpm test:ci:src
-
   # Runs integration tests for MV3
-  mv2:
-    name: MV2 Integration Tests
+  e2e:
+    name: E2E Playwright Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -105,18 +102,15 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run MV2 rollup tests
-        run: pnpm test:ci:mv2:rollup
+      - name: Run E2E vite build tests
+        run: pnpm test:ci:e2e:build
 
-      - name: Run MV2 Vite build tests
-        run: pnpm test:ci:mv2:build
+      - name: Run E2E vite serve tests
+        run: pnpm test:ci:e2e:serve
 
-      - name: Run MV2 Vite serve tests
-        run: pnpm test:ci:mv2:serve
-
-  # Runs integration tests for MV3
+  # Runs snapshot integration tests for MV3
   mv3:
-    name: MV3 Integration Tests
+    name: MV3 Snapshot Integration Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -156,9 +150,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm i
-
-      - name: Run MV3 rollup tests
-        run: pnpm test:ci:mv3:rollup
 
       - name: Run MV3 Vite build tests
         run: pnpm test:ci:mv3:build

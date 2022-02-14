@@ -44,6 +44,7 @@
     "build": "rimraf dist && run-s build:*",
     "build:js": "rollup -c rollup.config.ts --configPlugin esbuild",
     "build:types": "tsc -p tsconfig-types.json",
+    "ci": "run-s ci:e2e:* ci:snap:*",
     "dev:js": "npm run build:js -- -w",
     "dev:lint": "tsc --noEmit --watch",
     "lint": "run-s lint:eslint lint:types",
@@ -52,9 +53,13 @@
     "lint:types": "tsc --noEmit",
     "prepublishOnly": "npm run build",
     "release": "npx bumpp --commit --push --tag && npm publish",
-    "test": "run-s test:*",
-    "test:build": "jest build -u",
-    "test:serve": "jest serve -u"
+    "test": "run-s test:update:*",
+    "test:ci:e2e:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) build",
+    "test:ci:e2e:serve": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) serve",
+    "test:ci:mv3:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) build",
+    "test:ci:mv3:serve": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) serve",
+    "test:update:build": "jest build -u",
+    "test:update:serve": "jest serve -u"
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.2",
