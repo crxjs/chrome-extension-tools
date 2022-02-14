@@ -28,8 +28,10 @@ export interface CrxPlugin extends VitePlugin {
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
 }
 
+// change this to an interface when you want to add options
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type CrxOptions = Record<string, any>
+
 export interface CrxPluginFn {
-  (options: { manifest: ManifestV3; format?: 'es' | 'iife' }):
-    | CrxPlugin
-    | CrxPlugin[]
+  (options: CrxOptions): CrxPlugin | CrxPlugin[]
 }

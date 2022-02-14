@@ -6,18 +6,14 @@ import { pluginHMR } from './plugin-hmr'
 import { pluginHtmlAuditor } from './plugin-htmlAuditor'
 import { pluginManifest } from './plugin-manifest'
 import { pluginResources } from './plugin-resources'
-import type { CrxPlugin, CrxPluginFn } from './types'
+import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 
 export const crx = ({
-  format = 'es',
   manifest,
-  ...rest
+  ...options
 }: {
   manifest: ManifestV3Export
-  format?: 'iife' | 'es'
-}): CrxPlugin[] => {
-  const options = { format, ...rest }
-
+} & CrxOptions): CrxPlugin[] => {
   const plugins = [
     pluginFileWriter,
     pluginDynamicScripts,
@@ -36,4 +32,4 @@ export const crx = ({
 
 export { filesReady, rebuildFiles } from './plugin-fileWriter'
 export { defineDynamicResource, defineManifestV3 } from './define'
-export type { CrxPlugin, CrxPluginFn }
+export type { CrxPlugin }

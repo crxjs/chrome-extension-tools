@@ -34,7 +34,7 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  * developer dashboard, it is a special resource id that you can access by
  * calling `chrome.runtime.getURL`.
  */
-export const pluginResources: CrxPluginFn = ({ format }) => {
+export const pluginResources: CrxPluginFn = () => {
   return {
     name: pluginName,
     apply: 'build',
@@ -149,7 +149,7 @@ export const pluginResources: CrxPluginFn = ({ format }) => {
                   for (const i of imports)
                     if (dynamicScriptNames.has(i)) mainWorldScripts.add(i)
 
-                  if (format === 'es') imports.add(name)
+                  imports.add(name)
 
                   // inject css through content script
                   if (css.size) {
@@ -171,7 +171,7 @@ export const pluginResources: CrxPluginFn = ({ format }) => {
             if (!mainWorldScripts.has(name)) {
               const { assets, css, imports } = getResources(name)
 
-              if (format === 'es') dynamicResourceSet.add(name)
+              dynamicResourceSet.add(name)
               for (const a of assets) dynamicResourceSet.add(a)
               for (const c of css) dynamicResourceSet.add(c)
               for (const i of imports) dynamicResourceSet.add(i)
