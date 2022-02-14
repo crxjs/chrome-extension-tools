@@ -3,7 +3,7 @@
 exports[`build fs output: 00 manifest.json 1`] = `
 Object {
   "background": Object {
-    "service_worker": "service-worker-loader.background.ts.ecf61562.js",
+    "service_worker": "service-worker-loader.background.ts.03caa710.js",
     "type": "module",
   },
   "manifest_version": 3,
@@ -16,7 +16,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "assets/content1.ts.2f58f76f.js",
+        "assets/content1.ts.5fad3132.js",
         "assets/content2.ts.2d61eea3.js",
         "assets/content2.ts.ebf44dca.css",
         "assets/font.bb6bc8d6.otf",
@@ -31,20 +31,20 @@ Object {
 
 exports[`build fs output: 01 output files 1`] = `
 Array [
-  "assets/background.ts.ecf61562.js",
-  "assets/content1.ts.2f58f76f.js",
+  "assets/background.ts.03caa710.js",
+  "assets/content1.ts.5fad3132.js",
   "assets/content2.ts.2d61eea3.js",
   "assets/content2.ts.ebf44dca.css",
   "assets/font.bb6bc8d6.otf",
   "assets/image.51f8fe9d.png",
   "assets/script.ts.df173d4e.js",
   "manifest.json",
-  "service-worker-loader.background.ts.ecf61562.js",
+  "service-worker-loader.background.ts.03caa710.js",
 ]
 `;
 
-exports[`build fs output: assets/background.ts.ecf61562.js 1`] = `
-"var content1 = \\"/assets/content1.ts.2f58f76f.js\\";
+exports[`build fs output: assets/background.ts.03caa710.js 1`] = `
+"var content1 = \\"/assets/content1.ts.5fad3132.js\\";
 
 var content2 = \\"/assets/content2.ts.2d61eea3.js\\";
 
@@ -55,7 +55,7 @@ chrome.scripting.executeScript({
 "
 `;
 
-exports[`build fs output: assets/content1.ts.2f58f76f.js 1`] = `
+exports[`build fs output: assets/content1.ts.5fad3132.js 1`] = `
 "var icon = \\"/assets/image.51f8fe9d.png\\";
 
 var script = \\"/assets/script.ts.df173d4e.js\\";
@@ -85,7 +85,7 @@ exports[`build fs output: assets/script.ts.df173d4e.js 1`] = `
 "
 `;
 
-exports[`build fs output: service-worker-loader.background.ts.ecf61562.js 1`] = `
-"import './assets/background.ts.ecf61562.js';
+exports[`build fs output: service-worker-loader.background.ts.03caa710.js 1`] = `
+"import './assets/background.ts.03caa710.js';
 "
 `;

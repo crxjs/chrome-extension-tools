@@ -13,14 +13,14 @@ Object {
 
 exports[`build fs output: 01 output files 1`] = `
 Array [
-  "assets/popup.html.3ba1dc52.js",
+  "assets/popup.html.245d3d87.js",
   "assets/vendor.js",
   "manifest.json",
   "src/popup.html",
 ]
 `;
 
-exports[`build fs output: assets/popup.html.3ba1dc52.js 1`] = `
+exports[`build fs output: assets/popup.html.245d3d87.js 1`] = `
 "import { R as React, r as reactDom } from './vendor.js';
 
 const p = function polyfill() {
@@ -87,7 +87,7 @@ exports[`build fs output: src/popup.html 1`] = `
       content=\\"width=1000, initial-scale=1.0\\"
     />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.3ba1dc52.js\\"></script>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.245d3d87.js\\"></script>
     <link rel=\\"modulepreload\\" href=\\"/assets/vendor.js\\">
   </head>
   <body>

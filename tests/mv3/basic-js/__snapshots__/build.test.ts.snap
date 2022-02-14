@@ -47,7 +47,7 @@ Array [
   "assets/background.js.85dc521e.js",
   "assets/content-script-loader.content.js.5435d742.66176a5c.js",
   "assets/content.js.5435d742.js",
-  "assets/popup.html.2e5e7c13.js",
+  "assets/popup.html.1ff9f1a2.js",
   "assets/vendor.js",
   "manifest.json",
   "service-worker-loader.background.js.85dc521e.js",
@@ -80,7 +80,7 @@ exports[`build fs output: assets/content-script-loader.content.js.5435d742.66176
 "
 `;
 
-exports[`build fs output: assets/popup.html.2e5e7c13.js 1`] = `
+exports[`build fs output: assets/popup.html.1ff9f1a2.js 1`] = `
 "import { R as React, a as ReactDOM } from './vendor.js';
 
 const p = function polyfill() {
@@ -152,7 +152,7 @@ exports[`build fs output: src/popup.html 1`] = `
       content=\\"width=1000, initial-scale=1.0\\"
     />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.2e5e7c13.js\\"></script>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.1ff9f1a2.js\\"></script>
     <link rel=\\"modulepreload\\" href=\\"/assets/vendor.js\\">
   </head>
   <body>

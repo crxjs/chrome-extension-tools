@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content1.ts.0ffc4d4e.01471d09.js",
+        "assets/content-script-loader.content1.ts.5927740e.422c3492.js",
       ],
       "matches": Array [
         "https://google.com/*",
@@ -29,7 +29,7 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "assets/content1.ts.0ffc4d4e.js",
+        "assets/content1.ts.5927740e.js",
         "assets/image.51f8fe9d.png",
         "assets/script.ts.df173d4e.js",
       ],
@@ -51,9 +51,9 @@ Object {
 
 exports[`build fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content1.ts.0ffc4d4e.01471d09.js",
+  "assets/content-script-loader.content1.ts.5927740e.422c3492.js",
   "assets/content-script-loader.content2.ts.6fa9fa4c.7efea758.js",
-  "assets/content1.ts.0ffc4d4e.js",
+  "assets/content1.ts.5927740e.js",
   "assets/content2.ts.6fa9fa4c.js",
   "assets/font.bb6bc8d6.otf",
   "assets/image.51f8fe9d.png",
@@ -62,14 +62,14 @@ Array [
 ]
 `;
 
-exports[`build fs output: assets/content-script-loader.content1.ts.0ffc4d4e.01471d09.js 1`] = `
+exports[`build fs output: assets/content-script-loader.content1.ts.5927740e.422c3492.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content1.ts.0ffc4d4e.js\\")
+      chrome.runtime.getURL(\\"assets/content1.ts.5927740e.js\\")
     );
   })().catch(console.error);
 
@@ -92,7 +92,7 @@ exports[`build fs output: assets/content-script-loader.content2.ts.6fa9fa4c.7efe
 "
 `;
 
-exports[`build fs output: assets/content1.ts.0ffc4d4e.js 1`] = `
+exports[`build fs output: assets/content1.ts.5927740e.js 1`] = `
 "var icon = \\"/assets/image.51f8fe9d.png\\";
 
 var script = \\"/assets/script.ts.df173d4e.js\\";

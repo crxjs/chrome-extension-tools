@@ -9,7 +9,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.declared-script.ts.ded2226c.175d4145.js",
+        "assets/content-script-loader.declared-script.ts.ce39994e.b15c419a.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -38,8 +38,8 @@ Object {
 exports[`serve fs output: 01 output files 1`] = `
 Array [
   "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.declared-script.ts.ded2226c.175d4145.js",
-  "assets/declared-script.ts.ded2226c.js",
+  "assets/content-script-loader.declared-script.ts.ce39994e.b15c419a.js",
+  "assets/declared-script.ts.ce39994e.js",
   "assets/main-world.ts.fac125b9.js",
   "assets/precontroller.9e1e2319.js",
   "manifest.json",
@@ -79,7 +79,7 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.declared-script.ts.ded2226c.175d4145.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.declared-script.ts.ce39994e.b15c419a.js 1`] = `
 "(function () {
   'use strict';
 
@@ -90,7 +90,7 @@ exports[`serve fs output: assets/content-script-loader.declared-script.ts.ded222
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/declared-script.ts.ded2226c.js\\")
+      chrome.runtime.getURL(\\"assets/declared-script.ts.ce39994e.js\\")
     );
   })().catch(console.error);
 
@@ -98,7 +98,7 @@ exports[`serve fs output: assets/content-script-loader.declared-script.ts.ded222
 "
 `;
 
-exports[`serve fs output: assets/declared-script.ts.ded2226c.js 1`] = `
+exports[`serve fs output: assets/declared-script.ts.ce39994e.js 1`] = `
 "var fileName = \\"/assets/main-world.ts.fac125b9.js\\";
 
 console.log(\\"declared script\\");

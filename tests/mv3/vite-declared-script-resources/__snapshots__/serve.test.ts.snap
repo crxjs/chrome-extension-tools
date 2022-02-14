@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content1.ts.0ffc4d4e.431e701c.js",
+        "assets/content-script-loader.content1.ts.5927740e.d4655f2e.js",
       ],
       "matches": Array [
         "https://google.com/*",
@@ -41,9 +41,9 @@ Object {
 exports[`serve fs output: 01 output files 1`] = `
 Array [
   "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.content1.ts.0ffc4d4e.431e701c.js",
+  "assets/content-script-loader.content1.ts.5927740e.d4655f2e.js",
   "assets/content-script-loader.content2.ts.6fa9fa4c.d1abeea9.js",
-  "assets/content1.ts.0ffc4d4e.js",
+  "assets/content1.ts.5927740e.js",
   "assets/content2.ts.6fa9fa4c.js",
   "assets/font.bb6bc8d6.otf",
   "assets/image.51f8fe9d.png",
@@ -85,7 +85,7 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.content1.ts.0ffc4d4e.431e701c.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.content1.ts.5927740e.d4655f2e.js 1`] = `
 "(function () {
   'use strict';
 
@@ -96,7 +96,7 @@ exports[`serve fs output: assets/content-script-loader.content1.ts.0ffc4d4e.431e
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content1.ts.0ffc4d4e.js\\")
+      chrome.runtime.getURL(\\"assets/content1.ts.5927740e.js\\")
     );
   })().catch(console.error);
 
@@ -123,7 +123,7 @@ exports[`serve fs output: assets/content-script-loader.content2.ts.6fa9fa4c.d1ab
 "
 `;
 
-exports[`serve fs output: assets/content1.ts.0ffc4d4e.js 1`] = `
+exports[`serve fs output: assets/content1.ts.5927740e.js 1`] = `
 "var icon = \\"/assets/image.51f8fe9d.png\\";
 
 var script = \\"/assets/script.ts.df173d4e.js\\";

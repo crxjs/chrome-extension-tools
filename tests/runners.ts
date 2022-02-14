@@ -14,6 +14,21 @@ import {
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
 
+const removeVendorHash: CrxPlugin = {
+  name: 'test:vite-config',
+  outputOptions({ chunkFileNames: cfn, ...options }) {
+    return {
+      chunkFileNames: (info) =>
+        info.name === 'vendor'
+          ? 'assets/vendor.js'
+          : typeof cfn === 'function'
+          ? cfn(info)
+          : cfn ?? 'assets/[name].[hash].js',
+      ...options,
+    }
+  },
+}
+
 export async function build(dirname: string) {
   const debug = _debug('test:build')
   debug('start %s', dirname)
@@ -38,6 +53,7 @@ export async function build(dirname: string) {
           config = _config
         },
       },
+      removeVendorHash,
     ],
     clearScreen: false,
     logLevel: 'error',
@@ -64,6 +80,7 @@ export async function serve(dirname: string) {
 
   const plugins: CrxPlugin[] = []
   if (process.env.DEBUG) plugins.push(inspect())
+  plugins.push(removeVendorHash)
 
   const devServer = await createServer({
     configFile: path.join(dirname, 'vite.config.ts'),
@@ -89,7 +106,6 @@ export async function serve(dirname: string) {
   return { outDir, devServer, config: devServer.config! }
 }
 
-const isVendorFile = (x: string) => /vendor\..{8}\.js$/.test(x)
 const isTextFile = (x: string) =>
   ['.html', '.css', '.js'].some((y) => x.endsWith(y))
 const defaultTest = (source: string, name: string) => {
@@ -121,11 +137,9 @@ export async function testOutput(
   const manifestPath = path.join(outDir, 'manifest.json')
   const manifest: ManifestV3 = await fs.readJson(manifestPath)
 
-  // stub vendor chunk file name (hash is not stable)
-  for (const x of manifest.web_accessible_resources ?? []) {
-    x.resources = x.resources
-      .map((x) => (isVendorFile(x) ? 'vendor chunk' : x))
-      .sort()
+  for (const r of manifest.web_accessible_resources ?? []) {
+    r.resources.sort()
+    if ('matches' in r) r.matches.sort()
   }
 
   getTest('manifest.json', (source, name) => {
@@ -133,22 +147,12 @@ export async function testOutput(
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '00 manifest.json')
 
-  let vendor = ''
-  const files: string[] = []
-  for (const f of await fg(`**/*`, { cwd: outDir })) {
-    if (isVendorFile(f)) {
-      const { base, dir } = path.parse(f)
-      vendor = base
-      files.push(path.join(dir, 'vendor.js'))
-    } else {
-      files.push(f)
-    }
-  }
+  const files = await fg(`**/*`, { cwd: outDir })
 
   expect(files.sort()).toMatchSnapshot('01 output files')
 
   for (const file of files) {
-    if (file.endsWith('vendor.js')) continue
+    if (file === 'assets/vendor.js') continue
     if (isTextFile(file)) {
       const filename = path.join(outDir, file)
       let source = await fs.readFile(filename, { encoding: 'utf8' })
@@ -156,7 +160,6 @@ export async function testOutput(
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
-      if (vendor) source = source.replace(vendor, 'vendor.js')
       getTest(file)(source, file)
     }
   }

@@ -3,7 +3,7 @@
 exports[`build fs output: 00 manifest.json 1`] = `
 Object {
   "background": Object {
-    "service_worker": "service-worker-loader.background.ts.87e9b1a9.js",
+    "service_worker": "service-worker-loader.background.ts.a149423c.js",
     "type": "module",
   },
   "description": "test extension",
@@ -17,7 +17,7 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "assets/content1.ts.068126ad.js",
+        "assets/content1.ts.89cf82ba.js",
         "assets/content2.ts.c8c8a691.js",
         "assets/font.bb6bc8d6.otf",
         "assets/image.51f8fe9d.png",
@@ -31,19 +31,19 @@ Object {
 
 exports[`build fs output: 01 output files 1`] = `
 Array [
-  "assets/background.ts.87e9b1a9.js",
-  "assets/content1.ts.068126ad.js",
+  "assets/background.ts.a149423c.js",
+  "assets/content1.ts.89cf82ba.js",
   "assets/content2.ts.c8c8a691.js",
   "assets/font.bb6bc8d6.otf",
   "assets/image.51f8fe9d.png",
   "assets/script.ts.df173d4e.js",
   "manifest.json",
-  "service-worker-loader.background.ts.87e9b1a9.js",
+  "service-worker-loader.background.ts.a149423c.js",
 ]
 `;
 
-exports[`build fs output: assets/background.ts.87e9b1a9.js 1`] = `
-"var content1 = \\"/assets/content1.ts.068126ad.js\\";
+exports[`build fs output: assets/background.ts.a149423c.js 1`] = `
+"var content1 = \\"/assets/content1.ts.89cf82ba.js\\";
 
 var content2 = \\"/assets/content2.ts.c8c8a691.js\\";
 
@@ -54,7 +54,7 @@ chrome.scripting.executeScript({
 "
 `;
 
-exports[`build fs output: assets/content1.ts.068126ad.js 1`] = `
+exports[`build fs output: assets/content1.ts.89cf82ba.js 1`] = `
 "var icon = \\"/assets/image.51f8fe9d.png\\";
 
 var script = \\"/assets/script.ts.df173d4e.js\\";
@@ -77,7 +77,7 @@ exports[`build fs output: assets/script.ts.df173d4e.js 1`] = `
 "
 `;
 
-exports[`build fs output: service-worker-loader.background.ts.87e9b1a9.js 1`] = `
-"import './assets/background.ts.87e9b1a9.js';
+exports[`build fs output: service-worker-loader.background.ts.a149423c.js 1`] = `
+"import './assets/background.ts.a149423c.js';
 "
 `;
