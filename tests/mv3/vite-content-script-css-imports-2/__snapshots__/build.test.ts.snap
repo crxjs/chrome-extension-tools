@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/index.ts.f31ac90f.css",
+      ],
+      "js": Array [
+        "assets/content-script-loader.index.ts.074b6402.07a120b2.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "css": Array [
+        "assets/index.ts.caa36ca4.css",
+      ],
+      "js": Array [
+        "assets/content-script-loader.index.ts.e4e256db.5883fd73.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/index.ts.074b6402.js",
+        "assets/index.ts.e4e256db.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/content-script-loader.index.ts.074b6402.07a120b2.js",
+  "assets/content-script-loader.index.ts.e4e256db.5883fd73.js",
+  "assets/index.ts.074b6402.js",
+  "assets/index.ts.caa36ca4.css",
+  "assets/index.ts.e4e256db.js",
+  "assets/index.ts.f31ac90f.css",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output: assets/content-script-loader.index.ts.074b6402.07a120b2.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/index.ts.074b6402.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.index.ts.e4e256db.5883fd73.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/index.ts.e4e256db.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/index.ts.074b6402.js 1`] = `
+"var styles = '';
+
+console.log(\\"content1\\");
+"
+`;
+
+exports[`build fs output: assets/index.ts.caa36ca4.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`build fs output: assets/index.ts.e4e256db.js 1`] = `
+"var styles = '';
+
+console.log(\\"content2\\");
+"
+`;
+
+exports[`build fs output: assets/index.ts.f31ac90f.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;

@@ -1,9 +1,0 @@
-{
-  "background": {
-    "service_worker": "background.ts"
-  },
-  "options_page": "options.html",
-  "manifest_version": 3,
-  "host_permissions": ["http://*/*", "https://*/*"],
-  "permissions": ["scripting"]
-}

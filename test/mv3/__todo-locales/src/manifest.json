@@ -1,5 +1,0 @@
-{
-  "background": { "service_worker": "service-worker.js" },
-  "default_locale": "en",
-  "manifest_version": 3
-}

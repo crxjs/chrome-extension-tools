@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://google.com/*"],
+      "js": ["src/content1.ts"]
+    },
+    {
+      "matches": ["https://bing.com/*"],
+      "js": ["src/content2.ts"]
+    }
+  ],
+  "name": "test extension",
+  "version": "0.1.0"
+}

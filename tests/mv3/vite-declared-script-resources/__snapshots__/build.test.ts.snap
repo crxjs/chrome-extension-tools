@@ -1,0 +1,114 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content-script-loader.content1.ts.0ffc4d4e.01471d09.js",
+      ],
+      "matches": Array [
+        "https://google.com/*",
+      ],
+    },
+    Object {
+      "js": Array [
+        "assets/content-script-loader.content2.ts.6fa9fa4c.7efea758.js",
+      ],
+      "matches": Array [
+        "https://bing.com/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://google.com/*",
+      ],
+      "resources": Array [
+        "assets/content1.ts.0ffc4d4e.js",
+        "assets/image.51f8fe9d.png",
+        "assets/script.ts.df173d4e.js",
+      ],
+      "use_dynamic_url": true,
+    },
+    Object {
+      "matches": Array [
+        "https://bing.com/*",
+      ],
+      "resources": Array [
+        "assets/content2.ts.6fa9fa4c.js",
+        "assets/font.bb6bc8d6.otf",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/content-script-loader.content1.ts.0ffc4d4e.01471d09.js",
+  "assets/content-script-loader.content2.ts.6fa9fa4c.7efea758.js",
+  "assets/content1.ts.0ffc4d4e.js",
+  "assets/content2.ts.6fa9fa4c.js",
+  "assets/font.bb6bc8d6.otf",
+  "assets/image.51f8fe9d.png",
+  "assets/script.ts.df173d4e.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output: assets/content-script-loader.content1.ts.0ffc4d4e.01471d09.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content1.ts.0ffc4d4e.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.content2.ts.6fa9fa4c.7efea758.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content2.ts.6fa9fa4c.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content1.ts.0ffc4d4e.js 1`] = `
+"var icon = \\"/assets/image.51f8fe9d.png\\";
+
+var script = \\"/assets/script.ts.df173d4e.js\\";
+
+console.log(\\"content.ts\\", { icon, script });
+"
+`;
+
+exports[`build fs output: assets/content2.ts.6fa9fa4c.js 1`] = `
+"var font = \\"/assets/font.bb6bc8d6.otf\\";
+
+console.log(\\"content2.ts\\", { font });
+"
+`;
+
+exports[`build fs output: assets/script.ts.df173d4e.js 1`] = `
+"console.log(\\"main world script\\");
+"
+`;

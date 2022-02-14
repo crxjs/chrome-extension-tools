@@ -1,9 +1,0 @@
-{
-  "name": "input-array",
-  "description": "input-array chrome extension",
-  "manifest_version": 2,
-  "version": "0.1.0",
-  "background": {
-    "scripts": ["background.js"]
-  }
-}

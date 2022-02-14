@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.background.ts.ecf61562.js",
+    "type": "module",
+  },
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/content1.ts.2f58f76f.js",
+        "assets/content2.ts.2d61eea3.js",
+        "assets/content2.ts.ebf44dca.css",
+        "assets/font.bb6bc8d6.otf",
+        "assets/image.51f8fe9d.png",
+        "assets/script.ts.df173d4e.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/background.ts.ecf61562.js",
+  "assets/content1.ts.2f58f76f.js",
+  "assets/content2.ts.2d61eea3.js",
+  "assets/content2.ts.ebf44dca.css",
+  "assets/font.bb6bc8d6.otf",
+  "assets/image.51f8fe9d.png",
+  "assets/script.ts.df173d4e.js",
+  "manifest.json",
+  "service-worker-loader.background.ts.ecf61562.js",
+]
+`;
+
+exports[`build fs output: assets/background.ts.ecf61562.js 1`] = `
+"var content1 = \\"/assets/content1.ts.2f58f76f.js\\";
+
+var content2 = \\"/assets/content2.ts.2d61eea3.js\\";
+
+chrome.scripting.executeScript({
+  files: [content1, content2],
+  target: { tabId: 1 }
+});
+"
+`;
+
+exports[`build fs output: assets/content1.ts.2f58f76f.js 1`] = `
+"var icon = \\"/assets/image.51f8fe9d.png\\";
+
+var script = \\"/assets/script.ts.df173d4e.js\\";
+
+console.log(\\"content.ts\\", { icon, script });
+"
+`;
+
+exports[`build fs output: assets/content2.ts.2d61eea3.js 1`] = `
+"var font = \\"/assets/font.bb6bc8d6.otf\\";
+
+var css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
+
+console.log(\\"content2.ts\\", { css, font });
+"
+`;
+
+exports[`build fs output: assets/content2.ts.ebf44dca.css 1`] = `
+"body {
+  color: #333;
+}
+"
+`;
+
+exports[`build fs output: assets/script.ts.df173d4e.js 1`] = `
+"console.log(\\"main world script\\");
+"
+`;
+
+exports[`build fs output: service-worker-loader.background.ts.ecf61562.js 1`] = `
+"import './assets/background.ts.ecf61562.js';
+"
+`;

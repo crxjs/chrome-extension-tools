@@ -1,20 +1,2 @@
-/node_modules
-/lib
-/types
-/coverage
-**/*.js
-**/*.jsx
-**/*.cjs
-**/*.mjs
-
-rollup.config.js
-jest.config.js
-
-# *.jpg
-# *.json
-# *.html
-# *.png
-# *.css
-# *.ico
-# *.ttf
-# *.otf
+dist
+node_modules

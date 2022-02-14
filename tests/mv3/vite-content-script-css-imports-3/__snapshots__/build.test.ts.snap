@@ -1,0 +1,141 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/import.3b031dc7.css",
+        "assets/index.ts.f31ac90f.css",
+      ],
+      "js": Array [
+        "assets/content-script-loader.index.ts.37dcd2bd.be5b75b0.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "css": Array [
+        "assets/import.3b031dc7.css",
+        "assets/index.ts.caa36ca4.css",
+      ],
+      "js": Array [
+        "assets/content-script-loader.index.ts.4cf02768.b16d24e2.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/import.502e90d6.js",
+        "assets/index.ts.37dcd2bd.js",
+        "assets/index.ts.4cf02768.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/content-script-loader.index.ts.37dcd2bd.be5b75b0.js",
+  "assets/content-script-loader.index.ts.4cf02768.b16d24e2.js",
+  "assets/import.3b031dc7.css",
+  "assets/import.502e90d6.js",
+  "assets/index.ts.37dcd2bd.js",
+  "assets/index.ts.4cf02768.js",
+  "assets/index.ts.caa36ca4.css",
+  "assets/index.ts.f31ac90f.css",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output: assets/content-script-loader.index.ts.4cf02768.b16d24e2.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/index.ts.4cf02768.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.index.ts.37dcd2bd.be5b75b0.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/index.ts.37dcd2bd.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/import.3b031dc7.css 1`] = `
+"h1 {
+  color: green;
+}
+"
+`;
+
+exports[`build fs output: assets/import.502e90d6.js 1`] = `
+"var styles = '';
+
+console.log(\\"imported file\\");
+"
+`;
+
+exports[`build fs output: assets/index.ts.4cf02768.js 1`] = `
+"import './import.502e90d6.js';
+
+var styles = '';
+
+console.log(\\"content2\\");
+"
+`;
+
+exports[`build fs output: assets/index.ts.37dcd2bd.js 1`] = `
+"import './import.502e90d6.js';
+
+var styles = '';
+
+console.log(\\"content1\\");
+"
+`;
+
+exports[`build fs output: assets/index.ts.caa36ca4.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`build fs output: assets/index.ts.f31ac90f.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
