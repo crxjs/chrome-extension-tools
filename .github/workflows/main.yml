@@ -112,6 +112,12 @@ jobs:
         with:
           run: pnpm test:ci:e2e:serve
 
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: image-snapshot-diffs
+          path: /**/__image_snapshots__/__diff_output__/*
+
   # Runs snapshot integration tests for MV3
   mv3:
     name: MV3 Snapshot Integration Tests
@@ -160,3 +166,17 @@ jobs:
 
       - name: Run MV3 Vite serve tests
         run: pnpm test:ci:mv3:serve
+
+      - name: Git Diff Output Snapshots
+        id: diff
+        run: echo ::set-output diff=$(git diff)
+
+      - name: Save Diff To File
+        if: ${{ steps.diff.outputs.diff != '' }}
+        run: echo ${{steps.diff.outputs.diff}} > diff.txt
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ steps.diff.outputs.diff != '' }}
+        with:
+          name: output-snapshot-diff
+          path: diff.txt
