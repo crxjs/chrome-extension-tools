@@ -3,7 +3,7 @@ import fs from 'fs-extra'
 import { RollupOutput } from 'rollup'
 import { allFiles, _debug } from 'src/helpers'
 import type { ManifestV3 } from 'src/manifest'
-import * as path from 'src/path'
+import { join } from 'src/path'
 import { filesReady } from 'src/plugin-fileWriter'
 import type { CrxPlugin } from 'src/types'
 import {
@@ -33,8 +33,8 @@ export async function build(dirname: string) {
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
-  const cacheDir = path.join(dirname, '.vite')
-  const outDir = path.join(dirname, 'dist-build')
+  const cacheDir = join(dirname, '.vite')
+  const outDir = join(dirname, 'dist-build')
 
   process.chdir(dirname)
   await fs.remove(cacheDir)
@@ -42,7 +42,7 @@ export async function build(dirname: string) {
 
   let config: ResolvedConfig | undefined
   const output = await _build({
-    configFile: path.join(dirname, 'vite.config.ts'),
+    configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir },
     cacheDir,
@@ -70,8 +70,8 @@ export async function serve(dirname: string) {
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 
-  const cacheDir = path.join(dirname, '.vite')
-  const outDir = path.join(dirname, 'dist-serve')
+  const cacheDir = join(dirname, '.vite')
+  const outDir = join(dirname, 'dist-serve')
 
   process.chdir(dirname)
   await fs.remove(cacheDir)
@@ -83,7 +83,7 @@ export async function serve(dirname: string) {
   plugins.push(removeVendorHash)
 
   const devServer = await createServer({
-    configFile: path.join(dirname, 'vite.config.ts'),
+    configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir, minify: false },
     cacheDir,
@@ -134,7 +134,7 @@ export async function testOutput(
 
   expect(fs.existsSync(outDir)).toBe(true)
 
-  const manifestPath = path.join(outDir, 'manifest.json')
+  const manifestPath = join(outDir, 'manifest.json')
   const manifest: ManifestV3 = await fs.readJson(manifestPath)
 
   for (const r of manifest.web_accessible_resources ?? []) {
@@ -154,7 +154,7 @@ export async function testOutput(
   for (const file of files) {
     if (file === 'assets/vendor.js') continue
     if (isTextFile(file)) {
-      const filename = path.join(outDir, file)
+      const filename = join(outDir, file)
       let source = await fs.readFile(filename, { encoding: 'utf8' })
       if (devServer)
         source = source
