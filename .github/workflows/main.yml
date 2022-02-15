@@ -176,7 +176,7 @@ jobs:
         run: pnpm test:ci:mv3:serve
 
       - name: Fail if diff
-        if: git --no-pager diff --name-only
+        if: $(git --no-pager diff --name-only)
         run: exit 1
 
       - name: Git diff
