@@ -64,11 +64,9 @@ console.log(\\"content.ts\\", { icon, script });
 `;
 
 exports[`build fs output: assets/content2.ts.hash.js 1`] = `
-"var html = \\"data:text/html;base64,PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9ImVuIj4KICA8aGVhZD4KICAgIDxtZXRhIGNoYXJzZXQ9IlVURi04IiAvPgogICAgPG1ldGEgaHR0cC1lcXVpdj0iWC1VQS1Db21wYXRpYmxlIiBjb250ZW50PSJJRT1lZGdlIiAvPgogICAgPG1ldGEKICAgICAgbmFtZT0idmlld3BvcnQiCiAgICAgIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLjAiCiAgICAvPgogICAgPHRpdGxlPkRvY3VtZW50PC90aXRsZT4KICA8L2hlYWQ+CiAgPGJvZHk+CiAgICBJRlIKICA8L2JvZHk+CjwvaHRtbD4K\\";
+"var font = \\"/assets/font.hash.otf\\";
 
-var font = \\"/assets/font.hash.otf\\";
-
-console.log(\\"content2.ts\\", { html, font });
+console.log(\\"content2.ts\\", { font });
 "
 `;
 
