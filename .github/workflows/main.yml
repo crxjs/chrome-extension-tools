@@ -171,6 +171,9 @@ jobs:
         id: diff
         run: echo ::set-output files=$(git diff --name-only)
 
+      - name: Log diff output
+        run: echo ${{ steps.diff.outputs.files }}
+
       - name: Save diff To file
         if: ${{ steps.diff.outputs.files != 0 }}
         run: git diff > diff.txt
@@ -180,3 +183,7 @@ jobs:
         with:
           name: output-snapshot-diff
           path: diff.txt
+
+      - name: Fail if snapshots change
+        if: ${{ steps.diff.outputs.diff != 0 }}
+        run: exit 1
