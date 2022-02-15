@@ -1,0 +1,6 @@
+node_modules
+tests/artifacts
+tests/**/.vite
+tests/**/dist-*
+dist
+schema

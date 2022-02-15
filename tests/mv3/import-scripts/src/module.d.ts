@@ -4,7 +4,8 @@ declare module '*?script' {
    *
    * Default script format is IIFE.
    *
-   * If imported inside a content script, RPCE will include the file name in `web_accessible_resources`.
+   * If imported inside a content script, RPCE will include the file name in
+   * `web_accessible_resources`.
    */
   const fileName: string
   export default fileName
@@ -16,7 +17,8 @@ declare module '*?script&esm' {
    *
    * Script format is ESM.
    *
-   * If imported inside a content script, RPCE will include the file name in `web_accessible_resources`.
+   * If imported inside a content script, RPCE will include the file name in
+   * `web_accessible_resources`.
    */
   const fileName: string
   export default fileName

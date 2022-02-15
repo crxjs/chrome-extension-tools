@@ -147,10 +147,7 @@ exports[`build fs output: src/popup.html 1`] = `
 <html lang=\\"en\\">
   <head>
     <meta charset=\\"UTF-8\\" />
-    <meta
-      name=\\"viewport\\"
-      content=\\"width=1000, initial-scale=1.0\\"
-    />
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <title>Popup Page</title>
     <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
     <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">

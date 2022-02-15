@@ -48,10 +48,9 @@ watcherEvent$.subscribe((event) => {
 })
 
 export const filesStart$ = watcherEvent$.pipe(
-  filter((x): x is Extract<FileWriterEvent, { type: 'writeBundle' }> => {
+  filter((x): x is Extract<FileWriterEvent, { type: 'buildStart' }> => {
     return x.type === 'buildStart'
   }),
-  delay(100),
 )
 
 export const filesStart = () => firstValueFrom(filesStart$)
@@ -60,7 +59,7 @@ export const filesReady$ = watcherEvent$.pipe(
   filter((x): x is Extract<FileWriterEvent, { type: 'writeBundle' }> => {
     return x.type === 'writeBundle'
   }),
-  delay(100),
+  delay(200), // TODO: make this dynamic - check that written files exist and have been updated
 )
 
 export const filesReady = () => firstValueFrom(filesReady$)

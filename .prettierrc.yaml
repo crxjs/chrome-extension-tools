@@ -1,8 +1,9 @@
 semi: false
 tabWidth: 2
-trailingComma: "all"
+trailingComma: all
 jsxSingleQuote: true
 singleQuote: true
-arrowParens: "always"
+arrowParens: always
+proseWrap: always
 plugins:
   - "./node_modules/prettier-plugin-jsdoc"
