@@ -1,4 +1,5 @@
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
+import { join } from 'src/path'
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({
@@ -6,6 +7,8 @@ expect.extend({
       threshold: 0.3,
     },
     failureThreshold: 0.04,
+    failureThresholdType: 'percent',
+    customDiffDir: join(__dirname, '__image_snapshot_diffs__'),
   }),
 })
 
