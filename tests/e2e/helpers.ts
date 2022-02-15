@@ -20,7 +20,7 @@ export async function getPage(
     count++
   }
 
-  console.log('get page loop done', page)
+  console.log('get page loop done', page?.url())
   if (!page) throw new Error(`Could not get page "${included}"`)
   return page
 }
