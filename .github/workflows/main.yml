@@ -114,7 +114,7 @@ jobs:
 
   # Runs snapshot integration tests for MV3
   mv3:
-    name: MV3 Snapshot Integration Tests
+    name: MV3 Integration Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -165,18 +165,9 @@ jobs:
         id: diff
         run: echo "::set-output name=files::$(git diff --name-only)"
 
-      - name: Log diff output
-        run: echo "${{ steps.diff.outputs.files }}"
-
       - name: Save diff To file
         if: ${{ steps.diff.outputs.files != 0 }}
         run: git diff > diff.txt
-
-      - uses: actions/upload-artifact@v2
-        with:
-          name: output-snapshot-diff
-          path: /home/runner/work/rollup-plugin-chrome-extension/rollup-plugin-chrome-extension/diff.txt
-          if-no-files-found: ignore
 
       - name: Fail if snapshots change
         if: ${{ steps.diff.outputs.files != 0 }}
