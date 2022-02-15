@@ -116,7 +116,7 @@ jobs:
         if: failure()
         with:
           name: image-snapshot-diffs
-          path: /home/runner/work/**/__image_snapshots__/__diff_output__/*
+          path: /home/runner/work/rollup-plugin-chrome-extension/rollup-plugin-chrome-extension/tests/__image_snapshot_diffs__/*
 
   # Runs snapshot integration tests for MV3
   mv3:
