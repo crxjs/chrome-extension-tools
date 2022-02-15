@@ -1,26 +1,21 @@
 import { BrowserContext, Page } from 'playwright-chromium'
 
-export async function getPage(
-  browserContext: BrowserContext,
-  included: string,
-) {
+export async function getPage(browserContext: BrowserContext, test: string) {
   let count = 0
   let page: Page | undefined
+  let pages: Page[] = []
 
-  console.log('get page', included)
   while (!page && count < 50) {
-    const pages = browserContext.pages()
-    console.log(
-      'pages',
-      pages.map((p) => p.url()),
-    )
-    page = pages.find((p) => p.url().includes(included))
-    console.log('page', page?.url())
+    pages = browserContext.pages()
+    page = pages.find((p) => p.url().includes(test))
     if (!page) await new Promise((r) => setTimeout(r, 100))
     count++
   }
 
-  console.log('get page loop done', page?.url())
-  if (!page) throw new Error(`Could not get page "${included}"`)
+  if (!page) {
+    console.log({ included: test, page, pages: pages.map((p) => p.url()) })
+    throw new Error(`Could not get page "${test}"`)
+  }
+
   return page
 }
