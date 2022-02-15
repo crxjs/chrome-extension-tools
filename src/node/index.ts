@@ -30,6 +30,8 @@ export const crx = ({
   return plugins
 }
 
+export const chromeExtension = crx
+
 export { filesReady, rebuildFiles } from './plugin-fileWriter'
 export { defineDynamicResource, defineManifestV3 } from './define'
 export type { CrxPlugin }
