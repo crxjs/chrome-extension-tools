@@ -20,7 +20,7 @@ import {
   isMV2,
   Manifest,
 } from './types'
-
+import { normalizePath } from '@rollup/pluginutils'
 // recurse through content script imports
 type Resources = {
   assets: Set<string>
@@ -54,7 +54,7 @@ function getChunksById(bundle: OutputBundle) {
   return Object.entries(bundle).reduce(
     (map, [outputName, chunk]) => {
       if (isChunk(chunk) && chunk.facadeModuleId)
-        map.set(chunk.facadeModuleId, outputName)
+        map.set(normalizePath(chunk.facadeModuleId).toLowerCase(), outputName)
       return map
     },
     new Map<string, string>(),
@@ -69,7 +69,10 @@ function getCrxImportsFromBundle(
   const resources = Object.keys(modules)
     .filter((m) => m.startsWith(importedResourcePrefix))
     .map((m) => m.slice(importedResourcePrefix.length))
-    .map((m) => stubUrl(m).pathname)
+    .map((m) => {
+      const url = stubUrl(m)
+      return (url.protocol + url.pathname).toLowerCase()
+    })
 
   const chunks = [...imports, ...dynamicImports]
   const assets = []

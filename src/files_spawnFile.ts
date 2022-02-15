@@ -15,6 +15,7 @@ import { manifestParser } from './files_manifestParser'
 import { isUndefined } from './helpers'
 import { relative } from './path'
 import { Asset, BaseAsset, Script } from './types'
+import { normalizePath } from '@rollup/pluginutils'
 
 export function spawnFile(
   file: BaseAsset | Script,
@@ -135,7 +136,7 @@ function manifestLoader({ id, dirName }: Asset) {
           throw new Error(
             `Manifest appears to be empty at ${id}`,
           )
-        return model.events.LOADED({ source, id: filepath })
+        return model.events.LOADED({ source, id: normalizePath(filepath) })
       })
       .catch(model.events.ERROR),
   )

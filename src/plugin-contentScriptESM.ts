@@ -15,6 +15,7 @@ import {
   RpceApi,
 } from './plugin_helpers'
 import { CrxPlugin, Manifest } from './types'
+import { normalizePath } from '@rollup/pluginutils'
 
 export const helperScripts: string[] = [
   runtimeReloaderCS,
@@ -61,9 +62,13 @@ export const contentScriptESM = (): CrxPlugin => {
       for (const script of manifest.content_scripts ?? []) {
         script.js?.forEach((name, i) => {
           if (helperScripts.includes(name)) return
-          const fileName = generateFileNames(name).outputFileName
-          script.js![i] =
-            api.filesByFileName.get(fileName)!.wrapperName!
+          const fileName = normalizePath(generateFileNames(name).outputFileName)
+          const file = api.filesByFileName.get(fileName)
+
+          if(!file)
+            throw new Error('File ' + fileName + ' not found')
+
+          script.js![i] = file!.wrapperName!
         })
       }
 

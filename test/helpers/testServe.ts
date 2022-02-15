@@ -6,10 +6,9 @@ import {
 import { isMV2 } from '$src/types'
 import fs from 'fs-extra'
 import globCb, { hasMagic } from 'glob'
-import path from 'path'
+import { relative, join } from '$src/path'
 import { createServer, Manifest, ViteDevServer } from 'vite'
 import { mockDate } from './mockDate'
-
 /* ------------------ SETUP TESTS ------------------ */
 mockDate()
 
@@ -36,7 +35,7 @@ export function setupViteServe({
 }) {
   process.chdir(dirname)
 
-  const outDir = path.join(dirname, 'dist-serve')
+  const outDir = join(dirname, 'dist-serve')
 
   const shared: {
     devServer?: ViteDevServer
@@ -47,7 +46,7 @@ export function setupViteServe({
     await fs.remove(outDir)
 
     shared.devServer = await createServer({
-      configFile: path.join(dirname, 'vite.config.ts'),
+      configFile: join(dirname, 'vite.config.ts'),
       envFile: false,
       build: { outDir },
     })
@@ -94,7 +93,7 @@ export async function testViteServe(
 
   expect(fs.existsSync(outDir)).toBe(true)
 
-  const manifestPath = path.join(outDir, 'manifest.json')
+  const manifestPath = join(outDir, 'manifest.json')
   const manifest = await fs.readJson(manifestPath)
 
   const desc: Partial<Manifest> = {
@@ -132,7 +131,7 @@ export async function testViteServe(
   filepaths.sort()
   const files = new Set()
   for (const filepath of filepaths) {
-    const fileName = path.relative(outDir, filepath)
+    const fileName = relative(outDir, filepath)
     files.add(fileName)
 
     if (filepath === manifestPath) continue

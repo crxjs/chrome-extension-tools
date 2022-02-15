@@ -5,6 +5,7 @@ import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import { format } from '../src/helpers'
 import esbuild from 'rollup-plugin-esbuild'
+import { normalizePath } from '@rollup/pluginutils'
 
 const rootDirname = path.resolve(__dirname, '..')
 
@@ -28,7 +29,9 @@ const swCodeDirFiles = fs
 
 const testFixtureDirname = path.join(__dirname, 'fixtures')
 
-const entryFiles = browserCodeDirFiles.concat(swCodeDirFiles)
+const entryFiles = browserCodeDirFiles
+  .concat(swCodeDirFiles)
+  .map((path) => normalizePath(path))
 
 const config: RollupOptions = {
   input: entryFiles,
@@ -55,7 +58,7 @@ const config: RollupOptions = {
           return format`
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          import { code } from 'code ${importPath}'
+          import { code } from 'code ${normalizePath(importPath)}'
                        export { code }`
 
         return null

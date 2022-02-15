@@ -5,6 +5,7 @@ import { readFileSync, readJsonSync } from 'fs-extra'
 import { relative } from './path'
 import { format } from './helpers'
 import { isMV2, CrxPlugin } from './types'
+import { normalizePath } from '@rollup/pluginutils'
 
 export const browserPolyfillName = 'browser-polyfill.js'
 export const browserPolyfillExecuteScriptName =
@@ -22,7 +23,7 @@ export const browserPolyfill = (): CrxPlugin => {
   ].join('\n')
 
   let mv3 = false
-  let root = process.cwd()
+  let root = normalizePath(process.cwd())
   const fileNames = new Set<string>()
 
   return {

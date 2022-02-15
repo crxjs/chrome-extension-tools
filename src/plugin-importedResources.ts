@@ -45,11 +45,11 @@ export const importedResources = (): CrxPlugin => {
     },
     async load(_id) {
       if (!_id.startsWith(importedResourcePrefix)) return null
-
       const url = stubUrl(
         _id.slice(importedResourcePrefix.length),
       )
-      const id = url.pathname
+      const id = (url.protocol + url.pathname)
+      
       const relpath = relative(api.root, id)
       const isHtml = url.searchParams.has('html')
       const fileName = isHtml

@@ -16,6 +16,7 @@ import {
   Script,
 } from './types'
 import { narrowEvent } from './xstate_helpers'
+import { normalizePath } from '@rollup/pluginutils'
 
 export interface FilesContext {
   filesById: Map<string, ReturnType<typeof spawnFile>>
@@ -25,15 +26,18 @@ export interface FilesContext {
   excluded: Set<FileType>
   lastError?: Error
 }
+
+const ROOT_PATH = normalizePath(process.cwd())
+
 const filesContext: FilesContext = {
   filesById: new Map(),
   filesByName: new Map(),
-  root: process.cwd(),
+  root: ROOT_PATH,
   inputsByName: new Map().set('manifest.json', {
     fileName: 'manifest.json',
     fileType: 'MANIFEST',
-    id: join(process.cwd(), 'manifest.json'),
-    dirName: process.cwd(),
+    id: join(ROOT_PATH, 'manifest.json'),
+    dirName: ROOT_PATH,
   }),
   excluded: new Set(),
 }
