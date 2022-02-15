@@ -116,7 +116,7 @@ jobs:
         if: failure()
         with:
           name: image-snapshot-diffs
-          path: /**/__image_snapshots__/__diff_output__/*
+          path: /home/runner/work/**/__image_snapshots__/__diff_output__/*
 
   # Runs snapshot integration tests for MV3
   mv3:
@@ -167,16 +167,16 @@ jobs:
       - name: Run MV3 Vite serve tests
         run: pnpm test:ci:mv3:serve
 
-      - name: Git Diff Output Snapshots
+      - name: Check for diff
         id: diff
-        run: echo ::set-output diff=$(git diff)
+        run: echo ::set-output files=$(git diff --name-only)
 
-      - name: Save Diff To File
-        if: ${{ steps.diff.outputs.diff != '' }}
-        run: echo ${{steps.diff.outputs.diff}} > diff.txt
+      - name: Save diff To file
+        if: ${{ steps.diff.outputs.files != 0 }}
+        run: git diff > diff.txt
 
       - uses: actions/upload-artifact@v2
-        if: ${{ steps.diff.outputs.diff != '' }}
+        if: ${{ steps.diff.outputs.diff != 0 }}
         with:
           name: output-snapshot-diff
           path: diff.txt
