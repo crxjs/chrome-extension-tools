@@ -1,3 +1,6 @@
+import contentHmrClient from 'client/es/content-hmr-client.ts?client'
+import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
+import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import fs from 'fs'
 import jsesc from 'jsesc'
 import MagicString from 'magic-string'
@@ -8,7 +11,16 @@ import type { CrxPluginFn } from './types'
 /** A Map of dynamic scripts from virtual module id to the ref id of the emitted script */
 export const dynamicScripts = new Map<
   string,
-  { id: string; refId?: string; fileName?: string }
+  {
+    /** The file name of the source file */
+    id: string
+    /** The output file name of the content script entry (could be loader script) */
+    fileName?: string
+    /** TODO: unimplemented IIFE format */
+    format?: 'iife'
+    /** The ref id of the output file */
+    refId?: string
+  }
 >()
 
 function resolveScript({
@@ -32,9 +44,10 @@ function resolveScript({
   return { scriptId, id }
 }
 
-const pluginName = 'crx:dynamic-scripts'
-export const pluginDynamicScripts: CrxPluginFn = () => {
+const pluginName = 'crx:content-scripts'
+export const pluginContentScripts: CrxPluginFn = () => {
   let root: string
+  let port: string
 
   return [
     {
@@ -70,7 +83,7 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
       },
     },
     {
-      name: pluginName,
+      name: `${pluginName}-pre`,
       apply: 'build',
       enforce: 'pre',
       configResolved(config) {
@@ -111,11 +124,57 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
 
         return null
       },
-      generateBundle(options, bundle) {
-        for (const [name, { id, refId }] of dynamicScripts) {
+    },
+    {
+      name: `${pluginName}-post`,
+      apply: 'build',
+      enforce: 'post',
+      fileWriterStart({ port: p }) {
+        port = p.toString()
+      },
+      renderCrxManifest(manifest, bundle) {
+        if (this.meta.watchMode && typeof port === 'undefined')
+          throw new Error('server port is undefined')
+
+        let contentClientName: string | undefined
+        const scriptCount =
+          manifest.content_scripts?.length ?? 0 + dynamicScripts.size
+        if (this.meta.watchMode && scriptCount) {
+          const refId = this.emitFile({
+            type: 'asset',
+            name: 'content-script-hmr-client.js',
+            source: contentHmrClient,
+          })
+          contentClientName = this.getFileName(refId)
+        }
+
+        /* ---------------- DYNAMIC SCRIPTS ---------------- */
+
+        for (const [name, { id, refId, format = 'es' }] of dynamicScripts) {
           if (!refId) continue // may have been added during build
-          const fileName = this.getFileName(refId)
-          dynamicScripts.set(name, { id, fileName, refId })
+
+          let loaderRefId: string | undefined
+          if (format === 'es') {
+            const f = this.getFileName(refId)
+            const source = this.meta.watchMode
+              ? contentDevLoader
+                  .replace(/%PATH%/g, f)
+                  .replace(/%PORT%/g, port)
+                  .replace(/%CLIENT%/g, contentClientName!)
+              : contentProLoader.replace(/%PATH%/g, f)
+
+            loaderRefId = this.emitFile({
+              type: 'asset',
+              name: `content-script-loader.${parse(f).name}.js`,
+              source,
+            })
+          }
+
+          dynamicScripts.set(name, {
+            id,
+            fileName: this.getFileName(loaderRefId ?? refId),
+            refId,
+          })
         }
 
         for (const chunk of Object.values(bundle)) {
@@ -138,6 +197,32 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
                 }
             }
         }
+
+        /* ---------------- DECLARED SCRIPTS --------------- */
+
+        manifest.content_scripts = manifest.content_scripts?.map(
+          ({ js, ...rest }) => ({
+            js: js?.map((f: string) => {
+              const name = `content-script-loader.${parse(f).name}.js`
+              const source = this.meta.watchMode
+                ? contentDevLoader
+                    .replace(/%PATH%/g, f)
+                    .replace(/%PORT%/g, port!)
+                    .replace(/%CLIENT%/g, contentClientName!)
+                : contentProLoader.replace(/%PATH%/g, f)
+
+              const refId = this.emitFile({
+                type: 'asset',
+                name,
+                source,
+              })
+              return this.getFileName(refId)
+            }),
+            ...rest,
+          }),
+        )
+
+        return manifest
       },
     },
   ]

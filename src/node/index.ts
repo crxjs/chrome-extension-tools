@@ -1,12 +1,12 @@
 import type { ManifestV3Export } from './define'
-import { pluginDynamicScripts } from './plugin-dynamicScripts'
-import { pluginEsmFormat } from './plugin-esmFormat'
+import { pluginContentScripts } from './plugin-contentScripts'
 import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginHMR } from './plugin-hmr'
 import { pluginHtmlAuditor } from './plugin-htmlAuditor'
 import { pluginManifest } from './plugin-manifest'
 import { pluginResources } from './plugin-resources'
 import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
+import { pluginBackground } from './plugin-background'
 
 export const crx = ({
   manifest,
@@ -16,8 +16,8 @@ export const crx = ({
 } & CrxOptions): CrxPlugin[] => {
   const plugins = [
     pluginFileWriter,
-    pluginDynamicScripts,
-    pluginEsmFormat,
+    pluginContentScripts,
+    pluginBackground,
     pluginHMR,
     pluginHtmlAuditor,
     pluginManifest(manifest),
@@ -32,6 +32,6 @@ export const crx = ({
 
 export const chromeExtension = crx
 
-export { filesReady, rebuildFiles } from './plugin-fileWriter'
 export { defineDynamicResource, defineManifestV3 } from './define'
+export { filesReady, rebuildFiles } from './plugin-fileWriter'
 export type { CrxPlugin }
