@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.index.ts.074b6402.e7735bc2.js",
+        "assets/content-script-loader.index.ts.hash.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -14,7 +14,7 @@ Object {
     },
     Object {
       "js": Array [
-        "assets/content-script-loader.index.ts.e4e256db.b0a4346a.js",
+        "assets/content-script-loader.index.ts.hash2.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -42,19 +42,19 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.index.ts.074b6402.e7735bc2.js",
-  "assets/content-script-loader.index.ts.e4e256db.b0a4346a.js",
-  "assets/index.ts.074b6402.js",
-  "assets/index.ts.caa36ca4.css",
-  "assets/index.ts.e4e256db.js",
-  "assets/index.ts.f31ac90f.css",
-  "assets/precontroller.9e1e2319.js",
+  "assets/content-script-client.hash.js",
+  "assets/content-script-loader.index.ts.hash.hash.js",
+  "assets/content-script-loader.index.ts.hash2.hash.js",
+  "assets/index.ts.hash.css",
+  "assets/index.ts.hash.js",
+  "assets/index.ts.hash2.css",
+  "assets/index.ts.hash2.js",
+  "assets/precontroller.hash.js",
   "manifest.json",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-client.1b7d5e37.js 1`] = `
+exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -86,18 +86,18 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.index.ts.074b6402.e7735bc2.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.index.ts.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.074b6402.js\\")
+      chrome.runtime.getURL(\\"assets/index.ts.hash.js\\")
     );
   })().catch(console.error);
 
@@ -105,18 +105,18 @@ exports[`serve fs output: assets/content-script-loader.index.ts.074b6402.e7735bc
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.index.ts.e4e256db.b0a4346a.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.e4e256db.js\\")
+      chrome.runtime.getURL(\\"assets/index.ts.hash2.js\\")
     );
   })().catch(console.error);
 
@@ -124,35 +124,35 @@ exports[`serve fs output: assets/content-script-loader.index.ts.e4e256db.b0a4346
 "
 `;
 
-exports[`serve fs output: assets/index.ts.074b6402.js 1`] = `
-"var styles = '';
-
-console.log(\\"content1\\");
-"
-`;
-
-exports[`serve fs output: assets/index.ts.caa36ca4.css 1`] = `
-"body {
-  color: blue;
-}
-"
-`;
-
-exports[`serve fs output: assets/index.ts.e4e256db.js 1`] = `
-"var styles = '';
-
-console.log(\\"content2\\");
-"
-`;
-
-exports[`serve fs output: assets/index.ts.f31ac90f.css 1`] = `
+exports[`serve fs output: assets/index.ts.hash.css 1`] = `
 "body {
   color: red;
 }
 "
 `;
 
-exports[`serve fs output: assets/precontroller.9e1e2319.js 1`] = `
+exports[`serve fs output: assets/index.ts.hash.js 1`] = `
+"var styles = '';
+
+console.log(\\"content1\\");
+"
+`;
+
+exports[`serve fs output: assets/index.ts.hash2.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`serve fs output: assets/index.ts.hash2.js 1`] = `
+"var styles = '';
+
+console.log(\\"content2\\");
+"
+`;
+
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
 "
 `;

@@ -14,22 +14,6 @@ import {
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
 
-/**
- * Vite puts a hash in the output file names, but the hash randomly changes
- * between environments
- */
-const setOutputOptions: CrxPlugin = {
-  name: 'test:set-output-options',
-  outputOptions(options) {
-    return {
-      ...options,
-      assetFileNames: 'assets/[name].hash.[ext]',
-      chunkFileNames: 'assets/[name].hash.js',
-      entryFileNames: 'assets/[name].hash.js',
-    }
-  },
-}
-
 export async function build(dirname: string) {
   const debug = _debug('test:build')
   debug('start %s', dirname)
@@ -54,7 +38,6 @@ export async function build(dirname: string) {
           config = _config
         },
       },
-      setOutputOptions,
     ],
     clearScreen: false,
     logLevel: 'error',
@@ -81,7 +64,6 @@ export async function serve(dirname: string) {
 
   const plugins: CrxPlugin[] = []
   if (process.env.DEBUG) plugins.push(inspect())
-  plugins.push(setOutputOptions)
 
   const devServer = await createServer({
     configFile: join(dirname, 'vite.config.ts'),

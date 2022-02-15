@@ -19,8 +19,8 @@ Object {
         "assets/content1.ts.hash.js",
         "assets/content2.ts.hash.css",
         "assets/content2.ts.hash.js",
-        "assets/font.bb6bc8d6.otf",
-        "assets/image.51f8fe9d.png",
+        "assets/font.hash.otf",
+        "assets/image.hash.png",
         "assets/script.ts.hash.js",
       ],
       "use_dynamic_url": false,
@@ -35,8 +35,8 @@ Array [
   "assets/content1.ts.hash.js",
   "assets/content2.ts.hash.css",
   "assets/content2.ts.hash.js",
-  "assets/font.bb6bc8d6.otf",
-  "assets/image.51f8fe9d.png",
+  "assets/font.hash.otf",
+  "assets/image.hash.png",
   "assets/script.ts.hash.js",
   "manifest.json",
   "service-worker-loader.background.ts.hash.js",
@@ -56,7 +56,7 @@ chrome.scripting.executeScript({
 `;
 
 exports[`build fs output: assets/content1.ts.hash.js 1`] = `
-"var icon = \\"/assets/image.51f8fe9d.png\\";
+"var icon = \\"/assets/image.hash.png\\";
 
 var script = \\"/assets/script.ts.hash.js\\";
 
@@ -72,7 +72,7 @@ exports[`build fs output: assets/content2.ts.hash.css 1`] = `
 `;
 
 exports[`build fs output: assets/content2.ts.hash.js 1`] = `
-"var font = \\"/assets/font.bb6bc8d6.otf\\";
+"var font = \\"/assets/font.hash.otf\\";
 
 var css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
 

@@ -9,9 +9,9 @@ const excluded = ['invalid-manifest']
 const dirname = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 const templates = [
-  // 'vite.config.ts',
-  'build.test.ts',
-  'serve.test.ts',
+  'vite.config.ts',
+  // 'build.test.ts',
+  // 'serve.test.ts',
 ].map((name) => {
   const templatePath = path.join(dirname, 'templates', name)
   const template = fs.readFileSync(templatePath, 'utf8')

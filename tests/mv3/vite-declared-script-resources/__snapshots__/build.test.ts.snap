@@ -30,7 +30,7 @@ Object {
       ],
       "resources": Array [
         "assets/content1.ts.hash.js",
-        "assets/image.51f8fe9d.png",
+        "assets/image.hash.png",
         "assets/script.ts.hash.js",
       ],
       "use_dynamic_url": true,
@@ -41,7 +41,7 @@ Object {
       ],
       "resources": Array [
         "assets/content2.ts.hash.js",
-        "assets/font.bb6bc8d6.otf",
+        "assets/font.hash.otf",
       ],
       "use_dynamic_url": true,
     },
@@ -55,8 +55,8 @@ Array [
   "assets/content-script-loader.content2.ts.hash.hash.js",
   "assets/content1.ts.hash.js",
   "assets/content2.ts.hash.js",
-  "assets/font.bb6bc8d6.otf",
-  "assets/image.51f8fe9d.png",
+  "assets/font.hash.otf",
+  "assets/image.hash.png",
   "assets/script.ts.hash.js",
   "manifest.json",
 ]
@@ -93,7 +93,7 @@ exports[`build fs output: assets/content-script-loader.content2.ts.hash.hash.js 
 `;
 
 exports[`build fs output: assets/content1.ts.hash.js 1`] = `
-"var icon = \\"/assets/image.51f8fe9d.png\\";
+"var icon = \\"/assets/image.hash.png\\";
 
 var script = \\"/assets/script.ts.hash.js\\";
 
@@ -102,7 +102,7 @@ console.log(\\"content.ts\\", { icon, script });
 `;
 
 exports[`build fs output: assets/content2.ts.hash.js 1`] = `
-"var font = \\"/assets/font.bb6bc8d6.otf\\";
+"var font = \\"/assets/font.hash.otf\\";
 
 console.log(\\"content2.ts\\", { font });
 "

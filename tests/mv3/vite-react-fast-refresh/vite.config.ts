@@ -1,15 +1,19 @@
-import { crx, defineManifestV3 } from 'src/index'
+import { crx } from 'src/.'
 import { defineConfig } from 'vite'
-
-const manifest = defineManifestV3({
-  manifest_version: 3,
-  action: { default_popup: 'src/popup.html' },
-  name: 'test extension',
-  version: '1.0.0',
-})
+import manifest from './manifest.config'
 
 export default defineConfig({
-  build: { minify: false },
+  build: {
+    minify: false,
+    rollupOptions: {
+      output: {
+        // the hash randomly changes between environments
+        assetFileNames: 'assets/[name].hash.[ext]',
+        chunkFileNames: 'assets/[name].hash.js',
+        entryFileNames: 'assets/[name].hash.js',
+      },
+    },
+  },
   clearScreen: false,
   logLevel: 'error',
   plugins: [crx({ manifest })],

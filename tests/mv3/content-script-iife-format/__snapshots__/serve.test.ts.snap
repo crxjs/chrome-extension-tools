@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.js.5435d742.7ff03b76.js",
+        "assets/content-script-loader.content.js.hash.hash.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -44,22 +44,22 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.content.js.5435d742.7ff03b76.js",
-  "assets/content.js.5435d742.js",
-  "assets/precontroller.9e1e2319.js",
+  "assets/content-script-client.hash.js",
+  "assets/content-script-loader.content.js.hash.hash.js",
+  "assets/content.js.hash.js",
+  "assets/precontroller.hash.js",
   "manifest.json",
   "service-worker-loader.background.js",
   "src/popup.html",
 ]
 `;
 
-exports[`serve fs output: assets/content.js.5435d742.js 1`] = `
+exports[`serve fs output: assets/content.js.hash.js 1`] = `
 "console.log('content script');
 "
 `;
 
-exports[`serve fs output: assets/content-script-client.1b7d5e37.js 1`] = `
+exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -91,18 +91,18 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.js.5435d742.7ff03b76.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.content.js.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.5435d742.js\\")
+      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
     );
   })().catch(console.error);
 
@@ -110,7 +110,7 @@ exports[`serve fs output: assets/content-script-loader.content.js.5435d742.7ff03
 "
 `;
 
-exports[`serve fs output: assets/precontroller.9e1e2319.js 1`] = `
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
 "
 `;
@@ -134,7 +134,7 @@ exports[`serve fs output: src/popup.html 1`] = `
       after a full extension reload. In that case, this script will
       reload the page once the service worker is ready.
     -->
-    <script src=\\"/assets/precontroller.9e1e2319.js\\"></script>
+    <script src=\\"/assets/precontroller.hash.js\\"></script>
   </head>
   <body>
     <p>Waiting for CRX service worker...</p>

@@ -27,13 +27,13 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/precontroller.9e1e2319.js",
+  "assets/precontroller.hash.js",
   "manifest.json",
   "service-worker-loader.background.js",
 ]
 `;
 
-exports[`serve fs output: assets/precontroller.9e1e2319.js 1`] = `
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
 "
 `;

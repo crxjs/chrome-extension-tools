@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.ts.6b81e8bb.443d5018.js",
+        "assets/content-script-loader.content.ts.hash.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -33,30 +33,30 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.content.ts.6b81e8bb.443d5018.js",
-  "assets/content.ts.6b81e8bb.js",
-  "assets/content.ts.97d914ed.css",
-  "assets/precontroller.9e1e2319.js",
+  "assets/content-script-client.hash.js",
+  "assets/content-script-loader.content.ts.hash.hash.js",
+  "assets/content.ts.hash.css",
+  "assets/content.ts.hash.js",
+  "assets/precontroller.hash.js",
   "manifest.json",
 ]
 `;
 
-exports[`serve fs output: assets/content.ts.6b81e8bb.js 1`] = `
-"var styles = '';
-
-console.log(\\"content.ts\\");
-"
-`;
-
-exports[`serve fs output: assets/content.ts.97d914ed.css 1`] = `
+exports[`serve fs output: assets/content.ts.hash.css 1`] = `
 "body {
   color: red;
 }
 "
 `;
 
-exports[`serve fs output: assets/content-script-client.1b7d5e37.js 1`] = `
+exports[`serve fs output: assets/content.ts.hash.js 1`] = `
+"var styles = '';
+
+console.log(\\"content.ts\\");
+"
+`;
+
+exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -88,18 +88,18 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.ts.6b81e8bb.443d5018.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.content.ts.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.6b81e8bb.js\\")
+      chrome.runtime.getURL(\\"assets/content.ts.hash.js\\")
     );
   })().catch(console.error);
 
@@ -107,7 +107,7 @@ exports[`serve fs output: assets/content-script-loader.content.ts.6b81e8bb.443d5
 "
 `;
 
-exports[`serve fs output: assets/precontroller.9e1e2319.js 1`] = `
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
 "
 `;

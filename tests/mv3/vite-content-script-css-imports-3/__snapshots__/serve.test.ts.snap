@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.index.ts.37dcd2bd.b43e401c.js",
+        "assets/content-script-loader.index.ts.hash.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -14,7 +14,7 @@ Object {
     },
     Object {
       "js": Array [
-        "assets/content-script-loader.index.ts.4cf02768.cdaa3e5d.js",
+        "assets/content-script-loader.index.ts.hash2.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -42,21 +42,21 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.index.ts.37dcd2bd.b43e401c.js",
-  "assets/content-script-loader.index.ts.4cf02768.cdaa3e5d.js",
-  "assets/import.3b031dc7.css",
-  "assets/import.502e90d6.js",
-  "assets/index.ts.37dcd2bd.js",
-  "assets/index.ts.4cf02768.js",
-  "assets/index.ts.caa36ca4.css",
-  "assets/index.ts.f31ac90f.css",
-  "assets/precontroller.9e1e2319.js",
+  "assets/content-script-client.hash.js",
+  "assets/content-script-loader.index.ts.hash.hash.js",
+  "assets/content-script-loader.index.ts.hash2.hash.js",
+  "assets/import.hash.css",
+  "assets/import.hash.js",
+  "assets/index.ts.hash.css",
+  "assets/index.ts.hash.js",
+  "assets/index.ts.hash2.css",
+  "assets/index.ts.hash2.js",
+  "assets/precontroller.hash.js",
   "manifest.json",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-client.1b7d5e37.js 1`] = `
+exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -88,18 +88,18 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.index.ts.4cf02768.cdaa3e5d.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.index.ts.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.4cf02768.js\\")
+      chrome.runtime.getURL(\\"assets/index.ts.hash.js\\")
     );
   })().catch(console.error);
 
@@ -107,18 +107,18 @@ exports[`serve fs output: assets/content-script-loader.index.ts.4cf02768.cdaa3e5
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.index.ts.37dcd2bd.b43e401c.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.37dcd2bd.js\\")
+      chrome.runtime.getURL(\\"assets/index.ts.hash2.js\\")
     );
   })().catch(console.error);
 
@@ -126,31 +126,29 @@ exports[`serve fs output: assets/content-script-loader.index.ts.37dcd2bd.b43e401
 "
 `;
 
-exports[`serve fs output: assets/import.3b031dc7.css 1`] = `
+exports[`serve fs output: assets/import.hash.css 1`] = `
 "h1 {
   color: green;
 }
 "
 `;
 
-exports[`serve fs output: assets/import.502e90d6.js 1`] = `
+exports[`serve fs output: assets/import.hash.js 1`] = `
 "var styles = '';
 
 console.log(\\"imported file\\");
 "
 `;
 
-exports[`serve fs output: assets/index.ts.4cf02768.js 1`] = `
-"import './import.502e90d6.js';
-
-var styles = '';
-
-console.log(\\"content2\\");
+exports[`serve fs output: assets/index.ts.hash.css 1`] = `
+"body {
+  color: red;
+}
 "
 `;
 
-exports[`serve fs output: assets/index.ts.37dcd2bd.js 1`] = `
-"import './import.502e90d6.js';
+exports[`serve fs output: assets/index.ts.hash.js 1`] = `
+"import './import.hash.js';
 
 var styles = '';
 
@@ -158,21 +156,23 @@ console.log(\\"content1\\");
 "
 `;
 
-exports[`serve fs output: assets/index.ts.caa36ca4.css 1`] = `
+exports[`serve fs output: assets/index.ts.hash2.css 1`] = `
 "body {
   color: blue;
 }
 "
 `;
 
-exports[`serve fs output: assets/index.ts.f31ac90f.css 1`] = `
-"body {
-  color: red;
-}
+exports[`serve fs output: assets/index.ts.hash2.js 1`] = `
+"import './import.hash.js';
+
+var styles = '';
+
+console.log(\\"content2\\");
 "
 `;
 
-exports[`serve fs output: assets/precontroller.9e1e2319.js 1`] = `
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
 "
 `;

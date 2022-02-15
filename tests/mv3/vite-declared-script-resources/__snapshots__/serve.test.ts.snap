@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content1.ts.5927740e.d4655f2e.js",
+        "assets/content-script-loader.content1.ts.hash.hash.js",
       ],
       "matches": Array [
         "https://google.com/*",
@@ -13,7 +13,7 @@ Object {
     },
     Object {
       "js": Array [
-        "assets/content-script-loader.content2.ts.6fa9fa4c.d1abeea9.js",
+        "assets/content-script-loader.content2.ts.hash.hash.js",
       ],
       "matches": Array [
         "https://bing.com/*",
@@ -40,20 +40,20 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.1b7d5e37.js",
-  "assets/content-script-loader.content1.ts.5927740e.d4655f2e.js",
-  "assets/content-script-loader.content2.ts.6fa9fa4c.d1abeea9.js",
-  "assets/content1.ts.5927740e.js",
-  "assets/content2.ts.6fa9fa4c.js",
-  "assets/font.bb6bc8d6.otf",
-  "assets/image.51f8fe9d.png",
-  "assets/precontroller.9e1e2319.js",
-  "assets/script.ts.df173d4e.js",
+  "assets/content-script-client.hash.js",
+  "assets/content-script-loader.content1.ts.hash.hash.js",
+  "assets/content-script-loader.content2.ts.hash.hash.js",
+  "assets/content1.ts.hash.js",
+  "assets/content2.ts.hash.js",
+  "assets/font.hash.otf",
+  "assets/image.hash.png",
+  "assets/precontroller.hash.js",
+  "assets/script.ts.hash.js",
   "manifest.json",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-client.1b7d5e37.js 1`] = `
+exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -85,18 +85,18 @@ function handleRuntimeReload() {
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.content1.ts.5927740e.d4655f2e.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.content1.ts.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content1.ts.5927740e.js\\")
+      chrome.runtime.getURL(\\"assets/content1.ts.hash.js\\")
     );
   })().catch(console.error);
 
@@ -104,18 +104,18 @@ exports[`serve fs output: assets/content-script-loader.content1.ts.5927740e.d465
 "
 `;
 
-exports[`serve fs output: assets/content-script-loader.content2.ts.6fa9fa4c.d1abeea9.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.content2.ts.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.1b7d5e37.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content2.ts.6fa9fa4c.js\\")
+      chrome.runtime.getURL(\\"assets/content2.ts.hash.js\\")
     );
   })().catch(console.error);
 
@@ -123,28 +123,28 @@ exports[`serve fs output: assets/content-script-loader.content2.ts.6fa9fa4c.d1ab
 "
 `;
 
-exports[`serve fs output: assets/content1.ts.5927740e.js 1`] = `
-"var icon = \\"/assets/image.51f8fe9d.png\\";
+exports[`serve fs output: assets/content1.ts.hash.js 1`] = `
+"var icon = \\"/assets/image.hash.png\\";
 
-var script = \\"/assets/script.ts.df173d4e.js\\";
+var script = \\"/assets/script.ts.hash.js\\";
 
 console.log(\\"content.ts\\", { icon, script });
 "
 `;
 
-exports[`serve fs output: assets/content2.ts.6fa9fa4c.js 1`] = `
-"var font = \\"/assets/font.bb6bc8d6.otf\\";
+exports[`serve fs output: assets/content2.ts.hash.js 1`] = `
+"var font = \\"/assets/font.hash.otf\\";
 
 console.log(\\"content2.ts\\", { font });
 "
 `;
 
-exports[`serve fs output: assets/precontroller.9e1e2319.js 1`] = `
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
 "
 `;
 
-exports[`serve fs output: assets/script.ts.df173d4e.js 1`] = `
+exports[`serve fs output: assets/script.ts.hash.js 1`] = `
 "console.log(\\"main world script\\");
 "
 `;

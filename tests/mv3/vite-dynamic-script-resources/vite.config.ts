@@ -1,23 +1,19 @@
-import { crx, defineManifestV3, defineDynamicResource } from 'src/index'
+import { crx } from 'src/.'
 import { defineConfig } from 'vite'
-
-const manifest = defineManifestV3({
-  background: {
-    service_worker: 'src/background.ts',
-  },
-  description: 'test extension',
-  manifest_version: 3,
-  name: 'test extension',
-  version: '1.0.0',
-  web_accessible_resources: [
-    defineDynamicResource({
-      matches: ['https://google.com/*', 'https://github.com/*'],
-    }),
-  ],
-})
+import manifest from './manifest.config'
 
 export default defineConfig({
-  build: { minify: false },
+  build: {
+    minify: false,
+    rollupOptions: {
+      output: {
+        // the hash randomly changes between environments
+        assetFileNames: 'assets/[name].hash.[ext]',
+        chunkFileNames: 'assets/[name].hash.js',
+        entryFileNames: 'assets/[name].hash.js',
+      },
+    },
+  },
   clearScreen: false,
   logLevel: 'error',
   plugins: [crx({ manifest })],
