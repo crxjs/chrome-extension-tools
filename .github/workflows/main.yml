@@ -112,12 +112,6 @@ jobs:
         with:
           run: pnpm test:ci:e2e:serve
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: image-snapshot-diffs
-          path: __image_snapshot_diffs__/*
-          if-no-files-found: ignore
-
       - name: Check for image diffs
         id: diff
         run: echo "::set-output name=files::$(find . -wholename '__image_snapshot_diffs__/*.png')"
@@ -125,6 +119,12 @@ jobs:
       - name: Fail if image diffs found
         if: ${{ steps.diff.outputs.files }}
         run: exit 1
+
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: image-snapshot-diffs
+          path: __image_snapshot_diffs__/*
 
   # Runs snapshot integration tests for MV3
   mv3:
@@ -175,8 +175,12 @@ jobs:
       - name: Run MV3 Vite serve tests
         run: pnpm test:ci:mv3:serve
 
+      - name: Check for diff
+        id: diff
+        run: echo "::set-output name=diff::$(git --no-pager diff --name-only)"
+
       - name: Fail if diff
-        if: $(git --no-pager diff --name-only)
+        if: ${{ steps.diff.outputs.diff }}
         run: exit 1
 
       - name: Git diff
