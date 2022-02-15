@@ -6,13 +6,13 @@ Object {
     "default_popup": "src/popup.html",
   },
   "background": Object {
-    "service_worker": "service-worker-loader.background.js.85dc521e.js",
+    "service_worker": "service-worker-loader.background.js.hash.js",
     "type": "module",
   },
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.js.5435d742.66176a5c.js",
+        "assets/content-script-loader.content.js.hash.hash.js",
       ],
       "matches": Array [
         "http://b.com/*",
@@ -34,7 +34,7 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "assets/content.js.5435d742.js",
+        "assets/content.js.hash.js",
       ],
       "use_dynamic_url": true,
     },
@@ -44,35 +44,35 @@ Object {
 
 exports[`build fs output: 01 output files 1`] = `
 Array [
-  "assets/background.js.85dc521e.js",
-  "assets/content-script-loader.content.js.5435d742.66176a5c.js",
-  "assets/content.js.5435d742.js",
-  "assets/popup.html.1ff9f1a2.js",
-  "assets/vendor.js",
+  "assets/background.js.hash.js",
+  "assets/content-script-loader.content.js.hash.hash.js",
+  "assets/content.js.hash.js",
+  "assets/popup.html.hash.js",
+  "assets/vendor.hash.js",
   "manifest.json",
-  "service-worker-loader.background.js.85dc521e.js",
+  "service-worker-loader.background.js.hash.js",
   "src/popup.html",
 ]
 `;
 
-exports[`build fs output: assets/background.js.85dc521e.js 1`] = `
+exports[`build fs output: assets/background.js.hash.js 1`] = `
 "console.log('service_worker.js');
 "
 `;
 
-exports[`build fs output: assets/content.js.5435d742.js 1`] = `
+exports[`build fs output: assets/content.js.hash.js 1`] = `
 "console.log('content script');
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content.js.5435d742.66176a5c.js 1`] = `
+exports[`build fs output: assets/content-script-loader.content.js.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.5435d742.js\\")
+      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
     );
   })().catch(console.error);
 
@@ -80,8 +80,8 @@ exports[`build fs output: assets/content-script-loader.content.js.5435d742.66176
 "
 `;
 
-exports[`build fs output: assets/popup.html.1ff9f1a2.js 1`] = `
-"import { R as React, a as ReactDOM } from './vendor.js';
+exports[`build fs output: assets/popup.html.hash.js 1`] = `
+"import { R as React, a as ReactDOM } from './vendor.hash.js';
 
 const p = function polyfill() {
     const relList = document.createElement('link').relList;
@@ -137,8 +137,8 @@ ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
 "
 `;
 
-exports[`build fs output: service-worker-loader.background.js.85dc521e.js 1`] = `
-"import './assets/background.js.85dc521e.js';
+exports[`build fs output: service-worker-loader.background.js.hash.js 1`] = `
+"import './assets/background.js.hash.js';
 "
 `;
 
@@ -152,8 +152,8 @@ exports[`build fs output: src/popup.html 1`] = `
       content=\\"width=1000, initial-scale=1.0\\"
     />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.1ff9f1a2.js\\"></script>
-    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.js\\">
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
+    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>

@@ -13,15 +13,15 @@ Object {
 
 exports[`build fs output: 01 output files 1`] = `
 Array [
-  "assets/popup.html.245d3d87.js",
-  "assets/vendor.js",
+  "assets/popup.html.hash.js",
+  "assets/vendor.hash.js",
   "manifest.json",
   "src/popup.html",
 ]
 `;
 
-exports[`build fs output: assets/popup.html.245d3d87.js 1`] = `
-"import { R as React, r as reactDom } from './vendor.js';
+exports[`build fs output: assets/popup.html.hash.js 1`] = `
+"import { R as React, r as reactDom } from './vendor.hash.js';
 
 const p = function polyfill() {
     const relList = document.createElement('link').relList;
@@ -87,8 +87,8 @@ exports[`build fs output: src/popup.html 1`] = `
       content=\\"width=1000, initial-scale=1.0\\"
     />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.245d3d87.js\\"></script>
-    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.js\\">
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
+    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>

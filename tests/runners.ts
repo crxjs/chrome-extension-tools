@@ -14,17 +14,18 @@ import {
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
 
-const removeVendorHash: CrxPlugin = {
-  name: 'test:vite-config',
-  outputOptions({ chunkFileNames: cfn, ...options }) {
+/**
+ * Vite puts a hash in the output file names, but the hash randomly changes
+ * between environments
+ */
+const setOutputOptions: CrxPlugin = {
+  name: 'test:set-output-options',
+  outputOptions(options) {
     return {
-      chunkFileNames: (info) =>
-        info.name === 'vendor'
-          ? 'assets/vendor.js'
-          : typeof cfn === 'function'
-          ? cfn(info)
-          : cfn ?? 'assets/[name].[hash].js',
       ...options,
+      assetFileNames: 'assets/[name].hash.[ext]',
+      chunkFileNames: 'assets/[name].hash.js',
+      entryFileNames: 'assets/[name].hash.js',
     }
   },
 }
@@ -53,7 +54,7 @@ export async function build(dirname: string) {
           config = _config
         },
       },
-      removeVendorHash,
+      setOutputOptions,
     ],
     clearScreen: false,
     logLevel: 'error',
@@ -80,7 +81,7 @@ export async function serve(dirname: string) {
 
   const plugins: CrxPlugin[] = []
   if (process.env.DEBUG) plugins.push(inspect())
-  plugins.push(removeVendorHash)
+  plugins.push(setOutputOptions)
 
   const devServer = await createServer({
     configFile: join(dirname, 'vite.config.ts'),
@@ -152,7 +153,7 @@ export async function testOutput(
   expect(files.sort()).toMatchSnapshot('01 output files')
 
   for (const file of files) {
-    if (file === 'assets/vendor.js') continue
+    if (file.includes('vendor')) continue
     if (isTextFile(file)) {
       const filename = join(outDir, file)
       let source = await fs.readFile(filename, { encoding: 'utf8' })
