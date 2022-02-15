@@ -169,7 +169,7 @@ jobs:
 
       - name: Check for diff
         id: diff
-        run: echo ::set-output files=$(git diff --name-only)
+        run: echo "::set-output name=files::$(git diff --name-only)"
 
       - name: Log diff output
         run: echo ${{ steps.diff.outputs.files }}
