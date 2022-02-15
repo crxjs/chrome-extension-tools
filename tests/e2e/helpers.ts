@@ -15,7 +15,7 @@ export async function getPage(
       pages.map((p) => p.url()),
     )
     page = pages.find((p) => p.url().includes(included))
-    console.log('page', page)
+    console.log('page', page?.url())
     if (!page) await new Promise((r) => setTimeout(r, 100))
     count++
   }
