@@ -16,10 +16,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1>HMR + External XHR Test</h1>
-      <p>
-        Received successful response from external XHR:{' '}
-        {ok ? 'Yes' : 'No'}
-      </p>
+      <p>Received successful response from external XHR: {ok ? 'Yes' : 'No'}</p>
     </div>
   )
 }

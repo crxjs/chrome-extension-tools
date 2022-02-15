@@ -5,10 +5,6 @@ export const [sendBgCheck, bgCheckStream] = getMessage<
   Pick<chrome.tabs.Tab, 'id'>
 >('background check', { async: true })
 
-export const [sendBgOk, bgOkStream] = getMessage<undefined>(
-  'background ok',
-)
+export const [sendBgOk, bgOkStream] = getMessage<undefined>('background ok')
 
-export const [sendOptOk, optOkStream] = getMessage<undefined>(
-  'options ok',
-)
+export const [sendOptOk, optOkStream] = getMessage<undefined>('options ok')
