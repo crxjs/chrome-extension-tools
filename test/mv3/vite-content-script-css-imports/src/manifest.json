@@ -1,9 +1,0 @@
-{
-  "manifest_version": 3,
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.ts"]
-    }
-  ]
-}

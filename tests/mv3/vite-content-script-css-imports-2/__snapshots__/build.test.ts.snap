@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/index.ts.hash.css",
+      ],
+      "js": Array [
+        "assets/content-script-loader.index.ts.hash.hash.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "css": Array [
+        "assets/index.ts.hash2.css",
+      ],
+      "js": Array [
+        "assets/content-script-loader.index.ts.hash2.hash.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/index.ts.hash.js",
+        "assets/index.ts.hash2.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/content-script-loader.index.ts.hash.hash.js",
+  "assets/content-script-loader.index.ts.hash2.hash.js",
+  "assets/index.ts.hash.css",
+  "assets/index.ts.hash.js",
+  "assets/index.ts.hash2.css",
+  "assets/index.ts.hash2.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output: assets/content-script-loader.index.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/index.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/index.ts.hash2.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/index.ts.hash.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`build fs output: assets/index.ts.hash.js 1`] = `
+"var styles = '';
+
+console.log(\\"content1\\");
+"
+`;
+
+exports[`build fs output: assets/index.ts.hash2.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`build fs output: assets/index.ts.hash2.js 1`] = `
+"var styles = '';
+
+console.log(\\"content2\\");
+"
+`;

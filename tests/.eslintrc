@@ -1,0 +1,8 @@
+{
+  "env": {
+    "jest": true,
+    "webextensions": true,
+    "serviceworker": true,
+    "browser": true
+  }
+}

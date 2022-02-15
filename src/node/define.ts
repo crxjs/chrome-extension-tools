@@ -1,0 +1,47 @@
+import { ConfigEnv } from 'vite'
+import { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
+import { dynamicResourcesName } from './plugin-resources'
+
+export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
+
+export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
+
+export const defineManifestV3 = (
+  manifest: ManifestV3Export,
+): ManifestV3Export => manifest
+
+/**
+ * Content script resources like CSS and image files must be declared in the
+ * manifest under `web_accessible_resources`. Manifest V3 uses a match pattern
+ * to narrow the origins that can access a Chrome CRX resource.
+ *
+ * Content script resources use the same match pattern as the content script for
+ * web accessible resources.
+ *
+ * You don't need to define a match pattern for dynamic content script
+ * resources, but if you want to do so, you can use the helper function
+ * `defineDynamicResource` to define your web accessible resources in a TypeScript file:
+ *
+ * ```typescript
+ * import { crx, defineManifestV3, defineDynamicResource }
+ * const manifest = defineManifestV3({
+ *   "web_accessible_resources": [
+ *     defineDynamicResource({
+ *       matches: ["https://google.com/*", "file:///*.mp3", "..."]
+ *       use_dynamic_url?: true
+ *     })
+ *   ]
+ * })
+ * ```
+ */
+export const defineDynamicResource = ({
+  matches = ['http://*/*', 'https://*/*'],
+  use_dynamic_url = true,
+}: Omit<
+  WebAccessibleResourceByMatch,
+  'resources'
+>): WebAccessibleResourceByMatch => ({
+  matches,
+  resources: [dynamicResourcesName],
+  use_dynamic_url,
+})

@@ -1,0 +1,99 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "1.0.0",
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/popup.html.hash.js",
+  "assets/vendor.hash.js",
+  "manifest.json",
+  "src/popup.html",
+]
+`;
+
+exports[`build fs output: assets/popup.html.hash.js 1`] = `
+"import { R as React, r as reactDom } from './vendor.hash.js';
+
+const p = function polyfill() {
+    const relList = document.createElement('link').relList;
+    if (relList && relList.supports && relList.supports('modulepreload')) {
+        return;
+    }
+    for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+        processPreload(link);
+    }
+    new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.type !== 'childList') {
+                continue;
+            }
+            for (const node of mutation.addedNodes) {
+                if (node.tagName === 'LINK' && node.rel === 'modulepreload')
+                    processPreload(node);
+            }
+        }
+    }).observe(document, { childList: true, subtree: true });
+    function getFetchOpts(script) {
+        const fetchOpts = {};
+        if (script.integrity)
+            fetchOpts.integrity = script.integrity;
+        if (script.referrerpolicy)
+            fetchOpts.referrerPolicy = script.referrerpolicy;
+        if (script.crossorigin === 'use-credentials')
+            fetchOpts.credentials = 'include';
+        else if (script.crossorigin === 'anonymous')
+            fetchOpts.credentials = 'omit';
+        else
+            fetchOpts.credentials = 'same-origin';
+        return fetchOpts;
+    }
+    function processPreload(link) {
+        if (link.ep)
+            // ep marker = processed
+            return;
+        link.ep = true;
+        // prepopulate the load record
+        const fetchOpts = getFetchOpts(link);
+        fetch(link.href, fetchOpts);
+    }
+};true&&p();
+
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+};
+
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`build fs output: src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta
+      name=\\"viewport\\"
+      content=\\"width=1000, initial-scale=1.0\\"
+    />
+    <title>Popup Page</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
+    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    
+  </body>
+</html>
+"
+`;

@@ -1,0 +1,91 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: 00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.background.ts.hash.js",
+    "type": "module",
+  },
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/content1.ts.hash.js",
+        "assets/content2.ts.hash.css",
+        "assets/content2.ts.hash.js",
+        "assets/font.hash.otf",
+        "assets/image.hash.png",
+        "assets/script.ts.hash.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: 01 output files 1`] = `
+Array [
+  "assets/background.ts.hash.js",
+  "assets/content1.ts.hash.js",
+  "assets/content2.ts.hash.css",
+  "assets/content2.ts.hash.js",
+  "assets/font.hash.otf",
+  "assets/image.hash.png",
+  "assets/script.ts.hash.js",
+  "manifest.json",
+  "service-worker-loader.background.ts.hash.js",
+]
+`;
+
+exports[`build fs output: assets/background.ts.hash.js 1`] = `
+"var content1 = \\"/assets/content1.ts.hash.js\\";
+
+var content2 = \\"/assets/content2.ts.hash.js\\";
+
+chrome.scripting.executeScript({
+  files: [content1, content2],
+  target: { tabId: 1 }
+});
+"
+`;
+
+exports[`build fs output: assets/content1.ts.hash.js 1`] = `
+"var icon = \\"/assets/image.hash.png\\";
+
+var script = \\"/assets/script.ts.hash.js\\";
+
+console.log(\\"content.ts\\", { icon, script });
+"
+`;
+
+exports[`build fs output: assets/content2.ts.hash.css 1`] = `
+"body {
+  color: #333;
+}
+"
+`;
+
+exports[`build fs output: assets/content2.ts.hash.js 1`] = `
+"var font = \\"/assets/font.hash.otf\\";
+
+var css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
+
+console.log(\\"content2.ts\\", { css, font });
+"
+`;
+
+exports[`build fs output: assets/script.ts.hash.js 1`] = `
+"console.log(\\"main world script\\");
+"
+`;
+
+exports[`build fs output: service-worker-loader.background.ts.hash.js 1`] = `
+"import './assets/background.ts.hash.js';
+"
+`;

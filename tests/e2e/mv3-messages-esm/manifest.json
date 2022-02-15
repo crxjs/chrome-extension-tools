@@ -1,0 +1,17 @@
+{
+  "background": {
+    "service_worker": "src/background.ts"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/content.ts"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ],
+  "description": "test extension",
+  "manifest_version": 3,
+  "name": "test extension",
+  "options_page": "src/options.html",
+  "permissions": ["storage"],
+  "version": "1.0.0"
+}

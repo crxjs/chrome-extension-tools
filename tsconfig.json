@@ -1,12 +1,22 @@
 {
-  "extends": "./tsconfigs/tsconfig-base.json",
-  "include": ["src", "test/**/*.ts", "test/**/*.tsx"],
-  "exclude": [
-    "lib",
-    "playground",
-    "src/browser",
-    "src/service-worker",
-    "test/fixtures"
-  ]
-  // "typeAcquisition": { "enable": true }
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "lib": ["esnext", "DOM", "WebWorker"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "paths": {
+      "client/*": ["src/client/*"],
+      "src/*": ["src/node/*"],
+      "tests/*": ["tests/*"]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "esnext"
+  },
+  "exclude": ["node_modules", "tests/templates", "dist"]
 }

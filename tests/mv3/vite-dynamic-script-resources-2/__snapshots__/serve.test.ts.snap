@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`serve fs output: 00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.background.js",
+    "type": "module",
+  },
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+}
+`;
+
+exports[`serve fs output: 01 output files 1`] = `
+Array [
+  "assets/precontroller.hash.js",
+  "manifest.json",
+  "service-worker-loader.background.js",
+]
+`;
+
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
+"setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: service-worker-loader.background.js 1`] = `
+"import 'http://localhost:3000/@crx/worker-client';
+import 'http://localhost:3000/src/background.ts';
+"
+`;

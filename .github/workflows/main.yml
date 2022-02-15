@@ -14,8 +14,8 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Runs linter and unit tests in src folder
-  basic:
-    name: Lint and Unit Tests
+  lint:
+    name: Run Lint
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -59,12 +59,9 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-      - name: Run unit tests
-        run: pnpm test:ci:src
-
   # Runs integration tests for MV3
-  mv2:
-    name: MV2 Integration Tests
+  e2e:
+    name: E2E Playwright Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -105,16 +102,17 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run MV2 rollup tests
-        run: pnpm test:ci:mv2:rollup
+      - name: Run E2E vite build tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: pnpm test:ci:e2e:build
 
-      - name: Run MV2 Vite build tests
-        run: pnpm test:ci:mv2:build
+      - name: Run E2E vite serve tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: pnpm test:ci:e2e:serve
 
-      - name: Run MV2 Vite serve tests
-        run: pnpm test:ci:mv2:serve
-
-  # Runs integration tests for MV3
+  # Runs snapshot integration tests for MV3
   mv3:
     name: MV3 Integration Tests
 
@@ -157,11 +155,37 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run MV3 rollup tests
-        run: pnpm test:ci:mv3:rollup
-
       - name: Run MV3 Vite build tests
         run: pnpm test:ci:mv3:build
 
       - name: Run MV3 Vite serve tests
         run: pnpm test:ci:mv3:serve
+
+      - name: Check for diff
+        id: diff
+        run: echo "::set-output name=files::$(git diff --name-only)"
+
+      - name: Save diff To file
+        if: ${{ steps.diff.outputs.files != 0 }}
+        run: git diff > diff.txt
+
+      - name: Fail if snapshots change
+        if: ${{ steps.diff.outputs.files != 0 }}
+        run: exit 1
+
+  upload:
+    name: Upload artifacts
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    needs: [e2e, mv3]
+    if: failure()
+
+    steps:
+      - uses: actions/upload-artifact@v2
+        with:
+          name: image-snapshot-diffs
+          path: |
+            __image_snapshot_diffs__/*
+            diff.txt

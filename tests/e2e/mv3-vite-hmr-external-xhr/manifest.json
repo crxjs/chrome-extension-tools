@@ -1,0 +1,10 @@
+{
+  "background": {
+    "service_worker": "src/background.ts"
+  },
+  "options_page": "src/options.html",
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "1.0.0",
+  "description": "test extension"
+}

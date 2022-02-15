@@ -1,0 +1,49 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`serve fs output: 00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "description": "Chrome Extension with a public dir",
+  "manifest_version": 3,
+  "name": "public dir test extension",
+  "version": "1.0.0",
+}
+`;
+
+exports[`serve fs output: 01 output files 1`] = `
+Array [
+  "assets/precontroller.hash.js",
+  "favicon.svg",
+  "manifest.json",
+  "src/popup.html",
+]
+`;
+
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
+"setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <title>Waiting for CRX service worker...</title>
+    <!--
+      Chrome requires an HTML page for every page in the manifest.
+      
+      The service worker reroutes requests for HTML to the dev server,
+      so this isn't used unless the background opens a page immediately
+      after a full extension reload. In that case, this script will
+      reload the page once the service worker is ready.
+    -->
+    <script src=\\"/assets/precontroller.hash.js\\"></script>
+  </head>
+  <body>
+    <p>Waiting for CRX service worker...</p>
+  </body>
+</html>
+"
+`;
