@@ -1,7 +1,7 @@
-import { crx, defineManifestV3 } from 'src/index'
+import { crx, defineManifest } from 'src/index'
 import { defineConfig } from 'vite'
 
-const manifest = defineManifestV3({
+const manifest = defineManifest({
   background: {
     service_worker: 'src/background.ts',
   },

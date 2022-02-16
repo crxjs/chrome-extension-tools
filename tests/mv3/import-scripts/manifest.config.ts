@@ -1,6 +1,6 @@
-import { defineManifestV3 } from 'src/.'
+import { defineManifest } from 'src/.'
 
-export default defineManifestV3({
+export default defineManifest({
   background: {
     service_worker: 'src/background.ts',
   },

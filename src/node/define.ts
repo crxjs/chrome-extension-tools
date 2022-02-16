@@ -6,9 +6,8 @@ export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 
 export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
 
-export const defineManifestV3 = (
-  manifest: ManifestV3Export,
-): ManifestV3Export => manifest
+export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
+  manifest
 
 /**
  * Content script resources like CSS and image files must be declared in the
@@ -23,8 +22,8 @@ export const defineManifestV3 = (
  * `defineDynamicResource` to define your web accessible resources in a TypeScript file:
  *
  * ```typescript
- * import { crx, defineManifestV3, defineDynamicResource }
- * const manifest = defineManifestV3({
+ * import { crx, defineManifest, defineDynamicResource }
+ * const manifest = defineManifest({
  *   "web_accessible_resources": [
  *     defineDynamicResource({
  *       matches: ["https://google.com/*", "file:///*.mp3", "..."]

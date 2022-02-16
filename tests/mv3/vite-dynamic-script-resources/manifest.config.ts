@@ -1,6 +1,6 @@
-import { defineDynamicResource, defineManifestV3 } from 'src/.'
+import { defineDynamicResource, defineManifest } from 'src/.'
 
-export default defineManifestV3({
+export default defineManifest({
   background: {
     service_worker: 'src/background.ts',
   },

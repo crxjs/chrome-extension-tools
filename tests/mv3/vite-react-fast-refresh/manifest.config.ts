@@ -1,6 +1,6 @@
-import { defineManifestV3 } from 'src/.'
+import { defineManifest } from 'src/.'
 
-export default defineManifestV3({
+export default defineManifest({
   manifest_version: 3,
   action: { default_popup: 'src/popup.html' },
   name: 'test extension',
