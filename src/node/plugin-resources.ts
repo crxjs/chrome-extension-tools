@@ -1,7 +1,7 @@
 import { OutputAsset } from 'rollup'
 import { Manifest, ManifestChunk } from 'vite'
 import { isResourceByMatch, isString, _debug } from './helpers'
-import { dynamicScripts } from './plugin-dynamicScripts'
+import { dynamicScripts } from './plugin-contentScripts'
 import { CrxPluginFn } from './types'
 
 interface Resources {

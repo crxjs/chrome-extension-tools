@@ -1,18 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Waiting for CRX service worker...</title>
-    <!--
-      Chrome requires an HTML page for every page in the manifest.
-      
-      The service worker reroutes requests for HTML to the dev server,
-      so this isn't used unless the background opens a page immediately
-      after a full extension reload. In that case, this script will
-      reload the page once the service worker is ready.
-    -->
+    <title>Waiting for the extension service worker...</title>
     <script src="%PATH%"></script>
   </head>
   <body>
-    <p>Waiting for CRX service worker...</p>
+    <p>
+      If you see this message, it means the service worker has not loaded
+      correctly or the dev server is offline.
+    </p>
+
+    <p>
+      During development, the service worker reroutes HTML requests to the dev
+      server, so this file isn't used unless the extension service worker opens
+      a page immediately after a full extension reload, and before the service
+      worker takes control of fetch (e.g., in the onInstalled event). In that
+      case, this page will continuously reload until the service worker is
+      ready, always less than 100 ms.
+    </p>
+
+    <p>This page is never added in production.</p>
   </body>
 </html>

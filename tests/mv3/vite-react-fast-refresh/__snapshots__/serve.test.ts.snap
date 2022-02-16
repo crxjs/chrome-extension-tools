@@ -5,6 +5,10 @@ Object {
   "action": Object {
     "default_popup": "src/popup.html",
   },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
   "manifest_version": 3,
   "name": "test extension",
   "version": "1.0.0",
@@ -15,6 +19,7 @@ exports[`serve fs output: 01 output files 1`] = `
 Array [
   "assets/precontroller.hash.js",
   "manifest.json",
+  "service-worker-loader.js",
   "src/popup.html",
 ]
 `;
@@ -24,23 +29,34 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "
 `;
 
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@crx/worker-client';
+"
+`;
+
 exports[`serve fs output: src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
-    <title>Waiting for CRX service worker...</title>
-    <!--
-      Chrome requires an HTML page for every page in the manifest.
-      
-      The service worker reroutes requests for HTML to the dev server,
-      so this isn't used unless the background opens a page immediately
-      after a full extension reload. In that case, this script will
-      reload the page once the service worker is ready.
-    -->
+    <title>Waiting for the extension service worker...</title>
     <script src=\\"/assets/precontroller.hash.js\\"></script>
   </head>
   <body>
-    <p>Waiting for CRX service worker...</p>
+    <p>
+      If you see this message, it means the service worker has not loaded
+      correctly or the dev server is offline.
+    </p>
+
+    <p>
+      During development, the service worker reroutes HTML requests to the dev
+      server, so this file isn't used unless the extension service worker opens
+      a page immediately after a full extension reload, and before the service
+      worker takes control of fetch (e.g., in the onInstalled event). In that
+      case, this page will continuously reload until the service worker is
+      ready, always less than 100 ms.
+    </p>
+
+    <p>This page is never added in production.</p>
   </body>
 </html>
 "

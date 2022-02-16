@@ -2,6 +2,10 @@
 
 exports[`serve fs output: 00 manifest.json 1`] = `
 Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
   "content_scripts": Array [
     Object {
       "js": Array [
@@ -42,7 +46,7 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.hash.js",
+  "assets/content-script-hmr-client.hash.js",
   "assets/content-script-loader.index.ts.hash.hash.js",
   "assets/content-script-loader.index.ts.hash2.hash.js",
   "assets/index.ts.hash.css",
@@ -51,10 +55,11 @@ Array [
   "assets/index.ts.hash2.js",
   "assets/precontroller.hash.js",
   "manifest.json",
+  "service-worker-loader.js",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
+exports[`serve fs output: assets/content-script-hmr-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -93,7 +98,7 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash.hash.js 1`]
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -112,7 +117,7 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -154,5 +159,10 @@ console.log(\\"content2\\");
 
 exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@crx/worker-client';
 "
 `;

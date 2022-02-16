@@ -6,7 +6,7 @@ Object {
     "default_popup": "src/popup.html",
   },
   "background": Object {
-    "service_worker": "service-worker-loader.background.js",
+    "service_worker": "service-worker-loader.js",
     "type": "module",
   },
   "content_scripts": Array [
@@ -41,12 +41,12 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.hash.js",
+  "assets/content-script-hmr-client.hash.js",
   "assets/content-script-loader.content.ts.hash.hash.js",
   "assets/content.ts.hash.js",
   "assets/precontroller.hash.js",
   "manifest.json",
-  "service-worker-loader.background.js",
+  "service-worker-loader.js",
   "src/popup.html",
 ]
 `;
@@ -56,7 +56,7 @@ exports[`serve fs output: assets/content.ts.hash.js 1`] = `
 "
 `;
 
-exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
+exports[`serve fs output: assets/content-script-hmr-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -95,7 +95,7 @@ exports[`serve fs output: assets/content-script-loader.content.ts.hash.hash.js 1
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -112,7 +112,7 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "
 `;
 
-exports[`serve fs output: service-worker-loader.background.js 1`] = `
+exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/worker-client';
 import 'http://localhost:3000/src/background.ts';
 "
@@ -122,19 +122,25 @@ exports[`serve fs output: src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
-    <title>Waiting for CRX service worker...</title>
-    <!--
-      Chrome requires an HTML page for every page in the manifest.
-      
-      The service worker reroutes requests for HTML to the dev server,
-      so this isn't used unless the background opens a page immediately
-      after a full extension reload. In that case, this script will
-      reload the page once the service worker is ready.
-    -->
+    <title>Waiting for the extension service worker...</title>
     <script src=\\"/assets/precontroller.hash.js\\"></script>
   </head>
   <body>
-    <p>Waiting for CRX service worker...</p>
+    <p>
+      If you see this message, it means the service worker has not loaded
+      correctly or the dev server is offline.
+    </p>
+
+    <p>
+      During development, the service worker reroutes HTML requests to the dev
+      server, so this file isn't used unless the extension service worker opens
+      a page immediately after a full extension reload, and before the service
+      worker takes control of fetch (e.g., in the onInstalled event). In that
+      case, this page will continuously reload until the service worker is
+      ready, always less than 100 ms.
+    </p>
+
+    <p>This page is never added in production.</p>
   </body>
 </html>
 "

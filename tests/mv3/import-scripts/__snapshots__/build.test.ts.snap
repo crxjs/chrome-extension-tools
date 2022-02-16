@@ -3,7 +3,7 @@
 exports[`build fs output: 00 manifest.json 1`] = `
 Object {
   "background": Object {
-    "service_worker": "service-worker-loader.background.ts.hash.js",
+    "service_worker": "service-worker-loader.js",
     "type": "module",
   },
   "content_scripts": Array [
@@ -50,16 +50,18 @@ exports[`build fs output: 01 output files 1`] = `
 Array [
   "assets/background.ts.hash.js",
   "assets/content-script-loader.declared-script.ts.hash.hash.js",
+  "assets/content-script-loader.dynamic-script.ts.hash.hash.js",
+  "assets/content-script-loader.main-world.ts.hash.hash.js",
   "assets/declared-script.ts.hash.js",
   "assets/dynamic-script.ts.hash.js",
   "assets/main-world.ts.hash.js",
   "manifest.json",
-  "service-worker-loader.background.ts.hash.js",
+  "service-worker-loader.js",
 ]
 `;
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
-"var scriptFileName = \\"/assets/dynamic-script.ts.hash.js\\";
+"var scriptFileName = \\"/assets/content-script-loader.dynamic-script.ts.hash.hash.js\\";
 
 console.log(\\"background.ts\\");
 chrome.action.onClicked.addListener((tab) => {
@@ -87,8 +89,38 @@ exports[`build fs output: assets/content-script-loader.declared-script.ts.hash.h
 "
 `;
 
+exports[`build fs output: assets/content-script-loader.dynamic-script.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/dynamic-script.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.main-world.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/main-world.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
 exports[`build fs output: assets/declared-script.ts.hash.js 1`] = `
-"var fileName = \\"/assets/main-world.ts.hash.js\\";
+"var fileName = \\"/assets/content-script-loader.main-world.ts.hash.hash.js\\";
 
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
@@ -107,7 +139,7 @@ exports[`build fs output: assets/main-world.ts.hash.js 1`] = `
 "
 `;
 
-exports[`build fs output: service-worker-loader.background.ts.hash.js 1`] = `
+exports[`build fs output: service-worker-loader.js 1`] = `
 "import './assets/background.ts.hash.js';
 "
 `;

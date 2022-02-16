@@ -3,7 +3,7 @@
 exports[`serve fs output: 00 manifest.json 1`] = `
 Object {
   "background": Object {
-    "service_worker": "service-worker-loader.background.js",
+    "service_worker": "service-worker-loader.js",
     "type": "module",
   },
   "content_scripts": Array [
@@ -37,17 +37,18 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.hash.js",
+  "assets/content-script-hmr-client.hash.js",
   "assets/content-script-loader.declared-script.ts.hash.hash.js",
+  "assets/content-script-loader.main-world.ts.hash.hash.js",
   "assets/declared-script.ts.hash.js",
   "assets/main-world.ts.hash.js",
   "assets/precontroller.hash.js",
   "manifest.json",
-  "service-worker-loader.background.js",
+  "service-worker-loader.js",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
+exports[`serve fs output: assets/content-script-hmr-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -86,7 +87,7 @@ exports[`serve fs output: assets/content-script-loader.declared-script.ts.hash.h
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -98,8 +99,27 @@ exports[`serve fs output: assets/content-script-loader.declared-script.ts.hash.h
 "
 `;
 
+exports[`serve fs output: assets/content-script-loader.main-world.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
+    );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/main-world.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
 exports[`serve fs output: assets/declared-script.ts.hash.js 1`] = `
-"var fileName = \\"/assets/main-world.ts.hash.js\\";
+"var fileName = \\"/assets/content-script-loader.main-world.ts.hash.hash.js\\";
 
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
@@ -118,7 +138,7 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "
 `;
 
-exports[`serve fs output: service-worker-loader.background.js 1`] = `
+exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/worker-client';
 import 'http://localhost:3000/src/background.ts';
 "
