@@ -1,4 +1,4 @@
-import fileName from './main-world?script'
+import fileName from './main-world?script&main'
 
 const url = chrome.runtime.getURL(fileName)
 

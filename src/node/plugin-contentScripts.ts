@@ -17,7 +17,7 @@ export const dynamicScripts = new Map<
     /** The output file name of the content script entry (could be loader script) */
     fileName?: string
     /** TODO: unimplemented IIFE format */
-    format?: 'iife'
+    type?: 'module' | 'iife' | 'main'
     /** The ref id of the output file */
     refId?: string
   }
@@ -31,8 +31,13 @@ function resolveScript({
   source: string
   importer: string
   root: string
-}) {
-  const [preId] = source.split('?')
+}): {
+  scriptId: string
+  id: string
+  type: 'module' | 'iife' | 'main'
+} {
+  const [preId, query] = source.split('?')
+  const [, type = 'module'] = query.split('&')
   const resolved = resolve(dirname(importer), preId)
   const id = parse(resolved).ext
     ? resolved
@@ -41,7 +46,7 @@ function resolveScript({
         .find((x) => fs.existsSync(x)) ?? resolved
   const relId = relative(root, id)
   const scriptId = `${pluginName}::${relId}`
-  return { scriptId, id }
+  return { scriptId, id, type: type as 'module' | 'iife' | 'main' }
 }
 
 const pluginName = 'crx:content-scripts'
@@ -58,10 +63,14 @@ export const pluginContentScripts: CrxPluginFn = () => {
         root = config.root
       },
       resolveId(source, importer) {
-        if (importer && source.endsWith('?script')) {
-          const { scriptId, id } = resolveScript({ source, importer, root })
+        if (importer && source.includes('?script')) {
+          const { scriptId, id, type } = resolveScript({
+            source,
+            importer,
+            root,
+          })
           const script = dynamicScripts.get(scriptId)
-          if (!script) dynamicScripts.set(scriptId, { id })
+          if (!script) dynamicScripts.set(scriptId, { id, type })
           return scriptId
         }
 
@@ -90,20 +99,24 @@ export const pluginContentScripts: CrxPluginFn = () => {
         root = config.root
       },
       buildStart() {
-        for (const [scriptId, { id }] of dynamicScripts) {
+        for (const [scriptId, { id, type }] of dynamicScripts) {
           const refId = this.emitFile({
             type: 'chunk',
             id,
             name: parse(id).base,
           })
-          dynamicScripts.set(scriptId, { id, refId })
+          dynamicScripts.set(scriptId, { id, refId, type })
         }
       },
       resolveId(source, importer) {
-        if (importer && source.endsWith('?script')) {
-          const { scriptId, id } = resolveScript({ source, importer, root })
+        if (importer && source.includes('?script')) {
+          const { scriptId, id, type } = resolveScript({
+            source,
+            importer,
+            root,
+          })
           const script = dynamicScripts.get(scriptId)
-          if (!script) dynamicScripts.set(scriptId, { id })
+          if (!script) dynamicScripts.set(scriptId, { id, type })
           return scriptId
         }
 
@@ -111,14 +124,14 @@ export const pluginContentScripts: CrxPluginFn = () => {
       },
       async load(scriptId) {
         if (dynamicScripts.has(scriptId)) {
-          let { id, refId } = dynamicScripts.get(scriptId)!
+          let { id, refId, type } = dynamicScripts.get(scriptId)!
           if (!refId)
             refId = this.emitFile({
               type: 'chunk',
               id,
               name: parse(id).base,
             })
-          dynamicScripts.set(scriptId, { id, refId })
+          dynamicScripts.set(scriptId, { id, refId, type })
           return `export default "%IMPORTED_SCRIPT_${refId}%"`
         }
 
@@ -136,6 +149,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
         if (this.meta.watchMode && typeof port === 'undefined')
           throw new Error('server port is undefined')
 
+        /* ------------------- HMR CLIENT ------------------ */
+
         let contentClientName: string | undefined
         const scriptCount =
           manifest.content_scripts?.length ?? 0 + dynamicScripts.size
@@ -150,11 +165,11 @@ export const pluginContentScripts: CrxPluginFn = () => {
 
         /* ---------------- DYNAMIC SCRIPTS ---------------- */
 
-        for (const [name, { id, refId, format = 'es' }] of dynamicScripts) {
+        for (const [name, { id, refId, type }] of dynamicScripts) {
           if (!refId) continue // may have been added during build
 
           let loaderRefId: string | undefined
-          if (format === 'es') {
+          if (type === 'module') {
             const f = this.getFileName(refId)
             const source = this.meta.watchMode
               ? contentDevLoader
@@ -168,12 +183,17 @@ export const pluginContentScripts: CrxPluginFn = () => {
               name: `content-script-loader.${parse(f).name}.js`,
               source,
             })
+          } else if (type === 'iife') {
+            // TODO: rebundle as iife script for opaque origins
+          } else {
+            // TODO: main world scripts don't need a loader
           }
 
           dynamicScripts.set(name, {
             id,
             fileName: this.getFileName(loaderRefId ?? refId),
             refId,
+            type,
           })
         }
 

@@ -42,7 +42,7 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
-  "assets/content-script-client.hash.js",
+  "assets/content-script-hmr-client.hash.js",
   "assets/content-script-loader.index.ts.hash.hash.js",
   "assets/content-script-loader.index.ts.hash2.hash.js",
   "assets/index.ts.hash.css",
@@ -54,7 +54,7 @@ Array [
 ]
 `;
 
-exports[`serve fs output: assets/content-script-client.hash.js 1`] = `
+exports[`serve fs output: assets/content-script-hmr-client.hash.js 1`] = `
 "let port;
 setupPort();
 setInterval(() => port?.postMessage({ type: \\"ping\\" }), 5e3);
@@ -93,7 +93,7 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash.hash.js 1`]
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -112,7 +112,7 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
     );
     await import(
       /* @vite-ignore */

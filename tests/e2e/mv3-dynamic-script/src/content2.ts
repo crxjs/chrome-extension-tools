@@ -1,4 +1,4 @@
-import fileName from './main-world?script'
+import fileName from './main-world?script&main'
 
 const url = chrome.runtime.getURL(fileName)
 
@@ -7,6 +7,7 @@ console.log('main world script url', url)
 
 const script = document.createElement('script')
 script.src = url
+script.type = 'module'
 document.body.append(script)
 
 chrome.runtime.sendMessage({ type: 'ok' })

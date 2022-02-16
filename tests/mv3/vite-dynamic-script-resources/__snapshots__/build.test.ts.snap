@@ -32,6 +32,9 @@ Object {
 exports[`build fs output: 01 output files 1`] = `
 Array [
   "assets/background.ts.hash.js",
+  "assets/content-script-loader.content1.ts.hash.hash.js",
+  "assets/content-script-loader.content2.ts.hash.hash.js",
+  "assets/content-script-loader.script.ts.hash.hash.js",
   "assets/content1.ts.hash.js",
   "assets/content2.ts.hash.js",
   "assets/font.hash.otf",
@@ -43,9 +46,9 @@ Array [
 `;
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
-"var content1 = \\"/assets/content1.ts.hash.js\\";
+"var content1 = \\"/assets/content-script-loader.content1.ts.hash.hash.js\\";
 
-var content2 = \\"/assets/content2.ts.hash.js\\";
+var content2 = \\"/assets/content-script-loader.content2.ts.hash.hash.js\\";
 
 chrome.scripting.executeScript({
   files: [content1, content2],
@@ -54,10 +57,55 @@ chrome.scripting.executeScript({
 "
 `;
 
+exports[`build fs output: assets/content-script-loader.content1.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content1.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.content2.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content2.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.script.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/script.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
 exports[`build fs output: assets/content1.ts.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
 
-var script = \\"/assets/script.ts.hash.js\\";
+var script = \\"/assets/content-script-loader.script.ts.hash.hash.js\\";
 
 console.log(\\"content.ts\\", { icon, script });
 "
