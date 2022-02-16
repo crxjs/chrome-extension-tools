@@ -32,6 +32,7 @@ type FileWriterEvent =
       type: 'writeBundle'
       options: OutputOptions
       bundle: OutputBundle
+      duration: number
     }
   | {
       type: 'error'
@@ -119,6 +120,7 @@ export const pluginFileWriter: CrxPluginFn = () => {
           },
         }
 
+        let start = performance.now()
         /**
          * This plugin emits build events so other plugins can track the file
          * writer state. It only runs during development inside the file writer
@@ -129,6 +131,7 @@ export const pluginFileWriter: CrxPluginFn = () => {
           enforce: 'post',
           apply: 'build',
           async buildStart(options) {
+            start = performance.now()
             const filename = await triggerName
             if (!existsSync(filename)) {
               await outputFile(filename, Date.now().toString())
@@ -137,7 +140,13 @@ export const pluginFileWriter: CrxPluginFn = () => {
             watcherEvent$.next({ type: 'buildStart', options })
           },
           writeBundle(options, bundle) {
-            watcherEvent$.next({ type: 'writeBundle', options, bundle })
+            const duration = Math.round(performance.now() - start)
+            watcherEvent$.next({
+              type: 'writeBundle',
+              options,
+              bundle,
+              duration,
+            })
           },
           renderError(error) {
             watcherEvent$.next({ type: 'error', error })
@@ -158,6 +167,7 @@ export const pluginFileWriter: CrxPluginFn = () => {
             },
           },
           configFile: server.config.configFile,
+          logLevel: 'warn',
           mode: server.config.mode,
           plugins: [hookRunner, buildLifecycle],
         })

@@ -1,11 +1,13 @@
 import preControllerScript from 'client/es/page-precontroller-script.ts?client'
-import preControllerHtml from 'client/html/precontroller.html?client'
 import workerHmrClient from 'client/es/worker-hmr-client.ts?client'
-import { ModuleNode, ResolvedConfig, ViteDevServer } from 'vite'
+import preControllerHtml from 'client/html/precontroller.html?client'
+import colors from 'picocolors'
+import { skip } from 'rxjs'
+import type { ModuleNode, ResolvedConfig, ViteDevServer } from 'vite'
 import { htmlFiles, isObject } from './helpers'
-import { join, normalize } from './path'
-import { filesReady$ } from './plugin-fileWriter'
-import { CrxPluginFn } from './types'
+import { join, normalize, relative } from './path'
+import { filesReady$, filesStart$ } from './plugin-fileWriter'
+import type { CrxPluginFn } from './types'
 
 // const debug = _debug('crx:hmr')
 
@@ -19,13 +21,30 @@ function isImporter(file: string) {
   return pred
 }
 
-// TODO: emit new files for each content script module.
-// TODO: add fetch handler to service worker
-export const pluginHMR: CrxPluginFn = () => {
-  let config: ResolvedConfig
-  /** Provided by crx: */
-  let background: string | undefined
-  let server: ViteDevServer
+function setupHmrEvents(server: ViteDevServer) {
+  const brand = colors.cyan(colors.bold('[crx]'))
+
+  filesStart$.subscribe(() => {
+    const time = colors.dim(new Date().toLocaleTimeString())
+    const message = colors.green('files start')
+    const outDir = colors.dim(
+      relative(server.config.root, server.config.build.outDir),
+    )
+    console.log(`${time} ${brand} ${message} ${outDir}`)
+  })
+
+  filesReady$.subscribe(({ duration: d }) => {
+    const time = colors.dim(new Date().toLocaleTimeString())
+    const message = colors.green('files ready')
+    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
+    console.log(`${time} ${brand} ${message} ${duration}`)
+  })
+
+  filesReady$.pipe(skip(1)).subscribe(() => {
+    const time = colors.dim(new Date().toLocaleTimeString())
+    const message = colors.green('runtime reload')
+    console.log(`${time} ${brand} ${message}`)
+  })
 
   filesReady$.subscribe(() => {
     server.ws.send({
@@ -33,6 +52,14 @@ export const pluginHMR: CrxPluginFn = () => {
       event: 'runtime-reload',
     })
   })
+}
+
+// TODO: emit new files for each content script module.
+// TODO: add fetch handler to service worker
+export const pluginHMR: CrxPluginFn = () => {
+  let config: ResolvedConfig
+  /** Provided by crx: */
+  let background: string | undefined
 
   return [
     {
@@ -58,8 +85,8 @@ export const pluginHMR: CrxPluginFn = () => {
       configResolved(_config) {
         config = _config as ResolvedConfig
       },
-      configureServer(_server) {
-        server = _server
+      configureServer(server) {
+        setupHmrEvents(server)
       },
       resolveId(source) {
         if (source === workerClientId) return workerClientId

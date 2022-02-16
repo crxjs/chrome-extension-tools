@@ -68,7 +68,8 @@
     "fast-glob": "^3.2.11",
     "fs-extra": "^10.0.0",
     "jsesc": "^3.0.2",
-    "magic-string": "^0.25.7"
+    "magic-string": "^0.25.7",
+    "picocolors": "^1.0.0"
   },
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
