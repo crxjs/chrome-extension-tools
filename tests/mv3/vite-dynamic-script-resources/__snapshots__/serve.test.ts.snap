@@ -3,7 +3,7 @@
 exports[`serve fs output: 00 manifest.json 1`] = `
 Object {
   "background": Object {
-    "service_worker": "service-worker-loader.background.js",
+    "service_worker": "service-worker-loader.js",
     "type": "module",
   },
   "description": "test extension",
@@ -29,7 +29,7 @@ exports[`serve fs output: 01 output files 1`] = `
 Array [
   "assets/precontroller.hash.js",
   "manifest.json",
-  "service-worker-loader.background.js",
+  "service-worker-loader.js",
 ]
 `;
 
@@ -38,7 +38,7 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "
 `;
 
-exports[`serve fs output: service-worker-loader.background.js 1`] = `
+exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/worker-client';
 import 'http://localhost:3000/src/background.ts';
 "

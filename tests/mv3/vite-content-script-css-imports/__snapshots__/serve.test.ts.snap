@@ -2,6 +2,10 @@
 
 exports[`serve fs output: 00 manifest.json 1`] = `
 Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
   "content_scripts": Array [
     Object {
       "js": Array [
@@ -39,6 +43,7 @@ Array [
   "assets/content.ts.hash.js",
   "assets/precontroller.hash.js",
   "manifest.json",
+  "service-worker-loader.js",
 ]
 `;
 
@@ -109,5 +114,10 @@ exports[`serve fs output: assets/content-script-loader.content.ts.hash.hash.js 1
 
 exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@crx/worker-client';
 "
 `;

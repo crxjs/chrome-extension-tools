@@ -1,6 +1,3 @@
-import workerDevLoader from 'client/es/worker-dev-loader.ts?client'
-import workerProLoader from 'client/es/worker-pro-loader.ts?client'
-import { parse } from './path'
 import type { CrxPluginFn } from './types'
 
 const pluginName = 'crx:background'
@@ -24,19 +21,49 @@ export const pluginBackground: CrxPluginFn = () => {
       port = p.toString()
     },
     renderCrxManifest(manifest) {
-      if (manifest.background?.service_worker) {
-        const { service_worker: f } = manifest.background
-        const refId = this.emitFile({
-          type: 'asset',
-          // fileName b/c service worker must be at root of crx
-          fileName: `service-worker-loader.${parse(f).name}.js`,
-          source: this.meta.watchMode
-            ? workerDevLoader.replace(/%PATH%/g, f).replace(/%PORT%/g, port!)
-            : workerProLoader.replace(/%PATH%/g, f),
-        })
+      const worker = manifest.background?.service_worker
 
-        manifest.background.service_worker = this.getFileName(refId)
-        manifest.background.type = 'module'
+      /**
+       * This plugin enables HMR during Vite serve mode by intercepting fetch
+       * requests and routing them to the dev server.
+       *
+       * Service workers can only intercept requests inside their scope
+       * (folder), so the service worker must be located at the root of the
+       * Chrome Extension to handle all use cases.
+       *
+       * See https://stackoverflow.com/a/35780776/4842857 for more details.
+       *
+       * This module loader at the root of the Chrome Extension guarantees that
+       * the background service worker will behave the same during development
+       * and production.
+       */
+      let loader: string
+      if (this.meta.watchMode) {
+        if (typeof port === 'undefined')
+          throw new Error('server port is undefined in watch mode')
+
+        // development, required hmr client
+        loader = `import 'http://localhost:${port}/@crx/worker-client';\n`
+        // development, optional service worker
+        if (worker) loader += `import 'http://localhost:${port}/${worker}';\n`
+      } else if (worker) {
+        // production w/ service worker
+        loader = `import './${worker}';\n`
+      } else {
+        // production, no service worker, do nothing
+        return manifest
+      }
+
+      const refId = this.emitFile({
+        type: 'asset',
+        // fileName b/c service worker must be at root of crx
+        fileName: 'service-worker-loader.js',
+        source: loader,
+      })
+
+      manifest.background = {
+        service_worker: this.getFileName(refId),
+        type: 'module',
       }
 
       return manifest

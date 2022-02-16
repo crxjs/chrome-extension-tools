@@ -6,7 +6,7 @@ Object {
     "default_popup": "src/popup.html",
   },
   "background": Object {
-    "service_worker": "service-worker-loader.background.js.hash.js",
+    "service_worker": "service-worker-loader.js",
     "type": "module",
   },
   "content_scripts": Array [
@@ -50,7 +50,7 @@ Array [
   "assets/popup.html.hash.js",
   "assets/vendor.hash.js",
   "manifest.json",
-  "service-worker-loader.background.js.hash.js",
+  "service-worker-loader.js",
   "src/popup.html",
 ]
 `;
@@ -137,7 +137,7 @@ ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
 "
 `;
 
-exports[`build fs output: service-worker-loader.background.js.hash.js 1`] = `
+exports[`build fs output: service-worker-loader.js 1`] = `
 "import './assets/background.js.hash.js';
 "
 `;

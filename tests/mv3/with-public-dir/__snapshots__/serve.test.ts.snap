@@ -5,6 +5,10 @@ Object {
   "action": Object {
     "default_popup": "src/popup.html",
   },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
   "description": "Chrome Extension with a public dir",
   "manifest_version": 3,
   "name": "public dir test extension",
@@ -17,12 +21,18 @@ Array [
   "assets/precontroller.hash.js",
   "favicon.svg",
   "manifest.json",
+  "service-worker-loader.js",
   "src/popup.html",
 ]
 `;
 
 exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 "setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@crx/worker-client';
 "
 `;
 
