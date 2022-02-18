@@ -18,6 +18,7 @@ import { build, ResolvedConfig } from 'vite'
 import { isString, _debug } from './helpers'
 import { join } from './path'
 import { CrxPlugin, CrxPluginFn } from './types'
+import { performance } from 'perf_hooks'
 
 const pluginName = 'crx:file-writer'
 const debug = _debug(pluginName)
