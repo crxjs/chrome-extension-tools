@@ -4,7 +4,7 @@ tests/**/dist*
 tests/artifacts
 .vscode
 **/chromium-data-dir-*
-tests/e2e/mv3-vite-starter-page-hmr/src
+tests/e2e/mv3-*-hmr/src
 **/__diff_output__
 TODO
 pnpm-global
