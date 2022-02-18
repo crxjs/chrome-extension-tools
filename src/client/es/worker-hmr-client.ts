@@ -24,21 +24,28 @@ self.addEventListener('fetch', (fetchEvent) => {
   }
 })
 
-function sendToServer(url: URL): Response | PromiseLike<Response> {
+/**
+ * Sending extension page requests to the dev server via fetch handler.
+ *
+ * HMR requires fetching extension page code from the dev server, but the
+ * default extension CSP does not allow remote code. We should be able to relax
+ * the extension CSP, but Chromium currently ignores custom CSP's:
+ * https://bugs.chromium.org/p/chromium/issues/detail?id=1247690#c_ts1631117342
+ */
+async function sendToServer(url: URL): Promise<Response> {
   // change the url to point to the dev server
   url.protocol = 'http:'
   url.host = 'localhost'
   url.port = __SERVER_PORT__
+  // add a timestamp to force Chrome to do a new request
   url.searchParams.set('t', Date.now().toString())
-
-  return fetch(url.href).then((r) => {
-    const contentType = r.headers.get('Content-Type') ?? 'text/javascript'
-
-    return new Response(r.body, {
-      headers: {
-        'Content-Type': contentType,
-      },
-    })
+  // URLSearchParams adds "=" to every empty param & vite doesn't like it
+  const response = await fetch(url.href.replace(/=$|=(?=&)/g, ''))
+  // circumvent extension CSP by creating response from extension origin
+  return new Response(response.body, {
+    headers: {
+      'Content-Type': response.headers.get('Content-Type') ?? 'text/javascript',
+    },
   })
 }
 
