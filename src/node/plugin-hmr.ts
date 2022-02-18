@@ -22,36 +22,38 @@ function isImporter(file: string) {
 }
 
 function setupHmrEvents(server: ViteDevServer) {
-  const brand = colors.cyan(colors.bold('[crx]'))
-
-  filesStart$.subscribe(() => {
-    const time = colors.dim(new Date().toLocaleTimeString())
-    const message = colors.green('files start')
-    const outDir = colors.dim(
-      relative(server.config.root, server.config.build.outDir),
-    )
-    console.log(`${time} ${brand} ${message} ${outDir}`)
-  })
-
-  filesReady$.subscribe(({ duration: d }) => {
-    const time = colors.dim(new Date().toLocaleTimeString())
-    const message = colors.green('files ready')
-    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
-    console.log(`${time} ${brand} ${message} ${duration}`)
-  })
-
-  filesReady$.pipe(skip(1)).subscribe(() => {
-    const time = colors.dim(new Date().toLocaleTimeString())
-    const message = colors.green('runtime reload')
-    console.log(`${time} ${brand} ${message}`)
-  })
-
   filesReady$.subscribe(() => {
     server.ws.send({
       type: 'custom',
       event: 'runtime-reload',
     })
   })
+
+  if (server.config.logLevel === 'info') {
+    const brand = colors.cyan(colors.bold('[crx]'))
+
+    filesStart$.subscribe(() => {
+      const time = colors.dim(new Date().toLocaleTimeString())
+      const message = colors.green('files start')
+      const outDir = colors.dim(
+        relative(server.config.root, server.config.build.outDir),
+      )
+      console.log(`${time} ${brand} ${message} ${outDir}`)
+    })
+
+    filesReady$.subscribe(({ duration: d }) => {
+      const time = colors.dim(new Date().toLocaleTimeString())
+      const message = colors.green('files ready')
+      const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
+      console.log(`${time} ${brand} ${message} ${duration}`)
+    })
+
+    filesReady$.pipe(skip(1)).subscribe(() => {
+      const time = colors.dim(new Date().toLocaleTimeString())
+      const message = colors.green('runtime reload')
+      console.log(`${time} ${brand} ${message}`)
+    })
+  }
 }
 
 // TODO: emit new files for each content script module.
