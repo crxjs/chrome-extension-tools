@@ -90,6 +90,7 @@
     "@typescript-eslint/eslint-plugin": "5.10.2",
     "@typescript-eslint/parser": "5.10.2",
     "@vitejs/plugin-react": "1.2.0",
+    "@vitejs/plugin-vue": "^2.2.2",
     "@vue/compiler-sfc": "3.2.31",
     "@vueuse/core": "7.6.2",
     "@vueuse/router": "7.6.2",
@@ -111,7 +112,8 @@
     "rxjs": "7.5.4",
     "typescript": "4.5.5",
     "vite": "2.8.3",
-    "vite-plugin-inspect": "0.3.14"
+    "vite-plugin-inspect": "0.3.14",
+    "vue": "^3.2.31"
   },
   "peerDependencies": {
     "vite": "^2.0.0"
