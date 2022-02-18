@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "options_page": "src/index.html",
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "name": "Vite Vue Page",
+  "version": "0.0.1"
+}
