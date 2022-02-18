@@ -10,6 +10,7 @@ import {
 import { ManifestV3 } from './manifest'
 import { basename } from './path'
 import { CrxPlugin, CrxPluginFn } from './types'
+import colors from 'picocolors'
 
 // const debug = _debug('crx:manifest')
 
@@ -193,9 +194,19 @@ export const pluginManifest =
               )
               manifest = result ?? manifest
             } catch (error) {
-              if (error instanceof Error)
-                error.message = `[${plugin.name}] ${error.message}`
-              throw error
+              const name = `[${plugin.name}]`
+              let message = error
+              if (error instanceof Error) {
+                message = colors.red(
+                  `${name} ${error.stack ? error.stack : error.message}`,
+                )
+              } else if (typeof error === 'string') {
+                message = colors.red(`${name} ${error}`)
+              }
+
+              console.log(message)
+
+              throw new Error(`Error in ${plugin.name}.renderCrxManifest`)
             }
           }
 
