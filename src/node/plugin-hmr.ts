@@ -65,6 +65,9 @@ export const pluginHMR: CrxPluginFn = () => {
     {
       name: 'crx:hmr-background',
       apply: 'build',
+      configResolved(_config) {
+        config = config ?? (_config as ResolvedConfig)
+      },
       renderCrxManifest(manifest) {
         if (this.meta.watchMode && manifest.background?.service_worker)
           background = join(config.root, manifest.background?.service_worker)
