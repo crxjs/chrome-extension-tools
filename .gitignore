@@ -7,6 +7,7 @@ tests/artifacts
 tests/e2e/mv3-vite-starter-page-hmr/src
 **/__diff_output__
 TODO
+pnpm-global
 
 ### Node template
 # Logs
