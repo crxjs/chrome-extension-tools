@@ -35,12 +35,6 @@ test('crx page update on hmr', async () => {
   const { browser } = await serve(__dirname)
   const page = await getPage(browser, 'chrome-extension')
 
-  // check that page has not reloaded
-  let reloaded = false
-  page.on('framenavigated', () => {
-    reloaded = true
-  })
-
   await page.waitForLoadState()
 
   const styles = page.locator('head style')
@@ -50,6 +44,12 @@ test('crx page update on hmr', async () => {
 
   await button.click()
   buttonText.add(await button.innerText())
+
+  // check that page does not reload during hmr update
+  let reloaded = false
+  page.on('framenavigated', () => {
+    reloaded = true
+  })
 
   // update css files
   await fs.copy(src2, src, {

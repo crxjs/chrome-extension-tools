@@ -129,9 +129,10 @@ exports[`serve fs output: src/popup.html 1`] = `
     <script src=\\"/assets/precontroller.hash.js\\"></script>
   </head>
   <body>
+    <h1>Waiting for service worker</h1>
+
     <p>
-      If you see this message, it means the service worker has not loaded
-      correctly or the dev server is offline.
+      If you see this message, it means the service worker has not loaded fully.
     </p>
 
     <p>
