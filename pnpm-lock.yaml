@@ -49,7 +49,7 @@ specifiers:
   rollup-plugin-esbuild: 4.8.2
   rxjs: 7.5.4
   typescript: 4.5.5
-  vite: 2.8.3
+  vite: 2.8.4
   vite-plugin-inspect: 0.3.14
   vue: ^3.2.31
 
@@ -83,7 +83,7 @@ devDependencies:
   '@typescript-eslint/eslint-plugin': 5.10.2_1b08c9fe96cd93d27d9e149ef6ced69d
   '@typescript-eslint/parser': 5.10.2_eslint@8.9.0+typescript@4.5.5
   '@vitejs/plugin-react': 1.2.0
-  '@vitejs/plugin-vue': 2.2.2_vite@2.8.3+vue@3.2.31
+  '@vitejs/plugin-vue': 2.2.2_vite@2.8.4+vue@3.2.31
   '@vue/compiler-sfc': 3.2.31
   '@vueuse/core': 7.6.2_vue@3.2.31
   '@vueuse/router': 7.6.2_vue@3.2.31
@@ -104,8 +104,8 @@ devDependencies:
   rollup-plugin-esbuild: 4.8.2_esbuild@0.14.21+rollup@2.61.1
   rxjs: 7.5.4
   typescript: 4.5.5
-  vite: 2.8.3
-  vite-plugin-inspect: 0.3.14_vite@2.8.3
+  vite: 2.8.4
+  vite-plugin-inspect: 0.3.14_vite@2.8.4
   vue: 3.2.31
 
 packages:
@@ -1225,14 +1225,14 @@ packages:
       - supports-color
     dev: true
 
-  /@vitejs/plugin-vue/2.2.2_vite@2.8.3+vue@3.2.31:
+  /@vitejs/plugin-vue/2.2.2_vite@2.8.4+vue@3.2.31:
     resolution: {integrity: sha512-3C0s45VOwIFEDU+2ownJOpb0zD5fnjXWaHVOLID2R1mYOlAx3doNBFnNbVjaZvpke/L7IdPJXjpyYpXZToDKig==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       vite: ^2.5.10
       vue: ^3.2.25
     dependencies:
-      vite: 2.8.3
+      vite: 2.8.4
       vue: 3.2.31
     dev: true
 
@@ -5011,7 +5011,7 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite-plugin-inspect/0.3.14_vite@2.8.3:
+  /vite-plugin-inspect/0.3.14_vite@2.8.4:
     resolution: {integrity: sha512-oRjltmm1nUgkHmlGLgfSAuPiXA/FqC7daURJ+faY498r3mwnXrtcfe6Bg5khANQ0iss9Cn1uV6+W9c85noVq0g==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -5022,13 +5022,13 @@ packages:
       kolorist: 1.5.1
       sirv: 2.0.2
       ufo: 0.7.10
-      vite: 2.8.3
+      vite: 2.8.4
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite/2.8.3:
-    resolution: {integrity: sha512-967klrEiG7HEsN7fQYYVETs5495Iu6GpI7YyxoO5yVTJCRxjV8HhWgNWKgrbazjoOB9DQuztL53/nUoNqHNsWg==}
+  /vite/2.8.4:
+    resolution: {integrity: sha512-GwtOkkaT2LDI82uWZKcrpRQxP5tymLnC7hVHHqNkhFNknYr0hJUlDLfhVRgngJvAy3RwypkDCWtTKn1BjO96Dw==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:
