@@ -3,7 +3,13 @@ import workerHmrClient from 'client/es/worker-hmr-client.ts?client'
 import preControllerHtml from 'client/html/precontroller.html?client'
 import colors from 'picocolors'
 import { skip } from 'rxjs'
-import type { ModuleNode, ResolvedConfig, ViteDevServer } from 'vite'
+import {
+  ModuleNode,
+  ResolvedConfig,
+  ViteDevServer,
+  createLogger,
+  Logger,
+} from 'vite'
 import { htmlFiles, isObject } from './helpers'
 import { join, normalize, relative } from './path'
 import { filesReady$, filesStart$ } from './plugin-fileWriter'
@@ -21,36 +27,36 @@ function isImporter(file: string) {
   return pred
 }
 
-function setupHmrEvents(server: ViteDevServer) {
-  const brand = colors.cyan(colors.bold('[crx]'))
-
-  filesStart$.subscribe(() => {
-    const time = colors.dim(new Date().toLocaleTimeString())
-    const message = colors.green('files start')
-    const outDir = colors.dim(
-      relative(server.config.root, server.config.build.outDir),
-    )
-    console.log(`${time} ${brand} ${message} ${outDir}`)
-  })
-
-  filesReady$.subscribe(({ duration: d }) => {
-    const time = colors.dim(new Date().toLocaleTimeString())
-    const message = colors.green('files ready')
-    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
-    console.log(`${time} ${brand} ${message} ${duration}`)
-  })
-
-  filesReady$.pipe(skip(1)).subscribe(() => {
-    const time = colors.dim(new Date().toLocaleTimeString())
-    const message = colors.green('runtime reload')
-    console.log(`${time} ${brand} ${message}`)
-  })
-
+function setupHmrEvents({
+  logger,
+  server,
+}: {
+  logger: Logger
+  server: ViteDevServer
+}) {
   filesReady$.subscribe(() => {
     server.ws.send({
       type: 'custom',
       event: 'runtime-reload',
     })
+  })
+
+  filesStart$.subscribe(() => {
+    const message = colors.green('files start')
+    const outDir = colors.dim(
+      relative(server.config.root, server.config.build.outDir),
+    )
+    logger.info(`${message} ${outDir}`, { timestamp: true })
+  })
+
+  filesReady$.subscribe(({ duration: d }) => {
+    const message = colors.green('files ready')
+    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
+    logger.info(`${message} ${duration}`, { timestamp: true })
+  })
+
+  filesReady$.pipe(skip(1)).subscribe(() => {
+    logger.info('runtime reload', { timestamp: true })
   })
 }
 
@@ -58,7 +64,6 @@ function setupHmrEvents(server: ViteDevServer) {
 // TODO: add fetch handler to service worker
 export const pluginHMR: CrxPluginFn = () => {
   let config: ResolvedConfig
-  /** Provided by crx: */
   let background: string | undefined
 
   return [
@@ -89,7 +94,10 @@ export const pluginHMR: CrxPluginFn = () => {
         config = _config as ResolvedConfig
       },
       configureServer(server) {
-        setupHmrEvents(server)
+        setupHmrEvents({
+          logger: createLogger(config.logLevel, { prefix: '[crx]' }),
+          server,
+        })
       },
       resolveId(source) {
         if (source === workerClientId) return workerClientId
