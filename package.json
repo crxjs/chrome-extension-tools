@@ -101,7 +101,7 @@
     "jest": "27.5.1",
     "jest-image-snapshot": "4.5.1",
     "npm-run-all": "4.1.5",
-    "playwright-chromium": "1.19.0",
+    "playwright-chromium": "1.19.1",
     "prettier": "2.5.1",
     "prettier-plugin-jsdoc": "0.3.30",
     "react": "17.0.2",
