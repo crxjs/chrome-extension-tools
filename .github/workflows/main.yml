@@ -32,7 +32,7 @@ jobs:
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
         # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v2.0.1
+        uses: pnpm/action-setup@v2.1.0
         with:
           # Version of PNPM to install
           version: 6.3.0
@@ -78,7 +78,7 @@ jobs:
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
         # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v2.0.1
+        uses: pnpm/action-setup@v2.1.0
         with:
           # Version of PNPM to install
           version: 6.3.0
@@ -145,7 +145,7 @@ jobs:
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
         # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v2.0.1
+        uses: pnpm/action-setup@v2.1.0
         with:
           # Version of PNPM to install
           version: 6.3.0
