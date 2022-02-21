@@ -85,6 +85,11 @@ exports[`serve fs output: assets/content-script-loader.declared-script.ts.hash.h
   'use strict';
 
   (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
     await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
@@ -104,6 +109,11 @@ exports[`serve fs output: assets/content-script-loader.main-world.ts.hash.hash.j
   'use strict';
 
   (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
     await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/content-script-hmr-client.hash.js\\")
