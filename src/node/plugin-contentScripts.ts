@@ -49,10 +49,15 @@ function resolveScript({
   return { scriptId, id, type: type as 'module' | 'iife' | 'main' }
 }
 
+const preambleCodeId = 'contentScript.preambleCode'
+
 const pluginName = 'crx:content-scripts'
-export const pluginContentScripts: CrxPluginFn = () => {
+export const pluginContentScripts: CrxPluginFn = ({
+  contentScripts: { preambleCode } = {},
+}) => {
   let root: string
   let port: string
+  let preambleRefId: string
 
   return [
     {
@@ -107,8 +112,20 @@ export const pluginContentScripts: CrxPluginFn = () => {
           })
           dynamicScripts.set(scriptId, { id, refId, type })
         }
+
+        if (preambleCode) {
+          preambleRefId = this.emitFile({
+            type: 'chunk',
+            id: preambleCodeId,
+            name: 'content-script-preamble.js',
+          })
+        }
       },
       resolveId(source, importer) {
+        if (source === preambleCodeId) {
+          return preambleCodeId
+        }
+
         if (importer && source.includes('?script')) {
           const { scriptId, id, type } = resolveScript({
             source,
@@ -123,6 +140,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
         return null
       },
       async load(scriptId) {
+        if (scriptId === preambleCodeId) {
+          return preambleCode
+        }
+
         if (dynamicScripts.has(scriptId)) {
           let { id, refId, type } = dynamicScripts.get(scriptId)!
           if (!refId)
@@ -162,6 +183,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
           })
           contentClientName = this.getFileName(refId)
         }
+        const preambleName = preambleRefId
+          ? this.getFileName(preambleRefId)
+          : ''
 
         /* ---------------- DYNAMIC SCRIPTS ---------------- */
 
@@ -173,10 +197,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
             const f = this.getFileName(refId)
             const source = this.meta.watchMode
               ? contentDevLoader
-                  .replace(/%PATH%/g, f)
-                  .replace(/%PORT%/g, port)
-                  .replace(/%CLIENT%/g, contentClientName!)
-              : contentProLoader.replace(/%PATH%/g, f)
+                  .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
+                  .replace(/__CLIENT__/g, JSON.stringify(contentClientName)!)
+                  .replace(/__SCRIPT__/g, JSON.stringify(f))
+              : contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(f))
 
             loaderRefId = this.emitFile({
               type: 'asset',
@@ -185,8 +209,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
             })
           } else if (type === 'iife') {
             // TODO: rebundle as iife script for opaque origins
-          } else {
+          } else if (type === 'main') {
             // TODO: main world scripts don't need a loader
+          } else {
+            throw new Error(`Unknown script type: "${type}" (${id})`)
           }
 
           dynamicScripts.set(name, {
@@ -226,10 +252,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
               const name = `content-script-loader.${parse(f).name}.js`
               const source = this.meta.watchMode
                 ? contentDevLoader
-                    .replace(/%PATH%/g, f)
-                    .replace(/%PORT%/g, port!)
-                    .replace(/%CLIENT%/g, contentClientName!)
-                : contentProLoader.replace(/%PATH%/g, f)
+                    .replace(/__SCRIPT__/g, JSON.stringify(f))
+                    .replace(/__CLIENT__/g, JSON.stringify(contentClientName)!)
+                    .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
+                : contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(f))
 
               const refId = this.emitFile({
                 type: 'asset',

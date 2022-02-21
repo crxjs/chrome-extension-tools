@@ -30,7 +30,11 @@ export interface CrxPlugin extends VitePlugin {
 
 // change this to an interface when you want to add options
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type CrxOptions = Record<string, any>
+export interface CrxOptions {
+  contentScripts?: {
+    preambleCode?: string
+  }
+}
 
 export interface CrxPluginFn {
   (options: CrxOptions): CrxPlugin | CrxPlugin[]
