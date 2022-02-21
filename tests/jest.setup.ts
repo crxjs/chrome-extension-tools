@@ -3,10 +3,8 @@ import { join } from 'src/path'
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({
-    customDiffConfig: {
-      threshold: 0.3,
-    },
-    failureThreshold: 0.04,
+    comparisonMethod: 'ssim',
+    failureThreshold: 0.02,
     failureThresholdType: 'percent',
     customDiffDir: join(process.cwd(), '__image_snapshot_diffs__'),
   }),
