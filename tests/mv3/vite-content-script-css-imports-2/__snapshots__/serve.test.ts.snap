@@ -49,11 +49,13 @@ Array [
   "assets/content-script-hmr-client.hash.js",
   "assets/content-script-loader.index.ts.hash.hash.js",
   "assets/content-script-loader.index.ts.hash2.hash.js",
+  "assets/content-script-preamble.js.hash.js",
   "assets/index.ts.hash.css",
   "assets/index.ts.hash.js",
   "assets/index.ts.hash2.css",
   "assets/index.ts.hash2.js",
   "assets/precontroller.hash.js",
+  "assets/vendor.hash.js",
   "manifest.json",
   "service-worker-loader.js",
 ]
@@ -96,10 +98,10 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash.hash.js 1`]
   'use strict';
 
   (async () => {
-    if (\\"\\")
+    if (\\"assets/content-script-preamble.js.hash.js\\")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL(\\"assets/content-script-preamble.js.hash.js\\")
       );
     await import(
       /* @vite-ignore */
@@ -120,10 +122,10 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`
   'use strict';
 
   (async () => {
-    if (\\"\\")
+    if (\\"assets/content-script-preamble.js.hash.js\\")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL(\\"assets/content-script-preamble.js.hash.js\\")
       );
     await import(
       /* @vite-ignore */
@@ -136,6 +138,16 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash2.hash.js 1`
   })().catch(console.error);
 
 })();
+"
+`;
+
+exports[`serve fs output: assets/content-script-preamble.js.hash.js 1`] = `
+"import { R as RefreshRuntime } from './vendor.hash.js';
+
+RefreshRuntime.injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;
+window.__vite_plugin_react_preamble_installed__ = true;
 "
 `;
 

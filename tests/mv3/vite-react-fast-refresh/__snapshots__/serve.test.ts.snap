@@ -17,11 +17,23 @@ Object {
 
 exports[`serve fs output: 01 output files 1`] = `
 Array [
+  "assets/content-script-preamble.js.hash.js",
   "assets/precontroller.hash.js",
+  "assets/vendor.hash.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/popup.html",
 ]
+`;
+
+exports[`serve fs output: assets/content-script-preamble.js.hash.js 1`] = `
+"import { R as RefreshRuntime } from './vendor.hash.js';
+
+RefreshRuntime.injectIntoGlobalHook(window);
+window.$RefreshReg$ = () => {};
+window.$RefreshSig$ = () => (type) => type;
+window.__vite_plugin_react_preamble_installed__ = true;
+"
 `;
 
 exports[`serve fs output: assets/precontroller.hash.js 1`] = `
