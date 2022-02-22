@@ -32,7 +32,7 @@ export interface CrxPlugin extends VitePlugin {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface CrxOptions {
   contentScripts?: {
-    preambleCode?: string
+    preambleCode?: string | false
   }
 }
 

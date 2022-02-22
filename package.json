@@ -69,7 +69,8 @@
     "fs-extra": "^10.0.0",
     "jsesc": "^3.0.2",
     "magic-string": "^0.25.7",
-    "picocolors": "^1.0.0"
+    "picocolors": "^1.0.0",
+    "react-refresh": "^0.11.0"
   },
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
@@ -114,6 +115,9 @@
     "vite": "2.8.4",
     "vite-plugin-inspect": "0.3.14",
     "vue": "3.2.31"
+  },
+  "optionalDependencies": {
+    "@vitejs/plugin-react": "^1.2.0"
   },
   "peerDependencies": {
     "vite": "^2.0.0"

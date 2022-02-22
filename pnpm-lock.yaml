@@ -44,6 +44,7 @@ specifiers:
   prettier-plugin-jsdoc: 0.3.30
   react: 17.0.2
   react-dom: 17.0.2
+  react-refresh: ^0.11.0
   rimraf: 3.0.2
   rollup: 2.67.3
   rollup-plugin-esbuild: 4.8.2
@@ -63,6 +64,7 @@ dependencies:
   jsesc: 3.0.2
   magic-string: 0.25.7
   picocolors: 1.0.0
+  react-refresh: 0.11.0
 
 devDependencies:
   '@extend-chrome/messages': 1.2.2
@@ -4349,7 +4351,6 @@ packages:
   /react-refresh/0.11.0:
     resolution: {integrity: sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==}
     engines: {node: '>=0.10.0'}
-    dev: true
 
   /react/17.0.2:
     resolution: {integrity: sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA==}

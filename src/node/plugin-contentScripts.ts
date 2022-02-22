@@ -53,49 +53,14 @@ const preambleCodeId = 'contentScript.preambleCode'
 
 const pluginName = 'crx:content-scripts'
 export const pluginContentScripts: CrxPluginFn = ({
-  contentScripts: { preambleCode } = {},
+  contentScripts: options = {},
 }) => {
   let root: string
   let port: string
+  let { preambleCode } = options
   let preambleRefId: string
 
   return [
-    {
-      name: pluginName,
-      apply: 'serve',
-      enforce: 'pre',
-      configResolved(config) {
-        root = config.root
-      },
-      resolveId(source, importer) {
-        if (importer && source.includes('?script')) {
-          const { scriptId, id, type } = resolveScript({
-            source,
-            importer,
-            root,
-          })
-          const script = dynamicScripts.get(scriptId)
-          if (!script) dynamicScripts.set(scriptId, { id, type })
-          return scriptId
-        }
-
-        return null
-      },
-      async load(scriptId) {
-        const script = dynamicScripts.get(scriptId)
-        if (script) {
-          if (!script.fileName) await rebuildFiles()
-          const { fileName } = dynamicScripts.get(scriptId) ?? {}
-          if (!fileName)
-            throw new Error(
-              'dynamic script filename is undefined. this is a bug, please report it to rollup-plugin-chrome-extension',
-            )
-          return `export default "${fileName}"`
-        }
-
-        return null
-      },
-    },
     {
       name: `${pluginName}-pre`,
       apply: 'build',
@@ -103,7 +68,7 @@ export const pluginContentScripts: CrxPluginFn = ({
       configResolved(config) {
         root = config.root
       },
-      buildStart() {
+      async buildStart() {
         for (const [scriptId, { id, type }] of dynamicScripts) {
           const refId = this.emitFile({
             type: 'chunk',
@@ -113,19 +78,35 @@ export const pluginContentScripts: CrxPluginFn = ({
           dynamicScripts.set(scriptId, { id, refId, type })
         }
 
+        if (this.meta.watchMode) {
+          // simplify config for react users
+          if (typeof preambleCode === 'undefined') {
+            try {
+              // jest doesn't work w/ dynamic import, see https://github.com/nodejs/node/issues/35889
+              const react =
+                process.env.NODE_ENV === 'test'
+                  ? require('@vitejs/plugin-react') // jest needs this
+                  : await import('@vitejs/plugin-react') // rollup compiles this correctly for cjs output
+
+              preambleCode = react.default.preambleCode.replace(
+                '__BASE__@react-refresh',
+                'react-refresh',
+              )
+            } catch (error) {
+              preambleCode = false
+            }
+          }
+
         if (preambleCode) {
           preambleRefId = this.emitFile({
             type: 'chunk',
             id: preambleCodeId,
             name: 'content-script-preamble.js',
           })
+          }
         }
       },
       resolveId(source, importer) {
-        if (source === preambleCodeId) {
-          return preambleCodeId
-        }
-
         if (importer && source.includes('?script')) {
           const { scriptId, id, type } = resolveScript({
             source,
@@ -137,13 +118,13 @@ export const pluginContentScripts: CrxPluginFn = ({
           return scriptId
         }
 
+        if (source === preambleCodeId) {
+          return preambleCodeId
+        }
+
         return null
       },
       async load(scriptId) {
-        if (scriptId === preambleCodeId) {
-          return preambleCode
-        }
-
         if (dynamicScripts.has(scriptId)) {
           let { id, refId, type } = dynamicScripts.get(scriptId)!
           if (!refId)
@@ -154,6 +135,10 @@ export const pluginContentScripts: CrxPluginFn = ({
             })
           dynamicScripts.set(scriptId, { id, refId, type })
           return `export default "%IMPORTED_SCRIPT_${refId}%"`
+        }
+
+        if (scriptId === preambleCodeId && typeof preambleCode === 'string') {
+          return preambleCode
         }
 
         return null
@@ -183,6 +168,7 @@ export const pluginContentScripts: CrxPluginFn = ({
           })
           contentClientName = this.getFileName(refId)
         }
+
         const preambleName = preambleRefId
           ? this.getFileName(preambleRefId)
           : ''
@@ -192,19 +178,23 @@ export const pluginContentScripts: CrxPluginFn = ({
         for (const [name, { id, refId, type }] of dynamicScripts) {
           if (!refId) continue // may have been added during build
 
+          const scriptName = this.getFileName(refId)
+
           let loaderRefId: string | undefined
           if (type === 'module') {
-            const f = this.getFileName(refId)
             const source = this.meta.watchMode
               ? contentDevLoader
                   .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
                   .replace(/__CLIENT__/g, JSON.stringify(contentClientName)!)
-                  .replace(/__SCRIPT__/g, JSON.stringify(f))
-              : contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(f))
+                  .replace(/__SCRIPT__/g, JSON.stringify(scriptName))
+              : contentProLoader.replace(
+                  /__SCRIPT__/g,
+                  JSON.stringify(scriptName),
+                )
 
             loaderRefId = this.emitFile({
               type: 'asset',
-              name: `content-script-loader.${parse(f).name}.js`,
+              name: `content-script-loader.${parse(scriptName).name}.js`,
               source,
             })
           } else if (type === 'iife') {
@@ -252,9 +242,9 @@ export const pluginContentScripts: CrxPluginFn = ({
               const name = `content-script-loader.${parse(f).name}.js`
               const source = this.meta.watchMode
                 ? contentDevLoader
-                    .replace(/__SCRIPT__/g, JSON.stringify(f))
-                    .replace(/__CLIENT__/g, JSON.stringify(contentClientName)!)
                     .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
+                    .replace(/__CLIENT__/g, JSON.stringify(contentClientName)!)
+                    .replace(/__SCRIPT__/g, JSON.stringify(f))
                 : contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(f))
 
               const refId = this.emitFile({
@@ -262,6 +252,7 @@ export const pluginContentScripts: CrxPluginFn = ({
                 name,
                 source,
               })
+
               return this.getFileName(refId)
             }),
             ...rest,
@@ -269,6 +260,42 @@ export const pluginContentScripts: CrxPluginFn = ({
         )
 
         return manifest
+      },
+    },
+    {
+      name: pluginName,
+      apply: 'serve',
+      enforce: 'pre',
+      configResolved(config) {
+        root = config.root
+      },
+      resolveId(source, importer) {
+        if (importer && source.includes('?script')) {
+          const { scriptId, id, type } = resolveScript({
+            source,
+            importer,
+            root,
+          })
+          const script = dynamicScripts.get(scriptId)
+          if (!script) dynamicScripts.set(scriptId, { id, type })
+          return scriptId
+        }
+
+        return null
+      },
+      async load(scriptId) {
+        const script = dynamicScripts.get(scriptId)
+        if (script) {
+          if (!script.fileName) await rebuildFiles()
+          const { fileName } = dynamicScripts.get(scriptId) ?? {}
+          if (!fileName)
+            throw new Error(
+              'dynamic script filename is undefined. this is a bug, please report it to rollup-plugin-chrome-extension',
+            )
+          return `export default "${fileName}"`
+        }
+
+        return null
       },
     },
   ]

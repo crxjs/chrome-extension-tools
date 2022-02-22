@@ -10,13 +10,13 @@ import esbuild from 'rollup-plugin-esbuild'
 
 const debug = _debug('config:rollup')
 
-const { dependencies, peerDependencies = {} } = fs.readJsonSync(
-  path.join(process.cwd(), 'package.json'),
-)
+const { dependencies, optionalDependencies, peerDependencies } =
+  fs.readJsonSync(path.join(process.cwd(), 'package.json'))
 
 const external: (string | RegExp)[] = [
   ...Object.keys({
     ...dependencies,
+    ...optionalDependencies,
     ...peerDependencies,
   }),
   'v8',
