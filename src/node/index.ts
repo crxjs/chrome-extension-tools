@@ -8,24 +8,29 @@ import { pluginResources } from './plugin-resources'
 import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 import { pluginBackground } from './plugin-background'
 
+function init(options: CrxOptions, plugins: CrxPluginFn[]) {
+  return plugins
+    .map((p) => p?.(options as Parameters<CrxPluginFn>[0]))
+    .flat()
+    .filter((p): p is CrxPlugin => !!p && typeof p.name === 'string')
+}
+
 export const crx = ({
   manifest,
   ...options
 }: {
   manifest: ManifestV3Export
 } & CrxOptions): CrxPlugin[] => {
-  const plugins = [
-    pluginFileWriter,
+  const plugins = init(options, [
     pluginContentScripts,
     pluginBackground,
     pluginHMR,
     pluginHtmlAuditor,
     pluginManifest(manifest),
     pluginResources,
-  ]
-    .map((p) => p?.(options as Parameters<CrxPluginFn>[0]))
-    .flat()
-    .filter((p): p is CrxPlugin => !!p && typeof p.name === 'string')
+  ])
+
+  plugins.unshift(...init(options, [pluginFileWriter(plugins)]))
 
   return plugins
 }
