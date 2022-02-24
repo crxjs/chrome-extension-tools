@@ -1,6 +1,4 @@
-import { HMRPayload } from 'vite'
-
-export {}
+import type { HMRPayload } from 'vite'
 
 let port: chrome.runtime.Port
 setupPort()
@@ -32,4 +30,20 @@ function handlePortMessage(payload: HMRPayload | { type: 'ping' }) {
 function handleRuntimeReload() {
   console.log('[vite-crx] runtime reload.')
   setTimeout(() => location.reload(), 1000)
+}
+
+if (import.meta.hot) {
+  console.log('import.meta.hot', import.meta.hot)
+} else {
+  console.log('no import.meta.hot')
+}
+
+export function createHotContext() {
+  console.log('createHotContext')
+}
+export function updateStyle() {
+  console.log('updateStyle')
+}
+export function removeStyle() {
+  console.log('removeStyle')
 }
