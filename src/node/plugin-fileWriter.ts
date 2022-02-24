@@ -1,5 +1,8 @@
+import * as lexer from 'es-module-lexer'
 import { existsSync, outputFile } from 'fs-extra'
+import MagicString from 'magic-string'
 import { performance } from 'perf_hooks'
+import colors from 'picocolors'
 import {
   ChangeEvent,
   OutputBundle,
@@ -19,11 +22,16 @@ import {
   Subject,
 } from 'rxjs'
 import { createLogger, Logger, ResolvedConfig, ViteDevServer } from 'vite'
-import { isString, _debug } from './helpers'
-import { join, relative } from './path'
+import { isPresent, isString, _debug } from './helpers'
+import { join, parse, relative } from './path'
 import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
-import colors from 'picocolors'
+
+// const cssLangs = `\\.(css|less|sass|scss|styl|stylus|pcss|postcss)($|\\?)`
+// const cssLangRE = new RegExp(cssLangs)
+// const isCSSLang = (id: string): boolean => cssLangRE.test(id)
+const scriptRE = /\.[jt]sx?$/s
+const isScript = (s: string) => !s.startsWith('crx:') || scriptRE.test(s)
 
 const pluginName = 'crx:file-writer'
 const debug = _debug(pluginName)
@@ -178,6 +186,101 @@ export const pluginFileWriter =
             },
           }
 
+          const devServerLoader: CrxPlugin = {
+            name: `${pluginName}-dev-loader`,
+            apply: 'build',
+            async resolveId(source, importer) {
+              if (this.meta.watchMode)
+                if (source.includes('?import')) {
+                  // TODO: split this out into own file writer plugin
+                  // static asset, export default filename
+                  return join(server.config.root, source.split('?')[0])
+                } else if (source.startsWith('@crx/content-scripts')) {
+                  // emitted chunk, set file name in generateBundle
+                  return { id: source, external: true }
+                } else if (source === '/@vite/client') {
+                  // TODO: split this out into own file writer plugin
+                  // virtual crx module, resolved by other plugin
+                  return null
+                } else if (importer) {
+                  // imported script file, load though vite dev server
+                  const info = this.getModuleInfo(importer)
+                  const { pathname } = new URL(source, 'stub://stub')
+                  const { dir, name } = parse(pathname)
+                  if (info?.meta.isScript)
+                    return {
+                      id: `\0${join(dir, name + '.js')}`,
+                      meta: { isScript: true, url: source },
+                    }
+                } else if (isScript(source)) {
+                  // entry script file, load though vite dev server
+                  const r = await this.resolve(source, importer, {
+                    skipSelf: true,
+                  })
+                  if (!r) return null
+                  const resolved = typeof r === 'string' ? r : r.id
+                  const url = `/${relative(server.config.root, resolved)}`
+                  const { dir, name } = parse(resolved)
+                  return {
+                    id: `\0${join(dir, name + '.js')}`,
+                    meta: { isScript: true, url },
+                  }
+                }
+            },
+            async load(id) {
+              if (this.meta.watchMode) {
+                const info = this.getModuleInfo(id)
+                if (info?.meta.isScript) {
+                  const { url } = info.meta
+                  const r = await server.transformRequest(url)
+                  if (r === null)
+                    throw new TypeError(`Unable to load "${url}" from server.`)
+                  return { code: r.code, map: r.map }
+                }
+              }
+
+              return null
+            },
+            async transform(code, id) {
+              if (this.meta.watchMode) {
+                const info = this.getModuleInfo(id)
+                if (info?.meta.isScript) {
+                  const [imports] = lexer.parse(code)
+                  if (imports.length === 0) return null
+                  const magic = new MagicString(code)
+                  const refIds = new Set<string>()
+                  for (const i of imports)
+                    if (i.n) {
+                      if (i.n.startsWith('/@fs')) {
+                        continue // should go to vendor
+                      } else if (i.n.includes('?import')) {
+                        continue // is static asset
+                      } else {
+                        // break other files into own chunks
+                        const refId = this.emitFile({
+                          type: 'chunk',
+                          id: i.n,
+                          importer: id,
+                        })
+                        refIds.add(refId)
+                        magic.overwrite(
+                          i.s,
+                          i.e,
+                          `@crx/content-scripts/${refId}`,
+                        )
+                      }
+                    }
+
+                  return {
+                    code: magic.toString(),
+                    map: magic.generateMap(),
+                    meta: { refIds },
+                  }
+                }
+              }
+            },
+          }
+
           /* ------------------ SORT PLUGINS ----------------- */
 
           const pre: CrxPlugin[] = []
@@ -190,7 +293,13 @@ export const pluginFileWriter =
             else mid.push(p)
           }
 
-          const plugins = [...pre, ...mid, ...post, buildLifecycle]
+          const plugins = [
+            ...pre,
+            ...mid,
+            devServerLoader,
+            ...post,
+            buildLifecycle,
+          ]
 
           /* ------------ RUN FILEWRITERSTART HOOK ----------- */
 
@@ -235,9 +344,19 @@ export const pluginFileWriter =
 
           watcher.on('event', (event) => {
             if (event.code === 'ERROR') {
-              const { message, parserError, stack } = event.error
+              const { message, parserError, stack, id, loc } = event.error
               const error = parserError ?? new Error(message)
-              if (stack) error.stack = stack
+              if (parserError && message.startsWith('Unexpected token')) {
+                const m = `Unexpected token in ${loc?.file ?? id}`
+                error.message = [m, loc?.line, loc?.column]
+                  .filter(isPresent)
+                  .join(':')
+              }
+              error.stack = (stack ?? error.stack)?.replace(
+                /.+?\n/,
+                `Error: ${error.message}\n`,
+              )
+
               watcherEvent$.next({ type: 'error', error })
             }
           })

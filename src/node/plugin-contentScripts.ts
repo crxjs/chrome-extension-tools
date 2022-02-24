@@ -1,20 +1,13 @@
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
-import * as lexer from 'es-module-lexer'
 import fs from 'fs'
 import jsesc from 'jsesc'
 import MagicString from 'magic-string'
 import { ViteDevServer } from 'vite'
 import { defineClientValues } from './defineClientValues'
-import { dirname, join, parse, relative, resolve } from './path'
+import { dirname, parse, relative, resolve } from './path'
 import { rebuildFiles } from './plugin-fileWriter'
 import type { CrxPluginFn } from './types'
-
-// const cssLangs = `\\.(css|less|sass|scss|styl|stylus|pcss|postcss)($|\\?)`
-// const cssLangRE = new RegExp(cssLangs)
-// const isCSSLang = (id: string): boolean => cssLangRE.test(id)
-const scriptRE = /\.[jt]sx?$/s
-const isScript = (s: string) => !s.startsWith('crx:') || scriptRE.test(s)
 
 /** A Map of dynamic scripts from virtual module id to the ref id of the emitted script */
 export const dynamicScripts = new Map<
@@ -114,6 +107,9 @@ export const pluginContentScripts: CrxPluginFn = ({
       configResolved(config) {
         root = config.root
       },
+      fileWriterStart(config, _server) {
+        server = _server
+      },
       async buildStart() {
         // emit dynamic scripts
         for (const [scriptId, { id, type }] of dynamicScripts) {
@@ -163,9 +159,7 @@ export const pluginContentScripts: CrxPluginFn = ({
           return scriptId
         }
 
-        if (source === preambleId) {
-          return defineClientValues(preambleId, server.config)
-        }
+        if (source === preambleId) return preambleId
       },
       async load(scriptId) {
         if (dynamicScripts.has(scriptId)) {
@@ -180,8 +174,12 @@ export const pluginContentScripts: CrxPluginFn = ({
           return `export default "%IMPORTED_SCRIPT_${refId}%"`
         }
 
-        if (scriptId === preambleId && typeof preambleCode === 'string') {
-          return preambleCode
+        if (
+          server &&
+          scriptId === preambleId &&
+          typeof preambleCode === 'string'
+        ) {
+          return defineClientValues(preambleCode, server.config)
         }
 
         return null
@@ -259,6 +257,8 @@ export const pluginContentScripts: CrxPluginFn = ({
           })
         }
 
+        /* --------- APPLY DYNAMIC SCRIPT FILENAME --------- */
+
         for (const chunk of Object.values(bundle)) {
           if (chunk.type === 'chunk')
             for (const [name, { fileName, refId }] of dynamicScripts) {
@@ -306,98 +306,6 @@ export const pluginContentScripts: CrxPluginFn = ({
         )
 
         return manifest
-      },
-    },
-    {
-      name: `${pluginName}-dev-loader`,
-      apply: 'build',
-      async fileWriterStart(config, _server) {
-        server = _server
-        await lexer.init
-      },
-      async resolveId(source, importer) {
-        if (this.meta.watchMode)
-          if (source.includes('?import')) {
-            // TODO: split this out into own file writer plugin
-            // static asset, export default filename
-            return join(server.config.root, source.split('?')[0])
-          } else if (source.startsWith('@crx/content-scripts')) {
-            // emitted chunk, set file name in generateBundle
-            return { id: source, external: true }
-          } else if (source === '/@vite/client') {
-            // TODO: split this out into own file writer plugin
-            // virtual crx module, resolved by other plugin
-            return null
-          } else if (importer) {
-            // imported script file, load though vite dev server
-            const info = this.getModuleInfo(importer)
-            const { pathname } = new URL(source, 'stub://stub')
-            const { dir, name } = parse(pathname)
-            if (info?.meta.isScript)
-              return {
-                id: `\0${join(dir, name + '.js')}`,
-                meta: { isScript: true, url: source },
-              }
-          } else if (isScript(source)) {
-            // entry script file, load though vite dev server
-            const r = await this.resolve(source, importer, { skipSelf: true })
-            if (!r) return null
-            const resolved = typeof r === 'string' ? r : r.id
-            const url = `/${relative(server.config.root, resolved)}`
-            const { dir, name } = parse(resolved)
-            return {
-              id: `\0${join(dir, name + '.js')}`,
-              meta: { isScript: true, url },
-            }
-          }
-      },
-      async load(id) {
-        if (this.meta.watchMode) {
-          const info = this.getModuleInfo(id)
-          if (info?.meta.isScript) {
-            const { url } = info.meta
-            const r = await server.transformRequest(url)
-            if (r === null)
-              throw new TypeError(`Unable to load "${url}" from server.`)
-            return { code: r.code, map: r.map }
-          }
-        }
-
-        return null
-      },
-      async transform(code, id) {
-        if (this.meta.watchMode) {
-          const info = this.getModuleInfo(id)
-          if (info?.meta.isScript) {
-            const [imports] = lexer.parse(code)
-            if (imports.length === 0) return null
-            const magic = new MagicString(code)
-            const refIds = new Set<string>()
-            for (const i of imports)
-              if (i.n) {
-                if (i.n.startsWith('/@fs')) {
-                  continue // should go to vendor
-                } else if (i.n.includes('?import')) {
-                  continue // is static asset
-                } else {
-                  // break other files into own chunks
-                  const refId = this.emitFile({
-                    type: 'chunk',
-                    id: i.n,
-                    importer: id,
-                  })
-                  refIds.add(refId)
-                  magic.overwrite(i.s, i.e, `@crx/content-scripts/${refId}`)
-                }
-              }
-
-            return {
-              code: magic.toString(),
-              map: magic.generateMap(),
-              meta: { refIds },
-            }
-          }
-        }
       },
     },
   ]
