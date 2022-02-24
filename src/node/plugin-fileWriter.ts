@@ -20,6 +20,7 @@ import {
 import { ResolvedConfig } from 'vite'
 import { isString, _debug } from './helpers'
 import { join } from './path'
+import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
 
 const pluginName = 'crx:file-writer'
@@ -48,7 +49,8 @@ const watcherEvent$ = new BehaviorSubject<FileWriterEvent>({
 })
 
 watcherEvent$.subscribe((event) => {
-  return debug('watcher event %O', event.type)
+  debug('watcher event %O', event.type)
+  if (event.type === 'error') debug('watcher error %O', event.error)
 })
 
 export const filesStart$ = watcherEvent$.pipe(
@@ -98,21 +100,6 @@ export const pluginFileWriter =
         server.httpServer?.once('listening', async () => {
           serverConfig$.next(server.config)
 
-          const { outDir } = server.config.build
-          const { port } = server.config.server
-
-          if (typeof port === 'undefined')
-            throw new TypeError('vite serve port is undefined')
-
-          for (const p of server.config.plugins as CrxPlugin[]) {
-            const debug = _debug(p.name)
-            try {
-              await p.fileWriterStart?.({ port, outDir }, server)
-            } catch (error) {
-              debug('fileWriterStart error %O', error)
-            }
-          }
-
           let start = performance.now()
           /**
            * This plugin emits build events so other plugins can track the file
@@ -152,27 +139,60 @@ export const pluginFileWriter =
 
           const pre: CrxPlugin[] = []
           const post: CrxPlugin[] = []
-          const plugins: CrxPlugin[] = []
+          const mid: CrxPlugin[] = []
           for (const p of crxPlugins) {
             if (p.apply === 'serve') continue
             else if (p.enforce === 'pre') pre.push(p)
             else if (p.enforce === 'post') post.push(p)
-            else plugins.push(p)
+            else mid.push(p)
           }
 
+          const plugins = [...pre, ...mid, ...post, buildLifecycle]
+
+          const { outDir } = server.config.build
+          const { port } = server.config.server
+
+          if (typeof port === 'undefined')
+            throw new TypeError('vite serve port is undefined')
+
+          const allPlugins: CrxPlugin[] = [...server.config.plugins, ...plugins]
+          await Promise.all(
+            allPlugins.map(async (p) => {
+              try {
+                await p.fileWriterStart?.({ port, outDir }, server)
+              } catch (e) {
+                const hook = `[${p.name}].fileWriterStart`
+
+                let error = new Error(`Error in plugin ${hook}`)
+                if (e instanceof Error) {
+                  error = e
+                  error.message = `${hook} ${error.message}`
+                } else if (typeof e === 'string') {
+                  error = new Error(`${hook} ${e}`)
+                }
+
+                watcherEvent$.next({ type: 'error', error })
+              }
+            }),
+          )
+
           watcher = rollupWatch({
-            input: '@crx/stub',
+            input: stubId,
             context: 'this',
             output: {
               dir: server.config.build.outDir,
               format: 'es',
             },
-            plugins: [
-              ...pre,
-              ...plugins,
-              ...post,
-              buildLifecycle,
-            ] as RollupPlugin[],
+            plugins: plugins as RollupPlugin[],
+          })
+
+          watcher.on('event', (event) => {
+            if (event.code === 'ERROR') {
+              const { message, parserError, stack } = event.error
+              const error = parserError ?? new Error(message)
+              if (stack) error.stack = stack
+              watcherEvent$.next({ type: 'error', error })
+            }
           })
         })
       },
