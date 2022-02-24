@@ -1,4 +1,4 @@
-import type { ManifestV3Export } from './define'
+import type { ManifestV3Export } from './defineManifest'
 import { pluginContentScripts } from './plugin-contentScripts'
 import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginHMR } from './plugin-hmr'
@@ -37,6 +37,6 @@ export const crx = ({
 
 export const chromeExtension = crx
 
-export { defineDynamicResource, defineManifest } from './define'
+export { defineDynamicResource, defineManifest } from './defineManifest'
 export { filesReady, rebuildFiles } from './plugin-fileWriter'
 export type { CrxPlugin }

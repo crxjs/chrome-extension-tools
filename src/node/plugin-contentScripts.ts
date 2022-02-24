@@ -1,4 +1,3 @@
-import contentHmrClient from 'client/es/content-hmr-client.ts?client'
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import * as lexer from 'es-module-lexer'
@@ -6,6 +5,7 @@ import fs from 'fs'
 import jsesc from 'jsesc'
 import MagicString from 'magic-string'
 import { ViteDevServer } from 'vite'
+import { defineClientValues } from './defineClientValues'
 import { dirname, join, parse, relative, resolve } from './path'
 import { rebuildFiles } from './plugin-fileWriter'
 import type { CrxPluginFn } from './types'
@@ -115,6 +115,7 @@ export const pluginContentScripts: CrxPluginFn = ({
         root = config.root
       },
       async buildStart() {
+        // emit dynamic scripts
         for (const [scriptId, { id, type }] of dynamicScripts) {
           const refId = this.emitFile({
             type: 'chunk',
@@ -124,6 +125,7 @@ export const pluginContentScripts: CrxPluginFn = ({
           dynamicScripts.set(scriptId, { id, refId, type })
         }
 
+        // emit preamble, if defined
         if (this.meta.watchMode) {
           // simplify config for react users
           if (typeof preambleCode === 'undefined') {
@@ -134,10 +136,7 @@ export const pluginContentScripts: CrxPluginFn = ({
                   ? require('@vitejs/plugin-react') // jest needs this
                   : await import('@vitejs/plugin-react') // rollup compiles this correctly for cjs output
 
-              preambleCode = react.default.preambleCode.replace(
-                '__BASE__@react-refresh',
-                'react-refresh',
-              )
+              preambleCode = react.default.preambleCode
             } catch (error) {
               preambleCode = false
             }
@@ -165,7 +164,7 @@ export const pluginContentScripts: CrxPluginFn = ({
         }
 
         if (source === preambleId) {
-          return preambleId
+          return defineClientValues(preambleId, server.config)
         }
       },
       async load(scriptId) {
@@ -194,12 +193,6 @@ export const pluginContentScripts: CrxPluginFn = ({
       enforce: 'post',
       fileWriterStart({ port: p }) {
         port = p.toString()
-      },
-      resolveId(source) {
-        if (source === '@crx/client') return `\0${'@crx/client'}`
-      },
-      load(id) {
-        if (id === `\0${'@crx/client'}`) return contentHmrClient
       },
       transformCrxManifest(manifest) {
         if (this.meta.watchMode) {

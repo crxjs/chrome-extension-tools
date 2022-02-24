@@ -1,24 +1,16 @@
+import contentHmrClient from 'client/es/content-hmr-client.ts?client'
 import preControllerScript from 'client/es/page-precontroller-script.ts?client'
 import workerHmrClient from 'client/es/worker-hmr-client.ts?client'
 import preControllerHtml from 'client/html/precontroller.html?client'
-import colors from 'picocolors'
-import { skip } from 'rxjs'
-import {
-  ModuleNode,
-  ResolvedConfig,
-  ViteDevServer,
-  createLogger,
-  Logger,
-} from 'vite'
-import { htmlFiles, isObject } from './helpers'
-import { join, normalize, relative } from './path'
-import { filesReady$, filesStart$ } from './plugin-fileWriter'
+import { ModuleNode, ResolvedConfig } from 'vite'
+import { defineClientValues } from './defineClientValues'
+import { htmlFiles } from './helpers'
+import { join } from './path'
 import type { CrxPluginFn } from './types'
 
 // const debug = _debug('crx:hmr')
 
-const workerClientId = '/@crx/worker-client'
-
+/** Determine if a file was imported by a module or a parent module */
 function isImporter(file: string) {
   const pred = (node: ModuleNode) => {
     if (node.file === file) return true
@@ -27,38 +19,8 @@ function isImporter(file: string) {
   return pred
 }
 
-function setupHmrEvents({
-  logger,
-  server,
-}: {
-  logger: Logger
-  server: ViteDevServer
-}) {
-  filesReady$.subscribe(() => {
-    server.ws.send({
-      type: 'custom',
-      event: 'runtime-reload',
-    })
-  })
-
-  filesStart$.subscribe(() => {
-    const message = colors.green('files start')
-    const outDir = colors.dim(
-      relative(server.config.root, server.config.build.outDir),
-    )
-    logger.info(`${message} ${outDir}`, { timestamp: true })
-  })
-
-  filesReady$.subscribe(({ duration: d }) => {
-    const message = colors.green('files ready')
-    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
-    logger.info(`${message} ${duration}`, { timestamp: true })
-  })
-
-  filesReady$.pipe(skip(1)).subscribe(() => {
-    logger.info('runtime reload', { timestamp: true })
-  })
-}
+const workerClientId = '@crx/client/worker'
+const contentClientId = '@crx/client/content'
 
 // TODO: emit new files for each content script module.
 // TODO: add fetch handler to service worker
@@ -92,12 +54,6 @@ export const pluginHMR: CrxPluginFn = () => {
       },
       configResolved(_config) {
         config = _config as ResolvedConfig
-      },
-      configureServer(server) {
-        setupHmrEvents({
-          logger: createLogger(config.logLevel, { prefix: '[crx]' }),
-          server,
-        })
       },
       resolveId(source) {
         if (source === workerClientId) return workerClientId
@@ -154,57 +110,14 @@ export const pluginHMR: CrxPluginFn = () => {
     {
       name: 'crx:hmr-content-scripts',
       apply: 'build',
-      // TODO: emit new files for each content script module, use real file names
-      // TODO: add message-based content script HMR client
-      // TODO: send content script HMR updates to background via HMR websocket
+      enforce: 'pre',
+      resolveId(source) {
+        if (source === contentClientId) return `\0${contentClientId}`
+      },
+      load(id) {
+        if (id === `\0${contentClientId}`)
+          return defineClientValues(contentHmrClient, config)
+      },
     },
   ]
-}
-
-export function defineClientValues(code: string, config: ResolvedConfig) {
-  let options = config.server.hmr
-  options = options && typeof options !== 'boolean' ? options : {}
-  const host = options.host || null
-  const protocol = options.protocol || null
-  const timeout = options.timeout || 30000
-  const overlay = options.overlay !== false
-  let hmrPort: number | string | undefined
-  if (isObject(config.server.hmr)) {
-    hmrPort = config.server.hmr.clientPort || config.server.hmr.port
-  }
-  if (config.server.middlewareMode) {
-    hmrPort = String(hmrPort || 24678)
-  } else {
-    hmrPort = String(hmrPort || options.port || config.server.port!)
-  }
-  let hmrBase = config.base
-  if (options.path) {
-    hmrBase = join(hmrBase, options.path)
-  }
-  if (hmrBase !== '/') {
-    hmrPort = normalize(`${hmrPort}${hmrBase}`)
-  }
-
-  return code
-    .replace(`__MODE__`, JSON.stringify(config.mode))
-    .replace(`__BASE__`, JSON.stringify(config.base))
-    .replace(`__DEFINES__`, serializeDefine(config.define || {}))
-    .replace(`__HMR_PROTOCOL__`, JSON.stringify(protocol))
-    .replace(`__HMR_HOSTNAME__`, JSON.stringify(host))
-    .replace(`__HMR_PORT__`, JSON.stringify(hmrPort))
-    .replace(`__HMR_TIMEOUT__`, JSON.stringify(timeout))
-    .replace(`__HMR_ENABLE_OVERLAY__`, JSON.stringify(overlay))
-    .replace(`__SERVER_PORT__`, JSON.stringify(config.server.port?.toString()))
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function serializeDefine(define: Record<string, any>): string {
-    let res = `{`
-    for (const key in define) {
-      const val = define[key]
-      res += `${JSON.stringify(key)}: ${
-        typeof val === 'string' ? `(${val})` : JSON.stringify(val)
-      }, `
-    }
-    return res + `}`
-  }
 }

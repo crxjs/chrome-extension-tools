@@ -15,13 +15,15 @@ import {
   filter,
   firstValueFrom,
   map,
+  skip,
   Subject,
 } from 'rxjs'
-import { ResolvedConfig } from 'vite'
+import { createLogger, Logger, ResolvedConfig, ViteDevServer } from 'vite'
 import { isString, _debug } from './helpers'
-import { join } from './path'
+import { join, relative } from './path'
 import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
+import colors from 'picocolors'
 
 const pluginName = 'crx:file-writer'
 const debug = _debug(pluginName)
@@ -89,6 +91,39 @@ export const rebuildFiles = async (): Promise<void> => {
   await filesReady()
 }
 
+function logFileWriterEvents({
+  logger,
+  server,
+}: {
+  logger: Logger
+  server: ViteDevServer
+}) {
+  filesReady$.subscribe(() => {
+    server.ws.send({
+      type: 'custom',
+      event: 'runtime-reload',
+    })
+  })
+
+  filesStart$.subscribe(() => {
+    const message = colors.green('files start')
+    const outDir = colors.dim(
+      relative(server.config.root, server.config.build.outDir),
+    )
+    logger.info(`${message} ${outDir}`, { timestamp: true })
+  })
+
+  filesReady$.subscribe(({ duration: d }) => {
+    const message = colors.green('files ready')
+    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
+    logger.info(`${message} ${duration}`, { timestamp: true })
+  })
+
+  filesReady$.pipe(skip(1)).subscribe(() => {
+    logger.info('runtime reload', { timestamp: true })
+  })
+}
+
 export const pluginFileWriter =
   (crxPlugins: CrxPlugin[]): CrxPluginFn =>
   () => {
@@ -98,7 +133,13 @@ export const pluginFileWriter =
       apply: 'serve',
       configureServer(server) {
         server.httpServer?.once('listening', async () => {
+          // TODO: consider pushing the server, not just the config
           serverConfig$.next(server.config)
+          // TODO: consider allowing this to restart with the server? rxjs magic
+          logFileWriterEvents({
+            logger: createLogger(server.config.logLevel, { prefix: '[crx]' }),
+            server,
+          })
 
           let start = performance.now()
           /**
@@ -137,6 +178,8 @@ export const pluginFileWriter =
             },
           }
 
+          /* ------------------ SORT PLUGINS ----------------- */
+
           const pre: CrxPlugin[] = []
           const post: CrxPlugin[] = []
           const mid: CrxPlugin[] = []
@@ -148,6 +191,8 @@ export const pluginFileWriter =
           }
 
           const plugins = [...pre, ...mid, ...post, buildLifecycle]
+
+          /* ------------ RUN FILEWRITERSTART HOOK ----------- */
 
           const { outDir } = server.config.build
           const { port } = server.config.server
@@ -175,6 +220,8 @@ export const pluginFileWriter =
               }
             }),
           )
+
+          /* ------------- CREATE ROLLUP WATCHER ------------- */
 
           watcher = rollupWatch({
             input: stubId,

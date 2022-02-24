@@ -1,5 +1,5 @@
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ManifestV3Export } from './define'
+import { ManifestV3Export } from './defineManifest'
 import {
   decodeManifest,
   encodeManifest,
