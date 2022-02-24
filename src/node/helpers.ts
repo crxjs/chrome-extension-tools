@@ -9,12 +9,16 @@ import type {
   WebAccessibleResourceByMatch,
 } from './manifest'
 import type { AcornLiteral } from './types'
+import { createHash } from 'crypto'
+
+export { _debug } // makes it easy to import w/ intellisense
 
 export const structuredClone = <T>(obj: T): T => {
   return v8.deserialize(v8.serialize(obj))
 }
 
-export { _debug } // makes it easy to import w/ intellisense
+export const hash = (data: string): string =>
+  createHash('sha1').update(data).digest('base64').slice(0, 10)
 
 export const isString = (x: unknown): x is string => typeof x === 'string'
 
