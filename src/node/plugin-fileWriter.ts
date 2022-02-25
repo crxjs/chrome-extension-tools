@@ -5,16 +5,17 @@ import {
 } from 'rollup'
 import { isPresent } from './helpers'
 import { parse } from './path'
-import { devServerLoader } from './plugin-fileWriter--loader'
+import { pluginDevServerLoader } from './plugin-fileWriter--loader'
 import {
   filesReady,
-  fileWriterEvents,
+  fileWriterEvents as pluginFileWriterEvents,
   rebuildFiles,
   server$,
   writerEvent$,
 } from './plugin-fileWriter--events'
 import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
+import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
 
 export { filesReady, rebuildFiles }
 
@@ -44,9 +45,10 @@ export const pluginFileWriter =
           const plugins = [
             ...pre,
             ...mid,
-            devServerLoader(server)(options),
+            pluginDevServerLoader(options),
+            pluginFileWriterHtml(options),
             ...post,
-            fileWriterEvents(server)(options),
+            pluginFileWriterEvents(options),
           ].flat()
 
           /* ------------ RUN FILEWRITERSTART HOOK ----------- */

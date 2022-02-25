@@ -1,6 +1,5 @@
 import { ViteDevServer } from 'vite'
 import { _debug } from './helpers'
-import { relative } from './path'
 import { CrxPluginFn } from './types'
 
 const debug = _debug('file-writer').extend('loader')
@@ -8,11 +7,14 @@ const debug = _debug('file-writer').extend('loader')
 const scriptRE = /\.[jt]sx?$/s
 const isScript = (s: string) => scriptRE.test(s)
 
-export const devServerLoader =
-  (server: ViteDevServer): CrxPluginFn =>
-  () => ({
+export const pluginDevServerLoader: CrxPluginFn = () => {
+  let server: ViteDevServer
+  return {
     name: `crx:file-writer-loader`,
     apply: 'build',
+    fileWriterStart(config, _server) {
+      server = _server
+    },
     async resolveId(source, importer) {
       if (this.meta.watchMode)
         if (importer) {
@@ -22,15 +24,11 @@ export const devServerLoader =
           return { id, meta: { url: source } }
         } else if (isScript(source)) {
           // entry script file, load though vite dev server
-          const r = await this.resolve(source, importer, {
+          const resolved = await this.resolve(source, importer, {
             skipSelf: true,
           })
-          if (!r) return null
-          const resolved = relative(
-            server.config.root,
-            typeof r === 'string' ? r : r.id,
-          )
-          const { pathname } = new URL(resolved, 'stub://stub')
+          if (!resolved) return null
+          const { pathname } = new URL(resolved.id, 'stub://stub')
           const id = pathname.endsWith('.js') ? pathname : `\0${pathname}.js`
           return { id, meta: { url: pathname } }
         }
@@ -54,4 +52,5 @@ export const devServerLoader =
 
       return null
     },
-  })
+  }
+}
