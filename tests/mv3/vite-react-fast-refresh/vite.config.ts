@@ -1,6 +1,9 @@
+import react from '@vitejs/plugin-react'
 import { crx } from 'src/.'
 import { defineConfig } from 'vite'
 import manifest from './manifest.config'
+
+const { preambleCode } = react
 
 export default defineConfig({
   build: {
@@ -16,5 +19,5 @@ export default defineConfig({
   },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest })],
+  plugins: [crx({ manifest, contentScripts: { preambleCode } }), react()],
 })

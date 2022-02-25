@@ -39,14 +39,14 @@ export const pluginContentScripts: CrxPluginFn = ({
             name: 'content-script-client.js',
           })
 
-          if (typeof preambleCode === 'undefined') {
+          if (
+            typeof preambleCode === 'undefined' &&
+            process.env.NODE_ENV !== 'test'
+          ) {
             try {
-              // jest doesn't work w/ dynamic import, see https://github.com/nodejs/node/issues/35889
-              const react =
-                process.env.NODE_ENV === 'test'
-                  ? require('@vitejs/plugin-react') // jest needs this
-                  : await import('@vitejs/plugin-react') // rollup compiles this correctly for cjs output
-
+              // rollup compiles this correctly for cjs output
+              const react = await import('@vitejs/plugin-react')
+              // auto config for react users
               preambleCode = react.default.preambleCode
             } catch (error) {
               preambleCode = false
