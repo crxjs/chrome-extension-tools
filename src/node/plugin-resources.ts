@@ -39,8 +39,8 @@ export const pluginResources: CrxPluginFn = () => {
     name: pluginName,
     apply: 'build',
     enforce: 'post',
-    config({ build, ...config }, { mode }) {
-      return { ...config, build: { ...build, manifest: mode !== 'watch' } }
+    config({ build, ...config }, { command }) {
+      return { ...config, build: { ...build, manifest: command === 'build' } }
     },
     renderCrxManifest(manifest, bundle) {
       // set default value for web_accessible_resources
