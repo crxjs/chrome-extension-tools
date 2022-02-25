@@ -13,7 +13,7 @@ export const dynamicScripts = new Map<
   {
     /** The resolved id of the script file */
     chunkId: string
-    /** TODO: unimplemented IIFE format */
+    /** TODO: implement IIFE format */
     type: ScriptType
     /** File name of the script file or loader */
     fileName?: string
@@ -130,7 +130,6 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
                 if (chunk.modules[id])
                   if (fileName) {
                     const placeholder = `__IMPORTED_SCRIPT_${refId}__`
-                    // TODO: iterate over all instances? is there a use case for this?
                     const index = chunk.code.indexOf(placeholder)
                     // Overwrite placeholder with filename
                     magic.overwrite(
