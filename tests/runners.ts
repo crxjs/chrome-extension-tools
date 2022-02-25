@@ -70,11 +70,6 @@ export async function serve(dirname: string) {
     envFile: false,
     build: { outDir, minify: false },
     cacheDir,
-    server: {
-      watch: {
-        ignored: ['**/node_modules/**', '**/.git/**', cacheDir, outDir],
-      },
-    },
     plugins,
     clearScreen: false,
     logLevel: 'error',
