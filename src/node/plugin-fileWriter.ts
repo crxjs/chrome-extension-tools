@@ -108,7 +108,6 @@ export const pluginFileWriter =
               entryFileNames,
               manualChunks,
             },
-            treeshake: false,
             plugins: plugins as RollupPlugin[],
           })
 

@@ -50,7 +50,7 @@ export const pluginHMR: CrxPluginFn = () => {
         config = _config as ResolvedConfig
       },
       resolveId(source) {
-        if (source === workerClientId) return workerClientId
+        if (source === `/${workerClientId}`) return workerClientId
       },
       load(id) {
         if (id === workerClientId)

@@ -3,13 +3,12 @@ import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import { ViteDevServer } from 'vite'
 import { parse } from './path'
 import { dynamicScripts } from './plugin-dynamicScripts'
+import { contentClientId } from './plugin-hmr'
 import type { CrxPluginFn } from './types'
 
 // const debug = _debug('crx:hmr')
 
 const preambleId = '@crx/client/preamble'
-export const workerClientId = '@crx/client/worker'
-export const contentClientId = '@crx/client/content'
 
 /** Responsible for emitting content script loaders and resolving associated files */
 export const pluginContentScripts: CrxPluginFn = ({

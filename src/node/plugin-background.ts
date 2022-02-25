@@ -1,3 +1,4 @@
+import { workerClientId } from './plugin-hmr'
 import type { CrxPluginFn } from './types'
 
 const pluginName = 'crx:background'
@@ -43,7 +44,7 @@ export const pluginBackground: CrxPluginFn = () => {
           throw new Error('server port is undefined in watch mode')
 
         // development, required hmr client
-        loader = `import 'http://localhost:${port}/@crx/worker-client';\n`
+        loader = `import 'http://localhost:${port}/${workerClientId}';\n`
         // development, optional service worker
         if (worker) loader += `import 'http://localhost:${port}/${worker}';\n`
       } else if (worker) {
