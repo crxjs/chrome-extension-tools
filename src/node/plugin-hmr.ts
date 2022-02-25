@@ -79,6 +79,27 @@ export const pluginHMR: CrxPluginFn = () => {
         if (id === `\0${contentClientId}`)
           return defineClientValues(contentHmrClient, config)
       },
+      renderChunk(code, { fileName }) {
+        // make this
+        // import.meta.hot = createHotContext("/src/App.jsx")
+        // into this
+        // import.meta.hot = createHotContext("/${fileName}")
+      },
+    },
+    {
+      name: 'crx:hmr-content-scripts',
+      apply: 'serve',
+      enforce: 'pre',
+      handleHotUpdate() {
+        /**
+         * Handle HMR updates for outDir files
+         *
+         * Send mapped HMR events from source files to output files
+         *
+         * - Explore update & prune
+         * - What about full-reload?
+         */
+      },
     },
   ]
 }

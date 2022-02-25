@@ -1,13 +1,13 @@
 import { ViteDevServer } from 'vite'
-import { _debug } from './helpers'
+// import { _debug } from './helpers'
 import { CrxPluginFn } from './types'
 
-const debug = _debug('file-writer').extend('loader')
+// const debug = _debug('file-writer').extend('loader')
 
 const scriptRE = /\.[jt]sx?$/s
 const isScript = (s: string) => scriptRE.test(s)
 
-export const pluginDevServerLoader: CrxPluginFn = () => {
+export const pluginFileWriterLoader: CrxPluginFn = () => {
   let server: ViteDevServer
   return {
     name: `crx:file-writer-loader`,
@@ -41,11 +41,11 @@ export const pluginDevServerLoader: CrxPluginFn = () => {
           const r = await server.transformRequest(url)
           if (r === null)
             throw new TypeError(`Unable to load "${url}" from server.`)
-          debug('start "%s"', url)
-          debug('---------------------')
-          for (const l of r.code.split('\n')) debug('| %s', l)
-          debug('---------------------')
-          debug('end "%s"', url)
+          // debug('start "%s"', url)
+          // debug('---------------------')
+          // for (const l of r.code.split('\n')) debug('| %s', l)
+          // debug('---------------------')
+          // debug('end "%s"', url)
           return { code: r.code, map: r.map }
         }
       }
