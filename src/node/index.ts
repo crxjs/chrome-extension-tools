@@ -23,13 +23,13 @@ export const crx = ({
   manifest: ManifestV3Export
 } & CrxOptions): CrxPlugin[] => {
   const plugins = init(options, [
+    pluginHMR,
+    pluginHtmlAuditor,
+    pluginResources,
     pluginContentScripts,
     pluginDynamicScripts,
     pluginBackground,
-    pluginHMR,
-    pluginHtmlAuditor,
     pluginManifest(manifest),
-    pluginResources,
   ])
 
   plugins.unshift(...init(options, [pluginFileWriter(plugins)]))

@@ -24,7 +24,7 @@ export const pluginContentScripts: CrxPluginFn = ({
 
   return [
     {
-      name: 'crx:content-scripts',
+      name: 'crx:content-scripts-pre',
       apply: 'build',
       enforce: 'pre',
       fileWriterStart(config, _server) {
@@ -71,6 +71,11 @@ export const pluginContentScripts: CrxPluginFn = ({
           return defined
         }
       },
+    },
+    {
+      name: 'crx:content-scripts-post',
+      apply: 'build',
+      enforce: 'post',
       renderCrxManifest(manifest, bundle) {
         if (this.meta.watchMode && typeof port === 'undefined')
           throw new Error('server port is undefined')

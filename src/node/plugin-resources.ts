@@ -38,6 +38,7 @@ export const pluginResources: CrxPluginFn = () => {
   return {
     name: pluginName,
     apply: 'build',
+    enforce: 'post',
     config({ build, ...config }, { mode }) {
       return { ...config, build: { ...build, manifest: mode !== 'watch' } }
     },

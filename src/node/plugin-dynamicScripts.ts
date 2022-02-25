@@ -73,7 +73,7 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
           const refId = this.emitFile({
             type: 'chunk',
             id: chunkId,
-            name: parse(id).base,
+            name: parse(chunkId).base,
           })
           dynamicScripts.set(id, { chunkId, refId, type })
         }
@@ -105,7 +105,7 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
             refId = this.emitFile({
               type: 'chunk',
               id: chunkId,
-              name: parse(id).base,
+              name: parse(chunkId).base,
             })
             dynamicScripts.set(id, { chunkId, refId, type })
           }
