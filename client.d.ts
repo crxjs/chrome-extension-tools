@@ -1,8 +1,10 @@
 declare module '*?script' {
   /**
-   * The file name of the bundled script file.
+   * Script format is ESM. Loaded via dynamic import script. Supports HMR. Use
+   * with the Chrome Scripting API inside of the background service worker or an
+   * extension page.
    *
-   * Default script format is ESM, with a loader script.
+   * Exports the file name of the ouptut script file.
    *
    * If imported inside a content script, RPCE will include the file name in
    * `web_accessible_resources`.
@@ -13,9 +15,9 @@ declare module '*?script' {
 
 declare module '*?script&iife' {
   /**
-   * The file name of the bundled script file.
+   * Script format is IIFE. Use for content scripts with opaque origins.
    *
-   * Script format is IIFE.
+   * Exports the file name of the output script file.
    *
    * If imported inside a content script, RPCE will include the file name in
    * `web_accessible_resources`.
@@ -24,11 +26,12 @@ declare module '*?script&iife' {
   export default fileName
 }
 
-declare module '*?script&main' {
+declare module '*?script&module' {
   /**
-   * The file name of the bundled script file.
+   * Script format is ESM. No loader and no HMR. Import into a content script to
+   * inject via script tag into the page main world execution environment.
    *
-   * Script format is ESM, with no loader script.
+   * Exports the file name of the output script file.
    *
    * If imported inside a content script, RPCE will include the file name in
    * `web_accessible_resources`.

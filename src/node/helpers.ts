@@ -1,5 +1,5 @@
 import { simple } from 'acorn-walk'
-import _debug from 'debug'
+import debug from 'debug'
 import fg from 'fast-glob'
 import { PluginContext } from 'rollup'
 import v8 from 'v8'
@@ -11,7 +11,7 @@ import type {
 import type { AcornLiteral } from './types'
 import { createHash } from 'crypto'
 
-export { _debug } // makes it easy to import w/ intellisense
+export const _debug = (id: string) => debug('crx').extend(id)
 
 export const structuredClone = <T>(obj: T): T => {
   return v8.deserialize(v8.serialize(obj))
@@ -35,7 +35,7 @@ export const isResourceByMatch = (
   x: WebAccessibleResourceById | WebAccessibleResourceByMatch,
 ): x is WebAccessibleResourceByMatch => 'matches' in x
 
-export async function allFiles(manifest: ManifestV3, options: fg.Options) {
+export async function allFiles(manifest: ManifestV3, options: fg.Options = {}) {
   // JSON
   let locales: string[] = []
   if (manifest.default_locale)

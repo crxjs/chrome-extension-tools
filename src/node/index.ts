@@ -1,5 +1,5 @@
 import type { ManifestV3Export } from './defineManifest'
-import { pluginContentScripts } from './plugin-contentScripts'
+import { pluginDynamicScripts } from './plugin-dynamicScripts'
 import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginHMR } from './plugin-hmr'
 import { pluginHtmlAuditor } from './plugin-htmlAuditor'
@@ -7,6 +7,7 @@ import { pluginManifest } from './plugin-manifest'
 import { pluginResources } from './plugin-resources'
 import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 import { pluginBackground } from './plugin-background'
+import { pluginContentScripts } from './plugin-contentScripts'
 
 function init(options: CrxOptions, plugins: CrxPluginFn[]) {
   return plugins
@@ -23,6 +24,7 @@ export const crx = ({
 } & CrxOptions): CrxPlugin[] => {
   const plugins = init(options, [
     pluginContentScripts,
+    pluginDynamicScripts,
     pluginBackground,
     pluginHMR,
     pluginHtmlAuditor,

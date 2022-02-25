@@ -1,6 +1,7 @@
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ManifestV3Export } from './defineManifest'
 import {
+  allFiles,
   decodeManifest,
   encodeManifest,
   htmlFiles,
@@ -25,9 +26,10 @@ export const stubId = '@crx/stub'
 export const pluginManifest =
   (_manifest: ManifestV3Export): CrxPluginFn =>
   () => {
-    let refId: string
-    let plugins: CrxPlugin[]
     let manifest: ManifestV3
+    /** Vite plugins during production, file writer plugins during development */
+    let plugins: CrxPlugin[]
+    let refId: string
 
     return [
       {
@@ -37,9 +39,25 @@ export const pluginManifest =
           manifest = await (typeof _manifest === 'function'
             ? _manifest(env)
             : _manifest)
+
+          // pre-bundle dependencies
+          if (env.command === 'serve') {
+            const { js, serviceWorker, htmlPages } = await allFiles(manifest)
+            let { entries = [] } = config.optimizeDeps ?? {}
+            entries = [entries].flat()
+            entries.push(...js, ...serviceWorker, ...htmlPages)
+
+            return {
+              ...config,
+              optimizeDeps: {
+                ...config.optimizeDeps,
+                entries,
+              },
+            }
+          }
         },
         configResolved(config) {
-          plugins = config.plugins as CrxPlugin[]
+          const plugins = config.plugins as CrxPlugin[]
           // crx:manifest needs to come after vite:manifest; enforce:post puts it before
           const vite = plugins.findIndex(({ name }) => name === 'vite:manifest')
           const crx = plugins.findIndex(({ name }) => name === 'crx:manifest')
@@ -47,6 +65,9 @@ export const pluginManifest =
             const [plugin] = plugins.splice(crx, 1)
             plugins.splice(vite + 1, 0, plugin)
           }
+        },
+        buildStart(options) {
+          if (options.plugins) plugins = options.plugins
         },
       },
       {

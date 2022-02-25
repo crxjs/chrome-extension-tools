@@ -32,11 +32,7 @@ function handleRuntimeReload() {
   setTimeout(() => location.reload(), 1000)
 }
 
-if (import.meta.hot) {
-  console.log('import.meta.hot', import.meta.hot)
-} else {
-  console.log('no import.meta.hot')
-}
+console.log('import.meta.hot', import.meta.hot)
 
 export function createHotContext() {
   console.log('createHotContext')
