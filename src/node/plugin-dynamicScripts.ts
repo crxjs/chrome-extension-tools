@@ -1,7 +1,10 @@
 import MagicString from 'magic-string'
-import { parse } from './path'
-import { rebuildFiles } from './plugin-fileWriter'
+import { ResolvedConfig } from 'vite'
+import { parse, relative } from './path'
+import { rebuildFiles } from './plugin-fileWriter--events'
 import type { CrxPluginFn } from './types'
+
+export const crxDynamicNamespace = '@crx/dynamic'
 
 type ScriptType = 'script' | 'module' | 'iife'
 const isScriptType = (x: string): x is ScriptType =>
@@ -15,35 +18,48 @@ export const dynamicScripts = new Map<
     chunkId: string
     /** TODO: implement IIFE format */
     type: ScriptType
-    /** File name of the script file or loader */
+    /** Output file name of the script file or loader */
     fileName?: string
     /** The ref id of the emitted chunk */
     refId?: string
   }
 >()
 
+const resolvedRE = /^\/@id\/__x00__/
+const urlToId = (url: string) => url.replace(resolvedRE, '\0')
+const isResolved = (url: string) => dynamicScripts.has(urlToId(url))
+
 export const pluginDynamicScripts: CrxPluginFn = () => {
+  let config: ResolvedConfig
   return [
     {
       name: 'crx:dynamic-scripts',
       apply: 'serve',
       enforce: 'pre',
+      configResolved(_config) {
+        config = _config
+      },
       async resolveId(source, importer) {
-        if (importer && source.includes('?script')) {
+        if (!importer) return null
+        if (isResolved(source)) return source
+        if (source.includes('?script')) {
           const [name, query] = source.split('?')
           const type = query.split('&')[1] ?? 'script'
 
           if (!isScriptType(type))
             throw new Error(`Invalid script type: ${source}`)
 
-          const resolved = await this.resolve(name, importer)
+          const resolved = await this.resolve(name, importer, {
+            skipSelf: true,
+          })
           if (resolved === null) return null
 
           const chunkId = resolved.id
-          const id = `\0${chunkId}?${query}`
+          const fileName = relative(config.root, chunkId)
+          const id = `\0/${crxDynamicNamespace}/${fileName}`
 
           const script = dynamicScripts.get(id)
-          if (!script) dynamicScripts.set(id, { chunkId, type })
+          if (!script) dynamicScripts.set(id, { chunkId, type, fileName })
 
           return id
         }
@@ -67,6 +83,9 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
       name: 'crx:dynamic-scripts',
       apply: 'build',
       enforce: 'pre',
+      configResolved(_config) {
+        config = _config
+      },
       async buildStart() {
         // pre-bundle dynamic scripts
         for (const [id, { type, chunkId }] of dynamicScripts) {
@@ -79,18 +98,23 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
         }
       },
       async resolveId(source, importer) {
-        if (importer && source.includes('?script')) {
+        if (!importer) return null
+        if (isResolved(source)) return urlToId(source)
+        if (source.includes('?script')) {
           const [name, query] = source.split('?')
           const type = query.split('&')[1] ?? 'script'
 
           if (!isScriptType(type))
             throw new Error(`Invalid script type: ${source}`)
 
-          const resolved = await this.resolve(name, importer)
+          const resolved = await this.resolve(name, importer, {
+            skipSelf: true,
+          })
           if (resolved === null) return null
 
           const chunkId = resolved.id
-          const id = `\0${chunkId}?${query}`
+          const fileName = relative(config.root, chunkId)
+          const id = `\0/${crxDynamicNamespace}/${fileName}`
 
           const script = dynamicScripts.get(id)
           if (!script) dynamicScripts.set(id, { chunkId, type })
