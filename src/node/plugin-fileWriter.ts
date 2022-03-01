@@ -5,20 +5,16 @@ import {
 } from 'rollup'
 import { isPresent } from './helpers'
 import { parse } from './path'
-import { pluginFileWriterLoader } from './plugin-fileWriter--loader'
+import { pluginFileWriterAssets } from './plugin-fileWriter--assets'
 import {
-  filesReady,
-  fileWriterEvents as pluginFileWriterEvents,
-  rebuildFiles,
+  pluginFileWriterEvents,
   server$,
   writerEvent$,
 } from './plugin-fileWriter--events'
+import { pluginFileWriterLoader } from './plugin-fileWriter--loader'
+import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
 import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
-import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
-import { pluginFileWriterAssets } from './plugin-fileWriter--assets'
-
-export { filesReady, rebuildFiles }
 
 export const pluginFileWriter =
   (crxPlugins: CrxPlugin[]): CrxPluginFn =>

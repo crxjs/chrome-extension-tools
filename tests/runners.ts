@@ -1,10 +1,10 @@
 import fg from 'fast-glob'
 import fs from 'fs-extra'
 import { RollupOutput } from 'rollup'
-import { allFiles, _debug } from 'src/helpers'
+import { manifestFiles, _debug } from 'src/helpers'
 import type { ManifestV3 } from 'src/manifest'
 import { join } from 'src/path'
-import { filesReady } from 'src/plugin-fileWriter'
+import { filesReady } from 'src/plugin-fileWriter--events'
 import type { CrxPlugin } from 'src/types'
 import {
   build as _build,
@@ -144,7 +144,9 @@ export async function testOutput(
 
   /* ------------ CHECK FOR MISSING FILES ------------ */
 
-  const missingFiles = Object.values(await allFiles(manifest, { cwd: outDir }))
+  const missingFiles = Object.values(
+    await manifestFiles(manifest, { cwd: outDir }),
+  )
     .flat()
     .sort()
     .filter((f) => !files.includes(f))

@@ -90,13 +90,6 @@ function startFileWriterLogger(server: ViteDevServer) {
     prefix: 'crx',
   })
 
-  filesReady$.subscribe(() => {
-    server.ws.send({
-      type: 'custom',
-      event: 'runtime-reload',
-    })
-  })
-
   filesStart$.subscribe(() => {
     const message = colors.green('files start')
     const outDir = colors.dim(
@@ -121,7 +114,7 @@ function startFileWriterLogger(server: ViteDevServer) {
  *
  * It only runs during development inside the file writer Rollup watch instance.
  */
-export const fileWriterEvents: CrxPluginFn = () => {
+export const pluginFileWriterEvents: CrxPluginFn = () => {
   let start = performance.now()
   return {
     name: 'crx:file-writer-events',

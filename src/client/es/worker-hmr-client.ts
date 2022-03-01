@@ -4,6 +4,7 @@
 declare const self: ServiceWorkerGlobalScope
 export {}
 
+import { CrxHMRPayload } from 'src/types'
 import type { HMRPayload } from 'vite'
 
 // injected by the hmr plugin when served
@@ -57,15 +58,14 @@ chrome.runtime.onConnect.addListener((port) => {
   if (port.name === '@crx/client') {
     ports.add(port)
     port.onDisconnect.addListener((port) => ports.delete(port))
-    port.onMessage.addListener(handlePortMessage)
+    port.onMessage.addListener((message: PortMessage) => {
+      if (message.type === 'connected') port.postMessage(message)
+    })
   }
 })
 
-type PortMessage = { type: 'init'; url: string }
-function handlePortMessage(message: PortMessage) {
-  console.log('port message', message)
-}
-function notifyContentScripts(payload: HMRPayload | { type: 'ping' }) {
+type PortMessage = { type: 'connected'; url: string }
+function notifyContentScripts(payload: HMRPayload) {
   for (const port of ports) port.postMessage(payload)
 }
 
@@ -82,12 +82,20 @@ const base = __BASE__ || '/'
 
 // Listen for messages
 socket.addEventListener('message', async ({ data }) => {
-  handleSocketMessage(JSON.parse(data))
+  const payload: HMRPayload = JSON.parse(data)
+  console.log('hmr payload', payload)
+  // Ignore normal HMR payloads
+  if (isCrxHmrPayload(payload)) handleSocketMessage(payload.data)
+  else if (payload.type === 'connected') handleSocketMessage(payload)
 })
 
+function isCrxHmrPayload(x: HMRPayload): x is CrxHMRPayload {
+  return x.type === 'custom' && x.event.startsWith('crx:')
+}
+
 function handleSocketMessage(payload: HMRPayload) {
+  // forward all events to content scripts
   notifyContentScripts(payload)
-  console.log('[vite]', payload)
   switch (payload.type) {
     case 'connected':
       console.log(`[vite] connected.`)
@@ -95,11 +103,12 @@ function handleSocketMessage(payload: HMRPayload) {
       // so send ping package let ws keep alive.
       setInterval(() => socket.send('ping'), __HMR_TIMEOUT__)
       break
-    case 'custom':
-      if (payload.event === 'runtime-reload') chrome.runtime.reload()
+    case 'full-reload':
+      chrome.runtime.reload()
       break
 
     default:
+      // ignore other events in background
       console.log(payload)
       break
   }

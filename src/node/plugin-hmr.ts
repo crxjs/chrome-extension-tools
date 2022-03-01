@@ -1,11 +1,21 @@
-import contentHmrClient from 'client/es/content-hmr-client.ts?client'
-import workerHmrClient from 'client/es/worker-hmr-client.ts?client'
-import { ModuleNode, ResolvedConfig } from 'vite'
-import { defineClientValues } from './defineClientValues'
-import { join } from './path'
-import type { CrxPluginFn } from './types'
+import {
+  filter,
+  map,
+  mergeAll,
+  Observable,
+  Subject,
+  takeLast,
+  tap,
+  window,
+  withLatestFrom,
+} from 'rxjs'
+import { HMRPayload, ModuleNode } from 'vite'
+import { manifestFiles } from './helpers'
+import { filesReady$ } from './plugin-fileWriter--events'
+import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 
-// const debug = _debug('hmr')
+export const workerClientId = '@crx/client/worker'
+export const contentClientId = '@crx/client/content'
 
 /** Determine if a file was imported by a module or a parent module */
 function isImporter(file: string) {
@@ -16,28 +26,65 @@ function isImporter(file: string) {
   return pred
 }
 
-export const workerClientId = '@crx/client/worker'
-export const contentClientId = '@crx/client/content'
+function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
+  return x.type === 'custom' && x.event.startsWith('crx:')
+}
 
-// TODO: emit new files for each content script module.
-// TODO: add fetch handler to service worker
+const hmrPayload$ = new Subject<HMRPayload>()
+/**
+ * Buffer hmrPayloads by filesReady
+ *
+ * What about assets and manifest?
+ */
+export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
+  filter((p) => !isCrxHMRPayload(p)),
+  tap((p) => {
+    p
+  }),
+  window(filesReady$),
+  takeLast(25),
+  mergeAll(),
+  withLatestFrom(filesReady$),
+  filter(([p, { bundle }]) => {
+    if (p.type === 'full-reload') {
+      // only do full reload for files in output
+      return !!p.path && !!bundle[p.path]
+    } else {
+      // pass everything else through
+      return true
+    }
+  }),
+  map(
+    ([p]): CrxHMRPayload => ({
+      type: 'custom',
+      event: `crx:${p.type}`,
+      data: p,
+    }),
+  ),
+)
+filesReady$.subscribe(({ bundle }) => {
+  bundle
+})
+
 export const pluginHMR: CrxPluginFn = () => {
-  let config: ResolvedConfig
-  let background: string | undefined
+  let files: ManifestFiles
 
   return [
     {
-      name: 'crx:hmr-background',
+      name: 'crx:hmr',
       apply: 'build',
-      renderCrxManifest(manifest) {
-        if (this.meta.watchMode && manifest.background?.service_worker)
-          background = join(config.root, manifest.background?.service_worker)
+      enforce: 'pre',
+      async renderCrxManifest(manifest) {
+        if (this.meta.watchMode) {
+          files = await manifestFiles(manifest)
+        }
         return null
       },
     },
     {
-      name: 'crx:hmr-background',
+      name: 'crx:hmr',
       apply: 'serve',
+      enforce: 'pre',
       config({ server = {}, ...config }) {
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
@@ -46,59 +93,31 @@ export const pluginHMR: CrxPluginFn = () => {
 
         return { server, ...config }
       },
-      configResolved(_config) {
-        config = _config as ResolvedConfig
+      configureServer(server) {
+        const { send } = server.ws
+        server.ws.send = (payload) => {
+          hmrPayload$.next(payload) // sniff non-crx events
+          send(payload) // don't interfere with normal hmr
+        }
+        crxHmrPayload$.subscribe((payload) => {
+          send(payload)
+        })
       },
-      resolveId(source) {
-        if (source === `/${workerClientId}`) return workerClientId
-      },
-      load(id) {
-        if (id === workerClientId)
-          return defineClientValues(workerHmrClient, config)
-      },
-      handleHotUpdate({ server, modules, file }) {
-        if (background)
-          if (background === file || modules.some(isImporter(background))) {
-            server.ws.send({
-              type: 'custom',
-              event: 'runtime-reload',
-            })
-            return []
+      handleHotUpdate({ file, modules, server }) {
+        const [background] = files.background
+        // only update that needs special handling
+        if (file === 'background' || modules.some(isImporter(background))) {
+          const event: CrxHMRPayload = {
+            type: 'custom',
+            event: 'crx:full-reload',
+            data: {
+              type: 'full-reload',
+              path: file,
+            },
           }
-      },
-    },
-    {
-      name: 'crx:hmr-content-scripts',
-      apply: 'build',
-      enforce: 'pre',
-      resolveId(source) {
-        if (source === contentClientId || source === '/@vite/client')
-          return `\0${contentClientId}`
-      },
-      load(id) {
-        if (id === `\0${contentClientId}`)
-          return defineClientValues(contentHmrClient, config)
-      },
-      renderChunk(code, { fileName }) {
-        // make this
-        // import.meta.hot = createHotContext("/src/App.jsx")
-        // into this
-        // import.meta.hot = createHotContext("/${fileName}")
-      },
-    },
-    {
-      name: 'crx:hmr-content-scripts',
-      apply: 'serve',
-      enforce: 'pre',
-      handleHotUpdate() {
-        /**
-         * Handle HMR updates for outDir files
-         *
-         * Send mapped HMR events from source files to output files
-         *
-         * - Explore update & prune
-         * - What about full-reload?
-         */
+          server.ws.send(event)
+          return []
+        }
       },
     },
   ]

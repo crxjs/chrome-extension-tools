@@ -1,7 +1,7 @@
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ManifestV3Export } from './defineManifest'
 import {
-  allFiles,
+  manifestFiles,
   decodeManifest,
   encodeManifest,
   htmlFiles,
@@ -42,10 +42,14 @@ export const pluginManifest =
 
           // pre-bundle dependencies
           if (env.command === 'serve') {
-            const { js, serviceWorker, htmlPages } = await allFiles(manifest)
+            const {
+              contentScripts: js,
+              background: serviceWorker,
+              html,
+            } = await manifestFiles(manifest)
             let { entries = [] } = config.optimizeDeps ?? {}
             entries = [entries].flat()
-            entries.push(...js, ...serviceWorker, ...htmlPages)
+            entries.push(...js, ...serviceWorker, ...html)
 
             return {
               ...config,

@@ -8,7 +8,7 @@ import type {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
 } from './manifest'
-import type { AcornLiteral } from './types'
+import type { AcornLiteral, ManifestFiles } from './types'
 import { createHash } from 'crypto'
 
 export const _debug = (id: string) => debug('crx').extend(id)
@@ -35,7 +35,10 @@ export const isResourceByMatch = (
   x: WebAccessibleResourceById | WebAccessibleResourceByMatch,
 ): x is WebAccessibleResourceByMatch => 'matches' in x
 
-export async function allFiles(manifest: ManifestV3, options: fg.Options = {}) {
+export async function manifestFiles(
+  manifest: ManifestV3,
+  options: fg.Options = {},
+): Promise<ManifestFiles> {
   // JSON
   let locales: string[] = []
   if (manifest.default_locale)
@@ -46,9 +49,9 @@ export async function allFiles(manifest: ManifestV3, options: fg.Options = {}) {
       ({ path }) => path,
     ) ?? []
 
-  const js = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
+  const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
+  const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
   const serviceWorker = manifest.background?.service_worker
-  const css = manifest.content_scripts?.flatMap(({ css }) => css)
   const htmlPages = htmlFiles(manifest)
 
   const icons = [
@@ -57,13 +60,13 @@ export async function allFiles(manifest: ManifestV3, options: fg.Options = {}) {
   ].flat()
 
   return {
-    js: [...new Set(js)].filter(isString),
-    css: [...new Set(css)].filter(isString),
-    htmlPages: htmlPages,
+    contentScripts: [...new Set(contentScripts)].filter(isString),
+    contentStyles: [...new Set(contentStyles)].filter(isString),
+    html: htmlPages,
     icons: [...new Set(icons)].filter(isString),
     locales: [...new Set(locales)].filter(isString),
     rulesets: [...new Set(rulesets)].filter(isString),
-    serviceWorker: [serviceWorker].filter(isString),
+    background: [serviceWorker].filter(isString),
   }
 }
 

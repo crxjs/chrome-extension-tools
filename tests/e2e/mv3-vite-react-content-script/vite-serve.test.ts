@@ -6,6 +6,8 @@ test('crx runs from server output', async () => {
   await page.goto('https://www.google.com')
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
+  await new Promise(() => null)
+
   const app = page.locator('.App')
   await app.waitFor()
 

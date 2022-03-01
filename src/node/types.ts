@@ -1,6 +1,6 @@
 import type { Node } from 'acorn'
 import type { PluginContext, OutputBundle } from 'rollup'
-import type { Plugin as VitePlugin, ViteDevServer } from 'vite'
+import type { HMRPayload, Plugin as VitePlugin, ViteDevServer } from 'vite'
 import { ManifestV3 } from './manifest'
 
 export interface AcornLiteral extends Node {
@@ -38,4 +38,20 @@ export interface CrxOptions {
 
 export interface CrxPluginFn {
   (options: CrxOptions): CrxPlugin | CrxPlugin[]
+}
+
+export type ManifestFiles = {
+  contentScripts: string[]
+  contentStyles: string[]
+  html: string[]
+  icons: string[]
+  locales: string[]
+  rulesets: string[]
+  background: string[]
+}
+
+export interface CrxHMRPayload<Payload extends HMRPayload = HMRPayload> {
+  type: 'custom'
+  event: `crx:${Payload['type']}`
+  data: Payload
 }

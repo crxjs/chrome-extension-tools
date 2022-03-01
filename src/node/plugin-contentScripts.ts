@@ -1,6 +1,8 @@
+import contentHmrClient from 'client/es/content-hmr-client.ts?client'
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import { ViteDevServer } from 'vite'
+import { defineClientValues } from './defineClientValues'
 import { parse } from './path'
 import { dynamicScripts } from './plugin-dynamicScripts'
 import { contentClientId } from './plugin-hmr'
@@ -62,9 +64,15 @@ export const pluginContentScripts: CrxPluginFn = ({
         }
       },
       resolveId(source) {
+        if (source === contentClientId || source === '/@vite/client')
+          return `\0${contentClientId}`
+
         if (source === preambleId) return preambleId
       },
       load(id) {
+        if (id === `\0${contentClientId}`)
+          return defineClientValues(contentHmrClient, server.config)
+
         if (server && id === preambleId && typeof preambleCode === 'string') {
           const defined = preambleCode.replace(/__BASE__/g, server.config.base)
           return defined
