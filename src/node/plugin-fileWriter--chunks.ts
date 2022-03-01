@@ -2,6 +2,7 @@ import { existsSync, readFile } from 'fs-extra'
 import { PreRenderedChunk } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { relative } from './path'
+import { crxDynamicNamespace } from './plugin-dynamicScripts'
 // import { _debug } from './helpers'
 import { CrxPluginFn } from './types'
 
@@ -78,6 +79,8 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
       const manualChunks = (id: string): string => {
         if (id.includes('/.vite/')) {
           return 'vendor'
+        } else if (id.includes(crxDynamicNamespace)) {
+          return 'dynamic-scripts'
         } else {
           return id.slice(id.indexOf('@') + 1)
         }
