@@ -94,16 +94,13 @@ exports[`build fs output: assets/content-script-loader.content2.ts.hash.hash.js 
 
 exports[`build fs output: assets/content1.ts.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
-
 var script = \\"/assets/script.ts.hash.js\\";
-
 console.log(\\"content.ts\\", { icon, script });
 "
 `;
 
 exports[`build fs output: assets/content2.ts.hash.js 1`] = `
 "var font = \\"/assets/font.hash.otf\\";
-
 console.log(\\"content2.ts\\", { font });
 "
 `;

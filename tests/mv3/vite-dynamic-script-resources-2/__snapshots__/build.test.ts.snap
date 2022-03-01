@@ -48,9 +48,7 @@ Array [
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
 "var content1 = \\"/assets/content-script-loader.content1.ts.hash.hash.js\\";
-
 var content2 = \\"/assets/content-script-loader.content2.ts.hash.hash.js\\";
-
 chrome.scripting.executeScript({
   files: [content1, content2],
   target: { tabId: 1 }
@@ -105,9 +103,7 @@ exports[`build fs output: assets/content-script-loader.script.ts.hash.hash.js 1`
 
 exports[`build fs output: assets/content1.ts.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
-
 var script = \\"/assets/content-script-loader.script.ts.hash.hash.js\\";
-
 console.log(\\"content.ts\\", { icon, script });
 "
 `;
@@ -121,9 +117,7 @@ exports[`build fs output: assets/content2.ts.hash.css 1`] = `
 
 exports[`build fs output: assets/content2.ts.hash.js 1`] = `
 "var font = \\"/assets/font.hash.otf\\";
-
 var css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
-
 console.log(\\"content2.ts\\", { css, font });
 "
 `;

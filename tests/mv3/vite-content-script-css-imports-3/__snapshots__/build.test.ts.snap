@@ -102,8 +102,7 @@ exports[`build fs output: assets/import.hash.css 1`] = `
 `;
 
 exports[`build fs output: assets/import.hash.js 1`] = `
-"var styles = '';
-
+"var styles = \\"\\";
 console.log(\\"imported file\\");
 "
 `;
@@ -116,10 +115,8 @@ exports[`build fs output: assets/index.ts.hash.css 1`] = `
 `;
 
 exports[`build fs output: assets/index.ts.hash.js 1`] = `
-"import './import.hash.js';
-
-var styles = '';
-
+"import \\"./import.hash.js\\";
+var styles = \\"\\";
 console.log(\\"content1\\");
 "
 `;
@@ -132,10 +129,8 @@ exports[`build fs output: assets/index.ts.hash2.css 1`] = `
 `;
 
 exports[`build fs output: assets/index.ts.hash2.js 1`] = `
-"import './import.hash.js';
-
-var styles = '';
-
+"import \\"./import.hash.js\\";
+var styles = \\"\\";
 console.log(\\"content2\\");
 "
 `;

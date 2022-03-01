@@ -51,7 +51,6 @@ Array [
   "assets/background.ts.hash.js",
   "assets/content-script-loader.declared-script.ts.hash.hash.js",
   "assets/content-script-loader.dynamic-script.ts.hash.hash.js",
-  "assets/content-script-loader.main-world.ts.hash.hash.js",
   "assets/declared-script.ts.hash.js",
   "assets/dynamic-script.ts.hash.js",
   "assets/main-world.ts.hash.js",
@@ -62,7 +61,6 @@ Array [
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
 "var scriptFileName = \\"/assets/content-script-loader.dynamic-script.ts.hash.hash.js\\";
-
 console.log(\\"background.ts\\");
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id)
@@ -104,27 +102,12 @@ exports[`build fs output: assets/content-script-loader.dynamic-script.ts.hash.ha
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.main-world.ts.hash.hash.js 1`] = `
-"(function () {
-  'use strict';
-
-  (async () => {
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/main-world.ts.hash.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
 exports[`build fs output: assets/declared-script.ts.hash.js 1`] = `
-"var fileName = \\"/assets/content-script-loader.main-world.ts.hash.hash.js\\";
-
+"var fileName = \\"/assets/main-world.ts.hash.js\\";
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);
+script.type = \\"module\\";
 document.head.prepend(script);
 "
 `;

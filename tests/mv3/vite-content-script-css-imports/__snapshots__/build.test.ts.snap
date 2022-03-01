@@ -51,8 +51,7 @@ exports[`build fs output: assets/content.ts.hash.css 1`] = `
 `;
 
 exports[`build fs output: assets/content.ts.hash.js 1`] = `
-"var styles = '';
-
+"var styles = \\"\\";
 console.log(\\"content.ts\\");
 "
 `;
