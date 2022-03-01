@@ -4,14 +4,13 @@ import {
   watch as rollupWatch,
 } from 'rollup'
 import { isPresent } from './helpers'
-import { parse } from './path'
 import { pluginFileWriterAssets } from './plugin-fileWriter--assets'
+import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
 import {
   pluginFileWriterEvents,
   server$,
   writerEvent$,
 } from './plugin-fileWriter--events'
-import { pluginFileWriterLoader } from './plugin-fileWriter--loader'
 import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
 import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
@@ -43,7 +42,7 @@ export const pluginFileWriter =
             ...pre,
             pluginFileWriterAssets(options),
             ...mid,
-            pluginFileWriterLoader(options),
+            pluginFileWriterChunks(options),
             pluginFileWriterHtml(options),
             ...post,
             pluginFileWriterEvents(options),
@@ -79,21 +78,10 @@ export const pluginFileWriter =
           )
 
           /* ------------- CREATE ROLLUP WATCHER ------------- */
-
-          let { output = {} } = server.config.build.rollupOptions
-          output = [output].flat().pop()! // get first output
-
-          const {
-            assetFileNames = 'assets/[name].[hash].[ext]',
-            chunkFileNames = 'assets/[name].[hash].js',
-            entryFileNames = 'assets/[name].[hash].js',
-            manualChunks = (id) => {
-              if (id.startsWith('/.vite/')) {
-                return 'vendor'
-              }
-              return parse(id).base.replaceAll('@', '')
-            },
-          } = output
+          const { output = {} } = server.config.build.rollupOptions
+          const { assetFileNames, chunkFileNames, entryFileNames } = [output]
+            .flat()
+            .pop()! // get first output
 
           watcher = rollupWatch({
             input: stubId,
@@ -104,7 +92,6 @@ export const pluginFileWriter =
               assetFileNames,
               chunkFileNames,
               entryFileNames,
-              manualChunks,
             },
             plugins: plugins as RollupPlugin[],
           })

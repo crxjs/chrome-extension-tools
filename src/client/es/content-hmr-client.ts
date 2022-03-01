@@ -16,7 +16,7 @@ type CustomEventName<T extends string> = (T extends `vite:${T}` ? never : T) &
   (`vite:${T}` extends T ? never : T)
 
 // injected by the hmr plugin when served
-declare const __HMR_TIMEOUT__: number
+declare const __CRX_HMR_TIMEOUT__: number
 declare const __HMR_ENABLE_OVERLAY__: boolean
 
 console.log('[crx] connecting...')
@@ -31,10 +31,6 @@ function setupPort() {
   port.postMessage({ type: 'connected', url: import.meta.url })
   port.onMessage.addListener(handleMessage)
   port.onDisconnect.addListener(setupPort)
-}
-function handleRuntimeReload() {
-  console.log('[crx] runtime reload')
-  setTimeout(() => location.reload(), 1000)
 }
 
 function warnFailedFetch(err: Error, path: string | string[]) {
@@ -61,7 +57,7 @@ async function handleMessage(payload: HMRPayload) {
     case 'connected':
       console.log(`[crx] connected.`)
       // ping service worker to keep connection to dev server alive
-      setInterval(() => port.postMessage({ type: 'ping' }), __HMR_TIMEOUT__)
+      setInterval(() => port.postMessage({ type: 'ping' }), __CRX_HMR_TIMEOUT__)
       break
     case 'update':
       notifyListeners('vite:beforeUpdate', payload)
@@ -103,13 +99,12 @@ async function handleMessage(payload: HMRPayload) {
       })
       break
     case 'custom': {
-      if (payload.event === 'runtime-reload') handleRuntimeReload()
-      else notifyListeners(payload.event as CustomEventName<any>, payload.data)
+      notifyListeners(payload.event as CustomEventName<any>, payload.data)
       break
     }
     case 'full-reload': {
-      // ignore this; runtime reload for content scripts
-      console.log('full reload!!')
+      console.log('[crx] full reload')
+      setTimeout(() => location.reload(), 1000)
       break
     }
     case 'prune':
@@ -308,7 +303,8 @@ async function fetchUpdate({ path, acceptedPath, timestamp }: Update) {
         const newMod = await import(
           /* @vite-ignore */
           chrome.runtime.getURL(
-            path.slice(1) + `?import&t=${timestamp}${query ? `&${query}` : ''}`,
+            path.slice(1) +
+              `.js?import&t=${timestamp}${query ? `&${query}` : ''}`,
           )
         )
         moduleMap.set(dep, newMod)

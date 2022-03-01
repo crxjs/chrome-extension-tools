@@ -109,7 +109,6 @@ function handleSocketMessage(payload: HMRPayload) {
 
     default:
       // ignore other events in background
-      console.log(payload)
       break
   }
 }

@@ -1,11 +1,10 @@
 import {
   filter,
   map,
-  mergeAll,
+  mergeMap,
   Observable,
   Subject,
   takeLast,
-  tap,
   window,
   withLatestFrom,
 } from 'rxjs'
@@ -38,12 +37,8 @@ const hmrPayload$ = new Subject<HMRPayload>()
  */
 export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   filter((p) => !isCrxHMRPayload(p)),
-  tap((p) => {
-    p
-  }),
   window(filesReady$),
-  takeLast(25),
-  mergeAll(),
+  mergeMap((p) => p.pipe(takeLast(25))),
   withLatestFrom(filesReady$),
   filter(([p, { bundle }]) => {
     if (p.type === 'full-reload') {
@@ -62,9 +57,6 @@ export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
     }),
   ),
 )
-filesReady$.subscribe(({ bundle }) => {
-  bundle
-})
 
 export const pluginHMR: CrxPluginFn = () => {
   let files: ManifestFiles
@@ -96,11 +88,11 @@ export const pluginHMR: CrxPluginFn = () => {
       configureServer(server) {
         const { send } = server.ws
         server.ws.send = (payload) => {
-          hmrPayload$.next(payload) // sniff non-crx events
+          hmrPayload$.next(payload) // sniff hmr events
           send(payload) // don't interfere with normal hmr
         }
         crxHmrPayload$.subscribe((payload) => {
-          send(payload)
+          send(payload) // send crx hmr events
         })
       },
       handleHotUpdate({ file, modules, server }) {

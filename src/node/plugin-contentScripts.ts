@@ -19,7 +19,7 @@ export const pluginContentScripts: CrxPluginFn = ({
   let port: string
   let server: ViteDevServer
 
-  let { preambleCode } = options
+  let { preambleCode, hmrTimeout = 5000 } = options
   let preambleRefId: string
   let contentClientRefId: string
 
@@ -71,7 +71,10 @@ export const pluginContentScripts: CrxPluginFn = ({
       },
       load(id) {
         if (id === `\0${contentClientId}`)
-          return defineClientValues(contentHmrClient, server.config)
+          return defineClientValues(contentHmrClient, server.config).replace(
+            /__CRX_HMR_TIMEOUT__/g,
+            JSON.stringify(hmrTimeout),
+          )
 
         if (server && id === preambleId && typeof preambleCode === 'string') {
           const defined = preambleCode.replace(/__BASE__/g, server.config.base)
