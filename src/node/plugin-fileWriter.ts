@@ -4,7 +4,6 @@ import {
   watch as rollupWatch,
 } from 'rollup'
 import { isPresent } from './helpers'
-import { pluginFileWriterAssets } from './plugin-fileWriter--assets'
 import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
 import {
   pluginFileWriterEvents,
@@ -40,7 +39,6 @@ export const pluginFileWriter =
 
           const plugins = [
             ...pre,
-            pluginFileWriterAssets(options),
             ...mid,
             pluginFileWriterChunks(options),
             pluginFileWriterHtml(options),

@@ -1,4 +1,4 @@
-import { existsSync } from 'fs-extra'
+import { existsSync, readFile } from 'fs-extra'
 import { PreRenderedChunk } from 'rollup'
 import { ViteDevServer } from 'vite'
 import { relative } from './path'
@@ -24,8 +24,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         if (importer) {
           // imported script file, load though vite dev server
           const { pathname } = new URL(source, 'stub://stub')
-          const id = pathname.endsWith('.js') ? pathname : `\0${pathname}.js`
-          return { id, meta: { url: source } }
+          return { id: `\0${pathname}.js`, meta: { url: source } }
         } else if (isScript(source)) {
           // entry script file, load though vite dev server
           const resolved = await this.resolve(source, importer, {
@@ -33,8 +32,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
           })
           if (!resolved) return null
           const { pathname } = new URL(resolved.id, 'stub://stub')
-          const id = pathname.endsWith('.js') ? pathname : `\0${pathname}.js`
-          return { id, meta: { url: pathname } }
+          return { id: `\0${pathname}.js`, meta: { url: pathname } }
         }
     },
     async load(id) {
@@ -54,8 +52,15 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
 
           const module = await server.moduleGraph.getModuleByUrl(url)
           if (module?.file && existsSync(module.file)) {
-            fileById.set(id, relative(server.config.root, module.file))
             this.addWatchFile(module.file)
+            const fileName = relative(server.config.root, module.file)
+            fileById.set(id, fileName)
+            if (url.includes('?import'))
+              this.emitFile({
+                type: 'asset',
+                fileName,
+                source: await readFile(module.file),
+              })
           }
 
           return { code: r.code, map: r.map }
@@ -71,8 +76,11 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
       ...options
     }) {
       const manualChunks = (id: string): string => {
-        if (id.startsWith('/.vite/')) return 'vendor'
-        return id.slice(id.indexOf('@') + 1)
+        if (id.includes('/.vite/')) {
+          return 'vendor'
+        } else {
+          return id.slice(id.indexOf('@') + 1)
+        }
       }
       const fileNames = (chunk: PreRenderedChunk): string | undefined => {
         const [id, ...rest] = Object.keys(chunk.modules)
