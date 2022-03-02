@@ -11,16 +11,29 @@ import {
   writerEvent$,
 } from './plugin-fileWriter--events'
 import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
+import { pluginFileWriterPublic } from './plugin-fileWriter--public'
 import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
 
 export const pluginFileWriter =
   (crxPlugins: CrxPlugin[]): CrxPluginFn =>
   (options) => {
+    const chunks = pluginFileWriterChunks(options)
+    const html = pluginFileWriterHtml(options)
+    const events = pluginFileWriterEvents(options)
+    const publicDir = pluginFileWriterPublic(options)
+    const internal = [chunks, html, events, publicDir].flat()
+
     let watcher: RollupWatcher
     return {
       name: 'crx:file-writer',
       apply: 'serve',
+      config() {
+        // TODO: run config hooks for internal file writer plugins
+      },
+      async configResolved(config) {
+        await Promise.all(internal.map((p) => p.configResolved?.(config)))
+      },
       configureServer(server) {
         server.httpServer?.once('listening', async () => {
           server$.next(server)
@@ -40,10 +53,11 @@ export const pluginFileWriter =
           const plugins = [
             ...pre,
             ...mid,
-            pluginFileWriterChunks(options),
-            pluginFileWriterHtml(options),
+            chunks,
+            html,
+            publicDir,
             ...post,
-            pluginFileWriterEvents(options),
+            events,
           ].flat()
 
           /* ------------ RUN FILEWRITERSTART HOOK ----------- */

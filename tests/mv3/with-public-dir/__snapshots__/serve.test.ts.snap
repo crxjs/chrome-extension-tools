@@ -19,6 +19,7 @@ Object {
 exports[`serve fs output: 01 output files 1`] = `
 Array [
   "assets/precontroller.hash.js",
+  "favicon.svg",
   "manifest.json",
   "service-worker-loader.js",
   "src/popup.html",
