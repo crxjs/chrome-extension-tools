@@ -49,6 +49,12 @@ writerEvent$.subscribe((event) => {
   }
 })
 
+export const filesError$ = writerEvent$.pipe(
+  filter((x): x is Extract<FileWriterEvent, { type: 'error' }> => {
+    return x.type === 'error'
+  }),
+)
+
 export const filesStart$ = writerEvent$.pipe(
   filter((x): x is Extract<FileWriterEvent, { type: 'buildStart' }> => {
     return x.type === 'buildStart'
@@ -106,6 +112,11 @@ function startFileWriterLogger(server: ViteDevServer) {
 
   filesReady$.pipe(skip(1)).subscribe(() => {
     logger.info('runtime reload', { timestamp: true })
+  })
+
+  filesError$.subscribe(({ error }) => {
+    logger.error('error from file writer')
+    if (error) logger.error(error.message)
   })
 }
 
