@@ -1,15 +1,17 @@
 import { existsSync, readFile } from 'fs-extra'
 import { PreRenderedChunk } from 'rollup'
 import { ViteDevServer } from 'vite'
+import { isString } from './helpers'
 import { relative } from './path'
 import { crxDynamicNamespace } from './plugin-dynamicScripts'
-// import { _debug } from './helpers'
 import { CrxPluginFn } from './types'
 
-// const debug = _debug('file-writer').extend('loader')
+// const debug = _debug('file-writer').extend('chunks')
 
 const scriptRE = /\.[jt]sx?$/s
 const isScript = (s: string) => scriptRE.test(s)
+/** Server.transformRequest doesn't work with /@id/ urls */
+const cleanUrl = (url: string) => url.replace(/^\/@id\//, '')
 
 export const pluginFileWriterChunks: CrxPluginFn = () => {
   const fileById = new Map<string, string>()
@@ -23,9 +25,17 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
     async resolveId(source, importer) {
       if (this.meta.watchMode)
         if (importer) {
+          const clean = cleanUrl(source)
           // imported script file, load though vite dev server
-          const { pathname } = new URL(source, 'stub://stub')
-          return { id: `\0${pathname}.js`, meta: { url: source } }
+          const url = new URL(clean, 'stub://stub')
+          let ext = 'js'
+          if (url.searchParams.has('vue')) {
+            const type = url.searchParams.get('type')
+            const index = url.searchParams.get('index')
+            ext = [type, index, ext].filter(isString).join('.')
+          }
+          const id = `\0${url.pathname}.${ext}`
+          return { id, meta: { url: clean } }
         } else if (isScript(source)) {
           // entry script file, load though vite dev server
           const resolved = await this.resolve(source, importer, {
