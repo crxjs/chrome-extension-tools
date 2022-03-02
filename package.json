@@ -120,6 +120,9 @@
   "optionalDependencies": {
     "@vitejs/plugin-react": "^1.2.0"
   },
+  "peerDependencies": {
+    "vite": "^2.8.0"
+  },
   "engines": {
     "node": ">=14"
   }
