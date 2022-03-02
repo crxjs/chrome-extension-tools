@@ -30,7 +30,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
   return {
     name: 'crx:file-writer-chunks',
     apply: 'build',
-    fileWriterStart(config, _server) {
+    fileWriterStart(_server) {
       server = _server
     },
     async resolveId(source, importer) {

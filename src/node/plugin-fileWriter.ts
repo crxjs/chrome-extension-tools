@@ -48,17 +48,11 @@ export const pluginFileWriter =
 
           /* ------------ RUN FILEWRITERSTART HOOK ----------- */
 
-          const { outDir } = server.config.build
-          const { port } = server.config.server
-
-          if (typeof port === 'undefined')
-            throw new TypeError('vite serve port is undefined')
-
           const allPlugins: CrxPlugin[] = [...server.config.plugins, ...plugins]
           await Promise.all(
             allPlugins.map(async (p) => {
               try {
-                await p.fileWriterStart?.({ port, outDir }, server)
+                await p.fileWriterStart?.(server)
               } catch (e) {
                 const hook = `[${p.name}].fileWriterStart`
 

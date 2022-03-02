@@ -11,10 +11,7 @@ export interface AcornLiteral extends Node {
 
 export interface CrxPlugin extends VitePlugin {
   /** Runs during dev mode when the file writer has started and server is listening. */
-  fileWriterStart?: (
-    config: { port: number; outDir: string },
-    server: ViteDevServer,
-  ) => Promise<void> | void
+  fileWriterStart?: (server: ViteDevServer) => Promise<void> | void
   /** Runs during the transform hook for the manifest. */
   transformCrxManifest?: (
     this: PluginContext,

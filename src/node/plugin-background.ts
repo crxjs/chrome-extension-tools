@@ -27,8 +27,8 @@ export const pluginBackground: CrxPluginFn = () => {
       name: 'crx:background',
       apply: 'build',
       enforce: 'post',
-      fileWriterStart({ port: p }) {
-        port = p.toString()
+      fileWriterStart(server) {
+        port = server.config.server.port!.toString()
       },
       renderCrxManifest(manifest) {
         const worker = manifest.background?.service_worker

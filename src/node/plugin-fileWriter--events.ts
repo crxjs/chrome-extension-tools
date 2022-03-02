@@ -120,7 +120,7 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
     name: 'crx:file-writer-events',
     enforce: 'post',
     apply: 'build',
-    fileWriterStart(config, server) {
+    fileWriterStart(server) {
       startFileWriterLogger(server)
     },
     async buildStart(options) {

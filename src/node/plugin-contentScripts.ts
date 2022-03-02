@@ -28,8 +28,8 @@ export const pluginContentScripts: CrxPluginFn = ({
       name: 'crx:content-scripts-pre',
       apply: 'build',
       enforce: 'pre',
-      fileWriterStart(config, _server) {
-        port = config.port.toString()
+      fileWriterStart(_server) {
+        port = server.config.server.port!.toString()
         server = _server
       },
       async buildStart() {
