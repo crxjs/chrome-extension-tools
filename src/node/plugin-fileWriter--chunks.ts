@@ -4,6 +4,7 @@ import { ViteDevServer } from 'vite'
 import { fileById, idByUrl, setFileMeta, urlById } from './fileMeta'
 import { isString } from './helpers'
 import { relative } from './path'
+import { crxDynamicNamespace } from './plugin-dynamicScripts'
 import { CrxPluginFn } from './types'
 
 // const debug = _debug('file-writer').extend('chunks')
@@ -91,19 +92,27 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
       assetFileNames = 'assets/[name].[hash].[ext]',
       ...options
     }) {
+      const crx = '@crx/'
+      const rr = '@react-refresh'
       const manualChunks: GetManualChunk = (id: string) => {
-        const crx = '@crx/'
+        if (id.includes(crxDynamicNamespace)) return 'dynamic-scripts'
         if (id.includes(crx)) return id.slice(id.indexOf(crx) + crx.length)
+        if (id.includes(rr)) return 'react-refresh'
+
         // TODO: use config.cacheDir
-        if (id.includes('/.vite/')) return 'vendor'
+        if (id.includes('/.vite/')) {
+          return 'vendor'
+        }
         if (fileById.has(id)) return fileById.get(id)!
         return null
       }
 
       const fileNames = (chunk: PreRenderedChunk): string | undefined => {
         const ids = Object.keys(chunk.modules)
-        if (ids.length === 1 && fileById.has(ids[0]))
+        if (ids.length === 1 && fileById.has(ids[0])) {
+          if (ids[0].includes(rr)) return undefined
           return fileById.get(ids[0])!
+        }
       }
 
       return {

@@ -131,6 +131,8 @@ export async function testOutput(
 
   for (const file of files) {
     if (file.includes('vendor')) continue
+    if (file.includes('react-refresh')) continue
+    if (file.includes('content-script-client')) continue
     if (isTextFile(file)) {
       const filename = join(outDir, file)
       let source = await fs.readFile(filename, { encoding: 'utf8' })
