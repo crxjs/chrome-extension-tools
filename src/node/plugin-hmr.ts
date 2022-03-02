@@ -35,7 +35,7 @@ const hmrPayload$ = new Subject<HMRPayload>()
  *
  * What about assets and manifest?
  */
-export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
+const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   filter((p) => !isCrxHMRPayload(p)),
   window(filesReady$),
   mergeMap((p) => p.pipe(takeLast(25))),
@@ -49,15 +49,15 @@ export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       return true
     }
   }),
-  map(
-    ([p]): CrxHMRPayload => ({
+  map(([p]): CrxHMRPayload => {
+    // TODO: map paths to output file names
+    return {
       type: 'custom',
       event: `crx:${p.type}`,
       data: p,
-    }),
-  ),
+    }
+  }),
 )
-
 export const pluginHMR: CrxPluginFn = () => {
   let files: ManifestFiles
 
