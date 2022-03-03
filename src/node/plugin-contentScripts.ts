@@ -1,4 +1,4 @@
-import contentHmrClient from 'client/es/content-hmr-client.ts?client'
+import contentHmrClient from 'client/es/hmr-client-content.ts?client'
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import { ViteDevServer } from 'vite'

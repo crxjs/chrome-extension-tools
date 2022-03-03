@@ -1,4 +1,4 @@
-import workerHmrClient from 'client/es/worker-hmr-client.ts?client'
+import workerHmrClient from 'client/es/hmr-client-worker.ts?client'
 import { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import { workerClientId } from './plugin-hmr'
