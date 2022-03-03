@@ -39,7 +39,7 @@ a {
 }
 
 button {
-  background-color: rgb(239, 239, 239);
+  background-color: red;
   border-color: rgb(118, 118, 118);
   border-image: initial;
   border-style: outset;

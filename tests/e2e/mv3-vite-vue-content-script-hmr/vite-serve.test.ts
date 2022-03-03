@@ -42,16 +42,16 @@ test('crx page update on hmr', async () => {
 
   await app.waitFor()
 
-  const buttonText = new Set<string>()
-
-  await button.click()
-  buttonText.add(await button.innerText())
-
   // check that page does not update during hmr update
   let reloaded = false
   page.on('framenavigated', () => {
     reloaded = true
   })
+
+  const buttonText = new Set<string>()
+
+  await button.click()
+  buttonText.add(await button.innerText())
 
   // update template
   await fs.copy(src2, src, {
