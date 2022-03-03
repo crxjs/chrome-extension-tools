@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://www.google.com/*"],
+      "js": ["src/main.js"]
+    }
+  ],
+  "name": "Vite Vue Page",
+  "version": "0.0.1"
+}
