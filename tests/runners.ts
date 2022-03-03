@@ -1,17 +1,12 @@
 import fg from 'fast-glob'
 import fs from 'fs-extra'
-import { RollupOutput } from 'rollup'
+import jsesc from 'jsesc'
 import { manifestFiles, _debug } from 'src/helpers'
 import type { ManifestV3 } from 'src/manifest'
 import { join } from 'src/path'
 import { filesReady } from 'src/plugin-fileWriter--events'
 import type { CrxPlugin } from 'src/types'
-import {
-  build as _build,
-  createServer,
-  ResolvedConfig,
-  ViteDevServer,
-} from 'vite'
+import { build as _build, createServer, ResolvedConfig } from 'vite'
 import inspect from 'vite-plugin-inspect'
 
 export async function build(dirname: string) {
@@ -25,7 +20,7 @@ export async function build(dirname: string) {
   await fs.remove(cacheDir)
   await fs.remove(outDir)
 
-  let config: ResolvedConfig | undefined
+  let config: ResolvedConfig
   const output = await _build({
     configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
@@ -65,7 +60,7 @@ export async function serve(dirname: string) {
   const plugins: CrxPlugin[] = []
   if (process.env.DEBUG) plugins.push(inspect())
 
-  const devServer = await createServer({
+  const server = await createServer({
     configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir, minify: false },
@@ -76,12 +71,12 @@ export async function serve(dirname: string) {
   })
   debug('create server')
 
-  await devServer.listen()
+  await server.listen()
   debug('listen')
   await filesReady()
   debug('bundle end')
 
-  return { outDir, devServer, config: devServer.config! }
+  return { outDir, server, config: server.config }
 }
 
 const isTextFile = (x: string) =>
@@ -91,10 +86,7 @@ const defaultTest = (source: string, name: string) => {
 }
 
 export async function testOutput(
-  {
-    outDir,
-    devServer,
-  }: { outDir: string; devServer?: ViteDevServer; output?: RollupOutput },
+  { outDir, config }: { outDir: string; config: ResolvedConfig },
   tests: Map<
     string | RegExp,
     (source: string, name: string) => void
@@ -129,6 +121,7 @@ export async function testOutput(
 
   expect(files.sort()).toMatchSnapshot('01 output files')
 
+  const rootRegex = new RegExp(jsesc(config.root), 'g')
   for (const file of files) {
     if (file.includes('vendor')) continue
     if (file.includes('react-refresh')) continue
@@ -136,10 +129,11 @@ export async function testOutput(
     if (isTextFile(file)) {
       const filename = join(outDir, file)
       let source = await fs.readFile(filename, { encoding: 'utf8' })
-      if (devServer)
+      if (config?.command === 'serve')
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
+          .replace(rootRegex, '<root>')
       getTest(file)(source, file)
     }
   }

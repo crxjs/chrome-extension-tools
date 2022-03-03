@@ -110,11 +110,11 @@ if (import.meta.hot) {
   prevRefreshReg = window.$RefreshReg$;
   prevRefreshSig = window.$RefreshSig$;
   window.$RefreshReg$ = (type, id) => {
-    exports.register(type, \\"/media/jack/Storage/Documents/ExtendChrome/rpce/tests/mv3/vite-react-fast-refresh/src/App.tsx \\" + id);
+    exports.register(type, \\"<root>/src/App.tsx \\" + id);
   };
   window.$RefreshSig$ = exports.createSignatureFunctionForTransform;
 }
-var _jsxFileName = \\"/media/jack/Storage/Documents/ExtendChrome/rpce/tests/mv3/vite-react-fast-refresh/src/App.tsx\\";
+var _jsxFileName = \\"<root>/src/App.tsx\\";
  const _jsxDEV = react_jsx_dev_runtime_default[\\"jsxDEV\\"];
 const App = () => {
   return /* @__PURE__ */ _jsxDEV(\\"div\\", {
@@ -164,7 +164,7 @@ import '../.vite/chunk-E2HL6QYL.js.js';
 import '../assets/content-script-client.js.hash.js';
 import '../assets/react-refresh.hash.js';
 
-var _jsxFileName = \\"/media/jack/Storage/Documents/ExtendChrome/rpce/tests/mv3/vite-react-fast-refresh/src/content.tsx\\";
+var _jsxFileName = \\"<root>/src/content.tsx\\";
  const render = react_dom_default[\\"render\\"];
  const _jsxDEV = react_jsx_dev_runtime_default[\\"jsxDEV\\"];
 console.log(\\"content script\\");

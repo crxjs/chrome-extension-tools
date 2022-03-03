@@ -6,7 +6,7 @@ mockDate()
 let result: Awaited<ReturnType<typeof serve>> | undefined
 
 afterAll(async () => {
-  await result?.devServer.close()
+  await result?.server.close()
 })
 
 test('serve fs output', async () => {

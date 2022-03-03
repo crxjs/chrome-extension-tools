@@ -92,7 +92,7 @@ console.log(\\"content.ts\\");
 exports[`serve fs output: src/styles.css.js 1`] = `
 "import { createHotContext, updateStyle, removeStyle } from '../assets/content-script-client.js.hash.js';
 
-import.meta.hot = createHotContext(\\"/src/styles.css\\");const __vite__id = \\"/media/jack/Storage/Documents/ExtendChrome/rpce/tests/mv3/vite-content-script-css-imports/src/styles.css\\";
+import.meta.hot = createHotContext(\\"/src/styles.css\\");const __vite__id = \\"<root>/src/styles.css\\";
 const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\";
 updateStyle(__vite__id, __vite__css);
 import.meta.hot.accept();
