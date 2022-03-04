@@ -1,11 +1,20 @@
+import hmrClientContent from 'client/es/hmr-client-content.ts?client'
 import { existsSync, readFile } from 'fs-extra'
+import MagicString from 'magic-string'
 import { GetManualChunk, PreRenderedChunk } from 'rollup'
 import { ViteDevServer } from 'vite'
-import { fileById, idByUrl, setFileMeta, urlById } from './fileMeta'
+import {
+  fileById,
+  idByUrl,
+  setFileMeta,
+  setOwnerMeta,
+  urlById,
+} from './fileMeta'
 import { isString } from './helpers'
 import { relative } from './path'
 import { crxDynamicNamespace } from './plugin-dynamicScripts'
 import { CrxPluginFn } from './types'
+import { contentHmrPortId, viteClientUrl } from './virtualFileIds'
 
 // const debug = _debug('file-writer').extend('chunks')
 
@@ -24,6 +33,13 @@ function urlToFileName(source: string) {
   }
   const fileName = `${url.pathname.slice(1)}.${ext}`
   return fileName
+}
+
+for (const source of [viteClientUrl]) {
+  const url = cleanUrl(source)
+  const fileName = urlToFileName(url)
+  const id = `\0${fileName}`
+  setFileMeta({ url, fileName, id })
 }
 
 export const pluginFileWriterChunks: CrxPluginFn = () => {
@@ -80,8 +96,30 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
               source: await readFile(module.file),
             })
         }
+        if (module?.url) {
+          setOwnerMeta({ id, owner: module?.url })
+        }
 
         return { code: r.code, map: r.map }
+      }
+
+      return null
+    },
+    transform(code, id) {
+      if (id === idByUrl.get(viteClientUrl)) {
+        const magic = new MagicString(code)
+        magic.prepend(`import { HMRPort } from '${contentHmrPortId}';`)
+        const ws = 'new WebSocket'
+        const index = code.indexOf(ws)
+        magic.overwrite(index, index + ws.length, 'new HMRPort')
+        return { code: magic.toString(), map: magic.generateMap() }
+      }
+
+      const info = this.getModuleInfo(id)
+      if (!id.includes('@') && info?.isEntry) {
+        const magic = new MagicString(code)
+        magic.append(hmrClientContent)
+        return { code: magic.toString(), map: magic.generateMap() }
       }
 
       return null

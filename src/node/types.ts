@@ -48,8 +48,13 @@ export type ManifestFiles = {
   background: string[]
 }
 
-export interface CrxHMRPayload<Payload extends HMRPayload = HMRPayload> {
-  type: 'custom'
-  event: `crx:${Payload['type']}`
-  data: Payload
-}
+export type CrxHMRPayload =
+  | {
+      type: 'custom'
+      event: 'crx:runtime-reload'
+    }
+  | {
+      type: 'custom'
+      event: 'crx:content-script-payload'
+      data: HMRPayload
+    }

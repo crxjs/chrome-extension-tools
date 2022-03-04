@@ -12,11 +12,10 @@ import { ManifestV3 } from './manifest'
 import { basename } from './path'
 import { CrxPlugin, CrxPluginFn } from './types'
 import colors from 'picocolors'
+import { manifestId, stubId } from './virtualFileIds'
 
 // const debug = _debug('crx:manifest')
 
-const manifestId = '@crx/manifest'
-export const stubId = '@crx/stub'
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
  *
@@ -112,16 +111,19 @@ export const pluginManifest =
           }
         },
         resolveId(source) {
-          if (source === stubId) return stubId
+          if (source === stubId) return `\0${stubId}`
           return null
         },
         load(id) {
-          if (id === stubId) return `console.log('stub')`
+          if (id === `\0${stubId}`) return `console.log('stub')`
           return null
         },
         generateBundle(options, bundle) {
           for (const [key, chunk] of Object.entries(bundle)) {
-            if (chunk.type === 'chunk' && chunk.facadeModuleId === stubId) {
+            if (
+              chunk.type === 'chunk' &&
+              chunk.facadeModuleId === `\0${stubId}`
+            ) {
               delete bundle[key]
               break
             }

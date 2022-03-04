@@ -1,8 +1,8 @@
 import workerHmrClient from 'client/es/hmr-client-worker.ts?client'
 import { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
-import { workerClientId } from './plugin-hmr'
 import type { CrxPluginFn } from './types'
+import { workerClientId } from './virtualFileIds'
 
 export const pluginBackground: CrxPluginFn = () => {
   let port: string | undefined

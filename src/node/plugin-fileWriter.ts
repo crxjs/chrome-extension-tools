@@ -12,8 +12,8 @@ import {
 } from './plugin-fileWriter--events'
 import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
 import { pluginFileWriterPublic } from './plugin-fileWriter--public'
-import { stubId } from './plugin-manifest'
 import { CrxPlugin, CrxPluginFn } from './types'
+import { stubId } from './virtualFileIds'
 
 export const pluginFileWriter =
   (crxPlugins: CrxPlugin[]): CrxPluginFn =>

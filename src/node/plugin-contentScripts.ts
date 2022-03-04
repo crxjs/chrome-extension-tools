@@ -1,16 +1,13 @@
-import contentHmrClient from 'client/es/hmr-client-content.ts?client'
+import contentHmrPort from 'client/es/hmr-content-port.ts?client'
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import { ViteDevServer } from 'vite'
-import { defineClientValues } from './defineClientValues'
 import { parse } from './path'
 import { dynamicScripts } from './plugin-dynamicScripts'
-import { contentClientId } from './plugin-hmr'
 import type { CrxPluginFn } from './types'
+import { contentHmrPortId, preambleId } from './virtualFileIds'
 
 // const debug = _debug('crx:hmr')
-
-const preambleId = '@crx/client/preamble'
 
 /** Responsible for emitting content script loaders and resolving associated files */
 export const pluginContentScripts: CrxPluginFn = ({
@@ -34,12 +31,6 @@ export const pluginContentScripts: CrxPluginFn = ({
       },
       async buildStart() {
         if (this.meta.watchMode) {
-          contentClientRefId = this.emitFile({
-            type: 'chunk',
-            id: contentClientId,
-            name: 'content-script-client.js',
-          })
-
           if (
             typeof preambleCode === 'undefined' &&
             process.env.NODE_ENV !== 'test'
@@ -61,23 +52,31 @@ export const pluginContentScripts: CrxPluginFn = ({
               name: 'content-script-preamble.js',
             })
           }
+
+          contentClientRefId = this.emitFile({
+            type: 'chunk',
+            id: '/@vite/client',
+            name: 'content-script-client.js',
+          })
         }
       },
       resolveId(source) {
-        if (source === contentClientId || source === '/@vite/client')
-          return `\0${contentClientId}`
-
         if (source === preambleId) return preambleId
+        if (source === contentHmrPortId) {
+          return `\0${contentHmrPortId}`
+        }
       },
       load(id) {
-        if (id === `\0${contentClientId}`)
-          return defineClientValues(contentHmrClient, server.config).replace(
-            /__CRX_HMR_TIMEOUT__/g,
-            JSON.stringify(hmrTimeout),
-          )
-
         if (server && id === preambleId && typeof preambleCode === 'string') {
           const defined = preambleCode.replace(/__BASE__/g, server.config.base)
+          return defined
+        }
+
+        if (id === `\0${contentHmrPortId}`) {
+          const defined = contentHmrPort.replace(
+            '__CRX_HMR_TIMEOUT__',
+            JSON.stringify(hmrTimeout),
+          )
           return defined
         }
       },

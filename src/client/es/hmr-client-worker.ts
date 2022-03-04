@@ -58,15 +58,18 @@ chrome.runtime.onConnect.addListener((port) => {
   if (port.name === '@crx/client') {
     ports.add(port)
     port.onDisconnect.addListener((port) => ports.delete(port))
-    port.onMessage.addListener((message: PortMessage) => {
-      if (message.type === 'connected') port.postMessage(message)
+    port.onMessage.addListener((message: string) => {
+      console.log(
+        `${JSON.stringify(message, null, 2)} from ${port.sender?.origin}`,
+      )
     })
+    port.postMessage({ data: JSON.stringify({ type: 'connected' }) })
   }
 })
 
-type PortMessage = { type: 'connected'; url: string }
 function notifyContentScripts(payload: HMRPayload) {
-  for (const port of ports) port.postMessage(payload)
+  const data = JSON.stringify(payload)
+  for (const port of ports) port.postMessage({ data })
 }
 
 /* ----------- CONNECT TO VITE DEV SERVER ---------- */
@@ -82,11 +85,7 @@ const base = __BASE__ || '/'
 
 // Listen for messages
 socket.addEventListener('message', async ({ data }) => {
-  const payload: HMRPayload = JSON.parse(data)
-  console.log('hmr payload', payload)
-  // Ignore normal HMR payloads
-  if (isCrxHmrPayload(payload)) handleSocketMessage(payload.data)
-  else if (payload.type === 'connected') handleSocketMessage(payload)
+  handleSocketMessage(JSON.parse(data))
 })
 
 function isCrxHmrPayload(x: HMRPayload): x is CrxHMRPayload {
@@ -94,21 +93,28 @@ function isCrxHmrPayload(x: HMRPayload): x is CrxHMRPayload {
 }
 
 function handleSocketMessage(payload: HMRPayload) {
-  // forward all events to content scripts
-  notifyContentScripts(payload)
-  switch (payload.type) {
-    case 'connected':
-      console.log(`[vite] connected.`)
-      // proxy(nginx, docker) hmr ws maybe caused timeout,
-      // so send ping package let ws keep alive.
-      setInterval(() => socket.send('ping'), __HMR_TIMEOUT__)
-      break
-    case 'full-reload':
+  if (isCrxHmrPayload(payload)) {
+    handleCrxHmrPayload(payload)
+  } else if (payload.type === 'connected') {
+    console.log(`[vite] connected.`)
+    // proxy(nginx, docker) hmr ws maybe caused timeout,
+    // so send ping package let ws keep alive.
+    setInterval(() => socket.send('ping'), __HMR_TIMEOUT__)
+  }
+}
+
+function handleCrxHmrPayload(payload: CrxHMRPayload) {
+  switch (payload.event) {
+    case 'crx:runtime-reload':
+      notifyContentScripts(payload)
+      console.log('[crx] runtime reload')
       chrome.runtime.reload()
+      break
+    case 'crx:content-script-payload':
+      notifyContentScripts(payload.data)
       break
 
     default:
-      // ignore other events in background
       break
   }
 }
