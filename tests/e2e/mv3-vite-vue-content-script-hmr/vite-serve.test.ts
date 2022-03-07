@@ -63,7 +63,9 @@ test('crx page update on hmr', async () => {
     },
   })
 
-  await page.locator('h1', { hasText: 'Hello Vue 3 + Vite + CRX' }).waitFor()
+  await page
+    .locator('p', { hasText: 'Make a Chrome Extension with Vite!' })
+    .waitFor()
   expect(reloaded).toBe(false) // no reload on template update
   buttonText.add(await button.innerText())
 
@@ -80,7 +82,9 @@ test('crx page update on hmr', async () => {
     },
   })
 
-  await waitForInnerHtml(styles, (h) => h.includes('background: red;'))
+  await waitForInnerHtml(styles, (h) => {
+    return h.includes('background-color: red;')
+  })
   expect(reloaded).toBe(false) // no reload on css update
   buttonText.add(await button.innerText())
 
