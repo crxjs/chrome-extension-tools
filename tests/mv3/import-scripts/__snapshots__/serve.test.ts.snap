@@ -52,7 +52,22 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _virtual/src/declared-script.ts.js 1`] = `""`;
+exports[`serve fs output: _virtual/src/declared-script.ts.js 1`] = `
+"import fileName from '../vendor/crx-dynamic-src-main-world.ts.js';
+
+console.log(\\"declared script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+script.type = \\"module\\";
+document.head.prepend(script);
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
 
 exports[`serve fs output: _virtual/src/dynamic-script.ts.js 1`] = `
 "console.log(\\"dynamic script\\");
