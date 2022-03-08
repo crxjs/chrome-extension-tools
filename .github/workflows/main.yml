@@ -124,7 +124,7 @@ jobs:
         if: failure()
         with:
           name: image-snapshot-diffs
-          path: __image_snapshot_diffs__/*
+          path: tests/__image_snapshot_diffs__/*
 
   # Runs snapshot integration tests for MV3
   mv3:
