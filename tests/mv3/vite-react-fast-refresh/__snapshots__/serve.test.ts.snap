@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`serve fs output: 00 manifest.json 1`] = `
+exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -37,71 +37,32 @@ Object {
 }
 `;
 
-exports[`serve fs output: 01 output files 1`] = `
+exports[`serve fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-client.js.hash.js",
+  "_virtual/react-refresh.js",
+  "_virtual/src/App.tsx.js",
+  "_virtual/src/content.tsx.js",
+  "_virtual/vendor/chunk-E2HL6QYL.js",
+  "_virtual/vendor/crx-client-port.js",
+  "_virtual/vendor/crx-client-preamble.js",
+  "_virtual/vendor/react-dom.js",
+  "_virtual/vendor/react_jsx-dev-runtime.js",
+  "_virtual/vendor/vite-client-env.js",
+  "_virtual/vendor/vite-client.js",
   "assets/content-script-loader.content.tsx.hash.js",
-  "assets/content-script-preamble.js.hash.js",
   "assets/precontroller.hash.js",
-  "assets/react-refresh.hash.js",
   "manifest.json",
   "service-worker-loader.js",
-  "src/App.tsx.js",
-  "src/content.tsx.js",
   "src/popup.html",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.tsx.hash.js 1`] = `
-"(function () {
-  'use strict';
+exports[`serve fs output: _virtual/src/App.tsx.js 1`] = `
+"import { createHotContext } from '../vendor/vite-client.js';
+import exports from '../react-refresh.js';
+import react_jsx_dev_runtime_default from '../vendor/react_jsx-dev-runtime.js';
 
-  (async () => {
-    if (\\"assets/content-script-preamble.js.hash.js\\")
-      await import(
-        /* @vite-ignore */
-        chrome.runtime.getURL(\\"assets/content-script-preamble.js.hash.js\\")
-      );
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
-    );
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.tsx.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`serve fs output: assets/content-script-preamble.js.hash.js 1`] = `
-"import { e as exports } from './react-refresh.hash.js';
-
-exports.injectIntoGlobalHook(window);
-window.$RefreshReg$ = () => {};
-window.$RefreshSig$ = () => (type) => type;
-window.__vite_plugin_react_preamble_installed__ = true;
-"
-`;
-
-exports[`serve fs output: assets/precontroller.hash.js 1`] = `
-"setTimeout(() => location.reload(), 100);
-"
-`;
-
-exports[`serve fs output: service-worker-loader.js 1`] = `
-"import 'http://localhost:3000/@crx/client/worker';
-"
-`;
-
-exports[`serve fs output: src/App.tsx.js 1`] = `
-"import { createHotContext } from '../assets/content-script-client.js.hash.js';
-import { e as exports } from '../assets/react-refresh.hash.js';
-import { r as react_jsx_dev_runtime_default } from '../.vite/react_jsx-dev-runtime.js.js';
-
-import.meta.hot = createHotContext(\\"/src/App.tsx\\");let prevRefreshReg;
+import.meta.hot = createHotContext(\\"/_virtual/src/App.tsx.js\\");let prevRefreshReg;
 let prevRefreshSig;
 if (import.meta.hot) {
   if (!window.__vite_plugin_react_preamble_installed__) {
@@ -152,17 +113,14 @@ if (import.meta.hot) {
   }
 }
 
-export { App as A };
+export { App as default };
 "
 `;
 
-exports[`serve fs output: src/content.tsx.js 1`] = `
-"import { r as react_dom_default } from '../.vite/react-dom.js.js';
-import { A as App } from './App.tsx.js';
-import { r as react_jsx_dev_runtime_default } from '../.vite/react_jsx-dev-runtime.js.js';
-import '../.vite/chunk-E2HL6QYL.js.js';
-import '../assets/content-script-client.js.hash.js';
-import '../assets/react-refresh.hash.js';
+exports[`serve fs output: _virtual/src/content.tsx.js 1`] = `
+"import react_dom_default from '../vendor/react-dom.js';
+import App from './App.tsx.js';
+import react_jsx_dev_runtime_default from '../vendor/react_jsx-dev-runtime.js';
 
 var _jsxFileName = \\"<root>/src/content.tsx\\";
  const render = react_dom_default[\\"render\\"];
@@ -176,6 +134,46 @@ render(/* @__PURE__ */ _jsxDEV(App, {}, void 0, false, {
   lineNumber: 10,
   columnNumber: 8
 }, this), root);
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: assets/content-script-loader.content.tsx.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    if (\\"_virtual/vendor/crx-client-preamble.js\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"_virtual/vendor/crx-client-preamble.js\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
+    );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"_virtual/src/content.tsx.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output: assets/precontroller.hash.js 1`] = `
+"setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@crx/client/worker';
 "
 `;
 

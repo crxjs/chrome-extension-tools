@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`serve fs output: 00 manifest.json 1`] = `
+exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.js.hash.js",
+        "assets/content-script-loader.content.hash.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -42,19 +42,32 @@ Object {
 }
 `;
 
-exports[`serve fs output: 01 output files 1`] = `
+exports[`serve fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-client.js.hash.js",
-  "assets/content-script-loader.content.js.hash.js",
+  "_virtual/src/content.js",
+  "_virtual/vendor/crx-client-port.js",
+  "_virtual/vendor/vite-client-env.js",
+  "_virtual/vendor/vite-client.js",
+  "assets/content-script-loader.content.hash.js",
   "assets/precontroller.hash.js",
   "manifest.json",
   "service-worker-loader.js",
-  "src/content.js.js",
   "src/popup.html",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.js.hash.js 1`] = `
+exports[`serve fs output: _virtual/src/content.js 1`] = `
+"console.log('content script');
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: assets/content-script-loader.content.hash.js 1`] = `
 "(function () {
   'use strict';
 
@@ -66,11 +79,11 @@ exports[`serve fs output: assets/content-script-loader.content.js.hash.js 1`] = 
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.js.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/content.js\\")
     );
   })().catch(console.error);
 
@@ -86,11 +99,6 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/client/worker';
 import 'http://localhost:3000/src/background.js';
-"
-`;
-
-exports[`serve fs output: src/content.js.js 1`] = `
-"console.log('content script');
 "
 `;
 

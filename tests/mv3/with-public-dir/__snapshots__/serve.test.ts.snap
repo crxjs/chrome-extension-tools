@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`serve fs output: 00 manifest.json 1`] = `
+exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -16,8 +16,10 @@ Object {
 }
 `;
 
-exports[`serve fs output: 01 output files 1`] = `
+exports[`serve fs output: _01 output files 1`] = `
 Array [
+  "_virtual/vendor/crx-client-port.js",
+  "_virtual/vendor/vite-client-env.js",
   "assets/precontroller.hash.js",
   "favicon.svg",
   "manifest.json",

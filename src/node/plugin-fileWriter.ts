@@ -105,7 +105,9 @@ export const pluginFileWriter =
 
                 if (!id) return '[name].js'
 
-                if (id?.includes('/node_modules/')) {
+                if (id.includes('vite/dist/client/env')) {
+                  id = 'vite/client/env'
+                } else if (id?.includes('/node_modules/')) {
                   const libName = id
                     .split('/node_modules/')
                     .pop()!
@@ -114,9 +116,11 @@ export const pluginFileWriter =
                 } else if (id?.startsWith(cacheDir)) {
                   id = id.replace(cacheDir, 'vendor')
                 } else if (id?.startsWith('@')) {
-                  id = id.replace('@', '').replace(/\//g, '-')
-                } else if (id.startsWith('vite/')) {
-                  id = id.replace(/\//g, '-')
+                  id = `vendor/${id.replace('@', '').replace(/\//g, '-')}`
+                }
+
+                if (id.startsWith('vite/')) {
+                  id = `vendor/${id.replace(/\//g, '-')}`
                 }
 
                 return `${id}.js`.replace(/(\.js){2,}$/, '.js')

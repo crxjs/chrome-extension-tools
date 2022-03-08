@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`serve fs output: 00 manifest.json 1`] = `
+exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -44,21 +44,97 @@ Object {
 }
 `;
 
-exports[`serve fs output: 01 output files 1`] = `
+exports[`serve fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-client.js.hash.js",
+  "_virtual/src/content1/index.ts.js",
+  "_virtual/src/content1/styles.css.js",
+  "_virtual/src/content2/index.ts.js",
+  "_virtual/src/content2/styles.css.js",
+  "_virtual/src/main/import.ts.js",
+  "_virtual/src/main/styles.css.js",
+  "_virtual/vendor/crx-client-port.js",
+  "_virtual/vendor/vite-client-env.js",
+  "_virtual/vendor/vite-client.js",
   "assets/content-script-loader.index.ts.hash.js",
   "assets/content-script-loader.index.ts.hash2.js",
   "assets/precontroller.hash.js",
   "manifest.json",
   "service-worker-loader.js",
-  "src/content1/index.ts.js",
-  "src/content1/styles.css.js",
-  "src/content2/index.ts.js",
-  "src/content2/styles.css.js",
-  "src/main/import.ts.js",
-  "src/main/styles.css.js",
 ]
+`;
+
+exports[`serve fs output: _virtual/src/content1/index.ts.js 1`] = `
+"import '../main/import.ts.js';
+import './styles.css.js';
+
+console.log(\\"content1\\");
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: _virtual/src/content1/styles.css.js 1`] = `
+"import { createHotContext, updateStyle, removeStyle } from '../../vendor/vite-client.js';
+
+import.meta.hot = createHotContext(\\"/_virtual/src/content1/styles.css.js\\");const __vite__id = \\"<root>/src/content1/styles.css\\";
+const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\";
+updateStyle(__vite__id, __vite__css);
+import.meta.hot.accept();
+import.meta.hot.prune(() => removeStyle(__vite__id));
+
+export { __vite__css as default };
+"
+`;
+
+exports[`serve fs output: _virtual/src/content2/index.ts.js 1`] = `
+"import '../main/import.ts.js';
+import './styles.css.js';
+
+console.log(\\"content2\\");
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: _virtual/src/content2/styles.css.js 1`] = `
+"import { createHotContext, updateStyle, removeStyle } from '../../vendor/vite-client.js';
+
+import.meta.hot = createHotContext(\\"/_virtual/src/content2/styles.css.js\\");const __vite__id = \\"<root>/src/content2/styles.css\\";
+const __vite__css = \\"body {\\\\n  color: blue;\\\\n}\\\\n\\";
+updateStyle(__vite__id, __vite__css);
+import.meta.hot.accept();
+import.meta.hot.prune(() => removeStyle(__vite__id));
+
+export { __vite__css as default };
+"
+`;
+
+exports[`serve fs output: _virtual/src/main/import.ts.js 1`] = `
+"import './styles.css.js';
+
+console.log(\\"imported file\\");
+"
+`;
+
+exports[`serve fs output: _virtual/src/main/styles.css.js 1`] = `
+"import { createHotContext, updateStyle, removeStyle } from '../../vendor/vite-client.js';
+
+import.meta.hot = createHotContext(\\"/_virtual/src/main/styles.css.js\\");const __vite__id = \\"<root>/src/main/styles.css\\";
+const __vite__css = \\"h1 {\\\\n  color: green;\\\\n}\\\\n\\";
+updateStyle(__vite__id, __vite__css);
+import.meta.hot.accept();
+import.meta.hot.prune(() => removeStyle(__vite__id));
+
+export { __vite__css as default };
+"
 `;
 
 exports[`serve fs output: assets/content-script-loader.index.ts.hash.js 1`] = `
@@ -73,11 +149,11 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash.js 1`] = `
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content1/index.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/content1/index.ts.js\\")
     );
   })().catch(console.error);
 
@@ -97,11 +173,11 @@ exports[`serve fs output: assets/content-script-loader.index.ts.hash2.js 1`] = `
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content2/index.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/content2/index.ts.js\\")
     );
   })().catch(console.error);
 
@@ -116,65 +192,5 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 
 exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/client/worker';
-"
-`;
-
-exports[`serve fs output: src/content1/index.ts.js 1`] = `
-"import '../main/import.ts.js';
-import './styles.css.js';
-import '../main/styles.css.js';
-import '../../assets/content-script-client.js.hash.js';
-
-console.log(\\"content1\\");
-"
-`;
-
-exports[`serve fs output: src/content1/styles.css.js 1`] = `
-"import { createHotContext, updateStyle, removeStyle } from '../../assets/content-script-client.js.hash.js';
-
-import.meta.hot = createHotContext(\\"/src/content1/styles.css\\");const __vite__id = \\"<root>/src/content1/styles.css\\";
-const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\";
-updateStyle(__vite__id, __vite__css);
-import.meta.hot.accept();
-import.meta.hot.prune(() => removeStyle(__vite__id));
-"
-`;
-
-exports[`serve fs output: src/content2/index.ts.js 1`] = `
-"import '../main/import.ts.js';
-import './styles.css.js';
-import '../main/styles.css.js';
-import '../../assets/content-script-client.js.hash.js';
-
-console.log(\\"content2\\");
-"
-`;
-
-exports[`serve fs output: src/content2/styles.css.js 1`] = `
-"import { createHotContext, updateStyle, removeStyle } from '../../assets/content-script-client.js.hash.js';
-
-import.meta.hot = createHotContext(\\"/src/content2/styles.css\\");const __vite__id = \\"<root>/src/content2/styles.css\\";
-const __vite__css = \\"body {\\\\n  color: blue;\\\\n}\\\\n\\";
-updateStyle(__vite__id, __vite__css);
-import.meta.hot.accept();
-import.meta.hot.prune(() => removeStyle(__vite__id));
-"
-`;
-
-exports[`serve fs output: src/main/import.ts.js 1`] = `
-"import './styles.css.js';
-
-console.log(\\"imported file\\");
-"
-`;
-
-exports[`serve fs output: src/main/styles.css.js 1`] = `
-"import { createHotContext, updateStyle, removeStyle } from '../../assets/content-script-client.js.hash.js';
-
-import.meta.hot = createHotContext(\\"/src/main/styles.css\\");const __vite__id = \\"<root>/src/main/styles.css\\";
-const __vite__css = \\"h1 {\\\\n  color: green;\\\\n}\\\\n\\";
-updateStyle(__vite__id, __vite__css);
-import.meta.hot.accept();
-import.meta.hot.prune(() => removeStyle(__vite__id));
 "
 `;

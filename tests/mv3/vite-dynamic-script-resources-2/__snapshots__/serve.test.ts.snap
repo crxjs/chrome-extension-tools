@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`serve fs output: 00 manifest.json 1`] = `
+exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -24,25 +24,93 @@ Object {
 }
 `;
 
-exports[`serve fs output: 01 output files 1`] = `
+exports[`serve fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-client.js.hash.js",
+  "_virtual/src/content1.ts.js",
+  "_virtual/src/content2.ts.js",
+  "_virtual/src/font.otf.js",
+  "_virtual/src/image.png.js",
+  "_virtual/src/script.ts.js",
+  "_virtual/src/styles.css.js",
+  "_virtual/vendor/crx-client-port.js",
+  "_virtual/vendor/crx-dynamic-src-script.ts.js",
+  "_virtual/vendor/vite-client-env.js",
+  "_virtual/vendor/vite-client.js",
   "assets/content-script-loader.content1.ts.hash.js",
   "assets/content-script-loader.content2.ts.hash.js",
   "assets/content-script-loader.script.ts.hash.js",
-  "assets/dynamic-scripts.hash.js",
   "assets/precontroller.hash.js",
   "manifest.json",
   "service-worker-loader.js",
-  "src/content1.ts.js",
-  "src/content2.ts.js",
   "src/font.otf",
-  "src/font.otf.js",
   "src/image.png",
-  "src/image.png.js",
-  "src/script.ts.js",
-  "src/styles.css.js",
 ]
+`;
+
+exports[`serve fs output: _virtual/src/content1.ts.js 1`] = `
+"import icon from './image.png.js';
+import script from '../vendor/crx-dynamic-src-script.ts.js';
+
+console.log(\\"content.ts\\", { icon, script });
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: _virtual/src/content2.ts.js 1`] = `
+"import font from './font.otf.js';
+import __vite__css from './styles.css.js';
+
+console.log(\\"content2.ts\\", { css: __vite__css, font });
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: _virtual/src/font.otf.js 1`] = `
+"var font = \\"/src/font.otf\\";
+
+export { font as default };
+"
+`;
+
+exports[`serve fs output: _virtual/src/image.png.js 1`] = `
+"var icon = \\"/src/image.png\\";
+
+export { icon as default };
+"
+`;
+
+exports[`serve fs output: _virtual/src/script.ts.js 1`] = `
+"console.log(\\"main world script\\");
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: _virtual/src/styles.css.js 1`] = `
+"import { createHotContext, updateStyle, removeStyle } from '../vendor/vite-client.js';
+
+import.meta.hot = createHotContext(\\"/_virtual/src/styles.css.js\\");const __vite__id = \\"<root>/src/styles.css\\";
+const __vite__css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
+updateStyle(__vite__id, __vite__css);
+import.meta.hot.accept();
+import.meta.hot.prune(() => removeStyle(__vite__id));
+
+export { __vite__css as default };
+"
 `;
 
 exports[`serve fs output: assets/content-script-loader.content1.ts.hash.js 1`] = `
@@ -57,11 +125,11 @@ exports[`serve fs output: assets/content-script-loader.content1.ts.hash.js 1`] =
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content1.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/content1.ts.js\\")
     );
   })().catch(console.error);
 
@@ -81,11 +149,11 @@ exports[`serve fs output: assets/content-script-loader.content2.ts.hash.js 1`] =
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content2.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/content2.ts.js\\")
     );
   })().catch(console.error);
 
@@ -105,22 +173,15 @@ exports[`serve fs output: assets/content-script-loader.script.ts.hash.js 1`] = `
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/script.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/script.ts.js\\")
     );
   })().catch(console.error);
 
 })();
-"
-`;
-
-exports[`serve fs output: assets/dynamic-scripts.hash.js 1`] = `
-"var script = \\"/assets/content-script-loader.script.ts.hash.js\\";
-
-export { script as s };
 "
 `;
 
@@ -132,54 +193,5 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/client/worker';
 import 'http://localhost:3000/src/background.ts';
-"
-`;
-
-exports[`serve fs output: src/content1.ts.js 1`] = `
-"import { i as icon } from './image.png.js';
-import { s as script } from '../assets/dynamic-scripts.hash.js';
-
-console.log(\\"content.ts\\", { icon, script });
-"
-`;
-
-exports[`serve fs output: src/content2.ts.js 1`] = `
-"import { f as font } from './font.otf.js';
-import { _ as __vite__css } from './styles.css.js';
-import '../assets/content-script-client.js.hash.js';
-
-console.log(\\"content2.ts\\", { css: __vite__css, font });
-"
-`;
-
-exports[`serve fs output: src/font.otf.js 1`] = `
-"var font = \\"/src/font.otf\\";
-
-export { font as f };
-"
-`;
-
-exports[`serve fs output: src/image.png.js 1`] = `
-"var icon = \\"/src/image.png\\";
-
-export { icon as i };
-"
-`;
-
-exports[`serve fs output: src/script.ts.js 1`] = `
-"console.log(\\"main world script\\");
-"
-`;
-
-exports[`serve fs output: src/styles.css.js 1`] = `
-"import { createHotContext, updateStyle, removeStyle } from '../assets/content-script-client.js.hash.js';
-
-import.meta.hot = createHotContext(\\"/src/styles.css\\");const __vite__id = \\"<root>/src/styles.css\\";
-const __vite__css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
-updateStyle(__vite__id, __vite__css);
-import.meta.hot.accept();
-import.meta.hot.prune(() => removeStyle(__vite__id));
-
-export { __vite__css as _ };
 "
 `;

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`serve fs output: 00 manifest.json 1`] = `
+exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -35,19 +35,45 @@ Object {
 }
 `;
 
-exports[`serve fs output: 01 output files 1`] = `
+exports[`serve fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-client.js.hash.js",
+  "_virtual/src/declared-script.ts.js",
+  "_virtual/src/dynamic-script.ts.js",
+  "_virtual/src/main-world.ts.js",
+  "_virtual/vendor/crx-client-port.js",
+  "_virtual/vendor/crx-dynamic-src-main-world.ts.js",
+  "_virtual/vendor/vite-client-env.js",
+  "_virtual/vendor/vite-client.js",
   "assets/content-script-loader.declared-script.ts.hash.js",
   "assets/content-script-loader.dynamic-script.ts.hash.js",
-  "assets/dynamic-scripts.hash.js",
   "assets/precontroller.hash.js",
   "manifest.json",
   "service-worker-loader.js",
-  "src/declared-script.ts.js",
-  "src/dynamic-script.ts.js",
-  "src/main-world.ts.js",
 ]
+`;
+
+exports[`serve fs output: _virtual/src/declared-script.ts.js 1`] = `""`;
+
+exports[`serve fs output: _virtual/src/dynamic-script.ts.js 1`] = `
+"console.log(\\"dynamic script\\");
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
+`;
+
+exports[`serve fs output: _virtual/src/main-world.ts.js 1`] = `
+"console.log(\\"main world script\\");
+if (import.meta.hot) {
+  import.meta.hot.on(\\"crx:full-reload\\", () => {
+    console.log(\\"[crx] full reload\\");
+    setTimeout(() => location.reload(), 500);
+  });
+}
+"
 `;
 
 exports[`serve fs output: assets/content-script-loader.declared-script.ts.hash.js 1`] = `
@@ -62,11 +88,11 @@ exports[`serve fs output: assets/content-script-loader.declared-script.ts.hash.j
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/declared-script.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/declared-script.ts.js\\")
     );
   })().catch(console.error);
 
@@ -86,22 +112,15 @@ exports[`serve fs output: assets/content-script-loader.dynamic-script.ts.hash.js
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content-script-client.js.hash.js\\")
+      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/dynamic-script.ts.js\\")
+      chrome.runtime.getURL(\\"_virtual/src/dynamic-script.ts.js\\")
     );
   })().catch(console.error);
 
 })();
-"
-`;
-
-exports[`serve fs output: assets/dynamic-scripts.hash.js 1`] = `
-"var fileName = \\"/src/main-world.ts.js\\";
-
-export { fileName as f };
 "
 `;
 
@@ -113,26 +132,5 @@ exports[`serve fs output: assets/precontroller.hash.js 1`] = `
 exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@crx/client/worker';
 import 'http://localhost:3000/src/background.ts';
-"
-`;
-
-exports[`serve fs output: src/declared-script.ts.js 1`] = `
-"import { f as fileName } from '../assets/dynamic-scripts.hash.js';
-
-console.log(\\"declared script\\");
-const script = document.createElement(\\"script\\");
-script.src = chrome.runtime.getURL(fileName);
-script.type = \\"module\\";
-document.head.prepend(script);
-"
-`;
-
-exports[`serve fs output: src/dynamic-script.ts.js 1`] = `
-"console.log(\\"dynamic script\\");
-"
-`;
-
-exports[`serve fs output: src/main-world.ts.js 1`] = `
-"console.log(\\"main world script\\");
 "
 `;
