@@ -1,4 +1,5 @@
-import { serve, testOutput } from 'tests/runners'
+import { serve } from 'tests/runners'
+import { testOutput } from 'tests/testOutput'
 import { mockDate } from 'tests/helpers'
 
 mockDate()
