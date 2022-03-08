@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`build fs output: 00 manifest.json 1`] = `
+exports[`build fs output: _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -34,7 +34,7 @@ Object {
 }
 `;
 
-exports[`build fs output: 01 output files 1`] = `
+exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/App.hash.js",
   "assets/content-script-loader.content.tsx.hash.hash.js",

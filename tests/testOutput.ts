@@ -37,11 +37,11 @@ export async function testOutput(
   getTest('manifest.json', (source, name) => {
     const manifest: ManifestV3 = JSON.parse(source)
     expect(manifest).toMatchSnapshot(name)
-  })(JSON.stringify(manifest), '00 manifest.json')
+  })(JSON.stringify(manifest), '_00 manifest.json')
 
   const files = await fg(`**/*`, { cwd: outDir })
 
-  expect(files.sort()).toMatchSnapshot('01 output files')
+  expect(files.sort()).toMatchSnapshot('_01 output files')
 
   const rootRegex = new RegExp(jsesc(config.root), 'g')
   for (const file of files) {
