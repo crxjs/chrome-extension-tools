@@ -11,6 +11,8 @@ const count = ref(0)
 <template>
   <h1>{{ msg }}</h1>
 
+  <p>Make a Chrome Extension with Vite!</p>
+
   <p>
     Recommended IDE setup:
     <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
