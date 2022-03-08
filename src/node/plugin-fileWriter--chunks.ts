@@ -32,7 +32,7 @@ function urlToFileName(source: string) {
     const index = url.searchParams.get('index')
     ext = [type, index, ext].filter(isString).join('.')
   }
-  const fileName = `${url.pathname.slice(1)}.${ext}`.replaceAll('@', '')
+  const fileName = `${url.pathname.slice(1)}.${ext}`.replace(/@/g, '')
   return fileName
 }
 
