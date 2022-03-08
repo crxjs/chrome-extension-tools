@@ -7,6 +7,7 @@ expect.extend({
     failureThreshold: 0.02,
     failureThresholdType: 'percent',
     customDiffDir: join(process.cwd(), '__image_snapshot_diffs__'),
+    allowSizeMismatch: true,
   }),
 })
 
