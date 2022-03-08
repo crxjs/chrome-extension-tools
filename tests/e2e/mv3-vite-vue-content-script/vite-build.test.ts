@@ -5,7 +5,8 @@ test('crx runs from build output', async () => {
   const page = await browser.newPage()
   await page.goto('https://www.google.com')
 
-  await page.waitForSelector('#app img')
+  const app = page.locator('#app')
+  await app.locator('img').waitFor()
 
-  expect(await page.screenshot()).toMatchImageSnapshot()
+  expect(await app.screenshot()).toMatchImageSnapshot()
 })
