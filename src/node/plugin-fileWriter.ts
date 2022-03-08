@@ -4,6 +4,7 @@ import {
   watch as rollupWatch,
 } from 'rollup'
 import { isTruthy } from './helpers'
+import { relative } from './path'
 import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
 import {
   pluginFileWriterEvents,
@@ -90,6 +91,8 @@ export const pluginFileWriter =
             .flat()
             .pop()!
 
+          const cacheDir = relative(server.config.root, server.config.cacheDir)
+
           watcher = rollupWatch({
             input: stubId,
             context: 'this',
@@ -97,6 +100,27 @@ export const pluginFileWriter =
               dir: server.config.build.outDir,
               format: 'es',
               assetFileNames,
+              entryFileNames({ facadeModuleId }) {
+                let id = facadeModuleId?.replace('\0', '').replace(/^\//, '')
+
+                if (!id) return '[name].js'
+
+                if (id?.includes('/node_modules/')) {
+                  const libName = id
+                    .split('/node_modules/')
+                    .pop()!
+                    .split('/')[0]
+                  id = libName ? `vendor/${libName}` : id
+                } else if (id?.startsWith(cacheDir)) {
+                  id = id.replace(cacheDir, 'vendor')
+                } else if (id?.startsWith('@')) {
+                  id = id.replace('@', '').replace(/\//g, '-')
+                } else if (id.startsWith('vite/')) {
+                  id = id.replace(/\//g, '-')
+                }
+
+                return `${id}.js`.replace(/(\.js){2,}$/, '.js')
+              },
               preserveModules: true,
             },
             plugins: plugins as RollupPlugin[],
