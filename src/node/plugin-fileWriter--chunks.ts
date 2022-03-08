@@ -1,18 +1,19 @@
 import hmrClientContent from 'client/es/hmr-client-content.ts?client'
-import { existsSync, readFile } from 'fs-extra'
+import { readFile } from 'fs-extra'
 import MagicString from 'magic-string'
-import { GetManualChunk, PreRenderedChunk } from 'rollup'
-import { ViteDevServer } from 'vite'
+import { TransformResult, ViteDevServer } from 'vite'
 import {
-  fileById,
   idByUrl,
+  ownerById,
+  ownersByFile,
   setFileMeta,
+  setOutputMeta,
   setOwnerMeta,
+  setUrlMeta,
   urlById,
 } from './fileMeta'
 import { isString } from './helpers'
 import { relative } from './path'
-import { crxDynamicNamespace } from './plugin-dynamicScripts'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, viteClientUrl } from './virtualFileIds'
 
@@ -31,7 +32,7 @@ function urlToFileName(source: string) {
     const index = url.searchParams.get('index')
     ext = [type, index, ext].filter(isString).join('.')
   }
-  const fileName = `${url.pathname.slice(1)}.${ext}`
+  const fileName = `${url.pathname.slice(1)}.${ext}`.replaceAll('@', '')
   return fileName
 }
 
@@ -39,11 +40,13 @@ for (const source of [viteClientUrl]) {
   const url = cleanUrl(source)
   const fileName = urlToFileName(url)
   const id = `\0${fileName}`
-  setFileMeta({ url, fileName, id })
+  setUrlMeta({ url, id })
 }
 
 export const pluginFileWriterChunks: CrxPluginFn = () => {
   let server: ViteDevServer
+  const ownerToTransformResultMap = new Map<string, TransformResult>()
+
   return {
     name: 'crx:file-writer-chunks',
     apply: 'build',
@@ -51,14 +54,14 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
       server = _server
     },
     async resolveId(source, importer) {
-      if (this.meta.watchMode)
-        if (idByUrl.has(cleanUrl(source))) {
-          return idByUrl.get(cleanUrl(source))!
+      if (this.meta.watchMode) {
+        const url = cleanUrl(source)
+        if (idByUrl.has(url)) {
+          return idByUrl.get(url)!
         } else if (importer) {
-          const url = cleanUrl(source)
           const fileName = urlToFileName(url)
           const id = `\0${fileName}`
-          setFileMeta({ url, fileName, id })
+          setUrlMeta({ url, id })
           return id
         } else if (isScript(source)) {
           // entry script file, load though vite dev server
@@ -66,41 +69,63 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
             skipSelf: true,
           })
           if (!resolved) return null
-          const { pathname: url } = new URL(resolved.id, 'stub://stub')
-          const fileName = `${relative(server.config.root, url)}.js`
+          const { pathname } = new URL(resolved.id, 'stub://stub')
+          const fileName = `${relative(server.config.root, pathname)}.js`
           const id = `\0${fileName}`
-          setFileMeta({ url, fileName, id })
+          setUrlMeta({ url: pathname, id })
           return id
         }
+      }
+    },
+    watchChange(fileName) {
+      // dump cached transform results of changed files
+      for (const owner of ownersByFile.get(fileName) ?? new Set())
+        ownerToTransformResultMap.delete(owner)
     },
     async load(id) {
       if (this.meta.watchMode && urlById.has(id)) {
         const url = urlById.get(id)!
-        const r = await server.transformRequest(url)
-        if (r === null)
+
+        let module = await server.moduleGraph.getModuleByUrl(url)
+        let transformResult: TransformResult | null = null
+        if (!module) {
+          // first time, always transform
+          transformResult = await server.transformRequest(url)
+          module = await server.moduleGraph.getModuleByUrl(url)
+        }
+        if (!module) throw new Error(`Unable to load "${url}" from server.`)
+        const { file, url: owner } = module
+
+        // use cached result if available
+        transformResult =
+          transformResult ??
+          ownerToTransformResultMap.get(owner) ??
+          module.transformResult
+        if (!transformResult)
+          transformResult = await server.transformRequest(url)
+        if (!transformResult)
           throw new TypeError(`Unable to load "${url}" from server.`)
+        ownerToTransformResultMap.set(owner, transformResult)
+
+        if (file) {
+          setFileMeta({ id, file })
+          this.addWatchFile(file)
+          if (urlById.get(id)!.includes('?import'))
+            this.emitFile({
+              type: 'asset',
+              fileName: relative(server.config.root, file),
+              source: await readFile(file),
+            })
+        }
+        if (url) setOwnerMeta({ id, owner })
 
         // debug('start "%s"', url)
         // debug('---------------------')
-        // for (const l of r.code.split('\n')) debug('| %s', l)
+        // for (const l of transformResult.code.split('\n')) debug('| %s', l)
         // debug('---------------------')
         // debug('end "%s"', url)
 
-        const module = await server.moduleGraph.getModuleByUrl(url)
-        if (module?.file && existsSync(module.file)) {
-          this.addWatchFile(module.file)
-          if (url.includes('?import'))
-            this.emitFile({
-              type: 'asset',
-              fileName: relative(server.config.root, module.file),
-              source: await readFile(module.file),
-            })
-        }
-        if (module?.url) {
-          setOwnerMeta({ id, owner: module?.url })
-        }
-
-        return { code: r.code, map: r.map }
+        return { code: transformResult.code, map: transformResult.map }
       }
 
       return null
@@ -124,50 +149,32 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
 
       return null
     },
-    outputOptions({
-      chunkFileNames = 'assets/[name].[hash].js',
-      entryFileNames = 'assets/[name].[hash].js',
-      assetFileNames = 'assets/[name].[hash].[ext]',
-      ...options
-    }) {
-      const crx = '@crx/'
-      const rr = '@react-refresh'
-      const manualChunks: GetManualChunk = (id: string) => {
-        if (id.includes(crxDynamicNamespace)) return 'dynamic-scripts'
-        if (id.includes(crx)) return id.slice(id.indexOf(crx) + crx.length)
-        if (id.includes(rr)) return 'react-refresh'
+    generateBundle(options, bundle) {
+      for (const chunk of Object.values(bundle))
+        if (chunk.type === 'chunk') {
+          const { facadeModuleId: id, modules, code, fileName } = chunk
+          if (!id || Object.keys(modules).length !== 1) continue
 
-        // TODO: use config.cacheDir
-        if (id.includes('/.vite/')) {
-          return 'vendor'
+          const url = urlById.get(id)!
+          if (url === viteClientUrl) continue
+
+          const ownerPath = ownerById.get(id)
+          if (!ownerPath) continue
+
+          const index = code.indexOf('createHotContext(')
+          if (index === -1) continue
+
+          const start = code.indexOf(ownerPath, index)
+          const end = start + ownerPath.length
+          if (start > 0) {
+            const outputName = `/${fileName}`
+            setOutputMeta({ id, output: outputName })
+
+            const magic = new MagicString(code)
+            magic.overwrite(start, end, outputName)
+            chunk.code = magic.toString()
+          }
         }
-        if (fileById.has(id)) return fileById.get(id)!
-        return null
-      }
-
-      const fileNames = (chunk: PreRenderedChunk): string | undefined => {
-        const ids = Object.keys(chunk.modules)
-        if (ids.length === 1 && fileById.has(ids[0])) {
-          if (ids[0].includes(rr)) return undefined
-          return fileById.get(ids[0])!
-        }
-      }
-
-      return {
-        ...options,
-        assetFileNames,
-        chunkFileNames: (c) =>
-          fileNames(c) ??
-          (typeof chunkFileNames === 'string'
-            ? chunkFileNames
-            : chunkFileNames(c)),
-        entryFileNames: (c) =>
-          fileNames(c) ??
-          (typeof entryFileNames === 'string'
-            ? entryFileNames
-            : entryFileNames(c)),
-        manualChunks,
-      }
     },
   }
 }

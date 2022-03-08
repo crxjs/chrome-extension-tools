@@ -22,7 +22,8 @@ export const hash = (data: string): string =>
 
 export const isString = (x: unknown): x is string => typeof x === 'string'
 
-export const isPresent = <T>(x: T): x is NonNullable<T> => !!x
+type Falsy = false | 0 | '' | null | undefined
+export const isTruthy = <T>(x: T | Falsy): x is T => !!x
 
 export function isObject<T>(
   value: T,

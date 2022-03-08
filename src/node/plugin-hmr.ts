@@ -1,4 +1,3 @@
-import MagicString from 'magic-string'
 import {
   filter,
   map,
@@ -16,11 +15,10 @@ import {
   Update,
   ViteDevServer,
 } from 'vite'
-import { ownerById, pathById, pathByOwner, urlById } from './fileMeta'
+import { outputByOwner } from './fileMeta'
 import { manifestFiles } from './helpers'
 import { filesReady$ } from './plugin-fileWriter--events'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
-import { viteClientUrl } from './virtualFileIds'
 
 /** Determine if a file was imported by a module or a parent module */
 function isImporter(file: string) {
@@ -51,9 +49,10 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   window(filesReady$),
   mergeMap((p) => p.pipe(takeLast(25))),
   map((p): HMRPayload => {
+    // TODO: get outputByOwner
     switch (p.type) {
       case 'full-reload': {
-        const path = p.path && pathByOwner.get(p.path)
+        const path = p.path && outputByOwner.get(p.path)
         const fullReload: FullReloadPayload = {
           type: 'full-reload',
           path,
@@ -63,17 +62,17 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       case 'prune': {
         const paths: string[] = []
         for (const owner of p.paths)
-          if (pathByOwner.has(owner)) paths.push(pathByOwner.get(owner)!)
+          if (outputByOwner.has(owner)) paths.push(outputByOwner.get(owner)!)
         return { type: 'prune', paths }
       }
       case 'update': {
         const updates: Update[] = []
         for (const { acceptedPath, path, ...rest } of p.updates)
-          if (pathByOwner.has(acceptedPath) && pathByOwner.has(path))
+          if (outputByOwner.has(acceptedPath) && outputByOwner.has(path))
             updates.push({
               ...rest,
-              acceptedPath: pathByOwner.get(acceptedPath)!,
-              path: pathByOwner.get(path)!,
+              acceptedPath: outputByOwner.get(acceptedPath)!,
+              path: outputByOwner.get(path)!,
             })
         return { type: 'update', updates }
       }
@@ -113,34 +112,6 @@ export const pluginHMR: CrxPluginFn = () => {
       name: 'crx:hmr',
       apply: 'build',
       enforce: 'pre',
-      async renderChunk(code, chunk) {
-        if (this.meta.watchMode) {
-          const [id, ...rest] = Object.keys(chunk.modules)
-          if (rest.length) return null
-
-          const url = urlById.get(id)!
-          if (url === viteClientUrl) return null
-
-          const pathName = pathById.get(id)
-          if (!pathName) return null
-
-          const ownerPath = ownerById.get(id)
-          if (!ownerPath) return null
-
-          const index = code.indexOf('createHotContext(')
-          if (index === -1) return null
-
-          const start = code.indexOf(ownerPath, index)
-          const end = start + ownerPath.length
-          if (start > 0) {
-            const magic = new MagicString(code)
-            magic.overwrite(start, end, pathName)
-            return { code: magic.toString(), map: magic.generateMap() }
-          }
-        }
-
-        return null
-      },
       async renderCrxManifest(manifest) {
         if (this.meta.watchMode) {
           files = await manifestFiles(manifest)

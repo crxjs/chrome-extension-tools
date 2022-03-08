@@ -3,7 +3,7 @@ import {
   RollupWatcher,
   watch as rollupWatch,
 } from 'rollup'
-import { isPresent } from './helpers'
+import { isTruthy } from './helpers'
 import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
 import {
   pluginFileWriterEvents,
@@ -84,10 +84,11 @@ export const pluginFileWriter =
           )
 
           /* ------------- CREATE ROLLUP WATCHER ------------- */
+
           const { output = {} } = server.config.build.rollupOptions
-          const { assetFileNames, chunkFileNames, entryFileNames } = [output]
+          const { assetFileNames = 'assets/[name].[ext]' } = [output]
             .flat()
-            .pop()! // get first output
+            .pop()!
 
           watcher = rollupWatch({
             input: stubId,
@@ -96,10 +97,11 @@ export const pluginFileWriter =
               dir: server.config.build.outDir,
               format: 'es',
               assetFileNames,
-              chunkFileNames,
-              entryFileNames,
+              preserveModules: true,
             },
             plugins: plugins as RollupPlugin[],
+            // treeshake screws up hmr vue exports, don't need it for development
+            treeshake: false,
           })
 
           watcher.on('event', (event) => {
@@ -110,7 +112,7 @@ export const pluginFileWriter =
               if (parserError && message.startsWith('Unexpected token')) {
                 const m = `Unexpected token in ${loc?.file ?? id}`
                 error.message = [m, loc?.line, loc?.column]
-                  .filter(isPresent)
+                  .filter(isTruthy)
                   .join(':')
               }
               error.stack = (stack ?? error.stack)?.replace(

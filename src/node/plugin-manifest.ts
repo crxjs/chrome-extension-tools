@@ -59,16 +59,6 @@ export const pluginManifest =
             }
           }
         },
-        configResolved(config) {
-          const plugins = config.plugins as CrxPlugin[]
-          // crx:manifest needs to come after vite:manifest; enforce:post puts it before
-          const vite = plugins.findIndex(({ name }) => name === 'vite:manifest')
-          const crx = plugins.findIndex(({ name }) => name === 'crx:manifest')
-          if (vite > crx) {
-            const [plugin] = plugins.splice(crx, 1)
-            plugins.splice(vite + 1, 0, plugin)
-          }
-        },
         buildStart(options) {
           if (options.plugins) plugins = options.plugins
         },
@@ -131,9 +121,18 @@ export const pluginManifest =
         },
       },
       {
-        name: 'crx:manifest',
+        name: 'crx:manifest-post',
         apply: 'build',
         enforce: 'post',
+        configResolved(config) {
+          const plugins = config.plugins as CrxPlugin[]
+          // crx:manifest-post needs to come after vite:manifest; enforce:post puts it before
+          const crx = plugins.findIndex(
+            ({ name }) => name === 'crx:manifest-post',
+          )
+          const [plugin] = plugins.splice(crx, 1)
+          plugins.push(plugin)
+        },
         async transform(code, id) {
           if (id !== manifestId) return
 
@@ -214,6 +213,8 @@ export const pluginManifest =
             },
           )
 
+          // run renderCrxManifest hook
+          // this appears to run after generateBundle since this is the last plugin
           for (const plugin of plugins) {
             try {
               const m = structuredClone(manifest)
