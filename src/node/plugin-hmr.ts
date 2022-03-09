@@ -138,6 +138,12 @@ export const pluginHMR: CrxPluginFn = () => {
       configureServer(_server) {
         server = _server
         const { send } = server.ws
+
+        const { watch = {} } = server.config.server
+        server.config.server.watch = watch
+        watch.ignored = watch.ignored ? [watch.ignored].flat() : []
+        watch.ignored.push(server.config.build.outDir)
+
         server.ws.send = (payload) => {
           hmrPayload$.next(payload) // sniff hmr events
           send(payload) // don't interfere with normal hmr

@@ -65,6 +65,12 @@ export async function serve(dirname: string) {
     plugins,
     clearScreen: false,
     logLevel: 'error',
+    server: {
+      watch: {
+        // cache dir should not trigger update in these tests
+        ignored: [cacheDir],
+      },
+    },
   })
   debug('create server')
 
