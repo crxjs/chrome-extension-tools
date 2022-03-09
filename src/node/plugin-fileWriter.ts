@@ -101,7 +101,7 @@ export const pluginFileWriter =
               format: 'es',
               assetFileNames,
               entryFileNames({ facadeModuleId }) {
-                let id = facadeModuleId?.replace('\0', '').replace(/^\//, '')
+                let id = facadeModuleId?.replace(/^\//, '')
 
                 if (!id) return '[name].js'
 

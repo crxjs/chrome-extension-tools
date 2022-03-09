@@ -1,14 +1,16 @@
 import MagicString from 'magic-string'
 import { ResolvedConfig } from 'vite'
+import { _debug } from './helpers'
 import { parse, relative } from './path'
 import { rebuildFiles } from './plugin-fileWriter--events'
 import type { CrxPluginFn } from './types'
+import { dynamicScriptId } from './virtualFileIds'
 
-export const crxDynamicNamespace = '@crx/dynamic'
+const debug = _debug('dynamic')
 
 type ScriptType = 'script' | 'module' | 'iife'
 const isScriptType = (x: string): x is ScriptType =>
-  ['script', 'module', 'iife'].includes(x)
+  ['script', 'iife'].includes(x)
 
 /** A Map of dynamic scripts from virtual module id to the ref id of the emitted script */
 export const dynamicScripts = new Map<
@@ -25,10 +27,6 @@ export const dynamicScripts = new Map<
   }
 >()
 
-const resolvedRE = /^\/@id\/__x00__/
-const urlToId = (url: string) => url.replace(resolvedRE, '\0')
-const isResolved = (url: string) => dynamicScripts.has(urlToId(url))
-
 export const pluginDynamicScripts: CrxPluginFn = () => {
   let config: ResolvedConfig
   return [
@@ -41,8 +39,9 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
       },
       async resolveId(source, importer) {
         if (!importer) return null
-        if (isResolved(source)) return source
         if (source.includes('?script')) {
+          debug('serve:resolveId : source %s', source)
+
           const [name, query] = source.split('?')
           const type = query.split('&')[1] ?? 'script'
 
@@ -56,10 +55,14 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
 
           const chunkId = resolved.id
           const fileName = relative(config.root, chunkId)
-          const id = `\0/${crxDynamicNamespace}/${fileName}`
+          const id = `${dynamicScriptId}/${fileName}`
 
           const script = dynamicScripts.get(id)
           if (!script) dynamicScripts.set(id, { chunkId, type, fileName })
+
+          debug('serve:resolveId : chunk id %s', chunkId)
+          debug('serve:resolveId : id %s', id)
+          debug('serve:resolveId : fileName %s', fileName)
 
           return id
         }
@@ -67,6 +70,7 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
       async load(id) {
         const script = dynamicScripts.get(id)
         if (script) {
+          debug('serve:load : script %O', script)
           if (!script.fileName) await rebuildFiles()
           const { fileName } = dynamicScripts.get(id) ?? {}
           if (!fileName)
@@ -89,6 +93,7 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
       async buildStart() {
         // pre-bundle dynamic scripts
         for (const [id, { type, chunkId }] of dynamicScripts) {
+          debug('build:buildStart : emit %s', id)
           const refId = this.emitFile({
             type: 'chunk',
             id: chunkId,
@@ -96,11 +101,12 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
           })
           dynamicScripts.set(id, { chunkId, refId, type })
         }
+        debug('build:buildStart : end')
       },
       async resolveId(source, importer) {
         if (!importer) return null
-        if (isResolved(source)) return urlToId(source)
         if (source.includes('?script')) {
+          debug('build:resolveId : source %s', source)
           const [name, query] = source.split('?')
           const type = query.split('&')[1] ?? 'script'
 
@@ -114,10 +120,14 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
 
           const chunkId = resolved.id
           const fileName = relative(config.root, chunkId)
-          const id = `\0/${crxDynamicNamespace}/${fileName}`
+          const id = `${dynamicScriptId}/${fileName}`
 
           const script = dynamicScripts.get(id)
           if (!script) dynamicScripts.set(id, { chunkId, type })
+
+          debug('serve:resolveId : chunk id %s', chunkId)
+          debug('serve:resolveId : id %s', id)
+          debug('serve:resolveId : fileName %s', fileName)
 
           return id
         }
@@ -125,7 +135,9 @@ export const pluginDynamicScripts: CrxPluginFn = () => {
       async load(id) {
         if (dynamicScripts.has(id)) {
           let { chunkId, refId, type } = dynamicScripts.get(id)!
+          debug('serve:load : script %O', { chunkId, refId, type })
           if (!refId) {
+            debug('serve:load : emit', chunkId)
             refId = this.emitFile({
               type: 'chunk',
               id: chunkId,

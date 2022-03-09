@@ -83,12 +83,14 @@ export const triggerName = firstValueFrom(
 
 /** Trigger a rebuild from other plugins */
 export const rebuildFiles = async (): Promise<void> => {
+  debug('rebuildFiles start')
   await filesReady()
   await Promise.all([
     outputFile(await triggerName, Date.now().toString()),
     filesStart(),
   ])
   await filesReady()
+  debug('rebuildFiles end')
 }
 
 function startFileWriterLogger(server: ViteDevServer) {

@@ -38,8 +38,7 @@ function urlToFileName(source: string) {
 
 for (const source of [viteClientUrl]) {
   const url = cleanUrl(source)
-  const fileName = urlToFileName(url)
-  const id = `\0${fileName}`
+  const id = urlToFileName(url)
   setUrlMeta({ url, id })
 }
 
@@ -59,8 +58,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         if (idByUrl.has(url)) {
           return idByUrl.get(url)!
         } else if (importer) {
-          const fileName = urlToFileName(url)
-          const id = `\0${fileName}`
+          const id = urlToFileName(url)
           setUrlMeta({ url, id })
           return id
         } else if (isScript(source)) {
@@ -70,8 +68,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
           })
           if (!resolved) return null
           const { pathname } = new URL(resolved.id, 'stub://stub')
-          const fileName = `${relative(server.config.root, pathname)}.js`
-          const id = `\0${fileName}`
+          const id = `${relative(server.config.root, pathname)}.js`
           setUrlMeta({ url: pathname, id })
           return id
         }

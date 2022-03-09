@@ -63,7 +63,7 @@ export const pluginContentScripts: CrxPluginFn = ({
       resolveId(source) {
         if (source === preambleId) return preambleId
         if (source === contentHmrPortId) {
-          return `\0${contentHmrPortId}`
+          return contentHmrPortId
         }
       },
       load(id) {
@@ -72,7 +72,7 @@ export const pluginContentScripts: CrxPluginFn = ({
           return defined
         }
 
-        if (id === `\0${contentHmrPortId}`) {
+        if (id === contentHmrPortId) {
           const defined = contentHmrPort.replace(
             '__CRX_HMR_TIMEOUT__',
             JSON.stringify(hmrTimeout),
