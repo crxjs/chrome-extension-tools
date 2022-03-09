@@ -112,6 +112,7 @@ export const pluginContentScripts: CrxPluginFn = ({
                     .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
                     .replace(/__CLIENT__/g, JSON.stringify(contentClientName)!)
                     .replace(/__SCRIPT__/g, JSON.stringify(f))
+                    .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
                 : contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(f))
 
               const refId = this.emitFile({
