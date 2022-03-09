@@ -5,6 +5,7 @@ import {
   Observable,
   Subject,
   takeLast,
+  tap,
   window,
   withLatestFrom,
 } from 'rxjs'
@@ -49,7 +50,6 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   window(filesReady$),
   mergeMap((p) => p.pipe(takeLast(25))),
   map((p): HMRPayload => {
-    // TODO: get outputByOwner
     switch (p.type) {
       case 'full-reload': {
         const path = p.path && outputByOwner.get(p.path)
@@ -59,12 +59,14 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
         }
         return fullReload
       }
+
       case 'prune': {
         const paths: string[] = []
         for (const owner of p.paths)
           if (outputByOwner.has(owner)) paths.push(outputByOwner.get(owner)!)
         return { type: 'prune', paths }
       }
+
       case 'update': {
         const updates: Update[] = []
         for (const { acceptedPath, path, ...rest } of p.updates)
@@ -76,8 +78,9 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
             })
         return { type: 'update', updates }
       }
+
       default:
-        return p
+        return p // connected, custom, error
     }
   }),
   withLatestFrom(filesReady$),
@@ -93,15 +96,16 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
         return true
     }
   }),
-  map(([p]): CrxHMRPayload => {
-    if (p.type === 'full-reload') return crxRuntimeReload
-
-    return {
+  tap((p) => {
+    p
+  }),
+  map(
+    ([p]): CrxHMRPayload => ({
       type: 'custom',
       event: 'crx:content-script-payload',
       data: p,
-    }
-  }),
+    }),
+  ),
 )
 export const pluginHMR: CrxPluginFn = () => {
   let files: ManifestFiles
