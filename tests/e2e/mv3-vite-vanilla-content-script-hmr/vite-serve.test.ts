@@ -62,7 +62,7 @@ test('crx page update on hmr', async () => {
 
   await waitForInnerHtml(styles, (h) => h.includes('background-color: red;'))
   expect(reloads).toBe(0) // no reload on css update
-  expect(optionsPage.isClosed).toBe(false) // no runtime reload on css update
+  expect(optionsPage.isClosed()).toBe(false) // no runtime reload on css update
 
   // update content.ts file -> trigger full reload
   await fs.copy(src2, src, {
@@ -75,7 +75,7 @@ test('crx page update on hmr', async () => {
 
   await page.locator('p', { hasText: header }).waitFor()
   expect(reloads).toBe(1) // full reload on jsx update
-  expect(optionsPage.isClosed).toBe(false) // no runtime reload on js update
+  expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
 
   // update background.ts file -> trigger runtime reload
   await Promise.all([
@@ -93,7 +93,7 @@ test('crx page update on hmr', async () => {
   await app.waitFor()
 
   expect(reloads).toBe(2)
-  expect(optionsPage.isClosed).toBe(true)
+  expect(optionsPage.isClosed()).toBe(true)
 
   await getPage(browser, /options.html$/)
 })
