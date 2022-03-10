@@ -29,8 +29,13 @@ export const pluginFileWriter =
     return {
       name: 'crx:file-writer',
       apply: 'serve',
-      config() {
-        // TODO: run config hooks for internal file writer plugins
+      async config(_config, env) {
+        let config = _config
+        for (const p of internal) {
+          const r = await p.config?.(config, env)
+          config = r ?? config
+        }
+        return config
       },
       async configResolved(config) {
         await Promise.all(internal.map((p) => p.configResolved?.(config)))
