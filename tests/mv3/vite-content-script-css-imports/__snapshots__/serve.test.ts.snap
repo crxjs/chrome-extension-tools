@@ -79,19 +79,25 @@ exports[`serve fs output: assets/content-script-loader.content.ts.hash.js 1`] = 
 "(function () {
   'use strict';
 
+  function crxUrlWithTime(url) {
+    const crxUrl = new URL(chrome.runtime.getURL(url));
+    const time = 1643155200000;
+    crxUrl.searchParams.set(\\"t\\", time.toString());
+    return crxUrl.href;
+  }
   (async () => {
     if (\\"\\")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        crxUrlWithTime(\\"\\")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"_virtual/vendor/vite-client.js\\")
+      crxUrlWithTime(\\"_virtual/vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"_virtual/src/content.ts.js\\")
+      crxUrlWithTime(\\"_virtual/src/content.ts.js\\")
     );
   })().catch(console.error);
 
