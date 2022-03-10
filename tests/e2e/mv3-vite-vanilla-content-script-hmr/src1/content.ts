@@ -1,1 +1,1 @@
-export const header = 'Hello Vites!'
+export const header = 'Hello Vite!'
