@@ -12,31 +12,36 @@ import {
   setUrlMeta,
   urlById,
 } from './fileMeta'
-import { isString } from './helpers'
-import { relative } from './path'
+import { isString, _debug } from './helpers'
+import { join, parse, relative } from './path'
 import { CrxPluginFn } from './types'
-import { contentHmrPortId, viteClientUrl } from './virtualFileIds'
+import { contentHmrPortId, viteClientId } from './virtualFileIds'
 
-// const debug = _debug('file-writer').extend('chunks')
+const debug = _debug('file-writer').extend('chunks')
 
-const scriptRE = /\.[jt]sx?$/s
-const isScript = (s: string) => scriptRE.test(s)
+// const scriptRE = /\.[jt]sx?$/s
+// const isScript = (s: string) => scriptRE.test(s)
+
 /** Server.transformRequest doesn't work with /@id/ urls */
 const cleanUrl = (url: string) => url.replace(/^\/@id\//, '')
 
 function urlToFileName(source: string) {
-  const url = new URL(source.replace(':', '.'), 'stub://stub')
-  let ext = 'js'
+  const url = new URL(
+    source.replace(':', '.').replace(/^\/@fs/, ''),
+    'stub://stub',
+  )
+  // parsed.ext is always string, don't use ??
+  const parsed = parse(url.pathname)
+  let ext = parsed.ext || '.js'
   if (url.searchParams.has('vue')) {
     const type = url.searchParams.get('type')
     const index = url.searchParams.get('index')
-    ext = [type, index, ext].filter(isString).join('.')
+    ext = `.${[type, index, ext].filter(isString).join('.')}`
   }
-  const fileName = `${url.pathname.slice(1)}.${ext}`.replace(/@/g, '')
-  return fileName
+  return `${join(parsed.dir, parsed.name)}${ext}`
 }
 
-for (const source of [viteClientUrl]) {
+for (const source of [viteClientId]) {
   const url = cleanUrl(source)
   const id = urlToFileName(url)
   setUrlMeta({ url, id })
@@ -52,26 +57,25 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
     fileWriterStart(_server) {
       server = _server
     },
-    async resolveId(source, importer) {
+    async resolveId(_source, importer) {
       if (this.meta.watchMode) {
-        const url = cleanUrl(source)
-        if (idByUrl.has(url)) {
-          return idByUrl.get(url)!
+        const cleaned = cleanUrl(_source)
+        let id: string
+        if (idByUrl.has(cleaned)) {
+          id = idByUrl.get(cleaned)!
+          debug(`resolved cached ${cleaned} -> ${id}`)
         } else if (importer) {
-          const id = urlToFileName(url)
+          id = urlToFileName(cleaned)
+          setUrlMeta({ url: cleaned, id })
+          debug(`resolved ${cleaned} -> ${id}`)
+        } else {
+          const [serverUrl] = await server.moduleGraph.resolveUrl(_source)
+          const url = server.config.base + serverUrl
+          id = join(server.config.root, serverUrl)
           setUrlMeta({ url, id })
-          return id
-        } else if (isScript(source)) {
-          // entry script file, load though vite dev server
-          const resolved = await this.resolve(source, importer, {
-            skipSelf: true,
-          })
-          if (!resolved) return null
-          const { pathname } = new URL(resolved.id, 'stub://stub')
-          const id = `${relative(server.config.root, pathname)}.js`
-          setUrlMeta({ url: pathname, id })
-          return id
+          debug(`resolved entry ${cleaned} -> ${id}`)
         }
+        return id
       }
     },
     watchChange(fileName) {
@@ -83,21 +87,22 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
       if (this.meta.watchMode && urlById.has(id)) {
         const url = urlById.get(id)!
 
-        let module = await server.moduleGraph.getModuleByUrl(url)
+        let serverModule = await server.moduleGraph.getModuleByUrl(url)
         let transformResult: TransformResult | null = null
-        if (!module) {
+        if (!serverModule) {
           // first time, always transform
           transformResult = await server.transformRequest(url)
-          module = await server.moduleGraph.getModuleByUrl(url)
+          serverModule = await server.moduleGraph.getModuleByUrl(url)
         }
-        if (!module) throw new Error(`Unable to load "${url}" from server.`)
-        const { file, url: owner } = module
+        if (!serverModule)
+          throw new Error(`Unable to load "${url}" from server.`)
+        const { file, url: owner } = serverModule
 
         // use cached result if available
         transformResult =
           transformResult ??
           ownerToTransformResultMap.get(owner) ??
-          module.transformResult
+          serverModule.transformResult
         if (!transformResult)
           transformResult = await server.transformRequest(url)
         if (!transformResult)
@@ -128,7 +133,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
       return null
     },
     transform(code, id) {
-      if (id === idByUrl.get(viteClientUrl)) {
+      if (id === idByUrl.get(viteClientId)) {
         const magic = new MagicString(code)
         magic.prepend(`import { HMRPort } from '${contentHmrPortId}';`)
         const ws = 'new WebSocket'
@@ -153,7 +158,7 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
           if (!id || Object.keys(modules).length !== 1) continue
 
           const url = urlById.get(id)!
-          if (url === viteClientUrl) continue
+          if (url === viteClientId) continue
 
           const ownerPath = ownerById.get(id)
           if (!ownerPath) continue
