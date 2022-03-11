@@ -1,29 +1,8 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { Locator } from 'playwright-chromium'
-import { getPage } from '../helpers'
+import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/content'
-
-/** WaitForFunction uses eval, which doesn't work for CRX */
-async function waitForInnerHtml(
-  locator: Locator,
-  pred: (html: string) => boolean = () => true,
-) {
-  let count = 0
-  while (count < 300) {
-    const n = await locator.count()
-    for (let i = 0; i < n; ++i) {
-      const item = locator.nth(i)
-      const html = await item.innerHTML()
-      if (pred(html)) return item
-    }
-
-    count++
-    await new Promise((r) => setTimeout(r, 100))
-  }
-  throw new Error('could not find element')
-}
 
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
