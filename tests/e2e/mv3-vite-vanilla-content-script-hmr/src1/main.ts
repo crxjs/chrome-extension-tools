@@ -1,5 +1,5 @@
 import './style.css'
-import { header } from './content'
+import { header } from './header'
 
 const app = document.createElement('div')
 app.id = 'app'

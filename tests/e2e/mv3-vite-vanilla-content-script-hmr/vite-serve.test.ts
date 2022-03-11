@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
-import { header } from './src2/content'
+import { header } from './src2/header'
 
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
@@ -43,12 +43,12 @@ test('crx page update on hmr', async () => {
   expect(reloads).toBe(0) // no reload on css update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on css update
 
-  // update content.ts file -> trigger full reload
+  // update header.ts file -> trigger full reload
   await fs.copy(src2, src, {
     recursive: true,
     filter: (f) => {
       if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('content.ts')
+      return f.endsWith('header.ts')
     },
   })
 
