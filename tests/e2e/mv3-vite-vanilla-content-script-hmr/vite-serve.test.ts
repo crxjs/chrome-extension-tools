@@ -52,7 +52,7 @@ test('crx page update on hmr', async () => {
     },
   })
 
-  await page.locator('p', { hasText: header }).waitFor()
+  await page.locator('h1', { hasText: header }).waitFor()
   expect(reloads).toBe(1) // full reload on jsx update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
 
@@ -64,15 +64,13 @@ test('crx page update on hmr', async () => {
         if (fs.lstatSync(f).isDirectory()) return true
         return f.endsWith('background.ts')
       },
-    }), // when background page changes
-    page.waitForEvent('framenavigated'), // content script should reload
+    }),
     optionsPage.waitForEvent('close'), // options page should close
+    page.waitForEvent('framenavigated'), // content script should reload
   ])
 
   await app.waitFor()
 
   expect(reloads).toBe(2)
   expect(optionsPage.isClosed()).toBe(true)
-
-  await getPage(browser, /options.html$/)
 })

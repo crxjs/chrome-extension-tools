@@ -1,5 +1,3 @@
 export {}
 
-chrome.runtime.openOptionsPage()
-
-console.log('updated')
+console.log('post runtime reload')
