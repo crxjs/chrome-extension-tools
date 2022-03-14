@@ -15,7 +15,7 @@ import { isString, _debug } from './helpers'
 import { join, relative } from './path'
 import { CrxPluginFn } from './types'
 
-export const debug = _debug('file-writer')
+export const debug = _debug('file-writer').extend('events')
 
 type FileWriterEvent =
   | { type: 'init' }
