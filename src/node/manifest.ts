@@ -186,7 +186,10 @@ export interface ManifestV3 {
         keyword: string
       }
     | undefined
-  optional_permissions?: chrome.runtime.ManifestPermissions[] | undefined
+  optional_permissions?:
+    | chrome.runtime.ManifestPermissions[]
+    | string[]
+    | undefined
   options_page?: string | undefined
   options_ui?:
     | {
@@ -195,7 +198,7 @@ export interface ManifestV3 {
         open_in_tab?: boolean | undefined
       }
     | undefined
-  permissions?: chrome.runtime.ManifestPermissions[] | undefined
+  permissions?: chrome.runtime.ManifestPermissions[] | string[] | undefined
   platforms?:
     | {
         nacl_arch?: string | undefined
