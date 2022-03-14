@@ -1,6 +1,17 @@
+export const idBySource = new Map<string, string>()
 export const idByUrl = new Map<string, string>()
 export const urlById = new Map<string, string>()
-export const setUrlMeta = ({ id, url }: { id: string; url: string }) => {
+
+export function setUrlMeta({
+  id,
+  source,
+  url,
+}: {
+  id: string
+  url: string
+  source: string
+}) {
+  idBySource.set(source, id)
   idByUrl.set(url, id)
   urlById.set(id, url)
 }

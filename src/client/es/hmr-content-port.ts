@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import type { CrxHMRPayload } from 'src/types'
+import type { HMRPayload } from 'vite'
+
 declare const __CRX_HMR_TIMEOUT__: number
+
+function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
+  return x.type === 'custom' && x.event.startsWith('crx:')
+}
 
 export class HMRPort {
   private port: chrome.runtime.Port | undefined
@@ -14,11 +21,29 @@ export class HMRPort {
   }
 
   handleMessage(message: any) {
-    console.log('[crx] port message', JSON.parse(message.data))
-    if (this.callbacks.has('message'))
-      for (const cb of this.callbacks.get('message')!) {
-        cb(message)
+    const forward = (data: string) => {
+      if (this.callbacks.has('message'))
+        for (const cb of this.callbacks.get('message')!) {
+          cb({ data })
+        }
+    }
+
+    const payload: HMRPayload | CrxHMRPayload = JSON.parse(message.data)
+    if (isCrxHMRPayload(payload)) {
+      if (payload.event === 'crx:runtime-reload') {
+        // delayed page reload; let background finish restart
+        console.log('[crx] runtime reload')
+        setTimeout(() => location.reload(), 500)
+      } else {
+        // unpack hmr payloads; forward to vite client
+        // console.log('[crx] content payload', payload)
+        forward(JSON.stringify(payload.data))
       }
+    } else {
+      // forward things like connected messages
+      // console.log('[crx] forwarding', message)
+      forward(message.data)
+    }
   }
 
   initPort() {

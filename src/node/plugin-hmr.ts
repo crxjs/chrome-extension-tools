@@ -1,12 +1,11 @@
 import {
+  buffer,
   filter,
   map,
   mergeMap,
   Observable,
   Subject,
-  takeLast,
   tap,
-  window,
   withLatestFrom,
 } from 'rxjs'
 import {
@@ -17,9 +16,12 @@ import {
   ViteDevServer,
 } from 'vite'
 import { outputByOwner } from './fileMeta'
-import { manifestFiles } from './helpers'
+import { manifestFiles, _debug } from './helpers'
+import { join } from './path'
 import { filesReady$ } from './plugin-fileWriter--events'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
+
+const debug = _debug('hmr')
 
 /** Determine if a file was imported by a module or a parent module */
 function isImporter(file: string) {
@@ -47,8 +49,19 @@ const hmrPayload$ = new Subject<HMRPayload>()
  */
 const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   filter((p) => !isCrxHMRPayload(p)),
-  window(filesReady$),
-  mergeMap((p) => p.pipe(takeLast(25))),
+  buffer(filesReady$),
+  mergeMap((pps) => {
+    let fullReload: FullReloadPayload | undefined
+    const payloads: HMRPayload[] = []
+    for (const p of pps.slice(-50)) // payloads could accumulate during HTML development
+      if (p.type === 'full-reload') {
+        fullReload = p // only one full reload per build
+      } else {
+        payloads.push(p)
+      }
+    if (fullReload) payloads.push(fullReload)
+    return payloads
+  }),
   map((p): HMRPayload => {
     switch (p.type) {
       case 'full-reload': {
@@ -96,7 +109,7 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
         return true
     }
   }),
-  tap((p) => {
+  tap(([p]) => {
     p
   }),
   map(
@@ -115,7 +128,7 @@ export const pluginHMR: CrxPluginFn = () => {
     {
       name: 'crx:hmr',
       apply: 'build',
-      enforce: 'pre',
+      enforce: 'post',
       async renderCrxManifest(manifest) {
         if (this.meta.watchMode) {
           files = await manifestFiles(manifest)
@@ -135,14 +148,17 @@ export const pluginHMR: CrxPluginFn = () => {
 
         return { server, ...config }
       },
+      configResolved(config) {
+        const { watch = {} } = config.server
+        config.server.watch = watch
+        watch.ignored = watch.ignored
+          ? [...new Set([watch.ignored].flat())]
+          : []
+        watch.ignored.push(config.build.outDir)
+      },
       configureServer(_server) {
         server = _server
         const { send } = server.ws
-
-        const { watch = {} } = server.config.server
-        server.config.server.watch = watch
-        watch.ignored = watch.ignored ? [watch.ignored].flat() : []
-        watch.ignored.push(server.config.build.outDir)
 
         server.ws.send = (payload) => {
           hmrPayload$.next(payload) // sniff hmr events
@@ -153,12 +169,15 @@ export const pluginHMR: CrxPluginFn = () => {
         })
       },
       handleHotUpdate({ file, modules, server }) {
-        const [background] = files.background
-        // only update that needs special handling
-        if (file === 'background' || modules.some(isImporter(background))) {
-          server.ws.send(crxRuntimeReload)
-          return []
-        }
+        const background =
+          files.background[0] && join(server.config.root, files.background[0])
+
+        if (background)
+          if (file === background || modules.some(isImporter(background))) {
+            debug('sending runtime reload')
+            server.ws.send(crxRuntimeReload)
+            return []
+          }
       },
     },
   ]

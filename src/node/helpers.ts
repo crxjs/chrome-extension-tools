@@ -1,4 +1,5 @@
 import { simple } from 'acorn-walk'
+import { createHash as _hash } from 'crypto'
 import debug from 'debug'
 import fg from 'fast-glob'
 import { PluginContext } from 'rollup'
@@ -9,7 +10,6 @@ import type {
   WebAccessibleResourceByMatch,
 } from './manifest'
 import type { AcornLiteral, ManifestFiles } from './types'
-import { createHash } from 'crypto'
 
 export const _debug = (id: string) => debug('crx').extend(id)
 
@@ -17,8 +17,12 @@ export const structuredClone = <T>(obj: T): T => {
   return v8.deserialize(v8.serialize(obj))
 }
 
-export const hash = (data: string): string =>
-  createHash('sha1').update(data).digest('base64').slice(0, 10)
+export const createHash = (data: string, length = 5): string =>
+  _hash('sha1')
+    .update(data)
+    .digest('base64')
+    .replace(/[^A-Za-z0-9]/g, '')
+    .slice(0, length)
 
 export const isString = (x: unknown): x is string => typeof x === 'string'
 

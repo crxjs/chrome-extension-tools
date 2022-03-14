@@ -104,14 +104,14 @@ function handleSocketMessage(payload: HMRPayload) {
 }
 
 function handleCrxHmrPayload(payload: CrxHMRPayload) {
+  // everything goes to the content scripts
+  notifyContentScripts(payload)
+
   switch (payload.event) {
     case 'crx:runtime-reload':
-      notifyContentScripts(payload)
+      // immediate runtime reload
       console.log('[crx] runtime reload')
       chrome.runtime.reload()
-      break
-    case 'crx:content-script-payload':
-      notifyContentScripts(payload.data)
       break
 
     default:

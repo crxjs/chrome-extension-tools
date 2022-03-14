@@ -10,7 +10,7 @@ export const pluginBackground: CrxPluginFn = () => {
 
   return [
     {
-      name: 'crx:background',
+      name: 'crx:background-client',
       apply: 'serve',
       configResolved(_config) {
         config = _config as ResolvedConfig
@@ -24,8 +24,9 @@ export const pluginBackground: CrxPluginFn = () => {
       },
     },
     {
-      name: 'crx:background',
+      name: 'crx:background-loader-file',
       apply: 'build',
+      // this should happen after other plugins; the loader file is an implementation detail
       enforce: 'post',
       fileWriterStart(server) {
         port = server.config.server.port!.toString()

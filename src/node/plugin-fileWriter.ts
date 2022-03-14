@@ -4,7 +4,6 @@ import {
   watch as rollupWatch,
 } from 'rollup'
 import { isTruthy } from './helpers'
-import { relative } from './path'
 import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
 import {
   pluginFileWriterEvents,
@@ -13,6 +12,7 @@ import {
 } from './plugin-fileWriter--events'
 import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
 import { pluginFileWriterPublic } from './plugin-fileWriter--public'
+import { pluginFileWriterViteDeps } from './plugin-fileWriter--vite-deps'
 import { CrxPlugin, CrxPluginFn } from './types'
 import { stubId } from './virtualFileIds'
 
@@ -23,7 +23,8 @@ export const pluginFileWriter =
     const html = pluginFileWriterHtml(options)
     const events = pluginFileWriterEvents(options)
     const publicDir = pluginFileWriterPublic(options)
-    const internal = [chunks, html, events, publicDir].flat()
+    const viteDeps = pluginFileWriterViteDeps(options)
+    const internal = [chunks, html, events, publicDir, viteDeps].flat()
 
     let watcher: RollupWatcher
     return {
@@ -59,6 +60,7 @@ export const pluginFileWriter =
           const plugins = [
             ...pre,
             ...mid,
+            viteDeps,
             chunks,
             html,
             publicDir,
@@ -91,46 +93,12 @@ export const pluginFileWriter =
 
           /* ------------- CREATE ROLLUP WATCHER ------------- */
 
-          const { output = {} } = server.config.build.rollupOptions
-          const { assetFileNames = 'assets/[name].[ext]' } = [output]
-            .flat()
-            .pop()!
-
-          const cacheDir = relative(server.config.root, server.config.cacheDir)
-
           watcher = rollupWatch({
             input: stubId,
             context: 'this',
             output: {
               dir: server.config.build.outDir,
               format: 'es',
-              assetFileNames,
-              entryFileNames({ facadeModuleId }) {
-                let id = facadeModuleId?.replace(/^\//, '')
-
-                if (!id) return '[name].js'
-
-                if (id.includes('vite/dist/client/env')) {
-                  id = 'vite/client/env'
-                } else if (id?.includes('/node_modules/')) {
-                  const libName = id
-                    .split('/node_modules/')
-                    .pop()!
-                    .split('/')[0]
-                  id = libName ? `vendor/${libName}` : id
-                } else if (id?.startsWith(cacheDir)) {
-                  id = id.replace(cacheDir, 'vendor')
-                } else if (id?.startsWith('@')) {
-                  id = `vendor/${id.replace('@', '').replace(/\//g, '-')}`
-                }
-
-                if (id.startsWith('vite/')) {
-                  id = `vendor/${id.replace(/\//g, '-')}`
-                }
-
-                return `${id}.js`.replace(/(\.js){2,}$/, '.js')
-              },
-              preserveModules: true,
             },
             plugins: plugins as RollupPlugin[],
             // treeshake screws up hmr vue exports, don't need it for development

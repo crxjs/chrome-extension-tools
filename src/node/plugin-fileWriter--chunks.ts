@@ -1,9 +1,10 @@
-import hmrClientContent from 'client/es/hmr-client-content.ts?client'
 import { readFile } from 'fs-extra'
 import MagicString from 'magic-string'
+import { PreRenderedAsset, PreRenderedChunk } from 'rollup'
 import { TransformResult, ViteDevServer } from 'vite'
 import {
-  idByUrl,
+  fileById,
+  idBySource,
   ownerById,
   ownersByFile,
   setFileMeta,
@@ -12,41 +13,65 @@ import {
   setUrlMeta,
   urlById,
 } from './fileMeta'
-import { isString, _debug } from './helpers'
-import { join, parse, relative } from './path'
+import { createHash, isTruthy, _debug } from './helpers'
+import { relative } from './path'
 import { CrxPluginFn } from './types'
-import { contentHmrPortId, viteClientId } from './virtualFileIds'
+import {
+  customElementsId,
+  reactRefreshId,
+  viteClientId,
+} from './virtualFileIds'
 
 const debug = _debug('file-writer').extend('chunks')
 
-// const scriptRE = /\.[jt]sx?$/s
-// const isScript = (s: string) => scriptRE.test(s)
+/* ----------------- INIT URL META ----------------- */
 
-/** Server.transformRequest doesn't work with /@id/ urls */
-const cleanUrl = (url: string) => url.replace(/^\/@id\//, '')
+for (const source of [viteClientId, customElementsId]) {
+  setUrlMeta(sourceToUrlMeta(source))
+}
+setUrlMeta({
+  source: reactRefreshId,
+  id: '/react-refresh',
+  url: reactRefreshId,
+})
 
-function urlToFileName(source: string) {
-  const url = new URL(
-    source.replace(':', '.').replace(/^\/@fs/, ''),
-    'stub://stub',
-  )
-  // parsed.ext is always string, don't use ??
-  const parsed = parse(url.pathname)
-  let ext = parsed.ext || '.js'
-  if (url.searchParams.has('vue')) {
-    const type = url.searchParams.get('type')
-    const index = url.searchParams.get('index')
-    ext = `.${[type, index, ext].filter(isString).join('.')}`
-  }
-  return `${join(parsed.dir, parsed.name)}${ext}`
+export function sourceToUrlMeta(source: string) {
+  const [p, query = ''] = source.split('?')
+
+  // server.transformRequest doesn't work with /@id/ or /@fs/ urls
+  const pathname = p.replace(/^\/@id\//, '').replace(/^\/@fs/, '')
+  const url = [pathname, query].filter(isTruthy).join('?')
+
+  // differentiate multiple output files for SFC's (template, styles, etc)
+  const hash = createHash(url)
+
+  const base = p.split('/').slice(-4).filter(isTruthy).join('-')
+  // output.entryFileNames does not override folders; ids need to be root level
+  const id = `/${base}-${hash}.js`.replace(/[@]/g, '')
+
+  return { id, url, source }
 }
 
-for (const source of [viteClientId]) {
-  const url = cleanUrl(source)
-  const id = urlToFileName(url)
-  setUrlMeta({ url, id })
-}
-
+/**
+ * ### Constraints
+ *
+ * Vite (especially Vue) HMR depends on preserving default exports and export names.
+ *
+ * - `manualChunks` doesn't preserve the module signature
+ * - `preserveModules` runs the risk of creating the folder `_virtual`, an illegal
+ *   filenames for Chrome Extensions
+ * - `this.emitFile` preserves the module signature, but we need to know if the
+ *   file should be split before we load it.
+ *
+ * ### Notes
+ *
+ * With `preserveModules`, Rollup prepends the id dirname to the return value of
+ * `entryFileNames`, which can result in a strange file structure. By using
+ * root-level synthetic ids, we can gain complete control of filenames.
+ *
+ * We might explore `this.emitFile` later, but in the interests of time I'm
+ * going with `preserveModules` for now.
+ */
 export const pluginFileWriterChunks: CrxPluginFn = () => {
   let server: ViteDevServer
   const ownerToTransformResultMap = new Map<string, TransformResult>()
@@ -57,25 +82,27 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
     fileWriterStart(_server) {
       server = _server
     },
-    async resolveId(_source, importer) {
+    async resolveId(source, importer) {
       if (this.meta.watchMode) {
-        const cleaned = cleanUrl(_source)
-        let id: string
-        if (idByUrl.has(cleaned)) {
-          id = idByUrl.get(cleaned)!
-          debug(`resolved cached ${cleaned} -> ${id}`)
+        if (idBySource.has(source)) {
+          const id = idBySource.get(source)!
+          debug(`resolved cached ${source} -> ${id}`)
+          return id
         } else if (importer) {
-          id = urlToFileName(cleaned)
-          setUrlMeta({ url: cleaned, id })
-          debug(`resolved ${cleaned} -> ${id}`)
+          const meta = sourceToUrlMeta(source)
+          setUrlMeta(meta)
+          debug(`resolved ${source} -> ${meta.id}`)
+          return meta.id
         } else {
-          const [serverUrl] = await server.moduleGraph.resolveUrl(_source)
-          const url = server.config.base + serverUrl
-          id = join(server.config.root, serverUrl)
-          setUrlMeta({ url, id })
-          debug(`resolved entry ${cleaned} -> ${id}`)
+          const [serverUrl] = await server.moduleGraph.resolveUrl(source)
+          const url = server.config.base + serverUrl // entry files won't have queries
+          const id = `/${serverUrl.split('/').join('-')}-${createHash(
+            serverUrl,
+          )}.js`
+          setUrlMeta({ url, id, source })
+          debug(`resolved entry ${source} -> ${id}`)
+          return id
         }
-        return id
       }
     },
     watchChange(fileName) {
@@ -132,24 +159,57 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
 
       return null
     },
-    transform(code, id) {
-      if (id === idByUrl.get(viteClientId)) {
-        const magic = new MagicString(code)
-        magic.prepend(`import { HMRPort } from '${contentHmrPortId}';`)
-        const ws = 'new WebSocket'
-        const index = code.indexOf(ws)
-        magic.overwrite(index, index + ws.length, 'new HMRPort')
-        return { code: magic.toString(), map: magic.generateMap() }
+    outputOptions(options) {
+      const cacheDir = relative(server.config.root, server.config.cacheDir)
+      const fileNameById = new Map<string, string>()
+      fileNameById.set('/react-refresh', 'vendor/react-refresh.js')
+
+      function fileNames(info: PreRenderedChunk | PreRenderedAsset) {
+        const id = info.type === 'chunk' ? info.facadeModuleId : info.name
+        if (id && fileNameById.has(id)) return fileNameById.get(id)!
+
+        let fileName =
+          info.type === 'chunk' ? 'assets/[name].js' : 'assets/[name].[ext]'
+        if (id && fileById.has(id)) {
+          fileName = fileById.get(id)!
+          const url = new URL(urlById.get(id)!, 'stub://stub')
+          // support vue sfc
+          if (url.searchParams.has('type'))
+            fileName += `.${url.searchParams.get('type')}`
+          // support vue sfc
+          if (url.searchParams.has('index'))
+            fileName += `.${url.searchParams.get('index')}`
+        }
+        if (id?.startsWith('/@crx/'))
+          fileName = `vendor/${id.slice('/@crx/'.length).split('/').join('-')}`
+
+        if (fileName.startsWith(server.config.root))
+          fileName = fileName.slice(server.config.root.length + 1)
+        if (fileName.startsWith(cacheDir))
+          fileName = `vendor/${fileName.slice(cacheDir.length + 1)}`
+
+        if (fileName.includes('/node_modules/'))
+          fileName = `vendor/${fileName
+            .split('/node_modules/')
+            .pop()!
+            .split('/')
+            .join('-')
+            .replace('vite-dist-client', 'vite')}`
+
+        if (fileName.startsWith('/')) fileName = fileName.slice(1)
+        if (!fileName.endsWith('.js')) fileName += '.js'
+        if (id) fileNameById.set(id, fileName)
+
+        fileName = fileName.replace(/:/g, '-').replace(/@/, '')
+        return fileName
       }
 
-      const info = this.getModuleInfo(id)
-      if (!id.includes('@') && info?.isEntry) {
-        const magic = new MagicString(code)
-        magic.append(hmrClientContent)
-        return { code: magic.toString(), map: magic.generateMap() }
+      return {
+        ...options,
+        preserveModules: true,
+        assetFileNames: fileNames,
+        entryFileNames: fileNames,
       }
-
-      return null
     },
     generateBundle(options, bundle) {
       for (const chunk of Object.values(bundle))
