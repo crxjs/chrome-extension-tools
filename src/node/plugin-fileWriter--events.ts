@@ -92,31 +92,35 @@ export const rebuildFiles = async (): Promise<void> => {
   debug('rebuildFiles end')
 }
 
-function startFileWriterLogger(server: ViteDevServer) {
+function startLogger(server: ViteDevServer) {
   const logger = createLogger(server.config.logLevel, {
     prefix: '[crx]',
   })
 
-  filesStart$.subscribe(() => {
-    const message = colors.green('files start')
-    const outDir = colors.dim(
-      relative(server.config.root, server.config.build.outDir),
-    )
-    logger.info(`${message} ${outDir}`, { timestamp: true })
-  })
+  const subs = [
+    filesStart$.subscribe(() => {
+      const message = colors.green('files start')
+      const outDir = colors.dim(
+        relative(server.config.root, server.config.build.outDir),
+      )
+      logger.info(`${message} ${outDir}`, { timestamp: true })
+    }),
 
-  filesReady$.subscribe(({ duration: d }) => {
-    const message = colors.green('files ready')
-    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
-    logger.info(`${message} ${duration}`, { timestamp: true })
-  })
+    filesReady$.subscribe(({ duration: d }) => {
+      const message = colors.green('files ready')
+      const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
+      logger.info(`${message} ${duration}`, { timestamp: true })
+    }),
 
-  // TODO: log runtime reload from crxHmrPayload$
+    // TODO: log runtime reload from crxHmrPayload$
 
-  filesError$.subscribe(({ error }) => {
-    logger.error('error from file writer')
-    if (error) logger.error(error.message)
-  })
+    filesError$.subscribe(({ error }) => {
+      logger.error('error from file writer')
+      if (error) logger.error(error.message)
+    }),
+  ]
+
+  return () => subs.forEach((sub) => sub.unsubscribe())
 }
 
 /**
@@ -126,12 +130,18 @@ function startFileWriterLogger(server: ViteDevServer) {
  */
 export const pluginFileWriterEvents: CrxPluginFn = () => {
   let start = performance.now()
+  let stopLogger: () => void
   return {
     name: 'crx:file-writer-events',
     enforce: 'post',
     apply: 'build',
     fileWriterStart(server) {
-      startFileWriterLogger(server)
+      debug('fileWriterStart')
+      startLogger(server)
+    },
+    closeWatcher() {
+      debug('closeWatcher')
+      stopLogger()
     },
     async buildStart(options) {
       start = performance.now()
@@ -141,6 +151,7 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
       }
       this.addWatchFile(filename)
       writerEvent$.next({ type: 'buildStart', options })
+      debug('buildStart')
     },
     writeBundle(options, bundle) {
       const duration = Math.round(performance.now() - start)
@@ -150,6 +161,7 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
         bundle,
         duration,
       })
+      debug('writeBundle')
     },
     renderError(error) {
       writerEvent$.next({ type: 'error', error })
