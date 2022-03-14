@@ -8,6 +8,7 @@ import { pluginResources } from './plugin-resources'
 import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 import { pluginBackground } from './plugin-background'
 import { pluginContentScripts } from './plugin-contentScripts'
+import type { PluginOption } from 'vite'
 
 function init(options: CrxOptions, plugins: CrxPluginFn[]) {
   return plugins
@@ -21,7 +22,7 @@ export const crx = ({
   ...options
 }: {
   manifest: ManifestV3Export
-} & CrxOptions): CrxPlugin[] => {
+} & CrxOptions): PluginOption[] => {
   const plugins = init(options, [
     pluginHMR,
     pluginHtmlAuditor,

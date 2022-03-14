@@ -25,11 +25,11 @@ export interface ManifestV3 {
   // Recommended
   default_locale?: string | undefined
   description?: string | undefined
-  icons?: ManifestIcons | undefined
+  icons?: chrome.runtime.ManifestIcons | undefined
 
   // Optional
 
-  action?: ManifestAction | undefined
+  action?: chrome.runtime.ManifestAction | undefined
   author?: string | undefined
   background?:
     | {
@@ -40,7 +40,7 @@ export interface ManifestV3 {
   chrome_settings_overrides?:
     | {
         homepage?: string | undefined
-        search_provider?: SearchProvider | undefined
+        search_provider?: chrome.runtime.SearchProvider | undefined
         startup_pages?: string[] | undefined
       }
     | undefined
@@ -186,7 +186,7 @@ export interface ManifestV3 {
         keyword: string
       }
     | undefined
-  optional_permissions?: ManifestPermissions[] | undefined
+  optional_permissions?: chrome.runtime.ManifestPermissions[] | undefined
   options_page?: string | undefined
   options_ui?:
     | {
@@ -195,7 +195,7 @@ export interface ManifestV3 {
         open_in_tab?: boolean | undefined
       }
     | undefined
-  permissions?: ManifestPermissions[] | undefined
+  permissions?: chrome.runtime.ManifestPermissions[] | undefined
   platforms?:
     | {
         nacl_arch?: string | undefined
