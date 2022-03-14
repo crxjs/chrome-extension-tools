@@ -12,7 +12,7 @@ import {
 } from './plugin-fileWriter--events'
 import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
 import { pluginFileWriterPublic } from './plugin-fileWriter--public'
-import { pluginFileWriterViteDeps } from './plugin-fileWriter--vite-deps'
+import { pluginFileWriterPolyfill } from './plugin-fileWriter--polyfill'
 import { CrxPlugin, CrxPluginFn } from './types'
 import { stubId } from './virtualFileIds'
 
@@ -23,8 +23,8 @@ export const pluginFileWriter =
     const html = pluginFileWriterHtml(options)
     const events = pluginFileWriterEvents(options)
     const publicDir = pluginFileWriterPublic(options)
-    const viteDeps = pluginFileWriterViteDeps(options)
-    const internal = [chunks, html, events, publicDir, viteDeps].flat()
+    const polyfill = pluginFileWriterPolyfill(options)
+    const internal = [chunks, html, events, publicDir, polyfill].flat()
 
     let watcher: RollupWatcher
     return {
@@ -60,7 +60,7 @@ export const pluginFileWriter =
           const plugins = [
             ...pre,
             ...mid,
-            viteDeps,
+            polyfill,
             chunks,
             html,
             publicDir,

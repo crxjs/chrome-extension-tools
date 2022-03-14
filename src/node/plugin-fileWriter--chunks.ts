@@ -200,7 +200,10 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         if (!fileName.endsWith('.js')) fileName += '.js'
         if (id) fileNameById.set(id, fileName)
 
-        fileName = fileName.replace(/:/g, '-').replace(/@/, '')
+        fileName = fileName
+          .replace(/:/g, '-') // some virtual files
+          .replace(/@/, '') // no @xyz/ folders
+
         return fileName
       }
 
