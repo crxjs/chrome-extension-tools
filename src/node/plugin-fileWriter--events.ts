@@ -8,7 +8,6 @@ import {
   filter,
   firstValueFrom,
   map,
-  skip,
   Subject,
 } from 'rxjs'
 import { createLogger, ViteDevServer } from 'vite'
@@ -95,7 +94,7 @@ export const rebuildFiles = async (): Promise<void> => {
 
 function startFileWriterLogger(server: ViteDevServer) {
   const logger = createLogger(server.config.logLevel, {
-    prefix: 'crx',
+    prefix: '[crx]',
   })
 
   filesStart$.subscribe(() => {
@@ -112,9 +111,7 @@ function startFileWriterLogger(server: ViteDevServer) {
     logger.info(`${message} ${duration}`, { timestamp: true })
   })
 
-  filesReady$.pipe(skip(1)).subscribe(() => {
-    logger.info('runtime reload', { timestamp: true })
-  })
+  // TODO: log runtime reload from crxHmrPayload$
 
   filesError$.subscribe(({ error }) => {
     logger.error('error from file writer')
