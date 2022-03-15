@@ -33,6 +33,7 @@ export const crx = ({
     pluginManifest(manifest),
   ])
 
+  // file writer runs `fileWriterStart` hook on all plugins
   plugins.unshift(...init(options, [pluginFileWriter(plugins)]))
 
   return plugins

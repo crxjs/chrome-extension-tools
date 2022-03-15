@@ -120,6 +120,7 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
     }),
   ),
 )
+
 export const pluginHMR: CrxPluginFn = () => {
   let files: ManifestFiles
   let server: ViteDevServer
