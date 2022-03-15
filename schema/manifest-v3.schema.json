@@ -753,7 +753,7 @@
       "items": {
         "anyOf": [
           { "required": ["matches"] },
-          { "required": ["extensions"] }
+          { "required": ["extension_ids"] }
         ],
         "properties": {
           "resources": {
@@ -767,7 +767,7 @@
             "type": "array",
             "uniqueItems": true
           },
-          "extensions": {
+          "extension_ids": {
             "items": {
               "maxLength": 32,
               "minLength": 32,
