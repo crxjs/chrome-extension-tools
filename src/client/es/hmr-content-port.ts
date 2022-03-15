@@ -20,8 +20,19 @@ export class HMRPort {
      * - Ping service worker every 5 seconds
      * - Re-initialize port every 4 minutes
      */
-
-    setInterval(() => this.port?.postMessage('ping'), __CRX_HMR_TIMEOUT__)
+    setInterval(() => {
+      try {
+        this.port?.postMessage({ data: 'ping' })
+      } catch (error) {
+        if (
+          error instanceof Error &&
+          error.message.includes('Extension context invalidated.')
+        ) {
+          // TODO: hook into error overlay?
+          location.reload()
+        } else throw error
+      }
+    }, __CRX_HMR_TIMEOUT__)
     setInterval(this.initPort, 5 * 60 * 1000)
     this.initPort()
   }

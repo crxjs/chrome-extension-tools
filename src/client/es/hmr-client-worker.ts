@@ -59,9 +59,9 @@ chrome.runtime.onConnect.addListener((port) => {
     ports.add(port)
     port.onDisconnect.addListener((port) => ports.delete(port))
     port.onMessage.addListener((message: string) => {
-      console.log(
-        `${JSON.stringify(message, null, 2)} from ${port.sender?.origin}`,
-      )
+      // console.log(
+      //   `${JSON.stringify(message, null, 2)} from ${port.sender?.origin}`,
+      // )
     })
     port.postMessage({ data: JSON.stringify({ type: 'connected' }) })
   }
@@ -99,7 +99,8 @@ function handleSocketMessage(payload: HMRPayload) {
     console.log(`[vite] connected.`)
     // proxy(nginx, docker) hmr ws maybe caused timeout,
     // so send ping package let ws keep alive.
-    setInterval(() => socket.send('ping'), __HMR_TIMEOUT__)
+    const interval = setInterval(() => socket.send('ping'), __HMR_TIMEOUT__)
+    socket.addEventListener('close', () => clearInterval(interval))
   }
 }
 
@@ -136,5 +137,5 @@ socket.addEventListener('close', async ({ wasClean }) => {
   if (wasClean) return
   console.log(`[vite] server connection lost. polling for restart...`)
   await waitForSuccessfulPing()
-  location.reload()
+  chrome.runtime.reload()
 })

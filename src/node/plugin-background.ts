@@ -1,26 +1,31 @@
 import workerHmrClient from 'client/es/hmr-client-worker.ts?client'
-import { ResolvedConfig } from 'vite'
+import { ViteDevServer } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import type { CrxPluginFn } from './types'
 import { workerClientId } from './virtualFileIds'
 
 export const pluginBackground: CrxPluginFn = () => {
   let port: string | undefined
-  let config: ResolvedConfig
+  let server: ViteDevServer
 
   return [
     {
       name: 'crx:background-client',
       apply: 'serve',
-      configResolved(_config) {
-        config = _config as ResolvedConfig
+      configureServer(_server) {
+        server = _server
       },
       resolveId(source) {
         if (source === `/${workerClientId}`) return workerClientId
       },
       load(id) {
-        if (id === workerClientId)
-          return defineClientValues(workerHmrClient, config)
+        if (id === workerClientId) {
+          const base = `http://localhost:${server.config.server.port}/`
+          return defineClientValues(
+            workerHmrClient.replace('__BASE__', JSON.stringify(base)),
+            server.config,
+          )
+        }
       },
     },
     {
