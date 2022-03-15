@@ -137,7 +137,7 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
     apply: 'build',
     fileWriterStart(server) {
       debug('fileWriterStart')
-      startLogger(server)
+      stopLogger = startLogger(server)
     },
     closeWatcher() {
       debug('closeWatcher')
