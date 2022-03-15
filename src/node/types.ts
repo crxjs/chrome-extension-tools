@@ -31,6 +31,7 @@ export interface CrxOptions {
   contentScripts?: {
     preambleCode?: string | false
     hmrTimeout?: number
+    injectCss?: boolean
   }
 }
 
