@@ -1,9 +1,8 @@
-import fileName from './main-world?script&main'
+import fileName from './main-world?script&module'
 
 const url = chrome.runtime.getURL(fileName)
 
-console.log('content.ts')
-console.log('main world script url', url)
+console.log('content2.ts')
 
 const script = document.createElement('script')
 script.src = url

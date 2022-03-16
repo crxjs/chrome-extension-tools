@@ -1,18 +1,44 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`build fs output: 00 manifest.json 1`] = `
+exports[`build fs output: _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
   },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content-script-loader.content.tsx.hash.hash.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+      ],
+    },
+  ],
   "manifest_version": 3,
   "name": "test extension",
   "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+      ],
+      "resources": Array [
+        "assets/App.hash.js",
+        "assets/content.tsx.hash.js",
+        "assets/vendor.hash.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
 }
 `;
 
-exports[`build fs output: 01 output files 1`] = `
+exports[`build fs output: _01 output files 1`] = `
 Array [
+  "assets/App.hash.js",
+  "assets/content-script-loader.content.tsx.hash.hash.js",
+  "assets/content.tsx.hash.js",
   "assets/popup.html.hash.js",
   "assets/vendor.hash.js",
   "manifest.json",
@@ -20,60 +46,97 @@ Array [
 ]
 `;
 
-exports[`build fs output: assets/popup.html.hash.js 1`] = `
-"import { R as React, r as reactDom } from './vendor.hash.js';
-
-const p = function polyfill() {
-    const relList = document.createElement('link').relList;
-    if (relList && relList.supports && relList.supports('modulepreload')) {
-        return;
-    }
-    for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-        processPreload(link);
-    }
-    new MutationObserver((mutations) => {
-        for (const mutation of mutations) {
-            if (mutation.type !== 'childList') {
-                continue;
-            }
-            for (const node of mutation.addedNodes) {
-                if (node.tagName === 'LINK' && node.rel === 'modulepreload')
-                    processPreload(node);
-            }
-        }
-    }).observe(document, { childList: true, subtree: true });
-    function getFetchOpts(script) {
-        const fetchOpts = {};
-        if (script.integrity)
-            fetchOpts.integrity = script.integrity;
-        if (script.referrerpolicy)
-            fetchOpts.referrerPolicy = script.referrerpolicy;
-        if (script.crossorigin === 'use-credentials')
-            fetchOpts.credentials = 'include';
-        else if (script.crossorigin === 'anonymous')
-            fetchOpts.credentials = 'omit';
-        else
-            fetchOpts.credentials = 'same-origin';
-        return fetchOpts;
-    }
-    function processPreload(link) {
-        if (link.ep)
-            // ep marker = processed
-            return;
-        link.ep = true;
-        // prepopulate the load record
-        const fetchOpts = getFetchOpts(link);
-        fetch(link.href, fetchOpts);
-    }
-};true&&p();
-
+exports[`build fs output: assets/App.hash.js 1`] = `
+"import { j as jsxRuntime } from \\"./vendor.hash.js\\";
+const jsx = jsxRuntime.exports.jsx;
+const jsxs = jsxRuntime.exports.jsxs;
 const App = () => {
-  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+  return /* @__PURE__ */ jsxs(\\"div\\", {
+    children: [/* @__PURE__ */ jsx(\\"h1\\", {
+      children: \\"Popup Page\\"
+    }), /* @__PURE__ */ jsx(\\"p\\", {
+      children: \\"If you are seeing this, React is working!\\"
+    })]
+  });
 };
+export { App as A, jsx as j };
+"
+`;
 
+exports[`build fs output: assets/content.tsx.hash.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash.js\\";
+import { j as jsx, A as App } from \\"./App.hash.js\\";
+console.log(\\"content script\\");
+const root = document.createElement(\\"div\\");
+root.id = \\"root\\";
+document.body.append(root);
+reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.content.tsx.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.tsx.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/popup.html.hash.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash.js\\";
+import { j as jsx, A as App } from \\"./App.hash.js\\";
+const p = function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+};
+p();
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
-reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
 "
 `;
 
@@ -86,6 +149,7 @@ exports[`build fs output: src/popup.html 1`] = `
     <title>Popup Page</title>
     <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
     <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">
+    <link rel=\\"modulepreload\\" href=\\"/assets/App.hash.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>

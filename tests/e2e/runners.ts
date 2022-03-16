@@ -4,11 +4,11 @@ import { ViteDevServer } from 'vite'
 import { build as _build, serve as _serve } from '../runners'
 
 let browser: ChromiumBrowserContext | undefined
-let devServer: ViteDevServer | undefined
+let server: ViteDevServer | undefined
 
 afterAll(async () => {
   await browser?.close()
-  await devServer?.close()
+  await server?.close()
 })
 
 export async function build(dirname: string) {
@@ -28,8 +28,8 @@ export async function build(dirname: string) {
 }
 
 export async function serve(dirname: string) {
-  const { outDir, devServer: s, config } = await _serve(dirname)
-  devServer = s
+  const { outDir, server: s, config } = await _serve(dirname)
+  server = s
 
   await new Promise((r) => setTimeout(r, 1000))
 
@@ -48,5 +48,5 @@ export async function serve(dirname: string) {
     .find((p) => p.url() === 'about:blank')
     ?.goto('chrome://extensions')
 
-  return { browser, outDir, dataDir, devServer }
+  return { browser, outDir, dataDir, devServer: server }
 }

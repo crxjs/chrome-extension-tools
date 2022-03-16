@@ -1,221 +1,133 @@
-import { existsSync, outputFile } from 'fs-extra'
-import type {
-  ChangeEvent,
-  OutputBundle,
-  OutputOptions,
-  RollupOptions,
-  RollupWatcher,
-} from 'rollup'
 import {
-  BehaviorSubject,
-  delay,
-  filter,
-  firstValueFrom,
-  map,
-  Subject,
-} from 'rxjs'
-import { build, ResolvedConfig } from 'vite'
-import { isString, _debug } from './helpers'
-import { join } from './path'
+  Plugin as RollupPlugin,
+  RollupWatcher,
+  watch as rollupWatch,
+} from 'rollup'
+import { isTruthy } from './helpers'
+import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
+import {
+  pluginFileWriterEvents,
+  server$,
+  writerEvent$,
+} from './plugin-fileWriter--events'
+import { pluginFileWriterHtml } from './plugin-fileWriter--pages'
+import { pluginFileWriterPublic } from './plugin-fileWriter--public'
+import { pluginFileWriterPolyfill } from './plugin-fileWriter--polyfill'
 import { CrxPlugin, CrxPluginFn } from './types'
-import { performance } from 'perf_hooks'
+import { stubId } from './virtualFileIds'
 
-const pluginName = 'crx:file-writer'
-const debug = _debug(pluginName)
+export const pluginFileWriter =
+  (crxPlugins: CrxPlugin[]): CrxPluginFn =>
+  (options) => {
+    const chunks = pluginFileWriterChunks(options)
+    const html = pluginFileWriterHtml(options)
+    const events = pluginFileWriterEvents(options)
+    const publicDir = pluginFileWriterPublic(options)
+    const polyfill = pluginFileWriterPolyfill(options)
+    const internal = [chunks, html, events, publicDir, polyfill].flat()
 
-type FileWriterEvent =
-  | { type: 'init' }
-  | {
-      type: 'buildStart'
-      options: RollupOptions
-    }
-  | {
-      type: 'writeBundle'
-      options: OutputOptions
-      bundle: OutputBundle
-      duration: number
-    }
-  | {
-      type: 'error'
-      error: Error | undefined
-    }
-  | { type: 'change'; id: string; event: ChangeEvent }
+    let watcher: RollupWatcher
+    return {
+      name: 'crx:file-writer',
+      apply: 'serve',
+      async config(_config, env) {
+        let config = _config
+        for (const p of internal) {
+          const r = await p.config?.(config, env)
+          config = r ?? config
+        }
+        return config
+      },
+      async configResolved(config) {
+        await Promise.all(internal.map((p) => p.configResolved?.(config)))
+      },
+      configureServer(server) {
+        server.httpServer?.once('listening', async () => {
+          server$.next(server)
 
-const watcherEvent$ = new BehaviorSubject<FileWriterEvent>({
-  type: 'init',
-})
+          /* ------------------ SORT PLUGINS ----------------- */
 
-watcherEvent$.subscribe((event) => {
-  return debug('watcher event %O', event.type)
-})
+          const pre: CrxPlugin[] = []
+          const post: CrxPlugin[] = []
+          const mid: CrxPlugin[] = []
+          for (const p of crxPlugins) {
+            if (p.apply === 'serve') continue
+            else if (p.enforce === 'pre') pre.push(p)
+            else if (p.enforce === 'post') post.push(p)
+            else mid.push(p)
+          }
 
-export const filesStart$ = watcherEvent$.pipe(
-  filter((x): x is Extract<FileWriterEvent, { type: 'buildStart' }> => {
-    return x.type === 'buildStart'
-  }),
-)
+          const plugins = [
+            ...pre,
+            ...mid,
+            polyfill,
+            chunks,
+            html,
+            publicDir,
+            ...post,
+            events,
+          ].flat()
 
-export const filesStart = () => firstValueFrom(filesStart$)
+          /* ------------ RUN FILEWRITERSTART HOOK ----------- */
 
-export const filesReady$ = watcherEvent$.pipe(
-  filter((x): x is Extract<FileWriterEvent, { type: 'writeBundle' }> => {
-    return x.type === 'writeBundle'
-  }),
-  delay(200), // TODO: make this dynamic - check that written files exist and have been updated
-)
-
-export const filesReady = () => firstValueFrom(filesReady$)
-
-const viteConfig$ = new Subject<ResolvedConfig>()
-const triggerName = firstValueFrom(
-  viteConfig$.pipe(
-    map(({ cacheDir }) => cacheDir),
-    filter(isString),
-    map((dir) => join(dir, '.crx-watch-trigger')),
-  ),
-)
-
-/** Trigger a rebuild from other plugins */
-export const rebuildFiles = async (): Promise<void> => {
-  await filesReady()
-  await Promise.all([
-    outputFile(await triggerName, Date.now().toString()),
-    filesStart(),
-  ])
-  await filesReady()
-}
-
-export const pluginFileWriter: CrxPluginFn = () => {
-  let _watcher: RollupWatcher
-  const fileWriterPlugin: CrxPlugin = {
-    name: pluginName,
-    apply: 'serve',
-    configureServer(server) {
-      server.httpServer?.once('listening', async () => {
-        viteConfig$.next(server.config)
-
-        /**
-         * This plugin runs the `fileWriterStart` plugin hooks during the
-         * `configResolved` hook. It only runs during development inside the
-         * file writer Rollup watch instance.
-         */
-        const hookRunner: CrxPlugin = {
-          name: pluginName,
-          enforce: 'pre',
-          apply: 'build',
-          async configResolved({ plugins }) {
-            const { outDir } = server.config.build
-            const { port } = server.config.server
-
-            if (typeof port === 'undefined')
-              throw new TypeError('vite serve port is undefined')
-
-            for (const p of plugins as CrxPlugin[]) {
-              const debug = _debug(p.name)
+          const allPlugins: CrxPlugin[] = [...server.config.plugins, ...plugins]
+          await Promise.all(
+            allPlugins.map(async (p) => {
               try {
-                await p.fileWriterStart?.({ port, outDir }, server)
-              } catch (error) {
-                debug('fileWriterStart error %O', error)
+                await p.fileWriterStart?.(server)
+              } catch (e) {
+                const hook = `[${p.name}].fileWriterStart`
+
+                let error = new Error(`Error in plugin ${hook}`)
+                if (e instanceof Error) {
+                  error = e
+                  error.message = `${hook} ${error.message}`
+                } else if (typeof e === 'string') {
+                  error = new Error(`${hook} ${e}`)
+                }
+
+                writerEvent$.next({ type: 'error', error })
               }
-            }
-          },
-        }
+            }),
+          )
 
-        let start = performance.now()
-        /**
-         * This plugin emits build events so other plugins can track the file
-         * writer state. It only runs during development inside the file writer
-         * Rollup watch instance.
-         */
-        const buildLifecycle: CrxPlugin = {
-          name: 'crx:build-lifecycle',
-          enforce: 'post',
-          apply: 'build',
-          async buildStart(options) {
-            start = performance.now()
-            const filename = await triggerName
-            if (!existsSync(filename)) {
-              await outputFile(filename, Date.now().toString())
-            }
-            this.addWatchFile(filename)
-            watcherEvent$.next({ type: 'buildStart', options })
-          },
-          writeBundle(options, bundle) {
-            const duration = Math.round(performance.now() - start)
-            watcherEvent$.next({
-              type: 'writeBundle',
-              options,
-              bundle,
-              duration,
-            })
-          },
-          renderError(error) {
-            watcherEvent$.next({ type: 'error', error })
-          },
-          watchChange(id, { event }) {
-            watcherEvent$.next({ type: 'change', id, event })
-          },
-        }
+          /* ------------- CREATE ROLLUP WATCHER ------------- */
 
-        const result = build({
-          build: {
-            outDir: server.config.build.outDir,
-            rollupOptions: {
-              context: 'this',
+          watcher = rollupWatch({
+            input: stubId,
+            context: 'this',
+            output: {
+              dir: server.config.build.outDir,
+              format: 'es',
             },
-            watch: {
-              clearScreen: false,
-            },
-          },
-          configFile: server.config.configFile,
-          logLevel: 'warn',
-          mode: server.config.mode,
-          plugins: [hookRunner, buildLifecycle],
+            plugins: plugins as RollupPlugin[],
+            // treeshake screws up hmr vue exports, don't need it for development
+            treeshake: false,
+          })
+
+          watcher.on('event', (event) => {
+            if (event.code === 'ERROR') {
+              const { message, parserError, stack, id, loc, code, frame } =
+                event.error
+              const error = parserError ?? new Error(message)
+              if (parserError && message.startsWith('Unexpected token')) {
+                const m = `Unexpected token in ${loc?.file ?? id}`
+                error.message = [m, loc?.line, loc?.column]
+                  .filter(isTruthy)
+                  .join(':')
+              }
+              error.stack = (stack ?? error.stack)?.replace(
+                /.+?\n/,
+                `Error: ${error.message}\n`,
+              )
+
+              writerEvent$.next({ type: 'error', error, code, frame })
+            }
+          })
         })
-
-        try {
-          await result
-        } catch (error) {
-          watcherEvent$.error(error)
-
-          const message = 'Could not start the file writer'
-          if (error instanceof Error)
-            server.config.logger.error(`${message}: ${error.message}
-${error.stack}`)
-          else if (typeof error === 'string')
-            server.config.logger.error(`${message}: ${error}`)
-          else
-            server.config.logger.error(`${message}: ${JSON.stringify(error)}`)
-        }
-      })
-    },
-    closeBundle() {
-      _watcher?.close()
-    },
+      },
+      closeBundle() {
+        watcher?.close()
+      },
+    }
   }
-
-  /**
-   * When we start the file writer in Vite serve mode, we start an internal copy
-   * of Vite build. If a plugin runs in both serve and build, same plugin object
-   * may exist in both the serve and build plugin arrays. This is unexpected,
-   * but has been demonstrated while debugging `@vitejs/plugin-react`. Sharing
-   * plugins between two Vite instances is probably OK for most hooks, but
-   * `configResolved` should never run 2x, since plugins may use it to detect
-   * their environment. Serve settings should usually prevail.
-   */
-  let servePlugins: Set<CrxPlugin>
-  const dedupePlugins: CrxPlugin = {
-    name: 'crx:dedupe-plugins',
-    enforce: 'pre',
-    configResolved({ plugins, command }) {
-      if (command === 'serve') {
-        servePlugins = new Set(plugins)
-      } else if (command === 'build' && servePlugins) {
-        for (const p of plugins)
-          if (servePlugins.has(p)) delete p['configResolved']
-      }
-    },
-  }
-
-  return [fileWriterPlugin, dedupePlugins]
-}

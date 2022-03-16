@@ -87,9 +87,6 @@ jobs:
           # If specified, run `pnpm install`
           # run_install: true
 
-      - name: Check CWD
-        run: node -e "console.log('cwd', process.cwd())"
-
       - name: Cache pnpm modules
         uses: actions/cache@v2
         env:
@@ -120,11 +117,15 @@ jobs:
         if: ${{ steps.diff.outputs.files }}
         run: exit 1
 
+      - name: Check CWD
+        if: failure()
+        run: node -e "console.log('cwd', process.cwd())"
+
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: image-snapshot-diffs
-          path: __image_snapshot_diffs__/*
+          path: tests/__image_snapshot_diffs__/
 
   # Runs snapshot integration tests for MV3
   mv3:

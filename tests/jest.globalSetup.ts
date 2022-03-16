@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { OutputOptions, rollup } from 'rollup'
-import config from '../rollup.config'
+import configs from '../rollup.config'
 import { normalizePath } from '@rollup/pluginutils'
 import _debug from 'debug'
 
@@ -30,6 +30,7 @@ function getClientFiles() {
 const clientFiles = getClientFiles()
 debug('client files %o', clientFiles)
 
+const [config] = configs
 config.input = clientFiles.map((f) => normalizePath(f))
 config.output = { dir: outDir, format: 'esm', sourcemap: true, plugins: [] }
 config.plugins?.push(

@@ -1,24 +1,29 @@
-import preControllerScript from 'client/es/page-precontroller-script.ts?client'
-import workerHmrClient from 'client/es/worker-hmr-client.ts?client'
-import preControllerHtml from 'client/html/precontroller.html?client'
-import colors from 'picocolors'
-import { skip } from 'rxjs'
 import {
+  buffer,
+  filter,
+  map,
+  mergeMap,
+  Observable,
+  Subject,
+  tap,
+  withLatestFrom,
+} from 'rxjs'
+import {
+  FullReloadPayload,
+  HMRPayload,
   ModuleNode,
-  ResolvedConfig,
+  Update,
   ViteDevServer,
-  createLogger,
-  Logger,
 } from 'vite'
-import { htmlFiles, isObject } from './helpers'
-import { join, normalize, relative } from './path'
-import { filesReady$, filesStart$ } from './plugin-fileWriter'
-import type { CrxPluginFn } from './types'
+import { outputByOwner } from './fileMeta'
+import { manifestFiles, _debug } from './helpers'
+import { join } from './path'
+import { filesReady$ } from './plugin-fileWriter--events'
+import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 
-// const debug = _debug('crx:hmr')
+const debug = _debug('hmr')
 
-const workerClientId = '/@crx/worker-client'
-
+/** Determine if a file was imported by a module or a parent module */
 function isImporter(file: string) {
   const pred = (node: ModuleNode) => {
     if (node.file === file) return true
@@ -27,61 +32,115 @@ function isImporter(file: string) {
   return pred
 }
 
-function setupHmrEvents({
-  logger,
-  server,
-}: {
-  logger: Logger
-  server: ViteDevServer
-}) {
-  filesReady$.subscribe(() => {
-    server.ws.send({
-      type: 'custom',
-      event: 'runtime-reload',
-    })
-  })
-
-  filesStart$.subscribe(() => {
-    const message = colors.green('files start')
-    const outDir = colors.dim(
-      relative(server.config.root, server.config.build.outDir),
-    )
-    logger.info(`${message} ${outDir}`, { timestamp: true })
-  })
-
-  filesReady$.subscribe(({ duration: d }) => {
-    const message = colors.green('files ready')
-    const duration = colors.dim(`in ${colors.bold(`${d}ms`)}`)
-    logger.info(`${message} ${duration}`, { timestamp: true })
-  })
-
-  filesReady$.pipe(skip(1)).subscribe(() => {
-    logger.info('runtime reload', { timestamp: true })
-  })
+function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
+  return x.type === 'custom' && x.event.startsWith('crx:')
 }
 
-// TODO: emit new files for each content script module.
-// TODO: add fetch handler to service worker
+const crxRuntimeReload: CrxHMRPayload = {
+  type: 'custom',
+  event: 'crx:runtime-reload',
+}
+
+const hmrPayload$ = new Subject<HMRPayload>()
+/**
+ * Buffer hmrPayloads by filesReady
+ *
+ * What about assets and manifest?
+ */
+const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
+  filter((p) => !isCrxHMRPayload(p)),
+  buffer(filesReady$),
+  mergeMap((pps) => {
+    let fullReload: FullReloadPayload | undefined
+    const payloads: HMRPayload[] = []
+    for (const p of pps.slice(-50)) // payloads could accumulate during HTML development
+      if (p.type === 'full-reload') {
+        fullReload = p // only one full reload per build
+      } else {
+        payloads.push(p)
+      }
+    if (fullReload) payloads.push(fullReload)
+    return payloads
+  }),
+  map((p): HMRPayload => {
+    switch (p.type) {
+      case 'full-reload': {
+        const path = p.path && outputByOwner.get(p.path)
+        const fullReload: FullReloadPayload = {
+          type: 'full-reload',
+          path,
+        }
+        return fullReload
+      }
+
+      case 'prune': {
+        const paths: string[] = []
+        for (const owner of p.paths)
+          if (outputByOwner.has(owner)) paths.push(outputByOwner.get(owner)!)
+        return { type: 'prune', paths }
+      }
+
+      case 'update': {
+        const updates: Update[] = []
+        for (const { acceptedPath, path, ...rest } of p.updates)
+          if (outputByOwner.has(acceptedPath) && outputByOwner.has(path))
+            updates.push({
+              ...rest,
+              acceptedPath: outputByOwner.get(acceptedPath)!,
+              path: outputByOwner.get(path)!,
+            })
+        return { type: 'update', updates }
+      }
+
+      default:
+        return p // connected, custom, error
+    }
+  }),
+  withLatestFrom(filesReady$),
+  filter(([p, { bundle }]) => {
+    switch (p.type) {
+      case 'full-reload':
+        return typeof p.path === 'undefined' || p.path in bundle
+      case 'prune':
+        return p.paths.length > 0
+      case 'update':
+        return p.updates.length > 0
+      default:
+        return true
+    }
+  }),
+  tap(([p]) => {
+    p
+  }),
+  map(
+    ([p]): CrxHMRPayload => ({
+      type: 'custom',
+      event: 'crx:content-script-payload',
+      data: p,
+    }),
+  ),
+)
+
 export const pluginHMR: CrxPluginFn = () => {
-  let config: ResolvedConfig
-  let background: string | undefined
+  let files: ManifestFiles
+  let server: ViteDevServer
 
   return [
     {
-      name: 'crx:hmr-background',
+      name: 'crx:hmr',
       apply: 'build',
-      configResolved(_config) {
-        config = config ?? (_config as ResolvedConfig)
-      },
-      renderCrxManifest(manifest) {
-        if (this.meta.watchMode && manifest.background?.service_worker)
-          background = join(config.root, manifest.background?.service_worker)
+      enforce: 'post',
+      async renderCrxManifest(manifest) {
+        if (this.meta.watchMode) {
+          files = await manifestFiles(manifest)
+        }
         return null
       },
     },
     {
-      name: 'crx:hmr-background',
+      name: 'crx:hmr',
       apply: 'serve',
+      enforce: 'pre',
       config({ server = {}, ...config }) {
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
@@ -90,121 +149,37 @@ export const pluginHMR: CrxPluginFn = () => {
 
         return { server, ...config }
       },
-      configResolved(_config) {
-        config = _config as ResolvedConfig
+      configResolved(config) {
+        const { watch = {} } = config.server
+        config.server.watch = watch
+        watch.ignored = watch.ignored
+          ? [...new Set([watch.ignored].flat())]
+          : []
+        watch.ignored.push(config.build.outDir)
       },
-      configureServer(server) {
-        setupHmrEvents({
-          logger: createLogger(config.logLevel, { prefix: '[crx]' }),
-          server,
+      configureServer(_server) {
+        server = _server
+        const { send } = server.ws
+
+        server.ws.send = (payload) => {
+          hmrPayload$.next(payload) // sniff hmr events
+          send(payload) // don't interfere with normal hmr
+        }
+        crxHmrPayload$.subscribe((payload) => {
+          send(payload) // send crx hmr events
         })
       },
-      resolveId(source) {
-        if (source === workerClientId) return workerClientId
-      },
-      load(id) {
-        if (id === workerClientId)
-          return defineClientValues(workerHmrClient, config)
-      },
-      handleHotUpdate({ server, modules, file }) {
+      handleHotUpdate({ file, modules, server }) {
+        const background =
+          files.background[0] && join(server.config.root, files.background[0])
+
         if (background)
-          if (background === file || modules.some(isImporter(background))) {
-            server.ws.send({
-              type: 'custom',
-              event: 'runtime-reload',
-            })
+          if (file === background || modules.some(isImporter(background))) {
+            debug('sending runtime reload')
+            server.ws.send(crxRuntimeReload)
             return []
           }
       },
     },
-    {
-      name: 'crx:hmr-pages',
-      apply: 'build',
-      renderCrxManifest(manifest) {
-        if (this.meta.watchMode) {
-          /**
-           * We don't bundle HTML files during development b/c the background
-           * HMR client to redirects all HTML requests to the dev server.
-           *
-           * Chrome checks that all the HTML pages in the manifest have files to
-           * match, so we emit a stub HTML page. This page is never used.
-           *
-           * The only case where we use the stub page is if the background opens
-           * a page immediately upon start. The background HMR client might not
-           * be ready in those ~100ms after installation, so we use a simple
-           * script to reload the stub page.
-           */
-          const refId = this.emitFile({
-            type: 'asset',
-            name: 'precontroller.js',
-            source: preControllerScript,
-          })
-          const name = this.getFileName(refId)
-          for (const fileName of htmlFiles(manifest)) {
-            this.emitFile({
-              type: 'asset',
-              fileName,
-              source: preControllerHtml.replace('%PATH%', `/${name}`),
-            })
-          }
-        }
-        return manifest
-      },
-    },
-    {
-      name: 'crx:hmr-content-scripts',
-      apply: 'build',
-      // TODO: emit new files for each content script module, use real file names
-      // TODO: add message-based content script HMR client
-      // TODO: send content script HMR updates to background via HMR websocket
-    },
   ]
-}
-
-export function defineClientValues(code: string, config: ResolvedConfig) {
-  let options = config.server.hmr
-  options = options && typeof options !== 'boolean' ? options : {}
-  const host = options.host || null
-  const protocol = options.protocol || null
-  const timeout = options.timeout || 30000
-  const overlay = options.overlay !== false
-  let hmrPort: number | string | undefined
-  if (isObject(config.server.hmr)) {
-    hmrPort = config.server.hmr.clientPort || config.server.hmr.port
-  }
-  if (config.server.middlewareMode) {
-    hmrPort = String(hmrPort || 24678)
-  } else {
-    hmrPort = String(hmrPort || options.port || config.server.port!)
-  }
-  let hmrBase = config.base
-  if (options.path) {
-    hmrBase = join(hmrBase, options.path)
-  }
-  if (hmrBase !== '/') {
-    hmrPort = normalize(`${hmrPort}${hmrBase}`)
-  }
-
-  return code
-    .replace(`__MODE__`, JSON.stringify(config.mode))
-    .replace(`__BASE__`, JSON.stringify(config.base))
-    .replace(`__DEFINES__`, serializeDefine(config.define || {}))
-    .replace(`__HMR_PROTOCOL__`, JSON.stringify(protocol))
-    .replace(`__HMR_HOSTNAME__`, JSON.stringify(host))
-    .replace(`__HMR_PORT__`, JSON.stringify(hmrPort))
-    .replace(`__HMR_TIMEOUT__`, JSON.stringify(timeout))
-    .replace(`__HMR_ENABLE_OVERLAY__`, JSON.stringify(overlay))
-    .replace(`__SERVER_PORT__`, JSON.stringify(config.server.port?.toString()))
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function serializeDefine(define: Record<string, any>): string {
-    let res = `{`
-    for (const key in define) {
-      const val = define[key]
-      res += `${JSON.stringify(key)}: ${
-        typeof val === 'string' ? `(${val})` : JSON.stringify(val)
-      }, `
-    }
-    return res + `}`
-  }
 }

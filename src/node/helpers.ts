@@ -1,5 +1,6 @@
 import { simple } from 'acorn-walk'
-import _debug from 'debug'
+import { createHash as _hash } from 'crypto'
+import debug from 'debug'
 import fg from 'fast-glob'
 import { PluginContext } from 'rollup'
 import v8 from 'v8'
@@ -8,17 +9,25 @@ import type {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
 } from './manifest'
-import type { AcornLiteral } from './types'
+import type { AcornLiteral, ManifestFiles } from './types'
+
+export const _debug = (id: string) => debug('crx').extend(id)
 
 export const structuredClone = <T>(obj: T): T => {
   return v8.deserialize(v8.serialize(obj))
 }
 
-export { _debug } // makes it easy to import w/ intellisense
+export const createHash = (data: string, length = 5): string =>
+  _hash('sha1')
+    .update(data)
+    .digest('base64')
+    .replace(/[^A-Za-z0-9]/g, '')
+    .slice(0, length)
 
 export const isString = (x: unknown): x is string => typeof x === 'string'
 
-export const isPresent = <T>(x: T): x is NonNullable<T> => !!x
+type Falsy = false | 0 | '' | null | undefined
+export const isTruthy = <T>(x: T | Falsy): x is T => !!x
 
 export function isObject<T>(
   value: T,
@@ -31,7 +40,10 @@ export const isResourceByMatch = (
   x: WebAccessibleResourceById | WebAccessibleResourceByMatch,
 ): x is WebAccessibleResourceByMatch => 'matches' in x
 
-export async function allFiles(manifest: ManifestV3, options: fg.Options) {
+export async function manifestFiles(
+  manifest: ManifestV3,
+  options: fg.Options = {},
+): Promise<ManifestFiles> {
   // JSON
   let locales: string[] = []
   if (manifest.default_locale)
@@ -42,9 +54,9 @@ export async function allFiles(manifest: ManifestV3, options: fg.Options) {
       ({ path }) => path,
     ) ?? []
 
-  const js = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
+  const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
+  const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
   const serviceWorker = manifest.background?.service_worker
-  const css = manifest.content_scripts?.flatMap(({ css }) => css)
   const htmlPages = htmlFiles(manifest)
 
   const icons = [
@@ -53,13 +65,13 @@ export async function allFiles(manifest: ManifestV3, options: fg.Options) {
   ].flat()
 
   return {
-    js: [...new Set(js)].filter(isString),
-    css: [...new Set(css)].filter(isString),
-    htmlPages: htmlPages,
+    contentScripts: [...new Set(contentScripts)].filter(isString),
+    contentStyles: [...new Set(contentStyles)].filter(isString),
+    html: htmlPages,
     icons: [...new Set(icons)].filter(isString),
     locales: [...new Set(locales)].filter(isString),
     rulesets: [...new Set(rulesets)].filter(isString),
-    serviceWorker: [serviceWorker].filter(isString),
+    background: [serviceWorker].filter(isString),
   }
 }
 

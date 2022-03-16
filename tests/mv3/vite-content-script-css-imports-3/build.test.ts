@@ -1,4 +1,5 @@
-import { build, testOutput } from 'tests/runners'
+import { build } from 'tests/runners'
+import { testOutput } from 'tests/testOutput'
 import { mockDate } from 'tests/helpers'
 
 mockDate()

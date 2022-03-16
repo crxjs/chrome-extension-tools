@@ -7,16 +7,17 @@ import jsesc from 'jsesc'
 import { posix as path } from 'path'
 import { defineConfig, Plugin, rollup, RollupOptions } from 'rollup'
 import esbuild from 'rollup-plugin-esbuild'
+import dts from 'rollup-plugin-dts'
 
 const debug = _debug('config:rollup')
 
-const { dependencies, peerDependencies = {} } = fs.readJsonSync(
-  path.join(process.cwd(), 'package.json'),
-)
+const { dependencies, optionalDependencies, peerDependencies } =
+  fs.readJsonSync(path.join(process.cwd(), 'package.json'))
 
 const external: (string | RegExp)[] = [
   ...Object.keys({
     ...dependencies,
+    ...optionalDependencies,
     ...peerDependencies,
   }),
   'v8',
@@ -69,41 +70,48 @@ const bundleClientCode = (): Plugin => {
   }
 }
 
-const config = defineConfig({
-  external,
-  input: 'src/node/index.ts',
-  output: [
-    {
-      file: 'dist/index.mjs',
-      format: 'esm',
-    },
-    {
-      file: 'dist/index.cjs',
-      format: 'cjs',
-    },
-  ],
-  plugins: [
-    alias({
-      entries: [
-        {
-          find: /^src\/(.*)/,
-          replacement: path.resolve(__dirname, 'src/node/$1'),
-        },
-        {
-          find: /^client\/(.*)/,
-          replacement: path.resolve(__dirname, 'src/client/$1'),
-        },
-        {
-          find: /^tests\/(.*)/,
-          replacement: path.resolve(__dirname, 'tests/$1'),
-        },
-      ],
-    }),
-    bundleClientCode(),
-    resolve(),
-    commonjs(),
-    esbuild({ legalComments: 'inline' }),
-  ],
-})
+const config = defineConfig([
+  {
+    external,
+    input: 'src/node/index.ts',
+    output: [
+      {
+        file: 'dist/index.mjs',
+        format: 'esm',
+      },
+      {
+        file: 'dist/index.cjs',
+        format: 'cjs',
+      },
+    ],
+    plugins: [
+      alias({
+        entries: [
+          {
+            find: /^src\/(.*)/,
+            replacement: path.resolve(__dirname, 'src/node/$1'),
+          },
+          {
+            find: /^client\/(.*)/,
+            replacement: path.resolve(__dirname, 'src/client/$1'),
+          },
+          {
+            find: /^tests\/(.*)/,
+            replacement: path.resolve(__dirname, 'tests/$1'),
+          },
+        ],
+      }),
+      bundleClientCode(),
+      resolve(),
+      commonjs(),
+      esbuild({ legalComments: 'inline' }),
+    ],
+  },
+  {
+    input: 'src/node/index.ts',
+    output: { file: 'dist/index.d.ts', format: 'es' },
+    plugins: [dts()],
+  },
+])
 
 export default config

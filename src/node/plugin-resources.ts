@@ -1,7 +1,11 @@
 import { OutputAsset } from 'rollup'
 import { Manifest, ManifestChunk } from 'vite'
 import { isResourceByMatch, isString, _debug } from './helpers'
-import { dynamicScripts } from './plugin-contentScripts'
+import {
+  WebAccessibleResourceById,
+  WebAccessibleResourceByMatch,
+} from './manifest'
+import { dynamicScripts } from './plugin-dynamicScripts'
 import { CrxPluginFn } from './types'
 
 interface Resources {
@@ -34,12 +38,14 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  * developer dashboard, it is a special resource id that you can access by
  * calling `chrome.runtime.getURL`.
  */
-export const pluginResources: CrxPluginFn = () => {
+export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
+  const { injectCss = true } = contentScripts
   return {
     name: pluginName,
     apply: 'build',
-    config({ build, ...config }, { mode }) {
-      return { ...config, build: { ...build, manifest: mode !== 'watch' } }
+    enforce: 'post',
+    config({ build, ...config }, { command }) {
+      return { ...config, build: { ...build, manifest: command === 'build' } }
     },
     renderCrxManifest(manifest, bundle) {
       // set default value for web_accessible_resources
@@ -151,18 +157,25 @@ export const pluginResources: CrxPluginFn = () => {
 
                   imports.add(name)
 
-                  // inject css through content script
-                  if (css.size) {
-                    script.css = script.css ?? []
-                    script.css.push(...css)
+                  const resource:
+                    | WebAccessibleResourceById
+                    | WebAccessibleResourceByMatch = {
+                    matches: script.matches,
+                    resources: [...assets, ...imports],
+                    use_dynamic_url: true,
                   }
 
-                  if (assets.size + imports.size) {
-                    manifest.web_accessible_resources.push({
-                      matches: script.matches,
-                      resources: [...assets, ...imports],
-                      use_dynamic_url: true,
-                    })
+                  if (css.size)
+                    if (injectCss) {
+                      // inject css through content script
+                      script.css = script.css ?? []
+                      script.css.push(...css)
+                    } else {
+                      resource.resources.push(...css)
+                    }
+
+                  if (resource.resources.length) {
+                    manifest.web_accessible_resources.push(resource)
                   }
                 }
 

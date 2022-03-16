@@ -1,6 +1,7 @@
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ManifestV3Export } from './define'
+import { ManifestV3Export } from './defineManifest'
 import {
+  manifestFiles,
   decodeManifest,
   encodeManifest,
   htmlFiles,
@@ -11,11 +12,10 @@ import { ManifestV3 } from './manifest'
 import { basename } from './path'
 import { CrxPlugin, CrxPluginFn } from './types'
 import colors from 'picocolors'
+import { manifestId, stubId } from './virtualFileIds'
 
 // const debug = _debug('crx:manifest')
 
-const manifestId = 'crx:manifest'
-const stubId = 'crx:stub'
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
  *
@@ -25,20 +25,48 @@ const stubId = 'crx:stub'
 export const pluginManifest =
   (_manifest: ManifestV3Export): CrxPluginFn =>
   () => {
-    let refId: string
-    let plugins: CrxPlugin[]
     let manifest: ManifestV3
+    /** Vite plugins during production, file writer plugins during development */
+    let plugins: CrxPlugin[]
+    let refId: string
 
     return [
       {
-        name: 'crx:manifest-loader',
-        apply: 'build',
+        name: 'crx:manifest-init',
         enforce: 'pre',
         async config(config, env) {
           manifest = await (typeof _manifest === 'function'
             ? _manifest(env)
             : _manifest)
+
+          // pre-bundle dependencies
+          if (env.command === 'serve') {
+            const {
+              contentScripts: js,
+              background: serviceWorker,
+              html,
+            } = await manifestFiles(manifest)
+            let { entries = [] } = config.optimizeDeps ?? {}
+            entries = [entries].flat()
+            entries.push(...js, ...serviceWorker, ...html)
+
+            return {
+              ...config,
+              optimizeDeps: {
+                ...config.optimizeDeps,
+                entries,
+              },
+            }
+          }
         },
+        buildStart(options) {
+          if (options.plugins) plugins = options.plugins
+        },
+      },
+      {
+        name: 'crx:manifest-loader',
+        apply: 'build',
+        enforce: 'pre',
         buildStart() {
           refId = this.emitFile({
             type: 'chunk',
@@ -90,18 +118,17 @@ export const pluginManifest =
         },
       },
       {
-        name: 'crx:manifest',
+        name: 'crx:manifest-post',
         apply: 'build',
         enforce: 'post',
         configResolved(config) {
-          plugins = config.plugins as CrxPlugin[]
-          // crx:manifest needs to come after vite:manifest; enforce:post puts it before
-          const vite = plugins.findIndex(({ name }) => name === 'vite:manifest')
-          const crx = plugins.findIndex(({ name }) => name === 'crx:manifest')
-          if (vite > crx) {
-            const [plugin] = plugins.splice(crx, 1)
-            plugins.splice(vite + 1, 0, plugin)
-          }
+          const plugins = config.plugins as CrxPlugin[]
+          // crx:manifest-post needs to come after vite:manifest; enforce:post puts it before
+          const crx = plugins.findIndex(
+            ({ name }) => name === 'crx:manifest-post',
+          )
+          const [plugin] = plugins.splice(crx, 1)
+          plugins.push(plugin)
         },
         async transform(code, id) {
           if (id !== manifestId) return
@@ -119,19 +146,7 @@ export const pluginManifest =
             }
           }
 
-          // emit background service worker, but NOT during development
-          // service worker is served during development
-          if (manifest.background?.service_worker && !this.meta.watchMode) {
-            const file = manifest.background.service_worker
-            const refId = this.emitFile({
-              type: 'chunk',
-              id: file,
-              name: basename(file),
-            })
-            manifest.background.service_worker = refId
-          }
-
-          // emit content scripts
+          // always emit content scripts
           if (manifest.content_scripts?.length) {
             // css[] should be added and removed by crx:styles
             manifest.content_scripts = manifest.content_scripts.map(
@@ -149,8 +164,18 @@ export const pluginManifest =
             )
           }
 
-          // bundle html files only in watch mode
-          if (!this.meta.watchMode)
+          if (!this.meta.watchMode) {
+            // file writer does not emit background
+            if (manifest.background?.service_worker) {
+              const file = manifest.background.service_worker
+              const refId = this.emitFile({
+                type: 'chunk',
+                id: file,
+                name: basename(file),
+              })
+              manifest.background.service_worker = refId
+            }
+            // file writer does not emit html files
             for (const file of htmlFiles(manifest)) {
               this.emitFile({
                 type: 'chunk',
@@ -158,6 +183,7 @@ export const pluginManifest =
                 name: basename(file),
               })
             }
+          }
 
           const encoded = encodeManifest(manifest)
           return encoded
@@ -184,6 +210,8 @@ export const pluginManifest =
             },
           )
 
+          // run renderCrxManifest hook
+          // this appears to run after generateBundle since this is the last plugin
           for (const plugin of plugins) {
             try {
               const m = structuredClone(manifest)

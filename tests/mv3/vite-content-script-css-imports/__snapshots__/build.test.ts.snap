@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`build fs output: 00 manifest.json 1`] = `
+exports[`build fs output: _00 manifest.json 1`] = `
 Object {
   "content_scripts": Array [
     Object {
@@ -34,7 +34,7 @@ Object {
 }
 `;
 
-exports[`build fs output: 01 output files 1`] = `
+exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/content-script-loader.content.ts.hash.hash.js",
   "assets/content.ts.hash.css",
@@ -51,8 +51,7 @@ exports[`build fs output: assets/content.ts.hash.css 1`] = `
 `;
 
 exports[`build fs output: assets/content.ts.hash.js 1`] = `
-"var styles = '';
-
+"var styles = \\"\\";
 console.log(\\"content.ts\\");
 "
 `;

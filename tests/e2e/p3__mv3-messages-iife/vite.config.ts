@@ -8,5 +8,5 @@ export default defineConfig({
   build: { minify: false },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest, format: 'iife' })],
+  plugins: [crx({ manifest })],
 })
