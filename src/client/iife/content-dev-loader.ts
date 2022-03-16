@@ -1,7 +1,6 @@
 declare const __PREAMBLE__: string
 declare const __CLIENT__: string
 declare const __SCRIPT__: string
-  // declare const __TIMESTAMP__: number
 ;(async () => {
   // remember, __PREAMBLE__ and __CLIENT__ are emitted files
   if (__PREAMBLE__)
