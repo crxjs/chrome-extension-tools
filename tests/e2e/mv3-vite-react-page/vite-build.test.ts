@@ -6,7 +6,8 @@ test('crx runs from build output', async () => {
   const page = await getPage(browser, 'chrome-extension')
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.waitForSelector('.App')
+  const app = page.locator('.App')
+  await app.waitFor()
 
-  expect(await page.screenshot()).toMatchImageSnapshot()
+  expect(await app.screenshot()).toMatchImageSnapshot()
 })

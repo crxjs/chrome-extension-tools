@@ -59,12 +59,17 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-  # Runs integration tests for MV3
+  # Runs e2e integration tests in Playwright
   e2e:
-    name: E2E Playwright Tests
+    name: E2E Integration Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        type: [build, serve]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -87,6 +92,9 @@ jobs:
           # If specified, run `pnpm install`
           # run_install: true
 
+      - name: Check CWD
+        run: node -e "console.log('cwd', process.cwd())"
+
       - name: Cache pnpm modules
         uses: actions/cache@v2
         env:
@@ -99,40 +107,28 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run E2E vite build tests
+      - name: Run ${{ matrix.type }} tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: pnpm test:ci:e2e:build
-
-      - name: Run E2E vite serve tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: pnpm test:ci:e2e:serve
-
-      # - name: Check for image diffs
-      #   id: diff
-      #   run: echo "::set-output name=files::$(find . -wholename '__image_snapshot_diffs__/*.png')"
-
-      - name: Check CWD
-        if: failure()
-        run: node -e "console.log('cwd', process.cwd())"
-
-      - name: Print dir tree
-        if: failure()
-        run: tree -I node_modules
+          run: pnpm test:ci:e2e:${{ matrix.type }}
 
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: image-snapshot-diff-output
+          name: image-diff-${{ matrix.type }}
           path: ${{ github.workspace }}/tests/**/__image_snapshots__/__diff_output__/*.png
 
-  # Runs snapshot integration tests for MV3
-  mv3:
-    name: MV3 Integration Tests
+  # Runs output snapshot tests
+  output:
+    name: Output Snapshot Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        type: [build, serve]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -170,11 +166,8 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run MV3 Vite build tests
-        run: pnpm test:ci:mv3:build
-
-      - name: Run MV3 Vite serve tests
-        run: pnpm test:ci:mv3:serve
+      - name: Run ${{ matrix.type }} tests
+        run: pnpm test:ci:mv3:${{ matrix.type }}
 
       - name: Check for diff
         id: diff
@@ -191,6 +184,6 @@ jobs:
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: mv3-snapshot-diff
+          name: output-diff-${{ matrix.type }}
           path: diff.txt
           if-no-files-found: ignore

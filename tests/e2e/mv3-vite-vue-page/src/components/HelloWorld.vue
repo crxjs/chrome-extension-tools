@@ -1,11 +1,11 @@
 <script setup>
-import { ref } from "vue";
+import { ref } from 'vue'
 
 defineProps({
   msg: String,
-});
+})
 
-const count = ref(0);
+const count = ref(0)
 </script>
 
 <template>
@@ -36,5 +36,10 @@ const count = ref(0);
 <style scoped>
 a {
   color: #42b983;
+}
+
+button {
+  margin: 0;
+  padding: 1px 6px;
 }
 </style>
