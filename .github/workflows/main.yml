@@ -125,7 +125,7 @@ jobs:
         if: failure()
         with:
           name: image-snapshot-diffs
-          path: ${{ github.workspace }}/tests/__image_snapshot_diffs__/
+          path: ${{ github.workspace }}/tests/__image_snapshot_diffs__/*.png
 
   # Runs snapshot integration tests for MV3
   mv3:
