@@ -119,17 +119,13 @@ jobs:
 
       - name: Print dir tree
         if: failure()
-        run: tree
-
-      - name: Check image diffs
-        if: failure()
-        run: node -e "console.log('diffs', require('fs').readdirSync(require('path').join('${{ github.workspace }}', 'tests', '__image_snapshot_diffs__')))"
+        run: tree -I node_modules
 
       - uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: image-snapshot-diffs
-          path: ${{ github.workspace }}/tests/__image_snapshot_diffs__/*.png
+          name: image-snapshot-diff-output
+          path: ${{ github.workspace }}/tests/**/__image_snapshots__/__diff_output__/*.png
 
   # Runs snapshot integration tests for MV3
   mv3:
