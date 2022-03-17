@@ -44,8 +44,8 @@ button {
   border-image: initial;
   border-style: outset;
   border-width: 2px;
-  font-size: calc(10px + 2vmin);
-  margin: 0em;
+  font-size: 26px;
+  margin: 0;
   padding: 1px 6px;
 }
 </style>
