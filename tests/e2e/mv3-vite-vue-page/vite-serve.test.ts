@@ -5,7 +5,8 @@ test('crx runs from server output', async () => {
   const { browser } = await serve(__dirname)
   const page = await getPage(browser, 'chrome-extension')
 
-  await page.waitForSelector('#app img')
+  const app = page.locator('#app')
+  await app.locator('img').waitFor()
 
-  expect(await page.screenshot()).toMatchImageSnapshot()
+  expect(await app.screenshot()).toMatchImageSnapshot()
 })
