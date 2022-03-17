@@ -5,6 +5,7 @@ expect.extend({
     comparisonMethod: 'pixelmatch',
     failureThreshold: 0.1,
     failureThresholdType: 'percent',
+    allowSizeMismatch: true,
   }),
 })
 
