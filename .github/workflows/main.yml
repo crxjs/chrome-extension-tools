@@ -117,9 +117,13 @@ jobs:
         if: failure()
         run: node -e "console.log('cwd', process.cwd())"
 
-      - name: List image diffs
+      - name: Print dir tree
         if: failure()
-        run: find . -wholename '**/__image_snapshot_diffs__/*.png'
+        run: tree
+
+      - name: Check image diffs
+        if: failure()
+        run: node -e "console.log('diffs', require('fs').readdirSync(require('path').join('${{ github.workspace }}', 'tests', '__image_snapshot_diffs__')))"
 
       - uses: actions/upload-artifact@v2
         if: failure()
