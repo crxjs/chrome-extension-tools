@@ -59,12 +59,14 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-  # Runs integration tests for MV3
+  # Runs e2e integration tests in Playwright
   e2e:
-    name: E2E Playwright Tests
+    name: E2E Integration Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    continue-on-error: true
 
     strategy:
       matrix:
@@ -117,12 +119,14 @@ jobs:
           name: image-diff-${{ matrix.type }}
           path: ${{ github.workspace }}/tests/**/__image_snapshots__/__diff_output__/*.png
 
-  # Runs snapshot integration tests for MV3
-  mv3:
-    name: MV3 Output Snapshot Tests
+  # Runs output snapshot tests
+  output:
+    name: Output Snapshot Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    continue-on-error: true
 
     strategy:
       matrix:
