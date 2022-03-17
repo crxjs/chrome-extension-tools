@@ -6,6 +6,9 @@ expect.extend({
     failureThreshold: 0.1,
     failureThresholdType: 'percent',
     allowSizeMismatch: true,
+    customDiffConfig: {
+      ssim: 'weber',
+    },
   }),
 })
 
