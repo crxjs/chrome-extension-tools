@@ -120,6 +120,10 @@ jobs:
       - name: Check CWD
         if: failure()
         run: node -e "console.log('cwd', process.cwd())"
+        
+      - name: List image diffs
+        if: failure()
+        run: echo "${{ steps.diff.outputs.files }}"
 
       - uses: actions/upload-artifact@v2
         if: failure()
