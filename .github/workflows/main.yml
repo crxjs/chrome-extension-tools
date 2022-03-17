@@ -109,21 +109,17 @@ jobs:
         with:
           run: pnpm test:ci:e2e:serve
 
-      - name: Check for image diffs
-        id: diff
-        run: echo "::set-output name=files::$(find . -wholename '__image_snapshot_diffs__/*.png')"
-
-      - name: Fail if image diffs found
-        if: ${{ steps.diff.outputs.files }}
-        run: exit 1
+      # - name: Check for image diffs
+      #   id: diff
+      #   run: echo "::set-output name=files::$(find . -wholename '__image_snapshot_diffs__/*.png')"
 
       - name: Check CWD
         if: failure()
         run: node -e "console.log('cwd', process.cwd())"
-        
+
       - name: List image diffs
         if: failure()
-        run: echo "${{ steps.diff.outputs.files }}"
+        run: find . -wholename '**/__image_snapshot_diffs__/*.png'
 
       - uses: actions/upload-artifact@v2
         if: failure()
