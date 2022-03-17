@@ -2,11 +2,8 @@ import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({
-    customDiffConfig: {
-      threshold: 0.15,
-    },
     comparisonMethod: 'ssim',
-    failureThreshold: 0.03,
+    failureThreshold: 0.1,
     failureThresholdType: 'percent',
     allowSizeMismatch: true,
   }),
