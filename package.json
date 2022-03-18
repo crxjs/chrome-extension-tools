@@ -43,7 +43,6 @@
   "scripts": {
     "build": "rimraf dist && run-s build:*",
     "build:js": "rollup -c rollup.config.ts --configPlugin esbuild",
-    "build:types": "tsc -p tsconfig-types.json",
     "dev:js": "npm run build:js -- -w",
     "dev:lint": "tsc --noEmit --watch",
     "lint": "run-s lint:eslint lint:types",
