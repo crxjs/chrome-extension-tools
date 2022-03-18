@@ -32,7 +32,7 @@ specifiers:
   esbuild: 0.14.23
   esbuild-runner: 2.2.1
   eslint: 8.9.0
-  eslint-plugin-react: 7.28.0
+  eslint-plugin-react: 7.29.4
   fast-glob: ^3.2.11
   fs-extra: ^10.0.1
   jest: 27.5.1
@@ -100,7 +100,7 @@ devDependencies:
   esbuild: 0.14.23
   esbuild-runner: 2.2.1_esbuild@0.14.23
   eslint: 8.9.0
-  eslint-plugin-react: 7.28.0_eslint@8.9.0
+  eslint-plugin-react: 7.29.4_eslint@8.9.0
   jest: 27.5.1
   jest-image-snapshot: 4.5.1_jest@27.5.1
   npm-run-all: 4.1.5
@@ -2285,8 +2285,8 @@ packages:
       source-map: 0.6.1
     dev: true
 
-  /eslint-plugin-react/7.28.0_eslint@8.9.0:
-    resolution: {integrity: sha512-IOlFIRHzWfEQQKcAD4iyYDndHwTQiCMcJVJjxempf203jnNLUnW34AXLrV33+nEXoifJE2ZEGmcjKPL8957eSw==}
+  /eslint-plugin-react/7.29.4_eslint@8.9.0:
+    resolution: {integrity: sha512-CVCXajliVh509PcZYRFyu/BoUEz452+jtQJq2b3Bae4v3xBUWPLCmtmBM+ZinG4MzwmxJgJ2M5rMqhqLVn7MtQ==}
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8
