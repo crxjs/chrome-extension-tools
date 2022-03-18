@@ -54,7 +54,7 @@ specifiers:
   rxjs: 7.5.4
   typescript: 4.5.5
   vite: ^2.8.6
-  vite-plugin-inspect: 0.3.14
+  vite-plugin-inspect: 0.4.3
   vue: 3.2.31
 
 dependencies:
@@ -115,7 +115,7 @@ devDependencies:
   rxjs: 7.5.4
   typescript: 4.5.5
   vite: 2.8.6
-  vite-plugin-inspect: 0.3.14_vite@2.8.6
+  vite-plugin-inspect: 0.4.3_vite@2.8.6
   vue: 3.2.31
 
 packages:
@@ -4901,8 +4901,8 @@ packages:
     hasBin: true
     dev: true
 
-  /ufo/0.7.10:
-    resolution: {integrity: sha512-YTnDRlE1cIofRqOFN8ioAbz9qenDvkgVMSn0cnxvIDjM9sfEOMKB0ybMr+otSlCXMfQ/X35haYRoI7Nua82RrA==}
+  /ufo/0.7.11:
+    resolution: {integrity: sha512-IT3q0lPvtkqQ8toHQN/BkOi4VIqoqheqM1FnkNWT9y0G8B3xJhwnoKBu5OHx8zHDOvveQzfKuFowJ0VSARiIDg==}
     dev: true
 
   /unbox-primitive/1.0.1:
@@ -4956,8 +4956,8 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: true
 
-  /vite-plugin-inspect/0.3.14_vite@2.8.6:
-    resolution: {integrity: sha512-oRjltmm1nUgkHmlGLgfSAuPiXA/FqC7daURJ+faY498r3mwnXrtcfe6Bg5khANQ0iss9Cn1uV6+W9c85noVq0g==}
+  /vite-plugin-inspect/0.4.3_vite@2.8.6:
+    resolution: {integrity: sha512-lj3oWnReRUwMHB7k8ZD8o6E27/OSn+8ua+tOftxuS39aM6Z9MG7m5r1CMlxMwEwdTM/wnQr0aH22Y2IX3e+++w==}
     engines: {node: '>=14'}
     peerDependencies:
       vite: ^2.0.0
@@ -4966,7 +4966,7 @@ packages:
       debug: 4.3.3
       kolorist: 1.5.1
       sirv: 2.0.2
-      ufo: 0.7.10
+      ufo: 0.7.11
       vite: 2.8.6
     transitivePeerDependencies:
       - supports-color
