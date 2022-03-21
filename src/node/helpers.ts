@@ -54,6 +54,31 @@ export async function manifestFiles(
       ({ path }) => path,
     ) ?? []
 
+  const webScripts: string[] = []
+  const webResources: string[] = []
+  if (manifest.web_accessible_resources) {
+    // TODO: get web accessible resources
+    const resources = manifest.web_accessible_resources
+      .map(({ resources }) => resources)
+      .flat()
+
+    const files: string[] = []
+    for (const r of resources)
+      if (fg.isDynamicPattern(r)) {
+        const ff = await fg(r, options)
+        files.push(...ff)
+      } else {
+        files.push(r)
+      }
+
+    for (const f of files)
+      if (/\.[tj]sx?$/.test(f)) {
+        webScripts.push(f)
+      } else {
+        webResources.push(f)
+      }
+  }
+
   const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
   const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
   const serviceWorker = manifest.background?.service_worker
@@ -72,6 +97,8 @@ export async function manifestFiles(
     locales: [...new Set(locales)].filter(isString),
     rulesets: [...new Set(rulesets)].filter(isString),
     background: [serviceWorker].filter(isString),
+    webAccessibleScripts: [...new Set(webScripts)].filter(isString),
+    webAccessibleResources: [...new Set(webResources)].filter(isString),
   }
 }
 

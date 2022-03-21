@@ -47,6 +47,8 @@ export type ManifestFiles = {
   locales: string[]
   rulesets: string[]
   background: string[]
+  webAccessibleScripts: string[]
+  webAccessibleResources: string[]
 }
 
 export type CrxHMRPayload =
