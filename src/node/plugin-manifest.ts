@@ -10,14 +10,13 @@ import {
   isString,
   manifestFiles,
   structuredClone,
-  _debug,
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, join } from './path'
-import { CrxPlugin, CrxPluginFn } from './types'
+import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
 
-const debug = _debug('manifest')
+// const debug = _debug('manifest')
 
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
@@ -70,7 +69,6 @@ export const pluginManifest =
           }
         },
         buildStart(options) {
-          debug('buildStart', options)
           if (options.plugins) plugins = options.plugins
         },
       },
@@ -134,7 +132,7 @@ export const pluginManifest =
         enforce: 'post',
         configResolved(_config) {
           config = _config
-          debug('configResolved %o', config)
+
           const plugins = config.plugins as CrxPlugin[]
           // crx:manifest-post needs to come after vite:manifest; enforce:post puts it before
           const crx = plugins.findIndex(
@@ -254,9 +252,16 @@ export const pluginManifest =
 
           /* ---------- COPY MISSING MANIFEST ASSETS --------- */
 
+          const assetTypes: (keyof ManifestFiles)[] = [
+            'icons',
+            'locales',
+            'rulesets',
+            'webAccessibleResources',
+          ]
           const files = await manifestFiles(manifest)
           await Promise.all(
-            Object.values(files)
+            assetTypes
+              .map((k) => files[k])
               .flat()
               .map(async (f) => {
                 if (typeof bundle[f] === 'undefined') {
