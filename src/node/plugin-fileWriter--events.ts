@@ -115,8 +115,11 @@ function startLogger(server: ViteDevServer) {
     // TODO: log runtime reload from crxHmrPayload$
 
     filesError$.subscribe(({ error }) => {
-      logger.error('error from file writer')
-      if (error) logger.error(error.message)
+      logger.error(colors.dim('error from file writer:'), { timestamp: true })
+      if (error) {
+        const message = error?.stack ?? error.message
+        logger.error(colors.red(message))
+      }
     }),
   ]
 
