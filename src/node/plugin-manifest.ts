@@ -39,6 +39,12 @@ export const pluginManifest =
             ? _manifest(env)
             : _manifest)
 
+          // TODO: build this out into full validation plugin
+          if (manifest.manifest_version !== 3)
+            throw new Error(
+              `Manifest v${manifest.manifest_version} is currently unsupported, please use manifest v3`,
+            )
+
           // pre-bundle dependencies
           if (env.command === 'serve') {
             const {
