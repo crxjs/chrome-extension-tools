@@ -16,6 +16,20 @@ import { pluginFileWriterPolyfill } from './plugin-fileWriter--polyfill'
 import { CrxPlugin, CrxPluginFn } from './types'
 import { stubId } from './virtualFileIds'
 
+function sortPlugins(plugins: CrxPlugin[], command?: 'build' | 'serve') {
+  const pre: CrxPlugin[] = []
+  const mid: CrxPlugin[] = []
+  const post: CrxPlugin[] = []
+  for (const p of plugins) {
+    if (p.apply === command || !p.apply || !command) {
+      if (p.enforce === 'pre') pre.push(p)
+      else if (p.enforce === 'post') post.push(p)
+      else mid.push(p)
+    }
+  }
+  return { pre, mid, post }
+}
+
 export const pluginFileWriter =
   (crxPlugins: CrxPlugin[]): CrxPluginFn =>
   (options) => {
@@ -24,7 +38,19 @@ export const pluginFileWriter =
     const events = pluginFileWriterEvents(options)
     const publicDir = pluginFileWriterPublic(options)
     const polyfill = pluginFileWriterPolyfill(options)
-    const internal = [chunks, html, events, publicDir, polyfill].flat()
+
+    const { pre, mid, post } = sortPlugins(crxPlugins, 'build')
+
+    const plugins = [
+      ...pre,
+      ...mid,
+      polyfill,
+      chunks,
+      html,
+      publicDir,
+      ...post,
+      events,
+    ].flat()
 
     let watcher: RollupWatcher
     return {
@@ -32,45 +58,26 @@ export const pluginFileWriter =
       apply: 'serve',
       async config(_config, env) {
         let config = _config
-        for (const p of internal) {
+        for (const p of plugins) {
           const r = await p.config?.(config, env)
           config = r ?? config
         }
         return config
       },
       async configResolved(config) {
-        await Promise.all(internal.map((p) => p.configResolved?.(config)))
+        await Promise.all(plugins.map((p) => p.configResolved?.(config)))
       },
       configureServer(server) {
         server.httpServer?.once('listening', async () => {
           server$.next(server)
 
-          /* ------------------ SORT PLUGINS ----------------- */
-
-          const pre: CrxPlugin[] = []
-          const post: CrxPlugin[] = []
-          const mid: CrxPlugin[] = []
-          for (const p of crxPlugins) {
-            if (p.apply === 'serve') continue
-            else if (p.enforce === 'pre') pre.push(p)
-            else if (p.enforce === 'post') post.push(p)
-            else mid.push(p)
-          }
-
-          const plugins = [
-            ...pre,
-            ...mid,
-            polyfill,
-            chunks,
-            html,
-            publicDir,
-            ...post,
-            events,
-          ].flat()
-
           /* ------------ RUN FILEWRITERSTART HOOK ----------- */
 
-          const allPlugins: CrxPlugin[] = [...server.config.plugins, ...plugins]
+          const { pre, mid, post } = sortPlugins([
+            ...server.config.plugins,
+            ...plugins,
+          ])
+          const allPlugins: CrxPlugin[] = [...pre, ...mid, ...post]
           await Promise.all(
             allPlugins.map(async (p) => {
               try {
