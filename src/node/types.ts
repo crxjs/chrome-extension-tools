@@ -2,6 +2,7 @@ import type { Node } from 'acorn'
 import type { PluginContext, OutputBundle } from 'rollup'
 import type { HMRPayload, Plugin as VitePlugin, ViteDevServer } from 'vite'
 import { ManifestV3 } from './manifest'
+import type { Options as FastGlobOptions } from 'fast-glob'
 
 export interface AcornLiteral extends Node {
   type: 'Literal'
@@ -33,6 +34,7 @@ export interface CrxOptions {
     hmrTimeout?: number
     injectCss?: boolean
   }
+  fastGlobOptions?: FastGlobOptions
 }
 
 export interface CrxPluginFn {
@@ -47,8 +49,11 @@ export type ManifestFiles = {
   locales: string[]
   rulesets: string[]
   background: string[]
-  webAccessibleScripts: string[]
-  webAccessibleResources: string[]
+}
+
+export type WebAccessibleFiles = {
+  webScripts: string[]
+  webResources: string[]
 }
 
 export type CrxHMRPayload =
