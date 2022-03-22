@@ -1,0 +1,17 @@
+{
+  "content_scripts": [
+    {
+      "js": ["src/content.ts"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": [
+    {
+      "matches": ["https://www.google.com/*"],
+      "resources": ["src/script.ts", "src/font.otf", "src/image.png"]
+    }
+  ]
+}
