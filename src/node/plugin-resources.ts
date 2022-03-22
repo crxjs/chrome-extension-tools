@@ -55,14 +55,14 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       // add resources from declared and dynamic scripts
       if (manifest.content_scripts?.length || dynamicScripts.size)
         if (this.meta.watchMode) {
+          // during development do things faster
           manifest.web_accessible_resources.push({
-            // a content script from any url can access
+            // change the extension origin on every reload
+            use_dynamic_url: true,
+            // all web origins can access
             matches: ['<all_urls>'],
             // all resources are web accessible
             resources: ['**/*', '*'],
-            // this is secure enough for development
-            // b/c the CRX id is different each session
-            use_dynamic_url: true,
           })
         } else {
           const vmAsset = bundle['manifest.json'] as OutputAsset
