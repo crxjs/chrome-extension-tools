@@ -1,15 +1,17 @@
 {
-  "manifest_version": 3,
   "content_scripts": [
     {
-      "matches": ["https://google.com/*"],
-      "js": ["src/content1.ts"]
-    },
-    {
-      "matches": ["https://bing.com/*"],
-      "js": ["src/content2.ts"]
+      "js": ["src/content.ts"],
+      "matches": ["https://google.com/*"]
     }
   ],
+  "manifest_version": 3,
   "name": "test extension",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "web_accessible_resources": [
+    {
+      "matches": ["https://google.com/*"],
+      "resources": ["src/script.ts"]
+    }
+  ]
 }
