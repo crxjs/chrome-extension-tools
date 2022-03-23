@@ -7,11 +7,5 @@
   ],
   "manifest_version": 3,
   "name": "test extension",
-  "version": "0.1.0",
-  "web_accessible_resources": [
-    {
-      "matches": ["https://google.com/*"],
-      "resources": ["src/script.ts"]
-    }
-  ]
+  "version": "0.1.0"
 }

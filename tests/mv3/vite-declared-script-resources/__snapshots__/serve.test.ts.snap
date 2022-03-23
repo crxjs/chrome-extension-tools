@@ -22,15 +22,6 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://google.com/*",
-      ],
-      "resources": Array [
-        "src/script.ts.js",
-      ],
-      "use_dynamic_url": false,
-    },
-    Object {
-      "matches": Array [
         "<all_urls>",
       ],
       "resources": Array [

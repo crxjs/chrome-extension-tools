@@ -21,18 +21,10 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "src/script.ts.js",
-      ],
-      "use_dynamic_url": false,
-    },
-    Object {
-      "matches": Array [
-        "https://google.com/*",
-      ],
-      "resources": Array [
         "assets/content.ts.hash.js",
         "assets/font.hash.otf",
         "assets/image.hash.png",
+        "assets/script.hash.js",
       ],
       "use_dynamic_url": true,
     },
@@ -46,8 +38,8 @@ Array [
   "assets/content.ts.hash.js",
   "assets/font.hash.otf",
   "assets/image.hash.png",
+  "assets/script.hash.js",
   "manifest.json",
-  "src/script.ts.js",
 ]
 `;
 
@@ -55,7 +47,7 @@ exports[`build fs output: assets/content.ts.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
 var font = \\"/assets/font.hash.otf\\";
 console.log(\\"content.ts\\", { icon, font });
-fetch(chrome.runtime.getURL(\\"src/script.ts.js\\")).catch(console.error);
+fetch(chrome.runtime.getURL(\\"assets/script.hash.js\\")).catch(console.error);
 "
 `;
 
@@ -74,7 +66,7 @@ exports[`build fs output: assets/content-script-loader.content.ts.hash.hash.js 1
 "
 `;
 
-exports[`build fs output: src/script.ts.js 1`] = `
+exports[`build fs output: assets/script.hash.js 1`] = `
 "console.log(\\"main world script\\");
 "
 `;

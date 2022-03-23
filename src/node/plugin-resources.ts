@@ -1,12 +1,23 @@
+import { simple } from 'acorn-walk'
+import { readFile } from 'fs-extra'
+import MagicString from 'magic-string'
 import { OutputAsset } from 'rollup'
-import { Manifest, ManifestChunk } from 'vite'
-import { isResourceByMatch, isString, _debug } from './helpers'
+import { Manifest, ManifestChunk, ResolvedConfig } from 'vite'
+import {
+  isIdentifier,
+  isLiteral,
+  isMemberExpression,
+  isPresent,
+  isResourceByMatch,
+  _debug,
+} from './helpers'
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
 } from './manifest'
+import { join } from './path'
 import { dynamicScripts } from './plugin-dynamicScripts'
-import { CrxPluginFn } from './types'
+import { AcornCallExpression, CrxPluginFn } from './types'
 
 interface Resources {
   assets: Set<string>
@@ -14,8 +25,7 @@ interface Resources {
   imports: Set<string>
 }
 
-const pluginName = 'crx:resources'
-const debug = _debug(pluginName)
+const debug = _debug('content-script-resources')
 
 export const dynamicResourcesName = '<dynamic_resource>' as const
 
@@ -40,12 +50,94 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  */
 export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
   const { injectCss = true } = contentScripts
+  const allRefIds = new Set<string>()
+  const refIdsByModule = new Map<string, Set<string>>()
+  const assetsToSetSource = new Map<string, string>()
+  let config: ResolvedConfig
   return {
-    name: pluginName,
+    name: 'crx:content-script-resources',
     apply: 'build',
     enforce: 'post',
     config({ build, ...config }, { command }) {
       return { ...config, build: { ...build, manifest: command === 'build' } }
+    },
+    configResolved(_config) {
+      config = _config
+    },
+    async transform(code, id) {
+      /**
+       * What we just replace script imports with vars?
+       *
+       * 1. `import script from './script.ts?script'`
+       * 2. `var script = import.meta.ROLLUP_FILE_URL_referenceId`
+       * 3. `?script | ?script&loader` is dynamic content script w/ loader + HMR
+       * 4. `?script&es` is ES module (main world script)
+       * 5. `?script&iife` is IIFE script (works for either)
+       * 6. No virtual modules!!
+       * 7. No AST walkers
+       */
+      if (code.includes('runtime.getURL')) {
+        const magic = new MagicString(code)
+        const tree = this.parse(code)
+        const moduleRefIds = new Set<string>()
+        simple(tree, {
+          CallExpression: (_node) => {
+            const node = _node as AcornCallExpression
+            if (
+              isMemberExpression(node.callee) &&
+              isIdentifier(node.callee.property) &&
+              node.callee.property.name === 'getURL' &&
+              isMemberExpression(node.callee.object) &&
+              isIdentifier(node.callee.object.property) &&
+              node.callee.object.property.name === 'runtime' &&
+              // only emit string literal paths
+              isLiteral(node.arguments[0]) &&
+              typeof node.arguments[0].value === 'string'
+            ) {
+              const [literal] = node.arguments
+              let refId = assetsToSetSource.get(literal.value)
+              if (refId) {
+                // asset was emitted previously
+              } else if (/\.[jt]s$/.test(literal.value)) {
+                refId = this.emitFile({
+                  type: 'chunk',
+                  id: literal.value,
+                })
+              } else {
+                refId = this.emitFile({
+                  type: 'asset',
+                  name: literal.value,
+                })
+                assetsToSetSource.set(literal.value, refId)
+              }
+              allRefIds.add(refId)
+              moduleRefIds.add(refId)
+              magic.overwrite(
+                literal.start,
+                literal.end,
+                `import.meta.ROLLUP_FILE_URL_${refId}`,
+              )
+            }
+          },
+        })
+
+        refIdsByModule.set(id, moduleRefIds)
+        return { code: magic.toString(), map: magic.generateMap() }
+      }
+      return null
+    },
+    async renderStart() {
+      for (const [asset, refId] of assetsToSetSource) {
+        const assetPath = join(config.root, asset)
+        const buffer = await readFile(assetPath)
+        this.setAssetSource(refId, buffer)
+      }
+      assetsToSetSource.clear()
+    },
+    resolveFileUrl({ referenceId, fileName }) {
+      if (referenceId && allRefIds.has(referenceId)) {
+        return `"${fileName}"`
+      }
     },
     renderCrxManifest(manifest, bundle) {
       // set default value for web_accessible_resources
@@ -71,6 +163,8 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
           debug('vite manifest %O', viteManifest)
           if (Object.keys(viteManifest).length === 0) return
 
+          /* -------------- CONTENT SCRIPT DATA -------------- */
+
           const filesByName = new Map<string, ManifestChunk>()
           for (const file of Object.values(viteManifest))
             filesByName.set(file.file, file)
@@ -84,6 +178,8 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
           for (const [, { refId }] of dynamicScripts)
             if (refId) dynamicScriptNames.add(this.getFileName(refId))
 
+          /* ------------ CONTENT SCRIPT FUNCTIONS ----------- */
+
           const getChunkResources = (chunk: typeof bundle[string]) => {
             const chunks = new Set<string>()
             const assets = new Set<string>()
@@ -93,8 +189,12 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
             for (const i of [...imports, ...dynamicImports]) chunks.add(i)
 
             const resources = Object.keys(modules)
-              .map((m) => dynamicScripts.get(m)?.refId)
-              .filter(isString)
+              .map((m) => [
+                ...(refIdsByModule.get(m) ?? new Set()),
+                dynamicScripts.get(m)?.refId,
+              ])
+              .flat()
+              .filter(isPresent)
               .map((m) => this.getFileName(m))
 
             for (const id of resources) {
@@ -145,15 +245,13 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
             return sets
           }
 
-          const mainWorldScripts = new Set<string>()
+          /* ---------------- PROCESS SCRIPTS ---------------- */
+
           for (const script of manifest.content_scripts ?? [])
             if (script.js?.length)
               for (const name of script.js)
                 if (script.matches?.length) {
                   const { assets, css, imports } = getResources(name)
-
-                  for (const i of imports)
-                    if (dynamicScriptNames.has(i)) mainWorldScripts.add(i)
 
                   imports.add(name)
 
@@ -180,15 +278,14 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                 }
 
           const dynamicResourceSet = new Set<string>()
-          for (const name of dynamicScriptNames)
-            if (!mainWorldScripts.has(name)) {
-              const { assets, css, imports } = getResources(name)
+          for (const name of dynamicScriptNames) {
+            const { assets, css, imports } = getResources(name)
 
-              dynamicResourceSet.add(name)
-              for (const a of assets) dynamicResourceSet.add(a)
-              for (const c of css) dynamicResourceSet.add(c)
-              for (const i of imports) dynamicResourceSet.add(i)
-            }
+            dynamicResourceSet.add(name)
+            for (const a of assets) dynamicResourceSet.add(a)
+            for (const c of css) dynamicResourceSet.add(c)
+            for (const i of imports) dynamicResourceSet.add(i)
+          }
           if (dynamicResourceSet.size) {
             let resource = manifest.web_accessible_resources!.find(
               ({ resources: [r] }) => r === dynamicResourcesName,

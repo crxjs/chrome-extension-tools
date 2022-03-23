@@ -1,4 +1,3 @@
-import fg from 'fast-glob'
 import { readFile } from 'fs-extra'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
@@ -27,7 +26,7 @@ import { manifestId, stubId } from './virtualFileIds'
  */
 export const pluginManifest =
   (_manifest: ManifestV3Export): CrxPluginFn =>
-  ({ fastGlobOptions }) => {
+  () => {
     let manifest: ManifestV3
     /** Vite plugins during production, file writer plugins during development */
     let plugins: CrxPlugin[]
@@ -178,75 +177,6 @@ export const pluginManifest =
                 return { js: refJS, ...rest }
               },
             )
-          }
-
-          // always emit web accessible resources
-          if (manifest.web_accessible_resources?.length) {
-            const topLevelMatchPatterns = new Set<string>()
-            const fileDataByName = new Map<
-              string,
-              { fileName: string; refId: string }
-            >()
-            const emitResource = async (input: string) => {
-              // don't emit files 2x
-              if (fileDataByName.has(input)) {
-                const { refId } = fileDataByName.get(input)!
-                return refId
-              }
-
-              const scriptRegex = /\.[tj]sx?$/
-              const filePath = join(config.root, input)
-              let refId: string
-              let source: Buffer | undefined
-              if (scriptRegex.test(input)) {
-                const fileName = input.endsWith('.js') ? input : input + '.js'
-                refId = this.emitFile({
-                  type: 'chunk',
-                  // fileWriter/HMR isn't compatible with fileName (but works the same)
-                  fileName: this.meta.watchMode ? undefined : fileName,
-                  id: input,
-                })
-              } else {
-                source = await readFile(filePath)
-                refId = this.emitFile({
-                  type: 'asset',
-                  fileName: input,
-                  source,
-                })
-              }
-              fileDataByName.set(input, { fileName: input, refId })
-              return refId
-            }
-
-            for (const resource of manifest.web_accessible_resources) {
-              const refIds = await Promise.all(
-                resource.resources.map(async (r) => {
-                  // don't copy everything in config.root
-                  if (r.startsWith('*')) {
-                    topLevelMatchPatterns.add(r)
-                    return r
-                  }
-
-                  let files: string[] = []
-                  if (fg.isDynamicPattern(r)) {
-                    files = await fg(r, fastGlobOptions)
-                  } else {
-                    files = [r]
-                  }
-
-                  return Promise.all(files.map(emitResource))
-                }),
-              )
-
-              resource.resources = refIds.flat()
-            }
-
-            if (topLevelMatchPatterns.size > 0) {
-              const ignored = [...topLevelMatchPatterns].map((t) => `"${t}"`)
-              this.warn(
-                `Ignoring top level match patterns: ${ignored.join(', ')}`,
-              )
-            }
           }
 
           if (!this.meta.watchMode) {
