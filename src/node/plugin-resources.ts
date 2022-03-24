@@ -4,7 +4,7 @@ import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import MagicString from 'magic-string'
 import { OutputAsset } from 'rollup'
 import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
-import { isResourceByMatch, _debug } from './helpers'
+import { createHash, isResourceByMatch, isString, _debug } from './helpers'
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
@@ -12,6 +12,8 @@ import {
 import { parse } from './path'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, preambleId } from './virtualFileIds'
+import injector from 'connect-injector'
+import { filesReady, rebuildFiles } from './plugin-fileWriter--events'
 
 interface Resources {
   assets: Set<string>
@@ -21,17 +23,23 @@ interface Resources {
 
 const importedScriptRegex =
   /^import (.+?) from ['"](.+?)\?script&?(loader|module|iife)?['"];?$/gm
+
 type ImportedScriptType = 'loader' | 'module' | 'iife'
-const scriptTypes: ImportedScriptType[] = ['module', 'iife', 'loader']
-function isImportedScriptType(x: string): x is ImportedScriptType {
-  return scriptTypes.includes(x as ImportedScriptType)
-}
 interface ImportedScriptData {
   id: string
   type: ImportedScriptType
   fileName?: string
   refId?: string
   loaderRefId?: string
+  loaderName?: string
+}
+const scriptTypes: ImportedScriptType[] = ['module', 'iife', 'loader']
+function isImportedScriptType(x: string): x is ImportedScriptType {
+  return scriptTypes.includes(x as ImportedScriptType)
+}
+
+function getTypeId(input: { type: ImportedScriptType; id: string }) {
+  return createHash(JSON.stringify(input), 8)
 }
 
 const debug = _debug('content-script-resources')
@@ -129,74 +137,230 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
     {
       name: 'crx:content-script-imports',
       apply: 'serve',
+      configureServer(server) {
+        server.middlewares.use(
+          injector(
+            (req, res) => {
+              const contentType = [res.getHeader('Content-Type')]
+                .flat()
+                .filter(isString)
+              return contentType.some((t) => t.includes('javascript'))
+            },
+            // http requests are delayed until content scripts are available on disk
+            async (code, req, res, callback) => {
+              if (
+                isString(code) &&
+                code.includes('import.meta.CRX_IMPORTED_SCRIPT_')
+              ) {
+                // TODO: get all typeIds
+                // TODO: check status of typeIds
+                const matches = Array.from(
+                  code.matchAll(/import.meta.CRX_IMPORTED_SCRIPT_(.+?);/g),
+                )
+                const magic = new MagicString(code)
+                for (const m of matches)
+                  if (typeof m.index === 'number') {
+                    const [statement, typeId] = m
+                    // data was set in transform hook
+                    const data = importedScriptsByTypeId.get(typeId)!
+                    // build is in progress
+                    if (data.refId) await filesReady()
+                    // script was added during build, rebuild
+                    if (!data.fileName) await rebuildFiles()
+                    // something went wrong, surface the error
+                    if (!data.fileName)
+                      throw new Error(
+                        `Could not get URL for imported script "${data.id}"`,
+                      )
+
+                    magic.overwrite(
+                      m.index,
+                      m.index + statement.length,
+                      `"/${data.loaderRefId ?? data.fileName}"`,
+                    )
+                  }
+
+                callback(null, magic.toString())
+              } else {
+                callback(null, code)
+              }
+            },
+          ),
+        )
+      },
       async transform(code, importer) {
-        // need to output files to know file names
-        // file writer loads files from dev server, which triggers this hook
-        // need served code which can be replaced by file writer
-        // can we differentiate between requests from file writer and requests from browser?
+        importedScriptRegex.lastIndex = 0
+        if (importedScriptRegex.test(code)) {
+          const magic = new MagicString(code)
+          importedScriptRegex.lastIndex = 0
+          for (const m of code.matchAll(importedScriptRegex))
+            if (typeof m.index === 'number') {
+              const [statement, varName, scriptName, type = 'loader'] = m
+              if (!isImportedScriptType(type)) {
+                throw new Error(
+                  `Unsupported script import type "${type}" (imported in file: ${importer})`,
+                )
+              } else if (type === 'iife') {
+                throw new Error(
+                  `IIFE script import is unimplemented (imported in file: ${importer})`,
+                )
+              }
+
+              const { id = scriptName } =
+                (await this.resolve(scriptName, importer)) ?? {}
+
+              const typeId = getTypeId({ type, id })
+              const data = importedScriptsByTypeId.get(typeId) ?? {
+                type,
+                id,
+              }
+              importedScriptsByTypeId.set(typeId, data)
+
+              magic.overwrite(
+                m.index,
+                m.index + statement.length,
+                `var ${varName} = import.meta.CRX_IMPORTED_SCRIPT_${typeId};`,
+              )
+            }
+          return { code: magic.toString(), map: magic.generateMap() }
+        }
+        return null
       },
     },
     {
       name: 'crx:content-script-imports',
       apply: 'build',
+      buildStart() {
+        importedScriptsByLoaderRefId.clear()
+        importedScriptsByRefId.clear()
+        for (const [, data] of importedScriptsByTypeId) {
+          if (data.type === 'iife') {
+            // TODO: bundle as iife here, emit as asset, no support for vite special features
+            continue
+          } else {
+            data.refId = this.emitFile({ type: 'chunk', id: data.id })
+            importedScriptsByRefId.set(data.refId, data)
+          }
+
+          if (data.type === 'loader') {
+            data.loaderRefId = this.emitFile({
+              type: 'asset',
+              name: `content-script-loader.${parse(data.id).name}.js`,
+              // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
+              // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
+              source: JSON.stringify(data), // set real source in generateBundle
+            })
+            importedScriptsByLoaderRefId.set(data.loaderRefId, data)
+          }
+        }
+      },
       async transform(code, importer) {
-        importedScriptRegex.lastIndex = 0
-        if (importedScriptRegex.test(code)) {
-          const magic = new MagicString(code)
-          const refIds = new Set<string>()
+        if (this.meta.watchMode) {
           importedScriptRegex.lastIndex = 0
-          for (const m of code.matchAll(importedScriptRegex))
-            if (typeof m.index === 'number') {
-              const [statement, varName, scriptName, type = 'loader'] = m
-              if (!isImportedScriptType(type))
-                throw new Error(
-                  `Unsupported script import type "${type}" (imported in file: ${importer})`,
+          if (code.includes('import.meta.CRX_IMPORTED_SCRIPT_')) {
+            const magic = new MagicString(code)
+            const refIds = new Set<string>()
+            importedScriptRegex.lastIndex = 0
+            for (const m of code.matchAll(
+              /import.meta.CRX_IMPORTED_SCRIPT_(.+?);/g,
+            ))
+              if (typeof m.index === 'number') {
+                const [statement, typeId] = m
+                const data = importedScriptsByTypeId.get(typeId)!
+                if (!data.refId) {
+                  if (data.type === 'iife') {
+                    // TODO: bundle as iife here, emit as asset, no support for vite special features
+                    continue
+                  } else {
+                    data.refId = this.emitFile({ type: 'chunk', id: data.id })
+                    importedScriptsByRefId.set(data.refId, data)
+                  }
+
+                  if (data.type === 'loader') {
+                    data.loaderRefId = this.emitFile({
+                      type: 'asset',
+                      name: `content-script-loader.${parse(data.id).name}.js`,
+                      // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
+                      // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
+                      source: JSON.stringify(data), // set real source in generateBundle
+                    })
+                    importedScriptsByLoaderRefId.set(data.loaderRefId, data)
+                  }
+                }
+
+                refIds.add(data.refId)
+
+                const finalRefId = data.loaderRefId ?? data.refId
+                magic.overwrite(
+                  m.index,
+                  m.index + statement.length,
+                  `import.meta.ROLLUP_FILE_URL_${finalRefId};`,
                 )
-
-              const { id = scriptName } =
-                (await this.resolve(scriptName, importer)) ?? {}
-
-              const data = importedScriptsByTypeId.get(`${type}::${id}`) ?? {
-                type,
-                id,
               }
-              importedScriptsByTypeId.set(`${type}::${id}`, data)
-
-              if (!data.refId) {
-                if (type === 'iife') {
-                  // TODO: bundle as iife here, emit as asset, no support for vite special features
+            importedScriptRefIdsByModule.set(importer, refIds)
+            return { code: magic.toString(), map: magic.generateMap() }
+          }
+        } else {
+          importedScriptRegex.lastIndex = 0
+          if (importedScriptRegex.test(code)) {
+            const magic = new MagicString(code)
+            const refIds = new Set<string>()
+            importedScriptRegex.lastIndex = 0
+            for (const m of code.matchAll(importedScriptRegex))
+              if (typeof m.index === 'number') {
+                const [statement, varName, scriptName, type = 'loader'] = m
+                if (!isImportedScriptType(type))
                   throw new Error(
-                    `Script import type "iife" has not been implemented (imported in file: ${importer})`,
+                    `Unsupported script import type "${type}" (imported in file: ${importer})`,
                   )
-                } else {
-                  data.refId = this.emitFile({ type: 'chunk', id })
-                  importedScriptsByRefId.set(data.refId, data)
+
+                const { id = scriptName } =
+                  (await this.resolve(scriptName, importer)) ?? {}
+
+                const data = importedScriptsByTypeId.get(`${type}::${id}`) ?? {
+                  type,
+                  id,
+                }
+                importedScriptsByTypeId.set(`${type}::${id}`, data)
+
+                if (!data.refId) {
+                  if (type === 'iife') {
+                    // TODO: bundle as iife here, emit as asset, no support for vite special features
+                    throw new Error(
+                      `Script import type "iife" has not been implemented (imported in file: ${importer})`,
+                    )
+                  } else {
+                    data.refId = this.emitFile({ type: 'chunk', id })
+                    importedScriptsByRefId.set(data.refId, data)
+                  }
+
+                  if (type === 'loader') {
+                    data.loaderRefId = this.emitFile({
+                      type: 'asset',
+                      name: `content-script-loader.${
+                        parse(scriptName).name
+                      }.js`,
+                      // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
+                      // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
+                      source: id, // set real source in generateBundle
+                    })
+                    importedScriptsByLoaderRefId.set(data.loaderRefId, data)
+                  }
                 }
 
-                if (type === 'loader') {
-                  data.loaderRefId = this.emitFile({
-                    type: 'asset',
-                    name: `content-script-loader.${parse(scriptName).name}.js`,
-                    // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
-                    // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
-                    source: id, // set real source in generateBundle
-                  })
-                  importedScriptsByLoaderRefId.set(data.loaderRefId, data)
-                }
+                refIds.add(data.refId)
+
+                magic.overwrite(
+                  m.index,
+                  m.index + statement.length,
+                  `var ${varName} = import.meta.ROLLUP_FILE_URL_${
+                    data.loaderRefId ?? data.refId
+                  };`,
+                )
               }
-
-              refIds.add(data.refId)
-
-              magic.overwrite(
-                m.index,
-                m.index + statement.length,
-                `var ${varName} = import.meta.ROLLUP_FILE_URL_${
-                  data.loaderRefId ?? data.refId
-                };`,
-              )
-            }
-          importedScriptRefIdsByModule.set(importer, refIds)
-          return { code: magic.toString(), map: magic.generateMap() }
+            importedScriptRefIdsByModule.set(importer, refIds)
+            return { code: magic.toString(), map: magic.generateMap() }
+          }
         }
         return null
       },
@@ -222,7 +386,7 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
         /* ------- SET IMPORTED SCRIPT LOADER SOURCE ------- */
 
         for (const [typeId, data] of importedScriptsByTypeId)
-          if (data.refId && data.loaderRefId) {
+          if (data.refId && data.loaderRefId)
             try {
               const scriptName = this.getFileName(data.refId)
               const loaderName = this.getFileName(data.loaderRefId)
@@ -240,16 +404,23 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
               const asset = bundle[loaderName]
               if (asset?.type === 'asset') asset.source = source
             } catch (error) {
+              // TODO: not sure if we need this?
+              // this.getFileName threw b/c imported script was removed
               importedScriptsByRefId.delete(data.refId)
               importedScriptsByLoaderRefId.delete(data.loaderRefId)
               importedScriptsByTypeId.delete(typeId)
             }
-          }
+
+        /* ------- UPDATE DATA FOR SERVER MIDDLEWARE ------- */
 
         for (const data of importedScriptsByTypeId.values()) {
           if (data.refId) {
-            data.fileName = this.getFileName(data.loaderRefId ?? data.refId)
+            data.fileName = this.getFileName(data.refId)
             delete data.refId
+          }
+          if (data.loaderRefId) {
+            data.loaderName = this.getFileName(data.loaderRefId)
+            delete data.loaderRefId
           }
         }
       },
@@ -297,10 +468,8 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                 chunksById.set(chunk.facadeModuleId, name)
 
             const importedScriptNames = new Set<string>()
-            for (const [refId] of importedScriptsByRefId) {
-              const fileName = this.getFileName(refId)
+            for (const [, { fileName }] of importedScriptsByRefId)
               if (fileName) importedScriptNames.add(fileName)
-            }
 
             /* ------------ CONTENT SCRIPT FUNCTIONS ----------- */
 
