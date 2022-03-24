@@ -1,5 +1,6 @@
 import font from './font.otf'
 import image from './image.png'
+import scriptSrc from './script?script&module'
 
 console.log('content.ts')
 
@@ -29,7 +30,7 @@ img.addEventListener('load', function () {
 })
 
 const script = document.createElement('script')
-script.src = chrome.runtime.getURL('src/script.ts')
+script.src = chrome.runtime.getURL(scriptSrc)
 container.append(script)
 
 document.body.append(container)
