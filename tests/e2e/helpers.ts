@@ -5,14 +5,16 @@ export async function getPage(
   browser: BrowserContext,
   test: RegExp | string,
 ): Promise<Page> {
+  const timeout = 5000
+  const predicate = async (p: Page) => {
+    await p.waitForURL(regex, { timeout })
+    return true
+  }
   const regex = test instanceof RegExp ? test : new RegExp(jsesc(test))
   const page = await Promise.race([
-    browser.waitForEvent('page', async (p) => {
-      await p.waitForURL(regex)
-      return true
-    }),
+    browser.waitForEvent('page', { predicate, timeout }),
     ...browser.pages().map(async (p) => {
-      await p.waitForURL(regex)
+      await p.waitForURL(regex, { timeout })
       return p
     }),
   ])
