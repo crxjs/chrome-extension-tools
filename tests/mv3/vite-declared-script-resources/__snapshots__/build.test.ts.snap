@@ -46,8 +46,12 @@ Array [
 exports[`build fs output: assets/content.ts.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
 var font = \\"/assets/font.hash.otf\\";
+var scriptUrl = \\"/assets/script.hash.js\\";
 console.log(\\"content.ts\\", { icon, font });
-fetch(chrome.runtime.getURL(\\"assets/script.hash.js\\")).catch(console.error);
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(scriptUrl);
+script.type = \\"module\\";
+document.body.append(script);
 "
 `;
 

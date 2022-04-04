@@ -468,8 +468,9 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                 chunksById.set(chunk.facadeModuleId, name)
 
             const dynamicScriptNames = new Set<string>()
-            for (const [, { fileName }] of dynamicScriptsByRefId)
-              if (fileName) dynamicScriptNames.add(fileName)
+            for (const [, { fileName, type }] of dynamicScriptsByRefId)
+              if (fileName && type === 'loader')
+                dynamicScriptNames.add(fileName)
 
             /* ------------ CONTENT SCRIPT FUNCTIONS ----------- */
 

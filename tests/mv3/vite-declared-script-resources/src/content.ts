@@ -1,6 +1,6 @@
 import icon from './image.png'
 import font from './font.otf'
-import scriptUrl from './script?script'
+import scriptUrl from './script?script&module'
 
 console.log('content.ts', { icon, font })
 

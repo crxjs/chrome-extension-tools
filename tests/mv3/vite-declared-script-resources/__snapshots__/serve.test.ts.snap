@@ -161,8 +161,12 @@ exports[`serve fs output: src/content.ts.js 1`] = `
 "import icon from './image.png.js';
 import font from './font.otf.js';
 
+var scriptUrl = \\"/src/script.ts.js\\";
 console.log(\\"content.ts\\", { icon, font });
-fetch(chrome.runtime.getURL(\\"src/script.ts.js\\")).catch(console.error);
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(scriptUrl);
+script.type = \\"module\\";
+document.body.append(script);
 "
 `;
 
