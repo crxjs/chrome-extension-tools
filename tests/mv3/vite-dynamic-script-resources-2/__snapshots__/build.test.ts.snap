@@ -16,12 +16,12 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "assets/content1.ts.hash.js",
-        "assets/content2.ts.hash.css",
-        "assets/content2.ts.hash.js",
+        "assets/content1.hash.js",
+        "assets/content2.hash.css",
+        "assets/content2.hash.js",
         "assets/font.hash.otf",
         "assets/image.hash.png",
-        "assets/script.ts.hash.js",
+        "assets/script.hash.js",
       ],
       "use_dynamic_url": false,
     },
@@ -32,23 +32,23 @@ Object {
 exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/background.ts.hash.js",
-  "assets/content-script-loader.content1.ts.hash.hash.js",
-  "assets/content-script-loader.content2.ts.hash.hash.js",
-  "assets/content-script-loader.script.ts.hash.hash.js",
-  "assets/content1.ts.hash.js",
-  "assets/content2.ts.hash.css",
-  "assets/content2.ts.hash.js",
+  "assets/content-script-loader.content1.hash.js",
+  "assets/content-script-loader.content2.hash.js",
+  "assets/content-script-loader.script.hash.js",
+  "assets/content1.hash.js",
+  "assets/content2.hash.css",
+  "assets/content2.hash.js",
   "assets/font.hash.otf",
   "assets/image.hash.png",
-  "assets/script.ts.hash.js",
+  "assets/script.hash.js",
   "manifest.json",
   "service-worker-loader.js",
 ]
 `;
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
-"var content1 = \\"/assets/content-script-loader.content1.ts.hash.hash.js\\";
-var content2 = \\"/assets/content-script-loader.content2.ts.hash.hash.js\\";
+"var content1 = \\"/assets/content-script-loader.content1.hash.js\\";
+var content2 = \\"/assets/content-script-loader.content2.hash.js\\";
 chrome.scripting.executeScript({
   files: [content1, content2],
   target: { tabId: 1 }
@@ -56,14 +56,14 @@ chrome.scripting.executeScript({
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content1.ts.hash.hash.js 1`] = `
+exports[`build fs output: assets/content-script-loader.content1.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content1.ts.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content1.hash.js\\")
     );
   })().catch(console.error);
 
@@ -71,14 +71,14 @@ exports[`build fs output: assets/content-script-loader.content1.ts.hash.hash.js 
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content2.ts.hash.hash.js 1`] = `
+exports[`build fs output: assets/content-script-loader.content2.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content2.ts.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content2.hash.js\\")
     );
   })().catch(console.error);
 
@@ -86,14 +86,14 @@ exports[`build fs output: assets/content-script-loader.content2.ts.hash.hash.js 
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.script.ts.hash.hash.js 1`] = `
+exports[`build fs output: assets/content-script-loader.script.hash.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/script.ts.hash.js\\")
+      chrome.runtime.getURL(\\"assets/script.hash.js\\")
     );
   })().catch(console.error);
 
@@ -101,28 +101,28 @@ exports[`build fs output: assets/content-script-loader.script.ts.hash.hash.js 1`
 "
 `;
 
-exports[`build fs output: assets/content1.ts.hash.js 1`] = `
+exports[`build fs output: assets/content1.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
-var script = \\"/assets/content-script-loader.script.ts.hash.hash.js\\";
+var script = \\"/assets/content-script-loader.script.hash.js\\";
 console.log(\\"content.ts\\", { icon, script });
 "
 `;
 
-exports[`build fs output: assets/content2.ts.hash.css 1`] = `
+exports[`build fs output: assets/content2.hash.css 1`] = `
 "body {
   color: #333;
 }
 "
 `;
 
-exports[`build fs output: assets/content2.ts.hash.js 1`] = `
+exports[`build fs output: assets/content2.hash.js 1`] = `
 "var font = \\"/assets/font.hash.otf\\";
 var css = \\"body {\\\\n  color: #333;\\\\n}\\\\n\\";
 console.log(\\"content2.ts\\", { css, font });
 "
 `;
 
-exports[`build fs output: assets/script.ts.hash.js 1`] = `
+exports[`build fs output: assets/script.hash.js 1`] = `
 "console.log(\\"main world script\\");
 "
 `;
