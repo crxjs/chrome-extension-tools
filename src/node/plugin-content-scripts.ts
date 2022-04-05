@@ -135,23 +135,23 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       },
     },
     {
-      name: 'crx:content-script-imports',
+      name: 'crx:dynamic-scripts',
       apply: 'serve',
       configureServer(server) {
         server.middlewares.use(
           injector(
             (req, res) => {
+              if (!req.url || req.url.includes('node_modules')) return false
+
               const contentType = [res.getHeader('Content-Type')]
                 .flat()
                 .filter(isString)
               return contentType.some((t) => t.includes('javascript'))
             },
             // http requests are delayed until content scripts are available on disk
-            async (code, req, res, callback) => {
-              if (
-                isString(code) &&
-                code.includes('import.meta.CRX_DYNAMIC_SCRIPT_')
-              ) {
+            async (content, req, res, callback) => {
+              const code = isString(content) ? content : content.toString()
+              if (code.includes('import.meta.CRX_DYNAMIC_SCRIPT_')) {
                 // TODO: get all typeIds
                 // TODO: check status of typeIds
                 const matches = Array.from(
@@ -176,7 +176,7 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                     magic.overwrite(
                       m.index,
                       m.index + statement.length,
-                      `"/${data.loaderRefId ?? data.fileName}"`,
+                      `"/${data.loaderName ?? data.fileName}"`,
                     )
                   }
 
@@ -228,7 +228,7 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       },
     },
     {
-      name: 'crx:content-script-imports',
+      name: 'crx:dynamic-scripts',
       apply: 'build',
       buildStart() {
         dynamicScriptsByLoaderRefId.clear()
@@ -256,11 +256,9 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       },
       async transform(code, importer) {
         if (this.meta.watchMode) {
-          dynamicScriptRegex.lastIndex = 0
           if (code.includes('import.meta.CRX_DYNAMIC_SCRIPT_')) {
             const magic = new MagicString(code)
             const refIds = new Set<string>()
-            dynamicScriptRegex.lastIndex = 0
             for (const m of code.matchAll(
               /import.meta.CRX_DYNAMIC_SCRIPT_(.+?);/g,
             ))
