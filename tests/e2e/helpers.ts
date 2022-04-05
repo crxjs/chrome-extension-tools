@@ -9,15 +9,26 @@ export async function getPage(
     process.env.NODE_ENV === 'test' && process.env.TIMEOUT
       ? parseInt(process.env.TIMEOUT)
       : 5000
-  const predicate = async (p: Page) => {
-    await p.waitForURL(regex, { timeout })
-    return true
-  }
   const regex = test instanceof RegExp ? test : new RegExp(jsesc(test))
-  const page = await Promise.race([
-    browser.waitForEvent('page', { predicate, timeout }),
-    ...browser.pages().map(async (p) => {
+  const waitForUrl = async (p: Page): Promise<boolean> => {
+    try {
       await p.waitForURL(regex, { timeout })
+      return true
+    } catch (error) {
+      // never resolve if page closes, etc
+      return new Promise(() => undefined)
+    }
+  }
+  const page = await Promise.race([
+    browser.waitForEvent('page', {
+      predicate: async (p) => {
+        await waitForUrl(p)
+        return true
+      },
+      timeout,
+    }),
+    ...browser.pages().map(async (p) => {
+      await waitForUrl(p)
       return p
     }),
   ])
