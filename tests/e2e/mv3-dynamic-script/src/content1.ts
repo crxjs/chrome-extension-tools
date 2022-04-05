@@ -2,7 +2,7 @@ import fileName from './main-world?script&module'
 
 const url = chrome.runtime.getURL(fileName)
 
-console.log('content1.ts')
+console.log('content1.ts', { fileName, url })
 
 const script = document.createElement('script')
 script.src = url

@@ -1,9 +1,7 @@
 import { getPage } from '../helpers'
 import { serve } from '../runners'
 
-// TODO: handle main world scripts through web_accessible_resources
-
-test.skip('crx runs from server output', async () => {
+test('crx runs from server output', async () => {
   const { browser } = await serve(__dirname)
 
   const options1 = await getPage(browser, 'chrome-extension')
@@ -13,7 +11,7 @@ test.skip('crx runs from server output', async () => {
   const branch = await Promise.race([
     // it might work the first time
     options1.waitForSelector('.ok').then(() => 0),
-    // crx may do runtime reload b/c imported script has changed the manifest
+    // runtime reload b/c imported script has changed the manifest
     options1.waitForEvent('close').then(() => 1),
   ])
 

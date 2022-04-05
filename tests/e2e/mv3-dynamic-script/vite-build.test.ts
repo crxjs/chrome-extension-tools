@@ -1,9 +1,7 @@
 import { getPage } from '../helpers'
 import { build } from '../runners'
 
-// TODO: handle main world scripts through web_accessible_resources
-
-test.skip('crx runs from build output', async () => {
+test('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
 
   const options = await getPage(browser, 'chrome-extension')
