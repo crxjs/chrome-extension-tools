@@ -5,7 +5,10 @@ export async function getPage(
   browser: BrowserContext,
   test: RegExp | string,
 ): Promise<Page> {
-  const timeout = 5000
+  const timeout =
+    process.env.NODE_ENV === 'test' && process.env.TIMEOUT
+      ? parseInt(process.env.TIMEOUT)
+      : 5000
   const predicate = async (p: Page) => {
     await p.waitForURL(regex, { timeout })
     return true
