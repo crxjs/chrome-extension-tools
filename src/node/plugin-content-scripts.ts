@@ -1,6 +1,7 @@
 import contentHmrPort from 'client/es/hmr-content-port.ts?client'
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
+import injector from 'connect-injector'
 import MagicString from 'magic-string'
 import { OutputAsset } from 'rollup'
 import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
@@ -10,10 +11,10 @@ import {
   WebAccessibleResourceByMatch,
 } from './manifest'
 import { parse } from './path'
+import { filesReady, rebuildFiles } from './plugin-fileWriter--events'
+import { crxRuntimeReload } from './plugin-hmr'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, preambleId } from './virtualFileIds'
-import injector from 'connect-injector'
-import { filesReady, rebuildFiles } from './plugin-fileWriter--events'
 
 interface Resources {
   assets: Set<string>
@@ -141,41 +142,47 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
         server.middlewares.use(
           injector(
             (req, res) => {
-              if (!req.url || req.url.includes('node_modules')) return false
-
-              const contentType = [res.getHeader('Content-Type')]
-                .flat()
-                .filter(isString)
-              return contentType.some((t) => t.includes('javascript'))
+              if (req.url && !req.url.includes('node_modules')) {
+                const contentType = [res.getHeader('Content-Type')]
+                  .flat()
+                  .filter(isString)
+                return contentType.some((t) => t.includes('javascript'))
+              }
+              return false
             },
             // http requests are delayed until content scripts are available on disk
             async (content, req, res, callback) => {
               const code = isString(content) ? content : content.toString()
               if (code.includes('import.meta.CRX_DYNAMIC_SCRIPT_')) {
-                // TODO: get all typeIds
-                // TODO: check status of typeIds
                 const matches = Array.from(
                   code.matchAll(/import.meta.CRX_DYNAMIC_SCRIPT_(.+?);/g),
-                )
-                const magic = new MagicString(code)
-                for (const m of matches)
-                  if (typeof m.index === 'number') {
-                    const [statement, typeId] = m
-                    // data was set in transform hook
-                    const data = dynamicScriptsByTypeId.get(typeId)!
-                    // build is in progress
-                    if (data.refId) await filesReady()
-                    // script was added during build, rebuild
-                    if (!data.fileName) await rebuildFiles()
-                    // something went wrong, surface the error
-                    if (!data.fileName)
-                      throw new Error(
-                        `Could not get URL for dynamic script "${data.id}"`,
-                      )
+                ).map((m) => ({
+                  statement: m[0],
+                  typeId: m[1],
+                  index: m.index,
+                  data: dynamicScriptsByTypeId.get(m[1])!,
+                }))
 
+                // build is in progress, wait
+                if (matches.some(({ data }) => data.refId)) await filesReady()
+
+                // some content scripts are new and don't exist on disk
+                if (
+                  matches.some(
+                    ({ data }) => !(data.loaderName ?? data.fileName),
+                  )
+                ) {
+                  await rebuildFiles()
+                  // new content scripts require a runtime reload
+                  server.ws.send(crxRuntimeReload)
+                }
+
+                const magic = new MagicString(code)
+                for (const { index, statement, data } of matches)
+                  if (typeof index === 'number') {
                     magic.overwrite(
-                      m.index,
-                      m.index + statement.length,
+                      index,
+                      index + statement.length,
                       `"/${data.loaderName ?? data.fileName}"`,
                     )
                   }
@@ -210,11 +217,9 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                 (await this.resolve(scriptName, importer)) ?? {}
 
               const typeId = getTypeId({ type, id })
-              const data = dynamicScriptsByTypeId.get(typeId) ?? {
-                type,
-                id,
-              }
-              dynamicScriptsByTypeId.set(typeId, data)
+              const data = dynamicScriptsByTypeId.get(typeId)
+              // this is a new dynamic script
+              if (!data) dynamicScriptsByTypeId.set(typeId, { type, id })
 
               magic.overwrite(
                 m.index,
