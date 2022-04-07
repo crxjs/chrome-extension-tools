@@ -102,7 +102,7 @@ export async function manifestFiles(
 export function htmlFiles(manifest: ManifestV3): string[] {
   const files = [
     manifest.action?.default_popup,
-    Object.values(manifest.chrome_settings_overrides ?? {}),
+    Object.values(manifest.chrome_url_overrides ?? {}),
     manifest.devtools_page,
     manifest.options_page,
     manifest.options_ui?.page,
