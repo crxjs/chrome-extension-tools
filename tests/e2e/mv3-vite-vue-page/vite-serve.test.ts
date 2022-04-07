@@ -1,6 +1,8 @@
 import { getPage } from '../helpers'
 import { serve } from '../runners'
 
+jest.retryTimes(2)
+
 test('crx runs from server output', async () => {
   const { browser } = await serve(__dirname)
   const page = await getPage(browser, 'chrome-extension')
