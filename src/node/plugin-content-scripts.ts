@@ -2,10 +2,11 @@ import contentHmrPort from 'client/es/hmr-content-port.ts?client'
 import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import injector from 'connect-injector'
+import { createHash } from 'crypto'
 import MagicString from 'magic-string'
-import { OutputAsset } from 'rollup'
+import { OutputAsset, PluginContext } from 'rollup'
 import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
-import { createHash, isResourceByMatch, isString, _debug } from './helpers'
+import { isResourceByMatch, isString, _debug } from './helpers'
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
@@ -22,25 +23,36 @@ interface Resources {
   imports: Set<string>
 }
 
-const dynamicScriptRegex =
-  /^import (.+?) from ['"](.+?)\?script&?(loader|module|iife)?['"];?$/gm
-
-type DynamicScriptType = 'loader' | 'module' | 'iife'
+type DynamicScriptFormat = 'loader' | 'module' | 'iife'
 interface DynamicScriptData {
   id: string
-  type: DynamicScriptType
+  importer: string
+  scriptId: string
+  finalId: string
+  format: DynamicScriptFormat
   fileName?: string
-  refId?: string
-  loaderRefId?: string
   loaderName?: string
+  loaderRefId?: string
+  refId?: string
 }
-const scriptTypes: DynamicScriptType[] = ['module', 'iife', 'loader']
-function isDynamicScriptType(x: string): x is DynamicScriptType {
-  return scriptTypes.includes(x as DynamicScriptType)
-}
+// const scriptTypes: DynamicScriptFormat[] = ['module', 'iife', 'loader']
+// function isDynamicScriptFormat(x: string): x is DynamicScriptFormat {
+//   return scriptTypes.includes(x as DynamicScriptFormat)
+// }
 
-function getTypeId(input: { type: DynamicScriptType; id: string }) {
-  return createHash(JSON.stringify(input), 8)
+function getScriptId({
+  format,
+  id,
+}: {
+  format: DynamicScriptFormat
+  id: string
+}) {
+  return createHash('sha1')
+    .update(format)
+    .update(id)
+    .digest('base64')
+    .replace(/[^A-Za-z0-9]/g, '')
+    .slice(0, 8)
 }
 
 const debug = _debug('content-scripts')
@@ -62,10 +74,85 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  */
 export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
   const { hmrTimeout = 5000, injectCss = true } = contentScripts
-  const dynamicScriptRefIdsByModule = new Map<string, Set<string>>()
-  const dynamicScriptsByRefId = new Map<string, DynamicScriptData>()
-  const dynamicScriptsByTypeId = new Map<string, DynamicScriptData>()
+  const dynamicScriptsById = new Map<string, DynamicScriptData>()
   const dynamicScriptsByLoaderRefId = new Map<string, DynamicScriptData>()
+  const dynamicScriptsByRefId = new Map<string, DynamicScriptData>()
+  const dynamicScriptsByScriptId = new Map<string, DynamicScriptData>()
+  function emitDynamicScript(
+    this: PluginContext,
+    data: DynamicScriptData,
+  ): void {
+    if (data.format === 'iife') {
+      throw new Error(
+        `Dynamic script format IIFE is unimplemented (imported in file: ${data.importer})`.trim(),
+      )
+    } else {
+      data.refId = this.emitFile({ type: 'chunk', id: data.id })
+      dynamicScriptsByRefId.set(data.refId, data)
+    }
+
+    if (data.format === 'loader') {
+      data.loaderRefId = this.emitFile({
+        type: 'asset',
+        name: `content-script-loader.${parse(data.id).name}.js`,
+        // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
+        // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
+        source: JSON.stringify(data), // set real source in generateBundle
+      })
+      dynamicScriptsByLoaderRefId.set(data.loaderRefId, data)
+    }
+  }
+  async function resolveDynamicScript(
+    this: PluginContext,
+    _source: string,
+    importer?: string,
+  ) {
+    if (importer && _source.includes('?script')) {
+      const url = new URL(_source, 'stub://stub')
+      if (url.searchParams.has('scriptId')) {
+        const scriptId = url.searchParams.get('scriptId')!
+        const { finalId } = dynamicScriptsByScriptId.get(scriptId)!
+        return finalId
+      } else if (url.searchParams.has('script')) {
+        const [source] = _source.split('?')
+        const resolved = await this.resolve(source, importer, {
+          skipSelf: true,
+        })
+        if (!resolved)
+          throw new Error(
+            `Could not resolve dynamic script: "${_source}" from "${importer}"`,
+          )
+        const { id } = resolved
+
+        let format: DynamicScriptFormat = 'loader'
+        if (url.searchParams.has('module')) {
+          format = 'module'
+        } else if (url.searchParams.has('iife')) {
+          format = 'iife'
+        }
+
+        const scriptId = getScriptId({ format, id })
+        const finalId = `${id}?scriptId=${scriptId}`
+
+        const data = dynamicScriptsByScriptId.get(scriptId) ?? {
+          format,
+          id,
+          importer,
+          scriptId,
+          finalId,
+        }
+        dynamicScriptsByScriptId.set(scriptId, data)
+        dynamicScriptsById.set(finalId, data)
+
+        return finalId
+      }
+    }
+  }
+  function loadDynamicScript(this: PluginContext, id: string) {
+    const data = dynamicScriptsById.get(id)
+    if (data)
+      return `export default import.meta.CRX_DYNAMIC_SCRIPT_${data.scriptId};`
+  }
 
   let port: string
   let server: ViteDevServer
@@ -136,19 +223,116 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       },
     },
     {
-      name: 'crx:dynamic-scripts',
+      name: 'crx:dynamic-scripts-load',
+      apply: 'serve',
+      enforce: 'pre',
+      // this.meta.watchMode is true for server
+      resolveId: resolveDynamicScript,
+      load: loadDynamicScript,
+    },
+    {
+      name: 'crx:dynamic-scripts-load',
+      apply: 'build',
+      enforce: 'pre',
+      resolveId(id, importer) {
+        // should not run on file writer
+        if (!this.meta.watchMode)
+          return resolveDynamicScript.call(this, id, importer)
+      },
+      load(id) {
+        // should not run on file writer
+        if (!this.meta.watchMode) return loadDynamicScript.call(this, id)
+      },
+    },
+    {
+      name: 'crx:dynamic-scripts-build',
+      apply: 'build',
+      buildStart() {
+        dynamicScriptsByLoaderRefId.clear()
+        dynamicScriptsByRefId.clear()
+        for (const [, data] of dynamicScriptsByScriptId) {
+          emitDynamicScript.call(this, data)
+        }
+      },
+      async transform(code) {
+        if (code.includes('import.meta.CRX_DYNAMIC_SCRIPT_')) {
+          const match = code.match(/import.meta.CRX_DYNAMIC_SCRIPT_(.+?);/)!
+          const index = match.index! // only undefined when match is entire string
+          const [statement, scriptId] = match // only undefined when no groups
+          const data = dynamicScriptsByScriptId.get(scriptId)!
+          if (!data.refId) emitDynamicScript.call(this, data)
+          const magic = new MagicString(code)
+          magic.overwrite(
+            index,
+            index + statement.length,
+            `import.meta.ROLLUP_FILE_URL_${data.loaderRefId ?? data.refId};`,
+          )
+          return { code: magic.toString(), map: magic.generateMap() }
+        }
+      },
+      resolveFileUrl({ referenceId, fileName, moduleId }) {
+        if (moduleId && referenceId)
+          if (
+            dynamicScriptsByRefId.has(referenceId) ||
+            dynamicScriptsByLoaderRefId.has(referenceId)
+          ) {
+            return `"/${fileName}"`
+          }
+      },
+      generateBundle(options, bundle) {
+        const preambleName =
+          this.meta.watchMode && preambleRefId
+            ? this.getFileName(preambleRefId)
+            : ''
+        const contentClientName =
+          this.meta.watchMode && contentClientRefId
+            ? this.getFileName(contentClientRefId)
+            : ''
+
+        /* -------- SET DYNAMIC SCRIPT LOADER SOURCE ------- */
+
+        for (const data of dynamicScriptsByScriptId.values()) {
+          if (data.refId && data.loaderRefId) {
+            const scriptName = this.getFileName(data.refId)
+            const loaderName = this.getFileName(data.loaderRefId)
+
+            const source = this.meta.watchMode
+              ? contentDevLoader
+                  .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
+                  .replace(/__CLIENT__/g, JSON.stringify(contentClientName))
+                  .replace(/__SCRIPT__/g, JSON.stringify(scriptName))
+              : contentProLoader.replace(
+                  /__SCRIPT__/g,
+                  JSON.stringify(scriptName),
+                )
+
+            const asset = bundle[loaderName]
+            if (asset?.type === 'asset') asset.source = source
+          }
+        }
+      },
+      writeBundle() {
+        /* ------ CLEAN UP DATA FOR SERVER MIDDLEWARE ------ */
+        for (const [, data] of dynamicScriptsByScriptId) {
+          if (data.refId) {
+            data.fileName = this.getFileName(data.refId)
+            delete data.refId
+          }
+          if (data.loaderRefId) {
+            data.loaderName = this.getFileName(data.loaderRefId)
+            delete data.loaderRefId
+          }
+        }
+      },
+    },
+    {
+      name: 'crx:dynamic-scripts-serve',
       apply: 'serve',
       configureServer(server) {
         server.middlewares.use(
           injector(
-            (req, res) => {
-              if (req.url && !req.url.includes('node_modules')) {
-                const contentType = [res.getHeader('Content-Type')]
-                  .flat()
-                  .filter(isString)
-                return contentType.some((t) => t.includes('javascript'))
-              }
-              return false
+            (req) => {
+              return !!req.url?.includes('?scriptId')
             },
             // http requests are delayed until content scripts are available on disk
             async (content, req, res, callback) => {
@@ -158,9 +342,8 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                   code.matchAll(/import.meta.CRX_DYNAMIC_SCRIPT_(.+?);/g),
                 ).map((m) => ({
                   statement: m[0],
-                  typeId: m[1],
                   index: m.index,
-                  data: dynamicScriptsByTypeId.get(m[1])!,
+                  data: dynamicScriptsByScriptId.get(m[1])!,
                 }))
 
                 // build is in progress, wait
@@ -194,238 +377,6 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
             },
           ),
         )
-      },
-      async transform(code, importer) {
-        dynamicScriptRegex.lastIndex = 0
-        if (dynamicScriptRegex.test(code)) {
-          const magic = new MagicString(code)
-          dynamicScriptRegex.lastIndex = 0
-          for (const m of code.matchAll(dynamicScriptRegex))
-            if (typeof m.index === 'number') {
-              const [statement, varName, scriptName, type = 'loader'] = m
-              if (!isDynamicScriptType(type)) {
-                throw new Error(
-                  `Unsupported dynamic script type "${type}" (imported in file: ${importer})`,
-                )
-              } else if (type === 'iife') {
-                throw new Error(
-                  `Dynamic script format IIFE is unimplemented (imported in file: ${importer})`,
-                )
-              }
-
-              const { id = scriptName } =
-                (await this.resolve(scriptName, importer)) ?? {}
-
-              const typeId = getTypeId({ type, id })
-              const data = dynamicScriptsByTypeId.get(typeId)
-              // this is a new dynamic script
-              if (!data) dynamicScriptsByTypeId.set(typeId, { type, id })
-
-              magic.overwrite(
-                m.index,
-                m.index + statement.length,
-                `var ${varName} = import.meta.CRX_DYNAMIC_SCRIPT_${typeId};`,
-              )
-            }
-          return { code: magic.toString(), map: magic.generateMap() }
-        }
-        return null
-      },
-    },
-    {
-      name: 'crx:dynamic-scripts',
-      apply: 'build',
-      buildStart() {
-        dynamicScriptsByLoaderRefId.clear()
-        dynamicScriptsByRefId.clear()
-        for (const [, data] of dynamicScriptsByTypeId) {
-          if (data.type === 'iife') {
-            // TODO: bundle as iife here, emit as asset, no support for vite special features
-            continue
-          } else {
-            data.refId = this.emitFile({ type: 'chunk', id: data.id })
-            dynamicScriptsByRefId.set(data.refId, data)
-          }
-
-          if (data.type === 'loader') {
-            data.loaderRefId = this.emitFile({
-              type: 'asset',
-              name: `content-script-loader.${parse(data.id).name}.js`,
-              // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
-              // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
-              source: JSON.stringify(data), // set real source in generateBundle
-            })
-            dynamicScriptsByLoaderRefId.set(data.loaderRefId, data)
-          }
-        }
-      },
-      async transform(code, importer) {
-        if (this.meta.watchMode) {
-          if (code.includes('import.meta.CRX_DYNAMIC_SCRIPT_')) {
-            const magic = new MagicString(code)
-            const refIds = new Set<string>()
-            for (const m of code.matchAll(
-              /import.meta.CRX_DYNAMIC_SCRIPT_(.+?);/g,
-            ))
-              if (typeof m.index === 'number') {
-                const [statement, typeId] = m
-                const data = dynamicScriptsByTypeId.get(typeId)!
-                if (!data.refId) {
-                  if (data.type === 'iife') {
-                    // TODO: bundle as iife here, emit as asset, no support for vite special features
-                    continue
-                  } else {
-                    data.refId = this.emitFile({ type: 'chunk', id: data.id })
-                    dynamicScriptsByRefId.set(data.refId, data)
-                  }
-
-                  if (data.type === 'loader') {
-                    data.loaderRefId = this.emitFile({
-                      type: 'asset',
-                      name: `content-script-loader.${parse(data.id).name}.js`,
-                      // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
-                      // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
-                      source: JSON.stringify(data), // set real source in generateBundle
-                    })
-                    dynamicScriptsByLoaderRefId.set(data.loaderRefId, data)
-                  }
-                }
-
-                refIds.add(data.refId)
-
-                const finalRefId = data.loaderRefId ?? data.refId
-                magic.overwrite(
-                  m.index,
-                  m.index + statement.length,
-                  `import.meta.ROLLUP_FILE_URL_${finalRefId};`,
-                )
-              }
-            dynamicScriptRefIdsByModule.set(importer, refIds)
-            return { code: magic.toString(), map: magic.generateMap() }
-          }
-        } else {
-          dynamicScriptRegex.lastIndex = 0
-          if (dynamicScriptRegex.test(code)) {
-            const magic = new MagicString(code)
-            const refIds = new Set<string>()
-            dynamicScriptRegex.lastIndex = 0
-            for (const m of code.matchAll(dynamicScriptRegex))
-              if (typeof m.index === 'number') {
-                const [statement, varName, scriptName, type = 'loader'] = m
-                if (!isDynamicScriptType(type))
-                  throw new Error(
-                    `Unsupported dynamic script type "${type}" (imported in file: ${importer})`,
-                  )
-
-                const { id = scriptName } =
-                  (await this.resolve(scriptName, importer)) ?? {}
-
-                const data = dynamicScriptsByTypeId.get(`${type}::${id}`) ?? {
-                  type,
-                  id,
-                }
-                dynamicScriptsByTypeId.set(`${type}::${id}`, data)
-
-                if (!data.refId) {
-                  if (type === 'iife') {
-                    // TODO: bundle as iife here, emit as asset, no support for vite special features
-                    throw new Error(
-                      `Dynamic script format IIFE is unimplemented (imported in file: ${importer})`,
-                    )
-                  } else {
-                    data.refId = this.emitFile({ type: 'chunk', id })
-                    dynamicScriptsByRefId.set(data.refId, data)
-                  }
-
-                  if (type === 'loader') {
-                    data.loaderRefId = this.emitFile({
-                      type: 'asset',
-                      name: `content-script-loader.${
-                        parse(scriptName).name
-                      }.js`,
-                      // unset source causes Rollup error "Plugin error - Unable to get file name for asset..."
-                      // we're referencing it in `import.meta.ROLLUP_FILE_URL_` below and Rollup wants to generate a hash
-                      source: id, // set real source in generateBundle
-                    })
-                    dynamicScriptsByLoaderRefId.set(data.loaderRefId, data)
-                  }
-                }
-
-                refIds.add(data.refId)
-
-                magic.overwrite(
-                  m.index,
-                  m.index + statement.length,
-                  `var ${varName} = import.meta.ROLLUP_FILE_URL_${
-                    data.loaderRefId ?? data.refId
-                  };`,
-                )
-              }
-            dynamicScriptRefIdsByModule.set(importer, refIds)
-            return { code: magic.toString(), map: magic.generateMap() }
-          }
-        }
-        return null
-      },
-      resolveFileUrl({ referenceId, fileName, moduleId }) {
-        if (moduleId && referenceId)
-          if (
-            dynamicScriptsByRefId.has(referenceId) ||
-            dynamicScriptsByLoaderRefId.has(referenceId)
-          ) {
-            return `"/${fileName}"`
-          }
-      },
-      generateBundle(options, bundle) {
-        const preambleName =
-          this.meta.watchMode && preambleRefId
-            ? this.getFileName(preambleRefId)
-            : ''
-        const contentClientName =
-          this.meta.watchMode && contentClientRefId
-            ? this.getFileName(contentClientRefId)
-            : ''
-
-        /* -------- SET DYNAMIC SCRIPT LOADER SOURCE ------- */
-
-        for (const [typeId, data] of dynamicScriptsByTypeId)
-          if (data.refId && data.loaderRefId)
-            try {
-              const scriptName = this.getFileName(data.refId)
-              const loaderName = this.getFileName(data.loaderRefId)
-
-              const source = this.meta.watchMode
-                ? contentDevLoader
-                    .replace(/__PREAMBLE__/g, JSON.stringify(preambleName))
-                    .replace(/__CLIENT__/g, JSON.stringify(contentClientName))
-                    .replace(/__SCRIPT__/g, JSON.stringify(scriptName))
-                : contentProLoader.replace(
-                    /__SCRIPT__/g,
-                    JSON.stringify(scriptName),
-                  )
-
-              const asset = bundle[loaderName]
-              if (asset?.type === 'asset') asset.source = source
-            } catch (error) {
-              // TODO: not sure if we need this?
-              // this.getFileName threw b/c dynamic script was removed
-              dynamicScriptsByRefId.delete(data.refId)
-              dynamicScriptsByLoaderRefId.delete(data.loaderRefId)
-              dynamicScriptsByTypeId.delete(typeId)
-            }
-
-        /* ------- UPDATE DATA FOR SERVER MIDDLEWARE ------- */
-
-        for (const data of dynamicScriptsByTypeId.values()) {
-          if (data.refId) {
-            data.fileName = this.getFileName(data.refId)
-            delete data.refId
-          }
-          if (data.loaderRefId) {
-            data.loaderName = this.getFileName(data.loaderRefId)
-            delete data.loaderRefId
-          }
-        }
       },
     },
     {
@@ -470,11 +421,6 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
               if (chunk.type === 'chunk' && chunk.facadeModuleId)
                 chunksById.set(chunk.facadeModuleId, name)
 
-            const dynamicScriptNames = new Set<string>()
-            for (const [, { fileName, type }] of dynamicScriptsByRefId)
-              if (fileName && type === 'loader')
-                dynamicScriptNames.add(fileName)
-
             /* ------------ CONTENT SCRIPT FUNCTIONS ----------- */
 
             const getChunkResources = (chunk: typeof bundle[string]) => {
@@ -482,23 +428,18 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
               const assets = new Set<string>()
               if (chunk.type === 'asset') return { chunks, assets }
 
-              const { modules, imports, dynamicImports } = chunk
-              for (const i of [...imports, ...dynamicImports]) chunks.add(i)
+              const { dynamicImports, imports, modules } = chunk
+              for (const i of dynamicImports) chunks.add(i)
+              for (const i of imports) chunks.add(i)
 
-              const dynamicScripts = Object.keys(modules)
-                .filter((m) => dynamicScriptRefIdsByModule.has(m))
-                .map((m) => dynamicScriptRefIdsByModule.get(m)!)
-                .map((set) => [...set])
-                .flat()
-                .map((m) => {
-                  return this.getFileName(m)
-                })
-
-              for (const id of dynamicScripts) {
-                const chunk = bundle[id]
-                if (chunk.type === 'chunk') chunks.add(id)
-                else assets.add(id)
-              }
+              for (const id of Object.keys(modules))
+                if (dynamicScriptsById.has(id)) {
+                  const data = dynamicScriptsById.get(id)!
+                  const fileName = this.getFileName(data.refId!)
+                  const chunk = bundle[fileName]
+                  if (chunk.type === 'chunk') chunks.add(fileName)
+                  else assets.add(fileName)
+                }
 
               return { chunks, assets }
             }
@@ -575,7 +516,8 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                   }
 
             const dynamicResourceSet = new Set<string>()
-            for (const name of dynamicScriptNames) {
+            for (const [refId] of dynamicScriptsByRefId) {
+              const name = this.getFileName(refId)
               const { assets, css, imports } = getResources(name)
 
               dynamicResourceSet.add(name)

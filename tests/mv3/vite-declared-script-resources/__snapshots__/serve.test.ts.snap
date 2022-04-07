@@ -48,6 +48,7 @@ Array [
   "src/image.png",
   "src/image.png.js",
   "src/script.ts.js",
+  "src/script.ts2.js",
   "vendor/vite-client.mjs.js",
   "vendor/vite-env.mjs.js",
 ]
@@ -160,8 +161,8 @@ exports[`serve fs output: service-worker-loader.js 1`] = `
 exports[`serve fs output: src/content.ts.js 1`] = `
 "import icon from './image.png.js';
 import font from './font.otf.js';
+import scriptUrl from './script.ts2.js';
 
-var scriptUrl = \\"/src/script.ts.js\\";
 console.log(\\"content.ts\\", { icon, font });
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(scriptUrl);
@@ -186,5 +187,12 @@ export { icon as default };
 
 exports[`serve fs output: src/script.ts.js 1`] = `
 "console.log(\\"main world script\\");
+"
+`;
+
+exports[`serve fs output: src/script.ts2.js 1`] = `
+"var scriptUrl = \\"/src/script.ts.js\\";
+
+export { scriptUrl as default };
 "
 `;
