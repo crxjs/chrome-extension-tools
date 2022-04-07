@@ -13,6 +13,7 @@ import {
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, join } from './path'
+import { dynamicResourcesName } from './plugin-content-scripts'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
 
@@ -233,7 +234,9 @@ export const pluginManifest =
             manifest.web_accessible_resources?.map(
               ({ resources, ...rest }) => ({
                 resources: resources.map((r) =>
-                  r.startsWith('*') ? r : this.getFileName(r),
+                  r.startsWith('*') || r === dynamicResourcesName
+                    ? r
+                    : this.getFileName(r),
                 ),
                 ...rest,
               }),
