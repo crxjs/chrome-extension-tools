@@ -148,11 +148,11 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         }
         if (url) setOwnerMeta({ id, owner })
 
-        debug('start "%s"', url)
-        debug('---------------------')
-        for (const l of transformResult.code.split('\n')) debug('| %s', l)
-        debug('---------------------')
-        debug('end "%s"', url)
+        // debug('start "%s"', url)
+        // debug('---------------------')
+        // for (const l of transformResult.code.split('\n')) debug('| %s', l)
+        // debug('---------------------')
+        // debug('end "%s"', url)
 
         return { code: transformResult.code, map: transformResult.map }
       }
