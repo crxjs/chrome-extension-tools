@@ -1,0 +1,123 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": { "type": "block" },
+    "condition": { "urlFilter": "google.com", "resourceTypes": ["main_frame"] }
+  },
+  {
+    "id": 2,
+    "priority": 1,
+    "action": { "type": "allow" },
+    "condition": {
+      "urlFilter": "google.com/123",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 3,
+    "priority": 2,
+    "action": { "type": "block" },
+    "condition": {
+      "urlFilter": "google.com/12345",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 4,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": { "url": "https://example.com" }
+    },
+    "condition": { "urlFilter": "google.com", "resourceTypes": ["main_frame"] }
+  },
+  {
+    "id": 5,
+    "priority": 1,
+    "action": { "type": "redirect", "redirect": { "extensionPath": "/a.jpg" } },
+    "condition": { "urlFilter": "abcd.com", "resourceTypes": ["main_frame"] }
+  },
+  {
+    "id": 6,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "transform": { "scheme": "https", "host": "new.example.com" }
+      }
+    },
+    "condition": {
+      "urlFilter": "||example.com",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 7,
+    "priority": 1,
+    "action": {
+      "type": "redirect",
+      "redirect": {
+        "regexSubstitution": "https://\\1.xyz.com/"
+      }
+    },
+    "condition": {
+      "regexFilter": "^https://www\\.(abc|def)\\.xyz\\.com/",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 8,
+    "priority": 2,
+    "action": {
+      "type": "allowAllRequests"
+    },
+    "condition": {
+      "urlFilter": "||b.com/path",
+      "resourceTypes": ["sub_frame"]
+    }
+  },
+  {
+    "id": 9,
+    "priority": 1,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "urlFilter": "script.js",
+      "resourceTypes": ["script"]
+    }
+  },
+  {
+    "id": 10,
+    "priority": 2,
+    "action": {
+      "type": "modifyHeaders",
+      "responseHeaders": [
+        { "header": "h1", "operation": "remove" },
+        { "header": "h2", "operation": "set", "value": "v2" },
+        { "header": "h3", "operation": "append", "value": "v3" }
+      ]
+    },
+    "condition": {
+      "urlFilter": "headers.com/123",
+      "resourceTypes": ["main_frame"]
+    }
+  },
+  {
+    "id": 11,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "responseHeaders": [
+        { "header": "h1", "operation": "set", "value": "v4" },
+        { "header": "h2", "operation": "append", "value": "v5" },
+        { "header": "h3", "operation": "append", "value": "v6" }
+      ]
+    },
+    "condition": {
+      "urlFilter": "headers.com/12345",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]

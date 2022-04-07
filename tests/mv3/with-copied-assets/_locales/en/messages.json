@@ -1,0 +1,6 @@
+{
+  "name": {
+    "message": "Message text, with optional placeholders.",
+    "description": "Translator-aimed description of the message."
+  }
+}

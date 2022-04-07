@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_icon": Object {
+      "128": "src/icons/action-icon-128.png",
+      "16": "src/icons/action-icon-16.png",
+      "32": "src/icons/action-icon-32.png",
+      "48": "src/icons/action-icon-48.png",
+    },
+  },
+  "declarative_net_request": Object {
+    "rule_resources": Array [
+      Object {
+        "enabled": true,
+        "id": "ruleset_1",
+        "path": "rules/set-1.json",
+      },
+      Object {
+        "enabled": false,
+        "id": "ruleset_2",
+        "path": "rules/set-2.json",
+      },
+    ],
+  },
+  "default_locale": "en",
+  "icons": Object {
+    "128": "src/icons/manifest-icon-128.png",
+    "16": "src/icons/manifest-icon-16.png",
+    "32": "src/icons/manifest-icon-32.png",
+    "48": "src/icons/manifest-icon-48.png",
+  },
+  "manifest_version": 3,
+  "name": "Extension with copied assets",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://www.google.com/*",
+      ],
+      "resources": Array [
+        "src/images/*.png",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: _01 output files 1`] = `
+Array [
+  "_locales/en/messages.json",
+  "_locales/es/messages.json",
+  "manifest.json",
+  "rules/set-1.json",
+  "rules/set-2.json",
+  "src/icons/action-icon-128.png",
+  "src/icons/action-icon-16.png",
+  "src/icons/action-icon-32.png",
+  "src/icons/action-icon-48.png",
+  "src/icons/manifest-icon-128.png",
+  "src/icons/manifest-icon-16.png",
+  "src/icons/manifest-icon-32.png",
+  "src/icons/manifest-icon-48.png",
+  "src/images/image1.png",
+  "src/images/image2.png",
+]
+`;

@@ -1,0 +1,6 @@
+{
+  "name": {
+    "message": "Texto del mensaje, con marcadores de posición opcionales.",
+    "description": "Descripción del mensaje orientada al traductor."
+  }
+}
