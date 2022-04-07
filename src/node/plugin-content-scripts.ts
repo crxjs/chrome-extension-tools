@@ -516,15 +516,16 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                   }
 
             const dynamicResourceSet = new Set<string>()
-            for (const [refId] of dynamicScriptsByRefId) {
-              const name = this.getFileName(refId)
-              const { assets, css, imports } = getResources(name)
+            for (const [refId, { format }] of dynamicScriptsByRefId)
+              if (format === 'loader') {
+                const name = this.getFileName(refId)
+                const { assets, css, imports } = getResources(name)
 
-              dynamicResourceSet.add(name)
-              for (const a of assets) dynamicResourceSet.add(a)
-              for (const c of css) dynamicResourceSet.add(c)
-              for (const i of imports) dynamicResourceSet.add(i)
-            }
+                dynamicResourceSet.add(name)
+                for (const a of assets) dynamicResourceSet.add(a)
+                for (const c of css) dynamicResourceSet.add(c)
+                for (const i of imports) dynamicResourceSet.add(i)
+              }
 
             if (dynamicResourceSet.size) {
               let resource = manifest.web_accessible_resources!.find(
