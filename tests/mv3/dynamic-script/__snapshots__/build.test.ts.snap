@@ -1,0 +1,128 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content-script-loader.declared-script.ts.hash.hash.js",
+      ],
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+      "resources": Array [
+        "assets/declared-script.ts.hash.js",
+        "assets/main-world.hash.js",
+      ],
+      "use_dynamic_url": true,
+    },
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/dynamic-script.hash.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: _01 output files 1`] = `
+Array [
+  "assets/background.ts.hash.js",
+  "assets/content-script-loader.declared-script.ts.hash.hash.js",
+  "assets/content-script-loader.dynamic-script.hash.js",
+  "assets/declared-script.ts.hash.js",
+  "assets/dynamic-script.hash.js",
+  "assets/main-world.hash.js",
+  "manifest.json",
+  "service-worker-loader.js",
+]
+`;
+
+exports[`build fs output: assets/background.ts.hash.js 1`] = `
+"var scriptFileName = \\"/assets/content-script-loader.dynamic-script.hash.js\\";
+console.log(\\"background.ts\\");
+chrome.action.onClicked.addListener((tab) => {
+  if (tab.id)
+    chrome.scripting.executeScript({
+      files: [scriptFileName],
+      target: { tabId: tab.id }
+    });
+});
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.declared-script.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/declared-script.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.dynamic-script.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/dynamic-script.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/declared-script.ts.hash.js 1`] = `
+"var fileName = \\"/assets/main-world.hash.js\\";
+console.log(\\"declared script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+script.type = \\"module\\";
+document.head.prepend(script);
+"
+`;
+
+exports[`build fs output: assets/dynamic-script.hash.js 1`] = `
+"console.log(\\"dynamic script\\");
+"
+`;
+
+exports[`build fs output: assets/main-world.hash.js 1`] = `
+"console.log(\\"main world script\\");
+"
+`;
+
+exports[`build fs output: service-worker-loader.js 1`] = `
+"import './assets/background.ts.hash.js';
+"
+`;
