@@ -394,7 +394,18 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
         // add resources from declared and dynamic scripts
         if (manifest.content_scripts?.length || dynamicScriptsByRefId.size)
           if (this.meta.watchMode) {
-            // during development do things faster
+            // remove dynamic resources placeholder
+            manifest.web_accessible_resources =
+              manifest.web_accessible_resources
+                .map(({ resources, ...rest }) => ({
+                  resources: resources.filter(
+                    (r) => r !== dynamicResourcesName,
+                  ),
+                  ...rest,
+                }))
+                .filter(({ resources }) => resources.length)
+
+            // during development don't specific resources
             manifest.web_accessible_resources.push({
               // change the extension origin on every reload
               use_dynamic_url: true,
