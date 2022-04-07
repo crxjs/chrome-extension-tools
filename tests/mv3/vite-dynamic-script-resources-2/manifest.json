@@ -1,6 +1,0 @@
-{
-  "manifest_version": 3,
-  "background": { "service_worker": "src/background.ts" },
-  "name": "test extension",
-  "version": "0.1.0"
-}
