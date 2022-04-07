@@ -16,6 +16,7 @@ import { basename, join } from './path'
 import { dynamicResourcesName } from './plugin-content-scripts'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
+import fg from 'fast-glob'
 
 // const debug = _debug('manifest')
 
@@ -229,12 +230,11 @@ export const pluginManifest =
           )
 
           // update web accessible resources from refs
-          // ignore top level match patterns (don't copy node_modules)
           manifest.web_accessible_resources =
             manifest.web_accessible_resources?.map(
               ({ resources, ...rest }) => ({
                 resources: resources.map((r) =>
-                  r.startsWith('*') || r === dynamicResourcesName
+                  fg.isDynamicPattern(r) || r === dynamicResourcesName
                     ? r
                     : this.getFileName(r),
                 ),
@@ -277,6 +277,7 @@ export const pluginManifest =
             'icons',
             'locales',
             'rulesets',
+            'webAccessibleResources',
           ]
           const files = await manifestFiles(manifest)
           await Promise.all(

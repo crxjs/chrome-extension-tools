@@ -72,6 +72,21 @@ export async function manifestFiles(
     Object.values(manifest.action?.default_icon ?? {}) as string[],
   ].flat()
 
+  let webAccessibleResources: string[] = []
+  if (manifest.web_accessible_resources) {
+    const resources = await Promise.all(
+      manifest.web_accessible_resources
+        .flatMap(({ resources }) => resources!)
+        .map(async (r) => {
+          // don't copy node_modules, etc
+          if (['*', '**/*'].includes(r)) return undefined
+          if (fg.isDynamicPattern(r)) return fg(r, options)
+          return r
+        }),
+    )
+    webAccessibleResources = resources.flat().filter(isString)
+  }
+
   return {
     contentScripts: [...new Set(contentScripts)].filter(isString),
     contentStyles: [...new Set(contentStyles)].filter(isString),
@@ -80,6 +95,7 @@ export async function manifestFiles(
     locales: [...new Set(locales)].filter(isString),
     rulesets: [...new Set(rulesets)].filter(isString),
     background: [serviceWorker].filter(isString),
+    webAccessibleResources,
   }
 }
 

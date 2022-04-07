@@ -1,0 +1,158 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`serve fs output: _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_icon": Object {
+      "128": "src/icons/action-icon-128.png",
+      "16": "src/icons/action-icon-16.png",
+      "32": "src/icons/action-icon-32.png",
+      "48": "src/icons/action-icon-48.png",
+    },
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "declarative_net_request": Object {
+    "rule_resources": Array [
+      Object {
+        "enabled": true,
+        "id": "ruleset_1",
+        "path": "rules/set-1.json",
+      },
+      Object {
+        "enabled": false,
+        "id": "ruleset_2",
+        "path": "rules/set-2.json",
+      },
+    ],
+  },
+  "default_locale": "en",
+  "icons": Object {
+    "128": "src/icons/manifest-icon-128.png",
+    "16": "src/icons/manifest-icon-16.png",
+    "32": "src/icons/manifest-icon-32.png",
+    "48": "src/icons/manifest-icon-48.png",
+  },
+  "manifest_version": 3,
+  "name": "Extension with copied assets",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://www.google.com/*",
+      ],
+      "resources": Array [
+        "src/images/*.png",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output: _01 output files 1`] = `
+Array [
+  "_locales/en/messages.json",
+  "_locales/es/messages.json",
+  "assets/crx-client-port.js",
+  "assets/precontroller.js.js",
+  "assets/webcomponents-custom-elements-z7FmG.js",
+  "manifest.json",
+  "rules/set-1.json",
+  "rules/set-2.json",
+  "service-worker-loader.js",
+  "src/icons/action-icon-128.png",
+  "src/icons/action-icon-16.png",
+  "src/icons/action-icon-32.png",
+  "src/icons/action-icon-48.png",
+  "src/icons/manifest-icon-128.png",
+  "src/icons/manifest-icon-16.png",
+  "src/icons/manifest-icon-32.png",
+  "src/icons/manifest-icon-48.png",
+  "src/images/image1.png",
+  "src/images/image2.png",
+  "vendor/vite-env.mjs.js",
+]
+`;
+
+exports[`serve fs output: assets/crx-client-port.js 1`] = `
+"function isCrxHMRPayload(x) {
+  return x.type === \\"custom\\" && x.event.startsWith(\\"crx:\\");
+}
+class HMRPort {
+  port;
+  callbacks = /* @__PURE__ */ new Map();
+  constructor() {
+    setInterval(() => {
+      try {
+        this.port?.postMessage({ data: \\"ping\\" });
+      } catch (error) {
+        if (error instanceof Error && error.message.includes(\\"Extension context invalidated.\\")) {
+          location.reload();
+        } else
+          throw error;
+      }
+    }, 5000);
+    setInterval(this.initPort, 5 * 60 * 1e3);
+    this.initPort();
+  }
+  initPort = () => {
+    this.port?.disconnect();
+    this.port = chrome.runtime.connect({ name: \\"@crx/client\\" });
+    this.port.onDisconnect.addListener(this.handleDisconnect.bind(this));
+    this.port.onMessage.addListener(this.handleMessage.bind(this));
+    this.port.postMessage({ type: \\"connected\\" });
+  };
+  handleDisconnect = () => {
+    if (this.callbacks.has(\\"close\\"))
+      for (const cb of this.callbacks.get(\\"close\\")) {
+        cb({ wasClean: true });
+      }
+  };
+  handleMessage = (message) => {
+    const forward = (data) => {
+      if (this.callbacks.has(\\"message\\"))
+        for (const cb of this.callbacks.get(\\"message\\")) {
+          cb({ data });
+        }
+    };
+    const payload = JSON.parse(message.data);
+    if (isCrxHMRPayload(payload)) {
+      if (payload.event === \\"crx:runtime-reload\\") {
+        console.log(\\"[crx] runtime reload\\");
+        setTimeout(() => location.reload(), 500);
+      } else {
+        forward(JSON.stringify(payload.data));
+      }
+    } else {
+      forward(message.data);
+    }
+  };
+  addEventListener = (event, callback) => {
+    const cbs = this.callbacks.get(event) ?? /* @__PURE__ */ new Set();
+    cbs.add(callback);
+    this.callbacks.set(event, cbs);
+  };
+  send = (data) => {
+    if (this.port)
+      this.port.postMessage({ data });
+    else
+      throw new Error(\\"HMRPort is not initialized\\");
+  };
+}
+
+export { HMRPort };
+"
+`;
+
+exports[`serve fs output: assets/precontroller.js.js 1`] = `
+"setTimeout(() => location.reload(), 100);
+"
+`;
+
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/crx-client-worker';
+"
+`;
