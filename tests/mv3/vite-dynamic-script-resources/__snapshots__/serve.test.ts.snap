@@ -2,30 +2,13 @@
 
 exports[`serve fs output: _00 manifest.json 1`] = `
 Object {
-  "action": Object {
-    "default_popup": "src/popup.html",
-  },
   "background": Object {
     "service_worker": "service-worker-loader.js",
     "type": "module",
   },
-  "content_scripts": Array [
-    Object {
-      "js": Array [
-        "assets/content-script-loader.content.js.js",
-      ],
-      "matches": Array [
-        "https://a.com/*",
-        "http://b.com/*",
-      ],
-    },
-  ],
   "description": "test extension",
-  "host_permissions": Array [
-    "https://c.com/*",
-  ],
   "manifest_version": 3,
-  "name": "Test Extension",
+  "name": "test extension",
   "version": "1.0.0",
   "web_accessible_resources": Array [
     Object {
@@ -44,20 +27,27 @@ Object {
 
 exports[`serve fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content.js.js",
+  "assets/content-script-loader.content1.js.js",
+  "assets/content-script-loader.content2.js.js",
   "assets/crx-client-port.js",
   "assets/precontroller.js.js",
   "assets/webcomponents-custom-elements-z7FmG.js",
   "manifest.json",
   "service-worker-loader.js",
-  "src/content.js",
-  "src/popup.html",
+  "src/content1.ts.js",
+  "src/content2.ts.js",
+  "src/font.otf",
+  "src/font.otf.js",
+  "src/image.png",
+  "src/image.png.js",
+  "src/script.ts.js",
+  "src/script.ts2.js",
   "vendor/vite-client.mjs.js",
   "vendor/vite-env.mjs.js",
 ]
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.js.js 1`] = `
+exports[`serve fs output: assets/content-script-loader.content1.js.js 1`] = `
 "(function () {
   'use strict';
 
@@ -73,7 +63,31 @@ exports[`serve fs output: assets/content-script-loader.content.js.js 1`] = `
     );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.js\\")
+      chrome.runtime.getURL(\\"src/content1.ts.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output: assets/content-script-loader.content2.js.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.mjs.js\\")
+    );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content2.ts.js\\")
     );
   })().catch(console.error);
 
@@ -158,40 +172,48 @@ exports[`serve fs output: assets/precontroller.js.js 1`] = `
 
 exports[`serve fs output: service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/crx-client-worker';
-import 'http://localhost:3000/src/background.js';
+import 'http://localhost:3000/src/background.ts';
 "
 `;
 
-exports[`serve fs output: src/content.js 1`] = `
-"console.log('content script');
+exports[`serve fs output: src/content1.ts.js 1`] = `
+"import script from './script.ts.js';
+
+console.log(\\"content.ts\\", { script });
 "
 `;
 
-exports[`serve fs output: src/popup.html 1`] = `
-"<!DOCTYPE html>
-<html lang=\\"en\\">
-  <head>
-    <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.js.js\\"></script>
-  </head>
-  <body>
-    <h1>Waiting for service worker</h1>
+exports[`serve fs output: src/content2.ts.js 1`] = `
+"import font from './font.otf.js';
 
-    <p>
-      If you see this message, it means the service worker has not loaded fully.
-    </p>
+console.log(\\"content2.ts\\", { font });
+"
+`;
 
-    <p>
-      During development, the service worker reroutes HTML requests to the dev
-      server, so this file isn't used unless the extension service worker opens
-      a page immediately after a full extension reload, and before the service
-      worker takes control of fetch (e.g., in the onInstalled event). In that
-      case, this page will continuously reload until the service worker is
-      ready, always less than 100 ms.
-    </p>
+exports[`serve fs output: src/font.otf.js 1`] = `
+"var font = \\"/src/font.otf\\";
 
-    <p>This page is never added in production.</p>
-  </body>
-</html>
+export { font as default };
+"
+`;
+
+exports[`serve fs output: src/image.png.js 1`] = `
+"var icon = \\"/src/image.png\\";
+
+export { icon as default };
+"
+`;
+
+exports[`serve fs output: src/script.ts.js 1`] = `
+"var script = \\"/src/script.ts2.js\\";
+
+export { script as default };
+"
+`;
+
+exports[`serve fs output: src/script.ts2.js 1`] = `
+"import icon from './image.png.js';
+
+console.log(\\"main world script\\", { icon });
 "
 `;

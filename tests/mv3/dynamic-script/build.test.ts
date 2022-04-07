@@ -6,7 +6,7 @@ mockDate()
 
 // TODO: handle main world scripts through web_accessible_resources
 
-test.skip('build fs output', async () => {
+test('build fs output', async () => {
   const result = await build(__dirname)
   await testOutput(result)
 })

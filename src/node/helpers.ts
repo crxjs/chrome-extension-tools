@@ -2,14 +2,19 @@ import { simple } from 'acorn-walk'
 import { createHash as _hash } from 'crypto'
 import debug from 'debug'
 import fg from 'fast-glob'
-import { PluginContext } from 'rollup'
+import { AcornNode, PluginContext } from 'rollup'
 import v8 from 'v8'
 import type {
   ManifestV3,
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
 } from './manifest'
-import type { AcornLiteral, ManifestFiles } from './types'
+import type {
+  AcornIdentifier,
+  AcornLiteral,
+  AcornMemberExpression,
+  ManifestFiles,
+} from './types'
 
 export const _debug = (id: string) => debug('crx').extend(id)
 
@@ -28,6 +33,9 @@ export const isString = (x: unknown): x is string => typeof x === 'string'
 
 type Falsy = false | 0 | '' | null | undefined
 export const isTruthy = <T>(x: T | Falsy): x is T => !!x
+
+export const isPresent = <T>(x: T | null | undefined): x is T =>
+  x !== null && typeof x !== 'undefined'
 
 export function isObject<T>(
   value: T,
@@ -87,6 +95,18 @@ export function htmlFiles(manifest: ManifestV3): string[] {
     .filter(isString)
     .sort()
   return [...new Set(files)]
+}
+
+export function isMemberExpression(n: AcornNode): n is AcornMemberExpression {
+  return n.type === 'MemberExpression'
+}
+
+export function isLiteral(n: AcornNode): n is AcornLiteral {
+  return n.type === 'Literal'
+}
+
+export function isIdentifier(n: AcornNode): n is AcornIdentifier {
+  return n.type === 'Identifier'
 }
 
 export function decodeManifest(this: PluginContext, code: string): ManifestV3 {

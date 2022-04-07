@@ -1,13 +1,11 @@
 import type { ManifestV3Export } from './defineManifest'
-import { pluginDynamicScripts } from './plugin-dynamicScripts'
 import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginHMR } from './plugin-hmr'
 import { pluginHtmlAuditor } from './plugin-htmlAuditor'
 import { pluginManifest } from './plugin-manifest'
-import { pluginResources } from './plugin-resources'
+import { pluginResources } from './plugin-content-scripts'
 import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 import { pluginBackground } from './plugin-background'
-import { pluginContentScripts } from './plugin-contentScripts'
 import type { PluginOption } from 'vite'
 
 function init(options: CrxOptions, plugins: CrxPluginFn[]) {
@@ -27,8 +25,6 @@ export const crx = ({
     pluginHMR,
     pluginHtmlAuditor,
     pluginResources,
-    pluginContentScripts,
-    pluginDynamicScripts,
     pluginBackground,
     pluginManifest(manifest),
   ])

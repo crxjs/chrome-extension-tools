@@ -10,14 +10,14 @@ import {
   isString,
   manifestFiles,
   structuredClone,
-  _debug,
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, join } from './path'
-import { CrxPlugin, CrxPluginFn } from './types'
+import { dynamicResourcesName } from './plugin-content-scripts'
+import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
 
-const debug = _debug('manifest')
+// const debug = _debug('manifest')
 
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
@@ -70,7 +70,6 @@ export const pluginManifest =
           }
         },
         buildStart(options) {
-          debug('buildStart', options)
           if (options.plugins) plugins = options.plugins
         },
       },
@@ -134,7 +133,7 @@ export const pluginManifest =
         enforce: 'post',
         configResolved(_config) {
           config = _config
-          debug('configResolved %o', config)
+
           const plugins = config.plugins as CrxPlugin[]
           // crx:manifest-post needs to come after vite:manifest; enforce:post puts it before
           const crx = plugins.findIndex(
@@ -145,6 +144,8 @@ export const pluginManifest =
         },
         async transform(code, id) {
           if (id !== manifestId) return
+
+          /* ---------- RUN MANIFEST TRANSFORM HOOK ---------- */
 
           let manifest = decodeManifest.call(this, code)
           for (const plugin of plugins) {
@@ -158,6 +159,8 @@ export const pluginManifest =
               throw error
             }
           }
+
+          /* ----------- EMIT SCRIPTS AND RESOURCES ---------- */
 
           // always emit content scripts
           if (manifest.content_scripts?.length) {
@@ -206,6 +209,8 @@ export const pluginManifest =
           const manifestJs = bundle[manifestName] as OutputChunk
           let manifest = decodeManifest.call(this, manifestJs.code)
 
+          /* ----------- UPDATE EMITTED FILE NAMES ----------- */
+
           // update background service worker filename from ref
           // service worker not emitted during development, so don't update file name
           if (manifest.background?.service_worker && !this.meta.watchMode) {
@@ -215,7 +220,7 @@ export const pluginManifest =
           }
 
           // update content script file names from refs
-          // css[] is added and removed by crx:css
+          // TODO: emit and parse css
           manifest.content_scripts = manifest.content_scripts?.map(
             ({ js = [], ...rest }) => {
               const refJS = js.map((ref) => this.getFileName(ref))
@@ -223,7 +228,21 @@ export const pluginManifest =
             },
           )
 
-          /* ----------- RUN RENDERCRXMANIFEST HOOK ---------- */
+          // update web accessible resources from refs
+          // ignore top level match patterns (don't copy node_modules)
+          manifest.web_accessible_resources =
+            manifest.web_accessible_resources?.map(
+              ({ resources, ...rest }) => ({
+                resources: resources.map((r) =>
+                  r.startsWith('*') || r === dynamicResourcesName
+                    ? r
+                    : this.getFileName(r),
+                ),
+                ...rest,
+              }),
+            )
+
+          /* ------------ RUN MANIFEST RENDER HOOK ----------- */
 
           // this appears to run after generateBundle since this is the last plugin
           for (const plugin of plugins) {
@@ -254,9 +273,15 @@ export const pluginManifest =
 
           /* ---------- COPY MISSING MANIFEST ASSETS --------- */
 
+          const assetTypes: (keyof ManifestFiles)[] = [
+            'icons',
+            'locales',
+            'rulesets',
+          ]
           const files = await manifestFiles(manifest)
           await Promise.all(
-            Object.values(files)
+            assetTypes
+              .map((k) => files[k])
               .flat()
               .map(async (f) => {
                 if (typeof bundle[f] === 'undefined') {

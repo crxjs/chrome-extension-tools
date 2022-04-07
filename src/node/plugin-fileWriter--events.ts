@@ -1,14 +1,17 @@
-import { existsSync, outputFile } from 'fs-extra'
+import { existsSync, outputFile, statSync } from 'fs-extra'
 import { performance } from 'perf_hooks'
 import colors from 'picocolors'
 import { ChangeEvent, OutputBundle, OutputOptions, RollupOptions } from 'rollup'
 import {
   BehaviorSubject,
-  delay,
   filter,
+  first,
   firstValueFrom,
+  interval,
   map,
+  mapTo,
   Subject,
+  switchMap,
 } from 'rxjs'
 import { createLogger, ViteDevServer } from 'vite'
 import { isString, _debug } from './helpers'
@@ -28,6 +31,7 @@ type FileWriterEvent =
       options: OutputOptions
       bundle: OutputBundle
       duration: number
+      timestamp: number
     }
   | {
       type: 'error'
@@ -66,7 +70,20 @@ export const filesReady$ = writerEvent$.pipe(
   filter((x): x is Extract<FileWriterEvent, { type: 'writeBundle' }> => {
     return x.type === 'writeBundle'
   }),
-  delay(200), // TODO: make this dynamic - check that written files exist and have been updated
+  switchMap((event) =>
+    // poll fs until files are updated
+    interval(100).pipe(
+      mapTo(event),
+      first(({ bundle, options, timestamp }) => {
+        const result = Object.keys(bundle).every((p) => {
+          const stats = statSync(join(options.dir!, p))
+          // compare stats on disk with timestamp
+          return stats.mtimeMs > timestamp
+        })
+        return result
+      }),
+    ),
+  ),
 )
 
 export const filesReady = () => firstValueFrom(filesReady$)
@@ -157,12 +174,14 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
       debug('buildStart')
     },
     writeBundle(options, bundle) {
-      const duration = Math.round(performance.now() - start)
+      const timestamp = performance.now()
+      const duration = Math.round(timestamp - start)
       writerEvent$.next({
         type: 'writeBundle',
         options,
         bundle,
         duration,
+        timestamp,
       })
       debug('writeBundle')
     },

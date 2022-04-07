@@ -2,7 +2,7 @@
   "content_scripts": [
     {
       "js": ["src/content.ts"],
-      "matches": ["https://google.com/*"]
+      "matches": ["https://www.google.com/*"]
     }
   ],
   "manifest_version": 3,

@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: _00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content-script-loader.content.ts.hash.hash.js",
+      ],
+      "matches": Array [
+        "https://google.com/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://google.com/*",
+      ],
+      "resources": Array [
+        "assets/content.ts.hash.js",
+        "assets/font.hash.otf",
+        "assets/image.hash.png",
+        "assets/script.hash.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: _01 output files 1`] = `
+Array [
+  "assets/content-script-loader.content.ts.hash.hash.js",
+  "assets/content.ts.hash.js",
+  "assets/font.hash.otf",
+  "assets/image.hash.png",
+  "assets/script.hash.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output: assets/content.ts.hash.js 1`] = `
+"var icon = \\"/assets/image.hash.png\\";
+var font = \\"/assets/font.hash.otf\\";
+var scriptUrl = \\"/assets/script.hash.js\\";
+console.log(\\"content.ts\\", { icon, font });
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(scriptUrl);
+script.type = \\"module\\";
+document.body.append(script);
+"
+`;
+
+exports[`build fs output: assets/content-script-loader.content.ts.hash.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/script.hash.js 1`] = `
+"console.log(\\"main world script\\");
+"
+`;

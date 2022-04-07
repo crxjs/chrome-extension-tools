@@ -82,6 +82,11 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
     fileWriterStart(_server) {
       server = _server
     },
+    watchChange(fileName) {
+      // dump cached transform results of changed files
+      for (const owner of ownersByFile.get(fileName) ?? new Set())
+        ownerToTransformResultMap.delete(owner)
+    },
     async resolveId(source, importer) {
       if (this.meta.watchMode) {
         if (idBySource.has(source)) {
@@ -91,24 +96,19 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         } else if (importer) {
           const meta = sourceToUrlMeta(source)
           setUrlMeta(meta)
-          debug(`resolved ${source} -> ${meta.id}`)
-          return meta.id
+          const { id } = meta
+          debug(`resolved ${source} -> ${id}`)
+          return id
         } else {
-          const [serverUrl] = await server.moduleGraph.resolveUrl(source)
-          const url = server.config.base + serverUrl // entry files won't have queries
-          const id = `/${serverUrl.split('/').join('-')}-${createHash(
-            serverUrl,
-          )}.js`
+          const [rawUrl] = await server.moduleGraph.resolveUrl(source)
+          const name = rawUrl.split('/').join('-').replace(/^-/, '')
+          const url = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`
+          const id = `/${name}-${createHash(url)}.js`
           setUrlMeta({ url, id, source })
           debug(`resolved entry ${source} -> ${id}`)
           return id
         }
       }
-    },
-    watchChange(fileName) {
-      // dump cached transform results of changed files
-      for (const owner of ownersByFile.get(fileName) ?? new Set())
-        ownerToTransformResultMap.delete(owner)
     },
     async load(id) {
       if (this.meta.watchMode && urlById.has(id)) {
@@ -148,11 +148,11 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         }
         if (url) setOwnerMeta({ id, owner })
 
-        // debug('start "%s"', url)
-        // debug('---------------------')
-        // for (const l of transformResult.code.split('\n')) debug('| %s', l)
-        // debug('---------------------')
-        // debug('end "%s"', url)
+        debug('start "%s"', url)
+        debug('---------------------')
+        for (const l of transformResult.code.split('\n')) debug('| %s', l)
+        debug('---------------------')
+        debug('end "%s"', url)
 
         return { code: transformResult.code, map: transformResult.map }
       }

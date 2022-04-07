@@ -5,7 +5,6 @@ import {
   mergeMap,
   Observable,
   Subject,
-  tap,
   withLatestFrom,
 } from 'rxjs'
 import {
@@ -34,11 +33,6 @@ function isImporter(file: string) {
 
 function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
   return x.type === 'custom' && x.event.startsWith('crx:')
-}
-
-const crxRuntimeReload: CrxHMRPayload = {
-  type: 'custom',
-  event: 'crx:runtime-reload',
 }
 
 const hmrPayload$ = new Subject<HMRPayload>()
@@ -109,9 +103,6 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
         return true
     }
   }),
-  tap(([p]) => {
-    p
-  }),
   map(
     ([p]): CrxHMRPayload => ({
       type: 'custom',
@@ -120,6 +111,11 @@ const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
     }),
   ),
 )
+
+export const crxRuntimeReload: CrxHMRPayload = {
+  type: 'custom',
+  event: 'crx:runtime-reload',
+}
 
 export const pluginHMR: CrxPluginFn = () => {
   let files: ManifestFiles
