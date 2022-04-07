@@ -69,6 +69,7 @@ export type ManifestFiles = {
   locales: string[]
   rulesets: string[]
   background: string[]
+  webAccessibleResources: string[]
 }
 
 export type WebAccessibleFiles = {
