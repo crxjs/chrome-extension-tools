@@ -129,7 +129,7 @@ export const pluginHtmlAuditor: CrxPluginFn = () => {
         // this will load all the other scripts
         const loader = {
           tag: 'script',
-          attrs: { src: key, type: 'module' },
+          attrs: { src: `${key}?t=${Date.now()}`, type: 'module' },
         }
 
         return { html: $.html()!, tags: [loader] }
@@ -183,15 +183,16 @@ export const pluginHtmlAuditor: CrxPluginFn = () => {
             .join('\n')
 
           const dir = dirname(page.path)
-          const scripts = jsesc(
-            page.scripts
-              .map(({ attrs }) => attrs?.src)
-              .filter(isString)
-              .map((src) => (src.startsWith('.') ? resolve(dir, src) : src))
-              .join(','),
-          )
+          const scripts = page.scripts
+            .map(({ attrs }) => attrs?.src)
+            .filter(isString)
+            .filter((src) => src !== '/@vite/client')
+            .map((src) => (src.startsWith('.') ? resolve(dir, src) : src))
+          const json = `"${jsesc(JSON.stringify(scripts), {
+            quotes: 'double',
+          })}"`
 
-          return [inline, loader.replace('%SCRIPTS%', scripts)].join('\n')
+          return [inline, loader.replace('SCRIPTS', json)].join('\n')
         } else {
           debug('page missing %s', id)
         }
