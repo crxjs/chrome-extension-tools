@@ -39,4 +39,4 @@ export const chromeExtension = crx
 
 export { defineDynamicResource, defineManifest } from './defineManifest'
 export { filesReady, rebuildFiles } from './plugin-fileWriter--events'
-export type { CrxPlugin }
+export type { CrxPlugin, ManifestV3Export }
