@@ -13,6 +13,7 @@ import type {
   AcornIdentifier,
   AcornLiteral,
   AcornMemberExpression,
+  AcornTemplateElement,
   ManifestFiles,
 } from './types'
 
@@ -128,14 +129,24 @@ export function isIdentifier(n: AcornNode): n is AcornIdentifier {
 
 export function decodeManifest(this: PluginContext, code: string): ManifestV3 {
   const tree = this.parse(code)
+
   let literal: AcornLiteral | undefined
+  let templateElement: AcornTemplateElement | undefined
+
   simple(tree, {
-    Literal(n) {
-      literal = n as AcornLiteral
+    Literal(node) {
+      literal = node as AcornLiteral
+    },
+    TemplateElement(node) {
+      templateElement = node as AcornTemplateElement
     },
   })
-  if (!literal) throw new Error('unable to parse manifest code')
-  let result: ManifestV3 = JSON.parse(literal.value)
+
+  let manifestJson: string | undefined = literal?.value
+  if (!manifestJson) manifestJson = templateElement?.value?.cooked
+  if (!manifestJson) throw new Error('unable to parse manifest code')
+
+  let result: ManifestV3 = JSON.parse(manifestJson)
   if (typeof result === 'string') result = JSON.parse(result)
   return result
 }

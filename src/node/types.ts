@@ -30,6 +30,15 @@ export interface AcornIdentifier extends AcornNode {
   name: string
 }
 
+export interface AcornTemplateElement extends AcornNode {
+  type: 'TemplateElement'
+  tail: boolean
+  value: {
+    cooked: string
+    raw: string
+  }
+}
+
 export interface CrxPlugin extends VitePlugin {
   /** Runs during dev mode when the file writer has started and server is listening. */
   fileWriterStart?: (server: ViteDevServer) => Promise<void> | void
