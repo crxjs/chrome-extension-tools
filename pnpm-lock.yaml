@@ -52,7 +52,7 @@ specifiers:
   rollup: ^2.68.0
   rollup-plugin-dts: ^4.2.0
   rollup-plugin-esbuild: 4.8.2
-  rxjs: 7.5.4
+  rxjs: 7.5.5
   typescript: 4.6.3
   vite: ^2.8.6
   vite-plugin-inspect: 0.4.3
@@ -114,7 +114,7 @@ devDependencies:
   rimraf: 3.0.2
   rollup-plugin-dts: 4.2.0_rollup@2.68.0+typescript@4.6.3
   rollup-plugin-esbuild: 4.8.2_esbuild@0.14.23+rollup@2.68.0
-  rxjs: 7.5.4
+  rxjs: 7.5.5
   typescript: 4.6.3
   vite: 2.8.6
   vite-plugin-inspect: 0.4.3_vite@2.8.6
@@ -518,14 +518,14 @@ packages:
     dependencies:
       '@types/chrome': 0.0.99
       '@types/node': 13.13.52
-      rxjs: 7.5.4
+      rxjs: 7.5.5
     dev: true
 
   /@extend-chrome/storage/1.5.0:
     resolution: {integrity: sha512-JhoBZ1xIzu0/mauNR/MadUsfNsWP1lTmWR8RlVJvWStUifzNZdAxI2i8NFCkd4RfjyTn4FcDETik3SDlAfGQRA==}
     dependencies:
       chrome-promise: 3.0.5
-      rxjs: 7.5.4
+      rxjs: 7.5.5
     dev: true
 
   /@humanwhocodes/config-array/0.9.5:
@@ -4667,8 +4667,8 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
-  /rxjs/7.5.4:
-    resolution: {integrity: sha512-h5M3Hk78r6wAheJF0a5YahB1yRQKCsZ4MsGdZ5O9ETbVtjPcScGfrMmoOq7EBsCRzd4BDkvDJ7ogP8Sz5tTFiQ==}
+  /rxjs/7.5.5:
+    resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
     dependencies:
       tslib: 2.3.1
     dev: true
