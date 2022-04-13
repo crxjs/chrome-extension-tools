@@ -43,7 +43,7 @@ specifiers:
   npm-run-all: 4.1.5
   picocolors: ^1.0.0
   playwright-chromium: 1.20.0
-  prettier: 2.5.1
+  prettier: 2.6.2
   prettier-plugin-jsdoc: 0.3.38
   react: 17.0.2
   react-dom: 17.0.2
@@ -107,8 +107,8 @@ devDependencies:
   jest-image-snapshot: 4.5.1_jest@27.5.1
   npm-run-all: 4.1.5
   playwright-chromium: 1.20.0
-  prettier: 2.5.1
-  prettier-plugin-jsdoc: 0.3.38_prettier@2.5.1
+  prettier: 2.6.2
+  prettier-plugin-jsdoc: 0.3.38_prettier@2.6.2
   react: 17.0.2
   react-dom: 17.0.2_react@17.0.2
   rimraf: 3.0.2
@@ -4418,7 +4418,7 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier-plugin-jsdoc/0.3.38_prettier@2.5.1:
+  /prettier-plugin-jsdoc/0.3.38_prettier@2.6.2:
     resolution: {integrity: sha512-h81ZV/nFk5gr3fzWMWzWoz/M/8FneAZxscT7DVSy+5jMIuWYnBFZfSswVKYZyTaZ5r6+6k4hpFTDWhRp85C1tg==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -4427,13 +4427,13 @@ packages:
       binary-searching: 2.0.5
       comment-parser: 1.3.1
       mdast-util-from-markdown: 1.2.0
-      prettier: 2.5.1
+      prettier: 2.6.2
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /prettier/2.5.1:
-    resolution: {integrity: sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==}
+  /prettier/2.6.2:
+    resolution: {integrity: sha512-PkUpF+qoXTqhOeWL9fu7As8LXsIUZ1WYaJiY/a7McAQzxjk82OF0tibkFXVCDImZtWxbvojFjerkiLb0/q8mew==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
