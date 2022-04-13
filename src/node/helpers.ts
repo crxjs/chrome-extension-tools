@@ -106,6 +106,7 @@ export function htmlFiles(manifest: ManifestV3): string[] {
     manifest.devtools_page,
     manifest.options_page,
     manifest.options_ui?.page,
+    manifest.sandbox?.pages,
   ]
     .flat()
     .filter(isString)
