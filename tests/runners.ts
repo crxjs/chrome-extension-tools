@@ -6,7 +6,7 @@ import type { CrxPlugin } from 'src/types'
 import { build as _build, createServer, ResolvedConfig } from 'vite'
 import inspect from 'vite-plugin-inspect'
 
-export async function build(dirname: string) {
+export async function build(dirname: string, configFile = 'vite.config.ts') {
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
@@ -19,7 +19,7 @@ export async function build(dirname: string) {
 
   let config: ResolvedConfig
   const output = await _build({
-    configFile: join(dirname, 'vite.config.ts'),
+    configFile: join(dirname, configFile),
     envFile: false,
     build: { outDir },
     cacheDir,
