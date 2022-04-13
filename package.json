@@ -68,7 +68,7 @@
     "cheerio": "^1.0.0-rc.10",
     "connect-injector": "^0.4.4",
     "debug": "^4.3.3",
-    "es-module-lexer": "^0.9.3",
+    "es-module-lexer": "^0.10.0",
     "fast-glob": "^3.2.11",
     "fs-extra": "^10.0.1",
     "jsesc": "^3.0.2",
