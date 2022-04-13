@@ -8,7 +8,7 @@ specifiers:
   '@rollup/plugin-node-resolve': 13.1.3
   '@rollup/pluginutils': ^4.1.2
   '@types/acorn': 4.0.6
-  '@types/chrome': 0.0.180
+  '@types/chrome': 0.0.181
   '@types/debug': 4.1.7
   '@types/fs-extra': 9.0.13
   '@types/jest': 27.4.1
@@ -84,7 +84,7 @@ devDependencies:
   '@rollup/plugin-commonjs': 21.0.3_rollup@2.68.0
   '@rollup/plugin-node-resolve': 13.1.3_rollup@2.68.0
   '@types/acorn': 4.0.6
-  '@types/chrome': 0.0.180
+  '@types/chrome': 0.0.181
   '@types/debug': 4.1.7
   '@types/fs-extra': 9.0.13
   '@types/jest': 27.4.1
@@ -897,8 +897,8 @@ packages:
       '@babel/types': 7.17.0
     dev: true
 
-  /@types/chrome/0.0.180:
-    resolution: {integrity: sha512-A/CuuKAaHq2CHEpYBAtl0lp2ib7TTXK7VjJI4q+c+1U/HDvZLJ8IlsdEDzzHdvkNdh36bGONxrMnO9YZrKqbAw==}
+  /@types/chrome/0.0.181:
+    resolution: {integrity: sha512-34Ln9YVVC8a195ruqWeaty3pouFdCLr9L5kPcbRflQcxnbXQnHor9uETof8OhDf8JLDytSRDiuDsRXYQYQ+9FA==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.8
