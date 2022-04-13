@@ -99,7 +99,7 @@
     "@vitejs/plugin-vue": "2.2.2",
     "@vue/compiler-sfc": "3.2.31",
     "@vueuse/core": "7.6.2",
-    "@vueuse/router": "7.6.2",
+    "@vueuse/router": "7.7.1",
     "esbuild": "0.14.23",
     "esbuild-runner": "2.2.1",
     "eslint": "8.9.0",
