@@ -38,7 +38,8 @@
     "dist",
     "types",
     "manifest.schema.json",
-    "schema"
+    "schema",
+    "client.d.ts"
   ],
   "scripts": {
     "build": "rimraf dist && run-s build:*",
