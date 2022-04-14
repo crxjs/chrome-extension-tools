@@ -23,7 +23,7 @@ specifiers:
   '@vitejs/plugin-vue': 2.3.1
   '@vue/compiler-sfc': 3.2.33
   '@vueuse/core': 7.6.2
-  '@vueuse/router': 7.7.1
+  '@vueuse/router': 8.2.6
   '@webcomponents/custom-elements': ^1.5.0
   acorn-walk: ^8.2.0
   cheerio: ^1.0.0-rc.10
@@ -98,7 +98,7 @@ devDependencies:
   '@vitejs/plugin-vue': 2.3.1_vite@2.8.6+vue@3.2.33
   '@vue/compiler-sfc': 3.2.33
   '@vueuse/core': 7.6.2_vue@3.2.33
-  '@vueuse/router': 7.7.1_vue@3.2.33
+  '@vueuse/router': 8.2.6_vue@3.2.33
   esbuild: 0.14.23
   esbuild-runner: 2.2.1_esbuild@0.14.23
   eslint: 8.13.0
@@ -1325,12 +1325,12 @@ packages:
       vue-demi: 0.12.1_vue@3.2.33
     dev: true
 
-  /@vueuse/router/7.7.1_vue@3.2.33:
-    resolution: {integrity: sha512-fDAOu0BUvquZcY3MijtSXHiAwK4OVQC4swm4ZLh6/mFWsbdRqOAydMEBhGFCEj/8nLDd1FVh4DHUdGefdkGb7Q==}
+  /@vueuse/router/8.2.6_vue@3.2.33:
+    resolution: {integrity: sha512-7HKFR7VNfqXVB/N6sIP6hq7zn+XgWWOPdpWlgcTbbzyiDwzHu2dHjUx1LMn7o1GbQAyMFlJdiXqvuvqjS8Xb8A==}
     peerDependencies:
       vue-router: '>=4.0.0-rc.1'
     dependencies:
-      '@vueuse/shared': 7.7.1_vue@3.2.33
+      '@vueuse/shared': 8.2.6_vue@3.2.33
       vue-demi: 0.12.1_vue@3.2.33
     transitivePeerDependencies:
       - '@vue/composition-api'
@@ -1352,8 +1352,8 @@ packages:
       vue-demi: 0.12.1_vue@3.2.33
     dev: true
 
-  /@vueuse/shared/7.7.1_vue@3.2.33:
-    resolution: {integrity: sha512-rN2qd22AUl7VdBxihagWyhUNHCyVk9IpvBTTfHoLH9G7rGE552X1f+zeCfehuno0zXif13jPw+icW/wn2a0rnQ==}
+  /@vueuse/shared/8.2.6_vue@3.2.33:
+    resolution: {integrity: sha512-J/W4CMfdL8TahELuSOgtfVO4eQXTjhigp7dVWIBsLUVFCeY9d49gvHUcQN3y5xYLZ6iNP57TjTQjMMT/zhklkw==}
     peerDependencies:
       '@vue/composition-api': ^1.1.0
       vue: ^2.6.0 || ^3.2.0
