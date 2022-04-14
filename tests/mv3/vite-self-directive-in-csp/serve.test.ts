@@ -10,7 +10,7 @@ afterAll(async () => {
   await result?.server.close()
 })
 
-test('serve fs output', async () => {
+test("works with 'self' directive", async () => {
   result = await serve(__dirname)
   await testOutput(result)
 })
