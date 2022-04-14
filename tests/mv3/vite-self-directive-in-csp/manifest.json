@@ -14,5 +14,8 @@
   "manifest_version": 3,
   "name": "test extension",
   "description": "test extension",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
 }
