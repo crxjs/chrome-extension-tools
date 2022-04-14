@@ -47,7 +47,7 @@ specifiers:
   prettier-plugin-jsdoc: 0.3.38
   react: 17.0.2
   react-dom: 17.0.2
-  react-refresh: ^0.11.0
+  react-refresh: ^0.12.0
   rimraf: 3.0.2
   rollup: ^2.68.0
   rollup-plugin-dts: ^4.2.0
@@ -71,7 +71,7 @@ dependencies:
   jsesc: 3.0.2
   magic-string: 0.25.7
   picocolors: 1.0.0
-  react-refresh: 0.11.0
+  react-refresh: 0.12.0
   rollup: 2.68.0
 
 optionalDependencies:
@@ -4520,6 +4520,12 @@ packages:
 
   /react-refresh/0.11.0:
     resolution: {integrity: sha512-F27qZr8uUqwhWZboondsPx8tnC3Ct3SxZA3V5WyEvujRyyNv0VYPhoBg1gZ8/MV5tubQp76Trw8lTv9hzRBa+A==}
+    engines: {node: '>=0.10.0'}
+    dev: false
+    optional: true
+
+  /react-refresh/0.12.0:
+    resolution: {integrity: sha512-suLIhrU2IHKL5JEKR/fAwJv7bbeq4kJ+pJopf77jHwuR+HmJS/HbrPIGsTBUVfw7tXPOmYv7UJ7PCaN49e8x4A==}
     engines: {node: '>=0.10.0'}
     dev: false
 
