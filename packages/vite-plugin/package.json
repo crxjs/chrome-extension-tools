@@ -1,0 +1,133 @@
+{
+  "name": "rollup-plugin-chrome-extension",
+  "version": "4.0.1-24",
+  "description": "Build Chrome Extensions with this Rollup plugin.",
+  "keywords": [
+    "rollup-plugin",
+    "vite-plugin",
+    "chrome",
+    "chrome-extension",
+    "extension",
+    "webext",
+    "webextension",
+    "browser",
+    "browser-extension"
+  ],
+  "homepage": "https://github.com/extend-chrome/rollup-plugin-chrome-extension",
+  "bugs": {
+    "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension.git"
+  },
+  "license": "MIT",
+  "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./*": "./*"
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "types",
+    "manifest.schema.json",
+    "schema",
+    "client.d.ts"
+  ],
+  "scripts": {
+    "build": "rimraf dist && run-s build:*",
+    "build:js": "rollup -c rollup.config.ts --configPlugin esbuild",
+    "dev:js": "npm run build:js -- -w",
+    "dev:lint": "tsc --noEmit --watch",
+    "lint": "run-s lint:eslint lint:types",
+    "lint:eslint": "eslint \"{src,test}/**/*.ts\"",
+    "lint:fix": "npm lint:eslint -- --fix",
+    "lint:types": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
+    "release": "npx bumpp --commit --push --tag && npm publish",
+    "test": "run-s test:update:*",
+    "test:ci:e2e:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) -t build",
+    "test:ci:e2e:serve": "npm run test:ci:e2e:serve:cmd || npm run test:ci:e2e:serve:cmd",
+    "test:ci:e2e:serve:cmd": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) -t serve",
+    "test:ci:mv3:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) --updateSnapshot build",
+    "test:ci:mv3:serve": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) --updateSnapshot serve",
+    "test:update:build": "jest build -u",
+    "test:update:serve": "jest serve -u"
+  },
+  "dependencies": {
+    "@rollup/pluginutils": "^4.1.2",
+    "@webcomponents/custom-elements": "^1.5.0",
+    "acorn-walk": "^8.2.0",
+    "cheerio": "^1.0.0-rc.10",
+    "connect-injector": "^0.4.4",
+    "debug": "^4.3.3",
+    "es-module-lexer": "^0.10.0",
+    "fast-glob": "^3.2.11",
+    "fs-extra": "^10.0.1",
+    "jsesc": "^3.0.2",
+    "magic-string": "^0.26.0",
+    "picocolors": "^1.0.0",
+    "react-refresh": "^0.12.0",
+    "rollup": "^2.68.0"
+  },
+  "devDependencies": {
+    "@extend-chrome/messages": "1.2.2",
+    "@extend-chrome/storage": "1.5.0",
+    "@rollup/plugin-alias": "3.1.9",
+    "@rollup/plugin-commonjs": "21.0.3",
+    "@rollup/plugin-node-resolve": "13.2.0",
+    "@types/acorn": "4.0.6",
+    "@types/chrome": "0.0.181",
+    "@types/debug": "4.1.7",
+    "@types/fs-extra": "9.0.13",
+    "@types/jest": "27.4.1",
+    "@types/jest-image-snapshot": "4.3.1",
+    "@types/jsesc": "3.0.1",
+    "@types/node": "17.0.18",
+    "@types/react": "17.0.44",
+    "@types/react-dom": "17.0.11",
+    "@typescript-eslint/eslint-plugin": "5.19.0",
+    "@typescript-eslint/parser": "5.19.0",
+    "@vitejs/plugin-react": "1.3.1",
+    "@vitejs/plugin-vue": "2.3.1",
+    "@vue/compiler-sfc": "3.2.33",
+    "@vueuse/core": "7.6.2",
+    "@vueuse/router": "8.2.6",
+    "esbuild": "0.14.23",
+    "esbuild-runner": "2.2.1",
+    "eslint": "8.13.0",
+    "eslint-plugin-react": "7.29.4",
+    "jest": "27.5.1",
+    "jest-image-snapshot": "4.5.1",
+    "npm-run-all": "4.1.5",
+    "playwright-chromium": "1.21.0",
+    "prettier": "2.6.2",
+    "prettier-plugin-jsdoc": "0.3.38",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "rimraf": "3.0.2",
+    "rollup-plugin-dts": "^4.2.0",
+    "rollup-plugin-esbuild": "4.9.1",
+    "rxjs": "7.5.5",
+    "typescript": "4.6.3",
+    "vite": "^2.8.6",
+    "vite-plugin-inspect": "0.4.3",
+    "vue": "3.2.33"
+  },
+  "optionalDependencies": {
+    "@vitejs/plugin-react": "^1.2.0"
+  },
+  "peerDependencies": {
+    "vite": "^2.8.0"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
