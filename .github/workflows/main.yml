@@ -45,7 +45,7 @@ jobs:
         run: node -e "console.log('cwd', process.cwd())"
 
       - name: Cache pnpm modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-pnpm-modules
         with:
@@ -96,7 +96,7 @@ jobs:
         run: node -e "console.log('cwd', process.cwd())"
 
       - name: Cache pnpm modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-pnpm-modules
         with:
@@ -155,7 +155,7 @@ jobs:
         run: node -e "console.log('cwd', process.cwd())"
 
       - name: Cache pnpm modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         env:
           cache-name: cache-pnpm-modules
         with:
