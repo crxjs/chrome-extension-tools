@@ -42,7 +42,7 @@ specifiers:
   magic-string: ^0.26.0
   npm-run-all: 4.1.5
   picocolors: ^1.0.0
-  playwright-chromium: 1.20.0
+  playwright-chromium: 1.21.0
   prettier: 2.6.2
   prettier-plugin-jsdoc: 0.3.38
   react: 17.0.2
@@ -106,7 +106,7 @@ devDependencies:
   jest: 27.5.1
   jest-image-snapshot: 4.5.1_jest@27.5.1
   npm-run-all: 4.1.5
-  playwright-chromium: 1.20.0
+  playwright-chromium: 1.21.0
   prettier: 2.6.2
   prettier-plugin-jsdoc: 0.3.38_prettier@2.6.2
   react: 17.0.2
@@ -4337,21 +4337,21 @@ packages:
       find-up: 4.1.0
     dev: true
 
-  /playwright-chromium/1.20.0:
-    resolution: {integrity: sha512-5qyHaW2kFguX4eAne2MgS7AxZBfQ+hN2X0t5SD5mxOTAgwciEAhMNc06o9NxILnRcmF8QSXGg19OSb8VMUBLzg==}
+  /playwright-chromium/1.21.0:
+    resolution: {integrity: sha512-btps5gqqc4GUESv+H3/rTPMv5S6zUSsgEcpvM3HX08bqaHnpyy+cPK6XLJq9L8kGjm3SdzlmG8tkhSPP4iuWhA==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      playwright-core: 1.20.0
+      playwright-core: 1.21.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
       - utf-8-validate
     dev: true
 
-  /playwright-core/1.20.0:
-    resolution: {integrity: sha512-d25IRcdooS278Cijlp8J8A5fLQZ+/aY3dKRJvgX5yjXA69N0huIUdnh3xXSgn+LsQ9DCNmB7Ngof3eY630jgdA==}
+  /playwright-core/1.21.0:
+    resolution: {integrity: sha512-yDGVs9qaaW6WiefgR7wH1CGt9D6D/X4U3jNpIzH0FjjrrWLCOYQo78Tu3SkW8X+/kWlBpj49iWf3QNSxhYc12Q==}
     engines: {node: '>=12'}
     hasBin: true
     dependencies:
