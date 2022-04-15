@@ -6,4 +6,4 @@ singleQuote: true
 arrowParens: always
 proseWrap: always
 plugins:
-  - "./node_modules/prettier-plugin-jsdoc"
+  - './node_modules/prettier-plugin-jsdoc'
