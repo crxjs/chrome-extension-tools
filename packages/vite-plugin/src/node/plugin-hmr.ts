@@ -157,7 +157,7 @@ export const pluginHMR: CrxPluginFn = () => {
         server = _server
         const { send } = server.ws
 
-        server.ws.send = (payload) => {
+        server.ws.send = (payload: HMRPayload) => {
           hmrPayload$.next(payload) // sniff hmr events
           send(payload) // don't interfere with normal hmr
         }
