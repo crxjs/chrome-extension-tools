@@ -15,5 +15,15 @@
     "webextension",
     "browser",
     "browser-extension"
-  ]
+  ],
+  "scripts": {
+    "test": "pnpm --filter \"rollup*\" test"
+  },
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-plugin-react": "^7.29.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.6.2",
+    "prettier-plugin-jsdoc": "^0.3.38"
+  }
 }
