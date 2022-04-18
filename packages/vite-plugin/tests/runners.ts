@@ -21,7 +21,16 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
   const output = await _build({
     configFile: join(dirname, configFile),
     envFile: false,
-    build: { outDir },
+    build: {
+      outDir,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) return 'vendor'
+          },
+        },
+      },
+    },
     cacheDir,
     plugins: [
       {
