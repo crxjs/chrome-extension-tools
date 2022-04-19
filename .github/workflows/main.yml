@@ -92,6 +92,9 @@ jobs:
           # If specified, run `pnpm install`
           # run_install: true
 
+      - name: Check CWD
+        run: node -e "console.log('cwd', process.cwd())"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -106,9 +109,6 @@ jobs:
 
       - name: Change CWD to Vite plugin
         run: cd packages/vite-plugin
-
-      - name: Check CWD
-        run: node -e "console.log('cwd', process.cwd())"
 
       - name: Run ${{ matrix.type }} tests
         uses: GabrielBB/xvfb-action@v1
@@ -154,6 +154,9 @@ jobs:
           # If specified, run `pnpm install`
           # run_install: true
 
+      - name: Check CWD
+        run: node -e "console.log('cwd', process.cwd())"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -168,9 +171,6 @@ jobs:
 
       - name: Change CWD to Vite plugin
         run: cd packages/vite-plugin
-
-      - name: Check CWD
-        run: node -e "console.log('cwd', process.cwd())"
 
       - name: Run ${{ matrix.type }} tests
         run: pnpm test:ci:mv3:${{ matrix.type }}
