@@ -20,3 +20,5 @@ beforeAll(() => {
   console._warn = console.warn
   console.warn = jest.fn()
 })
+
+jest.setTimeout(45000)
