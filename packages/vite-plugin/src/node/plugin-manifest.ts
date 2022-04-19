@@ -54,18 +54,19 @@ export const pluginManifest =
           if (env.command === 'serve') {
             const {
               contentScripts: js,
-              background: serviceWorker,
+              background: sw,
               html,
             } = await manifestFiles(manifest)
             let { entries = [] } = config.optimizeDeps ?? {}
             entries = [entries].flat()
-            entries.push(...js, ...serviceWorker, ...html)
+            const set = new Set<string>(entries)
+            for (const x of [...js, ...sw, ...html]) set.add(x)
 
             return {
               ...config,
               optimizeDeps: {
                 ...config.optimizeDeps,
-                entries,
+                entries: [...set],
               },
             }
           }
