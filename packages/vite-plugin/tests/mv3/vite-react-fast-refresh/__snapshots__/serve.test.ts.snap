@@ -49,10 +49,10 @@ Array [
   "src/App.tsx.js",
   "src/content.tsx.js",
   "src/popup.html",
-  "vendor/chunk-E2HL6QYL.js",
-  "vendor/react-dom.js",
+  "vendor/deps/chunk-EC6NZEJ6.js",
+  "vendor/deps/react-dom.js",
+  "vendor/deps/react_jsx-dev-runtime.js",
   "vendor/react-refresh.js",
-  "vendor/react_jsx-dev-runtime.js",
   "vendor/vite-client.mjs.js",
   "vendor/vite-env.mjs.js",
 ]
@@ -175,7 +175,7 @@ exports[`serve fs output: service-worker-loader.js 1`] = `
 exports[`serve fs output: src/App.tsx.js 1`] = `
 "import { createHotContext } from '../vendor/vite-client.mjs.js';
 import exports from '../vendor/react-refresh.js';
-import react_jsx_dev_runtime_default from '../vendor/react_jsx-dev-runtime.js';
+import react_jsx_dev_runtime_default from '../vendor/deps/react_jsx-dev-runtime.js';
 
 import.meta.hot = createHotContext(\\"/src/App.tsx.js\\");let prevRefreshReg;
 let prevRefreshSig;
@@ -233,9 +233,9 @@ export { App as default };
 `;
 
 exports[`serve fs output: src/content.tsx.js 1`] = `
-"import react_dom_default from '../vendor/react-dom.js';
+"import react_dom_default from '../vendor/deps/react-dom.js';
 import App from './App.tsx.js';
-import react_jsx_dev_runtime_default from '../vendor/react_jsx-dev-runtime.js';
+import react_jsx_dev_runtime_default from '../vendor/deps/react_jsx-dev-runtime.js';
 
 var _jsxFileName = \\"<root>/src/content.tsx\\";
  const render = react_dom_default[\\"render\\"];
