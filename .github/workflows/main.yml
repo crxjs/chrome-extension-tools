@@ -115,6 +115,7 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: pnpm test:ci:e2e:${{ matrix.type }}
+          working-directory: "packages/vite-plugin"
 
       - uses: actions/upload-artifact@v3
         if: failure()
