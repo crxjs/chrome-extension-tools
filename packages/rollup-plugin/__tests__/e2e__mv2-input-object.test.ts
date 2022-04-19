@@ -6,7 +6,7 @@ beforeAll(async () => {
   const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 30000)
+}, 45000)
 
 // TODO: test input objects with MV3
 test('Handles config with input object', async () => {

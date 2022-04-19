@@ -14,4 +14,4 @@ test('warns and throws if the manifest is invalid', async () => {
 
     expect(error.message).toMatch('There were problems with the extension manifest.')
   }
-}, 30000)
+}, 45000)

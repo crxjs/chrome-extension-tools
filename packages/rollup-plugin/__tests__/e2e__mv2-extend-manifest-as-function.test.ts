@@ -7,7 +7,7 @@ beforeAll(async () => {
   const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 30000)
+}, 45000)
 
 const manifestJson = loadCrxJson(__filename, 'manifest.json')
 
@@ -53,10 +53,7 @@ test('extends the manifest', async () => {
   // Changes from extendManifest
   expect(manifest).toMatchObject({
     name: manifestJson.name + '123',
-    description: manifestJson.description
-      .split('')
-      .reverse()
-      .join(''),
+    description: manifestJson.description.split('').reverse().join(''),
     background: {
       persistent: true,
       scripts: [expect.stringMatching(/^assets\/background.+\.js$/)],

@@ -7,7 +7,7 @@ let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 30000)
+}, 45000)
 
 test('Handles background html page', async () => {
   const { output } = await outputPromise

@@ -7,7 +7,7 @@ let outputPromise: Promise<RollupOutput>
 beforeAll(async () => {
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 30000)
+}, 45000)
 
 test('bundles multiple content scripts as iife', async () => {
   const { output } = await outputPromise

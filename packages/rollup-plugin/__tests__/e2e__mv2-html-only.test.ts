@@ -6,7 +6,7 @@ beforeAll(async () => {
   const config = requireExtFile(__filename, 'rollup.config.js') as RollupOptions
   outputPromise = rollup(config).then((bundle) => bundle.generate(config.output as any))
   return outputPromise
-}, 30000)
+}, 45000)
 
 test.skip('Handles extension only html and no scripts at all', async () => {
   const { output } = await outputPromise
