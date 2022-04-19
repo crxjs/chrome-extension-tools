@@ -71,6 +71,11 @@ export const pluginFileWriter =
         server.httpServer?.once('listening', async () => {
           server$.next(server)
 
+          // Discovering dynamic scripts via pre-bundling
+          // @ts-expect-error Wait for Vite to finish optimizing deps
+          const optimizedDeps: OptimizedDeps = server._optimizedDeps
+          await optimizedDeps?.scanProcessing
+
           /* ------------ RUN FILEWRITERSTART HOOK ----------- */
 
           const { pre, mid, post } = sortPlugins([
