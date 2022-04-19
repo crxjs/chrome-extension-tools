@@ -17,7 +17,8 @@
     "browser-extension"
   ],
   "scripts": {
-    "test": "pnpm --filter \"rollup*\" test"
+    "test": "pnpm --filter \"rollup*\" test",
+    "lint": "pnpm --filter \"rollup*\" lint"
   },
   "devDependencies": {
     "eslint": "^8.13.0",
