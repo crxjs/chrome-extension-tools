@@ -12,10 +12,7 @@ export type MockPluginContext = PluginContext & {
   emitFile: jest.MockInstance<string, [EmittedFile]>
   error: jest.MockInstance<
     never,
-    [
-      RollupError | string,
-      (number | { column: number; line: number })?,
-    ]
+    [RollupError | string, (number | { column: number; line: number })?]
   >
   getFileName: jest.MockInstance<string, [string]>
   getModuleInfo: jest.MockInstance<
@@ -37,16 +34,10 @@ export type MockPluginContext = PluginContext & {
     Promise<ResolvedId | null>,
     [string, string, { skipSelf: boolean }]
   >
-  setAssetSource: jest.MockInstance<
-    void,
-    [string, string | Buffer]
-  >
+  setAssetSource: jest.MockInstance<void, [string, string | Buffer]>
   warn: jest.MockInstance<
     void,
-    [
-      RollupWarning | string,
-      number | { column: number; line: number },
-    ]
+    [RollupWarning | string, number | { column: number; line: number }]
   >
 }
 
@@ -86,7 +77,7 @@ export const context: MockPluginContext = {
   resolveId: null,
   setAssetSource: jest.fn(),
   warn: jest.fn(),
-  /** @deprecated Use `this.addWatchFile` and the `watchChange` hook instead  */
+  /** @deprecated Use `this.addWatchFile` and the `watchChange` hook instead */
   // @ts-ignore
   watcher: null,
 }

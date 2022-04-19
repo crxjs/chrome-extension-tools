@@ -24,25 +24,17 @@ export function mixedFormat(
       if (typeof formatMap === 'undefined') return
 
       const formats = Object.entries(formatMap).filter(
-        (
-          x,
-        ): x is [
-          ModuleFormat,
-          string[] | Record<string, string>,
-        ] => typeof x[1] !== 'undefined',
+        (x): x is [ModuleFormat, string[] | Record<string, string>] =>
+          typeof x[1] !== 'undefined',
       )
 
       {
         const allInput = formats.flatMap(([, inputs]) =>
-          Array.isArray(inputs)
-            ? inputs
-            : Object.values(inputs || {}),
+          Array.isArray(inputs) ? inputs : Object.values(inputs || {}),
         )
         const allInputSet = new Set(allInput)
         if (allInput.length !== allInputSet.size) {
-          throw new Error(
-            'formats should not have duplicate inputs',
-          )
+          throw new Error('formats should not have duplicate inputs')
         }
       }
 
@@ -50,22 +42,20 @@ export function mixedFormat(
       const bundles = await Promise.all(
         // Configured formats
         formats.flatMap(([f, inputs]) =>
-          (Array.isArray(inputs)
-            ? inputs
-            : Object.values(inputs)
-          ).map((input) =>
-            regenerateBundle.call(
-              this,
-              {
-                input,
-                output: {
-                  format: f,
-                  chunkFileNames,
-                  sourcemap,
+          (Array.isArray(inputs) ? inputs : Object.values(inputs)).map(
+            (input) =>
+              regenerateBundle.call(
+                this,
+                {
+                  input,
+                  output: {
+                    format: f,
+                    chunkFileNames,
+                    sourcemap,
+                  },
                 },
-              },
-              bundle,
-            ),
+                bundle,
+              ),
           ),
         ),
       )

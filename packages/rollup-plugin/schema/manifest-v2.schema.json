@@ -288,11 +288,7 @@
           "run_at": {
             "default": "document_idle",
             "description": "Controls when the files in js are injected.",
-            "enum": [
-              "document_start",
-              "document_end",
-              "document_idle"
-            ],
+            "enum": ["document_start", "document_end", "document_idle"],
             "type": "string"
           }
         },

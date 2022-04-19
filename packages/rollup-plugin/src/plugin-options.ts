@@ -8,9 +8,10 @@ import { ValidateNamesPlugin } from './validate-names/index'
 export interface ChromeExtensionOptions {
   /**
    * @deprecated This is not supported for MV3, use this instead:
-   * ```js
-   * import browser from 'webextension-polyfill'
-   * ```
+   *
+   *   ```js
+   *   import browser from 'webextension-polyfill'
+   *   ```
    */
   browserPolyfill?:
     | boolean
@@ -38,9 +39,10 @@ export interface ChromeExtensionOptions {
   }
   /**
    * @deprecated Use `options.extendManifest.key`
-   * ```js
-   * chromeExtension({ extendManifest: { key: '...' } })
-   * ```
+   *
+   *   ```js
+   *   chromeExtension({ extendManifest: { key: '...' } })
+   *   ```
    */
   publicKey?: string
   /** @deprecated Does nothing internally in MV3 */
@@ -70,8 +72,7 @@ export type ChromeExtensionPlugin = Pick<
 
 /* --------- MANIFEST INPUT PLUGIN OPTIONS --------- */
 
-export interface ManifestInputPluginOptions
-  extends ChromeExtensionOptions {
+export interface ManifestInputPluginOptions extends ChromeExtensionOptions {
   cache?: ManifestInputPluginCache
 }
 
@@ -85,7 +86,7 @@ export interface ManifestInputPluginCache {
   inputObj: Record<string, string>
   permsHash: string
   srcDir: string | null
-  /** for memoized fs.readFile */
+  /** For memoized fs.readFile */
   readFile: Map<string, any>
   manifest?: chrome.runtime.Manifest
   assetChanged: boolean
@@ -108,9 +109,7 @@ export type ManifestInputPlugin = Pick<
   srcDir: string | null
   browserPolyfill?: ChromeExtensionOptions['browserPolyfill']
   crossBrowser?: ChromeExtensionOptions['crossBrowser']
-  formatMap?: Partial<
-    Record<ModuleFormat, string[] | Record<string, string>>
-  >
+  formatMap?: Partial<Record<ModuleFormat, string[] | Record<string, string>>>
 }
 
 /* ----------- HTML INPUTS PLUGIN OPTIONS ---------- */
@@ -140,13 +139,8 @@ export interface HtmlInputsPluginCache {
   srcDir?: string
 }
 
-type HtmlInputsPluginHooks =
-  | 'name'
-  | 'options'
-  | 'buildStart'
-  | 'watchChange'
+type HtmlInputsPluginHooks = 'name' | 'options' | 'buildStart' | 'watchChange'
 
-export type HtmlInputsPlugin = Pick<
-  Required<Plugin>,
-  HtmlInputsPluginHooks
-> & { cache: HtmlInputsPluginCache }
+export type HtmlInputsPlugin = Pick<Required<Plugin>, HtmlInputsPluginHooks> & {
+  cache: HtmlInputsPluginCache
+}

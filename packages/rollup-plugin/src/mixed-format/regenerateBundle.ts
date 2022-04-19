@@ -1,12 +1,7 @@
 import path from 'path'
 import { OutputChunk } from 'rollup'
 import { RollupOptions } from 'rollup'
-import {
-  Plugin,
-  OutputBundle,
-  PluginContext,
-  rollup,
-} from 'rollup'
+import { Plugin, OutputBundle, PluginContext, rollup } from 'rollup'
 import { resolveFromBundle } from './resolveFromBundle'
 
 export async function regenerateBundle(
@@ -15,9 +10,7 @@ export async function regenerateBundle(
   bundle: OutputBundle,
 ): Promise<OutputBundle> {
   if (!output || Array.isArray(output)) {
-    throw new TypeError(
-      'options.output must be an OutputOptions object',
-    )
+    throw new TypeError('options.output must be an OutputOptions object')
   }
 
   if (typeof input === 'undefined') {
@@ -32,7 +25,7 @@ export async function regenerateBundle(
   }
 
   const { format, chunkFileNames: cfn = '', sourcemap } = output
-  
+
   const chunkFileNames = path.join(path.dirname(cfn), '[name].js')
 
   // Transform input array to input object

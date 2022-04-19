@@ -3,10 +3,7 @@ import fs from 'fs-extra'
 import { Plugin } from 'rollup'
 import { isAsset } from '../helpers'
 import { isMV3 } from '../manifest-types'
-import {
-  ChromeExtensionPlugin,
-  ManifestInputPlugin,
-} from '../plugin-options'
+import { ChromeExtensionPlugin, ManifestInputPlugin } from '../plugin-options'
 
 const defaultOptions = { executeScript: true }
 export function browserPolyfill({
@@ -37,9 +34,7 @@ export function browserPolyfill({
   return {
     name: 'browser-polyfill',
     generateBundle({ plugins = [] }, bundle) {
-      const firefoxPlugin = plugins.find(
-        ({ name }) => name === 'firefox-addon',
-      )
+      const firefoxPlugin = plugins.find(({ name }) => name === 'firefox-addon')
       const chromeExtensionPlugin = plugins.find(
         ({ name }) => name === 'chrome-extension',
       ) as ChromeExtensionPlugin
@@ -89,9 +84,7 @@ export function browserPolyfill({
         const executeScriptPolyfillPath = this.getFileName(exId)
 
         // TODO: support this in MV3
-        manifest.background?.scripts?.unshift(
-          executeScriptPolyfillPath,
-        )
+        manifest.background?.scripts?.unshift(executeScriptPolyfillPath)
       }
 
       // TODO: support this in MV3

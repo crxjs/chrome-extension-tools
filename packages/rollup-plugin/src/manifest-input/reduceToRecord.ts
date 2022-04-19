@@ -8,14 +8,8 @@ export function reduceToRecord(srcDir: string | null) {
     throw new TypeError('srcDir is null or undefined')
   }
 
-  return (
-    inputRecord: InputRecord,
-    filename: string,
-  ): InputRecord => {
-    const name = relative(srcDir, filename)
-      .split('.')
-      .slice(0, -1)
-      .join('.')
+  return (inputRecord: InputRecord, filename: string): InputRecord => {
+    const name = relative(srcDir, filename).split('.').slice(0, -1).join('.')
 
     if (name in inputRecord) {
       throw new Error(

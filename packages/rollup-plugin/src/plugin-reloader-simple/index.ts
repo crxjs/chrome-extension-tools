@@ -16,8 +16,7 @@ import {
   unregisterServiceWorkersPlaceholder,
 } from './CONSTANTS'
 
-const delay = (ms: number) =>
-  new Promise((resolve) => setTimeout(resolve, ms))
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export type SimpleReloaderPlugin = Pick<
   Required<Plugin>,
@@ -59,24 +58,17 @@ export const simpleReloader = (
 
     generateBundle({ dir }, bundle) {
       const date = new Date()
-      const time = `${date
-        .getFullYear()
+      const time = `${date.getFullYear().toString().padStart(2, '0')}-${(
+        date.getMonth() + 1
+      )
         .toString()
-        .padStart(2, '0')}-${(date.getMonth() + 1)
-        .toString()
-        .padStart(2, '0')}-${date
-        .getDate()
-        .toString()
-        .padStart(2, '0')} ${date
+        .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date
         .getHours()
         .toString()
         .padStart(2, '0')}:${date
         .getMinutes()
         .toString()
-        .padStart(2, '0')}:${date
-        .getSeconds()
-        .toString()
-        .padStart(2, '0')}`
+        .padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`
 
       cache.outputDir = dir
       cache.loadMessage = [
@@ -86,11 +78,7 @@ export const simpleReloader = (
 
       /* --------------- EMIT CLIENT FILES --------------- */
 
-      const emit = (
-        name: string,
-        source: string,
-        isFileName?: boolean,
-      ) => {
+      const emit = (name: string, source: string, isFileName?: boolean) => {
         const id = this.emitFile({
           type: 'asset',
           [isFileName ? 'fileName' : 'name']: name,
@@ -118,18 +106,9 @@ export const simpleReloader = (
         backgroundPageReloader,
         bgClientCode
           .replace(timestampPathPlaceholder, cache.timestampPath)
-          .replace(
-            loadMessagePlaceholder,
-            JSON.stringify(cache.loadMessage),
-          )
-          .replace(
-            ctScriptPathPlaceholder,
-            JSON.stringify(cache.ctScriptPath),
-          )
-          .replace(
-            executeScriptPlaceholder,
-            JSON.stringify(executeScript),
-          )
+          .replace(loadMessagePlaceholder, JSON.stringify(cache.loadMessage))
+          .replace(ctScriptPathPlaceholder, JSON.stringify(cache.ctScriptPath))
+          .replace(executeScriptPlaceholder, JSON.stringify(executeScript))
           .replace(
             unregisterServiceWorkersPlaceholder,
             JSON.stringify(unregisterServiceWorkers),
@@ -154,14 +133,11 @@ export const simpleReloader = (
           /* ---------------- BACKGROUND PAGE ---------------- */
 
           if (!cache.bgScriptPath)
-            this.error(
-              `cache.bgScriptPath is ${typeof cache.bgScriptPath}`,
-            )
+            this.error(`cache.bgScriptPath is ${typeof cache.bgScriptPath}`)
 
           if (manifest.manifest_version === 3) {
             const swPath =
-              manifest.background?.service_worker ??
-              'service_worker.js'
+              manifest.background?.service_worker ?? 'service_worker.js'
 
             const swCode = `
               // SIMPLE RELOADER IMPORT
@@ -183,9 +159,7 @@ export const simpleReloader = (
             set(
               manifest,
               'background.scripts',
-              (manifest.background?.scripts ?? []).concat([
-                cache.bgScriptPath,
-              ]),
+              (manifest.background?.scripts ?? []).concat([cache.bgScriptPath]),
             )
             set(manifest, 'background.persistent', true)
           }
@@ -193,18 +167,14 @@ export const simpleReloader = (
           /* ---------------- CONTENT SCRIPTS ---------------- */
 
           if (!cache.ctScriptPath)
-            this.error(
-              `cache.ctScriptPath is ${typeof cache.ctScriptPath}`,
-            )
+            this.error(`cache.ctScriptPath is ${typeof cache.ctScriptPath}`)
 
           const { content_scripts: ctScripts } = manifest
 
-          manifest.content_scripts = ctScripts?.map(
-            ({ js = [], ...rest }) => ({
-              js: [cache.ctScriptPath!, ...js],
-              ...rest,
-            }),
-          )
+          manifest.content_scripts = ctScripts?.map(({ js = [], ...rest }) => ({
+            js: [cache.ctScriptPath!, ...js],
+            ...rest,
+          }))
 
           return manifest
         },
@@ -228,9 +198,7 @@ export const simpleReloader = (
         )
       } catch (err) {
         if (isErrorLike(err)) {
-          this.error(
-            `Unable to update timestamp file:\n\t${err.message}`,
-          )
+          this.error(`Unable to update timestamp file:\n\t${err.message}`)
         } else {
           this.error('Unable to update timestamp file')
         }

@@ -108,9 +108,7 @@ test('add reloader script to background', async () => {
     manifestObj.source as string,
   )
 
-  expect(manifest.background!.scripts).toContain(
-    'mock-file-name',
-  )
+  expect(manifest.background!.scripts).toContain('mock-file-name')
 })
 
 test('set background script to persistent', async () => {
@@ -160,8 +158,7 @@ test('Errors if manifest is not in the bundle', async () => {
 
   delete bundle['manifest.json']
 
-  const errorMessage =
-    'No manifest.json in the rollup output bundle.'
+  const errorMessage = 'No manifest.json in the rollup output bundle.'
 
   try {
     await plugin.generateBundle.call(context, {}, bundle, false)
@@ -185,9 +182,7 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
   try {
     await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
-    expect(context.error).toBeCalledWith(
-      'cache.bgScriptPath is undefined',
-    )
+    expect(context.error).toBeCalledWith('cache.bgScriptPath is undefined')
   }
 })
 
@@ -205,8 +200,6 @@ test('Errors if cache.ctScriptPath is undefined', async () => {
   try {
     await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
-    expect(context.error).toBeCalledWith(
-      'cache.ctScriptPath is undefined',
-    )
+    expect(context.error).toBeCalledWith('cache.ctScriptPath is undefined')
   }
 })

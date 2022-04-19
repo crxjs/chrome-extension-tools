@@ -16,10 +16,7 @@ export default {
       verbose: false,
       contentScriptWrapper: false,
       dynamicImportWrapper: false,
-      iifeJsonPaths: [
-        '$.background.scripts[*]',
-        '$.content_scripts[*].js',
-      ],
+      iifeJsonPaths: ['$.background.scripts[*]', '$.content_scripts[*].js'],
     }),
     resolve(),
     commonjs(),

@@ -8,10 +8,7 @@ import { cloneObject } from './cloneObject'
 const isManifestFileName = (filename: string) =>
   basename(filename).startsWith('manifest')
 
-const validateFileName = (
-  filename: string,
-  { input }: InputOptions,
-) => {
+const validateFileName = (filename: string, { input }: InputOptions) => {
   if (isUndefined(filename))
     throw new Error(
       `Could not find manifest in Rollup options.input: ${JSON.stringify(
@@ -19,24 +16,18 @@ const validateFileName = (
       )}`,
     )
   if (!existsSync(filename))
-    throw new Error(
-      `Could not load manifest: ${filename} does not exist`,
-    )
+    throw new Error(`Could not load manifest: ${filename} does not exist`)
 
   return filename
 }
 
-export function getInputManifestPath(
-  options: InputOptions,
-): Partial<
+export function getInputManifestPath(options: InputOptions): Partial<
   Pick<ManifestInputPluginCache, 'inputAry' | 'inputObj'>
 > & {
   inputManifestPath: string
 } {
   if (Array.isArray(options.input)) {
-    const manifestIndex = options.input.findIndex(
-      isManifestFileName,
-    )
+    const manifestIndex = options.input.findIndex(isManifestFileName)
     const inputAry = [
       ...options.input.slice(0, manifestIndex),
       ...options.input.slice(manifestIndex + 1),
@@ -48,19 +39,13 @@ export function getInputManifestPath(
 
     return { inputManifestPath, inputAry }
   } else if (typeof options.input === 'object') {
-    const inputManifestPath = validateFileName(
-      options.input.manifest,
-      options,
-    )
+    const inputManifestPath = validateFileName(options.input.manifest, options)
     const inputObj = cloneObject(options.input)
     delete inputObj['manifest']
 
     return { inputManifestPath, inputObj }
   } else if (isString(options.input)) {
-    const inputManifestPath = validateFileName(
-      options.input,
-      options,
-    )
+    const inputManifestPath = validateFileName(options.input, options)
     return { inputManifestPath }
   }
 

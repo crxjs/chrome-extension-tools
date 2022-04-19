@@ -11,33 +11,18 @@
   "default_locale": "en",
   "devtools_page": "devtools/devtools.html",
   "background": {
-    "scripts": [
-      "background.js"
-    ]
+    "scripts": ["background.js"]
   },
-  "permissions": [
-    "webRequest",
-    "webRequestBlocking"
-  ],
+  "permissions": ["webRequest", "webRequestBlocking"],
   "content_scripts": [
     {
-      "js": [
-        "content.js"
-      ],
-      "matches": [
-        "https://www.google.com/*"
-      ]
+      "js": ["content.js"],
+      "matches": ["https://www.google.com/*"]
     },
     {
-      "js": [
-        "content.js"
-      ],
-      "css": [
-        "content.css"
-      ],
-      "matches": [
-        "https://www.yahoo.com/*"
-      ]
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "matches": ["https://www.yahoo.com/*"]
     }
   ],
   "options_page": "options.html",
@@ -47,10 +32,6 @@
     },
     "default_popup": "popup/popup.html"
   },
-  "web_accessible_resources": [
-    "options.jpg",
-    "fonts/*.ttf",
-    "fonts/*.otf"
-  ],
+  "web_accessible_resources": ["options.jpg", "fonts/*.ttf", "fonts/*.otf"],
   "content_security_policy": "script-src 'self'; object-src 'self'"
 }

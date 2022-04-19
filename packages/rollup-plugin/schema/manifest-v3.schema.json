@@ -331,11 +331,7 @@
           "run_at": {
             "default": "document_idle",
             "description": "Controls when the files in js are injected.",
-            "enum": [
-              "document_start",
-              "document_end",
-              "document_idle"
-            ],
+            "enum": ["document_start", "document_end", "document_idle"],
             "type": "string"
           }
         },
@@ -751,10 +747,7 @@
     "web_accessible_resources": {
       "description": "An array of objects that declare resource access rules. Each object maps an array of extension resources to an array of URLs and/or extension IDs that can access those resources.",
       "items": {
-        "anyOf": [
-          { "required": ["matches"] },
-          { "required": ["extensions"] }
-        ],
+        "anyOf": [{ "required": ["matches"] }, { "required": ["extensions"] }],
         "properties": {
           "resources": {
             "$ref": "#/definitions/files"

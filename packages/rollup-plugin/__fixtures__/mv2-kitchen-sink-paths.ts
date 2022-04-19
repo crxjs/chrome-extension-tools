@@ -6,40 +6,16 @@ export const manifestJson = getExtPath(crxName, 'manifest.json')
 export const indexHtml = getExtPath(crxName, 'index.html')
 
 // Icons
-export const icon16 = getExtPath(
-  crxName,
-  'images/icon-main-16.png',
-)
-export const icon48 = getExtPath(
-  crxName,
-  'images/icon-main-48.png',
-)
-export const icon128 = getExtPath(
-  crxName,
-  'images/icon-main-128.png',
-)
-export const faviconIco = getExtPath(
-  crxName,
-  'images/favicon.ico',
-)
-export const faviconPng = getExtPath(
-  crxName,
-  'images/favicon.png',
-)
+export const icon16 = getExtPath(crxName, 'images/icon-main-16.png')
+export const icon48 = getExtPath(crxName, 'images/icon-main-48.png')
+export const icon128 = getExtPath(crxName, 'images/icon-main-128.png')
+export const faviconIco = getExtPath(crxName, 'images/favicon.ico')
+export const faviconPng = getExtPath(crxName, 'images/favicon.png')
 
 // Fonts
-export const notoSansBlack = getExtPath(
-  crxName,
-  'fonts/NotoSans-Black.ttf',
-)
-export const missaaliOtf = getExtPath(
-  crxName,
-  'fonts/Missaali-Regular.otf',
-)
-export const notoSansLight = getExtPath(
-  crxName,
-  'fonts/NotoSans-Light.ttf',
-)
+export const notoSansBlack = getExtPath(crxName, 'fonts/NotoSans-Black.ttf')
+export const missaaliOtf = getExtPath(crxName, 'fonts/Missaali-Regular.otf')
+export const notoSansLight = getExtPath(crxName, 'fonts/NotoSans-Light.ttf')
 
 // Options assets
 export const kitchenSinkRoot = getExtPath(crxName)
@@ -66,20 +42,11 @@ export const popupJs = getExtPath(crxName, 'popup/popup.js')
 export const contentCss = getExtPath(crxName, 'content.css')
 
 // Devtools subfolder
-export const devtoolsHtml = getExtPath(
-  crxName,
-  'devtools/devtools.html',
-)
+export const devtoolsHtml = getExtPath(crxName, 'devtools/devtools.html')
 
 // Locales subfolder
-export const localesEnJson = getExtPath(
-  crxName,
-  '_locales/en/messages.json',
-)
-export const localesEsJson = getExtPath(
-  crxName,
-  '_locales/en/messages.json',
-)
+export const localesEnJson = getExtPath(crxName, '_locales/en/messages.json')
+export const localesEsJson = getExtPath(crxName, '_locales/en/messages.json')
 
 // Double underscore bug
 export const _textFile = getExtPath(crxName, '_war/test.txt')

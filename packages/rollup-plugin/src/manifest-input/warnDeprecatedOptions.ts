@@ -28,16 +28,12 @@ export function warnDeprecatedOptions(
   cache: ManifestInputPluginCache,
 ) {
   /* ------------ WARN DEPRECATED OPTIONS ------------ */
-  if (crossBrowser)
-    this.warn('`options.crossBrowser` is not implemented yet')
+  if (crossBrowser) this.warn('`options.crossBrowser` is not implemented yet')
 
   if (!firstClassManifest)
-    this.warn(
-      '`options.firstClassManifest` will be removed in version 5.0.0',
-    )
+    this.warn('`options.firstClassManifest` will be removed in version 5.0.0')
 
-  if (iifeJsonPaths?.length)
-    this.warn('`options.iifeJsonPaths` is deprecated')
+  if (iifeJsonPaths?.length) this.warn('`options.iifeJsonPaths` is deprecated')
 
   if (typeof contentScriptWrapper !== 'undefined')
     this.warn(
@@ -61,9 +57,7 @@ export function warnDeprecatedOptions(
     typeof dynamicImportWrapper !== 'object' ||
     Object.keys(dynamicImportWrapper).length > 0
   )
-    this.warn(
-      '`options.dynamicImportWrapper` is not required for MV3',
-    )
+    this.warn('`options.dynamicImportWrapper` is not required for MV3')
 
   if (publicKey)
     this.warn(

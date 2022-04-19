@@ -18,8 +18,7 @@ export default {
     chromeExtension({
       verbose: false,
       extendManifest: {
-        description:
-          'properties from options.extendManifest are preferred',
+        description: 'properties from options.extendManifest are preferred',
         content_scripts: [
           {
             js: ['content.js'],

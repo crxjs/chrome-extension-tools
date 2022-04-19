@@ -25,15 +25,14 @@ export function prepImportWrapperScript({
 }: DynamicImportWrapperOptions) {
   const delay = JSON.stringify(eventDelay)
   const events = wakeEvents.length
-    ? JSON.stringify(
-        wakeEvents.map((ev) => ev.replace(/^chrome\./, '')),
-      )
+    ? JSON.stringify(wakeEvents.map((ev) => ev.replace(/^chrome\./, '')))
     : false
   const exclude = JSON.stringify(excludeNames)
 
-  const script = (events
-    ? explicitScript.replace('%EVENTS%', events)
-    : implicitScript.replace('%EXCLUDE%', exclude)
+  const script = (
+    events
+      ? explicitScript.replace('%EVENTS%', events)
+      : implicitScript.replace('%EXCLUDE%', exclude)
   ).replace('%DELAY%', delay)
 
   return script

@@ -17,20 +17,12 @@ export default {
   plugins: [
     chromeExtension({
       verbose: false,
-      extendManifest: ({
-        name,
-        description,
-        background,
-        ...manifest
-      }) => {
+      extendManifest: ({ name, description, background, ...manifest }) => {
         background.persistent = true
 
         return Object.assign(manifest, {
           name: name + '123',
-          description: description
-            .split('')
-            .reverse()
-            .join(''),
+          description: description.split('').reverse().join(''),
           background,
           options_page: 'options.html',
           ...manifest,

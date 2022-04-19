@@ -14,10 +14,6 @@ export default {
     format: 'esm',
     chunkFileNames: 'chunks/[name]-[hash].js',
   },
-  plugins: [
-    chromeExtension({ verbose: false }),
-    resolve(),
-    commonjs(),
-  ],
+  plugins: [chromeExtension({ verbose: false }), resolve(), commonjs()],
   external: ['path'],
 }

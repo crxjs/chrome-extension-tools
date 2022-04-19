@@ -13,7 +13,5 @@ test('returns correct path', () => {
   expect(getter('options/options.js')).toBe(
     '__fixtures__/extensions/mv2-kitchen-sink/options/options.js',
   )
-  expect(getter('../options.js')).toBe(
-    '__fixtures__/extensions/options.js',
-  )
+  expect(getter('../options.js')).toBe('__fixtures__/extensions/options.js')
 })

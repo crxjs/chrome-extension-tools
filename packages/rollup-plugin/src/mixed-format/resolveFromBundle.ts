@@ -3,9 +3,7 @@ import { OutputBundle } from 'rollup'
 import { Plugin } from 'rollup'
 import { isChunk } from '../helpers'
 
-export const resolveFromBundle = (
-  bundle: OutputBundle,
-): Plugin => ({
+export const resolveFromBundle = (bundle: OutputBundle): Plugin => ({
   name: 'resolve-from-bundle',
   resolveId(source, importer) {
     if (typeof importer === 'undefined') {

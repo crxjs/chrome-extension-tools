@@ -10,10 +10,7 @@ import { isString } from '../../helpers'
 /*              DERIVE PERMISSIONS              */
 /* ============================================ */
 
-export const derivePermissions = (
-  set: Set<string>,
-  { code }: OutputChunk,
-) =>
+export const derivePermissions = (set: Set<string>, { code }: OutputChunk) =>
   Object.entries(permissions)
     .filter(([key]) => key !== 'default')
     .filter(([, fn]) => fn(code))
@@ -84,11 +81,7 @@ export function deriveFilesMV3(
 
   const css = [
     ...files.filter((f) => f.endsWith('.css')),
-    ...get(
-      manifest,
-      'content_scripts',
-      [] as ContentScript[],
-    ).reduce(
+    ...get(manifest, 'content_scripts', [] as ContentScript[]).reduce(
       (r, { css = [] }) => [...r, ...css],
       [] as string[],
     ),
@@ -99,9 +92,7 @@ export function deriveFilesMV3(
       /\.(jpe?g|png|svg|tiff?|gif|webp|bmp|ico)$/i.test(f),
     ),
     ...(Object.values(get(manifest, 'icons', {})) as string[]),
-    ...(Object.values(
-      get(manifest, 'action.default_icon', {}),
-    ) as string[]),
+    ...(Object.values(get(manifest, 'action.default_icon', {})) as string[]),
   ]
 
   // Files like fonts, things that are not expected
@@ -117,9 +108,7 @@ export function deriveFilesMV3(
   }
 
   function validate(ary: any[]) {
-    return [...new Set(ary.filter(isString))].map((x) =>
-      join(srcDir, x),
-    )
+    return [...new Set(ary.filter(isString))].map((x) => join(srcDir, x))
   }
 }
 
@@ -171,11 +160,7 @@ export function deriveFilesMV2(
 
   const css = [
     ...files.filter((f) => f.endsWith('.css')),
-    ...get(
-      manifest,
-      'content_scripts',
-      [] as ContentScript[],
-    ).reduce(
+    ...get(manifest, 'content_scripts', [] as ContentScript[]).reduce(
       (r, { css = [] }) => [...r, ...css],
       [] as string[],
     ),
@@ -185,11 +170,7 @@ export function deriveFilesMV2(
     'browser_action.default_icon',
     'page_action.default_icon',
   ].reduce((set, query) => {
-    const result: string | { [size: string]: string } = get(
-      manifest,
-      query,
-      {},
-    )
+    const result: string | { [size: string]: string } = get(manifest, query, {})
 
     if (typeof result === 'string') {
       set.add(result)
@@ -221,8 +202,6 @@ export function deriveFilesMV2(
   }
 
   function validate(ary: any[]) {
-    return [...new Set(ary.filter(isString))].map((x) =>
-      join(srcDir, x),
-    )
+    return [...new Set(ary.filter(isString))].map((x) => join(srcDir, x))
   }
 }

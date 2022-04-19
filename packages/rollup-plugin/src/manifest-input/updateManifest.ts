@@ -23,9 +23,9 @@ export function updateManifestV3(
 
   if (manifest.content_scripts) {
     const { output = {} } = options
-    const {
-      chunkFileNames = 'chunks/[name]-[hash].js',
-    } = Array.isArray(output) ? output[0] : output
+    const { chunkFileNames = 'chunks/[name]-[hash].js' } = Array.isArray(output)
+      ? output[0]
+      : output
 
     cache.chunkFileNames = chunkFileNames
 
@@ -33,10 +33,8 @@ export function updateManifestV3(
     if (Array.isArray(output)) {
       if (
         // Should only be one value for chunkFileNames
-        output.reduce(
-          (r, x) => r.add(x.chunkFileNames ?? 'no cfn'),
-          new Set(),
-        ).size > 1
+        output.reduce((r, x) => r.add(x.chunkFileNames ?? 'no cfn'), new Set())
+          .size > 1
       )
         // We need to know chunkFileNames now, before the output stage
         throw new TypeError(
@@ -63,22 +61,17 @@ export function updateManifestV3(
         .replace('[format]', '*')
         .replace('[name]', '*')
         .replace('[hash]', '*')}`,
-      ...cache.contentScripts.map((x) =>
-        relative(cache.srcDir!, x),
-      ),
+      ...cache.contentScripts.map((x) => relative(cache.srcDir!, x)),
     ]
-    
+
     if (wrapContentScripts) {
-      manifest.content_scripts = manifest.content_scripts.map(
-        (c) => ({
-          ...c,
-          js: c.js?.map(getImportContentScriptFileName),
-        }),
-      )
+      manifest.content_scripts = manifest.content_scripts.map((c) => ({
+        ...c,
+        js: c.js?.map(getImportContentScriptFileName),
+      }))
     }
 
-    manifest.web_accessible_resources =
-      manifest.web_accessible_resources ?? []
+    manifest.web_accessible_resources = manifest.web_accessible_resources ?? []
 
     manifest.web_accessible_resources.push({
       resources,

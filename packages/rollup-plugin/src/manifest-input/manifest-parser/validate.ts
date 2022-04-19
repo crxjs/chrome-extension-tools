@@ -18,39 +18,31 @@ ajv.addFormat('permission', true)
 
 const validator = ajv.compile(schema)
 
-const setupPointer = (target: Record<string, unknown>) => (
-  pointer: string,
-): string | Record<string, unknown> =>
-  JsonPointer.create(pointer).get(target) as string
+const setupPointer =
+  (target: Record<string, unknown>) =>
+  (pointer: string): string | Record<string, unknown> =>
+    JsonPointer.create(pointer).get(target) as string
 
 const getSchemaDataMV2 = setupPointer(schemaMV2)
 const getSchemaDataMV3 = setupPointer(schemaMV3)
 
-const ignoredErrors = [
-  'must match "then" schema',
-  'must match "else" schema',
-]
+const ignoredErrors = ['must match "then" schema', 'must match "else" schema']
 
-export function validateManifest<
-  T extends chrome.runtime.ManifestBase
->(manifest: T): T {
+export function validateManifest<T extends chrome.runtime.ManifestBase>(
+  manifest: T,
+): T {
   const valid = validator(manifest)
   if (valid === true) return manifest
 
   const getValue = setupPointer(manifest)
   const getDesc =
-    manifest.manifest_version === 2
-      ? getSchemaDataMV2
-      : getSchemaDataMV3
+    manifest.manifest_version === 2 ? getSchemaDataMV2 : getSchemaDataMV3
 
   throw new Error(
     [
       'There were problems with the extension manifest.',
       ...(validator.errors
-        ?.filter(
-          ({ message }) =>
-            message && !ignoredErrors.includes(message),
-        )
+        ?.filter(({ message }) => message && !ignoredErrors.includes(message))
         .map((e) => {
           const schemaPath = `/${e.schemaPath
             .split('/')
@@ -63,9 +55,9 @@ export function validateManifest<
             return `- Manifest ${desc}`
           }
 
-          return `- ${JSON.stringify(
-            getValue(e.instancePath),
-          )} at "${e.instancePath}" ${desc}`
+          return `- ${JSON.stringify(getValue(e.instancePath))} at "${
+            e.instancePath
+          }" ${desc}`
         }) ?? []),
     ].join('\n'),
   )

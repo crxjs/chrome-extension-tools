@@ -1,7 +1,7 @@
 # API Documentation <a name = "api"></a>
 
-`rollup-plugin-chrome-extension` works out of the box, but
-sometimes you need more.
+`rollup-plugin-chrome-extension` works out of the box, but sometimes you need
+more.
 
 ## Table of Contents
 
@@ -24,11 +24,9 @@ sometimes you need more.
 | ---------- | --------------------------------------------- |
 | `function` | `(options?: object) => ChromeExtensionPlugin` |
 
-Call this function to initialize
-`rollup-plugin-chrome-extension`. Always put it first in the
-plugins array, since it converts the manifest json file to an
-array of input files. See [Options API](#options-api) for config
-details.
+Call this function to initialize `rollup-plugin-chrome-extension`. Always put it
+first in the plugins array, since it converts the manifest json file to an array
+of input files. See [Options API](#options-api) for config details.
 
 ```javascript
 // rollup.config.js
@@ -47,28 +45,23 @@ export default {
 
 ### `simpleReloader`
 
-| Type       | Call Signature                           |
-| ---------- | ---------------------------------------- |
+| Type       | Call Signature              |
+| ---------- | --------------------------- | ---------- |
 | `function` | `() => SimpleReloaderPlugin | undefined` |
 
-This reloader simply uses `setInterval` to fetch a local
-timestamp file every few seconds. When Rollup completes a new
-build, it changes the timestamp and the Chrome extension reloads
-itself.
+This reloader simply uses `setInterval` to fetch a local timestamp file every
+few seconds. When Rollup completes a new build, it changes the timestamp and the
+Chrome extension reloads itself.
 
-If Rollup is not in watch mode, `simpleReloader` disables
-itself`.
+If Rollup is not in watch mode, `simpleReloader` disables itself`.
 
-Make sure to do your final build outside of watch mode so that it
-doesn't include the reloader.
+Make sure to do your final build outside of watch mode so that it doesn't
+include the reloader.
 
 #### Usage for `simpleReloader`
 
 ```javascript
-import {
-  chromeExtension,
-  simpleReloader,
-} from 'rollup-plugin-chrome-extension'
+import { chromeExtension, simpleReloader } from 'rollup-plugin-chrome-extension'
 
 export default {
   input: 'src/manifest.json',
@@ -84,8 +77,8 @@ export default {
 }
 ```
 
-Start Rollup in watch mode. Enjoy auto-reloading whenever Rollup
-makes a new build.
+Start Rollup in watch mode. Enjoy auto-reloading whenever Rollup makes a new
+build.
 
 ## Manifest API <a name = "manifest"></a>
 
@@ -93,9 +86,8 @@ makes a new build.
 
 #### If a wrong permission has been detected
 
-Sometimes a third-party module will reference a Chrome API to
-detect its environment, but you don't need the permission in your
-manifest.
+Sometimes a third-party module will reference a Chrome API to detect its
+environment, but you don't need the permission in your manifest.
 
 ```jsonc
 // wrong permissions in output manifest.json
@@ -107,8 +99,8 @@ manifest.
 }
 ```
 
-**Solution:** Prefix unwanted permissions in the manifest with
-`"!"`, for example, `"!alarms"`.
+**Solution:** Prefix unwanted permissions in the manifest with `"!"`, for
+example, `"!alarms"`.
 
 ```jsonc
 // source manifest.json
@@ -129,13 +121,12 @@ manifest.
 
 ### `[web_accessible_resources]`
 
-If you have files that are not imported to a script, or
-referenced directly in the manifest or an HTML file, add them to
-`web_accessible_resources`.
+If you have files that are not imported to a script, or referenced directly in
+the manifest or an HTML file, add them to `web_accessible_resources`.
 
-They will be written to `output.dir` with the same folder
-structure as the source folder (the folder with the manifest
-file). Relative paths may not lead outside of the source folder.
+They will be written to `output.dir` with the same folder structure as the
+source folder (the folder with the manifest file). Relative paths may not lead
+outside of the source folder.
 
 ```jsonc
 {
@@ -151,8 +142,8 @@ file). Relative paths may not lead outside of the source folder.
 
 ## Options API <a name = "options"></a>
 
-You can use an options object with any of the following
-properties. Everything is optional.
+You can use an options object with any of the following properties. Everything
+is optional.
 
 ### `[browserPolyfill]` <a name = "options-browser-polyfill"></a>
 
@@ -160,8 +151,8 @@ properties. Everything is optional.
 | --------- |
 | `boolean` |
 
-Add the excellent [promisified Browser API]() by Mozilla to your
-Chrome extension with one easy option:
+Add the excellent [promisified Browser API]() by Mozilla to your Chrome
+extension with one easy option:
 
 ```javascript
 chromeExtension({
@@ -170,8 +161,8 @@ chromeExtension({
 ```
 
 Don't forget to
-[install types](https://www.npmjs.com/package/@types/firefox-webext-browser)
-if you want Intellisense to work!
+[install types](https://www.npmjs.com/package/@types/firefox-webext-browser) if
+you want Intellisense to work!
 
 ### `[dynamicImportWrapper]` <a name = "options-dynamic-import-wrapper"></a>
 
@@ -185,20 +176,27 @@ for JS files.
 
 <!-- ARTICLE: write "modules in chrome extension" article -->
 
-[Use modules in Chrome extension scripts](). Only disable if you
-know what you're doing, because code splitting won't work if
+[Use modules in Chrome extension scripts](). Only disable if you know what
+you're doing, because code splitting won't work if
 `dynamicImportWrapper === false`.
 
 ### Why do we need to use dynamic import in scripts?
-Two things are going on here:
-This Rollup plugin leverages two Rollup features to parse the manifest into inputs:
-*   It adds multiple parsed files to options.input
-*   It uses options.output.dir to support multiple output files.
-This means that [Rollup will use code-splitting](https://github.com/rollup/rollup/issues/2756#issuecomment-476242982). This is great because it makes a smaller bundle with no overlapping code, but we need a way to load those chunks into our content and background scripts.
-After some experimentation, I found that ES modules are the best format for web extensions, but they don’t support ES modules in background or content scripts out of the box. 
 
-The solution is to use [dynamic imports](https://stackoverflow.com/a/53033388/4842857) in extension scripts. All Chromium browsers and Firefox 89+ (coming May 2021) support this.
+Two things are going on here: This Rollup plugin leverages two Rollup features
+to parse the manifest into inputs:
 
+- It adds multiple parsed files to options.input
+- It uses options.output.dir to support multiple output files. This means that
+  [Rollup will use code-splitting](https://github.com/rollup/rollup/issues/2756#issuecomment-476242982).
+  This is great because it makes a smaller bundle with no overlapping code, but
+  we need a way to load those chunks into our content and background scripts.
+  After some experimentation, I found that ES modules are the best format for
+  web extensions, but they don’t support ES modules in background or content
+  scripts out of the box.
+
+The solution is to use
+[dynamic imports](https://stackoverflow.com/a/53033388/4842857) in extension
+scripts. All Chromium browsers and Firefox 89+ (coming May 2021) support this.
 
 #### `[dynamicImportWrapper.wakeEvents]`
 
@@ -206,20 +204,19 @@ The solution is to use [dynamic imports](https://stackoverflow.com/a/53033388/48
 | ---------- |
 | `string[]` |
 
-Events that wake (reactivate) an extension may be lost if that
-extension uses dynamic imports to load modules or asynchronously
-adds event listeners.
+Events that wake (reactivate) an extension may be lost if that extension uses
+dynamic imports to load modules or asynchronously adds event listeners.
 
 <!-- ARTICLE: write "wake events and module loading" article -->
 
 List events that will wake your background page (for example,
-`'chrome.tabs.onUpdated'`, or `'chrome.runtime.onInstalled'`).
-The script module loader will defer them until after all the
-background script modules have fully loaded.
+`'chrome.tabs.onUpdated'`, or `'chrome.runtime.onInstalled'`). The script module
+loader will defer them until after all the background script modules have fully
+loaded.
 
-> It may be possible to statically analyze the background page
-> code to detect which events the extension uses. Like
-> [this issue]() if this is something that interests you!
+> It may be possible to statically analyze the background page code to detect
+> which events the extension uses. Like [this issue]() if this is something that
+> interests you!
 
 ```javascript
 // Example usage
@@ -232,10 +229,7 @@ chromeExtension({
 // Default value
 chromeExtension({
   dynamicImportWrapper: {
-    wakeEvents: [
-      'chrome.runtime.onInstalled',
-      'chrome.runtime.onMessage',
-    ],
+    wakeEvents: ['chrome.runtime.onInstalled', 'chrome.runtime.onMessage'],
   },
 })
 ```
@@ -246,9 +240,9 @@ chromeExtension({
 | --------------------- |
 | `number` or `boolean` |
 
-Delay Event page wake events by `n` milliseconds after the all
-background page modules have finished loading. This may be useful
-for event listeners that are added asynchronously.
+Delay Event page wake events by `n` milliseconds after the all background page
+modules have finished loading. This may be useful for event listeners that are
+added asynchronously.
 
 ```javascript
 chromeExtension({
@@ -284,15 +278,15 @@ chromeExtension({
 | -------- |
 | `object` |
 
-Only use this field if you will not run Rollup using npm scripts
-(for example, `$ npm run build`), since npm provides scripts with
-the package info as an environment variable.
+Only use this field if you will not run Rollup using npm scripts (for example,
+`$ npm run build`), since npm provides scripts with the package info as an
+environment variable.
 
 The fields `name`, `description`, and `version` are used.
 
-These values are used to derive certain values from the
-`package.json` for the extension manifest. A value set in the
-source `manifest.json` will override a value from `package.json`.
+These values are used to derive certain values from the `package.json` for the
+extension manifest. A value set in the source `manifest.json` will override a
+value from `package.json`.
 
 ```javascript
 // Example usage
@@ -317,12 +311,11 @@ chromeExtension({
 
 <!-- ARTICLE: how to get stable extension id -->
 
-If truthy, `manifest.key` will be set to this value. Use this
-feature to
+If truthy, `manifest.key` will be set to this value. Use this feature to
 [stabilize the extension id during development](https://stackoverflow.com/questions/31422195/keep-chrome-extension-id-same-during-development).
 
-> Note that this value is not the actual id. An extension id is
-> derived from this value.
+> Note that this value is not the actual id. An extension id is derived from
+> this value.
 
 ```javascript
 const p = process.env.NODE_ENV === 'production'

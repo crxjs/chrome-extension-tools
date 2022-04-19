@@ -2,10 +2,7 @@ import { EmittedFile, OutputAsset } from 'rollup'
 import { simpleReloader, _internalCache } from '..'
 import { buildCRX } from '../../../__fixtures__/build-crx'
 import { context } from '../../../__fixtures__/plugin-context'
-import {
-  byFileName,
-  getExtPath,
-} from '../../../__fixtures__/utils'
+import { byFileName, getExtPath } from '../../../__fixtures__/utils'
 import { cloneObject } from '../../manifest-input/cloneObject'
 import {
   backgroundPageReloader,
@@ -167,8 +164,7 @@ test('Errors if manifest is not in the bundle', async () => {
 
   delete bundle['manifest.json']
 
-  const errorMessage =
-    'No manifest.json in the rollup output bundle.'
+  const errorMessage = 'No manifest.json in the rollup output bundle.'
 
   try {
     await plugin.generateBundle.call(context, {}, bundle, false)
@@ -192,9 +188,7 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
   try {
     await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
-    expect(context.error).toBeCalledWith(
-      'cache.bgScriptPath is undefined',
-    )
+    expect(context.error).toBeCalledWith('cache.bgScriptPath is undefined')
   }
 })
 
@@ -212,8 +206,6 @@ test('Errors if cache.ctScriptPath is undefined', async () => {
   try {
     await plugin.generateBundle.call(context, {}, bundle, false)
   } catch (error) {
-    expect(context.error).toBeCalledWith(
-      'cache.ctScriptPath is undefined',
-    )
+    expect(context.error).toBeCalledWith('cache.ctScriptPath is undefined')
   }
 })

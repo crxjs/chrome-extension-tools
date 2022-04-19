@@ -71,9 +71,7 @@ export default function htmlInputs(
       } else if (typeof options.input === 'object') {
         input = Object.values(options.input)
       } else {
-        throw new TypeError(
-          `options.input cannot be ${typeof options.input}`,
-        )
+        throw new TypeError(`options.input cannot be ${typeof options.input}`)
       }
 
       /* ------------------------------------------------- */
@@ -113,10 +111,7 @@ export default function htmlInputs(
       // - Parse HTML and emit chunks and assets in buildStart
       return {
         ...options,
-        input: cache.input.reduce(
-          reduceToRecord(htmlInputsOptions.srcDir),
-          {},
-        ),
+        input: cache.input.reduce(reduceToRecord(htmlInputsOptions.srcDir), {}),
       }
     },
 
@@ -133,11 +128,7 @@ export default function htmlInputs(
         throw new TypeError('options.srcDir not initialized')
       }
 
-      const assets = [
-        ...cache.css,
-        ...cache.img,
-        ...cache.scripts,
-      ]
+      const assets = [...cache.css, ...cache.img, ...cache.scripts]
 
       assets.concat(cache.html).forEach((asset) => {
         this.addWatchFile(asset)

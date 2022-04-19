@@ -12,9 +12,5 @@ export default {
     dir: getExtPath(crxName, 'dist'),
     format: 'esm',
   },
-  plugins: [
-    chromeExtension({ verbose: false }),
-    resolve(),
-    commonjs(),
-  ],
+  plugins: [chromeExtension({ verbose: false }), resolve(), commonjs()],
 }

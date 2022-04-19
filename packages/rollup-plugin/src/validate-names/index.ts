@@ -22,16 +22,12 @@ export const validateNames = (): ValidateNamesPlugin => ({
     // Rollup may output a helper file that starts with "_commonjsHelpers"
     // Loop through each file and check for "_commonjsHelpers" in filename
     Object.keys(bundle)
-      .filter((fileName) =>
-        basename(fileName).startsWith('_commonjsHelpers'),
-      )
+      .filter((fileName) => basename(fileName).startsWith('_commonjsHelpers'))
       .forEach((fileName) => {
         // Only replace first instance
         const regex = new RegExp(fileName)
         const [base, ...rest] = fileName.split('/').reverse()
-        const fixed = [base.slice(1), ...rest]
-          .reverse()
-          .join('/')
+        const fixed = [base.slice(1), ...rest].reverse().join('/')
 
         // Fix manifest
         const manifest = bundle['manifest.json'] as ManifestAsset

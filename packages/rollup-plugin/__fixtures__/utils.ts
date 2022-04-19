@@ -3,11 +3,7 @@ import { resolve, join, sep } from 'path'
 import { OutputAsset, OutputChunk, OutputBundle } from 'rollup'
 
 export const getTestName = (filename: string): string => {
-  const result = filename
-    .split('__')
-    .pop()
-    ?.split('.')
-    ?.shift()
+  const result = filename.split('__').pop()?.split('.')?.shift()
 
   if (typeof result === 'string') {
     return result
@@ -25,19 +21,13 @@ export const getCrxName = (filepath: string): string => {
 export const getExtPath = (...args: string[]): string =>
   resolve(__dirname, 'extensions', ...args)
 
-export const getExtPathFromTestName = (
-  testname: string,
-  crxPath: string,
-) => {
+export const getExtPathFromTestName = (testname: string, crxPath: string) => {
   const crxName = getTestName(testname)
   const relPath = join(crxName, crxPath)
   return getExtPath(relPath)
 }
 
-export const loadCrxJson = (
-  filename: string,
-  crxPath: string,
-) => {
+export const loadCrxJson = (filename: string, crxPath: string) => {
   const fullPath = getExtPathFromTestName(filename, crxPath)
   return readJsonSync(fullPath)
 }
@@ -48,26 +38,19 @@ export const requireExtFile = (
 ) => {
   const testName = getTestName(currentFilename)
 
-  return require(getExtPath(join(testName, targetFilename)))
-    .default
+  return require(getExtPath(join(testName, targetFilename))).default
 }
 
-/**  Make relative to project root */
+/** Make relative to project root */
 export const getRelative = (p: string): string =>
   p.replace(process.cwd() + '/', '')
 
 export function byFileName(n: string) {
-  return ({ fileName }: OutputAsset | OutputChunk): boolean =>
-    fileName === n
+  return ({ fileName }: OutputAsset | OutputChunk): boolean => fileName === n
 }
 
-/**
- * Get the source of an OutputAsset as a string
- */
-export const getAssetSource = (
-  key: string,
-  bundle: OutputBundle,
-): string => {
+/** Get the source of an OutputAsset as a string */
+export const getAssetSource = (key: string, bundle: OutputBundle): string => {
   const asset = bundle[key] as OutputAsset
 
   if (!asset) {

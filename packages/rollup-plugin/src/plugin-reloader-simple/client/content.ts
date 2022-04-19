@@ -11,9 +11,7 @@ console.log(loadMessagePlaceholder.slice(1, -1))
 
 const { name } = chrome.runtime.getManifest()
 
-connect()
-  .then(reload)
-  .catch(console.error)
+connect().then(reload).catch(console.error)
 
 async function reload(): Promise<void> {
   console.log(`${name} has reloaded...`)
@@ -46,9 +44,9 @@ async function connect(): Promise<void> {
       port.onDisconnect.addListener(r),
     ).then(() => false),
     // unless we get a reload message
-    new Promise<{ type: string }>((r) =>
-      port.onMessage.addListener(r),
-    ).then(({ type }) => type === 'reload'),
+    new Promise<{ type: string }>((r) => port.onMessage.addListener(r)).then(
+      ({ type }) => type === 'reload',
+    ),
   ])
 
   // Clean up old port

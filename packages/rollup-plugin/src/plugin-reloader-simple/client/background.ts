@@ -57,8 +57,7 @@ const interval = setInterval(async () => {
     const res = await fetch(timestampPathPlaceholder)
     const t = await res.json()
     await localforage.removeItem(errorsKey)
-    const timestamp =
-      (await localforage.getItem(timestampKey)) ?? undefined
+    const timestamp = (await localforage.getItem(timestampKey)) ?? undefined
 
     if (typeof timestamp === 'undefined') {
       await localforage.setItem(timestampKey, t)
@@ -66,17 +65,14 @@ const interval = setInterval(async () => {
       chrome.runtime.reload()
     }
   } catch (error) {
-    const errors =
-      (await localforage.getItem<number>(errorsKey)) ?? 0
+    const errors = (await localforage.getItem<number>(errorsKey)) ?? 0
 
     if (errors < 5) {
       await localforage.setItem(errorsKey, errors + 1)
     } else {
       clearInterval(interval)
 
-      console.log(
-        'rollup-plugin-chrome-extension simple reloader error:',
-      )
+      console.log('rollup-plugin-chrome-extension simple reloader error:')
       console.error(error)
     }
   }
@@ -96,8 +92,7 @@ chrome.runtime.reload = () => {
     // Reload the content scripts
     reloadContentScripts()
     // Unregister service workers in MV2
-    if (options.unregisterServiceWorkers)
-      await unregisterServiceWorkers()
+    if (options.unregisterServiceWorkers) await unregisterServiceWorkers()
     // Reload the extension
     _runtimeReload()
   })()
@@ -106,8 +101,7 @@ chrome.runtime.reload = () => {
 /* ---------- POLYFILL TABS.EXECUTESCRIPT ---------- */
 
 if (options.executeScript) {
-  const markerId =
-    'rollup-plugin-chrome-extension-simple-reloader'
+  const markerId = 'rollup-plugin-chrome-extension-simple-reloader'
 
   const addMarker = `{
     const tag = document.createElement('meta');
@@ -145,9 +139,7 @@ if (options.executeScript) {
 
     // Don't add reloader if it's already there
     if (!done) {
-      await withP(
-        ...(argsBase.concat({ code: addMarker }) as [any, any]),
-      )
+      await withP(...(argsBase.concat({ code: addMarker }) as [any, any]))
 
       // execute reloader
       const reloaderArgs = argsBase.concat([

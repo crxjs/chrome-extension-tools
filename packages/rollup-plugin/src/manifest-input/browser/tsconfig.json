@@ -2,7 +2,7 @@
   // Manifest Inputs Browser Config
   "extends": "../../../tsconfigs/tsconfig-base.json",
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom"]
   },
   "include": ["./**/*.ts"]
 }

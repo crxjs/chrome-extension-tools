@@ -2,11 +2,7 @@ import {
   kitchenSinkRoot,
   optionsHtml,
 } from '../../../__fixtures__/mv2-kitchen-sink-paths'
-import {
-  mutateScriptElems,
-  loadHtml,
-  getScripts,
-} from '../cheerio'
+import { mutateScriptElems, loadHtml, getScripts } from '../cheerio'
 
 const html$ = loadHtml(kitchenSinkRoot)(optionsHtml)
 
