@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfigs/tsconfig-base.json",
+  "include": [
+    "src/**/*",
+    "__fixtures__/**/*",
+    "__tests__/**/*",
+    "jest.setup.ts",
+    "examples/**/*.ts"
+  ],
+  "exclude": ["src/manifest-input/browser"],
+  "typeAcquisition": { "enable": true }
+}

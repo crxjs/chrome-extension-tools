@@ -1,0 +1,9 @@
+{
+  "name": "iife-json-paths-bg-multiscript",
+  "description": "iife json paths background multiscript",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "background": {
+    "scripts": ["background1.js", "background2.js"]
+  }
+}

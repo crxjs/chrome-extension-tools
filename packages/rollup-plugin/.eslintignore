@@ -1,0 +1,17 @@
+/node_modules
+/lib
+/types
+/coverage
+**/*.js
+
+rollup.config.js
+jest.config.js
+
+# *.jpg
+# *.json
+# *.html
+# *.png
+# *.css
+# *.ico
+# *.ttf
+# *.otf

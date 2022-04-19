@@ -1,0 +1,46 @@
+{
+  "action": {
+    "default_icon": {
+      "16": "images/icon-main-16.png"
+    },
+    "default_popup": "popup/popup.html"
+  },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["https://www.google.com/*"]
+    },
+    {
+      "css": ["content.css"],
+      "js": ["content.js"],
+      "matches": ["https://www.yahoo.com/*"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "description": "basic chrome extension with options ui",
+  "devtools_page": "devtools/devtools.html",
+  "icons": {
+    "16": "images/icon-main-16.png",
+    "48": "images/icon-main-48.png",
+    "128": "images/icon-main-128.png"
+  },
+  "manifest_version": 3,
+  "name": "options-ui",
+  "options_ui": {
+    "open_in_tab": false,
+    "page": "options.html"
+  },
+  "permissions": ["webRequest", "webRequestBlocking"],
+  "version": "1.0.0",
+  "web_accessible_resources": [
+    {
+      "matches": ["<all_urls>"],
+      "resources": ["options.jpg", "fonts/*.ttf", "fonts/*.otf"]
+    }
+  ]
+}

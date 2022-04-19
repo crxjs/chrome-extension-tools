@@ -1,0 +1,15 @@
+{
+  "$id": "https://extend-chrome.dev/manifest.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "if": {
+    "properties": {
+      "manifest_version": { "type": "number", "enum": [2] }
+    }
+  },
+  "then": {
+    "$ref": "./schema/manifest-v2.schema.json"
+  },
+  "else": {
+    "$ref": "./schema/manifest-v3.schema.json"
+  }
+}

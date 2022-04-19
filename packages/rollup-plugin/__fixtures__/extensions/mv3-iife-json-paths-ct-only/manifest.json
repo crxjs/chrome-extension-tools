@@ -1,0 +1,12 @@
+{
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["https://www.google.com/*"]
+    }
+  ],
+  "description": "iife json paths content only",
+  "manifest_version": 3,
+  "name": "iife-json-paths-ct-only",
+  "version": "1.0.0"
+}

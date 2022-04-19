@@ -1,0 +1,16 @@
+{
+  "content_scripts": [
+    {
+      "js": ["content1.js"],
+      "matches": ["https://www.google.com/*"]
+    },
+    {
+      "js": ["content2.js"],
+      "matches": ["https://www.yahoo.com/*"]
+    }
+  ],
+  "description": "iife json paths multi content scripts",
+  "manifest_version": 3,
+  "name": "iife-json-paths-multi-ct-scripts",
+  "version": "1.0.0"
+}
