@@ -6,6 +6,7 @@
 
 rollup.config.js
 jest.config.js
+__fixtures__
 
 # *.jpg
 # *.json
