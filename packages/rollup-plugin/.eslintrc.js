@@ -1,84 +1,49 @@
-console.log('loaded config file', __filename)
-
 module.exports = {
   env: {
-    es6: true,
+    browser: true,
+    es2021: true,
     node: true,
   },
   extends: [
     'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:react/recommended',
+    'plugin:react/jsx-runtime',
     'plugin:@typescript-eslint/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 'latest',
     sourceType: 'module',
-    project: './tsconfig.json',
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['react', '@typescript-eslint'],
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
   rules: {
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'no-empty': ['error', { allowEmptyCatch: true }],
-    '@typescript-eslint/no-empty-function': 'off',
-    '@typescript-eslint/ban-ts-ignore': 'off',
-    '@typescript-eslint/camelcase': 'off',
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/member-delimiter-style': [
-      'error',
-      {
-        multiline: {
-          delimiter: 'none',
-          requireLast: false,
-        },
-        singleline: {
-          delimiter: 'semi',
-          requireLast: false,
-        },
-      },
-    ],
-    '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unused-vars': [
-      'warn',
+      'error',
       {
+        vars: 'all',
         args: 'after-used',
         ignoreRestSiblings: true,
-        vars: 'all',
+        varsIgnorePattern: 'self',
       },
     ],
-    '@typescript-eslint/no-use-before-define': [
+    'prefer-const': [
       'error',
       {
-        classes: true,
-        functions: false,
+        destructuring: 'all',
+        ignoreReadBeforeAssign: false,
       },
     ],
-    '@typescript-eslint/no-var-requires': 'off',
-    '@typescript-eslint/unbound-method': 'off',
-    'comma-dangle': [
-      'warn',
-      {
-        arrays: 'always-multiline',
-        exports: 'always-multiline',
-        functions: 'always-multiline',
-        imports: 'always-multiline',
-        objects: 'always-multiline',
-      },
-    ],
-    'no-console': 'off',
-    quotes: ['warn', 'single', { avoidEscape: true }],
-    'require-atomic-updates': 'off',
-    semi: ['warn', 'never'],
+    // note you must disable the base rule as it can report incorrect errors
     'no-extra-semi': 'off',
-    '@typescript-eslint/no-misused-promises': [
-      'error',
-      {
-        checksVoidReturn: false,
-      },
-    ],
-    '@typescript-eslint/no-unsafe-assignment': 0,
-    '@typescript-eslint/no-floating-promises': 0,
-    '@typescript-eslint/no-extra-semi': 0,
+    '@typescript-eslint/no-extra-semi': 'off',
   },
 }
