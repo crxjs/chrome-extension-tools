@@ -53,7 +53,7 @@ test('crx page update on hmr', async () => {
   })
 
   await page.locator('h1', { hasText: header }).waitFor()
-  expect(reloads).toBe(1) // full reload on jsx update
+  expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
 
   // update background.ts file -> trigger runtime reload
@@ -71,6 +71,6 @@ test('crx page update on hmr', async () => {
 
   await app.waitFor()
 
-  expect(reloads).toBe(2)
+  expect(reloads).toBeGreaterThanOrEqual(2)
   expect(optionsPage.isClosed()).toBe(true)
 })
