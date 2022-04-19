@@ -23,6 +23,7 @@ export function browserPolyfill({
   else if (options === true) options = defaultOptions
   const { executeScript = true } = options
 
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const convert = require('convert-source-map')
   const polyfillPath = require.resolve('webextension-polyfill')
   const src = fs.readFileSync(polyfillPath, 'utf-8')

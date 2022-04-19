@@ -6,11 +6,7 @@ import memoize from 'mem'
 import path, { basename, relative } from 'path'
 import { EmittedAsset, OutputChunk } from 'rollup'
 import slash from 'slash'
-import {
-  isChunk,
-  isPresent,
-  normalizeFilename,
-} from '../helpers'
+import { isChunk, isPresent, normalizeFilename } from '../helpers'
 import { isMV2, isMV3 } from '../manifest-types'
 import {
   ManifestInputPlugin,
@@ -21,10 +17,7 @@ import { cloneObject } from './cloneObject'
 import { prepImportWrapperScript } from './dynamicImportWrapper'
 import { getInputManifestPath } from './getInputManifestPath'
 import { combinePerms } from './manifest-parser/combine'
-import {
-  deriveFiles,
-  derivePermissions,
-} from './manifest-parser/index'
+import { deriveFiles, derivePermissions } from './manifest-parser/index'
 import { validateManifest } from './manifest-parser/validate'
 import { reduceToRecord } from './reduceToRecord'
 import {
@@ -38,6 +31,7 @@ export const explorer = cosmiconfigSync('manifest', {
   loaders: {
     '.ts': (filePath: string) => {
       require('esbuild-runner/register')
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const result = require(filePath)
 
       return result.default ?? result
@@ -51,8 +45,7 @@ const name = 'manifest-input'
 //   eg, a CSS only Chrome Extension
 export const stubChunkNameForCssOnlyCrx =
   'stub__css-only-chrome-extension-manifest'
-export const importWrapperChunkNamePrefix =
-  '__RPCE-import-wrapper'
+export const importWrapperChunkNamePrefix = '__RPCE-import-wrapper'
 
 const npmPkgDetails =
   process.env.npm_package_name &&
@@ -156,16 +149,12 @@ export function manifestInput(
 
       // Do not reload manifest without changes
       if (!cache.manifest) {
-        const {
-          inputManifestPath,
-          ...cacheValues
-        } = getInputManifestPath(options)
+        const { inputManifestPath, ...cacheValues } =
+          getInputManifestPath(options)
 
         Object.assign(cache, cacheValues)
 
-        const configResult = explorer.load(
-          inputManifestPath,
-        ) as {
+        const configResult = explorer.load(inputManifestPath) as {
           filepath: string
           config: chrome.runtime.Manifest
           isEmpty?: true
@@ -202,9 +191,7 @@ export function manifestInput(
           manifest_version: 2,
           name: pkg.name,
           // version must be all digits with up to three dots
-          version: [
-            ...(pkg.version?.matchAll(/\d+/g) ?? []),
-          ].join('.'),
+          version: [...(pkg.version?.matchAll(/\d+/g) ?? [])].join('.'),
           description: pkg.description,
           ...extendedManifest,
         } as chrome.runtime.Manifest
@@ -225,16 +212,13 @@ export function manifestInput(
             .flat(Infinity)
 
           // Derive entry paths from manifest
-          const {
-            js,
-            html,
-            css,
-            img,
-            others,
-            contentScripts,
-          } = deriveFiles(fullManifest, cache.srcDir, {
-            contentScripts: true,
-          })
+          const { js, html, css, img, others, contentScripts } = deriveFiles(
+            fullManifest,
+            cache.srcDir,
+            {
+              contentScripts: true,
+            },
+          )
 
           cache.contentScripts = contentScripts
 
@@ -272,9 +256,7 @@ export function manifestInput(
 
       // Use a stub if no js scripts
       if (Object.keys(finalInput).length === 0) {
-        finalInput[
-          stubChunkNameForCssOnlyCrx
-        ] = stubChunkNameForCssOnlyCrx
+        finalInput[stubChunkNameForCssOnlyCrx] = stubChunkNameForCssOnlyCrx
       }
 
       return { ...options, input: finalInput }
@@ -328,11 +310,10 @@ export function manifestInput(
       /* --------------- EMIT MV3 MANIFEST --------------- */
 
       const manifestBody = cloneObject(cache.manifest!)
-      const manifestJson = JSON.stringify(
-        manifestBody,
-        undefined,
-        2,
-      ).replace(/\.[jt]sx?"/g, '.js"')
+      const manifestJson = JSON.stringify(manifestBody, undefined, 2).replace(
+        /\.[jt]sx?"/g,
+        '.js"',
+      )
 
       // Emit manifest.json
       this.emitFile({
@@ -360,10 +341,7 @@ export function manifestInput(
         id.startsWith(importWrapperChunkNamePrefix)
       ) {
         const [, target] = id.split(':')
-        const code = ctWrapperScript.replace(
-          '%PATH%',
-          JSON.stringify(target),
-        )
+        const code = ctWrapperScript.replace('%PATH%', JSON.stringify(target))
         return { code }
       }
 
@@ -451,13 +429,9 @@ export function manifestInput(
 
         if (verbose && permissions.length) {
           if (!cache.permsHash) {
-            this.warn(
-              `Detected permissions: ${permissions.toString()}`,
-            )
+            this.warn(`Detected permissions: ${permissions.toString()}`)
           } else if (permsHash !== cache.permsHash) {
-            this.warn(
-              `Detected new permissions: ${permissions.toString()}`,
-            )
+            this.warn(`Detected new permissions: ${permissions.toString()}`)
           }
         }
 
@@ -496,9 +470,7 @@ export function manifestInput(
               wrapperScript.replace(
                 '%PATH%',
                 // Fix path slashes to support Windows
-                JSON.stringify(
-                  slash(relative('assets', scriptPath)),
-                ),
+                JSON.stringify(slash(relative('assets', scriptPath))),
               )
 
             const assetId = this.emitFile({
@@ -526,9 +498,7 @@ export function manifestInput(
           const source = ctWrapperScript.replace(
             '%PATH%',
             // Fix path slashes to support Windows
-            JSON.stringify(
-              slash(relative('assets', scriptPath)),
-            ),
+            JSON.stringify(slash(relative('assets', scriptPath))),
           )
 
           const assetId = this.emitFile({
@@ -541,19 +511,17 @@ export function manifestInput(
         })
 
         // Setup content script import wrapper
-        manifestBody.content_scripts = cts.map(
-          ({ js, ...rest }) => {
-            return typeof js === 'undefined'
-              ? rest
-              : {
-                  js: js
-                    .map(normalizeFilename)
-                    .map(memoizedEmitter)
-                    .map((p) => slash(p)),
-                  ...rest,
-                }
-          },
-        )
+        manifestBody.content_scripts = cts.map(({ js, ...rest }) => {
+          return typeof js === 'undefined'
+            ? rest
+            : {
+                js: js
+                  .map(normalizeFilename)
+                  .map(memoizedEmitter)
+                  .map((p) => slash(p)),
+                ...rest,
+              }
+        })
 
         // make all imports & dynamic imports web_acc_res
         const imports = Object.values(bundle)
@@ -588,11 +556,10 @@ export function manifestInput(
 
       /* ----------- OUTPUT MANIFEST.JSON BEGIN ---------- */
 
-      const manifestJson = JSON.stringify(
-        manifestBody,
-        null,
-        2,
-      ).replace(/\.[jt]sx?"/g, '.js"')
+      const manifestJson = JSON.stringify(manifestBody, null, 2).replace(
+        /\.[jt]sx?"/g,
+        '.js"',
+      )
 
       // Emit manifest.json
       this.emitFile({

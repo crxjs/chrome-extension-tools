@@ -5,10 +5,7 @@ import { validateNames as v } from './validate-names'
 import { readJSONSync } from 'fs-extra'
 import { join } from 'path'
 
-import {
-  ChromeExtensionOptions,
-  ChromeExtensionPlugin,
-} from './plugin-options'
+import { ChromeExtensionOptions, ChromeExtensionPlugin } from './plugin-options'
 import { mixedFormat as m } from './mixed-format'
 
 export { simpleReloader } from './plugin-reloader-simple'
@@ -23,6 +20,7 @@ export const chromeExtension = (
   try {
     const packageJsonPath = join(process.cwd(), 'package.json')
     options.pkg = options.pkg || readJSONSync(packageJsonPath)
+    // eslint-disable-next-line no-empty
   } catch (error) {}
 
   /* ----------------- SETUP PLUGINS ----------------- */
@@ -64,8 +62,8 @@ export const chromeExtension = (
           'At least one HTML file must have at least one script.'
 
         if (
-          error.message === manifestError ||
-          error.message === htmlError
+          error instanceof Error &&
+          (error.message === manifestError || error.message === htmlError)
         ) {
           throw new Error(
             'A Chrome extension must have at least one script or HTML file.',

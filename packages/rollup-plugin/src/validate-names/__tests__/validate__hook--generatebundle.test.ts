@@ -3,11 +3,10 @@ import { context } from '../../../__fixtures__/plugin-context'
 import { isChunk } from '../../helpers'
 import { validateNames } from '../index'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const bundle: OutputBundle = require('../../../__fixtures__/validate-names__sample-bundle.json')
 
-const helperKey = Object.keys(bundle).find((name) =>
-  name.includes('_'),
-)!
+const helperKey = Object.keys(bundle).find((name) => name.includes('_'))!
 
 const helperName = helperKey.split('-')[0]
 
@@ -53,9 +52,7 @@ test('renames chunks by mutating the bundle', () => {
 
   const chunks = Object.values(bundle).filter(isChunk)
 
-  const dynamicImports = chunks.flatMap(
-    ({ dynamicImports: d }) => d,
-  )
+  const dynamicImports = chunks.flatMap(({ dynamicImports: d }) => d)
   const exports = chunks.flatMap(({ exports: e }) => e)
 
   expect(dynamicImports).not.toContain(helperKey)
