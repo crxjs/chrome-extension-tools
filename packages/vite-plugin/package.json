@@ -42,14 +42,14 @@
     "client.d.ts"
   ],
   "scripts": {
-    "build": "rimraf dist && run-s build:*",
+    "build": "run-s build:clean build:js",
+    "build:clean": "rimraf dist",
     "build:js": "rollup -c rollup.config.ts --configPlugin esbuild",
     "dev:js": "npm run build:js -- -w",
     "dev:lint": "tsc --noEmit --watch",
     "lint": "run-s lint:eslint lint:types",
     "lint:eslint": "eslint \"{src,test}/**/*.ts\"",
     "lint:types": "tsc --noEmit",
-    "prepublishOnly": "npm run build",
     "test": "run-s test:update:*",
     "test:ci:e2e:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) -t build",
     "test:ci:e2e:serve": "npm run test:ci:e2e:serve:cmd || npm run test:ci:e2e:serve:cmd",
@@ -114,11 +114,11 @@
     "vite-plugin-inspect": "0.4.3",
     "vue": "3.2.33"
   },
-  "optionalDependencies": {
-    "@vitejs/plugin-react": "^1.2.0"
-  },
   "peerDependencies": {
     "vite": "^2.9.0"
+  },
+  "optionalDependencies": {
+    "@vitejs/plugin-react": "^1.2.0"
   },
   "engines": {
     "node": ">=14"
