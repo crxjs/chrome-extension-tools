@@ -5,6 +5,7 @@ import sucrase from '@rollup/plugin-sucrase'
 import bundleImports from 'rollup-plugin-bundle-imports'
 import json from '@rollup/plugin-json'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { dependencies } = require('./package.json')
 
 const external = Object.keys(dependencies).concat('path', 'fs')
@@ -27,12 +28,12 @@ export default [
     input: 'src/index.ts',
     output: [
       {
-        file: 'lib/index-esm.js',
+        file: 'dist/index-esm.js',
         format: 'esm',
         sourcemap: 'inline',
       },
       {
-        file: 'lib/index-cjs.js',
+        file: 'dist/index-cjs.js',
         format: 'cjs',
         sourcemap: 'inline',
       },
