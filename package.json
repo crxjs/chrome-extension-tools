@@ -13,7 +13,7 @@
     "browser-extension"
   ],
   "homepage": "https://crxjs.dev",
-  "devDependencies": {
+  "dependencies": {
     "@changesets/cli": "^2.22.0",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
