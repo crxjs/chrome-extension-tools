@@ -25,7 +25,7 @@ defaults:
 jobs:
   # Runs linter and unit tests in src folder
   lint:
-    name: Run Lint
+    name: Linter
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -69,9 +69,9 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-  # Runs e2e integration tests in Playwright
+  # Runs e2e tests in Playwright
   e2e:
-    name: E2E Integration Tests
+    name: E2E Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest

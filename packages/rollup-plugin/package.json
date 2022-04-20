@@ -38,7 +38,8 @@
     "prepublishOnly": "run-p build build:types",
     "postpublish": "rm -rf node_modules package-lock.json && pnpm i",
     "test": "jest",
-    "test:ci": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|playwright\""
+    "test:ci:mv2": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|playwright\" --testPathPattern=mv2",
+    "test:ci:mv3": "jest --runInBand --testPathIgnorePatterns=\"/node_modules/|playwright\" --testPathPattern=mv3"
   },
   "dependencies": {
     "@types/lodash": "^4.14.172",
