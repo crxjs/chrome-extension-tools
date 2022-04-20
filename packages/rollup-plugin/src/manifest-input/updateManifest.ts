@@ -1,5 +1,6 @@
 import { basename, relative } from 'path'
 import { RollupOptions } from 'rollup'
+import slash from 'slash'
 import { ManifestInputPluginCache } from '../plugin-options'
 import { cloneObject } from './cloneObject'
 import { convertMatchPatterns } from './convertMatchPatterns'
@@ -54,14 +55,17 @@ export function updateManifestV3(
       .map(convertMatchPatterns)
 
     const matches = Array.from(new Set(allMatches))
+    // Use slash to guarantee support Windows
     const resources = [
-      `${chunkFileNames
-        .split('/')
-        .join('/')
-        .replace('[format]', '*')
-        .replace('[name]', '*')
-        .replace('[hash]', '*')}`,
-      ...cache.contentScripts.map((x) => relative(cache.srcDir!, x)),
+      slash(
+        `${chunkFileNames
+          .split('/')
+          .join('/')
+          .replace('[format]', '*')
+          .replace('[name]', '*')
+          .replace('[hash]', '*')}`,
+      ),
+      ...cache.contentScripts.map((x) => slash(relative(cache.srcDir!, x))),
     ]
 
     if (wrapContentScripts) {
