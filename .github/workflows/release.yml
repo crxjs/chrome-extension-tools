@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
+      - name: Setup PNPM
+        # You may pin to the exact commit or the version.
+        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
+        uses: pnpm/action-setup@v2.2.1
+        with:
+          # Version of PNPM to install
+          version: 6.3.0
+          # Where to store PNPM files
+          # dest: # optional, default is ~/setup-pnpm
+          # If specified, run `pnpm install`
+          # run_install: true
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # This expects you to have a script called release which does a build for your packages and calls changeset publish
+          publish: yarn release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # - name: Send a Slack notification if a publish happens
+      #   if: steps.changesets.outputs.published == 'true'
+      #   # You can do something when a publish happens.
+      #   run: my-slack-bot send-notification --message "A new version of ${GITHUB_REPOSITORY} was published!"
