@@ -21,3 +21,4 @@ TODOs.md
 *.log
 *.local
 packages/vite/LICENSE
+types
