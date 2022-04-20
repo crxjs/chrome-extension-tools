@@ -1,8 +1,8 @@
 # [rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
 
 [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
-[![GitHub last commit](https://img.shields.io/github/last-commit/extend-chrome/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/extend-chrome/rollup-plugin-chrome-extension)
-![GitHub action badge](https://github.com/extend-chrome/rollup-plugin-chrome-extension/actions/workflows/rollup-plugin.yml/badge.svg)
+[![GitHub last commit](https://img.shields.io/github/last-commit/crxjs/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/crxjs/rollup-plugin-chrome-extension)
+![GitHub action badge](https://github.com/crxjs/rollup-plugin-chrome-extension/actions/workflows/rollup-plugin.yml/badge.svg)
 [![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
 
 <a href="https://www.extend-chrome.dev/rollup-plugin" rel="noopener">
@@ -42,8 +42,8 @@ Just add new features to your manifest and RPCE does the rest.
 
 We have
 [v3 boilerplates](https://www.extend-chrome.dev/rollup-plugin#chrome-extension-boilerplates)
-for [React JavaScript](https://github.com/extend-chrome/js-react-boilerplate),
-[React TypeScript](https://github.com/extend-chrome/ts-react-boilerplate) and
+for [React JavaScript](https://github.com/crxjs/js-react-boilerplate),
+[React TypeScript](https://github.com/crxjs/ts-react-boilerplate) and
 [Svelte](https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate),
 as well as [instructions](https://www.extend-chrome.dev/rollup-plugin#usage) for
 setting up your own project.

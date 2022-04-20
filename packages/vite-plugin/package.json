@@ -13,13 +13,13 @@
     "browser",
     "browser-extension"
   ],
-  "homepage": "https://github.com/extend-chrome/rollup-plugin-chrome-extension",
+  "homepage": "https://github.com/crxjs/rollup-plugin-chrome-extension",
   "bugs": {
-    "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension/issues"
+    "url": "https://github.com/crxjs/rollup-plugin-chrome-extension/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/extend-chrome/rollup-plugin-chrome-extension.git"
+    "url": "https://github.com/crxjs/rollup-plugin-chrome-extension.git"
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
