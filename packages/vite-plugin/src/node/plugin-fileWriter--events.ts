@@ -1,4 +1,5 @@
-import { existsSync, outputFile, statSync } from 'fs-extra'
+import fsExtra from 'fs-extra' 
+const { pathExistsSync, outputFile, statSync } = fsExtra
 import { performance } from 'perf_hooks'
 import colors from 'picocolors'
 import { ChangeEvent, OutputBundle, OutputOptions, RollupOptions } from 'rollup'
@@ -166,7 +167,7 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
     async buildStart(options) {
       start = performance.now()
       const filename = await triggerName
-      if (!existsSync(filename)) {
+      if (!pathExistsSync(filename)) {
         await outputFile(filename, Date.now().toString())
       }
       this.addWatchFile(filename)
