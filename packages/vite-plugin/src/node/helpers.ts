@@ -111,6 +111,7 @@ export function htmlFiles(manifest: ManifestV3): string[] {
   ]
     .flat()
     .filter(isString)
+    .map(s => s.split('#')[0])
     .sort()
   return [...new Set(files)]
 }
