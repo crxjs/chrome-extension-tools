@@ -102,7 +102,7 @@
     "esbuild-runner": "2.2.1",
     "jest": "27.5.1",
     "jest-image-snapshot": "4.5.1",
-    "playwright-chromium": "1.21.0",
+    "playwright-chromium": "1.21.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "rimraf": "3.0.2",
