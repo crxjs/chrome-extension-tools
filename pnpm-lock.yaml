@@ -189,7 +189,7 @@ importers:
       jsesc: ^3.0.2
       magic-string: ^0.26.0
       picocolors: ^1.0.0
-      playwright-chromium: 1.21.0
+      playwright-chromium: 1.21.1
       react: 17.0.2
       react-dom: 17.0.2
       react-refresh: ^0.12.0
@@ -245,7 +245,7 @@ importers:
       esbuild-runner: 2.2.1_esbuild@0.14.23
       jest: 27.5.1
       jest-image-snapshot: 4.5.1_jest@27.5.1
-      playwright-chromium: 1.21.0
+      playwright-chromium: 1.21.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       rimraf: 3.0.2
@@ -7912,42 +7912,13 @@ packages:
     dependencies:
       find-up: 4.1.0
 
-  /playwright-chromium/1.21.0:
-    resolution: {integrity: sha512-btps5gqqc4GUESv+H3/rTPMv5S6zUSsgEcpvM3HX08bqaHnpyy+cPK6XLJq9L8kGjm3SdzlmG8tkhSPP4iuWhA==}
+  /playwright-chromium/1.21.1:
+    resolution: {integrity: sha512-bbqFFpcTs+3amiofja/KvTmZ+FZnMNEOuGkRyJk2p6DV9EbgRYVrlzzgLtMnX2DwaX3ZZ23MukGuQ+bVKOdsnw==}
     engines: {node: '>=12'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      playwright-core: 1.21.0
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-    dev: true
-
-  /playwright-core/1.21.0:
-    resolution: {integrity: sha512-yDGVs9qaaW6WiefgR7wH1CGt9D6D/X4U3jNpIzH0FjjrrWLCOYQo78Tu3SkW8X+/kWlBpj49iWf3QNSxhYc12Q==}
-    engines: {node: '>=12'}
-    hasBin: true
-    dependencies:
-      colors: 1.4.0
-      commander: 8.3.0
-      debug: 4.3.3
-      extract-zip: 2.0.1
-      https-proxy-agent: 5.0.0
-      jpeg-js: 0.4.3
-      mime: 3.0.0
-      pixelmatch: 5.2.1
-      pngjs: 6.0.0
-      progress: 2.0.3
-      proper-lockfile: 4.1.2
-      proxy-from-env: 1.1.0
-      rimraf: 3.0.2
-      socks-proxy-agent: 6.1.1
-      stack-utils: 2.0.5
-      ws: 8.4.2
-      yauzl: 2.10.0
-      yazl: 2.5.1
+      playwright-core: 1.21.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
