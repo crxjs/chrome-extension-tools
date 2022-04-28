@@ -79,7 +79,7 @@
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
     "@rollup/plugin-alias": "3.1.9",
-    "@rollup/plugin-commonjs": "21.0.3",
+    "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-node-resolve": "13.2.0",
     "@types/acorn": "4.0.6",
     "@types/chrome": "0.0.183",

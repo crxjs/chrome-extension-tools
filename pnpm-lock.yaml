@@ -154,7 +154,7 @@ importers:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
       '@rollup/plugin-alias': 3.1.9
-      '@rollup/plugin-commonjs': 21.0.3
+      '@rollup/plugin-commonjs': 21.1.0
       '@rollup/plugin-node-resolve': 13.2.0
       '@rollup/pluginutils': ^4.1.2
       '@types/acorn': 4.0.6
@@ -223,7 +223,7 @@ importers:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
       '@rollup/plugin-alias': 3.1.9_rollup@2.70.2
-      '@rollup/plugin-commonjs': 21.0.3_rollup@2.70.2
+      '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.70.2
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.183
@@ -2231,8 +2231,8 @@ packages:
       rollup: 1.32.1
     dev: true
 
-  /@rollup/plugin-commonjs/21.0.3_rollup@2.70.2:
-    resolution: {integrity: sha512-ThGfwyvcLc6cfP/MWxA5ACF+LZCvsuhUq7V5134Az1oQWsiC7lNpLT4mJI86WQunK7BYmpUiHmMk2Op6OAHs0g==}
+  /@rollup/plugin-commonjs/21.1.0_rollup@2.70.2:
+    resolution: {integrity: sha512-6ZtHx3VHIp2ReNNDxHjuUml6ur+WcQ28N1yHgCQwsbNkQg2suhxGMDQGJOn/KuDxKtd1xuZP5xSTwBA4GQ8hbA==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       rollup: ^2.38.3
