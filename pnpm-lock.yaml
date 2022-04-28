@@ -34,7 +34,7 @@ importers:
       '@rollup/plugin-json': ^4.0.2
       '@rollup/plugin-node-resolve': ^7.1.1
       '@rollup/plugin-sucrase': ^3.0.0
-      '@rollup/plugin-typescript': ^6.0.0
+      '@rollup/plugin-typescript': 8.3.2
       '@sucrase/jest-plugin': ^2.1.0
       '@testing-library/dom': ^6.12.2
       '@testing-library/jest-dom': ^5.1.1
@@ -115,7 +115,7 @@ importers:
       '@rollup/plugin-json': 4.1.0_rollup@1.32.1
       '@rollup/plugin-node-resolve': 7.1.3_rollup@1.32.1
       '@rollup/plugin-sucrase': 3.1.1_rollup@1.32.1
-      '@rollup/plugin-typescript': 6.1.0_cd0f9c11974e533491ffbf8e7bee161c
+      '@rollup/plugin-typescript': 8.3.2_cd0f9c11974e533491ffbf8e7bee161c
       '@sucrase/jest-plugin': 2.2.0
       '@testing-library/dom': 6.16.0
       '@testing-library/jest-dom': 5.16.4
@@ -2296,13 +2296,13 @@ packages:
       sucrase: 3.21.0
     dev: true
 
-  /@rollup/plugin-typescript/6.1.0_cd0f9c11974e533491ffbf8e7bee161c:
-    resolution: {integrity: sha512-hJxaiE6WyNOsK+fZpbFh9CUijZYqPQuAOWO5khaGTUkM8DYNNyA2TDlgamecE+qLOG1G1+CwbWMAx3rbqpp6xQ==}
+  /@rollup/plugin-typescript/8.3.2_cd0f9c11974e533491ffbf8e7bee161c:
+    resolution: {integrity: sha512-MtgyR5LNHZr3GyN0tM7gNO9D0CS+Y+vflS4v/PHmrX17JCkHUYKvQ5jN5o3cz1YKllM3duXUqu3yOHwMPUxhDg==}
     engines: {node: '>=8.0.0'}
     peerDependencies:
       rollup: ^2.14.0
       tslib: '*'
-      typescript: '>=3.4.0'
+      typescript: '>=3.7.0'
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@1.32.1
       resolve: 1.22.0
