@@ -97,7 +97,7 @@
     "@vitejs/plugin-vue": "2.3.1",
     "@vue/compiler-sfc": "3.2.33",
     "@vueuse/core": "8.3.1",
-    "@vueuse/router": "8.2.6",
+    "@vueuse/router": "8.3.1",
     "esbuild": "0.14.38",
     "esbuild-runner": "2.2.1",
     "jest": "27.5.1",
