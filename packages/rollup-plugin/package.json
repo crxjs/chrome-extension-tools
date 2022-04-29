@@ -98,7 +98,7 @@
     "prettier": "^2.3.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "read-pkg-up": "^7.0.1",
+    "read-pkg-up": "9.1.0",
     "rollup-plugin-bundle-imports": "^1.4.5",
     "rxjs": "^7.3.0",
     "ts-jest": "^27.1.4",
