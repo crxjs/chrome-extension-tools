@@ -84,7 +84,7 @@ importers:
       ts-jest: ^27.1.4
       tslib: ^2.3.0
       typescript: ^4.3.5
-      webextension-polyfill: ^0.6.0
+      webextension-polyfill: ^0.9.0
     dependencies:
       '@types/lodash': 4.14.182
       ajv: 8.11.0
@@ -103,7 +103,7 @@ importers:
       mem: 6.1.1
       rollup: 1.32.1
       slash: 3.0.0
-      webextension-polyfill: 0.6.0
+      webextension-polyfill: 0.9.0
     devDependencies:
       '@babel/plugin-proposal-class-properties': 7.16.7
       '@babel/preset-env': 7.16.11
@@ -9382,8 +9382,8 @@ packages:
       defaults: 1.0.3
     dev: false
 
-  /webextension-polyfill/0.6.0:
-    resolution: {integrity: sha512-PlYwiX8e4bNZrEeBFxbFFsLtm0SMPxJliLTGdNCA0Bq2XkWrAn2ejUd+89vZm+8BnfFB1BclJyCz3iKsm2atNg==}
+  /webextension-polyfill/0.9.0:
+    resolution: {integrity: sha512-LTtHb0yR49xa9irkstDxba4GATDAcDw3ncnFH9RImoFwDlW47U95ME5sn5IiQX2ghfaECaf6xyXM8yvClIBkkw==}
     dev: false
 
   /webidl-conversions/5.0.0:
