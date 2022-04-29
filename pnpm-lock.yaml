@@ -30,7 +30,7 @@ importers:
       '@extend-chrome/messages': ^1.2.2
       '@extend-chrome/storage': ^1.5.0
       '@rollup/plugin-babel': ^5.3.0
-      '@rollup/plugin-commonjs': ^11
+      '@rollup/plugin-commonjs': 22.0.0
       '@rollup/plugin-json': ^4.0.2
       '@rollup/plugin-node-resolve': ^7.1.1
       '@rollup/plugin-sucrase': ^3.0.0
@@ -111,7 +111,7 @@ importers:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
       '@rollup/plugin-babel': 5.3.1_rollup@1.32.1
-      '@rollup/plugin-commonjs': 11.1.0_rollup@1.32.1
+      '@rollup/plugin-commonjs': 22.0.0_rollup@1.32.1
       '@rollup/plugin-json': 4.1.0_rollup@1.32.1
       '@rollup/plugin-node-resolve': 7.1.3_rollup@1.32.1
       '@rollup/plugin-sucrase': 3.1.1_rollup@1.32.1
@@ -143,7 +143,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       read-pkg-up: 7.0.1
-      rollup-plugin-bundle-imports: 1.5.1_8e491f3f5ee24e2ec51ff799ee34e149
+      rollup-plugin-bundle-imports: 1.5.1_072957c11124a0682c1b32a4ede9f30d
       rxjs: 7.5.5
       ts-jest: 27.1.4_05614e395d0c1ad42d61f9fb9b0fde93
       tslib: 2.3.1
@@ -154,7 +154,7 @@ importers:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
       '@rollup/plugin-alias': 3.1.9
-      '@rollup/plugin-commonjs': 21.1.0
+      '@rollup/plugin-commonjs': 22.0.0
       '@rollup/plugin-node-resolve': 13.2.0
       '@rollup/pluginutils': ^4.1.2
       '@types/acorn': 4.0.6
@@ -223,7 +223,7 @@ importers:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
       '@rollup/plugin-alias': 3.1.9_rollup@2.70.2
-      '@rollup/plugin-commonjs': 21.1.0_rollup@2.70.2
+      '@rollup/plugin-commonjs': 22.0.0_rollup@2.70.2
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.70.2
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.183
@@ -2215,15 +2215,15 @@ packages:
       rollup: 1.32.1
     dev: true
 
-  /@rollup/plugin-commonjs/11.1.0_rollup@1.32.1:
-    resolution: {integrity: sha512-Ycr12N3ZPN96Fw2STurD21jMqzKwL9QuFhms3SD7KKRK7oaXUsBU9Zt0jL/rOPHiPYisI21/rXGO3jr9BnLHUA==}
-    engines: {node: '>= 8.0.0'}
+  /@rollup/plugin-commonjs/22.0.0_rollup@1.32.1:
+    resolution: {integrity: sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==}
+    engines: {node: '>= 12.0.0'}
     peerDependencies:
-      rollup: ^1.20.0||^2.0.0
+      rollup: ^2.68.0
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@1.32.1
       commondir: 1.0.1
-      estree-walker: 1.0.1
+      estree-walker: 2.0.2
       glob: 7.2.0
       is-reference: 1.2.1
       magic-string: 0.25.9
@@ -2231,11 +2231,11 @@ packages:
       rollup: 1.32.1
     dev: true
 
-  /@rollup/plugin-commonjs/21.1.0_rollup@2.70.2:
-    resolution: {integrity: sha512-6ZtHx3VHIp2ReNNDxHjuUml6ur+WcQ28N1yHgCQwsbNkQg2suhxGMDQGJOn/KuDxKtd1xuZP5xSTwBA4GQ8hbA==}
-    engines: {node: '>= 8.0.0'}
+  /@rollup/plugin-commonjs/22.0.0_rollup@2.70.2:
+    resolution: {integrity: sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==}
+    engines: {node: '>= 12.0.0'}
     peerDependencies:
-      rollup: ^2.38.3
+      rollup: ^2.68.0
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.70.2
       commondir: 1.0.1
@@ -8372,14 +8372,14 @@ packages:
     dependencies:
       glob: 7.2.0
 
-  /rollup-plugin-bundle-imports/1.5.1_8e491f3f5ee24e2ec51ff799ee34e149:
+  /rollup-plugin-bundle-imports/1.5.1_072957c11124a0682c1b32a4ede9f30d:
     resolution: {integrity: sha512-EIOiPV3Pk+RJtujTAXOdiKBV82qd+PM44uczsZI07XQ53nmMy5rFq2+YcMSRmGWRz9aCGEmib7Q6Ge4EZaRG+A==}
     peerDependencies:
       '@rollup/plugin-commonjs': ^21.0.0
       '@rollup/plugin-node-resolve': ^13.0.5
       rollup: ^1.20.1 || ^2.0.0
     dependencies:
-      '@rollup/plugin-commonjs': 11.1.0_rollup@1.32.1
+      '@rollup/plugin-commonjs': 22.0.0_rollup@1.32.1
       '@rollup/plugin-node-resolve': 7.1.3_rollup@1.32.1
       rollup: 1.32.1
       rollup-pluginutils: 2.8.2
