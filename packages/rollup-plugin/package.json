@@ -50,7 +50,7 @@
     "esbuild": "^0.14.0",
     "esbuild-runner": "^2.2.0",
     "fs-extra": "^8.1.0",
-    "glob": "^7.1.6",
+    "glob": "^8.0.0",
     "json-ptr": "^2.2.0",
     "jsonpath-plus": "^4.0.0",
     "localforage": "^1.9.0",
