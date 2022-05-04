@@ -18,5 +18,11 @@ test('crx runs from server output', async () => {
   })
 
   const page = await getPage(browser, 'chrome-extension')
-  await page.waitForSelector('text=external XHR: Yes')
+
+  try {
+    await page.waitForSelector('text=external XHR: Yes', { timeout: 5000 })
+  } catch (error) {
+    await page.reload()
+    await page.waitForSelector('text=external XHR: Yes', { timeout: 5000 })
+  }
 })
