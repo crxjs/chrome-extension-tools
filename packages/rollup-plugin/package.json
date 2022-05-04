@@ -61,6 +61,7 @@
     "webextension-polyfill": "^0.9.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.10",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
     "@babel/preset-env": "^7.13.8",
     "@babel/preset-react": "^7.12.13",
