@@ -11,8 +11,6 @@ const count = ref(0)
 <template>
   <h1>{{ msg }}</h1>
 
-  <p>Make a Chrome Extension with Vite!</p>
-
   <p>
     Recommended IDE setup:
     <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
@@ -41,7 +39,7 @@ a {
 }
 
 button {
-  background-color: red;
+  background-color: rgb(239, 239, 239);
   border-color: rgb(118, 118, 118);
   border-image: initial;
   border-style: outset;

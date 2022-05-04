@@ -4,9 +4,8 @@ import {
   optionsHtml,
 } from '../../../__fixtures__/mv2-kitchen-sink-paths'
 import { loadHtml } from '../cheerio'
-
-const fs = require('fs-extra')
-const cheerio = require('cheerio')
+import cheerio from 'cheerio'
+import fs from 'fs-extra'
 
 jest.spyOn(fs, 'readFileSync')
 jest.spyOn(cheerio, 'load')

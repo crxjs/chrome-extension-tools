@@ -1,3 +1,5 @@
 export {}
 
-console.log('post runtime reload')
+console.log('open options page 1')
+
+chrome.runtime.openOptionsPage()

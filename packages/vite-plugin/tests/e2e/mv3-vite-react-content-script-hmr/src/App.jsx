@@ -11,8 +11,7 @@ function App() {
     <div className='App'>
       <header className='App-header'>
         <img src={crxLogo} className='App-logo' alt='logo' />
-        {/* Added "+ CRX" */}
-        <p>Hello Vite + React + CRX!</p>
+        <p>Hello Vite + React!</p>
         <p>
           <button type='button' onClick={() => setCount((count) => count + 1)}>
             count is: {count}
