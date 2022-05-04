@@ -102,8 +102,7 @@
     "rollup-plugin-bundle-imports": "^1.4.5",
     "rxjs": "^7.3.0",
     "ts-jest": "^27.1.4",
-    "tslib": "^2.3.0",
-    "typescript": "^4.3.5"
+    "tslib": "^2.3.0"
   },
   "engines": {
     "node": ">=12.0.0"
