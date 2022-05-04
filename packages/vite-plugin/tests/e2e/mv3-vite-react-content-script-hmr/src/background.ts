@@ -1,2 +1,0 @@
-chrome.runtime.openOptionsPage()
-export {}
