@@ -13,10 +13,8 @@ import {
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, join } from './path'
-import { dynamicResourcesName } from './plugin-content-scripts'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
-import fg from 'fast-glob'
 
 // const debug = _debug('manifest')
 
@@ -229,19 +227,6 @@ export const pluginManifest =
               return { js: refJS, ...rest }
             },
           )
-
-          // update web accessible resources from refs
-          manifest.web_accessible_resources =
-            manifest.web_accessible_resources?.map(
-              ({ resources, ...rest }) => ({
-                resources: resources.map((r) =>
-                  fg.isDynamicPattern(r) || r === dynamicResourcesName
-                    ? r
-                    : this.getFileName(r),
-                ),
-                ...rest,
-              }),
-            )
 
           /* ------------ RUN MANIFEST RENDER HOOK ----------- */
 
