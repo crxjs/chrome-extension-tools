@@ -5,5 +5,6 @@
  * Note: `oncontrollerchange` does not fire in this context, instead the page
  * continuously reloads until the service worker takes over.
  */
-setTimeout(() => location.reload(), 100)
+const id = setInterval(() => location.reload(), 100)
+setTimeout(() => clearInterval(id), 5000)
 export {}
