@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.0.3
+
+### Patch Changes
+
+- 8b2e587: check service worker on interval from extension page
+
 ## 1.0.2
 
 ### Patch Changes
