@@ -148,7 +148,8 @@ export { HMRPort };
 `;
 
 exports[`serve fs output: assets/precontroller.js.js 1`] = `
-"setTimeout(() => location.reload(), 100);
+"const id = setInterval(() => location.reload(), 100);
+setTimeout(() => clearInterval(id), 5e3);
 "
 `;
 
