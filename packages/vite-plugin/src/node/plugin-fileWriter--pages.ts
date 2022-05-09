@@ -1,12 +1,27 @@
-import preControllerScript from 'client/es/page-precontroller-script.ts?client'
-import preControllerHtml from 'client/html/precontroller.html?client'
+import precontrollerScript from 'client/es/page-precontroller-script.ts?client'
+import precontrollerHtml from 'client/html/precontroller.html?client'
 import { htmlFiles } from './helpers'
-import { CrxPluginFn } from './types'
+import { CrxPlugin, CrxPluginFn } from './types'
 
 export const pluginFileWriterHtml: CrxPluginFn = () => {
+  let precontrollerName: string | undefined
+
   return {
     name: 'crx:file-writer-html',
     apply: 'build',
+    fileWriterStart(server) {
+      const plugins = server.config.plugins as CrxPlugin[]
+      const i = plugins.findIndex(({ name }) => name === 'alias')
+      plugins.splice(i, 0, {
+        name: 'crx:load-precontroller',
+        apply: 'serve',
+        load(id) {
+          // if the placeholder html loads before the service worker controls fetch,
+          // the script may load from the devserver; in this case the page should reload
+          if (id === `/${precontrollerName}`) return 'location.reload();'
+        },
+      })
+    },
     renderCrxManifest(manifest) {
       if (this.meta.watchMode) {
         /**
@@ -24,14 +39,17 @@ export const pluginFileWriterHtml: CrxPluginFn = () => {
         const refId = this.emitFile({
           type: 'asset',
           name: 'precontroller.js',
-          source: preControllerScript,
+          source: precontrollerScript,
         })
-        const name = this.getFileName(refId)
+        precontrollerName = this.getFileName(refId)
         for (const fileName of htmlFiles(manifest)) {
           this.emitFile({
             type: 'asset',
             fileName,
-            source: preControllerHtml.replace('%PATH%', `/${name}`),
+            source: precontrollerHtml.replace(
+              '%PATH%',
+              `/${precontrollerName}`,
+            ),
           })
         }
       }
