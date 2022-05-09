@@ -82,7 +82,7 @@
     "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-node-resolve": "13.2.0",
     "@types/acorn": "4.0.6",
-    "@types/chrome": "0.0.183",
+    "@types/chrome": "0.0.184",
     "@types/debug": "4.1.7",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "27.4.1",
