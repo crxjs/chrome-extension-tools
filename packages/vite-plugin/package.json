@@ -1,6 +1,6 @@
 {
   "name": "@crxjs/vite-plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Build Chrome Extensions with this Vite plugin.",
   "keywords": [
     "rollup-plugin",

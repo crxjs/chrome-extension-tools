@@ -1,5 +1,13 @@
 # @crxjs/vite-plugin
 
+## 1.0.4
+
+### Patch Changes
+
+- b83a4bd: Check for manifest assets first in the project root, then check in
+  the public dir. Throw an informative error if the file does not exist in
+  either dir.
+
 ## 1.0.3
 
 ### Patch Changes
