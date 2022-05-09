@@ -182,15 +182,6 @@ exports[`serve fs output: src/popup.html 1`] = `
       If you see this message, it means the service worker has not loaded fully.
     </p>
 
-    <p>
-      During development, the service worker reroutes HTML requests to the dev
-      server, so this file isn't used unless the extension service worker opens
-      a page immediately after a full extension reload, and before the service
-      worker takes control of fetch (e.g., in the onInstalled event). In that
-      case, this page will continuously reload until the service worker is
-      ready, always less than 100 ms.
-    </p>
-
     <p>This page is never added in production.</p>
   </body>
 </html>
