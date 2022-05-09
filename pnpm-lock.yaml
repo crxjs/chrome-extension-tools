@@ -163,7 +163,7 @@ importers:
       '@types/chrome': 0.0.184
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
-      '@types/jest': 27.4.1
+      '@types/jest': 27.5.0
       '@types/jest-image-snapshot': 4.3.1
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
@@ -228,7 +228,7 @@ importers:
       '@types/chrome': 0.0.184
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
-      '@types/jest': 27.4.1
+      '@types/jest': 27.5.0
       '@types/jest-image-snapshot': 4.3.1
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
@@ -2756,7 +2756,7 @@ packages:
   /@types/jest-image-snapshot/4.3.1:
     resolution: {integrity: sha512-WDdUruGF14C53axe/mNDgQP2YIhtcwXrwmmVP8eOGyfNTVD+FbxWjWR7RTU+lzEy4K6V6+z7nkVDm/auI/r3xQ==}
     dependencies:
-      '@types/jest': 27.4.1
+      '@types/jest': 27.5.0
       '@types/pixelmatch': 5.2.4
       ssim.js: 3.5.0
     dev: true
@@ -2777,6 +2777,13 @@ packages:
 
   /@types/jest/27.4.1:
     resolution: {integrity: sha512-23iPJADSmicDVrWk+HT58LMJtzLAnB2AgIzplQuq/bSrGaxCrlvRFjGbXmamnnk/mAmCdLStiGqggu28ocUyiw==}
+    dependencies:
+      jest-matcher-utils: 27.5.1
+      pretty-format: 27.5.1
+    dev: true
+
+  /@types/jest/27.5.0:
+    resolution: {integrity: sha512-9RBFx7r4k+msyj/arpfaa0WOOEcaAZNmN+j80KFbFCoSqCJGHTz7YMAMGQW9Xmqm5w6l5c25vbSjMwlikJi5+g==}
     dependencies:
       jest-matcher-utils: 27.5.1
       pretty-format: 27.5.1
