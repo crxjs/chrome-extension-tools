@@ -3,9 +3,21 @@
 exports[`build fs output: _00 manifest.json 1`] = `
 Object {
   "action": Object {
+    "default_icon": Object {
+      "128": "icons/action-icon-128.png",
+      "16": "icons/action-icon-16.png",
+      "32": "icons/action-icon-32.png",
+      "48": "icons/action-icon-48.png",
+    },
     "default_popup": "src/popup.html",
   },
   "description": "Chrome Extension with a public dir",
+  "icons": Object {
+    "128": "icons/manifest-icon-128.png",
+    "16": "icons/manifest-icon-16.png",
+    "32": "icons/manifest-icon-32.png",
+    "48": "icons/manifest-icon-48.png",
+  },
   "manifest_version": 3,
   "name": "public dir test extension",
   "version": "1.0.0",
@@ -16,6 +28,14 @@ exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/popup.html.hash.js",
   "favicon.svg",
+  "icons/action-icon-128.png",
+  "icons/action-icon-16.png",
+  "icons/action-icon-32.png",
+  "icons/action-icon-48.png",
+  "icons/manifest-icon-128.png",
+  "icons/manifest-icon-16.png",
+  "icons/manifest-icon-32.png",
+  "icons/manifest-icon-48.png",
   "manifest.json",
   "src/popup.html",
 ]

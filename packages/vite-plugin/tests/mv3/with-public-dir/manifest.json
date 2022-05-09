@@ -1,9 +1,21 @@
 {
-  "action": {
-    "default_popup": "src/popup.html"
-  },
   "manifest_version": 3,
+  "description": "Chrome Extension with a public dir",
   "name": "public dir test extension",
   "version": "1.0.0",
-  "description": "Chrome Extension with a public dir"
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/action-icon-16.png",
+      "32": "icons/action-icon-32.png",
+      "48": "icons/action-icon-48.png",
+      "128": "icons/action-icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/manifest-icon-16.png",
+    "32": "icons/manifest-icon-32.png",
+    "48": "icons/manifest-icon-48.png",
+    "128": "icons/manifest-icon-128.png"
+  }
 }
