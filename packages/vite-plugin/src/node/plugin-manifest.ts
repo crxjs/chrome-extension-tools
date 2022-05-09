@@ -1,3 +1,4 @@
+import { existsSync } from 'fs'
 import { readFile } from 'fs-extra'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
@@ -271,8 +272,20 @@ export const pluginManifest =
               .map((k) => files[k])
               .flat()
               .map(async (f) => {
+                // copy an asset if it is missing from the bundle
                 if (typeof bundle[f] === 'undefined') {
-                  const filename = join(config.root, f)
+                  // get assets from project root or from public dir
+                  let filename = join(config.root, f)
+                  if (!existsSync(filename))
+                    filename = join(config.publicDir, f)
+                  if (!existsSync(filename))
+                    throw new Error(
+                      `ENOENT: Could not load manifest asset "${f}".
+Manifest assets must exist in one of these directories:
+Project root: "${config.root}"
+Public dir: "${config.publicDir}"`,
+                    )
+
                   this.emitFile({
                     type: 'asset',
                     fileName: f,
