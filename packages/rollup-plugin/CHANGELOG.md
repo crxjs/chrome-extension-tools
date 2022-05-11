@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.9
+
+### Patch Changes
+
+- 267c252: chore(rpce) update rollup
+
 ## 3.6.8
 
 ### Patch Changes
