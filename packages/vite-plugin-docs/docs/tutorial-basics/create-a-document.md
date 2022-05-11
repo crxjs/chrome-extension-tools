@@ -51,5 +51,5 @@ module.exports = {
       items: ['hello'],
     },
   ],
-};
+}
 ```

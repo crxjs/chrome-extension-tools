@@ -16,7 +16,7 @@ module.exports = {
     defaultLocale: 'en',
     locales: ['en', 'fr'],
   },
-};
+}
 ```
 
 ## Translate a doc
@@ -39,7 +39,8 @@ Start your site on the French locale:
 npm run start -- --locale fr
 ```
 
-Your localized site is accessible at `http://localhost:3000/fr/` and the `Getting Started` page is translated.
+Your localized site is accessible at `http://localhost:3000/fr/` and the
+`Getting Started` page is translated.
 
 :::caution
 
@@ -66,7 +67,7 @@ module.exports = {
       ],
     },
   },
-};
+}
 ```
 
 The locale dropdown now appears in your navbar:
