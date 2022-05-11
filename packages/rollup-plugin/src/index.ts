@@ -48,13 +48,19 @@ export const chromeExtension = (
       )
     },
 
-    options(options) {
+    async options(options) {
       try {
-        return [manifest, html].reduce((opts, plugin) => {
-          const result = plugin.options.call(this, opts)
+        // return [manifest, html].reduce((opts, plugin) => {
+        //   const result = plugin.options.call(this, opts)
 
-          return result || options
-        }, options)
+        //   return result || options
+        // }, options)
+        let result = options
+        for (const plugin of [manifest, html]) {
+          const r = await plugin.options.call(this, result)
+          result = r ?? result
+        }
+        return result
       } catch (error) {
         const manifestError =
           'The manifest must have at least one script or HTML file.'
@@ -81,8 +87,8 @@ export const chromeExtension = (
       ])
     },
 
-    async resolveId(source, importer) {
-      return manifest.resolveId.call(this, source, importer)
+    async resolveId(...args) {
+      return manifest.resolveId.call(this, ...args)
     },
 
     async load(id) {
@@ -93,9 +99,9 @@ export const chromeExtension = (
       return manifest.transform.call(this, source, id)
     },
 
-    watchChange(id) {
-      manifest.watchChange.call(this, id)
-      html.watchChange.call(this, id)
+    watchChange(...args) {
+      manifest.watchChange.call(this, ...args)
+      html.watchChange.call(this, ...args)
     },
 
     async generateBundle(...args) {

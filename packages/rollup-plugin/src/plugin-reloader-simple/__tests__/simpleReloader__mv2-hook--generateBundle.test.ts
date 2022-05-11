@@ -1,3 +1,4 @@
+import { NormalizedOutputOptions } from 'rollup'
 import { EmittedFile, OutputAsset } from 'rollup'
 import { simpleReloader, _internalCache } from '..'
 import { buildCRX } from '../../../__fixtures__/build-crx'
@@ -25,7 +26,12 @@ test('emit assets', async () => {
   const { bundle } = cloneObject(await buildPromise)
   const plugin = simpleReloader()!
 
-  await plugin.generateBundle.call(context, {}, bundle, false)
+  await plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   expect(context.emitFile).toBeCalledTimes(3)
 
@@ -57,11 +63,17 @@ test('updates manifest in bundle', async () => {
 
   expect(manifestObj).toEqual(manifestClone)
 
-  await plugin.generateBundle.call(context, {}, bundle, false)
+  await plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   expect(manifestObj).toBe(bundle['manifest.json'])
   expect(manifestObj).not.toEqual(manifestClone)
 
+  // @ts-expect-error OutputAsset type is wrong
   expect(manifestObj).toEqual<OutputAsset>({
     fileName: 'manifest.json',
     type: 'asset',
@@ -87,7 +99,12 @@ test('set manifest description', async () => {
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(context, {}, bundle, false)
+  await plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
@@ -102,7 +119,12 @@ test('add reloader script to background', async () => {
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(context, {}, bundle, false)
+  await plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
@@ -117,7 +139,12 @@ test('set background script to persistent', async () => {
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(context, {}, bundle, false)
+  await plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
@@ -132,7 +159,12 @@ test('add reloader script to content scripts', async () => {
 
   const manifestObj = bundle['manifest.json'] as OutputAsset
 
-  await plugin.generateBundle.call(context, {}, bundle, false)
+  await plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   const manifest: chrome.runtime.ManifestV2 = JSON.parse(
     manifestObj.source as string,
@@ -161,7 +193,12 @@ test('Errors if manifest is not in the bundle', async () => {
   const errorMessage = 'No manifest.json in the rollup output bundle.'
 
   try {
-    await plugin.generateBundle.call(context, {}, bundle, false)
+    await plugin.generateBundle.call(
+      context,
+      {} as NormalizedOutputOptions,
+      bundle,
+      false,
+    )
   } catch (error) {
     expect(error).toEqual(new Error(errorMessage))
     expect(context.error).toBeCalledWith(errorMessage)
@@ -180,7 +217,12 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
   })
 
   try {
-    await plugin.generateBundle.call(context, {}, bundle, false)
+    await plugin.generateBundle.call(
+      context,
+      {} as NormalizedOutputOptions,
+      bundle,
+      false,
+    )
   } catch (error) {
     expect(context.error).toBeCalledWith('cache.bgScriptPath is undefined')
   }
@@ -198,7 +240,12 @@ test('Errors if cache.ctScriptPath is undefined', async () => {
   })
 
   try {
-    await plugin.generateBundle.call(context, {}, bundle, false)
+    await plugin.generateBundle.call(
+      context,
+      {} as NormalizedOutputOptions,
+      bundle,
+      false,
+    )
   } catch (error) {
     expect(context.error).toBeCalledWith('cache.ctScriptPath is undefined')
   }

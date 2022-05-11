@@ -6,5 +6,5 @@ const { packageJson } = readPkgUp.sync() || {}
 const rollupVersion = packageJson?.dependencies?.rollup || 'unknown'
 
 export const context: MinimalPluginContext = {
-  meta: { rollupVersion },
+  meta: { rollupVersion, watchMode: false },
 }
