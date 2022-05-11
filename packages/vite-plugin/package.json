@@ -97,7 +97,7 @@
     "@vitejs/plugin-vue": "2.3.2",
     "esbuild": "0.14.38",
     "esbuild-runner": "2.2.1",
-    "eslint": "^8.14.0",
+    "eslint": "8.15.0",
     "jest": "27.5.1",
     "jest-image-snapshot": "4.5.1",
     "playwright-chromium": "1.21.1",
