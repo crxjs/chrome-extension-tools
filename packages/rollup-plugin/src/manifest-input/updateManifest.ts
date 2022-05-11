@@ -28,7 +28,9 @@ export function updateManifestV3(
       ? output[0]
       : output
 
-    cache.chunkFileNames = chunkFileNames
+    const cfn = chunkFileNames as string
+
+    cache.chunkFileNames = cfn
 
     // Output could be an array
     if (Array.isArray(output)) {
@@ -43,10 +45,10 @@ export function updateManifestV3(
         )
 
       // If chunkFileNames is undefined, use our default
-      output.forEach((x) => (x.chunkFileNames = chunkFileNames))
+      output.forEach((x) => (x.chunkFileNames = cfn))
     } else {
       // If chunkFileNames is undefined, use our default
-      output.chunkFileNames = chunkFileNames
+      output.chunkFileNames = cfn
     }
 
     const allMatches = manifest.content_scripts
@@ -58,7 +60,7 @@ export function updateManifestV3(
     // Use slash to guarantee support Windows
     const resources = [
       slash(
-        `${chunkFileNames
+        `${cfn
           .split('/')
           .join('/')
           .replace('[format]', '*')

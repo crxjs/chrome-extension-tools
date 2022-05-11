@@ -1,3 +1,4 @@
+import { NormalizedOutputOptions } from 'rollup'
 import { OutputBundle, OutputChunk } from 'rollup'
 import { context } from '../../../__fixtures__/plugin-context'
 import { isChunk } from '../../helpers'
@@ -30,7 +31,12 @@ test('renames chunks by mutating the bundle', () => {
     expect(facadeModuleId!).toBeNull()
   }
 
-  plugin.generateBundle.call(context, {}, bundle, false)
+  plugin.generateBundle.call(
+    context,
+    {} as NormalizedOutputOptions,
+    bundle,
+    false,
+  )
 
   expect(bundle[helperKey]).toBeUndefined()
 

@@ -60,6 +60,6 @@ export const getAssetSource = (key: string, bundle: OutputBundle): string => {
   if (asset.source instanceof Buffer) {
     return asset.source.toString('utf8')
   } else {
-    return asset.source
+    return asset.source as string
   }
 }
