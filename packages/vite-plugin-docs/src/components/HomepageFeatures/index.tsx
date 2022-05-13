@@ -8,34 +8,66 @@ type FeatureItem = {
   description: JSX.Element
 }
 
-const FeatureList: FeatureItem[] = [
+const FeatureList = [
   {
-    title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    title: 'Simple Config',
+    Svg: require('@site/static/img/undraw_happy_news.svg').default,
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Declare most extension files in one place. CRXJS parses{' '}
+        <code>manifest.json</code> to find the files to build your extension.
       </>
     ),
   },
   {
-    title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    title: 'Modern Experience',
+    Svg: require(`@site/static/img/undraw_javascript_frameworks.svg`).default,
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Build Chrome Extensions with CRXJS using modern development tools and
+        frameworks like TypeScript, ES&nbsp;Modules, React, and Vue.
       </>
     ),
   },
   {
-    title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: 'True HMR',
+    Svg: require('@site/static/img/undraw_programming.svg').default,
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        CRXJS adds true Vite-style HMR to your extension during development.
+        HTML&nbsp;pages, background, and content scripts included.
+      </>
+    ),
+  },
+  {
+    title: 'Content Scripts',
+    Svg: require(`@site/static/img/undraw_good_team.svg`).default,
+    description: (
+      <>
+        Content Scripts are first class citizens with CRXJS, enjoying advanced
+        development features like imported static assets and file-system-based
+        HMR.
+      </>
+    ),
+  },
+  {
+    title: 'Dynamic Scripting API',
+    Svg: require('@site/static/img/undraw_blooming.svg').default,
+    description: (
+      <>
+        Use <code>chrome.scripting</code> with no extra config. Develop dynamic
+        content scripts without compromising developer experience.
+      </>
+    ),
+  },
+  {
+    title: 'Automatic Script Assets',
+    Svg: require('@site/static/img/undraw_gifts.svg').default,
+    description: (
+      <>
+        CRXJS compiles a list of the exact <code>web_accessible_resources</code>{' '}
+        a content script needs and automatically declares these files in the
+        manifest.
       </>
     ),
   },

@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'CRXJS Vite Plugin',
-  tagline: 'Bundle Chrome Extensions with Vite',
+  tagline: 'Build Chrome Extensions with Vite',
   url: 'https://crxjs.dev',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -43,7 +43,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'CRXJS',
+        title: 'CRXJS Vite Plugin',
         logo: {
           alt: 'CRXJS Logo',
           src: 'img/logo.svg',
@@ -51,13 +51,13 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'create-chrome-extension/index',
             position: 'left',
-            label: 'Vite Plugin',
+            label: 'Docs',
           },
           {
             href: 'https://extend-chrome.dev/rollup-plugin',
-            html: 'Rollup Plugin',
+            label: 'Rollup Plugin',
             position: 'left',
           },
           {
@@ -111,7 +111,7 @@ const config = {
         //     ],
         //   },
         // ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} CRXJS`,
       },
       prism: {
         theme: lightCodeTheme,
