@@ -1,0 +1,9 @@
+position: 2.1
+label: Vanilla JavaScript
+collapsible: true
+collapsed: true
+link:
+  type: "generated-index"
+  title: "Vanilla JavaScript Usage Guides"
+  description: "Learn how to use CRXJS with Vite and no framework."
+  keywords: ["vanilla", "javascript", "vite", "crxjs"]
