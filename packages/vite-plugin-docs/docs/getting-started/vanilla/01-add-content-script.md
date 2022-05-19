@@ -9,16 +9,14 @@ tags:
 pagination_next: null
 ---
 
-:::tip Did you know?
+import DefineContentScript from '../\_define-content-script.md'
 
-A **content script** is JavaScript from a Chrome Extension that the browser
-executes on a designated web page. The page where the script runs is called the
-**host page**. The content script shares the DOM with the host page but has a
-**separate** JavaScript environment.
+CRXJS brings an authentic Vite HMR experience to content scripts. Let's add a
+plain JavaScript content script to your Chrome Extension.
 
-:::
+<DefineContentScript/>
 
-## Add a content script
+## Declare a content script
 
 We declare content scripts in the manifest with a list of JavaScript files and
 match patterns. Match patterns represent the pages where Chrome should execute
@@ -41,7 +39,7 @@ Here we're telling Chrome to execute `src/content.js` on all pages that start
 with `https://www.google.com`. In this case, the Google homepage is the content
 script's host page.
 
-## Adding an element
+## Add an visual element
 
 We're not using a framework, but we can use plain JavaScript to add the
 [CRXJS logo](./assets/image.png) to a host page. Notice how Vite still allows
@@ -85,7 +83,7 @@ do that now.
 
 Now our content script is ready for action!
 
-## Profit with HMR
+## Profit with Vite HMR
 
 Make sure that your extension is loaded in the browser and that you've started
 Vite in the terminal. Navigate to `https://www.google.com` in the browser and

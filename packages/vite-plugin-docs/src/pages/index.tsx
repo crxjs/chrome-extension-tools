@@ -16,7 +16,7 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className='button button--secondary button--lg'
-            to='docs/create-chrome-extension'
+            to='docs/getting-started'
           >
             Get started in 90 seconds ⏱️
           </Link>

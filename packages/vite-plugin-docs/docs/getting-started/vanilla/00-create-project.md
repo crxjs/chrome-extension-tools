@@ -19,7 +19,7 @@ want to add a framework later. I have news for you! Vite and CRXJS don't require
 you to choose a JS framework to get started. Don't worry. Vite still provides
 HMR for CSS, and your JavaScript changes will trigger a full page reload.
 
-## Create your project
+## Create a vanilla project
 
 Use your favorite package manager to scaffold a new project and follow the
 prompts to create a vanilla JS project.
@@ -89,7 +89,7 @@ extension's name.
 
 ![Vite CRXJS Chrome Extension Action Context Menu with "Inspect pop-up window" highlighted](./assets/crxjs-vanilla-inspect-menu.png)
 
-## Profit with Vite HMR
+## Vite HMR in the popup
 
 Once you've found the extension icon, right-click it and choose "Inspect popup
 window". This menu item will open the popup and the popup dev tools window. We
@@ -98,7 +98,7 @@ need to inspect the popup to keep it open while making changes.
 ![Vite CRXJS Chrome Extension Popup](assets/crxjs-vanilla-inspect-raw.png)
 
 Let's see how Vite handles file updates without an HMR framework. We can add a
-counter button to test if Vite preserves the page state.
+counter button to test how Vite preserves the page state.
 
 ```javascript title=main.js
 import './style.css'

@@ -9,18 +9,14 @@ tags:
 pagination_next: null
 ---
 
+import DefineContentScript from '../\_define-content-script.md'
+
 # React Content Scripts
 
 CRXJS brings an authentic Vite HMR experience to content scripts. Let's add a
-content script to your Chrome Extension.
+React content script to your Chrome Extension.
 
-:::tip Did you know?
-
-A **content script** is JavaScript from a Chrome Extension that the browser
-executes on a designated host page. It shares the DOM with the host page but has
-a separate JavaScript environment.
-
-:::
+<DefineContentScript/>
 
 ## Add a content script
 

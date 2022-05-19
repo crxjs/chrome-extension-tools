@@ -51,7 +51,7 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'create-chrome-extension/index',
+            docId: 'getting-started/index',
             position: 'left',
             label: 'Docs',
           },
