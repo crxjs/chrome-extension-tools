@@ -8,8 +8,7 @@ tags:
   - Popup page
   - React
   - Vite config
-# could point this to a TypeScript manifest guide
-pagination_next: null
+pagination_prev: null
 ---
 
 # Get Started with React

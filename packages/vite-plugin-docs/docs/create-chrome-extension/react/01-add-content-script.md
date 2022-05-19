@@ -5,6 +5,8 @@ description: Add a React content script to an existing project
 tags:
   - Content script
   - React
+# could point this to a TypeScript manifest guide
+pagination_next: null
 ---
 
 # React Content Scripts
