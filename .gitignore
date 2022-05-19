@@ -20,3 +20,4 @@ TODOs.md
 *.local
 packages/vite/LICENSE
 types
+**/.docusaurus
