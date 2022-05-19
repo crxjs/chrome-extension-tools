@@ -14,9 +14,9 @@ get started making things, not configuring build tools.
 
 We have tutorials for the following frameworks. Pick one to start:
 
-### ![React Logo](./assets/React-icon.svg) [React](./react/create-project)
+### ![React Logo](./assets/React-icon.svg) [React](/docs/getting-started/react/create-project)
 
-### ![JS Logo](./assets/JS-icon.svg) [Vanilla JavaScript](./vanilla/create-project)
+### ![JS Logo](./assets/JS-icon.svg) [Vanilla JavaScript](/docs/getting-started/vanilla/create-project)
 
 ### ![Vue Logo](./assets/Vue-icon.svg) Vue (coming soon!)
 
