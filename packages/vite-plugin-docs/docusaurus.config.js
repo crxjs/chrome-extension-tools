@@ -65,6 +65,11 @@ const config = {
             label: 'GitHub',
             position: 'right',
           },
+          {
+            href: 'https://www.npmjs.com/package/@crxjs/vite-plugin',
+            label: 'NPM',
+            position: 'right',
+          },
         ],
       },
       footer: {
