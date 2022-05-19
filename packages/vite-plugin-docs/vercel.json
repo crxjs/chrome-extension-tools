@@ -1,0 +1,14 @@
+{
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "vite.crxjs.dev"
+        }
+      ],
+      "destination": "/vite-plugin/:path*"
+    }
+  ]
+}
