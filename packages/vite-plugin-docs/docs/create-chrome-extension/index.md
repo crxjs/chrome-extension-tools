@@ -14,11 +14,11 @@ get started making things, not configuring build tools.
 
 We have tutorials for the following frameworks. Pick one to start:
 
-<!-- TODO: convert to list of logos, use homepage list component -->
+### ![React Logo](./assets/React-icon.svg) [React](./react/create-project)
 
-- [React](./react/create-project)
-- Vue
-- Vanilla JavaScript
+### ![JS Logo](./assets/JS-icon.svg) [Vanilla JavaScript](./vanilla/create-project)
+
+### ![Vue Logo](./assets/Vue-icon.svg) Vue (coming soon!)
 
 :::
 
