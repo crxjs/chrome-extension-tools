@@ -1,79 +1,21 @@
 ---
-id: create-project
-title: Create a project
+id: dev-basics
+title: Development basics
 description:
-  Get started with vanilla JavaScript in a Chrome Extension popup page.
+  Basic Chrome Extension development with vanilla JavaScript action popup page.
 tags:
-  - Getting started
   - HTML page
   - Popup page
   - JavaScript
-  - Vite config
-pagination_prev: null
 ---
 
-# Get Started with no framework
+import Intro from '../\_dev-basics-intro.md'
 
-Sometimes you don't want to use a framework for your Chrome Extension, or you
-want to add a framework later. I have news for you! Vite and CRXJS don't require
-you to choose a JS framework to get started. Don't worry. Vite still provides
-HMR for CSS, and your JavaScript changes will trigger a full page reload.
+# Development Basics with Vanilla JS
 
-## Create a vanilla project
+<Intro/>
 
-Use your favorite package manager to scaffold a new project and follow the
-prompts to create a vanilla JS project.
-
-```sh
-npm init vite@latest
-```
-
-## Install CRXJS Vite plugin
-
-Now install the CRXJS Vite plugin using your favorite package manager.
-
-```sh
-npm i @crxjs/vite-plugin -D
-```
-
-## Create a Vite config file
-
-Create `vite.config.js` with the code below.
-
-```js title=vite.config.js
-import { defineConfig } from 'vite'
-import { crx } from '@crxjs/vite-plugin'
-import manifest from './manifest.json'
-
-export default defineConfig({
-  plugins: [crx({ manifest })],
-})
-```
-
-Create a file named `manifest.json` next to `vite.config.js`.
-
-```json title=manifest.json
-{
-  "manifest_version": 3,
-  "name": "CRXJS Vanilla JS Example",
-  "version": "1.0.0",
-  "action": { "default_popup": "index.html" }
-}
-```
-
-And run the dev command in the terminal.
-
-```sh
-npm run dev
-```
-
-That's it! CRXJS will do the rest. Your project directory should look like this:
-
-![Vite-CRXJS Vanilla JavaScript Project Files](./assets/crxjs-vanilla-files.png)
-
-## Add the extension to Chrome
-
-Let's try it out.
+## Install the extension
 
 When the build completes, open Chrome or Edge and navigate to
 `chrome://extensions`. Make sure to turn on the developer mode switch.
@@ -89,7 +31,7 @@ extension's name.
 
 ![Vite CRXJS Chrome Extension Action Context Menu with "Inspect pop-up window" highlighted](./assets/crxjs-vanilla-inspect-menu.png)
 
-## Vite HMR in the popup
+## Inspect the popup
 
 Once you've found the extension icon, right-click it and choose "Inspect popup
 window". This menu item will open the popup and the popup dev tools window. We
@@ -97,8 +39,10 @@ need to inspect the popup to keep it open while making changes.
 
 ![Vite CRXJS Chrome Extension Popup](assets/crxjs-vanilla-inspect-raw.png)
 
-Let's see how Vite handles file updates without an HMR framework. We can add a
-counter button to test how Vite preserves the page state.
+## Vite HMR for JavaScript
+
+Let's see how Vite handles JavaScript updates without an HMR framework. We can
+add a counter button to test how Vite preserves the page state.
 
 ```javascript title=main.js
 import './style.css'
@@ -125,6 +69,8 @@ open since the devtools inspector is open. Our button is there, but the elements
 look a little squashed.
 
 ![Vite CRXJS Chrome Extension Popup](./assets/crxjs-vanilla-inspect-edit-js.png)
+
+## Vite HMR for CSS
 
 HTML and JS changes trigger full page reloads, but Vite provides HMR updates for
 imported styles _without_ a full page reload. Click that counter a few times and

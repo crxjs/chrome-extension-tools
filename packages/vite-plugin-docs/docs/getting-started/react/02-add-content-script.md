@@ -122,11 +122,11 @@ the `getURL()` method to get the extension url for our logo:
 
 Now our content script is ready for action!
 
-## Profit with HMR
+## Profit with Vite HMR
 
-Make sure that your extension is loaded in the browser and that you've started
-Vite. Navigate to `https://www.google.com` and scroll to the bottom of the page.
-There's our familiar Vite Hello World!
+Make sure that your extension is [loaded in the browser](dev-basics) and that
+you've started Vite. Navigate to `https://www.google.com` and scroll to the
+bottom of the page. There's our familiar Vite Hello World!
 
 Notice how the counter button doesn't look like a button. That's because
 Google's styles affect our content script elements. The same goes the other way:

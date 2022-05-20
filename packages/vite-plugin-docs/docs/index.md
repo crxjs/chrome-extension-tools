@@ -1,5 +1,7 @@
 ---
 sidebar_position: 1
+slug: '/'
+id: 'index'
 ---
 
 # What is CRXJS Vite Plugin?
@@ -14,9 +16,9 @@ get started making things, not configuring build tools.
 
 We have tutorials for the following frameworks. Pick one to start:
 
-### ![React Logo](./assets/React-icon.svg) [React](/docs/getting-started/react/create-project)
+### ![React Logo](./assets/React-icon.svg) [React](/getting-started/react/create-project)
 
-### ![JS Logo](./assets/JS-icon.svg) [Vanilla JavaScript](/docs/getting-started/vanilla/create-project)
+### ![JS Logo](./assets/JS-icon.svg) [Vanilla JavaScript](/getting-started/vanilla-js/create-project)
 
 ### ![Vue Logo](./assets/Vue-icon.svg) Vue (coming soon!)
 
@@ -24,8 +26,8 @@ We have tutorials for the following frameworks. Pick one to start:
 
 ## Why CRXJS?
 
-We've grown to expect a polished developer experience these days. Build tools
-like Create React App or Vite make it easy to start making a web app.
+We've grown to expect a **polished developer experience** these days. Build
+tools like Create React App or Vite make it easy to start making a web app.
 Unfortunately, building a Chrome Extension isn't the same.
 
 You crawl the web looking for the perfect boilerplate, and the most popular ones
@@ -36,10 +38,20 @@ to come by.
 
 Not anymore. CRXJS Vite Plugin simplifies the Chrome Extension developer
 experience by combining the refined features of Vite with a simple configuration
-strategy: Just use the manifest. CRXJS parses `manifest.json` to find the files
-to include in your extension.
+strategy:
+
+## Use the manifest!
+
+CRXJS parses `manifest.json` to find the files to include in your extension. The
+manifest is the central document that declares most of the files and
+configuration for your extension, why do we need more?
+
+:::info
 
 ## Missing something?
 
 These docs are a work in progress! We are adding new content every week. If you
-have questions or ideas, please join the discussion on GitHub.
+have questions or ideas, please
+[join the discussion on GitHub](https://github.com/crxjs/chrome-extension-tools/discussions).
+
+:::

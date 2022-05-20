@@ -28,6 +28,7 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
             'https://github.com/crxjs/rollup-plugin-chrome-extension/tree/main/packages/vite-plugin-docs/',
@@ -35,6 +36,7 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
+        blog: false,
       }),
     ],
   ],
@@ -43,7 +45,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'CRXJS Vite Plugin',
+        title: 'CRXJS',
         logo: {
           alt: 'CRXJS Logo',
           src: 'img/logo.svg',
@@ -51,9 +53,9 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'getting-started/index',
+            docId: 'index',
             position: 'left',
-            label: 'Docs',
+            label: 'Vite Plugin',
           },
           {
             href: 'https://extend-chrome.dev/rollup-plugin',
