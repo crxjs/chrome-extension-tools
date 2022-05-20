@@ -11,23 +11,15 @@ tags:
 
 import Intro from '../\_dev-basics-intro.md'
 
+import Installing from '../\_install-extension.md'
+
 # Development Basics with Vanilla JS
 
 <Intro/>
 
 ## Install the extension
 
-When the build completes, open Chrome or Edge and navigate to
-`chrome://extensions`. Make sure to turn on the developer mode switch.
-
-| Chrome                                                                | Edge                                                              |
-| --------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Top right corner                                                      | Middle left sidebar                                               |
-| ![Chrome developer mode switch](../assets/dev-mode-switch-chrome.png) | ![Edge developer mode switch](../assets/dev-mode-switch-edge.png) |
-
-Drag your `dist` folder into the Extensions Dashboard to install it. Your
-extension icon will be in the top bar. The icon will be the first letter of the
-extension's name.
+<Installing/>
 
 ![Vite CRXJS Chrome Extension Action Context Menu with "Inspect pop-up window" highlighted](./assets/crxjs-vanilla-inspect-menu.png)
 

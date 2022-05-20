@@ -4,6 +4,8 @@ slug: '/'
 id: 'index'
 ---
 
+import GetStartedTip from './\_tip-getting-started.md'
+
 # What is CRXJS Vite Plugin?
 
 CRXJS Vite Plugin is a tool that helps you make Chrome Extensions using modern
@@ -12,17 +14,7 @@ web development technology.
 Things like **HMR** and **static asset imports** work out of the box so you can
 get started making things, not configuring build tools.
 
-:::tip Get started in 90 seconds
-
-We have tutorials for the following frameworks. Pick one to start:
-
-### ![React Logo](./assets/React-icon.svg) [React](/getting-started/react/create-project)
-
-### ![JS Logo](./assets/JS-icon.svg) [Vanilla JavaScript](/getting-started/vanilla-js/create-project)
-
-### ![Vue Logo](./assets/Vue-icon.svg) Vue (coming soon!)
-
-:::
+<GetStartedTip/>
 
 ## Why CRXJS?
 
@@ -46,12 +38,11 @@ CRXJS parses `manifest.json` to find the files to include in your extension. The
 manifest is the central document that declares most of the files and
 configuration for your extension, why do we need more?
 
-:::info
-
-## Missing something?
+:::info Help wanted
 
 These docs are a work in progress! We are adding new content every week. If you
 have questions or ideas, please
-[join the discussion on GitHub](https://github.com/crxjs/chrome-extension-tools/discussions).
+[join the discussion on GitHub](https://github.com/crxjs/chrome-extension-tools/discussions)
+or make a PR.
 
 :::
