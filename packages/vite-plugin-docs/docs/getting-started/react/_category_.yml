@@ -1,9 +1,2 @@
 position: 2.1
 label: React
-collapsible: true
-collapsed: true
-link:
-  type: "generated-index"
-  title: "React Usage Guides"
-  description: "Learn how to use CRXJS with Vite and React."
-  keywords: ["react", "vite", "crxjs"]
