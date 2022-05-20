@@ -27,14 +27,14 @@ our styles change Google's styles.
 
 :::tip
 
-Remember that the CSS of the host page will affect your content script, and the
-CSS of the content script will affect the page.
+The CSS of the host page will affect your content script, and the CSS of the
+content script will affect the host page.
 
 :::
 
 Let's fix that button. Replace everything in `src/index.css` with this:
 
-```css
+```css title="src/index.css"
 #crx-root {
   position: fixed;
   top: 3rem;
@@ -54,11 +54,15 @@ Let's fix that button. Replace everything in `src/index.css` with this:
 ```
 
 CRXJS will quickly rebuild the content script, and our CSS changes will take
-effect. Now our `div` position is fixed, and the button looks more like a
-button!
+effect.
 
 <!-- TODO: add screenshot of fixed content script -->
 
+Now our `div` position is fixed, and the button looks more like a button!
+
 ## React Refresh in action
+
+CRXJS does some magic behind the scenes to get React Refresh working in content
+scripts.
 
 <!-- TODO: add more detailed instructions -->

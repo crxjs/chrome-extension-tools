@@ -1,7 +1,3 @@
----
-id: dev-basics-intro
----
-
 Now that you've [setup your project](create-project), it's time to give it a
 test run in the browser.
 
