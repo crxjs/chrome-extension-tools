@@ -5,8 +5,6 @@ description: Add a React content script to an existing project
 tags:
   - Content script
   - React
-# could point this to a TypeScript manifest guide
-pagination_next: null
 ---
 
 import DefineContentScript from '../\_define-content-script.md'
@@ -120,44 +118,5 @@ the `getURL()` method to get the extension url for our logo:
 />
 ```
 
-Now our content script is ready for action!
-
-## Profit with HMR
-
-Make sure that your extension is loaded in the browser and that you've started
-Vite. Navigate to `https://www.google.com` and scroll to the bottom of the page.
-There's our familiar Vite Hello World!
-
-Notice how the counter button doesn't look like a button. That's because
-Google's styles affect our content script elements. The same goes the other way:
-our styles change Google's styles.
-
-Let's fix that button. Replace everything in `src/index.css` with this:
-
-```css
-#crx-root {
-  position: fixed;
-  top: 3rem;
-  left: 50%;
-  transform: translate(-50%, 0);
-}
-
-#crx-root button {
-  background-color: rgb(239, 239, 239);
-  border-color: rgb(118, 118, 118);
-  border-image: initial;
-  border-style: outset;
-  border-width: 2px;
-  margin: 0;
-  padding: 1px 6px;
-}
-```
-
-CRXJS will quickly rebuild the content script, and our CSS changes will take
-effect. Now our `div` position is fixed, and that button looks more like a
-button!
-
-<!-- TODO: add more detailed instructions -->
-
-Click the count button and play around with `src/App.jsx` to see Vite HMR at
-work.
+Now our content script is ready for action! Let's try it out in the next
+section.
