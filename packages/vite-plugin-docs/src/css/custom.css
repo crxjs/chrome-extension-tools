@@ -6,25 +6,47 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #298cd6;
-  --ifm-color-primary-dark: #2681c7;
-  --ifm-color-primary-darker: #2377b8;
-  --ifm-color-primary-darkest: #206da8;
-  --ifm-color-primary-light: #3893d9;
-  --ifm-color-primary-lighter: #479cdc;
-  --ifm-color-primary-lightest: #57a4df;
+  --ifm-color-primary: #206ba4;
+  --ifm-color-primary-dark: #1d6094;
+  --ifm-color-primary-darker: #1b5b8b;
+  --ifm-color-primary-darkest: #164b73;
+  --ifm-color-primary-light: #2376b4;
+  --ifm-color-primary-lighter: #257bbd;
+  --ifm-color-primary-lightest: #2a8bd5;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-navbar-background-color: var(--ifm-color-primary-lightest);
+  --ifm-navbar-link-hover-color: #fff;
+}
+
+.navbar-sidebar {
+  background-color: #fff;
+}
+
+.navbar-sidebar__brand {
+  background-color: var(--ifm-color-primary-light);
+}
+
+[data-theme='dark'] .navbar-sidebar {
+  background-color: #000;
+}
+
+[data-theme='dark'] .navbar-sidebar__brand {
+  background-color: var(--ifm-color-primary-darkest);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #479cdc;
-  --ifm-color-primary-dark: #3893d9;
-  --ifm-color-primary-darker: #298cd6;
-  --ifm-color-primary-darkest: #2681c7;
-  --ifm-color-primary-light: #57a4df;
-  --ifm-color-primary-lighter: #66ace2;
-  --ifm-color-primary-lightest: #75b4e5;
+  --ifm-color-primary: #61aae1;
+  --ifm-color-primary-dark: #469bdc;
+  --ifm-color-primary-darker: #3894d9;
+  --ifm-color-primary-darkest: #247bbd;
+  --ifm-color-primary-light: #7cb9e6;
+  --ifm-color-primary-lighter: #8ac0e9;
+  --ifm-color-primary-lightest: #b2d6f0;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --ifm-navbar-background-color: var(--ifm-color-primary-darkest);
+  --ifm-navbar-link-hover-color: #000;
 }
