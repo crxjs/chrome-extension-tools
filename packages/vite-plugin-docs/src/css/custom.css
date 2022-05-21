@@ -6,13 +6,13 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #206ba4;
-  --ifm-color-primary-dark: #1d6094;
-  --ifm-color-primary-darker: #1b5b8b;
-  --ifm-color-primary-darkest: #164b73;
-  --ifm-color-primary-light: #2376b4;
-  --ifm-color-primary-lighter: #257bbd;
-  --ifm-color-primary-lightest: #2a8bd5;
+  --ifm-color-primary: #1d6094;
+  --ifm-color-primary-dark: #1a5685;
+  --ifm-color-primary-darker: #19527e;
+  --ifm-color-primary-darkest: #144368;
+  --ifm-color-primary-light: #206aa3;
+  --ifm-color-primary-lighter: #216eaa;
+  --ifm-color-primary-lightest: #267dc0;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 
@@ -28,14 +28,6 @@
   background-color: var(--ifm-color-primary-light);
 }
 
-[data-theme='dark'] .navbar-sidebar {
-  background-color: #000;
-}
-
-[data-theme='dark'] .navbar-sidebar__brand {
-  background-color: var(--ifm-color-primary-darkest);
-}
-
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
   --ifm-color-primary: #61aae1;
@@ -49,4 +41,12 @@
 
   --ifm-navbar-background-color: var(--ifm-color-primary-darkest);
   --ifm-navbar-link-hover-color: #000;
+}
+
+[data-theme='dark'] .navbar-sidebar {
+  background-color: #000;
+}
+
+[data-theme='dark'] .navbar-sidebar__brand {
+  background-color: var(--ifm-color-primary-darkest);
 }
