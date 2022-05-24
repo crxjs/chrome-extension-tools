@@ -24,9 +24,18 @@ const debug = _debug('hmr')
 
 /** Determine if a file was imported by a module or a parent module */
 function isImporter(file: string) {
-  const pred = (node: ModuleNode) => {
+  const seen = new Set<ModuleNode>()
+  const pred = (node: ModuleNode): boolean => {
+    seen.add(node)
+
     if (node.file === file) return true
-    for (const node2 of node.importers) if (pred(node2)) return true
+    for (const node2 of node.importers) {
+      // check each node once to avoid max stack error
+      const unseen = !seen.has(node2)
+      if (unseen && pred(node2)) return true
+    }
+
+    return false
   }
   return pred
 }
