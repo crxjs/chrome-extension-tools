@@ -142,7 +142,8 @@ export const pluginHMR: CrxPluginFn = () => {
         watch.ignored = watch.ignored
           ? [...new Set([watch.ignored].flat())]
           : []
-        watch.ignored.push(config.build.outDir)
+        const outDir = join(config.root, config.build.outDir, '**/*')
+        watch.ignored.push(outDir)
       },
       configureServer(_server) {
         server = _server
