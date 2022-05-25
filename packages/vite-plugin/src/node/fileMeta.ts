@@ -1,3 +1,5 @@
+import { TransformResult } from 'vite'
+
 export const idBySource = new Map<string, string>()
 export const idByUrl = new Map<string, string>()
 export const urlById = new Map<string, string>()
@@ -67,3 +69,5 @@ export const setOutputMeta = ({
   outputByOwner.set(ownerName, output)
   outputById.set(id, output)
 }
+
+export const transformResultByOwner = new Map<string, TransformResult>()
