@@ -15,10 +15,8 @@ import {
   PrunePayload,
   Update,
   UpdatePayload,
-  ViteDevServer,
 } from 'vite'
-import { outputByOwner, ownersByFile } from './fileMeta'
-import { join } from './path'
+import { outputByOwner, transformResultByOwner } from './fileMeta'
 import { filesReady$ } from './plugin-fileWriter--events'
 import { CrxHMRPayload } from './types'
 
@@ -51,30 +49,27 @@ type RebuildType =
       type: 'full'
     }
 /** Emits based on buffered HMRPayloads */
-export const rebuildSignal$ = (server: ViteDevServer) =>
-  payload$.pipe(
-    // emit buffer when files are ready (now or later)
-    buffer(payload$.pipe(debounce(() => filesReady$))),
-    // flatten payloads
-    map((payloads): RebuildType => {
-      if (payloads.every(isUpdatePayload)) {
-        const owners = new Set<string>()
-        for (const { updates } of payloads)
-          for (const { path } of updates) {
-            const file = join(server.config.root, path)
-            for (const owner of ownersByFile.get(file) ?? []) owners.add(owner)
-          }
+export const rebuildSignal$ = payload$.pipe(
+  // emit buffer when files are ready (now or later)
+  buffer(payload$.pipe(debounce(() => filesReady$))),
+  // flatten payloads
+  map((payloads): RebuildType => {
+    if (payloads.every(isUpdatePayload)) {
+      const owners = new Set<string>()
+      for (const { updates } of payloads)
+        for (const { path } of updates)
+          if (transformResultByOwner.has(path)) owners.add(path)
 
-        return { type: 'partial', owners }
-      }
+      return { type: 'partial', owners }
+    }
 
-      return { type: 'full' }
-    }),
-    // exclude empty rebuilds
-    filter((rebuild) =>
-      rebuild.type === 'partial' ? rebuild.owners.size > 0 : true,
-    ),
-  )
+    return { type: 'full' }
+  }),
+  // exclude empty rebuilds
+  filter((rebuild) =>
+    rebuild.type === 'partial' ? rebuild.owners.size > 0 : true,
+  ),
+)
 
 /**
  * Buffer hmrPayloads by filesReady

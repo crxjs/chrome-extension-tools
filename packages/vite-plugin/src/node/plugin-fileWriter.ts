@@ -140,7 +140,7 @@ export const pluginFileWriter =
             }
           })
 
-          rebuildSignal$(server).subscribe((rebuild) => {
+          rebuildSignal$.subscribe((rebuild) => {
             if (rebuild.type === 'partial') {
               for (const owner of rebuild.owners)
                 transformResultByOwner.delete(owner)

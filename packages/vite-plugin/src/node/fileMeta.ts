@@ -70,4 +70,5 @@ export const setOutputMeta = ({
   outputById.set(id, output)
 }
 
+/** "owner" is same as Update["path"] in Vite */
 export const transformResultByOwner = new Map<string, TransformResult>()
