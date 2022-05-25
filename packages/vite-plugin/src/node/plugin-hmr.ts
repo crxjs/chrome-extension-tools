@@ -1,7 +1,7 @@
 import { HMRPayload, ModuleNode } from 'vite'
 import { manifestFiles, _debug } from './helpers'
 import { crxHmrPayload$, hmrPayload$ } from './hmrPayload'
-import { join } from './path'
+import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 
 const debug = _debug('hmr')
@@ -45,7 +45,9 @@ export const pluginHMR: CrxPluginFn = () => {
         watch.ignored = watch.ignored
           ? [...new Set([watch.ignored].flat())]
           : []
-        const outDir = join(config.root, config.build.outDir, '**/*')
+        const outDir = isAbsolute(config.build.outDir)
+          ? config.build.outDir
+          : join(config.root, config.build.outDir, '**/*')
         watch.ignored.push(outDir)
       },
       configureServer(server) {
@@ -66,6 +68,7 @@ export const pluginHMR: CrxPluginFn = () => {
         const background =
           files.background[0] && join(server.config.root, files.background[0])
 
+        // check that the changed file is not a background dependency
         if (background)
           if (file === background || modules.some(isImporter(background))) {
             debug('sending runtime reload')
@@ -77,17 +80,18 @@ export const pluginHMR: CrxPluginFn = () => {
   ]
 }
 
-/** Determine if a file was imported by a module or a parent module */
+/** Determine if a changed file was imported by a file */
 function isImporter(file: string) {
   const seen = new Set<ModuleNode>()
-  const pred = (node: ModuleNode): boolean => {
-    seen.add(node)
+  const pred = (changedNode: ModuleNode): boolean => {
+    seen.add(changedNode)
 
-    if (node.file === file) return true
-    for (const node2 of node.importers) {
-      // check each node once to avoid max stack error
-      const unseen = !seen.has(node2)
-      if (unseen && pred(node2)) return true
+    if (changedNode.file === file) return true
+    // crawl back up the dependency tree
+    for (const parentNode of changedNode.importers) {
+      // check each node once to handle shared files
+      const unseen = !seen.has(parentNode)
+      if (unseen && pred(parentNode)) return true
     }
 
     return false

@@ -62,7 +62,7 @@ test('crx page update on hmr', async () => {
       recursive: true,
       filter: (f) => {
         if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('background.ts')
+        return f.endsWith('bg-onload.ts')
       },
     }),
     optionsPage.waitForEvent('close'), // options page should close

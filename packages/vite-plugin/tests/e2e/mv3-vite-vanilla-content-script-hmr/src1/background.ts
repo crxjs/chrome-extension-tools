@@ -1,5 +1,3 @@
-export {}
+import { onLoad } from './bg-onload'
 
-console.log('open options page 1')
-
-chrome.runtime.openOptionsPage()
+onLoad()
