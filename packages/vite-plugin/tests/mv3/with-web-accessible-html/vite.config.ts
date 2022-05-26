@@ -32,10 +32,13 @@ export default defineConfig({
         web_accessible_resources: [
           {
             resources: [
+              // TODO: sidebar assets must also be web accessible
               // this file is web accessible; it supports HMR b/c it's declared in `rollupOptions.input`
               'src/sidebar.html',
               // this file is web accessible; CRXJS copies it directly
               'src/static.html',
+              // must list static HTML file assets; static HTML is not parsed
+              'src/static.js',
             ],
             matches: ['https://www.google.com/*'],
           },
