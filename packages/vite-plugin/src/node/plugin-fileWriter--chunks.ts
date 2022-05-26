@@ -6,11 +6,11 @@ import {
   fileById,
   idBySource,
   ownerById,
-  ownersByFile,
   setFileMeta,
   setOutputMeta,
   setOwnerMeta,
   setUrlMeta,
+  transformResultByOwner,
   urlById,
 } from './fileMeta'
 import { createHash, isTruthy, _debug } from './helpers'
@@ -74,18 +74,12 @@ export function sourceToUrlMeta(source: string) {
  */
 export const pluginFileWriterChunks: CrxPluginFn = () => {
   let server: ViteDevServer
-  const ownerToTransformResultMap = new Map<string, TransformResult>()
 
   return {
     name: 'crx:file-writer-chunks',
     apply: 'build',
     fileWriterStart(_server) {
       server = _server
-    },
-    watchChange(fileName) {
-      // dump cached transform results of changed files
-      for (const owner of ownersByFile.get(fileName) ?? new Set())
-        ownerToTransformResultMap.delete(owner)
     },
     async resolveId(source, importer) {
       if (this.meta.watchMode) {
@@ -128,13 +122,13 @@ export const pluginFileWriterChunks: CrxPluginFn = () => {
         // use cached result if available
         transformResult =
           transformResult ??
-          ownerToTransformResultMap.get(owner) ??
+          transformResultByOwner.get(owner) ??
           serverModule.transformResult
         if (!transformResult)
           transformResult = await server.transformRequest(url)
         if (!transformResult)
           throw new TypeError(`Unable to load "${url}" from server.`)
-        ownerToTransformResultMap.set(owner, transformResult)
+        transformResultByOwner.set(owner, transformResult)
 
         if (file) {
           setFileMeta({ id, file })

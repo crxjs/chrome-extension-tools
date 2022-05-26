@@ -7,6 +7,7 @@ import { isTruthy } from './helpers'
 import { pluginFileWriterChunks } from './plugin-fileWriter--chunks'
 import {
   pluginFileWriterEvents,
+  rebuildFiles,
   server$,
   writerEvent$,
 } from './plugin-fileWriter--events'
@@ -15,6 +16,8 @@ import { pluginFileWriterPublic } from './plugin-fileWriter--public'
 import { pluginFileWriterPolyfill } from './plugin-fileWriter--polyfill'
 import { CrxPlugin, CrxPluginFn } from './types'
 import { stubId } from './virtualFileIds'
+import { transformResultByOwner } from './fileMeta'
+import { rebuildSignal$ } from './hmrPayload'
 
 function sortPlugins(plugins: CrxPlugin[], command?: 'build' | 'serve') {
   const pre: CrxPlugin[] = []
@@ -135,6 +138,20 @@ export const pluginFileWriter =
 
               writerEvent$.next({ type: 'error', error, code, frame })
             }
+          })
+
+          const rebuildSub = rebuildSignal$.subscribe((rebuild) => {
+            if (rebuild.type === 'partial') {
+              for (const owner of rebuild.owners)
+                transformResultByOwner.delete(owner)
+            } else {
+              transformResultByOwner.clear()
+            }
+
+            rebuildFiles()
+          })
+          watcher.on('close', () => {
+            rebuildSub.unsubscribe()
           })
         })
       },

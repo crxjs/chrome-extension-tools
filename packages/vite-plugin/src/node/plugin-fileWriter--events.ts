@@ -1,5 +1,4 @@
-import fsExtra from 'fs-extra' 
-const { pathExistsSync, outputFile, statSync } = fsExtra
+import fsExtra from 'fs-extra'
 import { performance } from 'perf_hooks'
 import colors from 'picocolors'
 import { ChangeEvent, OutputBundle, OutputOptions, RollupOptions } from 'rollup'
@@ -8,16 +7,16 @@ import {
   filter,
   first,
   firstValueFrom,
-  interval,
   map,
-  mapTo,
   Subject,
   switchMap,
+  timer,
 } from 'rxjs'
 import { createLogger, ViteDevServer } from 'vite'
 import { isString, _debug } from './helpers'
 import { join, relative } from './path'
 import { CrxPluginFn } from './types'
+const { pathExistsSync, outputFile, statSync } = fsExtra
 
 export const debug = _debug('file-writer').extend('events')
 
@@ -67,14 +66,15 @@ export const filesStart$ = writerEvent$.pipe(
 
 export const filesStart = () => firstValueFrom(filesStart$)
 
+/** Emits after the file writer completes, or immediately if file writer is idle. */
 export const filesReady$ = writerEvent$.pipe(
   filter((x): x is Extract<FileWriterEvent, { type: 'writeBundle' }> => {
     return x.type === 'writeBundle'
   }),
   switchMap((event) =>
-    // poll fs until files are updated
-    interval(100).pipe(
-      mapTo(event),
+    // check then poll fs until files are updated
+    timer(0, 100).pipe(
+      map(() => event),
       first(({ bundle, options, timestamp }) => {
         const result = Object.keys(bundle).every((p) => {
           const stats = statSync(join(options.dir!, p))
@@ -166,11 +166,14 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
     },
     async buildStart(options) {
       start = performance.now()
+
+      // set up rebuild trigger
       const filename = await triggerName
       if (!pathExistsSync(filename)) {
         await outputFile(filename, Date.now().toString())
       }
       this.addWatchFile(filename)
+
       writerEvent$.next({ type: 'buildStart', options })
       debug('buildStart')
     },
