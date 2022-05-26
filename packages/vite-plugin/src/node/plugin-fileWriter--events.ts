@@ -166,11 +166,14 @@ export const pluginFileWriterEvents: CrxPluginFn = () => {
     },
     async buildStart(options) {
       start = performance.now()
+
+      // set up rebuild trigger
       const filename = await triggerName
       if (!pathExistsSync(filename)) {
         await outputFile(filename, Date.now().toString())
       }
       this.addWatchFile(filename)
+
       writerEvent$.next({ type: 'buildStart', options })
       debug('buildStart')
     },
