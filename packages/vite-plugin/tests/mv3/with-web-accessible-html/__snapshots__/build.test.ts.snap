@@ -1,0 +1,190 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`build fs output: _00 manifest.json 1`] = `
+Object {
+  "manifest_version": 3,
+  "name": "Extension with copied assets",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://www.google.com/*",
+      ],
+      "resources": Array [
+        "public.html",
+        "src/sidebar.html",
+        "src/static.html",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output: _01 output files 1`] = `
+Array [
+  "assets/modulepreload-polyfill.hash.js",
+  "assets/sidebar.hash.js",
+  "assets/welcome.hash.js",
+  "manifest.json",
+  "public.html",
+  "public.js",
+  "src/sidebar.html",
+  "src/static.html",
+  "src/welcome.html",
+  "static.js",
+]
+`;
+
+exports[`build fs output: assets/modulepreload-polyfill.hash.js 1`] = `
+"const p = function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+};
+p();
+"
+`;
+
+exports[`build fs output: assets/sidebar.hash.js 1`] = `
+"import \\"./modulepreload-polyfill.hash.js\\";
+console.log(\\"content script sidebar\\");
+"
+`;
+
+exports[`build fs output: assets/welcome.hash.js 1`] = `
+"import \\"./modulepreload-polyfill.hash.js\\";
+console.log(\\"welcome page\\");
+"
+`;
+
+exports[`build fs output: public.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Public</title>
+  </head>
+  <body>
+    <p>
+      This HTML file is a web accessible resource and CRXJS copies it directly
+      without any processing.
+    </p>
+    <script src=\\"/public.js\\"></script>
+  </body>
+</html>
+"
+`;
+
+exports[`build fs output: public.js 1`] = `
+"console.log('static script')
+"
+`;
+
+exports[`build fs output: src/sidebar.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Sidebar</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/sidebar.hash.js\\"></script>
+    <link rel=\\"modulepreload\\" href=\\"/assets/modulepreload-polyfill.hash.js\\">
+  </head>
+  <body>
+    <p>
+      This HTML page is a sidebar in a content script. It is web accessible and
+      supports HMR and build optimizations.
+    </p>
+    
+  </body>
+</html>
+"
+`;
+
+exports[`build fs output: src/static.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Static</title>
+  </head>
+  <body>
+    <p>
+      This HTML file is a web accessible resource and CRXJS copies it directly
+      without any processing. Static HTML file assets should go in the public
+      dir.
+    </p>
+    <script src=\\"/static.js\\"></script>
+  </body>
+</html>
+"
+`;
+
+exports[`build fs output: src/welcome.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
+    <title>Welcome Page</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/welcome.hash.js\\"></script>
+    <link rel=\\"modulepreload\\" href=\\"/assets/modulepreload-polyfill.hash.js\\">
+  </head>
+  <body>
+    <p>
+      This HTML page is not web accessible and supports HMR and build
+      optimizations.
+    </p>
+    <div id=\\"root\\"></div>
+    
+  </body>
+</html>
+"
+`;
+
+exports[`build fs output: static.js 1`] = `
+"console.log('static script')
+"
+`;

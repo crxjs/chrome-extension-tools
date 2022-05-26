@@ -1,0 +1,194 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`serve fs output: _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "manifest_version": 3,
+  "name": "Extension with copied assets",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://www.google.com/*",
+      ],
+      "resources": Array [
+        "public.html",
+        "src/sidebar.html",
+        "src/static.html",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output: _01 output files 1`] = `
+Array [
+  "assets/crx-client-port.js",
+  "assets/precontroller.js.js",
+  "assets/webcomponents-custom-elements-z7FmG.js",
+  "manifest.json",
+  "public.html",
+  "public.js",
+  "service-worker-loader.js",
+  "src/sidebar.html",
+  "src/static.html",
+  "static.js",
+  "vendor/vite-env.mjs.js",
+]
+`;
+
+exports[`serve fs output: assets/crx-client-port.js 1`] = `
+"function isCrxHMRPayload(x) {
+  return x.type === \\"custom\\" && x.event.startsWith(\\"crx:\\");
+}
+class HMRPort {
+  port;
+  callbacks = /* @__PURE__ */ new Map();
+  constructor() {
+    setInterval(() => {
+      try {
+        this.port?.postMessage({ data: \\"ping\\" });
+      } catch (error) {
+        if (error instanceof Error && error.message.includes(\\"Extension context invalidated.\\")) {
+          location.reload();
+        } else
+          throw error;
+      }
+    }, 5000);
+    setInterval(this.initPort, 5 * 60 * 1e3);
+    this.initPort();
+  }
+  initPort = () => {
+    this.port?.disconnect();
+    this.port = chrome.runtime.connect({ name: \\"@crx/client\\" });
+    this.port.onDisconnect.addListener(this.handleDisconnect.bind(this));
+    this.port.onMessage.addListener(this.handleMessage.bind(this));
+    this.port.postMessage({ type: \\"connected\\" });
+  };
+  handleDisconnect = () => {
+    if (this.callbacks.has(\\"close\\"))
+      for (const cb of this.callbacks.get(\\"close\\")) {
+        cb({ wasClean: true });
+      }
+  };
+  handleMessage = (message) => {
+    const forward = (data) => {
+      if (this.callbacks.has(\\"message\\"))
+        for (const cb of this.callbacks.get(\\"message\\")) {
+          cb({ data });
+        }
+    };
+    const payload = JSON.parse(message.data);
+    if (isCrxHMRPayload(payload)) {
+      if (payload.event === \\"crx:runtime-reload\\") {
+        console.log(\\"[crx] runtime reload\\");
+        setTimeout(() => location.reload(), 500);
+      } else {
+        forward(JSON.stringify(payload.data));
+      }
+    } else {
+      forward(message.data);
+    }
+  };
+  addEventListener = (event, callback) => {
+    const cbs = this.callbacks.get(event) ?? /* @__PURE__ */ new Set();
+    cbs.add(callback);
+    this.callbacks.set(event, cbs);
+  };
+  send = (data) => {
+    if (this.port)
+      this.port.postMessage({ data });
+    else
+      throw new Error(\\"HMRPort is not initialized\\");
+  };
+}
+
+export { HMRPort };
+"
+`;
+
+exports[`serve fs output: assets/precontroller.js.js 1`] = `
+"const id = setInterval(() => location.reload(), 100);
+setTimeout(() => clearInterval(id), 5e3);
+"
+`;
+
+exports[`serve fs output: public.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Public</title>
+  </head>
+  <body>
+    <p>
+      This HTML file is a web accessible resource and CRXJS copies it directly
+      without any processing.
+    </p>
+    <script src=\\"/public.js\\"></script>
+  </body>
+</html>
+"
+`;
+
+exports[`serve fs output: public.js 1`] = `
+"console.log('static script')
+"
+`;
+
+exports[`serve fs output: service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/crx-client-worker';
+"
+`;
+
+exports[`serve fs output: src/sidebar.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Sidebar</title>
+  </head>
+  <body>
+    <p>
+      This HTML page is a sidebar in a content script. It is web accessible and
+      supports HMR and build optimizations.
+    </p>
+    <script src=\\"./sidebar.js\\" type=\\"module\\"></script>
+  </body>
+</html>
+"
+`;
+
+exports[`serve fs output: src/static.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Static</title>
+  </head>
+  <body>
+    <p>
+      This HTML file is a web accessible resource and CRXJS copies it directly
+      without any processing. Static HTML file assets should go in the public
+      dir.
+    </p>
+    <script src=\\"/static.js\\"></script>
+  </body>
+</html>
+"
+`;
+
+exports[`serve fs output: static.js 1`] = `
+"console.log('static script')
+"
+`;
