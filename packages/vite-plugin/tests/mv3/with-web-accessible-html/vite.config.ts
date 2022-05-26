@@ -32,13 +32,14 @@ export default defineConfig({
         web_accessible_resources: [
           {
             resources: [
-              // TODO: sidebar assets must also be web accessible
               // this file is web accessible; it supports HMR b/c it's declared in `rollupOptions.input`
               'src/sidebar.html',
-              // this file is web accessible; CRXJS copies it directly
+              // this static HTML file is web accessible; CRXJS copies it directly (static assets should be in public dir)
               'src/static.html',
-              // must list static HTML file assets; static HTML is not parsed
-              'src/static.js',
+              // this static HTML file in `public/` is web accessible; the path works b/c it's in the public dir
+              'public.html',
+              // If you're using a content script to load a web accessible HTML file in an iframe,
+              // the assets of the web accessible HTMl file don't need to be web accessible 🤯
             ],
             matches: ['https://www.google.com/*'],
           },
