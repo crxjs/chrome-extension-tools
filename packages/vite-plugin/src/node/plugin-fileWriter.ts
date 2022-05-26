@@ -140,7 +140,7 @@ export const pluginFileWriter =
             }
           })
 
-          rebuildSignal$.subscribe((rebuild) => {
+          const rebuildSub = rebuildSignal$.subscribe((rebuild) => {
             if (rebuild.type === 'partial') {
               for (const owner of rebuild.owners)
                 transformResultByOwner.delete(owner)
@@ -149,6 +149,9 @@ export const pluginFileWriter =
             }
 
             rebuildFiles()
+          })
+          watcher.on('close', () => {
+            rebuildSub.unsubscribe()
           })
         })
       },
