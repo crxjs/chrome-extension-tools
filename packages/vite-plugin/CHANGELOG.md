@@ -1,5 +1,16 @@
 # @crxjs/vite-plugin
 
+## 1.0.6
+
+### Patch Changes
+
+- 63d102f: Automatically ignores `build.outDir` for server HMR, so the file
+  writer doesn't trigger a full reload.
+
+  Fixes flaky HMR updates for content scripts; Tailwind should work fine now 🥳
+
+- a1e2728: Fix isImporter recursion
+
 ## 1.0.5
 
 ### Patch Changes
