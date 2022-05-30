@@ -168,7 +168,7 @@ importers:
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
       '@types/react': 17.0.44
-      '@types/react-dom': 17.0.16
+      '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.23.0
       '@typescript-eslint/parser': 5.23.0
       '@vitejs/plugin-react': ^1.2.0
@@ -234,7 +234,7 @@ importers:
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
       '@types/react': 17.0.44
-      '@types/react-dom': 17.0.16
+      '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.23.0_c63nfttrfhylg3zmgcxfslaw44
       '@typescript-eslint/parser': 5.23.0_hcfsmds2fshutdssjqluwm76uu
       '@vitejs/plugin-vue': 2.3.2_vite@2.9.9+vue@3.2.36
@@ -3755,6 +3755,12 @@ packages:
 
   /@types/react-dom/17.0.16:
     resolution: {integrity: sha512-DWcXf8EbMrO/gWnQU7Z88Ws/p16qxGpPyjTKTpmBSFKeE+HveVubqGO1CVK7FrwlWD5MuOcvh8gtd0/XO38NdQ==}
+    dependencies:
+      '@types/react': 17.0.45
+    dev: true
+
+  /@types/react-dom/17.0.17:
+    resolution: {integrity: sha512-VjnqEmqGnasQKV0CWLevqMTXBYG9GbwuE6x3VetERLh0cq2LTptFE73MrQi2S7GkKXCf2GgwItB/melLnxfnsg==}
     dependencies:
       '@types/react': 17.0.45
     dev: true
