@@ -111,7 +111,7 @@ export function htmlFiles(manifest: ManifestV3): string[] {
   ]
     .flat()
     .filter(isString)
-    .map(s => s.split('#')[0])
+    .map((s) => s.split('#')[0])
     .sort()
   return [...new Set(files)]
 }
@@ -155,4 +155,15 @@ export function decodeManifest(this: PluginContext, code: string): ManifestV3 {
 export function encodeManifest(manifest: ManifestV3): string {
   const json = JSON.stringify(JSON.stringify(manifest))
   return `export default ${json}`
+}
+
+/**
+ * [Strip paths for `web_accessible_resources`'s `matches` · Issue
+ * #282](https://github.com/crxjs/chrome-extension-tools/issues/282)
+ */
+export const stubMatchPattern = (pattern: string): string => {
+  const [schema, rest] = pattern.split('://')
+  const [origin, pathname] = rest.split('/')
+  const root = `${schema}://${origin}`
+  return pathname ? `${root}/*` : root
 }

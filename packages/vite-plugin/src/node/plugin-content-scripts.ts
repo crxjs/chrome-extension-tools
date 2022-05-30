@@ -6,7 +6,12 @@ import { createHash } from 'crypto'
 import MagicString from 'magic-string'
 import { OutputAsset, PluginContext } from 'rollup'
 import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
-import { isResourceByMatch, isString, _debug } from './helpers'
+import {
+  isResourceByMatch,
+  isString,
+  stubMatchPattern,
+  _debug,
+} from './helpers'
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
@@ -522,6 +527,8 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                       }
 
                     if (resource.resources.length) {
+                      // chromium only uses origin of match pattern
+                      resource.matches = resource.matches.map(stubMatchPattern)
                       manifest.web_accessible_resources.push(resource)
                     }
                   }
