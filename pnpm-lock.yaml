@@ -42,7 +42,7 @@ importers:
       '@testing-library/dom': ^6.12.2
       '@testing-library/jest-dom': ^5.1.1
       '@types/cheerio': 0.22.22
-      '@types/chrome': 0.0.184
+      '@types/chrome': 0.0.188
       '@types/fs-extra': ^8.0.1
       '@types/glob': ^7.1.1
       '@types/jest': ^27.0.0
@@ -123,7 +123,7 @@ importers:
       '@testing-library/dom': 6.16.0
       '@testing-library/jest-dom': 5.16.4
       '@types/cheerio': 0.22.22
-      '@types/chrome': 0.0.184
+      '@types/chrome': 0.0.188
       '@types/fs-extra': 8.1.2
       '@types/glob': 7.2.0
       '@types/jest': 27.5.0
@@ -160,7 +160,7 @@ importers:
       '@rollup/plugin-node-resolve': 13.2.0
       '@rollup/pluginutils': ^4.1.2
       '@types/acorn': 4.0.6
-      '@types/chrome': 0.0.184
+      '@types/chrome': 0.0.188
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest': 27.5.0
@@ -226,7 +226,7 @@ importers:
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.72.1
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.72.1
       '@types/acorn': 4.0.6
-      '@types/chrome': 0.0.184
+      '@types/chrome': 0.0.188
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest': 27.5.0
@@ -3468,8 +3468,8 @@ packages:
       '@types/node': 13.13.52
     dev: true
 
-  /@types/chrome/0.0.184:
-    resolution: {integrity: sha512-Wvawa0L2jUyLd6RNd0mx/1z0R/RZXkGKDI77+twsbcmhLlsGA64xrXQYxFr/F7yu6yGLEqKpEmrrJ1tveuVkIQ==}
+  /@types/chrome/0.0.188:
+    resolution: {integrity: sha512-fVxbcnSrQqCaaTFfaP9QooRr0Lf47Ni+QVGpd4SQafe6x8RlLrlp+AAgc4QKNUVK7W6xEoOePMAu5sBXrc2qhA==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.8
