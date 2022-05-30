@@ -44,7 +44,7 @@
     "@types/lodash": "^4.14.172",
     "ajv": "^8.6.2",
     "array-flat-polyfill": "^1.0.1",
-    "cheerio": "1.0.0-rc.10",
+    "cheerio": "1.0.0-rc.11",
     "convert-source-map": "^1.7.0",
     "cosmiconfig": "^6.0.0",
     "esbuild": "^0.14.0",
