@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.0.7
+
+### Patch Changes
+
+- e1604d8: Strip paths from content script resource match patterns
+
 ## 1.0.6
 
 ### Patch Changes
