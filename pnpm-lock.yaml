@@ -172,7 +172,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.23.0
       '@typescript-eslint/parser': 5.23.0
       '@vitejs/plugin-react': ^1.2.0
-      '@vitejs/plugin-vue': 2.3.2
+      '@vitejs/plugin-vue': 2.3.3
       '@webcomponents/custom-elements': ^1.5.0
       acorn-walk: ^8.2.0
       cheerio: ^1.0.0-rc.10
@@ -237,7 +237,7 @@ importers:
       '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.23.0_c63nfttrfhylg3zmgcxfslaw44
       '@typescript-eslint/parser': 5.23.0_hcfsmds2fshutdssjqluwm76uu
-      '@vitejs/plugin-vue': 2.3.2_vite@2.9.9+vue@3.2.36
+      '@vitejs/plugin-vue': 2.3.3_vite@2.9.9+vue@3.2.36
       esbuild: 0.14.38
       esbuild-runner: 2.2.1_esbuild@0.14.38
       eslint: 8.15.0
@@ -4040,8 +4040,8 @@ packages:
     dev: false
     optional: true
 
-  /@vitejs/plugin-vue/2.3.2_vite@2.9.9+vue@3.2.36:
-    resolution: {integrity: sha512-umyypfSHS4kQLdYAnJHhaASq7FRzNCdvcRoQ3uYGNk1/M4a+hXUd7ysN7BLhCrWH6uBokyCkFeUAaFDzSaaSrQ==}
+  /@vitejs/plugin-vue/2.3.3_vite@2.9.9+vue@3.2.36:
+    resolution: {integrity: sha512-SmQLDyhz+6lGJhPELsBdzXGc+AcaT8stgkbiTFGpXPe8Tl1tJaBw1A6pxDqDuRsVkD8uscrkx3hA7QDOoKYtyw==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       vite: ^2.5.10
