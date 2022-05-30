@@ -189,7 +189,7 @@ importers:
       jsesc: ^3.0.2
       magic-string: ^0.26.0
       picocolors: ^1.0.0
-      playwright-chromium: 1.21.1
+      playwright-chromium: 1.22.2
       react: 17.0.2
       react-dom: 17.0.2
       react-refresh: ^0.13.0
@@ -243,7 +243,7 @@ importers:
       eslint: 8.15.0
       jest: 27.5.1
       jest-image-snapshot: 4.5.1_jest@27.5.1
-      playwright-chromium: 1.21.1
+      playwright-chromium: 1.22.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       rimraf: 3.0.2
@@ -10768,17 +10768,13 @@ packages:
       find-up: 3.0.0
     dev: false
 
-  /playwright-chromium/1.21.1:
-    resolution: {integrity: sha512-bbqFFpcTs+3amiofja/KvTmZ+FZnMNEOuGkRyJk2p6DV9EbgRYVrlzzgLtMnX2DwaX3ZZ23MukGuQ+bVKOdsnw==}
-    engines: {node: '>=12'}
+  /playwright-chromium/1.22.2:
+    resolution: {integrity: sha512-msRcdCIJkdM2R6S+NMJZ02uyZHzJ7TIzkjzs3usDJ1Pwacp9HMhv9T/S4AxtpFXFmvMZq7UJYb0x+tCdHx9+0w==}
+    engines: {node: '>=14'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      playwright-core: 1.21.1
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
+      playwright-core: 1.22.2
     dev: true
 
   /playwright-core/1.21.1:
@@ -10808,6 +10804,12 @@ packages:
       - bufferutil
       - supports-color
       - utf-8-validate
+    dev: true
+
+  /playwright-core/1.22.2:
+    resolution: {integrity: sha512-w/hc/Ld0RM4pmsNeE6aL/fPNWw8BWit2tg+TfqJ3+p59c6s3B6C8mXvXrIPmfQEobkcFDc+4KirNzOQ+uBSP1Q==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /playwright/1.21.1:
