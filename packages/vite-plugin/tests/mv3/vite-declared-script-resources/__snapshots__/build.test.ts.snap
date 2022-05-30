@@ -8,7 +8,8 @@ Object {
         "assets/content-script-loader.content.ts.hash.hash.js",
       ],
       "matches": Array [
-        "https://google.com/*",
+        "https://google.com/search*",
+        "*://a.com/*",
       ],
     },
   ],
@@ -18,6 +19,7 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
+        "*://a.com/*",
         "https://google.com/*",
       ],
       "resources": Array [

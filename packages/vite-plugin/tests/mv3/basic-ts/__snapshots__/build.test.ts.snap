@@ -15,8 +15,8 @@ Object {
         "assets/content-script-loader.content.ts.hash.hash.js",
       ],
       "matches": Array [
-        "http://*/*",
         "https://*/*",
+        "http://*/*",
       ],
     },
   ],

@@ -12,7 +12,8 @@ Object {
         "assets/content-script-loader.content.ts.js.js",
       ],
       "matches": Array [
-        "https://google.com/*",
+        "https://google.com/search*",
+        "*://a.com/*",
       ],
     },
   ],
