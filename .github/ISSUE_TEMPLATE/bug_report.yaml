@@ -49,7 +49,7 @@ body:
     id: system-info
     attributes:
       label: System Info
-      description: Output of `npx envinfo --system --npmPackages rollup-plugin-chrome-extension,vite,rollup --binaries --browsers`
+      description: Output of `npx envinfo --system --npmPackages rollup-plugin-chrome-extension,vite,rollup,@crxjs/vite-plugin --binaries --browsers`
       render: shell
       placeholder: System, Binaries, Browsers
     validations:
