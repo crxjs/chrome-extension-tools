@@ -9,7 +9,7 @@ const config = {
   title: 'CRXJS Vite Plugin',
   tagline: 'Build Chrome Extensions with Vite',
   url: 'https://crxjs.dev',
-  baseUrl: '/vite-plugin/',
+  baseUrl: process.env.VERCEL_ENV === 'production' ? '/vite-plugin/' : '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
