@@ -13,7 +13,7 @@ import {
   structuredClone,
 } from './helpers'
 import { ManifestV3 } from './manifest'
-import { basename, join } from './path'
+import { basename, isAbsolute, join, relative } from './path'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
 
@@ -46,20 +46,33 @@ export const pluginManifest =
           // TODO: build this out into full validation plugin
           if (manifest.manifest_version !== 3)
             throw new Error(
-              `Manifest v${manifest.manifest_version} is currently unsupported, please use manifest v3`,
+              `CRXJS does not support Manifest v${manifest.manifest_version}, please use Manifest v3`,
             )
 
           // pre-bundle dependencies
           if (env.command === 'serve') {
+            // Vite should crawl manifest entry files
             const {
               contentScripts: js,
               background: sw,
               html,
             } = await manifestFiles(manifest)
-            let { entries = [] } = config.optimizeDeps ?? {}
-            entries = [entries].flat()
-            const set = new Set<string>(entries)
-            for (const x of [...js, ...sw, ...html]) set.add(x)
+            const { entries = [] } = config.optimizeDeps ?? {}
+            // Vite ignores build inputs if explicit entries,
+            // so we need to merge both to include extra HTML files
+            let { input = [] } = config.build?.rollupOptions ?? {}
+            if (typeof input === 'string') input = [input]
+            else input = Object.values(input)
+            input = input.map((f) => {
+              let result = f
+              if (isAbsolute(f)) {
+                result = relative(config.root ?? process.cwd(), f)
+              }
+              return result
+            })
+            // Merging explicit entries and build inputs
+            const set = new Set<string>([entries, input].flat())
+            for (const x of [js, sw, html].flat()) set.add(x)
 
             return {
               ...config,

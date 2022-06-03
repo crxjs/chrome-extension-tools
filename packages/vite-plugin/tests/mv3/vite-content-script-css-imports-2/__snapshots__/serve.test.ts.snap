@@ -62,6 +62,13 @@ Array [
 ]
 `;
 
+exports[`serve fs output: _02 optimized deps 1`] = `
+Set {
+  "src/content1/index.ts",
+  "src/content2/index.ts",
+}
+`;
+
 exports[`serve fs output: assets/content-script-loader.index.ts.js.js 1`] = `
 "(function () {
   'use strict';

@@ -57,6 +57,14 @@ Array [
 ]
 `;
 
+exports[`works with 'self' directive: _02 optimized deps 1`] = `
+Set {
+  "src/content.ts",
+  "src/background.ts",
+  "src/popup.html",
+}
+`;
+
 exports[`works with 'self' directive: assets/content-script-loader.content.ts.js.js 1`] = `
 "(function () {
   'use strict';

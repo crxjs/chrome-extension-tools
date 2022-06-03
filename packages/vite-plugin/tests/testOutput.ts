@@ -61,6 +61,11 @@ export async function testOutput(
     }
   }
 
+  if (config.command === 'serve')
+    expect(new Set(config.optimizeDeps.entries)).toMatchSnapshot(
+      '_02 optimized deps',
+    )
+
   /* ------------ CHECK FOR MISSING FILES ------------ */
   const missingFiles = Object.values(
     await manifestFiles(manifest, { cwd: outDir }),

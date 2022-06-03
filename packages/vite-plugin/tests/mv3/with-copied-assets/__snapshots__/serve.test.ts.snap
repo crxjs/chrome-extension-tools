@@ -77,6 +77,8 @@ Array [
 ]
 `;
 
+exports[`serve fs output: _02 optimized deps 1`] = `Set {}`;
+
 exports[`serve fs output: assets/crx-client-port.js 1`] = `
 "function isCrxHMRPayload(x) {
   return x.type === \\"custom\\" && x.event.startsWith(\\"crx:\\");
