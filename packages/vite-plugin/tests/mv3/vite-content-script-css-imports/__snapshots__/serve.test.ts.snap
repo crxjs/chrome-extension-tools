@@ -50,6 +50,12 @@ Array [
 ]
 `;
 
+exports[`serve fs output: _02 optimized deps 1`] = `
+Set {
+  "src/content.ts",
+}
+`;
+
 exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
 "(function () {
   'use strict';
