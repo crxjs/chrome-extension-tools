@@ -63,9 +63,13 @@ export const pluginManifest =
             let { input = [] } = config.build?.rollupOptions ?? {}
             if (typeof input === 'string') input = [input]
             else input = Object.values(input)
-            input = input.map((f) =>
-              config.root && isAbsolute(f) ? relative(config.root, f) : f,
-            )
+            input = input.map((f) => {
+              let result = f
+              if (isAbsolute(f)) {
+                result = relative(config.root ?? process.cwd(), f)
+              }
+              return result
+            })
             // Merging explicit entries and build inputs
             const set = new Set<string>([entries, input].flat())
             for (const x of [js, sw, html].flat()) set.add(x)
