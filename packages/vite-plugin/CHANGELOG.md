@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.0.8
+
+### Patch Changes
+
+- 8a09cb9: Optimize rollup input
+
 ## 1.0.7
 
 ### Patch Changes
