@@ -1,12 +1,9 @@
 <script>
-  let count = 0
-  const increment = () => {
-    count += 1
-  }
+import { count } from "./stores";
 </script>
 
-<button on:click={increment}>
-  Clicks: {count}
+<button on:click={() => $count++}>
+  Count: {$count}
 </button>
 
 <style>
