@@ -159,6 +159,7 @@ importers:
       '@rollup/plugin-commonjs': 21.1.0
       '@rollup/plugin-node-resolve': 13.2.0
       '@rollup/pluginutils': ^4.1.2
+      '@sveltejs/vite-plugin-svelte': 1.0.0-next.47
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.188
       '@types/debug': 4.1.7
@@ -198,6 +199,7 @@ importers:
       rollup-plugin-dts: ^4.2.0
       rollup-plugin-esbuild: 4.9.1
       rxjs: 7.5.5
+      svelte: ^3.48.0
       typescript: ^4.6.4
       vite: ^2.9.5
       vite-plugin-inspect: 0.5.0
@@ -225,6 +227,7 @@ importers:
       '@rollup/plugin-alias': 3.1.9_rollup@2.72.1
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.72.1
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.72.1
+      '@sveltejs/vite-plugin-svelte': 1.0.0-next.47_svelte@3.48.0+vite@2.9.9
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.188
       '@types/debug': 4.1.7
@@ -250,6 +253,7 @@ importers:
       rollup-plugin-dts: 4.2.1_pz6niy2zrvqhgxfup3pdyir4yu
       rollup-plugin-esbuild: 4.9.1_kkyl4r2ouanou5tfhnzrsy63ge
       rxjs: 7.5.5
+      svelte: 3.48.0
       typescript: 4.6.4
       vite: 2.9.9
       vite-plugin-inspect: 0.5.0_vite@2.9.9
@@ -3212,6 +3216,29 @@ packages:
     resolution: {integrity: sha512-5fG+kHOlfwPNi82MCvTFQdAg50YQymGbdwH9nzTA9D9FhJVHynTjadXi58gb/Ae17RMvinY0+Fglx33MB056Rg==}
     dependencies:
       sucrase: 3.21.0
+    dev: true
+
+  /@sveltejs/vite-plugin-svelte/1.0.0-next.47_svelte@3.48.0+vite@2.9.9:
+    resolution: {integrity: sha512-J6n8UN51aq/TEZGQ89/EtdXTtca3cRcTJGzi6fi+xK8LkgsHQLCZhRj+PJ+swktRSWTX9IOmQS55SqVg6bz5fA==}
+    engines: {node: ^14.13.1 || >= 16}
+    peerDependencies:
+      diff-match-patch: ^1.0.5
+      svelte: ^3.44.0
+      vite: ^2.9.0
+    peerDependenciesMeta:
+      diff-match-patch:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 4.2.1
+      debug: 4.3.4
+      deepmerge: 4.2.2
+      kleur: 4.1.4
+      magic-string: 0.26.2
+      svelte: 3.48.0
+      svelte-hmr: 0.14.12_svelte@3.48.0
+      vite: 2.9.9
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@svgr/babel-plugin-add-jsx-attribute/6.0.0_@babel+core@7.17.10:
@@ -6405,6 +6432,7 @@ packages:
     cpu: [x64]
     os: [android]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-android-64/0.14.42:
@@ -6422,6 +6450,7 @@ packages:
     cpu: [arm64]
     os: [android]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-android-arm64/0.14.42:
@@ -6439,6 +6468,7 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-darwin-64/0.14.42:
@@ -6456,6 +6486,7 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-darwin-arm64/0.14.42:
@@ -6473,6 +6504,7 @@ packages:
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-freebsd-64/0.14.42:
@@ -6490,6 +6522,7 @@ packages:
     cpu: [arm64]
     os: [freebsd]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-freebsd-arm64/0.14.42:
@@ -6507,6 +6540,7 @@ packages:
     cpu: [ia32]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-32/0.14.42:
@@ -6524,6 +6558,7 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-64/0.14.42:
@@ -6541,6 +6576,7 @@ packages:
     cpu: [arm]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-arm/0.14.42:
@@ -6558,6 +6594,7 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-arm64/0.14.42:
@@ -6575,6 +6612,7 @@ packages:
     cpu: [mips64el]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-mips64le/0.14.42:
@@ -6592,6 +6630,7 @@ packages:
     cpu: [ppc64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-ppc64le/0.14.42:
@@ -6609,6 +6648,7 @@ packages:
     cpu: [riscv64]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-riscv64/0.14.42:
@@ -6626,6 +6666,7 @@ packages:
     cpu: [s390x]
     os: [linux]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-linux-s390x/0.14.42:
@@ -6643,6 +6684,7 @@ packages:
     cpu: [x64]
     os: [netbsd]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-netbsd-64/0.14.42:
@@ -6660,6 +6702,7 @@ packages:
     cpu: [x64]
     os: [openbsd]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-openbsd-64/0.14.42:
@@ -6699,6 +6742,7 @@ packages:
     cpu: [x64]
     os: [sunos]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-sunos-64/0.14.42:
@@ -6716,6 +6760,7 @@ packages:
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-windows-32/0.14.42:
@@ -6733,6 +6778,7 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-windows-64/0.14.42:
@@ -6750,6 +6796,7 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
+    dev: false
     optional: true
 
   /esbuild-windows-arm64/0.14.42:
@@ -6787,6 +6834,7 @@ packages:
       esbuild-windows-32: 0.14.38
       esbuild-windows-64: 0.14.38
       esbuild-windows-arm64: 0.14.38
+    dev: false
 
   /esbuild/0.14.42:
     resolution: {integrity: sha512-V0uPZotCEHokJdNqyozH6qsaQXqmZEOiZWrXnds/zaH/0SyrIayRXWRB98CENO73MIZ9T3HBIOsmds5twWtmgw==}
@@ -9725,7 +9773,6 @@ packages:
   /kleur/4.1.4:
     resolution: {integrity: sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA==}
     engines: {node: '>=6'}
-    dev: false
 
   /klona/2.0.5:
     resolution: {integrity: sha512-pJiBpiXMbt7dkzXe8Ghj/u4FfXOOa98fPW+bihOJ4SjnoijweJrNThJfd3ifXpXhREjpoF2mZVH1GfS9LV3kHQ==}
@@ -13249,6 +13296,20 @@ packages:
   /supports-preserve-symlinks-flag/1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  /svelte-hmr/0.14.12_svelte@3.48.0:
+    resolution: {integrity: sha512-4QSW/VvXuqVcFZ+RhxiR8/newmwOCTlbYIezvkeN6302YFRE8cXy0naamHcjz8Y9Ce3ITTZtrHrIL0AGfyo61w==}
+    engines: {node: ^12.20 || ^14.13.1 || >= 16}
+    peerDependencies:
+      svelte: '>=3.19.0'
+    dependencies:
+      svelte: 3.48.0
+    dev: true
+
+  /svelte/3.48.0:
+    resolution: {integrity: sha512-fN2YRm/bGumvjUpu6yI3BpvZnpIm9I6A7HR4oUNYd7ggYyIwSA/BX7DJ+UXXffLp6XNcUijyLvttbPVCYa/3xQ==}
+    engines: {node: '>= 8'}
+    dev: true
 
   /svg-parser/2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}
