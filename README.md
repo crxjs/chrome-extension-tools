@@ -23,7 +23,7 @@ Vite support is in beta! Check out this
 [90 second getting started guide](https://dev.to/jacksteamdev/create-a-vite-react-chrome-extension-in-90-seconds-3df7).
 
 ```sh
-npm i rollup-plugin-chrome-extension@beta -D
+npm i @crxjs/vite-plugin -D
 ```
 
 ```javascript
@@ -31,7 +31,7 @@ npm i rollup-plugin-chrome-extension@beta -D
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { crx } from 'rollup-plugin-chrome-extension'
+import { crx } from '@crxjs/vite-plugin'
 import manifest from './manifest.json'
 
 export default defineConfig({
