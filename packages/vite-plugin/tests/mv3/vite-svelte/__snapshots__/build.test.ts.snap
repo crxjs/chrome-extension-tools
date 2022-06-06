@@ -196,8 +196,8 @@ export { App as A };
 exports[`build fs output: assets/content.js.hash.js 1`] = `
 "import { A as App } from \\"./App.hash.js\\";
 import \\"./vendor.hash.js\\";
-const html = \`<div id=\\"root\\"></div>\`;
-const target = new DOMParser().parseFromString(html).body.firstElementChild;
+const html = \`<div id=\\"crx-app\\"></div>\`;
+const target = new DOMParser().parseFromString(html, \\"text/html\\").body.firstElementChild;
 document.body.append(target);
 new App({ target });
 "

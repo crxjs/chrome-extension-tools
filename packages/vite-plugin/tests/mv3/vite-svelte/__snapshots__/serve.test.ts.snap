@@ -359,8 +359,9 @@ export { logo as default };
 exports[`serve fs output: src/content.js 1`] = `
 "import App from './App.svelte.js';
 
-const html = \`<div id=\\"root\\"></div>\`;
-const target = new DOMParser().parseFromString(html).body.firstElementChild;
+const html = \`<div id=\\"crx-app\\"></div>\`;
+const target = new DOMParser().parseFromString(html, 'text/html').body
+  .firstElementChild;
 document.body.append(target);
 
 const app = new App({ target });
