@@ -2,11 +2,12 @@
 sidebar_position: 1
 slug: '/'
 id: 'index'
+title: Introduction
 ---
 
 import GetStartedTip from './\_tip-getting-started.md'
 
-# What is CRXJS Vite Plugin?
+# CRXJS Vite Plugin
 
 CRXJS Vite Plugin is a tool that helps you make Chrome Extensions using modern
 web development technology.
