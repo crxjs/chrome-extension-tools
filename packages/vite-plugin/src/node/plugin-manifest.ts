@@ -1,5 +1,5 @@
 import { existsSync } from 'fs'
-import { readFile } from 'fs-extra'
+import { promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
@@ -16,6 +16,7 @@ import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
+const { readFile } = fs
 
 // const debug = _debug('manifest')
 
