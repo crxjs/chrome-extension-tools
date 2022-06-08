@@ -1,74 +1,35 @@
-# [rollup-plugin-chrome-extension](https://www.extend-chrome.dev/rollup-plugin)
+# ![CRXJS](./banner-github.png)
 
-[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension/beta.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
-[![GitHub last commit](https://img.shields.io/github/last-commit/crxjs/rollup-plugin-chrome-extension.svg?logo=github)](https://github.com/crxjs/rollup-plugin-chrome-extension)
-![GitHub action badge](https://github.com/crxjs/rollup-plugin-chrome-extension/actions/workflows/vite-plugin.yml/badge.svg)
-[![TypeScript Declarations Included](https://img.shields.io/badge/types-TypeScript-informational)](#typescript)
+## What is CRXJS?
 
-<a href="https://www.extend-chrome.dev/rollup-plugin" rel="noopener">
-  <img width=200px height=200px src="https://imgur.com/wEXnCYK.png" alt="rollup-plugin-chrome-extension logo"></a>
+CRXJS is a project to bring a modern developer experience to the Chrome
+Extension ecosystem. This repo houses two bundling libraries: a
+[modern Vite plugin](./packages/vite-plugin/README.md) and a
+[legacy Rollup plugin](./packages/rollup-plugin/README.md).
 
-The bundler configuration for a Chrome Extension can be pretty complex. This
-plugin makes it simple.
+|                               |                                          [`@crxjs/vite-plugin`](./packages/vite-plugin/README.md)                                           |                                         [`rollup-plugin-chrome-extension`](./packages/rollup-plugin/README.md)                                          |
+| :---------------------------- | :-----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
+| Works on                      |                                                        [Vite](https://vitejs.dev) ⚡                                                        |                                                             [Rollup](https://rollupjs.org)                                                              |
+| Simple Config                 |                                                                     Yes                                                                     |                                                                           Yes                                                                           |
+| HMR                           |                                                                  True HMR                                                                   |                                                                       Auto-reload                                                                       |
+| Static Asset Imports          |                                                                     Yes                                                                     |                                                                       With config                                                                       |
+| MV3                           |                                                                     Yes                                                                     |                                                                           Yes                                                                           |
+| MV2                           |                                                                      -                                                                      |                                                                           Yes                                                                           |
+| Auto Web-accessible Resources |                                                                     Yes                                                                     |                                                                            -                                                                            |
+| Documentation                 |                                           [CRXJS Vite Plugin Docs](https://crxjs.dev/vite-plugin)                                           |                                              [Extend Chrome Docs](https://extend-chrome.com/rollup-plugin)                                              |
+| NPM                           | [![npm (scoped)](https://img.shields.io/npm/v/@crxjs/vite-plugin/latest.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension) | [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension/latest.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension) |
 
-The manifest is front and center. Import your manifest to your config file and
-RPCE will do the rest.
+If you're starting a new Chrome Extension project, consider using
+[`@crxjs/vite-plugin`](https://crxjs.dev/vite-plugin). This Vite plugin brings
+all the features of Vite to the Chrome Extension developer experience.
+[Get Started in 90 seconds.](https://crxjs.dev/vite-plugin)
 
-RPCE simplifies project config and supports many of Vite's features in the
-Chrome Extension environment, including HMR.
+## Supporting
 
-## Vite Usage (beta)
-
-Vite support is in beta! Check out this
-[90 second getting started guide](https://dev.to/jacksteamdev/create-a-vite-react-chrome-extension-in-90-seconds-3df7).
-
-```sh
-npm i @crxjs/vite-plugin -D
-```
-
-```javascript
-// vite.config.js
-
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { crx } from '@crxjs/vite-plugin'
-import manifest from './manifest.json'
-
-export default defineConfig({
-  plugins: [react(), crx({ manifest })],
-})
-```
-
-Just add new features to your manifest, and RPCE does the rest.
-
-## [Documentation for v3](https://www.extend-chrome.dev/rollup-plugin)
-
-We have
-[v3 boilerplates](https://www.extend-chrome.dev/rollup-plugin#chrome-extension-boilerplates)
-for [React JavaScript](https://github.com/crxjs/js-react-boilerplate),
-[React TypeScript](https://github.com/crxjs/ts-react-boilerplate) and
-[Svelte](https://github.com/kyrelldixon/svelte-tailwind-extension-boilerplate),
-as well as [instructions](https://www.extend-chrome.dev/rollup-plugin#usage) for
-setting up your project.
-
-See the [documentation](https://www.extend-chrome.dev/rollup-plugin) for usage
-and how to get started.
+If these plugins have helped you ship your product faster, please consider
+[sponsoring me](https://github.com/sponsors/jacksteamdev) on GitHub.
 
 ## Contributing
 
-Your help is super welcome!
-
-🎯 Ongoing development is for v4+ only.
-
-👀 Be sure to take a look at the issues before starting to work on a new
-feature.
-
-🙏 Please update the tests to cover bug fixes or new features.
-
-📕 Documentation for v4 has not yet begun, but you can open an issue for help.
-
-✨ If you enjoy using RPCE, please help spread the word!
-
-## Development
-
-This monorepo uses [pnpm](https://pnpm.io/).
+We encourage pull requests! This is a
+[pnpm monorepo](https://pnpm.io/workspaces), so use pnpm instead of Yarn or npm.
