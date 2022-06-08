@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.0.10
+
+### Patch Changes
+
+- f35c49e: Update READMEs
+
 ## 1.0.9
 
 ### Patch Changes
