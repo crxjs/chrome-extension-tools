@@ -18,3 +18,13 @@ CRXJS brings the Vite developer experience to Chrome Extensions:
 
 See the CRXJS documentation to
 [get started in 90 seconds 🚀](https://crxjs.dev/vite-plugin)
+
+## Supporting
+
+If these plugins have helped you ship your product faster, please consider
+[sponsoring me](https://github.com/sponsors/jacksteamdev) on GitHub.
+
+## Contributing
+
+We encourage pull requests! This is a
+[pnpm monorepo](https://pnpm.io/workspaces), so use pnpm instead of Yarn or npm.

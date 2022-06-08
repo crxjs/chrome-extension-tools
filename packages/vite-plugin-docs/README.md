@@ -26,3 +26,13 @@ $ pnpm build
 
 This command generates static content into the `build` directory and can be
 served using any static contents hosting service.
+
+## Supporting
+
+If these plugins have helped you ship your product faster, please consider
+[sponsoring me](https://github.com/sponsors/jacksteamdev) on GitHub.
+
+## Contributing
+
+We encourage pull requests! This is a
+[pnpm monorepo](https://pnpm.io/workspaces), so use pnpm instead of Yarn or npm.
