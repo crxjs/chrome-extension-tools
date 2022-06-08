@@ -1,4 +1,4 @@
-# CRXJS
+# ![CRXJS](./banner-github.png)
 
 ## What is CRXJS?
 
@@ -27,9 +27,9 @@ all the features of Vite to the Chrome Extension developer experience.
 ## Supporting
 
 If these plugins have helped you ship your product faster, please consider
-sponsoring me on GitHub.
+[sponsoring me](https://github.com/sponsors/jacksteamdev) on GitHub.
 
 ## Contributing
 
-We encourage pull requests! This is a pnpm monorepo, so use pnpm instead of Yarn
-or npm.
+We encourage pull requests! This is a
+[pnpm monorepo](https://pnpm.io/workspaces), so use pnpm instead of Yarn or npm.
