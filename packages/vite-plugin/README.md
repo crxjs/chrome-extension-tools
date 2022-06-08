@@ -6,7 +6,7 @@
 
 ## CRXJS Vite Plugin
 
-> Build a Chrome Extension with Vite!
+> Build a Chrome Extension with [Vite](https://vitejs.dev)⚡
 
 CRXJS brings the Vite developer experience to Chrome Extensions:
 
