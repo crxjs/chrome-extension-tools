@@ -6,7 +6,7 @@ tags:
   - Content script
   - JavaScript
   - vanilla
-pagination_next: null
+pagination_next: concepts/manifest
 ---
 
 # Working with Content Scripts
