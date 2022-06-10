@@ -6,7 +6,7 @@ tags:
   - Content script
   - React
 # could point this to a TypeScript manifest guide
-pagination_next: null
+pagination_next: concepts/manifest
 ---
 
 # React and Content Scripts

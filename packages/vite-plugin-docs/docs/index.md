@@ -2,6 +2,7 @@
 sidebar_position: 1
 slug: '/'
 id: 'index'
+title: Introduction
 ---
 
 import GetStartedTip from './\_tip-getting-started.md'
