@@ -34,8 +34,8 @@ const url = chrome.runtime.getURL(logo)
 ## HTML in content scripts
 
 It is possible to inject an extension page into a host page using an iframe. The
-host page CSP does not affect the inject iframe even if the host page specifies
-the `frame-src` policy.
+host page CSP does not affect the injected iframe even if the host page
+specifies the `frame-src` policy.
 
 An injected extension page loads inside a cross-origin iframe, so it does not
 have access to the host page DOM like a content script.
