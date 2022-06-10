@@ -100,7 +100,7 @@
     "esbuild-runner": "2.2.1",
     "eslint": "8.15.0",
     "jest": "27.5.1",
-    "jest-image-snapshot": "4.5.1",
+    "jest-image-snapshot": "5.1.0",
     "playwright-chromium": "1.21.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
