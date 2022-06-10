@@ -2,3 +2,6 @@ position: 3
 label: Concepts
 collapsible: false
 collapsed: false
+link:
+  type: generated-index
+  description: "Now that you've learned the basics of using CRXJS, these are some concepts you might find useful."
