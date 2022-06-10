@@ -1,4 +1,4 @@
-import { readFile } from 'fs-extra'
+import { promises as fs } from 'fs'
 import MagicString from 'magic-string'
 import { PreRenderedAsset, PreRenderedChunk } from 'rollup'
 import { TransformResult, ViteDevServer } from 'vite'
@@ -21,6 +21,7 @@ import {
   reactRefreshId,
   viteClientId,
 } from './virtualFileIds'
+const { readFile } = fs
 
 const debug = _debug('file-writer').extend('chunks')
 

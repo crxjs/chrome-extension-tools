@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.10
+
+### Patch Changes
+
+- f35c49e: Update READMEs
+
 ## 3.6.9
 
 ### Patch Changes

@@ -7,13 +7,13 @@ title: Introduction
 
 import GetStartedTip from './\_tip-getting-started.md'
 
-# CRXJS Vite Plugin
+# What is CRXJS?
 
 CRXJS Vite Plugin is a tool that helps you make Chrome Extensions using modern
 web development technology.
 
 Things like **HMR** and **static asset imports** work out of the box so you can
-get started making things, not configuring build tools.
+get started making a modern Chrome Extension, not configuring build tools.
 
 <GetStartedTip/>
 

@@ -1,5 +1,17 @@
 # @crxjs/vite-plugin
 
+## 1.0.10
+
+### Patch Changes
+
+- f35c49e: Update READMEs
+
+## 1.0.9
+
+### Patch Changes
+
+- 8941353: Remove & refactor use of fs-extra
+
 ## 1.0.8
 
 ### Patch Changes

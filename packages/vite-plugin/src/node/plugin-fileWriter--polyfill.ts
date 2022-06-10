@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs-extra'
+import { readFileSync } from 'fs'
 import MagicString from 'magic-string'
 import { createRequire } from 'module'
 import { idByUrl } from './fileMeta'
