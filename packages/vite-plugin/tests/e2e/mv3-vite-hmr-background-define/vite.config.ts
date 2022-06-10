@@ -7,5 +7,5 @@ export default defineConfig({
   clearScreen: false,
   logLevel: 'error',
   plugins: [crx({ manifest })],
-  define: { __HELLO_WORLD__: 'Hello, world!' },
+  define: { __HELLO_WORLD__: JSON.stringify('Hello, world!') },
 })
