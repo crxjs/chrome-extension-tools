@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.0.11
+
+### Patch Changes
+
+- dc479d1: Fix global constant replacement in background
+
 ## 1.0.10
 
 ### Patch Changes
