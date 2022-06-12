@@ -69,8 +69,8 @@ export async function manifestFiles(
   const htmlPages = htmlFiles(manifest)
 
   const icons = [
-    Object.values(manifest.icons ?? {}) as string[],
-    Object.values(manifest.action?.default_icon ?? {}) as string[],
+    Object.values(isString(manifest.icons) ? [manifest.icons] : manifest.icons ?? {}) as string[],
+    Object.values(isString(manifest.action?.default_icon) ? [manifest.action?.default_icon] : manifest.action?.default_icon ?? {}) as string[],
   ].flat()
 
   let webAccessibleResources: string[] = []
