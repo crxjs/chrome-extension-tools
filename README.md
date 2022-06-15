@@ -2,6 +2,8 @@
 
 ## What is CRXJS?
 
+[Get Started in 90 seconds.](https://crxjs.dev/vite-plugin)
+
 CRXJS is a project to bring a modern developer experience to the Chrome
 Extension ecosystem. This repo houses two bundling libraries: a
 [modern Vite plugin](./packages/vite-plugin/README.md) and a
@@ -22,7 +24,6 @@ Extension ecosystem. This repo houses two bundling libraries: a
 If you're starting a new Chrome Extension project, consider using
 [`@crxjs/vite-plugin`](https://crxjs.dev/vite-plugin). This Vite plugin brings
 all the features of Vite to the Chrome Extension developer experience.
-[Get Started in 90 seconds.](https://crxjs.dev/vite-plugin)
 
 ## Supporting
 
