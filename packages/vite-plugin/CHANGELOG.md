@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.0.12
+
+### Patch Changes
+
+- 0027f1e: Fix manifest icons type
+
 ## 1.0.11
 
 ### Patch Changes
