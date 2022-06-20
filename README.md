@@ -25,7 +25,7 @@ all the features of Vite to the Chrome Extension developer experience.
 | MV2                           |                                                                      -                                                                      |                                                                           Yes                                                                           |
 | Auto Web-accessible Resources |                                                                     Yes                                                                     |                                                                            -                                                                            |
 | Documentation                 |                                           [CRXJS Vite Plugin Docs](https://crxjs.dev/vite-plugin)                                           |                                              [Extend Chrome Docs](https://www.extend-chrome.dev/rollup-plugin)                                              |
-| NPM                           | [![npm (scoped)](https://img.shields.io/npm/v/@crxjs/vite-plugin/latest.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension) | [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension/latest.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension) |
+| NPM                           | [![npm (scoped)](https://img.shields.io/npm/v/@crxjs/vite-plugin/latest.svg)](https://www.npmjs.com/package/@crxjs/vite-plugin) | [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension/latest.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension) |
 
 ## Supporting
 
