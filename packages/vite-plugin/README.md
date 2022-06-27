@@ -1,6 +1,6 @@
 # ![CRXJS](./banner-github.png)
 
-[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension)
+[![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension.svg)](https://www.npmjs.com/package/@crxjs/vite-plugin)
 [![GitHub last commit](https://img.shields.io/github/last-commit/crxjs/chrome-extension-tools.svg?logo=github)](https://github.com/crxjs/rollup-plugin-chrome-extension)
 ![GitHub action badge](https://github.com/crxjs/chrome-extension-tools/actions/workflows/vite-plugin.yml/badge.svg)
 
