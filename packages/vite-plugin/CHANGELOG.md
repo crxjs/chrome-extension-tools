@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 1.0.13
+
+### Patch Changes
+
+- 68c661f: Support Vite 3
+- a8d5670: Fixed the npm link of the npm badge.
+
 ## 1.0.12
 
 ### Patch Changes
