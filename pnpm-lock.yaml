@@ -69,7 +69,7 @@ importers:
       jest-html-reporters: 3.0.8
       jest-in-case: ^1.0.2
       json-ptr: ^3.0.0
-      jsonpath-plus: ^4.0.0
+      jsonpath-plus: ^7.0.0
       localforage: ^1.9.0
       lodash: ^4.17.21
       mem: ^6.0.1
@@ -99,7 +99,7 @@ importers:
       fs-extra: 8.1.0
       glob: 8.0.1
       json-ptr: 3.1.0
-      jsonpath-plus: 4.0.0
+      jsonpath-plus: 7.0.0
       localforage: 1.10.0
       lodash: 4.17.21
       mem: 6.1.1
@@ -11742,9 +11742,9 @@ packages:
     optionalDependencies:
       graceful-fs: 4.2.10
 
-  /jsonpath-plus/4.0.0:
-    resolution: {integrity: sha512-e0Jtg4KAzDJKKwzbLaUtinCn0RZseWBVRTRGihSpvFlM3wTR7ExSp+PTdeTsDrLNJUe7L7JYJe8mblHX5SCT6A==}
-    engines: {node: '>=10.0'}
+  /jsonpath-plus/7.0.0:
+    resolution: {integrity: sha512-MH4UnrWrU1hJGVEyEyjvYgONkzNTO6Yol0nq18EMnUQ/ZC5cTuJheirXXIwu1b9mZ6t3XL0P79gPsu+zlTnDIQ==}
+    engines: {node: '>=12.0.0'}
     dev: false
 
   /jsx-ast-utils/3.3.0:
