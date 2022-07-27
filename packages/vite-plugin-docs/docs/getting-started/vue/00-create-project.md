@@ -42,7 +42,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // highlight-start
 import { crx } from '@crxjs/vite-plugin'
-import manifest from './manifest.json'
+import manifest from './manifest.json' assert { type: 'json' }
 // highlight-end
 
 export default defineConfig({
