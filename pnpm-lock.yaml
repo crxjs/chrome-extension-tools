@@ -167,7 +167,7 @@ importers:
       '@types/jest-image-snapshot': 4.3.1
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
-      '@types/react': 17.0.44
+      '@types/react': 17.0.48
       '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.27.1
       '@typescript-eslint/parser': 5.27.1
@@ -233,7 +233,7 @@ importers:
       '@types/jest-image-snapshot': 4.3.1
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
-      '@types/react': 17.0.44
+      '@types/react': 17.0.48
       '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.27.1_bnfefdnvqpcyokeggdz5sotnli
       '@typescript-eslint/parser': 5.27.1_pm7osnb22e4oktq33hptgspr5i
@@ -5466,7 +5466,7 @@ packages:
   /@types/react-dom/17.0.17:
     resolution: {integrity: sha512-VjnqEmqGnasQKV0CWLevqMTXBYG9GbwuE6x3VetERLh0cq2LTptFE73MrQi2S7GkKXCf2GgwItB/melLnxfnsg==}
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 17.0.48
     dev: true
 
   /@types/react-router-config/5.0.6:
@@ -5489,20 +5489,20 @@ packages:
       '@types/history': 4.7.11
       '@types/react': 17.0.45
 
-  /@types/react/17.0.44:
-    resolution: {integrity: sha512-Ye0nlw09GeMp2Suh8qoOv0odfgCoowfM/9MG6WeRD60Gq9wS90bdkdRtYbRkNhXOpG4H+YXGvj4wOWhAC0LJ1g==}
-    dependencies:
-      '@types/prop-types': 15.7.5
-      '@types/scheduler': 0.16.2
-      csstype: 3.0.11
-    dev: true
-
   /@types/react/17.0.45:
     resolution: {integrity: sha512-YfhQ22Lah2e3CHPsb93tRwIGNiSwkuz1/blk4e6QrWS0jQzCSNbGLtOEYhPg02W0yGTTmpajp7dCTbBAMN3qsg==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.0.11
+
+  /@types/react/17.0.48:
+    resolution: {integrity: sha512-zJ6IYlJ8cYYxiJfUaZOQee4lh99mFihBoqkOSEGV+dFi9leROW6+PgstzQ+w3gWTnUfskALtQPGHK6dYmPj+2A==}
+    dependencies:
+      '@types/prop-types': 15.7.5
+      '@types/scheduler': 0.16.2
+      csstype: 3.0.11
+    dev: true
 
   /@types/resolve/1.17.1:
     resolution: {integrity: sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==}
@@ -8736,6 +8736,7 @@ packages:
       esbuild: 0.14.38
       source-map-support: 0.5.19
       tslib: 2.3.1
+    dev: false
 
   /esbuild-runner/2.2.1_esbuild@0.14.43:
     resolution: {integrity: sha512-VP0VfJJZiZ3cKzdOH59ZceDxx/GzBKra7tiGM8MfFMLv6CR1/cpsvtQ3IsJI3pz7HyeYxtbPyecj3fHwR+3XcQ==}
