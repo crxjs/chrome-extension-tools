@@ -8,6 +8,7 @@ test.each`
   ${'http://b.com'}                | ${'http://b.com'}
   ${'https://a.com/*'}             | ${'https://a.com/*'}
   ${'https://a.com/subpath/* '}    | ${'https://a.com/*'}
+  ${'<all_urls>'}                  | ${'<all_urls>'}
 `(
   '$pattern -> $expected',
   ({ pattern, expected }: { pattern: string; expected: string }) => {
