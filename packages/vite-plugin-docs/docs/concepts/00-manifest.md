@@ -38,7 +38,7 @@ const [major, minor, patch, label = '0'] = version
   // split into version parts
   .split(/[.-]/)
 
-export default defineManifest(async (config, env) => ({
+export default defineManifest(async (env) => ({
   manifest_version: 3,
   name:
     env.mode === 'staging'
