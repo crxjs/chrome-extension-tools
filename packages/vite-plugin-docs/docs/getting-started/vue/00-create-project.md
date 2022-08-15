@@ -42,7 +42,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 // highlight-start
 import { crx } from '@crxjs/vite-plugin'
-import manifest from './manifest.json'
+import manifest from './manifest.json' // Node 14 & 16
+import manifest from './manifest.json' assert { type: 'json' } // Node >=17
 // highlight-end
 
 export default defineConfig({
