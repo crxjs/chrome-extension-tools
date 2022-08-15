@@ -197,7 +197,7 @@ importers:
       rollup: ^2.70.2
       rollup-plugin-dts: ^4.2.0
       rollup-plugin-esbuild: 4.9.1
-      rxjs: 7.5.5
+      rxjs: 7.5.6
       typescript: ^4.6.4
       vite: ^2.9.5
       vite-plugin-inspect: 0.5.0
@@ -249,7 +249,7 @@ importers:
       rimraf: 3.0.2
       rollup-plugin-dts: 4.2.1_pz6niy2zrvqhgxfup3pdyir4yu
       rollup-plugin-esbuild: 4.9.1_pdd2yz6f2woplgsidjr5hxogku
-      rxjs: 7.5.5
+      rxjs: 7.5.6
       typescript: 4.6.4
       vite: 2.9.9
       vite-plugin-inspect: 0.5.0_vite@2.9.9
@@ -8736,6 +8736,7 @@ packages:
       esbuild: 0.14.38
       source-map-support: 0.5.19
       tslib: 2.3.1
+    dev: false
 
   /esbuild-runner/2.2.1_esbuild@0.14.43:
     resolution: {integrity: sha512-VP0VfJJZiZ3cKzdOH59ZceDxx/GzBKra7tiGM8MfFMLv6CR1/cpsvtQ3IsJI3pz7HyeYxtbPyecj3fHwR+3XcQ==}
@@ -14884,6 +14885,12 @@ packages:
     resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
     dependencies:
       tslib: 2.4.0
+
+  /rxjs/7.5.6:
+    resolution: {integrity: sha512-dnyv2/YsXhnm461G+R/Pe5bWP41Nm6LBXEYWI6eiFP4fiwx6WRI/CD0zbdVAudd9xwLEF2IDcKXLHit0FYjUzw==}
+    dependencies:
+      tslib: 2.4.0
+    dev: true
 
   /sade/1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
