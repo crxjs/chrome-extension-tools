@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 1.0.14
+
+### Patch Changes
+
+- 01f8e37: Allow <all_urls> in content_scripts.matches section of manifest.json
+- a65fe1f: CRXJS isn't fully compatible with Vite 3
+
 ## 1.0.13
 
 ### Patch Changes
