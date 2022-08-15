@@ -57,7 +57,7 @@ importers:
       '@types/react-dom': ^17.0.3
       ajv: ^8.6.2
       array-flat-polyfill: ^1.0.1
-      cheerio: 1.0.0-rc.11
+      cheerio: 1.0.0-rc.12
       convert-source-map: ^1.7.0
       cosmiconfig: ^6.0.0
       esbuild: ^0.14.0
@@ -91,7 +91,7 @@ importers:
       '@types/lodash': 4.14.182
       ajv: 8.11.0
       array-flat-polyfill: 1.0.1
-      cheerio: 1.0.0-rc.11
+      cheerio: 1.0.0-rc.12
       convert-source-map: 1.8.0
       cosmiconfig: 6.0.0
       esbuild: 0.14.38
@@ -7147,6 +7147,19 @@ packages:
       tslib: 2.4.0
     dev: false
 
+  /cheerio/1.0.0-rc.12:
+    resolution: {integrity: sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==}
+    engines: {node: '>= 6'}
+    dependencies:
+      cheerio-select: 2.1.0
+      dom-serializer: 2.0.0
+      domhandler: 5.0.3
+      domutils: 3.0.1
+      htmlparser2: 8.0.1
+      parse5: 7.0.0
+      parse5-htmlparser2-tree-adapter: 7.0.0
+    dev: false
+
   /chokidar/3.5.3:
     resolution: {integrity: sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==}
     engines: {node: '>= 8.10.0'}
@@ -8736,6 +8749,7 @@ packages:
       esbuild: 0.14.38
       source-map-support: 0.5.19
       tslib: 2.3.1
+    dev: false
 
   /esbuild-runner/2.2.1_esbuild@0.14.43:
     resolution: {integrity: sha512-VP0VfJJZiZ3cKzdOH59ZceDxx/GzBKra7tiGM8MfFMLv6CR1/cpsvtQ3IsJI3pz7HyeYxtbPyecj3fHwR+3XcQ==}
