@@ -4,7 +4,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import _debug from 'debug'
 import fs from 'fs-extra'
 import jsesc from 'jsesc'
-import { posix as path } from 'path'
+import path from 'path'
 import { defineConfig, Plugin, rollup, RollupOptions } from 'rollup'
 import esbuild from 'rollup-plugin-esbuild'
 import dts from 'rollup-plugin-dts'
@@ -44,7 +44,9 @@ const bundleClientCode = (): Plugin => {
       if (id.includes('?client')) {
         const url = new URL(id, 'stub://stub')
         const filepath = url.pathname
-        const format = path.dirname(filepath).split('/').pop() as
+        const normalizedFilepath = path.normalize(filepath);
+        const dirname = path.dirname(normalizedFilepath);
+        const format = dirname.split(path.sep).pop() as
           | 'es'
           | 'iife'
           | 'html'
