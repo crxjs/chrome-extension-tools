@@ -45,7 +45,7 @@ Update `vite.config.js` to match the code below.
 
 ```js title=vite.config.js
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import solidPlugin from "vite-plugin-solid";
 // highlight-start
 import { crx } from '@crxjs/vite-plugin'
 import manifest from './manifest.json'
