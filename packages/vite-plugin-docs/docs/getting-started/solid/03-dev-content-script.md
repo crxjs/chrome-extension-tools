@@ -21,6 +21,21 @@ There's our familiar Vite-Solid Hello World!
 
 ## Leaking CSS styles
 
+Let's try to change the Learn Solid `<a>` link to a button.
+
+```css title="src/App.jsx"
+// highlight-next-line
+<button
+  class={styles.link}
+  href="https://github.com/solidjs/solid"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Learn Solid
+// highlight-next-line
+</button>
+```
+
 Notice how the counter button doesn't look like a button. That's because
 Google's styles affect our content script elements. The same goes the other way:
 our styles change Google's styles.
