@@ -34,7 +34,7 @@ inspect the popup to keep it open while making changes.
 
 That popup is pretty tiny; let's add some CSS to make it wider.
 
-```css title=App.css
+```css title=App.module.css
 .App {
   text-align: center;
   // highlight-next-line
