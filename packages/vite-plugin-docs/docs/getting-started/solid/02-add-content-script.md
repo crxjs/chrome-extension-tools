@@ -57,7 +57,7 @@ render(
 );
 ```
 
-Let's add that root element. Make a copy of `src/main.jsx` and name it
+Let's add that root element. Make a copy of `src/index.jsx` and name it
 `src/content.jsx`. Add the highlighted code.
 
 ```jsx title=src/content.jsx
