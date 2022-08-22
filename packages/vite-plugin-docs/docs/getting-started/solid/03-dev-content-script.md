@@ -36,7 +36,7 @@ Let's try to change the Learn Solid `<a>` link to a button.
 </button>
 ```
 
-Notice how the counter button doesn't look like a button. That's because
+Notice how our button doesn't look like a button. That's because
 Google's styles affect our content script elements. The same goes the other way:
 our styles change Google's styles.
 
