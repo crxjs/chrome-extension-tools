@@ -164,7 +164,7 @@ importers:
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest': 27.5.2
-      '@types/jest-image-snapshot': 4.3.1
+      '@types/jest-image-snapshot': 5.1.0
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
       '@types/react': 17.0.44
@@ -185,7 +185,7 @@ importers:
       fast-glob: ^3.2.11
       fs-extra: ^10.0.1
       jest: 27.5.1
-      jest-image-snapshot: 5.1.0
+      jest-image-snapshot: 5.2.0
       jsesc: ^3.0.2
       magic-string: ^0.26.0
       picocolors: ^1.0.0
@@ -230,7 +230,7 @@ importers:
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest': 27.5.2
-      '@types/jest-image-snapshot': 4.3.1
+      '@types/jest-image-snapshot': 5.1.0
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
       '@types/react': 17.0.44
@@ -242,7 +242,7 @@ importers:
       esbuild-runner: 2.2.1_esbuild@0.14.43
       eslint: 8.17.0
       jest: 27.5.1
-      jest-image-snapshot: 5.1.0_jest@27.5.1
+      jest-image-snapshot: 5.2.0_jest@27.5.1
       playwright-chromium: 1.21.1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -5326,8 +5326,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest-image-snapshot/4.3.1:
-    resolution: {integrity: sha512-WDdUruGF14C53axe/mNDgQP2YIhtcwXrwmmVP8eOGyfNTVD+FbxWjWR7RTU+lzEy4K6V6+z7nkVDm/auI/r3xQ==}
+  /@types/jest-image-snapshot/5.1.0:
+    resolution: {integrity: sha512-pfCz6dclA8mDxwXN/x/PuYBCPwzGuYcTfOVZvDAikC1GLXg/CwECF9UgtWse0tR42c6OaL7LPEnN7i/Dm86KkQ==}
     dependencies:
       '@types/jest': 27.5.2
       '@types/pixelmatch': 5.2.4
@@ -8736,6 +8736,7 @@ packages:
       esbuild: 0.14.38
       source-map-support: 0.5.19
       tslib: 2.3.1
+    dev: false
 
   /esbuild-runner/2.2.1_esbuild@0.14.43:
     resolution: {integrity: sha512-VP0VfJJZiZ3cKzdOH59ZceDxx/GzBKra7tiGM8MfFMLv6CR1/cpsvtQ3IsJI3pz7HyeYxtbPyecj3fHwR+3XcQ==}
@@ -11067,8 +11068,8 @@ packages:
       open: 8.4.0
     dev: true
 
-  /jest-image-snapshot/5.1.0_jest@27.5.1:
-    resolution: {integrity: sha512-GpTaiJehsVeMRvszSuMkRK0ODSHxr31zalk3qoHVqHKGztgYlJ+Y6AheWHU6azODuoVpMQH52zY/sxri9d/GaA==}
+  /jest-image-snapshot/5.2.0_jest@27.5.1:
+    resolution: {integrity: sha512-msKQqsxr4ZS8S3FQ6ot1SPlDKc4pCfyKY3SxU9LEoASj1zoEfglDYjmxNX53pxpNf7Fp7CJZvwP4xkNXVQgEXA==}
     engines: {node: ^12.13.0 || ^14.15.0 || ^16.10.0 || >=17.0.0}
     peerDependencies:
       jest: '>=20 <=28'
@@ -14221,6 +14222,12 @@ packages:
   /react-dev-utils/12.0.1_gp3atwgq76mgimstdygasg64n4:
     resolution: {integrity: sha512-84Ivxmr17KjUupyqzFode6xKhjwuEJDROWKJy/BthkL7Wn6NJ8h4WE6k/exAv6ImS+0oZLRRW5j/aINMHyeGeQ==}
     engines: {node: '>=14'}
+    peerDependencies:
+      typescript: '>=2.7'
+      webpack: '>=4'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     dependencies:
       '@babel/code-frame': 7.16.7
       address: 1.2.0
@@ -14246,12 +14253,12 @@ packages:
       shell-quote: 1.7.3
       strip-ansi: 6.0.1
       text-table: 0.2.0
+      typescript: 4.6.4
+      webpack: 5.72.1
     transitivePeerDependencies:
       - eslint
       - supports-color
-      - typescript
       - vue-template-compiler
-      - webpack
     dev: false
 
   /react-dom/17.0.2_react@17.0.2:
@@ -16096,6 +16103,7 @@ packages:
   /unified/8.4.2:
     resolution: {integrity: sha512-JCrmN13jI4+h9UAyKEoGcDZV+i1E7BLFuG7OsaDvTXI5P0qhHX+vZO/kOhz9jn8HGENDKbwSeB0nVOg4gVStGA==}
     dependencies:
+      '@types/unist': 2.0.6
       bail: 1.0.5
       extend: 3.0.2
       is-plain-obj: 2.1.0
@@ -16106,6 +16114,7 @@ packages:
   /unified/9.2.0:
     resolution: {integrity: sha512-vx2Z0vY+a3YoTj8+pttM3tiJHCwY5UFbYdiWrwBEbHmK8pvsPj2rtAX2BFfgXen8T39CJWblWRDT4L5WGXtDdg==}
     dependencies:
+      '@types/unist': 2.0.6
       bail: 1.0.5
       extend: 3.0.2
       is-buffer: 2.0.5
