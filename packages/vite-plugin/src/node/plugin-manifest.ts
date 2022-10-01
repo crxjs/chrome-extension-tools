@@ -1,5 +1,6 @@
 import { existsSync } from 'fs'
 import { promises as fs } from 'fs'
+import { resolve } from 'path/posix'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
@@ -185,7 +186,7 @@ export const pluginManifest =
                 const refJS = js.map((file) =>
                   this.emitFile({
                     type: 'chunk',
-                    id: file,
+                    id: resolve(config.root, file),
                     name: basename(file),
                   }),
                 )
@@ -201,7 +202,7 @@ export const pluginManifest =
               const file = manifest.background.service_worker
               const refId = this.emitFile({
                 type: 'chunk',
-                id: file,
+                id: resolve(config.root, file),
                 name: basename(file),
               })
               manifest.background.service_worker = refId
@@ -210,7 +211,7 @@ export const pluginManifest =
             for (const file of htmlFiles(manifest)) {
               this.emitFile({
                 type: 'chunk',
-                id: file,
+                id: resolve(config.root, file),
                 name: basename(file),
               })
             }
