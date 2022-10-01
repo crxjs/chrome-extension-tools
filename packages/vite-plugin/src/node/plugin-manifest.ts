@@ -186,11 +186,7 @@ export const pluginManifest =
                 const refJS = js.map((file) =>
                   this.emitFile({
                     type: 'chunk',
-<<<<<<< HEAD
-                    id: `${config.root}/${file}`,
-=======
                     id: resolve(config.root, file),
->>>>>>> a22884002792095faef19f1f22d119f64621b2aa
                     name: basename(file),
                   }),
                 )
