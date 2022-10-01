@@ -201,11 +201,7 @@ export const pluginManifest =
               const file = manifest.background.service_worker
               const refId = this.emitFile({
                 type: 'chunk',
-<<<<<<< HEAD
-                id: `${config.root}/${file}`,
-=======
                 id: resolve(config.root, file),
->>>>>>> a22884002792095faef19f1f22d119f64621b2aa
                 name: basename(file),
               })
               manifest.background.service_worker = refId
@@ -214,11 +210,7 @@ export const pluginManifest =
             for (const file of htmlFiles(manifest)) {
               this.emitFile({
                 type: 'chunk',
-<<<<<<< HEAD
-                id: `${config.root}/${file}`,
-=======
                 id: resolve(config.root, file),
->>>>>>> a22884002792095faef19f1f22d119f64621b2aa
                 name: basename(file),
               })
             }
