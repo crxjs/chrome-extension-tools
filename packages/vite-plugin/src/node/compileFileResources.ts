@@ -22,7 +22,11 @@ export function compileFileResources(
 ): FileResources {
   const chunk = chunks.get(fileName)
   if (chunk) {
-    const { modules, facadeModuleId } = chunk
+    const { modules, facadeModuleId, imports, dynamicImports } = chunk
+    for (const x of imports) resources.imports.add(x)
+    for (const x of dynamicImports) resources.imports.add(x)
+    for (const x of [...imports, ...dynamicImports])
+      compileFileResources(x, { chunks, files }, resources)
     for (const m of Object.keys(modules))
       if (m !== facadeModuleId) {
         const script = contentScripts.get(m)
@@ -37,13 +41,9 @@ export function compileFileResources(
   }
   const file = files.get(fileName)
   if (file) {
-    const { assets = [], css = [], imports = [], dynamicImports = [] } = file
+    const { assets = [], css = [] } = file
     for (const x of assets) resources.assets.add(x)
     for (const x of css) resources.css.add(x)
-    for (const x of imports) resources.imports.add(x)
-    for (const x of dynamicImports) resources.imports.add(x)
-    for (const x of [...imports, ...dynamicImports])
-      compileFileResources(x, { chunks, files }, resources)
   }
   return resources
 }

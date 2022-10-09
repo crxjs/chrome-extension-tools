@@ -2,6 +2,7 @@ import { OutputChunk } from 'rollup'
 import { Manifest as ViteManifest } from 'vite'
 import { compileFileResources } from './compileFileResources'
 import { contentScripts } from './contentScripts'
+import { DYNAMIC_RESOURCE } from './defineManifest'
 import {
   getMatchPatternOrigin,
   isResourceByMatch,
@@ -32,7 +33,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
         // remove dynamic resources placeholder
         manifest.web_accessible_resources = manifest.web_accessible_resources
           .map(({ resources, ...rest }) => ({
-            resources: resources.filter((r) => r !== '<dynamic_resource>'),
+            resources: resources.filter((r) => r !== DYNAMIC_RESOURCE),
             ...rest,
           }))
           .filter(({ resources }) => resources.length)
@@ -60,10 +61,10 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
       renderCrxManifest(manifest, bundle) {
         const { web_accessible_resources: _war = [] } = manifest
         const dynamicScriptMatches = new Set<string>()
-        let dynamicScriptDynamicUrl = true
+        let dynamicScriptDynamicUrl = false
         const web_accessible_resources: typeof _war = []
         for (const r of _war) {
-          const i = r.resources.indexOf('<dynamic_script>')
+          const i = r.resources.indexOf(DYNAMIC_RESOURCE)
           if (i > -1 && isResourceByMatch(r)) {
             r.resources = r.resources.slice(i, 1)
             for (const p of r.matches) dynamicScriptMatches.add(p)
