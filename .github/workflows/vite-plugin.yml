@@ -115,7 +115,7 @@ jobs:
       - name: Run e2e tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: pnpm test:ci:e2e
+          run: pnpm test:run:e2e
           working-directory: "packages/vite-plugin"
 
       - uses: actions/upload-artifact@v3
@@ -168,7 +168,7 @@ jobs:
         run: pnpm i
 
       - name: Run unit and output tests
-        run: pnpm test:ci:unit
+        run: pnpm test:run:unit
 
       - name: Check for diff
         id: diff
