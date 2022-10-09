@@ -220,7 +220,11 @@ export const pluginManifest =
               ({ js = [], ...rest }) => {
                 const loaders = js.map(
                   // add is sync, rollup is unconcerned with file write status
-                  (f) => add({ viteUrl: `/${f}`, type: 'loader' }).fileName,
+                  (f) =>
+                    add({ viteUrl: `/${f}`, type: 'loader' }).fileName.replace(
+                      /^\//,
+                      '',
+                    ),
                 )
 
                 return { js: loaders, ...rest }
