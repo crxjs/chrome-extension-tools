@@ -9,7 +9,7 @@ import {
 import { add } from './fileWriter'
 import { getFileName } from './fileWriter-utilities'
 import { basename } from './path'
-import { isChangeType } from './RxMap'
+import { RxMap } from './RxMap'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
 
@@ -87,7 +87,7 @@ export const pluginContentScripts: CrxPluginFn = (options) => {
         // emit content scripts and loaders
         sub.add(
           contentScripts.change$
-            .pipe(filter(isChangeType.set))
+            .pipe(filter(RxMap.isChangeType.set))
             .subscribe(({ value: script }) => {
               const { type, id } = script
               if (type === 'loader') {

@@ -2,7 +2,7 @@ import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
 import contentProLoader from 'client/iife/content-pro-loader.ts?client'
 import { filter } from 'rxjs'
 import { hash } from './helpers'
-import { isChangeType, RxMap } from './RxMap'
+import { RxMap } from './RxMap'
 
 export interface ContentScript {
   type: 'module' | 'iife' | 'loader'
@@ -32,25 +32,15 @@ export interface ContentScript {
 export const contentScripts = new RxMap<string, ContentScript>()
 // sync subscriptions to change$ run before RxMap#set returns.
 contentScripts.change$
-  .pipe(filter(isChangeType.set))
+  .pipe(filter(RxMap.isChangeType.set))
   .subscribe(({ map, value }) => {
-    if (typeof value.refId === 'string')
-      if (typeof map.get(value.refId) === 'undefined') {
-        map.set(value.refId, value)
-      }
-
-    if (typeof map.get(value.id) === 'undefined') {
-      map.set(value.id, value)
+    const keyNames = ['refId', 'id', 'fileName', 'loaderName'] as const
+    for (const keyName of keyNames) {
+      const key = value[keyName]
+      // avoid runaway recursion
+      if (typeof key === 'undefined' || map.has(key)) continue
+      else map.set(key, value)
     }
-
-    if (typeof value.fileName === 'string')
-      if (typeof map.get(value.fileName) === 'undefined') {
-        map.set(value.fileName, value)
-      }
-    if (typeof value.loaderName === 'string')
-      if (typeof map.get(value.loaderName) === 'undefined') {
-        map.set(value.loaderName, value)
-      }
   })
 
 /** Generates a hash of the script type and id */

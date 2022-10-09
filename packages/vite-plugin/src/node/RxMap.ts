@@ -17,19 +17,19 @@ export type RxMapChange<K, V> =
       map: RxMap<K, V>
     }
 
-export const isChangeType = {
-  clear: <K, V>(
-    x: RxMapChange<K, V>,
-  ): x is Extract<typeof x, { type: 'clear' }> => x.type === 'clear',
-  delete: <K, V>(
-    x: RxMapChange<K, V>,
-  ): x is Extract<typeof x, { type: 'delete' }> => x.type === 'delete',
-  set: <K, V>(x: RxMapChange<K, V>): x is Extract<typeof x, { type: 'set' }> =>
-    x.type === 'set',
-}
-
 /** Decorated Map with Observable of change events. */
 export class RxMap<K, V> extends Map<K, V> {
+  static isChangeType = {
+    clear: <K, V>(
+      x: RxMapChange<K, V>,
+    ): x is Extract<typeof x, { type: 'clear' }> => x.type === 'clear',
+    delete: <K, V>(
+      x: RxMapChange<K, V>,
+    ): x is Extract<typeof x, { type: 'delete' }> => x.type === 'delete',
+    set: <K, V>(
+      x: RxMapChange<K, V>,
+    ): x is Extract<typeof x, { type: 'set' }> => x.type === 'set',
+  }
   change$: Observable<RxMapChange<K, V>>
   constructor(iterable?: Iterable<readonly [K, V]> | null | undefined) {
     super(iterable)
