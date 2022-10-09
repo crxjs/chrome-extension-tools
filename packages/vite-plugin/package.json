@@ -54,7 +54,7 @@
     "test": "vitest --mode unit",
     "test:e2e": "vitest --mode e2e",
     "test:ci": "run-s test:ci:*",
-    "test:ci:unit": "vitest --run",
+    "test:ci:unit": "vitest --run --mode unit",
     "test:ci:e2e": "vitest --run --mode e2e"
   },
   "dependencies": {

@@ -64,7 +64,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --filter "vite-plugin"
 
       - name: Lint files
         run: pnpm lint
