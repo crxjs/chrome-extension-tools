@@ -46,8 +46,11 @@ contentScripts.change$
     for (const keyName of keyNames) {
       const key = value[keyName]
       // avoid runaway recursion
-      if (typeof key === 'undefined' || map.has(key)) continue
-      else map.set(key, value)
+      if (typeof key === 'undefined' || map.has(key)) {
+        continue
+      } else {
+        map.set(key, value)
+      }
     }
   })
 
