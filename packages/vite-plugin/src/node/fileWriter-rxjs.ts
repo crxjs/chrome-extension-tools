@@ -74,7 +74,7 @@ export const allFilesReady$ = buildEnd$.pipe(
   switchMap((files) => Promise.allSettled(files.map(({ file }) => file))),
 )
 
-const isRejected = <T>(
+export const isRejected = <T>(
   x: PromiseSettledResult<T> | undefined,
 ): x is PromiseRejectedResult => x?.status === 'rejected'
 export const fileWriterError$: Observable<ErrorPayload> = allFilesReady$.pipe(

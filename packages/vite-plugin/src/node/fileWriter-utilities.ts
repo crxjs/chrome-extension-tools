@@ -1,7 +1,7 @@
 import { firstValueFrom } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
-import { allFilesReady$ } from './fileWriter-rxjs'
+import { allFilesReady$, isRejected } from './fileWriter-rxjs'
 import { _debug } from './helpers'
 import { isAbsolute, join } from './path'
 import { CrxDevAssetId, CrxDevScriptId } from './types'
@@ -134,6 +134,14 @@ export async function fileReady(script: FileWriterId): Promise<void> {
 
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesReady(): Promise<void> {
-  await firstValueFrom(allFilesReady$)
-  debug('allFilesReady')
+  const result = await firstValueFrom(allFilesReady$)
+  debug('allFilesReady %O', result)
+}
+
+/** Resolves when all existing files in scriptFiles are written. */
+export async function allFilesSuccess(): Promise<void> {
+  const result = await firstValueFrom(allFilesReady$)
+  let reason = result.find(isRejected)?.reason
+  if (!(reason instanceof Error)) reason = new Error(reason.toString())
+  if (reason) throw reason
 }
