@@ -42,7 +42,9 @@ export async function testOutput(
 
   const files = await fg(`**/*`, { cwd: outDir })
 
-  expect(files.sort()).toMatchSnapshot('_01 output files')
+  expect(
+    files.map((f) => f.replace(/v--([a-z0-9]+)/, 'v--hash')).sort(),
+  ).toMatchSnapshot('_01 output files')
 
   const rootRegex = new RegExp(jsesc(config.root), 'g')
   for (const file of files) {
