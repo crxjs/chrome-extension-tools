@@ -1,23 +1,29 @@
 import fg from 'fast-glob'
 import fs from 'fs-extra'
 import jsesc from 'jsesc'
-import { _debug } from 'src/helpers'
-import { manifestFiles } from 'src/files'
-import { ManifestV3 } from 'src/manifest'
 import { join } from 'path/posix'
-import { ResolvedConfig } from 'vite'
-import { defaultTest, isTextFile } from './runners'
+import { manifestFiles } from 'src/files'
+import { allFileWriterErrors } from 'src/fileWriter-rxjs'
+import { _debug } from 'src/helpers'
+import { ManifestV3 } from 'src/manifest'
 import { expect } from 'vitest'
+import { BuildTestResult, defaultTest, isTextFile, ServeTestResult } from './runners'
 
 export async function testOutput(
-  { outDir, config }: { outDir: string; config: ResolvedConfig },
+  testResult: BuildTestResult | ServeTestResult,
   tests: Map<
     string | RegExp,
     (source: string, name: string) => void
   > = new Map(),
 ) {
+  const { outDir, config } = testResult
   const debug = _debug('test:output')
   debug('start %s', outDir)
+
+  if (testResult.command === 'serve') {
+    testResult.server.close()
+    expect(await allFileWriterErrors).toEqual([])
+  }
 
   const getTest = (x: string, d = defaultTest): typeof defaultTest => {
     const t = [...tests].find(([k]) =>
@@ -68,14 +74,14 @@ export async function testOutput(
       let source = scrubHashes(
         await fs.readFile(filename, { encoding: 'utf8' }),
       )
-      
+
       if (config?.command === 'serve') {
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
           .replace(rootRegex, '<root>')
       }
-      
+
       const scrubbed = scrubHashes(file)
       getTest(scrubbed)(source, scrubbed)
     }

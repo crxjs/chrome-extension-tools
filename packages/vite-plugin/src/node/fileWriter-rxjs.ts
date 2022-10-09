@@ -3,6 +3,8 @@ import { readFile } from 'fs-extra'
 import MagicString from 'magic-string'
 import {
   filter,
+  first,
+  firstValueFrom,
   map,
   mergeMap,
   Observable,
@@ -11,6 +13,8 @@ import {
   retry,
   startWith,
   switchMap,
+  takeUntil,
+  toArray,
 } from 'rxjs'
 import { ErrorPayload, ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
@@ -74,9 +78,14 @@ const isRejected = <T>(
   x: PromiseSettledResult<T> | undefined,
 ): x is PromiseRejectedResult => x?.status === 'rejected'
 export const fileWriterError$: Observable<ErrorPayload> = allFilesReady$.pipe(
-  map((results) => results.find(isRejected)),
-  filter(isRejected),
+  mergeMap((results) => results.filter(isRejected)),
   map((rejected): ErrorPayload => ({ err: rejected.reason, type: 'error' })),
+)
+export const allFileWriterErrors = firstValueFrom(
+  fileWriterError$.pipe(
+    takeUntil(serverEvent$.pipe(first(({ type }) => type === 'close'))),
+    toArray(),
+  ),
 )
 
 /* ------------------- WRITE OPS ------------------- */

@@ -1,5 +1,6 @@
 import fs from 'fs-extra'
 import { join } from 'path/posix'
+import { RollupOutput } from 'rollup'
 import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
 import type { CrxPlugin } from 'src/types'
@@ -8,11 +9,28 @@ import {
   createServer,
   InlineConfig,
   ResolvedConfig,
+  ViteDevServer,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
 import { expect, vi } from 'vitest'
 
-export async function build(dirname: string, configFile = 'vite.config.ts') {
+export interface BuildTestResult {
+  command: 'build'
+  config: ResolvedConfig
+  output: RollupOutput
+  outDir: string
+}
+export interface ServeTestResult {
+  command: 'serve',
+  config: ResolvedConfig
+  server: ViteDevServer
+  outDir: string
+}
+
+export async function build(
+  dirname: string,
+  configFile = 'vite.config.ts',
+): Promise<BuildTestResult> {
   const date = new Date('2022-01-26T00:00:00.000Z')
   vi.setSystemTime(date)
 
@@ -60,10 +78,12 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
     throw new TypeError('received outputarray from vite build')
   if ('close' in output) throw new TypeError('recieved watcher from vite build')
 
-  return { outDir, output, config: config! }
+  return { command: 'build', outDir, output, config: config! }
 }
 
-export async function serve(dirname: string) {
+export async function serve(
+  dirname: string,
+): Promise<ServeTestResult> {
   const date = new Date('2022-01-26T00:00:00.000Z')
   vi.setSystemTime(date)
 
@@ -110,7 +130,7 @@ export async function serve(dirname: string) {
   await allFilesReady()
   debug('bundle end')
 
-  return { outDir, server, config: server.config }
+  return { command: 'serve', outDir, server, config: server.config }
 }
 
 export const isTextFile = (x: string) =>
