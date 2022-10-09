@@ -42,6 +42,7 @@
     "client.d.ts"
   ],
   "scripts": {
+    "format": "prettier -w -c ../../.prettierrc.yaml",
     "build": "run-s build:clean build:js",
     "build:clean": "rimraf dist",
     "build:js": "rollup -c rollup.config.ts --configPlugin esbuild",
@@ -50,15 +51,11 @@
     "lint": "run-s lint:eslint lint:types",
     "lint:eslint": "eslint \"{src,test}/**/*.ts\"",
     "lint:types": "tsc --noEmit",
-    "test": "run-s test:units test:update:*",
-    "test:ci:e2e:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) -t build",
-    "test:ci:e2e:serve": "npm run test:ci:e2e:serve:cmd || npm run test:ci:e2e:serve:cmd",
-    "test:ci:e2e:serve:cmd": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\) -t serve",
-    "test:ci:mv3:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) --updateSnapshot build",
-    "test:ci:mv3:serve": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) --updateSnapshot serve",
-    "test:units": "jest src",
-    "test:update:build": "jest build -u",
-    "test:update:serve": "jest serve -u"
+    "test": "vitest --mode unit",
+    "test:e2e": "vitest --mode e2e",
+    "test:ci": "run-s test:ci:*",
+    "test:ci:unit": "vitest --run --mode unit",
+    "test:ci:e2e": "vitest --run --mode e2e"
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.2",
@@ -74,7 +71,7 @@
     "magic-string": "^0.26.0",
     "picocolors": "^1.0.0",
     "react-refresh": "^0.13.0",
-    "rollup": "^2.70.2"
+    "rollup": "2.78.1"
   },
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
@@ -86,21 +83,22 @@
     "@types/chrome": "0.0.190",
     "@types/debug": "4.1.7",
     "@types/fs-extra": "9.0.13",
-    "@types/jest": "27.5.2",
-    "@types/jest-image-snapshot": "4.3.1",
+    "@types/jest-image-snapshot": "^5.1.0",
     "@types/jsesc": "3.0.1",
     "@types/node": "17.0.18",
     "@types/react": "17.0.44",
     "@types/react-dom": "17.0.17",
     "@typescript-eslint/eslint-plugin": "5.27.1",
     "@typescript-eslint/parser": "5.27.1",
-    "@vitejs/plugin-react": "1.3.2",
-    "@vitejs/plugin-vue": "2.3.3",
+    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-vue": "3.1.0",
+    "chokidar": "^3.5.3",
     "esbuild": "0.14.43",
     "esbuild-runner": "2.2.1",
     "eslint": "8.17.0",
-    "jest": "27.5.1",
-    "jest-image-snapshot": "5.1.0",
+    "eslint-plugin-react": "^7.29.4",
+    "jest-image-snapshot": "^5.2.0",
+    "npm-run-all": "^4.1.5",
     "playwright-chromium": "1.21.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -109,15 +107,13 @@
     "rollup-plugin-esbuild": "4.9.1",
     "rxjs": "7.5.5",
     "typescript": "^4.6.4",
-    "vite": "^2.9.5",
-    "vite-plugin-inspect": "0.5.0",
+    "vite": "^3.1.3",
+    "vite-plugin-inspect": "0.7.2",
+    "vitest": "^0.23.4",
     "vue": "3.2.36"
   },
   "peerDependencies": {
-    "vite": "^2.9.0"
-  },
-  "optionalDependencies": {
-    "@vitejs/plugin-react": ">=1.2.0"
+    "vite": "^2.9.0 <= ^3.1.3"
   },
   "engines": {
     "node": ">=14"

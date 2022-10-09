@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`build fs output: _00 manifest.json 1`] = `
+exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -8,7 +8,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.tsx.hash.hash.js",
+        "assets/content.tsx-loader.hash0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -24,9 +24,9 @@ Object {
         "http://*/*",
       ],
       "resources": Array [
-        "assets/App.hash.js",
-        "assets/content.tsx.hash.js",
-        "assets/vendor.hash.js",
+        "assets/App.hash1.js",
+        "assets/content.tsx.hash2.js",
+        "assets/vendor.hash3.js",
       ],
       "use_dynamic_url": true,
     },
@@ -34,20 +34,20 @@ Object {
 }
 `;
 
-exports[`build fs output: _01 output files 1`] = `
+exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/App.hash.js",
-  "assets/content-script-loader.content.tsx.hash.hash.js",
-  "assets/content.tsx.hash.js",
-  "assets/popup.html.hash.js",
-  "assets/vendor.hash.js",
+  "assets/App.hash1.js",
+  "assets/content.tsx-loader.hash0.js",
+  "assets/content.tsx.hash2.js",
+  "assets/popup.html.hash4.js",
+  "assets/vendor.hash3.js",
   "manifest.json",
   "src/popup.html",
 ]
 `;
 
-exports[`build fs output: assets/App.hash.js 1`] = `
-"import { j as jsxRuntime } from \\"./vendor.hash.js\\";
+exports[`build fs output > assets/App.hash1.js 1`] = `
+"import { j as jsxRuntime } from \\"./vendor.hash3.js\\";
 const jsx = jsxRuntime.exports.jsx;
 const jsxs = jsxRuntime.exports.jsxs;
 const App = () => {
@@ -59,13 +59,16 @@ const App = () => {
     })]
   });
 };
-export { App as A, jsx as j };
+export {
+  App as A,
+  jsx as j
+};
 "
 `;
 
-exports[`build fs output: assets/content.tsx.hash.js 1`] = `
-"import { r as reactDom } from \\"./vendor.hash.js\\";
-import { j as jsx, A as App } from \\"./App.hash.js\\";
+exports[`build fs output > assets/content.tsx.hash2.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash3.js\\";
+import { j as jsx, A as App } from \\"./App.hash1.js\\";
 console.log(\\"content script\\");
 const root = document.createElement(\\"div\\");
 root.id = \\"root\\";
@@ -74,14 +77,14 @@ reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content.tsx.hash.hash.js 1`] = `
+exports[`build fs output > assets/content.tsx-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.tsx.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content.tsx.hash2.js\\")
     );
   })().catch(console.error);
 
@@ -89,10 +92,10 @@ exports[`build fs output: assets/content-script-loader.content.tsx.hash.hash.js 
 "
 `;
 
-exports[`build fs output: assets/popup.html.hash.js 1`] = `
-"import { r as reactDom } from \\"./vendor.hash.js\\";
-import { j as jsx, A as App } from \\"./App.hash.js\\";
-const p = function polyfill() {
+exports[`build fs output > assets/popup.html.hash4.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash3.js\\";
+import { j as jsx, A as App } from \\"./App.hash1.js\\";
+(function polyfill() {
   const relList = document.createElement(\\"link\\").relList;
   if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
     return;
@@ -132,24 +135,23 @@ const p = function polyfill() {
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
-};
-p();
+})();
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
 reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
 "
 `;
 
-exports[`build fs output: src/popup.html 1`] = `
+exports[`build fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <meta charset=\\"UTF-8\\" />
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
-    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">
-    <link rel=\\"modulepreload\\" href=\\"/assets/App.hash.js\\">
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash4.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/App.hash1.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>

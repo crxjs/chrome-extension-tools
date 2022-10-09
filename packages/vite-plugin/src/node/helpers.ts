@@ -1,8 +1,7 @@
 import { simple } from 'acorn-walk'
 import { createHash as _hash } from 'crypto'
 import debug from 'debug'
-import fg from 'fast-glob'
-import { AcornNode, PluginContext } from 'rollup'
+import { AcornNode, OutputBundle, PluginContext } from 'rollup'
 import v8 from 'v8'
 import type {
   ManifestV3,
@@ -14,7 +13,6 @@ import type {
   AcornLiteral,
   AcornMemberExpression,
   AcornTemplateElement,
-  ManifestFiles,
 } from './types'
 
 export const _debug = (id: string) => debug('crx').extend(id)
@@ -23,7 +21,7 @@ export const structuredClone = <T>(obj: T): T => {
   return v8.deserialize(v8.serialize(obj))
 }
 
-export const createHash = (data: string, length = 5): string =>
+export const hash = (data: string, length = 5): string =>
   _hash('sha1')
     .update(data)
     .digest('base64')
@@ -45,76 +43,10 @@ export function isObject<T>(
   return Object.prototype.toString.call(value) === '[object Object]'
 }
 
+/** Is web accessible resource with match pattern array */
 export const isResourceByMatch = (
   x: WebAccessibleResourceById | WebAccessibleResourceByMatch,
 ): x is WebAccessibleResourceByMatch => 'matches' in x
-
-export async function manifestFiles(
-  manifest: ManifestV3,
-  options: fg.Options = {},
-): Promise<ManifestFiles> {
-  // JSON
-  let locales: string[] = []
-  if (manifest.default_locale)
-    locales = await fg('_locales/**/messages.json', options)
-
-  const rulesets =
-    manifest.declarative_net_request?.rule_resources.flatMap(
-      ({ path }) => path,
-    ) ?? []
-
-  const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
-  const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
-  const serviceWorker = manifest.background?.service_worker
-  const htmlPages = htmlFiles(manifest)
-
-  const icons = [
-    Object.values(isString(manifest.icons) ? [manifest.icons] : manifest.icons ?? {}) as string[],
-    Object.values(isString(manifest.action?.default_icon) ? [manifest.action?.default_icon] : manifest.action?.default_icon ?? {}) as string[],
-  ].flat()
-
-  let webAccessibleResources: string[] = []
-  if (manifest.web_accessible_resources) {
-    const resources = await Promise.all(
-      manifest.web_accessible_resources
-        .flatMap(({ resources }) => resources!)
-        .map(async (r) => {
-          // don't copy node_modules, etc
-          if (['*', '**/*'].includes(r)) return undefined
-          if (fg.isDynamicPattern(r)) return fg(r, options)
-          return r
-        }),
-    )
-    webAccessibleResources = resources.flat().filter(isString)
-  }
-
-  return {
-    contentScripts: [...new Set(contentScripts)].filter(isString),
-    contentStyles: [...new Set(contentStyles)].filter(isString),
-    html: htmlPages,
-    icons: [...new Set(icons)].filter(isString),
-    locales: [...new Set(locales)].filter(isString),
-    rulesets: [...new Set(rulesets)].filter(isString),
-    background: [serviceWorker].filter(isString),
-    webAccessibleResources,
-  }
-}
-
-export function htmlFiles(manifest: ManifestV3): string[] {
-  const files = [
-    manifest.action?.default_popup,
-    Object.values(manifest.chrome_url_overrides ?? {}),
-    manifest.devtools_page,
-    manifest.options_page,
-    manifest.options_ui?.page,
-    manifest.sandbox?.pages,
-  ]
-    .flat()
-    .filter(isString)
-    .map((s) => s.split('#')[0])
-    .sort()
-  return [...new Set(files)]
-}
 
 export function isMemberExpression(n: AcornNode): n is AcornMemberExpression {
   return n.type === 'MemberExpression'
@@ -157,18 +89,29 @@ export function encodeManifest(manifest: ManifestV3): string {
   return `export default ${json}`
 }
 
+export function parseJsonAsset<T>(bundle: OutputBundle, key: string): T {
+  const asset = bundle[key]
+
+  if (typeof asset === 'undefined')
+    throw new TypeError(`OutputBundle["${key}"] is undefined.`)
+  if (asset.type !== 'asset')
+    throw new Error(`OutputBundle["${key}"] is not an OutputAsset.`)
+  if (typeof asset.source !== 'string')
+    throw new TypeError(`OutputBundle["${key}"].source is not a string.`)
+
+  return JSON.parse(asset.source)
+}
+
 /**
  * [Strip paths for `web_accessible_resources`'s `matches` · Issue
  * #282](https://github.com/crxjs/chrome-extension-tools/issues/282)
  */
-export const stubMatchPattern = (pattern: string): string => {
+export const getMatchPatternOrigin = (pattern: string): string => {
   /**
-   * Allow <all_urls> in matches section. 
-   * [Issue #459](https://github.com/crxjs/chrome-extension-tools/issues/459)
+   * Allow <all_urls> in matches section. [Issue
+   * #459](https://github.com/crxjs/chrome-extension-tools/issues/459)
    */
-  if (pattern === "<all_urls>") {
-    return pattern;
-  }
+  if (pattern.startsWith('<')) return pattern
   const [schema, rest] = pattern.split('://')
   const [origin, pathname] = rest.split('/')
   const root = `${schema}://${origin}`

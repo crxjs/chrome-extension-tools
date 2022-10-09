@@ -1,6 +1,6 @@
-import contentHmrPort from 'client/es/hmr-content-port.ts?client'
-import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
-import contentProLoader from 'client/iife/content-pro-loader.ts?client'
+import contentHmrPort from 'client/es/hmr-content-port.ts'
+import contentDevLoader from 'client/iife/content-dev-loader.ts'
+import contentProLoader from 'client/iife/content-pro-loader.ts'
 import injector from 'connect-injector'
 import { createHash } from 'crypto'
 import MagicString from 'magic-string'
@@ -9,18 +9,18 @@ import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
 import {
   isResourceByMatch,
   isString,
-  stubMatchPattern,
+  getMatchPatternOrigin,
   _debug,
-} from './helpers'
+} from '../helpers'
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
-} from './manifest'
-import { parse } from './path'
-import { filesReady, rebuildFiles } from './plugin-fileWriter--events'
-import { crxRuntimeReload } from './plugin-hmr'
-import { CrxPluginFn } from './types'
-import { contentHmrPortId, preambleId } from './virtualFileIds'
+} from '../manifest'
+import { parse } from '../path'
+import { filesReady } from '../fileWriter'
+import { crxRuntimeReload } from '../plugin-hmr'
+import { CrxPluginFn } from '../types'
+import { contentHmrPortId, preambleId } from '../virtualFileIds'
 
 interface Resources {
   assets: Set<string>
@@ -77,7 +77,7 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  * to all urls. This is secure enough for our purposes b/c the CRX origin is
  * changed randomly each runtime reload.
  */
-export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
+export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
   const { hmrTimeout = 5000, injectCss = true } = contentScripts
   const dynamicScriptsById = new Map<string, DynamicScriptData>()
   const dynamicScriptsByLoaderRefId = new Map<string, DynamicScriptData>()
@@ -171,11 +171,10 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       name: 'crx:content-scripts-pre',
       apply: 'build',
       enforce: 'pre',
-      async fileWriterStart(_server) {
+      async configureServer(_server) {
         server = _server
         port = server.config.server.port!.toString()
         if (
-          process.env.NODE_ENV !== 'test' &&
           typeof preambleCode === 'undefined' &&
           server.config.plugins.some(({ name }) =>
             name.toLowerCase().includes('react'),
@@ -360,7 +359,7 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
                     ({ data }) => !(data.loaderName ?? data.fileName),
                   )
                 ) {
-                  await rebuildFiles()
+                  // await rebuildFiles()
                   // new content scripts require a runtime reload
                   server.ws.send(crxRuntimeReload)
                 }
@@ -385,7 +384,7 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
       },
     },
     {
-      name: 'crx:content-script-resources',
+      name: 'crx:∏content-script-resources',
       apply: 'build',
       enforce: 'post',
       config({ build, ...config }, { command }) {
@@ -528,7 +527,9 @@ export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
 
                     if (resource.resources.length) {
                       // chromium only uses origin of match pattern
-                      resource.matches = resource.matches.map(stubMatchPattern)
+                      resource.matches = resource.matches.map(
+                        getMatchPatternOrigin,
+                      )
                       manifest.web_accessible_resources.push(resource)
                     }
                   }

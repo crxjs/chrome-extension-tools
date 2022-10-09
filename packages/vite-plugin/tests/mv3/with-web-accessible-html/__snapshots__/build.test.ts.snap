@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`build fs output: _00 manifest.json 1`] = `
+exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "manifest_version": 3,
   "name": "Extension with copied assets",
@@ -8,7 +8,7 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://www.google.com/*",
+        "https://example.com/*",
       ],
       "resources": Array [
         "public.html",
@@ -21,7 +21,7 @@ Object {
 }
 `;
 
-exports[`build fs output: _01 output files 1`] = `
+exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/modulepreload-polyfill.hash.js",
   "assets/sidebar.hash.js",
@@ -36,8 +36,8 @@ Array [
 ]
 `;
 
-exports[`build fs output: assets/modulepreload-polyfill.hash.js 1`] = `
-"const p = function polyfill() {
+exports[`build fs output > assets/modulepreload-polyfill.hash.js 1`] = `
+"(function polyfill() {
   const relList = document.createElement(\\"link\\").relList;
   if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
     return;
@@ -77,24 +77,23 @@ exports[`build fs output: assets/modulepreload-polyfill.hash.js 1`] = `
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
-};
-p();
+})();
 "
 `;
 
-exports[`build fs output: assets/sidebar.hash.js 1`] = `
+exports[`build fs output > assets/sidebar.hash.js 1`] = `
 "import \\"./modulepreload-polyfill.hash.js\\";
 console.log(\\"content script sidebar\\");
 "
 `;
 
-exports[`build fs output: assets/welcome.hash.js 1`] = `
+exports[`build fs output > assets/welcome.hash.js 1`] = `
 "import \\"./modulepreload-polyfill.hash.js\\";
 console.log(\\"welcome page\\");
 "
 `;
 
-exports[`build fs output: public.html 1`] = `
+exports[`build fs output > public.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -114,12 +113,12 @@ exports[`build fs output: public.html 1`] = `
 "
 `;
 
-exports[`build fs output: public.js 1`] = `
+exports[`build fs output > public.js 1`] = `
 "console.log('static script')
 "
 `;
 
-exports[`build fs output: src/sidebar.html 1`] = `
+exports[`build fs output > src/sidebar.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -128,7 +127,7 @@ exports[`build fs output: src/sidebar.html 1`] = `
     <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
     <title>Sidebar</title>
     <script type=\\"module\\" crossorigin src=\\"/assets/sidebar.hash.js\\"></script>
-    <link rel=\\"modulepreload\\" href=\\"/assets/modulepreload-polyfill.hash.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/modulepreload-polyfill.hash.js\\">
   </head>
   <body>
     <p>
@@ -141,7 +140,7 @@ exports[`build fs output: src/sidebar.html 1`] = `
 "
 `;
 
-exports[`build fs output: src/static.html 1`] = `
+exports[`build fs output > src/static.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -162,7 +161,7 @@ exports[`build fs output: src/static.html 1`] = `
 "
 `;
 
-exports[`build fs output: src/welcome.html 1`] = `
+exports[`build fs output > src/welcome.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -170,7 +169,7 @@ exports[`build fs output: src/welcome.html 1`] = `
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <title>Welcome Page</title>
     <script type=\\"module\\" crossorigin src=\\"/assets/welcome.hash.js\\"></script>
-    <link rel=\\"modulepreload\\" href=\\"/assets/modulepreload-polyfill.hash.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/modulepreload-polyfill.hash.js\\">
   </head>
   <body>
     <p>
@@ -184,7 +183,7 @@ exports[`build fs output: src/welcome.html 1`] = `
 "
 `;
 
-exports[`build fs output: static.js 1`] = `
+exports[`build fs output > static.js 1`] = `
 "console.log('static script')
 "
 `;

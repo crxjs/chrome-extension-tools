@@ -31,6 +31,7 @@ img.addEventListener('load', function () {
 
 const script = document.createElement('script')
 script.src = chrome.runtime.getURL(scriptSrc)
+script.type = 'module'
 container.append(script)
 
 document.body.append(container)

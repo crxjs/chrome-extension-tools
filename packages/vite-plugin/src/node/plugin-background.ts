@@ -1,60 +1,57 @@
-import workerHmrClient from 'client/es/hmr-client-worker.ts?client'
-import { ViteDevServer } from 'vite'
+import workerHmrClient from 'client/es/hmr-client-worker.ts'
+import { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
+import { getFileName } from './fileWriter-utilities'
 import type { CrxPluginFn } from './types'
 import { workerClientId } from './virtualFileIds'
 
+/**
+ * This plugin enables HMR during Vite serve mode by intercepting fetch requests
+ * and routing them to the dev server.
+ *
+ * Service workers can only intercept requests inside their scope (folder), so
+ * the service worker must be located at the root of the Chrome Extension to
+ * handle all use cases.
+ *
+ * See https://stackoverflow.com/a/35780776/4842857 for more details.
+ *
+ * This code places a module loader at the root of the Chrome Extension to
+ * guarantee that the background service worker will behave the same during
+ * development and production.
+ */
 export const pluginBackground: CrxPluginFn = () => {
-  let port: string | undefined
-  let server: ViteDevServer
+  let config: ResolvedConfig
 
   return [
     {
       name: 'crx:background-client',
       apply: 'serve',
-      configureServer(_server) {
-        server = _server
-      },
       resolveId(source) {
         if (source === `/${workerClientId}`) return workerClientId
       },
       load(id) {
         if (id === workerClientId) {
-          const base = `http://localhost:${server.config.server.port}/`
+          const base = `http://localhost:${config.server.port}/`
           return defineClientValues(
             workerHmrClient.replace('__BASE__', JSON.stringify(base)),
-            server.config,
+            config,
           )
         }
       },
     },
     {
       name: 'crx:background-loader-file',
-      apply: 'build',
       // this should happen after other plugins; the loader file is an implementation detail
       enforce: 'post',
-      fileWriterStart(server) {
-        port = server.config.server.port!.toString()
+      configResolved(_config) {
+        config = _config
       },
       renderCrxManifest(manifest) {
         const worker = manifest.background?.service_worker
 
-        /**
-         * This plugin enables HMR during Vite serve mode by intercepting fetch
-         * requests and routing them to the dev server.
-         *
-         * Service workers can only intercept requests inside their scope
-         * (folder), so the service worker must be located at the root of the
-         * Chrome Extension to handle all use cases.
-         *
-         * See https://stackoverflow.com/a/35780776/4842857 for more details.
-         *
-         * This module loader at the root of the Chrome Extension guarantees
-         * that the background service worker will behave the same during
-         * development and production.
-         */
         let loader: string
-        if (this.meta.watchMode) {
+        if (config.command === 'serve') {
+          const port = config.server.port?.toString()
           if (typeof port === 'undefined')
             throw new Error('server port is undefined in watch mode')
 
@@ -65,17 +62,17 @@ export const pluginBackground: CrxPluginFn = () => {
           // development, optional service worker
           if (worker) loader += `import 'http://localhost:${port}/${worker}';\n`
         } else if (worker) {
-          // production w/ service worker
+          // production w/ service worker loader at root, see comment at top of file.
           loader = `import './${worker}';\n`
         } else {
-          // production, no service worker, do nothing
+          // production w/o service worker, do nothing & early return
           return null
         }
 
         const refId = this.emitFile({
           type: 'asset',
           // fileName b/c service worker must be at root of crx
-          fileName: 'service-worker-loader.js',
+          fileName: getFileName({ type: 'loader', id: 'service-worker' }),
           source: loader,
         })
 

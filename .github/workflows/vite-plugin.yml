@@ -25,7 +25,7 @@ defaults:
 jobs:
   # Runs linter and unit tests
   checks:
-    name: Lint and Unit Tests
+    name: Lint
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -37,7 +37,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "16"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -45,7 +45,7 @@ jobs:
         uses: pnpm/action-setup@v2.2.2
         with:
           # Version of PNPM to install
-          version: 6.3.0
+          version: 7.9.5
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -64,13 +64,10 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --filter "vite-plugin"
 
       - name: Lint files
         run: pnpm lint
-
-      - name: Unit tests
-        run: pnpm test:units
 
   # Runs e2e tests in Playwright
   e2e:
@@ -79,11 +76,6 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        type: [build, serve]
-
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -91,7 +83,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "16"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -99,7 +91,7 @@ jobs:
         uses: pnpm/action-setup@v2.2.2
         with:
           # Version of PNPM to install
-          version: 6.3.0
+          version: 7.9.5
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -120,10 +112,10 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run ${{ matrix.type }} tests
+      - name: Run e2e tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: pnpm test:ci:e2e:${{ matrix.type }}
+          run: pnpm test:ci:e2e
           working-directory: "packages/vite-plugin"
 
       - uses: actions/upload-artifact@v3
@@ -132,17 +124,12 @@ jobs:
           name: image-diff-${{ matrix.type }}
           path: ${{ github.workspace }}/tests/**/__image_snapshots__/__diff_output__/*.png
 
-  # Runs output snapshot tests
-  output:
-    name: Output Snapshot Tests
+  # Runs unit and output tests
+  unit:
+    name: Unit and Output Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        type: [build, serve]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -151,7 +138,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "16"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -159,7 +146,7 @@ jobs:
         uses: pnpm/action-setup@v2.2.2
         with:
           # Version of PNPM to install
-          version: 6.3.0
+          version: 7.9.5
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -180,8 +167,8 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run ${{ matrix.type }} tests
-        run: pnpm test:ci:mv3:${{ matrix.type }}
+      - name: Run unit and output tests
+        run: pnpm test:ci:unit
 
       - name: Check for diff
         id: diff

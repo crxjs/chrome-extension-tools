@@ -1,10 +1,11 @@
+import { test } from 'vitest'
 import { build } from '../runners'
 
 test('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
 
   const page = await browser.newPage()
-  await page.goto('https://google.com')
+  await page.goto('https://example.com')
 
   await page.waitForSelector('text="Content script loaded"')
   await page.waitForSelector('text="Background response"')

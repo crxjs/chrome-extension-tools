@@ -32,7 +32,7 @@ module.exports = {
         vars: 'all',
         args: 'after-used',
         ignoreRestSiblings: true,
-        varsIgnorePattern: 'self',
+        varsIgnorePattern: 'self|debug',
       },
     ],
     'prefer-const': [
@@ -45,5 +45,6 @@ module.exports = {
     // note you must disable the base rule as it can report incorrect errors
     'no-extra-semi': 'off',
     '@typescript-eslint/no-extra-semi': 'off',
+    'no-empty': ['error', { allowEmptyCatch: true }],
   },
 }

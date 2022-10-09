@@ -7,7 +7,6 @@ import {
   mergeMap,
   Observable,
   Subject,
-  withLatestFrom,
 } from 'rxjs'
 import {
   FullReloadPayload,
@@ -17,8 +16,8 @@ import {
   UpdatePayload,
 } from 'vite'
 import { outputByOwner, transformResultByOwner } from './fileMeta'
-import { filesReady$ } from './plugin-fileWriter--events'
-import { CrxHMRPayload } from './types'
+import { filesReady$ } from './fileWriter'
+import { CrxHMRPayload } from '../types'
 
 export function isUpdatePayload(p: HMRPayload): p is UpdatePayload {
   return p.type === 'update'
@@ -125,11 +124,10 @@ export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
         return p // connected, custom, error
     }
   }),
-  withLatestFrom(filesReady$),
-  filter(([p, { bundle }]) => {
+  filter((p) => {
     switch (p.type) {
       case 'full-reload':
-        return typeof p.path === 'undefined' || p.path in bundle
+        return typeof p.path === 'undefined'
       case 'prune':
         return p.paths.length > 0
       case 'update':
@@ -139,10 +137,10 @@ export const crxHmrPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
     }
   }),
   map(
-    ([p]): CrxHMRPayload => ({
+    (data): CrxHMRPayload => ({
       type: 'custom',
       event: 'crx:content-script-payload',
-      data: p,
+      data,
     }),
   ),
 )

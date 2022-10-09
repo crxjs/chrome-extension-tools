@@ -21,7 +21,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   }
 })
 
-chrome.tabs.create({ url: 'https://google.com' }).then((tab) => {
+chrome.tabs.create({ url: 'https://example.com' }).then((tab) => {
   newTab = tab
 })
 

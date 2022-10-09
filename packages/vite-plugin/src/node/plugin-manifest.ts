@@ -1,19 +1,21 @@
-import { existsSync } from 'fs'
-import { promises as fs } from 'fs'
+import precontrollerJs from 'client/es/page-precontroller-script.ts'
+import precontrollerHtml from 'client/html/precontroller.html'
+import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
-import { ManifestV3Export } from './defineManifest'
+import { contentScripts, hashScriptId } from './contentScripts'
+import { htmlFiles, manifestFiles } from './files'
+import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import {
   decodeManifest,
   encodeManifest,
-  htmlFiles,
   isString,
-  manifestFiles,
   structuredClone,
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
+import { getOptions } from './plugin-optionsProvider'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
@@ -26,209 +28,253 @@ const { readFile } = fs
  * It maps the manifest scripts to ref ids after `transformCrxManifest` and
  * renders them as output file names before `renderCrxManifest`.
  */
-export const pluginManifest =
-  (_manifest: ManifestV3Export): CrxPluginFn =>
-  () => {
-    let manifest: ManifestV3
-    /** Vite plugins during production, file writer plugins during development */
-    let plugins: CrxPlugin[]
-    let refId: string
-    let config: ResolvedConfig
+export const pluginManifest: CrxPluginFn = () => {
+  let manifest: ManifestV3
+  let plugins: CrxPlugin[]
+  let refId: string
+  let config: ResolvedConfig
 
-    return [
-      {
-        name: 'crx:manifest-init',
-        enforce: 'pre',
-        async config(config, env) {
-          manifest = await (typeof _manifest === 'function'
-            ? _manifest(env)
-            : _manifest)
+  return [
+    {
+      name: 'crx:manifest-init',
+      enforce: 'pre',
+      async config(config, env) {
+        const { manifest: _manifest } = await getOptions(config)
+        manifest = await (typeof _manifest === 'function'
+          ? _manifest(env)
+          : _manifest)
 
-          // TODO: build this out into full validation plugin
-          if (manifest.manifest_version !== 3)
-            throw new Error(
-              `CRXJS does not support Manifest v${manifest.manifest_version}, please use Manifest v3`,
-            )
+        // TODO: build this out into full validation plugin
+        if (manifest.manifest_version !== 3)
+          throw new Error(
+            `CRXJS does not support Manifest v${manifest.manifest_version}, please use Manifest v3`,
+          )
 
-          // pre-bundle dependencies
-          if (env.command === 'serve') {
-            // Vite should crawl manifest entry files
-            const {
-              contentScripts: js,
-              background: sw,
-              html,
-            } = await manifestFiles(manifest)
-            const { entries = [] } = config.optimizeDeps ?? {}
-            // Vite ignores build inputs if explicit entries,
-            // so we need to merge both to include extra HTML files
-            let { input = [] } = config.build?.rollupOptions ?? {}
-            if (typeof input === 'string') input = [input]
-            else input = Object.values(input)
-            input = input.map((f) => {
-              let result = f
-              if (isAbsolute(f)) {
-                result = relative(config.root ?? process.cwd(), f)
-              }
-              return result
-            })
-            // Merging explicit entries and build inputs
-            const set = new Set<string>([entries, input].flat())
-            for (const x of [js, sw, html].flat()) set.add(x)
+        /* ------- CONFIGURE PRE-BUNDLED DEPENDENCIES ------ */
 
-            return {
-              ...config,
-              optimizeDeps: {
-                ...config.optimizeDeps,
-                entries: [...set],
-              },
+        if (env.command === 'serve') {
+          // Vite should crawl manifest entry files
+          const {
+            contentScripts: js,
+            background: sw,
+            html,
+          } = await manifestFiles(manifest, { cwd: config.root })
+          const { entries = [] } = config.optimizeDeps ?? {}
+          // Vite ignores build inputs if optimize depts has explicit entries,
+          // so we need to merge both to include extra HTML files
+          let { input = [] } = config.build?.rollupOptions ?? {}
+          if (typeof input === 'string') input = [input]
+          else input = Object.values(input)
+          input = input.map((f) => {
+            let result = f
+            if (isAbsolute(f)) {
+              result = relative(config.root ?? process.cwd(), f)
             }
+            return result
+          })
+          // Merging explicit entries and build inputs
+          const set = new Set<string>([entries, input].flat())
+          for (const x of [js, sw, html].flat()) set.add(x)
+
+          return {
+            ...config,
+            optimizeDeps: {
+              ...config.optimizeDeps,
+              entries: [...set],
+            },
           }
-        },
-        buildStart(options) {
-          if (options.plugins) plugins = options.plugins
-        },
+        }
       },
-      {
-        name: 'crx:manifest-loader',
-        apply: 'build',
-        enforce: 'pre',
-        buildStart() {
+      buildStart(options) {
+        if (options.plugins) plugins = options.plugins as CrxPlugin[]
+      },
+    },
+    {
+      name: 'crx:manifest-loader',
+      enforce: 'pre',
+      buildStart() {
+        try {
           refId = this.emitFile({
             type: 'chunk',
             id: manifestId,
             name: 'crx-manifest.js',
             preserveSignature: 'strict',
           })
-        },
-        resolveId(source) {
-          if (source === manifestId) return manifestId
-          return null
-        },
-        load(id) {
-          if (id === manifestId) return encodeManifest(manifest)
-          return null
-        },
+        } catch (error) {
+          // this means it's running on the dev server
+        }
       },
-      {
-        name: 'crx:stub-input',
-        apply: 'build',
-        enforce: 'pre',
-        options({ input, ...options }) {
-          /**
-           * By using a stub as the default input, we can avoid extending
-           * complicated inputs and easily find the manifest in
-           * crx:manifest#generateBundle using a ref id.
-           */
-          return {
-            input:
-              isString(input) && input.endsWith('index.html') ? stubId : input,
-            ...options,
-          }
-        },
-        resolveId(source) {
-          if (source === stubId) return stubId
-          return null
-        },
-        load(id) {
-          if (id === stubId) return `console.log('stub')`
-          return null
-        },
-        generateBundle(options, bundle) {
-          for (const [key, chunk] of Object.entries(bundle)) {
-            if (chunk.type === 'chunk' && chunk.facadeModuleId === stubId) {
-              delete bundle[key]
-              break
-            }
-          }
-        },
+      resolveId(source) {
+        if (source === manifestId) return manifestId
+        return null
       },
-      {
-        name: 'crx:manifest-post',
-        apply: 'build',
-        enforce: 'post',
-        configResolved(_config) {
-          config = _config
+      load(id) {
+        if (id === manifestId) return encodeManifest(manifest)
+        return null
+      },
+    },
+    {
+      name: 'crx:stub-input',
+      enforce: 'pre',
+      options({ input, ...options }) {
+        let finalInput = input
+        if (isString(input) && input.endsWith('index.html')) {
+          finalInput = stubId
+        }
 
-          const plugins = config.plugins as CrxPlugin[]
-          // crx:manifest-post needs to come after vite:manifest; enforce:post puts it before
-          const crx = plugins.findIndex(
-            ({ name }) => name === 'crx:manifest-post',
-          )
-          const [plugin] = plugins.splice(crx, 1)
-          plugins.push(plugin)
-        },
-        async transform(code, id) {
-          if (id !== manifestId) return
-
-          /* ---------- RUN MANIFEST TRANSFORM HOOK ---------- */
-
-          let manifest = decodeManifest.call(this, code)
-          for (const plugin of plugins) {
-            try {
-              const m = structuredClone(manifest)
-              const result = await plugin.transformCrxManifest?.call(this, m)
-              manifest = result ?? manifest
-            } catch (error) {
-              if (error instanceof Error)
-                error.message = `[${plugin.name}] ${error.message}`
-              throw error
-            }
+        // don't emit extra html files during serve
+        if (config.command === 'serve')
+          if (Array.isArray(input)) {
+            finalInput = input.filter((x) => !x.endsWith('.html'))
+          } else if (typeof input === 'object') {
+            for (const [key, value] of Object.entries(input))
+              if (value.endsWith('.html')) delete input[key]
           }
 
-          /* ----------- EMIT SCRIPTS AND RESOURCES ---------- */
+        /**
+         * Rollup requires an initial input, but we don't need it By using a
+         * stub instead of the default input, we can avoid extending complicated
+         * inputs and easily find the manifest in crx:manifest#generateBundle
+         * using a ref id.
+         */
+        return { input: finalInput, ...options }
+      },
+      resolveId(source) {
+        if (source === stubId) return stubId
+        return null
+      },
+      load(id) {
+        if (id === stubId) return `console.log('stub')`
+        return null
+      },
+      generateBundle(options, bundle) {
+        for (const [key, chunk] of Object.entries(bundle)) {
+          if (chunk.type === 'chunk' && chunk.facadeModuleId === stubId) {
+            delete bundle[key]
+            break
+          }
+        }
+      },
+    },
+    {
+      name: 'crx:manifest-post',
+      enforce: 'post',
+      configResolved(_config) {
+        config = _config
 
-          // always emit content scripts
-          if (manifest.content_scripts?.length) {
-            // css[] should be added and removed by crx:styles
-            manifest.content_scripts = manifest.content_scripts.map(
-              ({ js = [], ...rest }) => {
-                const refJS = js.map((file) =>
-                  this.emitFile({
-                    type: 'chunk',
-                    id: file,
-                    name: basename(file),
+        const plugins = config.plugins as CrxPlugin[]
+        // crx:manifest-post needs to come after vite:manifest; enforce:post puts it before
+        const crx = plugins.findIndex(
+          ({ name }) => name === 'crx:manifest-post',
+        )
+        const [plugin] = plugins.splice(crx, 1)
+        plugins.push(plugin)
+      },
+      async transform(code, id) {
+        if (id !== manifestId) return
+
+        /* ---------- RUN MANIFEST TRANSFORM HOOK ---------- */
+
+        let manifest = decodeManifest.call(this, code)
+        for (const plugin of plugins) {
+          try {
+            const m = structuredClone(manifest)
+            const result = await plugin.transformCrxManifest?.call(this, m)
+            manifest = result ?? manifest
+          } catch (error) {
+            if (error instanceof Error)
+              error.message = `[${plugin.name}] ${error.message}`
+            throw error
+          }
+        }
+
+        /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
+
+        if (config.command === 'serve') {
+          // vite serve file writer only emits content scripts
+          // - html files come directly from vite dev server
+          // - service worker comes from vite dev server via loader file
+          if (manifest.content_scripts)
+            for (const { js = [], matches = [] } of manifest.content_scripts)
+              for (const id of js) {
+                contentScripts.set(
+                  prefix('/', id),
+                  formatFileData({
+                    type: 'loader',
+                    id,
+                    matches,
+                    refId: hashScriptId({ type: 'loader', id }),
+                    fileName: getFileName({ type: 'loader', id }),
                   }),
                 )
+              }
+        } else {
+          // vite build emits content scripts, html files and service worker
+          if (manifest.content_scripts)
+            for (const { js = [], matches = [] } of manifest.content_scripts)
+              for (const file of js) {
+                const id = join(config.root, file)
+                const refId = this.emitFile({
+                  type: 'chunk',
+                  id,
+                  name: basename(file),
+                })
+                contentScripts.set(
+                  file,
+                  formatFileData({
+                    type: 'loader',
+                    id: file,
+                    refId,
+                    matches,
+                  }),
+                )
+              }
 
-                return { js: refJS, ...rest }
-              },
-            )
+          if (manifest.background?.service_worker) {
+            const file = manifest.background.service_worker
+            const id = join(config.root, file)
+            const refId = this.emitFile({
+              type: 'chunk',
+              id,
+              name: basename(file),
+            })
+            manifest.background.service_worker = refId
           }
 
-          if (!this.meta.watchMode) {
-            // file writer does not emit background
-            if (manifest.background?.service_worker) {
-              const file = manifest.background.service_worker
-              const refId = this.emitFile({
-                type: 'chunk',
-                id: file,
-                name: basename(file),
-              })
-              manifest.background.service_worker = refId
-            }
-            // file writer does not emit html files
-            for (const file of htmlFiles(manifest)) {
-              this.emitFile({
-                type: 'chunk',
-                id: file,
-                name: basename(file),
-              })
-            }
+          for (const file of htmlFiles(manifest)) {
+            const id = join(config.root, file)
+            this.emitFile({
+              type: 'chunk',
+              id,
+              name: basename(file),
+            })
           }
+        }
 
-          const encoded = encodeManifest(manifest)
-          return encoded
-        },
-        async generateBundle(options, bundle) {
-          const manifestName = this.getFileName(refId)
-          const manifestJs = bundle[manifestName] as OutputChunk
-          let manifest = decodeManifest.call(this, manifestJs.code)
+        const encoded = encodeManifest(manifest)
+        return encoded
+      },
+      async generateBundle(options, bundle) {
+        const manifestName = this.getFileName(refId)
+        const manifestJs = bundle[manifestName] as OutputChunk
+        let manifest = decodeManifest.call(this, manifestJs.code)
 
-          /* ----------- UPDATE EMITTED FILE NAMES ----------- */
+        /* ----------- UPDATE EMITTED FILE NAMES ----------- */
 
+        if (config.command === 'serve') {
+          // plugin-background emits service worker loader in renderCrxManifest
+          // vite dev server sends html files through local host
+          if (manifest.content_scripts)
+            for (const script of manifest.content_scripts) {
+              script.js = script.js?.map((id) =>
+                getFileName({ id, type: 'loader' }),
+              )
+            }
+        } else {
+          // transform hook emits files and replaces in manifest with ref ids
           // update background service worker filename from ref
           // service worker not emitted during development, so don't update file name
-          if (manifest.background?.service_worker && !this.meta.watchMode) {
+          if (manifest.background?.service_worker) {
             const ref = manifest.background.service_worker
             const name = this.getFileName(ref)
             manifest.background.service_worker = name
@@ -238,95 +284,122 @@ export const pluginManifest =
           // TODO: emit and parse css
           manifest.content_scripts = manifest.content_scripts?.map(
             ({ js = [], ...rest }) => {
-              const refJS = js.map((ref) => this.getFileName(ref))
-              return { js: refJS, ...rest }
+              return {
+                js: js.map((id) => {
+                  const script = contentScripts.get(id)
+                  const fileName = script?.loaderName ?? script?.fileName
+                  if (typeof fileName === 'undefined')
+                    throw new Error(
+                      `Content script fileName is undefined: "${id}"`,
+                    )
+                  return fileName
+                }),
+                ...rest,
+              }
             },
           )
+        }
 
-          /* ------------ RUN MANIFEST RENDER HOOK ----------- */
+        /* ------------ RUN MANIFEST RENDER HOOK ----------- */
 
-          // this appears to run after generateBundle since this is the last plugin
-          for (const plugin of plugins) {
-            try {
-              const m = structuredClone(manifest)
-              const result = await plugin.renderCrxManifest?.call(
-                this,
-                m,
-                bundle,
+        // this appears to run after generateBundle since this is the last plugin
+        for (const plugin of plugins) {
+          try {
+            const m = structuredClone(manifest)
+            const result = await plugin.renderCrxManifest?.call(this, m, bundle)
+            manifest = result ?? manifest
+          } catch (error) {
+            const name = `[${plugin.name}]`
+            let message = error
+            if (error instanceof Error) {
+              message = colors.red(
+                `${name} ${error.stack ? error.stack : error.message}`,
               )
-              manifest = result ?? manifest
-            } catch (error) {
-              const name = `[${plugin.name}]`
-              let message = error
-              if (error instanceof Error) {
-                message = colors.red(
-                  `${name} ${error.stack ? error.stack : error.message}`,
-                )
-              } else if (typeof error === 'string') {
-                message = colors.red(`${name} ${error}`)
-              }
-
-              console.log(message)
-
-              throw new Error(`Error in ${plugin.name}.renderCrxManifest`)
+            } else if (typeof error === 'string') {
+              message = colors.red(`${name} ${error}`)
             }
+
+            console.log(message)
+
+            throw new Error(`Error in ${plugin.name}.renderCrxManifest`)
           }
+        }
 
-          /* ---------- COPY MISSING MANIFEST ASSETS --------- */
+        /* ---------- COPY MISSING MANIFEST ASSETS --------- */
 
-          const assetTypes: (keyof ManifestFiles)[] = [
-            'icons',
-            'locales',
-            'rulesets',
-            'webAccessibleResources',
-          ]
-          const files = await manifestFiles(manifest)
-          await Promise.all(
-            assetTypes
-              .map((k) => files[k])
-              .flat()
-              .map(async (f) => {
-                // copy an asset if it is missing from the bundle
-                if (typeof bundle[f] === 'undefined') {
-                  // get assets from project root or from public dir
-                  let filename = join(config.root, f)
-                  if (!existsSync(filename))
-                    filename = join(config.publicDir, f)
-                  if (!existsSync(filename))
-                    throw new Error(
-                      `ENOENT: Could not load manifest asset "${f}".
+        const assetTypes: (keyof ManifestFiles)[] = [
+          'icons',
+          'locales',
+          'rulesets',
+          'webAccessibleResources',
+        ]
+        const files = await manifestFiles(manifest, { cwd: config.root })
+        await Promise.all(
+          assetTypes
+            .map((k) => files[k])
+            .flat()
+            .map(async (f) => {
+              // copy an asset if it is missing from the bundle
+              if (typeof bundle[f] === 'undefined') {
+                // get assets from project root or from public dir
+                let filename = join(config.root, f)
+                if (!existsSync(filename)) filename = join(config.publicDir, f)
+                if (!existsSync(filename))
+                  throw new Error(
+                    `ENOENT: Could not load manifest asset "${f}".
 Manifest assets must exist in one of these directories:
 Project root: "${config.root}"
 Public dir: "${config.publicDir}"`,
-                    )
+                  )
 
-                  this.emitFile({
-                    type: 'asset',
-                    fileName: f,
-                    // TODO: cache source buffer
-                    source: await readFile(filename),
-                  })
-                }
-              }),
-          )
+                this.emitFile({
+                  type: 'asset',
+                  fileName: f,
+                  // TODO: cache source buffer
+                  source: await readFile(filename),
+                })
+              }
+            }),
+        )
 
-          /* -------------- OUTPUT MANIFEST FILE ------------- */
+        /* ---------- SETUP HTML PLACEHOLDER FILES --------- */
 
-          // overwrite vite manifest.json after render hooks
-          const manifestJson = bundle['manifest.json'] as OutputAsset
-          if (typeof manifestJson === 'undefined') {
+        if (config.command === 'serve' && files.html.length) {
+          const refId = this.emitFile({
+            type: 'asset',
+            name: 'precontroller.js',
+            source: precontrollerJs,
+          })
+          const precontrollerJsName = this.getFileName(refId)
+          files.html.map((f) =>
             this.emitFile({
               type: 'asset',
-              fileName: 'manifest.json',
-              source: JSON.stringify(manifest, null, 2),
-            })
-          } else {
-            manifestJson.source = JSON.stringify(manifest, null, 2)
-          }
+              fileName: f,
+              source: precontrollerHtml.replace(
+                '%SCRIPT%',
+                `/${precontrollerJsName}`,
+              ),
+            }),
+          )
+        }
 
-          // remove manifest js file, we're done with it :)
-          delete bundle[manifestName]
-        },
+        /* -------------- OUTPUT MANIFEST FILE ------------- */
+
+        // overwrite vite manifest.json after render hooks
+        const manifestJson = bundle['manifest.json'] as OutputAsset
+        if (typeof manifestJson === 'undefined') {
+          this.emitFile({
+            type: 'asset',
+            fileName: 'manifest.json',
+            source: JSON.stringify(manifest, null, 2),
+          })
+        } else {
+          manifestJson.source = JSON.stringify(manifest, null, 2)
+        }
+
+        // remove manifest js file, we're done with it :)
+        delete bundle[manifestName]
       },
-    ]
-  }
+    },
+  ]
+}

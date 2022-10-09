@@ -1,4 +1,7 @@
-import { defineDynamicResource, defineManifest } from 'src/.'
+import {
+  defineDynamicResource,
+  defineManifest,
+} from '../../../src/node/defineManifest'
 
 export default defineManifest({
   background: {

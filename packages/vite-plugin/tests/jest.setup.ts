@@ -1,4 +1,13 @@
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
+import { afterEach, beforeEach, expect, vi } from 'vitest'
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] })
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({
@@ -8,6 +17,3 @@ expect.extend({
     allowSizeMismatch: true,
   }),
 })
-
-if (process.env.TIMEOUT) jest.setTimeout(parseInt(process.env.TIMEOUT))
-else jest.setTimeout(45000)

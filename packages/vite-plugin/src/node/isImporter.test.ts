@@ -1,5 +1,6 @@
 import { ModuleNode } from 'vite'
 import { isImporter } from './isImporter'
+import { test, expect } from 'vitest'
 
 function createModuleNode(name: string) {
   return {

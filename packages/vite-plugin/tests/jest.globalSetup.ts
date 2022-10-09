@@ -5,7 +5,7 @@ import configs from '../rollup.config'
 import { normalizePath } from '@rollup/pluginutils'
 import _debug from 'debug'
 
-const debug = _debug('jest:global-setup')
+const debug = _debug('test:global-setup')
 
 const clientDir = path.resolve(__dirname, '..', 'src', 'client')
 const outDir = normalizePath(path.join(__dirname, 'artifacts'))
@@ -50,10 +50,16 @@ config.plugins?.push(
         importPath = path.posix.join(clientDir, id)
       }
 
-      if (importPath)
+      if (importPath?.endsWith('.html')) {
+        return `
+var clientCode = \`${fs.readFileSync(importPath, 'utf-8')}\`;
+export default clientCode;
+        `.trim()
+      } else if (importPath) {
         return `
 import clientCode from '${importPath}?client'
 export default clientCode`.trim()
+      }
 
       return null
     },

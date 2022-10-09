@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.tsx.js.js",
+        "src/content.tsx-loader.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -37,156 +37,50 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content.tsx.js.js",
-  "assets/content-script-preamble.js.js",
-  "assets/crx-client-port.js",
-  "assets/precontroller.js.js",
-  "assets/webcomponents-custom-elements-z7FmG.js",
+  "assets/precontroller.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/App.tsx.js",
+  "src/content.tsx-loader.js",
   "src/content.tsx.js",
   "src/popup.html",
-  "vendor/deps/chunk-EC6NZEJ6.js",
-  "vendor/deps/react-dom.js",
-  "vendor/deps/react_jsx-dev-runtime.js",
+  "vendor/chunk-D6CDYV2H.js__v--hash.js",
+  "vendor/crx-client-port.js",
+  "vendor/crx-client-preamble.js",
+  "vendor/id-__x00__react-jsx-dev-runtime.js",
+  "vendor/react-dom.js__v--hash.js",
   "vendor/react-refresh.js",
-  "vendor/vite-client.mjs.js",
-  "vendor/vite-env.mjs.js",
+  "vendor/react_jsx-dev-runtime.js__v--hash.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.tsx",
   "src/popup.html",
 }
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.tsx.js.js 1`] = `
-"(function () {
-  'use strict';
-
-  (async () => {
-    if (\\"assets/content-script-preamble.js.js\\")
-      await import(
-        /* @vite-ignore */
-        chrome.runtime.getURL(\\"assets/content-script-preamble.js.js\\")
-      );
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.mjs.js\\")
-    );
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.tsx.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`serve fs output: assets/content-script-preamble.js.js 1`] = `
-"import exports from '../vendor/react-refresh.js';
-
-exports.injectIntoGlobalHook(window);
-window.$RefreshReg$ = () => {};
-window.$RefreshSig$ = () => (type) => type;
-window.__vite_plugin_react_preamble_installed__ = true;
-"
-`;
-
-exports[`serve fs output: assets/crx-client-port.js 1`] = `
-"function isCrxHMRPayload(x) {
-  return x.type === \\"custom\\" && x.event.startsWith(\\"crx:\\");
-}
-class HMRPort {
-  port;
-  callbacks = /* @__PURE__ */ new Map();
-  constructor() {
-    setInterval(() => {
-      try {
-        this.port?.postMessage({ data: \\"ping\\" });
-      } catch (error) {
-        if (error instanceof Error && error.message.includes(\\"Extension context invalidated.\\")) {
-          location.reload();
-        } else
-          throw error;
-      }
-    }, 5000);
-    setInterval(this.initPort, 5 * 60 * 1e3);
-    this.initPort();
-  }
-  initPort = () => {
-    this.port?.disconnect();
-    this.port = chrome.runtime.connect({ name: \\"@crx/client\\" });
-    this.port.onDisconnect.addListener(this.handleDisconnect.bind(this));
-    this.port.onMessage.addListener(this.handleMessage.bind(this));
-    this.port.postMessage({ type: \\"connected\\" });
-  };
-  handleDisconnect = () => {
-    if (this.callbacks.has(\\"close\\"))
-      for (const cb of this.callbacks.get(\\"close\\")) {
-        cb({ wasClean: true });
-      }
-  };
-  handleMessage = (message) => {
-    const forward = (data) => {
-      if (this.callbacks.has(\\"message\\"))
-        for (const cb of this.callbacks.get(\\"message\\")) {
-          cb({ data });
-        }
-    };
-    const payload = JSON.parse(message.data);
-    if (isCrxHMRPayload(payload)) {
-      if (payload.event === \\"crx:runtime-reload\\") {
-        console.log(\\"[crx] runtime reload\\");
-        setTimeout(() => location.reload(), 500);
-      } else {
-        forward(JSON.stringify(payload.data));
-      }
-    } else {
-      forward(message.data);
-    }
-  };
-  addEventListener = (event, callback) => {
-    const cbs = this.callbacks.get(event) ?? /* @__PURE__ */ new Set();
-    cbs.add(callback);
-    this.callbacks.set(event, cbs);
-  };
-  send = (data) => {
-    if (this.port)
-      this.port.postMessage({ data });
-    else
-      throw new Error(\\"HMRPort is not initialized\\");
-  };
-}
-
-export { HMRPort };
-"
-`;
-
-exports[`serve fs output: assets/precontroller.js.js 1`] = `
+exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
 "const id = setInterval(() => location.reload(), 100);
 setTimeout(() => clearInterval(id), 5e3);
 "
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
-import 'http://localhost:3000/crx-client-worker';
+import 'http://localhost:3000/@crx/client-worker';
 "
 `;
 
-exports[`serve fs output: src/App.tsx.js 1`] = `
-"import { createHotContext } from '../vendor/vite-client.mjs.js';
-import exports from '../vendor/react-refresh.js';
-import react_jsx_dev_runtime_default from '../vendor/deps/react_jsx-dev-runtime.js';
-
-import.meta.hot = createHotContext(\\"/src/App.tsx.js\\");let prevRefreshReg;
+exports[`serve fs output > src/App.tsx.js 1`] = `
+"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/App.tsx.js\\");import RefreshRuntime from \\"/vendor/react-refresh.js\\";
+let prevRefreshReg;
 let prevRefreshSig;
 if (import.meta.hot) {
   if (!window.__vite_plugin_react_preamble_installed__) {
@@ -195,12 +89,12 @@ if (import.meta.hot) {
   prevRefreshReg = window.$RefreshReg$;
   prevRefreshSig = window.$RefreshSig$;
   window.$RefreshReg$ = (type, id) => {
-    exports.register(type, \\"<root>/src/App.tsx \\" + id);
+    RefreshRuntime.register(type, \\"<root>/src/App.tsx \\" + id);
   };
-  window.$RefreshSig$ = exports.createSignatureFunctionForTransform;
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
 }
 var _jsxFileName = \\"<root>/src/App.tsx\\";
- const _jsxDEV = react_jsx_dev_runtime_default[\\"jsxDEV\\"];
+import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 const App = () => {
   return /* @__PURE__ */ _jsxDEV(\\"div\\", {
     children: [/* @__PURE__ */ _jsxDEV(\\"h1\\", {
@@ -209,20 +103,21 @@ const App = () => {
       fileName: _jsxFileName,
       lineNumber: 6,
       columnNumber: 7
-    }, this), /* @__PURE__ */ _jsxDEV(\\"p\\", {
+    }, void 0), /* @__PURE__ */ _jsxDEV(\\"p\\", {
       children: \\"If you are seeing this, React is working!\\"
     }, void 0, false, {
       fileName: _jsxFileName,
       lineNumber: 7,
       columnNumber: 7
-    }, this)]
+    }, void 0)]
   }, void 0, true, {
     fileName: _jsxFileName,
     lineNumber: 5,
     columnNumber: 5
-  }, this);
+  }, void 0);
 };
 _c = App;
+export default App;
 var _c;
 $RefreshReg$(_c, \\"App\\");
 if (import.meta.hot) {
@@ -232,23 +127,18 @@ if (import.meta.hot) {
   if (!window.__vite_plugin_react_timeout) {
     window.__vite_plugin_react_timeout = setTimeout(() => {
       window.__vite_plugin_react_timeout = 0;
-      exports.performReactRefresh();
+      RefreshRuntime.performReactRefresh();
     }, 30);
   }
 }
-
-export { App as default };
 "
 `;
 
-exports[`serve fs output: src/content.tsx.js 1`] = `
-"import react_dom_default from '../vendor/deps/react-dom.js';
-import App from './App.tsx.js';
-import react_jsx_dev_runtime_default from '../vendor/deps/react_jsx-dev-runtime.js';
-
-var _jsxFileName = \\"<root>/src/content.tsx\\";
- const render = react_dom_default[\\"render\\"];
- const _jsxDEV = react_jsx_dev_runtime_default[\\"jsxDEV\\"];
+exports[`serve fs output > src/content.tsx.js 1`] = `
+"var _jsxFileName = \\"<root>/src/content.tsx\\";
+import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--hash.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
+import App from \\"/src/App.tsx.js\\";
+import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 console.log(\\"content script\\");
 const root = document.createElement(\\"div\\");
 root.id = \\"root\\";
@@ -261,12 +151,36 @@ render(/* @__PURE__ */ _jsxDEV(App, {}, void 0, false, {
 "
 `;
 
-exports[`serve fs output: src/popup.html 1`] = `
+exports[`serve fs output > src/content.tsx-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    if (\\"vendor/crx-client-preamble.js\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"vendor/crx-client-preamble.js\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content.tsx.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.js.js\\"></script>
+    <script src=\\"/assets/precontroller.hash0.js\\"></script>
   </head>
   <body>
     <h1>Waiting for service worker</h1>

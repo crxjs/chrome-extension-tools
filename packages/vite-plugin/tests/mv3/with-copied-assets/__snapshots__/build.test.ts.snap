@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`build fs output: _00 manifest.json 1`] = `
+exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_icon": Object {
@@ -37,7 +37,7 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://www.google.com/*",
+        "https://example.com/*",
       ],
       "resources": Array [
         "src/images/*.png",
@@ -48,7 +48,7 @@ Object {
 }
 `;
 
-exports[`build fs output: _01 output files 1`] = `
+exports[`build fs output > _01 output files 1`] = `
 Array [
   "_locales/en/messages.json",
   "_locales/es/messages.json",
