@@ -60,7 +60,8 @@
     "test:output:build": "jest build -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\)",
     "test:output:serve": "jest serve -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\)",
     "test:e2e:build": "jest build -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\)",
-    "test:e2e:serve": "jest serve -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\)"
+    "test:e2e:serve": "jest serve -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/ hmr\\)",
+    "test:e2e:hmr": "jest hmr -u --runInBand"
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.2",
