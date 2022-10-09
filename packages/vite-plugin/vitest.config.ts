@@ -14,6 +14,10 @@ export default defineConfig(({ mode }) => {
       ? ['**/e2e/**'] // exclude e2e tests
       : [] // for running any individual test
 
+  const testTimeout = process.env.TIMEOUT
+    ? parseInt(process.env.TIMEOUT)
+    : 15000
+
   return {
     test: {
       alias: [
@@ -36,7 +40,7 @@ export default defineConfig(({ mode }) => {
       snapshotFormat: {
         printBasicPrototype: true,
       },
-      testTimeout: process.env.TIMEOUT ? parseInt(process.env.TIMEOUT) : 30000,
+      testTimeout,
       watchExclude: [...configDefaults.watchExclude, '**/tests/templates'],
     },
   }
