@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "matches": ["https://example.com/*"],
-      "js": ["src/main.ts"]
+      "js": ["src/content.ts"]
     }
   ],
   "options_page": "src/options.html",

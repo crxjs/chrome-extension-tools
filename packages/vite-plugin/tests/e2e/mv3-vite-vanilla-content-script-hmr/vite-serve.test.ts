@@ -17,7 +17,6 @@ test(
     await fs.copy(src1, src, { recursive: true })
 
     const { browser, routes } = await serve(__dirname)
-    const optionsPage = await getPage(browser, /options.html$/)
 
     const page = await browser.newPage()
     await page.goto('https://example.com')
@@ -32,6 +31,8 @@ test(
     routes.subscribe(() => {
       reloads++
     })
+
+    const optionsPage = await getPage(browser, /options.html$/)
 
     // update css file -> trigger css update
     await fs.copy(src2, src, {
