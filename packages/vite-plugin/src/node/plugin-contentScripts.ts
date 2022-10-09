@@ -175,7 +175,6 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
         server = _server
         port = server.config.server.port!.toString()
         if (
-          process.env.NODE_ENV !== 'test' &&
           typeof preambleCode === 'undefined' &&
           server.config.plugins.some(({ name }) =>
             name.toLowerCase().includes('react'),

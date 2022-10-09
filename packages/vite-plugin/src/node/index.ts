@@ -7,6 +7,7 @@ import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 import { pluginBackground } from './plugin-background'
 import type { PluginOption } from 'vite'
 import { pluginFileWriterPages } from './plugin-fileWriter--pages'
+import { pluginContentScripts } from './plugin-contentScripts'
 
 /** `init` initializes crx plugins with crx options */
 function init(options: CrxOptions, plugins: CrxPluginFn[]) {
@@ -30,6 +31,7 @@ export const crx = ({
     pluginHMR,
     pluginHtmlInlineScripts,
     pluginBackground,
+    pluginContentScripts,
     /** Only manifest plugin uses manifest, other plugins get manifest in manifest hooks */
     pluginManifest(manifest),
     pluginFileWriterPages,
