@@ -185,10 +185,7 @@ export const getMatchPatternOrigin = (pattern: string): string => {
    * Allow <all_urls> in matches section. [Issue
    * #459](https://github.com/crxjs/chrome-extension-tools/issues/459)
    */
-  if (pattern === '<all_urls>') {
-    return pattern
-  }
-  if (pattern === '<all_urls>') return pattern
+  if (pattern.startsWith('<')) return pattern
   const [schema, rest] = pattern.split('://')
   const [origin, pathname] = rest.split('/')
   const root = `${schema}://${origin}`
