@@ -3,7 +3,7 @@ import {
   FullReloadPayload,
   HMRPayload,
   PrunePayload,
-  UpdatePayload
+  UpdatePayload,
 } from 'vite'
 import { allFilesReady$ } from './fileWriter-rxjs'
 import { getFileName, getViteUrl, prefix } from './fileWriter-utilities'

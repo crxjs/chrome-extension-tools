@@ -7,7 +7,7 @@ import {
   build as _build,
   createServer,
   InlineConfig,
-  ResolvedConfig
+  ResolvedConfig,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
 import { expect, vi } from 'vitest'

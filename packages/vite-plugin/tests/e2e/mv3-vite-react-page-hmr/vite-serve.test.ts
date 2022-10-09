@@ -4,7 +4,6 @@ import { expect, test } from 'vitest'
 import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
-
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')

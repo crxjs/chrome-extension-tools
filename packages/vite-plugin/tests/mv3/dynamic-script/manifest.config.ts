@@ -1,4 +1,4 @@
-import { defineManifest } from "../../plugin-testOptionsProvider";
+import { defineManifest } from '../../plugin-testOptionsProvider'
 
 export default defineManifest({
   background: {

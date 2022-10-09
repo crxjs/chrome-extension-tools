@@ -5,7 +5,6 @@ import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
 
-
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')

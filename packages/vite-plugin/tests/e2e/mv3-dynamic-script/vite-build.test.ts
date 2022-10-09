@@ -2,7 +2,6 @@ import { test } from 'vitest'
 import { getPage } from '../helpers'
 import { build } from '../runners'
 
-
 test('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
 
