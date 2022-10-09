@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -37,18 +37,19 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/precontroller.hash.js",
+  "assets/precontroller.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/App.tsx.js",
   "src/content.tsx-loader.js",
   "src/content.tsx.js",
   "src/popup.html",
-  "vendor/chunk-EC6NZEJ6.js__v--hash.js",
+  "vendor/chunk-D6CDYV2H.js__v--hash.js",
   "vendor/crx-client-port.js",
   "vendor/crx-client-preamble.js",
+  "vendor/id-__x00__react-jsx-dev-runtime.js",
   "vendor/react-dom.js__v--hash.js",
   "vendor/react-refresh.js",
   "vendor/react_jsx-dev-runtime.js__v--hash.js",
@@ -58,26 +59,26 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.tsx",
   "src/popup.html",
 }
 `;
 
-exports[`serve fs output: assets/precontroller.hash.js 1`] = `
+exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
 "const id = setInterval(() => location.reload(), 100);
 setTimeout(() => clearInterval(id), 5e3);
 "
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 "
 `;
 
-exports[`serve fs output: src/App.tsx.js 1`] = `
+exports[`serve fs output > src/App.tsx.js 1`] = `
 "import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/App.tsx.js\\");import RefreshRuntime from \\"/vendor/react-refresh.js\\";
 let prevRefreshReg;
 let prevRefreshSig;
@@ -93,7 +94,7 @@ if (import.meta.hot) {
   window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
 }
 var _jsxFileName = \\"<root>/src/App.tsx\\";
-import __vite__cjsImport2_react_jsxDevRuntime from \\"/vendor/react_jsx-dev-runtime.js__v--hash.js\\"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime[\\"jsxDEV\\"];
+import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 const App = () => {
   return /* @__PURE__ */ _jsxDEV(\\"div\\", {
     children: [/* @__PURE__ */ _jsxDEV(\\"h1\\", {
@@ -102,18 +103,18 @@ const App = () => {
       fileName: _jsxFileName,
       lineNumber: 6,
       columnNumber: 7
-    }, this), /* @__PURE__ */ _jsxDEV(\\"p\\", {
+    }, void 0), /* @__PURE__ */ _jsxDEV(\\"p\\", {
       children: \\"If you are seeing this, React is working!\\"
     }, void 0, false, {
       fileName: _jsxFileName,
       lineNumber: 7,
       columnNumber: 7
-    }, this)]
+    }, void 0)]
   }, void 0, true, {
     fileName: _jsxFileName,
     lineNumber: 5,
     columnNumber: 5
-  }, this);
+  }, void 0);
 };
 _c = App;
 export default App;
@@ -133,11 +134,11 @@ if (import.meta.hot) {
 "
 `;
 
-exports[`serve fs output: src/content.tsx.js 1`] = `
+exports[`serve fs output > src/content.tsx.js 1`] = `
 "var _jsxFileName = \\"<root>/src/content.tsx\\";
 import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--hash.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
 import App from \\"/src/App.tsx.js\\";
-import __vite__cjsImport2_react_jsxDevRuntime from \\"/vendor/react_jsx-dev-runtime.js__v--hash.js\\"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime[\\"jsxDEV\\"];
+import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 console.log(\\"content script\\");
 const root = document.createElement(\\"div\\");
 root.id = \\"root\\";
@@ -150,7 +151,7 @@ render(/* @__PURE__ */ _jsxDEV(App, {}, void 0, false, {
 "
 `;
 
-exports[`serve fs output: src/content.tsx-loader.js 1`] = `
+exports[`serve fs output > src/content.tsx-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -174,12 +175,12 @@ exports[`serve fs output: src/content.tsx-loader.js 1`] = `
 "
 `;
 
-exports[`serve fs output: src/popup.html 1`] = `
+exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.hash.js\\"></script>
+    <script src=\\"/assets/precontroller.hash0.js\\"></script>
   </head>
   <body>
     <h1>Waiting for service worker</h1>

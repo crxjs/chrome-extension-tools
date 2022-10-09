@@ -115,7 +115,8 @@ export function getViteUrl({ type, id }: FileWriterId) {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {
     // node_modules ids should not start with a slash
-    if (id.startsWith('/@id/')) return id.slice('/@id/'.length)
+    if (id.startsWith('/@id/'))
+      return id.slice('/@id/'.length).replace('__x00__', '')
     return prefix('/', id)
   } else {
     throw new Error(`Invalid file type: "${type}"`)

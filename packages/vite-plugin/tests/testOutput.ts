@@ -28,8 +28,8 @@ export async function testOutput(
   if (testResult.command === 'serve') {
     testResult.server.close()
     const errors = await allFileWriterErrors
-    for (const error of errors) console.error(error)
-    expect(errors.length).toBe(0)
+    for (const { err } of errors) console.error(err)
+    if (errors[0]) throw errors[0].err
   }
 
   const getTest = (x: string, d = defaultTest): typeof defaultTest => {
@@ -52,12 +52,13 @@ export async function testOutput(
   const hashMap = new Map<string, string>()
   const scrubHashes = (text: string) =>
     text
-      .replace(/v--([a-z0-9]+)/g, 'v--hash')
-      .replace(/\.hash([a-z0-9]+)\./g, (found) => {
-        const replaced = hashMap.get(found) ?? `.hash${hashMap.size}.`
+      .replace(/(\.hash)([a-z0-9]+)\./g, (found, p1) => {
+        const replaced =
+          hashMap.get(found) ?? `${p1.toString()}${hashMap.size.toString()}.`
         hashMap.set(found, replaced)
         return replaced
       })
+      .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
 
   getTest('manifest.json', (source, name) => {
     const scrubbed = scrubHashes(source)
