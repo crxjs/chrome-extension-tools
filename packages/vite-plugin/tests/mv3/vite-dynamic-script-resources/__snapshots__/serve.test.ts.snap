@@ -38,7 +38,7 @@ Array [
   "src/image.png",
   "src/image.png__import.js",
   "src/script.ts.js",
-  "src/script.ts__scriptId--GJUON.js",
+  "src/script.ts__scriptId--0.js",
   "vendor/crx-client-port.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
@@ -60,7 +60,7 @@ import 'http://localhost:3000/src/background.ts';
 `;
 
 exports[`serve fs output > src/content1.ts.js 1`] = `
-"import script from \\"/src/script.ts__scriptId--GJUON.js\\";
+"import script from \\"/src/script.ts__scriptId--0.js\\";
 console.log(\\"content.ts\\", { script });
 "
 `;
@@ -130,7 +130,7 @@ export {};
 "
 `;
 
-exports[`serve fs output > src/script.ts__scriptId--GJUON.js 1`] = `
+exports[`serve fs output > src/script.ts__scriptId--0.js 1`] = `
 "export default \\"src/script.ts.js\\";
 "
 `;

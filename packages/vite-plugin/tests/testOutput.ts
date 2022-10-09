@@ -58,6 +58,12 @@ export async function testOutput(
         hashMap.set(found, replaced)
         return replaced
       })
+      .replace(/(__scriptId--)([a-zA-Z]+)\./g, (found, p1) => {
+        const replaced =
+          hashMap.get(found) ?? `${p1.toString()}${hashMap.size.toString()}.`
+        hashMap.set(found, replaced)
+        return replaced
+      })
       .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
 
   getTest('manifest.json', (source, name) => {

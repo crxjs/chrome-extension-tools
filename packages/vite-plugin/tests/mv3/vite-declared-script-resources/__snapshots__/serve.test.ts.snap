@@ -46,7 +46,7 @@ Array [
   "src/image.png",
   "src/image.png__import.js",
   "src/script.ts.js",
-  "src/script.ts__scriptId--zfEki.js",
+  "src/script.ts__scriptId--0.js",
   "vendor/crx-client-port.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
@@ -69,7 +69,7 @@ import 'http://localhost:3000/@crx/client-worker';
 exports[`serve fs output > src/content.ts.js 1`] = `
 "import icon from \\"/src/image.png__import.js\\";
 import font from \\"/src/font.otf__import.js\\";
-import scriptUrl from \\"/src/script.ts__scriptId--zfEki.js\\";
+import scriptUrl from \\"/src/script.ts__scriptId--0.js\\";
 console.log(\\"content.ts\\", { icon, font });
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(scriptUrl);
@@ -112,7 +112,7 @@ export {};
 "
 `;
 
-exports[`serve fs output > src/script.ts__scriptId--zfEki.js 1`] = `
+exports[`serve fs output > src/script.ts__scriptId--0.js 1`] = `
 "export default \\"src/script.ts.js\\";
 "
 `;
