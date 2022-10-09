@@ -1,20 +1,18 @@
 import { Subject, Observable } from 'rxjs'
 
+interface RxMapChange<K, V> {
+  type: keyof Map<string, unknown>
+  key?: string
+  map: RxMap<K, V>
+}
+
 /** Decorated Map with Observable of change events. */
 export class RxMap<K, V> extends Map<K, V> {
-  change$: Observable<{
-    type: keyof Map<string, unknown>
-    key?: string
-    map: RxMap<K, V>
-  }>
+  change$: Observable<RxMapChange<K, V>>
   constructor(iterable?: Iterable<readonly [K, V]> | null | undefined) {
     super(iterable)
 
-    const change$ = new Subject<{
-      type: keyof Map<string, unknown>
-      key?: string
-      map: RxMap<K, V>
-    }>()
+    const change$ = new Subject<RxMapChange<K, V>>()
     this.change$ = change$.asObservable()
 
     // Decorate change methods to emit change events
