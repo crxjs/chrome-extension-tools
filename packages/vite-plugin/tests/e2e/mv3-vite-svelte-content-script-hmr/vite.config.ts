@@ -1,5 +1,5 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte'
-import { crx } from 'src/.'
+import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 import manifest from './manifest.config'
 

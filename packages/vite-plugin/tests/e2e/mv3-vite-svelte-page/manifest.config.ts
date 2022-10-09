@@ -1,4 +1,4 @@
-import { defineManifest } from 'src/.'
+import { defineManifest } from '../../plugin-testOptionsProvider'
 
 export default defineManifest({
   manifest_version: 3,

@@ -2,6 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import { waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
+import { test, expect } from 'vitest'
 
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')

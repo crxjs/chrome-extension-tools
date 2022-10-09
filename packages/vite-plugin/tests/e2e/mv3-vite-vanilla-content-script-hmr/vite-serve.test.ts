@@ -43,8 +43,6 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
     },
   })
 
-  console.log('copy 1')
-
   await waitForInnerHtml(styles, (h) => h.includes('background-color: red;'))
   expect(reloads).toBe(0) // no reload on css update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on css update
@@ -58,13 +56,9 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
     },
   })
 
-  console.log('copy 2')
-
   await page.locator('h1', { hasText: header }).waitFor()
   expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
-
-  console.log('pre-copy 3')
 
   // update background.ts file -> trigger runtime reload
   await Promise.all([
@@ -78,8 +72,6 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
       },
     }),
   ])
-
-  console.log('copy 3')
 
   await app.waitFor()
 
