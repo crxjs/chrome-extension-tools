@@ -128,7 +128,7 @@ export const pluginManifest =
           // don't emit extra html files during serve
           if (config.command === 'serve')
             if (Array.isArray(input)) {
-              finalInput = input.filter((x) => x.endsWith('.html'))
+              finalInput = input.filter((x) => !x.endsWith('.html'))
             } else if (typeof input === 'object') {
               for (const [key, value] of Object.entries(input))
                 if (value.endsWith('.html')) delete input[key]
