@@ -12,7 +12,7 @@ import {
   startWith,
   switchMap,
 } from 'rxjs'
-import { ViteDevServer } from 'vite'
+import { ErrorPayload, ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
@@ -67,7 +67,16 @@ export const buildStart$ = fileWriterEvent$.pipe(
 export const allFilesReady$ = buildEnd$.pipe(
   switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
   map(() => [...outputFiles.values()]),
-  switchMap((files) => Promise.all(files.map(({ file }) => file))),
+  switchMap((files) => Promise.allSettled(files.map(({ file }) => file))),
+)
+
+const isRejected = <T>(
+  x: PromiseSettledResult<T> | undefined,
+): x is PromiseRejectedResult => x?.status === 'rejected'
+export const fileWriterError$: Observable<ErrorPayload> = allFilesReady$.pipe(
+  map((results) => results.find(isRejected)),
+  filter(isRejected),
+  map((rejected): ErrorPayload => ({ err: rejected.reason, type: 'error' })),
 )
 
 /* ------------------- WRITE OPS ------------------- */

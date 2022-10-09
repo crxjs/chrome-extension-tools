@@ -6,16 +6,12 @@ import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { htmlFiles, manifestFiles } from './files'
-import {
-  formatFileData,
-  getFileName,
-  prefix
-} from './fileWriter-utilities'
+import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import {
   decodeManifest,
   encodeManifest,
   isString,
-  structuredClone
+  structuredClone,
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
@@ -62,7 +58,7 @@ export const pluginManifest: CrxPluginFn = () => {
             contentScripts: js,
             background: sw,
             html,
-          } = await manifestFiles(manifest)
+          } = await manifestFiles(manifest, { cwd: config.root })
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize depts has explicit entries,
           // so we need to merge both to include extra HTML files
@@ -337,7 +333,7 @@ export const pluginManifest: CrxPluginFn = () => {
           'rulesets',
           'webAccessibleResources',
         ]
-        const files = await manifestFiles(manifest)
+        const files = await manifestFiles(manifest, { cwd: config.root })
         await Promise.all(
           assetTypes
             .map((k) => files[k])

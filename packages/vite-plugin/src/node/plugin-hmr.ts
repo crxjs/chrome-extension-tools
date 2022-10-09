@@ -1,9 +1,11 @@
 // import { HMRPayload } from 'vite'
-import { HMRPayload } from 'vite'
+import { merge } from 'rxjs'
+import { HMRPayload, ResolvedConfig } from 'vite'
 import { contentScripts } from './contentScripts'
 import { manifestFiles } from './files'
 import { update } from './fileWriter'
 import { crxHMRPayload$, hmrPayload$ } from './fileWriter-hmr'
+import { fileWriterError$ } from './fileWriter-rxjs'
 import { getFileName, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { isImporter } from './isImporter'
@@ -20,6 +22,7 @@ export const crxRuntimeReload: CrxHMRPayload = {
 export const pluginHMR: CrxPluginFn = () => {
   let inputManifestFiles: ManifestFiles
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
+  let config: ResolvedConfig
 
   return [
     {
@@ -36,7 +39,8 @@ export const pluginHMR: CrxPluginFn = () => {
         return { server, ...config }
       },
       // server should ignore outdir
-      configResolved(config) {
+      configResolved(_config) {
+        config = _config
         const { watch = {} } = config.server
         config.server.watch = watch
         watch.ignored = watch.ignored
@@ -57,8 +61,8 @@ export const pluginHMR: CrxPluginFn = () => {
             send(payload) // don't interfere with normal hmr
           }
           server.ws.send = decoratedSend
-          crxHMRPayload$.subscribe((payload) => {
-            send(payload) // send crx hmr events
+          merge(crxHMRPayload$, fileWriterError$).subscribe((payload) => {
+            send(payload) // send crx hmr and error events
           })
         }
       },
@@ -103,7 +107,7 @@ export const pluginHMR: CrxPluginFn = () => {
       enforce: 'post',
       // get final output manifest for handleHotUpdate 👆
       async transformCrxManifest(manifest) {
-        inputManifestFiles = await manifestFiles(manifest)
+        inputManifestFiles = await manifestFiles(manifest, { cwd: config.root })
         return null
       },
       renderCrxDevScript(code, { id: _id, type }) {
