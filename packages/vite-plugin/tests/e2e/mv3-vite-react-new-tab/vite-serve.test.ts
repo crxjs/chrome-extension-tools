@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest'
-import { getPage } from '../helpers'
+import { getCustomId, getPage } from '../helpers'
 import { serve } from '../runners'
 
-test('crx runs from server output', async () => {
+test('crx runs from server output', async (ctx) => {
   const { browser } = await serve(__dirname)
   const page = await getPage(browser, 'chrome-extension')
 
@@ -11,6 +11,6 @@ test('crx runs from server output', async () => {
   await app.waitFor()
 
   expect(await app.screenshot()).toMatchImageSnapshot({
-    customSnapshotIdentifier: __filename + 1,
+    customSnapshotIdentifier: getCustomId(ctx),
   })
 })
