@@ -9,7 +9,7 @@ import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
 import {
   isResourceByMatch,
   isString,
-  stubMatchPattern,
+  getMatchPatternOrigin,
   _debug,
 } from '../helpers'
 import {
@@ -384,7 +384,7 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
       },
     },
     {
-      name: 'crx:content-script-resources',
+      name: 'crx:∏content-script-resources',
       apply: 'build',
       enforce: 'post',
       config({ build, ...config }, { command }) {
@@ -527,7 +527,9 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
 
                     if (resource.resources.length) {
                       // chromium only uses origin of match pattern
-                      resource.matches = resource.matches.map(stubMatchPattern)
+                      resource.matches = resource.matches.map(
+                        getMatchPatternOrigin,
+                      )
                       manifest.web_accessible_resources.push(resource)
                     }
                   }

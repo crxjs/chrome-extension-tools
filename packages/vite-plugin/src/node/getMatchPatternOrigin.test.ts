@@ -1,4 +1,4 @@
-import { stubMatchPattern } from './helpers'
+import { getMatchPatternOrigin } from './helpers'
 
 test.each`
   pattern                          | expected
@@ -12,14 +12,14 @@ test.each`
 `(
   '$pattern -> $expected',
   ({ pattern, expected }: { pattern: string; expected: string }) => {
-    const result = stubMatchPattern(pattern)
+    const result = getMatchPatternOrigin(pattern)
     expect(result).toBe(expected)
   },
 )
 
 test('sorting mystery', () => {
   const inputs = ['https://a.com/*', 'http://b.com/*']
-  const outputs = inputs.map(stubMatchPattern)
+  const outputs = inputs.map(getMatchPatternOrigin)
 
   expect(inputs).toEqual(outputs)
   expect(inputs.sort()).toEqual(outputs.sort())
