@@ -1,5 +1,5 @@
 import { remove } from 'fs-extra'
-import { chromium, ChromiumBrowserContext, Page } from 'playwright'
+import { chromium, ChromiumBrowserContext, Page } from 'playwright-chromium'
 import { InputOptions, OutputOptions, rollup } from 'rollup'
 import { getExtPath, getTestName, requireExtFile } from '../__fixtures__/utils'
 
