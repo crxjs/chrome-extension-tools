@@ -18,6 +18,7 @@ import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
+import { getFileName } from './fileWriter-utilities'
 const { readFile } = fs
 
 // const debug = _debug('manifest')
@@ -195,6 +196,7 @@ export const pluginManifest =
                     id,
                     matches,
                     refId: hashScriptId({ type: 'loader', id }),
+                    fileName: getFileName({ type: 'loader', id }),
                   })
                 }
           } else {

@@ -1,3 +1,5 @@
+import * as lexer from 'es-module-lexer'
+import MagicString from 'magic-string'
 import {
   filter,
   map,
@@ -12,7 +14,6 @@ import {
 import { ViteDevServer } from 'vite'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
-import * as lexer from 'es-module-lexer'
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -103,8 +104,14 @@ function prepScript(
         await lexer.init
         const [imports] = lexer.parse(code, fileName)
         const depSet = new Set(deps)
-        for (const { n } of imports) if (n) depSet.add(n)
-        return { target, source: code, deps: [...depSet] }
+        const magic = new MagicString(code)
+        for (const i of imports)
+          if (i.n) {
+            depSet.add(i.n)
+            const fileName = getFileName({ type: 'module', id: i.n })
+            magic.overwrite(i.s, i.e, fileName)
+          }
+        return { target, source: magic.toString(), deps: [...depSet] }
       }),
     )
 }

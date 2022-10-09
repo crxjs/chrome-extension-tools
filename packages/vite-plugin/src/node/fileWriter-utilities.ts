@@ -13,7 +13,7 @@ export type FileWriterId = {
 
 /** Converts ScriptId to string */
 export function getFileName({ type, id }: FileWriterId): string {
-  let fileName = id
+  let fileName = id.replace(/\?/g, '__').replace(/&/g, '_').replace(/=/g, '--')
   if (fileName.startsWith('/@fs')) {
     fileName = `vendor/${fileName
       .slice(5)

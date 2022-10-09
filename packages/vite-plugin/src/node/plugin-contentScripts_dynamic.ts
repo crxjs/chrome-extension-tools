@@ -1,7 +1,7 @@
 import { ResolvedConfig } from 'vite'
 import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
 import { fileReady } from './fileWriter'
-import { basename } from './path'
+import { basename, relative } from './path'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
@@ -79,12 +79,12 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
               }
               script = {
                 type,
-                id,
+                id: relative(config.root, id),
                 isDynamicScript: true,
                 refId,
                 matches: [],
               }
-              contentScripts.set(resolvedId, script)
+              contentScripts.set(scriptId, script)
             }
 
             return resolvedId
@@ -94,14 +94,20 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         }
       },
       async load(id) {
-        const script = id.includes('?scriptId=') && contentScripts.get(id)
-        if (script)
+        const index = id.indexOf('?scriptId=')
+        if (index > -1) {
+          const scriptId = id.slice(index + '?scriptId='.length)
+          const script = contentScripts.get(scriptId)!
           if (config.command === 'build') {
             return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.refId};`
           } else {
             await fileReady(script)
-            return `export default ${JSON.stringify(script.fileName)};`
+            const fileName = script.fileName?.startsWith('/')
+              ? script.fileName
+              : `/${script.fileName}`
+            return `export default ${JSON.stringify(fileName)};`
           }
+        }
       },
     },
     {
