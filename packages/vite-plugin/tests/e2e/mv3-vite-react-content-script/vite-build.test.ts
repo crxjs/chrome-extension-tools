@@ -1,5 +1,7 @@
 import { build } from '../runners'
 
+jest.retryTimes(2)
+
 test('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
   const page = await browser.newPage()
@@ -11,5 +13,7 @@ test('crx runs from build output', async () => {
 
   await app.waitFor()
 
-  expect(await app.screenshot()).toMatchImageSnapshot()
+  expect(await app.screenshot()).toMatchImageSnapshot({
+    customSnapshotIdentifier: __filename + 1,
+  })
 })

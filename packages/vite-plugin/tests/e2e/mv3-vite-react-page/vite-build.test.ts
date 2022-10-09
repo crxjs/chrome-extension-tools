@@ -1,6 +1,8 @@
 import { getPage } from '../helpers'
 import { build } from '../runners'
 
+jest.retryTimes(2)
+
 test('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
   const page = await getPage(browser, 'chrome-extension')
@@ -9,5 +11,7 @@ test('crx runs from build output', async () => {
   const app = page.locator('.App')
   await app.waitFor()
 
-  expect(await app.screenshot()).toMatchImageSnapshot()
+  expect(await app.screenshot()).toMatchImageSnapshot({
+    customSnapshotIdentifier: __filename + 1,
+  })
 })

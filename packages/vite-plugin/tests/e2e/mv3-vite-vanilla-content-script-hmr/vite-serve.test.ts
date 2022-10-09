@@ -4,6 +4,8 @@ import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
 
+jest.retryTimes(2)
+
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')
@@ -65,6 +67,7 @@ test('crx page update on hmr', async () => {
         return f.endsWith('bg-onload.ts')
       },
     }),
+    // TODO: this should trigger a runtime reload
     optionsPage.waitForEvent('close'), // options page should close
     page.waitForEvent('framenavigated'), // content script should reload
   ])

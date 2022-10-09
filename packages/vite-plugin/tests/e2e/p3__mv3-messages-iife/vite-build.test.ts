@@ -1,5 +1,7 @@
 import { build } from '../runners'
 
+jest.retryTimes(2)
+
 test.skip('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
 
