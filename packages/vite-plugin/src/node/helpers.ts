@@ -23,7 +23,7 @@ export const structuredClone = <T>(obj: T): T => {
   return v8.deserialize(v8.serialize(obj))
 }
 
-export const createHash = (data: string, length = 5): string =>
+export const hash = (data: string, length = 5): string =>
   _hash('sha1')
     .update(data)
     .digest('base64')

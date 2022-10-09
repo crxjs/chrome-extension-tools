@@ -1,14 +1,13 @@
 import { CrxPluginFn } from './types'
 
 /**
- * 1. Renders manifest content scripts as loader files
+ * Plugin-manifest handles declared content scripts:
  *
- * - Build: emits loaders as assets
- * - Serve: not needed b/c file name is deterministic
+ * - Emits content scripts during transformCrxManifest
+ * - Emits loaders during renderCrxManifest
+ *
+ * Not currently any need for a declared content script plugin!
  */
 export const pluginDeclaredContentScripts: CrxPluginFn = () => {
-  throw new Error('plugin declared content scripts not implemented')
-  return {
-    name: 'crx:declared-content-scripts',
-  }
+  return []
 }

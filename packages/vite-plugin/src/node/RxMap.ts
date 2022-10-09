@@ -1,9 +1,31 @@
 import { Subject, Observable } from 'rxjs'
 
-interface RxMapChange<K, V> {
-  type: keyof Map<string, unknown>
-  key?: string
-  map: RxMap<K, V>
+export type RxMapChange<K, V> =
+  | {
+      type: 'clear'
+      map: RxMap<K, V>
+    }
+  | {
+      type: 'delete'
+      key: K
+      map: RxMap<K, V>
+    }
+  | {
+      type: 'set'
+      key: K
+      value: V
+      map: RxMap<K, V>
+    }
+
+export const isChangeType = {
+  clear: <K, V>(
+    x: RxMapChange<K, V>,
+  ): x is Extract<typeof x, { type: 'clear' }> => x.type === 'clear',
+  delete: <K, V>(
+    x: RxMapChange<K, V>,
+  ): x is Extract<typeof x, { type: 'delete' }> => x.type === 'delete',
+  set: <K, V>(x: RxMapChange<K, V>): x is Extract<typeof x, { type: 'set' }> =>
+    x.type === 'set',
 }
 
 /** Decorated Map with Observable of change events. */
@@ -23,7 +45,7 @@ export class RxMap<K, V> extends Map<K, V> {
       this[type] = function (this: typeof this, ...args) {
         // @ts-expect-error also too dynamic for ts
         const result = method.call(this, ...args)
-        change$.next({ type, key: args[0], map: this })
+        change$.next({ type, key: args[0], value: args[1], map: this })
         return result
       }.bind(this)
     }

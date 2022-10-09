@@ -1,21 +1,35 @@
 import { firstValueFrom, map, switchMap } from 'rxjs'
 import { ViteDevServer } from 'vite'
-import { scriptFiles, ScriptId } from './fileWriter-filesMap'
+import { scriptFiles } from './fileWriter-filesMap'
 import { isAbsolute, join } from './path'
+import { CrxDevAssetId, CrxDevScriptId } from './types'
+
+export type FileWriterId = {
+  type: CrxDevAssetId['type'] | CrxDevScriptId['type'] | 'loader'
+  id: string
+}
 
 /* ------------------- UTILITIES ------------------- */
 
 /** Converts ScriptId to string */
-export function getFileName({ type, id }: ScriptId): string {
-  // TODO: handle URL queries
+export function getFileName({ type, id }: FileWriterId): string {
   const fileName = id
   switch (type) {
     case 'iife':
       return `${fileName}.iife.js`
     case 'loader':
       return `${fileName}.loader.js`
-    default:
+    case 'module':
       return `${fileName}.js`
+    case 'asset':
+      return fileName
+    default:
+      throw new Error(
+        `Unexpected script type "${type}" for "${JSON.stringify({
+          type,
+          id,
+        })}"`,
+      )
   }
 }
 
@@ -32,7 +46,7 @@ export function getOutputPath(server: ViteDevServer, fileName: string) {
 }
 
 /** Converts a script to the correct Vite URL */
-export function getViteUrl({ type, id }: ScriptId) {
+export function getViteUrl({ type, id }: FileWriterId) {
   if (type === 'asset') {
     // TODO: verify if assets need special handling
     throw new Error(`File type "${type}" not implemented.`)
@@ -49,7 +63,7 @@ export function getViteUrl({ type, id }: ScriptId) {
 }
 
 /** Resolves when file and dependencies are written. */
-export async function fileReady(script: ScriptId): Promise<void> {
+export async function fileReady(script: FileWriterId): Promise<void> {
   const key = getFileName(script)
   const scriptFile = scriptFiles.get(key)
   if (!scriptFile) throw new Error('unknown script type and id')

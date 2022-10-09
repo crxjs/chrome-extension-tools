@@ -1,10 +1,9 @@
-import { existsSync } from 'fs'
-import { promises as fs } from 'fs'
+import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
+import { contentScripts } from './contentScripts'
 import { ManifestV3Export } from './defineManifest'
-import { add } from './fileWriter'
 import {
   decodeManifest,
   encodeManifest,
@@ -61,7 +60,7 @@ export const pluginManifest =
               html,
             } = await manifestFiles(manifest)
             const { entries = [] } = config.optimizeDeps ?? {}
-            // Vite ignores build inputs if explicit entries,
+            // Vite ignores build inputs if optimize depts has explicit entries,
             // so we need to merge both to include extra HTML files
             let { input = [] } = config.build?.rollupOptions ?? {}
             if (typeof input === 'string') input = [input]
@@ -118,9 +117,9 @@ export const pluginManifest =
         options({ input, ...options }) {
           /**
            * Rollup requires an initial input, but we don't need it By using a
-           * stub as the default input, we can avoid extending complicated
-           * inputs and easily find the manifest in crx:manifest#generateBundle
-           * using a ref id.
+           * stub instead of the default input, we can avoid extending
+           * complicated inputs and easily find the manifest in
+           * crx:manifest#generateBundle using a ref id.
            */
           return {
             input:
@@ -147,7 +146,6 @@ export const pluginManifest =
       },
       {
         name: 'crx:manifest-post',
-        apply: 'build',
         enforce: 'post',
         configResolved(_config) {
           config = _config
@@ -180,22 +178,32 @@ export const pluginManifest =
 
           /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
 
-          // file writer does not emit scripts nor html files
-          if (config.command === 'build') {
-            // css[] should be added and removed by crx:styles
-            manifest.content_scripts = manifest.content_scripts?.map(
-              ({ js = [], ...rest }) => {
-                const refJS = js.map((file) =>
-                  this.emitFile({
+          if (config.command === 'serve') {
+            // vite serve file writer only emits content scripts
+            // - html files come directly from vite dev server
+            // - service worker comes from vite dev server via loader file
+            if (manifest.content_scripts)
+              for (const { js = [], matches = [] } of manifest.content_scripts)
+                for (const id of js) {
+                  contentScripts.set(id, { type: 'loader', id, matches })
+                }
+          } else {
+            // vite build emits content scripts, html files and service worker
+            if (manifest.content_scripts)
+              for (const { js = [], matches = [] } of manifest.content_scripts)
+                for (const id of js) {
+                  const refId = this.emitFile({
                     type: 'chunk',
-                    id: file,
-                    name: basename(file),
-                  }),
-                )
-
-                return { js: refJS, ...rest }
-              },
-            )
+                    id,
+                    name: basename(id),
+                  })
+                  contentScripts.set(id, {
+                    type: 'loader',
+                    id,
+                    refId,
+                    matches,
+                  })
+                }
 
             if (manifest.background?.service_worker) {
               const file = manifest.background.service_worker
@@ -214,22 +222,6 @@ export const pluginManifest =
                 name: basename(file),
               })
             }
-          } else {
-            // build plugin runs in file writer during serve
-            manifest.content_scripts = manifest.content_scripts?.map(
-              ({ js = [], ...rest }) => {
-                const loaders = js.map(
-                  // add is sync, rollup is unconcerned with file write status
-                  (f) =>
-                    add({ id: `/${f}`, type: 'loader' }).fileName.replace(
-                      /^\//,
-                      '',
-                    ),
-                )
-
-                return { js: loaders, ...rest }
-              },
-            )
           }
 
           const encoded = encodeManifest(manifest)
@@ -242,7 +234,21 @@ export const pluginManifest =
 
           /* ----------- UPDATE EMITTED FILE NAMES ----------- */
 
-          if (config.command === 'build') {
+          if (config.command === 'serve') {
+            // plugin-background emits service worker loader in renderCrxManifest
+            // vite dev server sends html files through local host
+            if (manifest.content_scripts)
+              for (const script of manifest.content_scripts) {
+                script.js = script.js?.map((id) => {
+                  const f = contentScripts.get(id)?.fileName
+                  if (typeof f === 'undefined')
+                    throw new Error(
+                      `Content script fileName is undefined: ${id}`,
+                    )
+                  return f
+                })
+              }
+          } else {
             // transform hook emits files and replaces in manifest with ref ids
             // update background service worker filename from ref
             // service worker not emitted during development, so don't update file name
@@ -256,8 +262,15 @@ export const pluginManifest =
             // TODO: emit and parse css
             manifest.content_scripts = manifest.content_scripts?.map(
               ({ js = [], ...rest }) => {
-                const refJS = js.map((ref) => this.getFileName(ref))
-                return { js: refJS, ...rest }
+                return {
+                  js: js.map((id) => {
+                    const script = contentScripts.get(id)
+                    if (typeof script?.refId === 'undefined')
+                      throw new Error(`Content script was not emitted: "${id}"`)
+                    return this.getFileName(script.refId)
+                  }),
+                  ...rest,
+                }
               },
             )
           }
