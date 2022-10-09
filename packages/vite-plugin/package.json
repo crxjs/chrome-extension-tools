@@ -76,7 +76,7 @@
     "magic-string": "^0.26.0",
     "picocolors": "^1.0.0",
     "react-refresh": "^0.13.0",
-    "rollup": "^2.70.2"
+    "rollup": "^2.79.0"
   },
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",

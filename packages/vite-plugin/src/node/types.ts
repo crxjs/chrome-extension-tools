@@ -84,7 +84,7 @@ export interface CrxOptions {
 }
 
 export interface CrxPluginFn {
-  (options: CrxOptions): CrxPlugin | CrxPlugin[]
+  (): CrxPlugin | CrxPlugin[]
 }
 
 export type ManifestFiles = {

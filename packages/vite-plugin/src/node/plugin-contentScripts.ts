@@ -8,6 +8,7 @@ import {
 } from './contentScripts'
 import { add } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
+import { getOptions } from './plugin-optionsProvider'
 import { basename } from './path'
 import { RxMap } from './RxMap'
 import { CrxPluginFn } from './types'
@@ -25,43 +26,21 @@ import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
  *
  * - This plugin emits content scripts and loaders
  */
-export const pluginContentScripts: CrxPluginFn = (options) => {
+export const pluginContentScripts: CrxPluginFn = () => {
   let server: ViteDevServer
-  let { preambleCode, hmrTimeout } = options.contentScripts ?? {}
+  let preambleCode: string | false | undefined
+  let hmrTimeout: number | undefined
   let sub = new Subscription()
 
   return [
     {
       name: 'crx:content-scripts',
-      apply: 'build',
-      enforce: 'pre',
-      generateBundle() {
-        // emit content script loaders
-        for (const [key, script] of contentScripts)
-          if (key === script.refId) {
-            if (script.type === 'module') {
-              const fileName = this.getFileName(script.refId)
-              script.fileName = fileName
-            } else if (script.type === 'loader') {
-              const fileName = this.getFileName(script.refId)
-              script.fileName = fileName
-              const refId = this.emitFile({
-                type: 'asset',
-                name: getFileName({ type: 'loader', id: basename(script.id) }),
-                source: createProLoader({ fileName }),
-              })
-              script.loaderName = this.getFileName(refId)
-            } else if (script.type === 'iife') {
-              throw new Error('IIFE content scripts are not implemented')
-            }
-            // trigger update for other key values
-            contentScripts.set(script.refId, formatFileData(script))
-          }
-      },
-    },
-    {
-      name: 'crx:content-scripts',
       apply: 'serve',
+      config(config) {
+        const { contentScripts = {} } = getOptions(config)
+        hmrTimeout = contentScripts.hmrTimeout
+        preambleCode = preambleCode ?? contentScripts.preambleCode
+      },
       async configureServer(_server) {
         server = _server
         if (
@@ -133,6 +112,34 @@ export const pluginContentScripts: CrxPluginFn = (options) => {
       closeBundle() {
         sub.unsubscribe()
         sub = new Subscription() // can't reuse subscriptions
+      },
+    },
+    {
+      name: 'crx:content-scripts',
+      apply: 'build',
+      enforce: 'pre',
+      generateBundle() {
+        // emit content script loaders
+        for (const [key, script] of contentScripts)
+          if (key === script.refId) {
+            if (script.type === 'module') {
+              const fileName = this.getFileName(script.refId)
+              script.fileName = fileName
+            } else if (script.type === 'loader') {
+              const fileName = this.getFileName(script.refId)
+              script.fileName = fileName
+              const refId = this.emitFile({
+                type: 'asset',
+                name: getFileName({ type: 'loader', id: basename(script.id) }),
+                source: createProLoader({ fileName }),
+              })
+              script.loaderName = this.getFileName(refId)
+            } else if (script.type === 'iife') {
+              throw new Error('IIFE content scripts are not implemented')
+            }
+            // trigger update for other key values
+            contentScripts.set(script.refId, formatFileData(script))
+          }
       },
     },
   ]

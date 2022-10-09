@@ -13,14 +13,15 @@ import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
 } from './manifest'
+import { getOptions } from './plugin-optionsProvider'
 import { CrxPluginFn } from './types'
 
 const debug = _debug('web-acc-res')
 
-export const pluginWebAccessibleResources: CrxPluginFn = ({
-  contentScripts: { injectCss = true } = {},
-}) => {
+export const pluginWebAccessibleResources: CrxPluginFn = () => {
   let config: ResolvedConfig
+  let injectCss: boolean
+
   return [
     {
       name: 'crx:web-accessible-resources',
@@ -56,13 +57,16 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
       name: 'crx:web-accessible-resources',
       apply: 'build',
       enforce: 'post',
-      config({ build, ...config }, { command }) {
+      async config({ build, ...config }, { command }) {
+        const { contentScripts = {} } = await getOptions(config)
+        injectCss = contentScripts.injectCss ?? true
+
         return { ...config, build: { ...build, manifest: command === 'build' } }
       },
       configResolved(_config) {
         config = _config
       },
-      renderCrxManifest(manifest, bundle) {
+      async renderCrxManifest(manifest, bundle) {
         const { web_accessible_resources: _war = [] } = manifest
         const dynamicScriptMatches = new Set<string>()
         let dynamicScriptDynamicUrl = false
@@ -136,6 +140,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
                       ? dynamicScriptDynamicUrl
                       : true,
                   }
+
                   if (isDynamicScript || !injectCss) {
                     resource.resources.push(...css)
                   }

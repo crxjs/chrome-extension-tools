@@ -1,12 +1,16 @@
 import { contentScripts } from './contentScripts'
+import { getOptions } from './plugin-optionsProvider'
 import { CrxPluginFn } from './types'
 
-export const pluginContentScriptsCss: CrxPluginFn = ({
-  contentScripts: { injectCss = true } = {},
-}) => {
+export const pluginContentScriptsCss: CrxPluginFn = () => {
+  let injectCss: boolean
   return {
     name: 'crx:content-scripts-css',
     enforce: 'post',
+    config(config) {
+      const { contentScripts = {} } = getOptions(config)
+      injectCss = contentScripts.injectCss ?? true
+    },
     renderCrxManifest(manifest) {
       if (injectCss)
         if (manifest.content_scripts)
