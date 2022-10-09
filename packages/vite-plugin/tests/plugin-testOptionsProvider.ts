@@ -1,2 +1,5 @@
-export { pluginOptionsProvider as crx } from 'src/plugin-optionsProvider'
-export { defineManifest, defineDynamicResource } from 'src/.'
+export { pluginOptionsProvider as crx } from '../src/node/plugin-optionsProvider'
+export {
+  defineManifest,
+  defineDynamicResource,
+} from '../src/node/defineManifest'

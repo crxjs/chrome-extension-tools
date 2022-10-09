@@ -1,8 +1,5 @@
 import { serve } from 'tests/runners'
 import { testOutput } from 'tests/testOutput'
-import { mockDate } from 'tests/helpers'
-
-mockDate()
 
 let result: Awaited<ReturnType<typeof serve>> | undefined
 

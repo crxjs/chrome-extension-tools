@@ -1,4 +1,4 @@
-import { crx, defineManifest } from 'tests/plugin-testOptionsProvider'
+import { crx, defineManifest } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 
 const manifest = defineManifest({

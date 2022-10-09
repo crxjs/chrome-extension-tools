@@ -1,5 +1,5 @@
 import vue from '@vitejs/plugin-vue'
-import { crx } from 'tests/plugin-testOptionsProvider'
+import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 import manifest from './manifest.json'
 

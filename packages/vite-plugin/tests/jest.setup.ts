@@ -1,5 +1,13 @@
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
-import { expect } from 'vitest'
+import { expect, vi, beforeEach, afterEach } from 'vitest'
+
+beforeEach(() => {
+  vi.useFakeTimers()
+})
+
+afterEach(() => {
+  vi.useRealTimers()
+})
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({

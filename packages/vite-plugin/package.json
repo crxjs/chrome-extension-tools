@@ -57,8 +57,8 @@
     "test:ci:mv3:build": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) --updateSnapshot build",
     "test:ci:mv3:serve": "node --expose-gc ./node_modules/jest/bin/jest.js --logHeapUsage --runInBand --forceExit --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\) --updateSnapshot serve",
     "test:units": "vitest run src",
-    "test:output:build": "vitest build -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\)",
-    "test:output:serve": "vitest serve -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /e2e/\\)",
+    "test:output:build": "vitest build -u -c vitest.config.ts",
+    "test:output:serve": "vitest serve -u",
     "test:e2e:build": "vitest build -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/\\)",
     "test:e2e:serve": "vitest serve -u --testPathIgnorePatterns=\\(/node_modules/ /templates/ /mv3/ hmr\\)",
     "test:e2e:hmr": "vitest hmr -u --runInBand"

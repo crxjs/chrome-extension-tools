@@ -10,15 +10,18 @@ import {
   ResolvedConfig,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
+import { vi } from 'vitest'
 
 export async function build(dirname: string, configFile = 'vite.config.ts') {
+  const date = new Date('2022-01-26T00:00:00.000Z')
+  vi.setSystemTime(date)
+
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
   const cacheDir = join(dirname, '.vite')
   const outDir = join(dirname, 'dist-build')
 
-  process.chdir(dirname)
   await fs.remove(cacheDir)
   await fs.remove(outDir)
 
@@ -60,6 +63,9 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
 }
 
 export async function serve(dirname: string) {
+  const date = new Date('2022-01-26T00:00:00.000Z')
+  vi.setSystemTime(date)
+
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 

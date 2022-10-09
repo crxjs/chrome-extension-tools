@@ -8,6 +8,7 @@ console.log(__dirname)
 
 export default defineConfig({
   test: {
+    exclude: ['**/e2e/**', '**/templates/**'],
     globalSetup: './tests/jest.globalSetup.ts',
     setupFiles: './tests/jest.setup.ts',
     alias: [
@@ -15,6 +16,10 @@ export default defineConfig({
       { find: 'tests', replacement: path.resolve(__dirname, 'tests') },
       {
         find: /^client\/(.+)\.ts$/,
+        replacement: `${path.resolve(__dirname, 'tests/artifacts')}/$1.js`,
+      },
+      {
+        find: /^client\/(.+)\.html$/,
         replacement: `${path.resolve(__dirname, 'tests/artifacts')}/$1.js`,
       },
     ],
