@@ -4,7 +4,13 @@ import { fileReady } from './fileWriter'
 import { basename } from './path'
 import { CrxPluginFn } from './types'
 
-const dynamicScriptRegEx = /import\.meta\.CRX_DYNAMIC_SCRIPT_(.+?);/g
+// Rollup may use `import_meta` instead of `import.meta`
+const _dynamicScriptRegEx = /\b(import.meta).CRX_DYNAMIC_SCRIPT_(.+?);$/gm
+const dynamicScriptRegEx = () => {
+  // stupid stateful JS RegExp
+  _dynamicScriptRegEx.lastIndex = 0
+  return _dynamicScriptRegEx
+}
 
 /**
  * 1. Resolves `?script` import queries
@@ -105,11 +111,11 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       generateBundle(options, bundle) {
         for (const chunk of Object.values(bundle))
           if (chunk.type === 'chunk') {
-            if (dynamicScriptRegEx.test(chunk.code)) {
+            if (dynamicScriptRegEx().test(chunk.code)) {
               const replaced = chunk.code.replace(
-                dynamicScriptRegEx,
-                (match, p1) => {
-                  const script = contentScripts.get(p1)
+                dynamicScriptRegEx(),
+                (match, p1, scriptKey) => {
+                  const script = contentScripts.get(scriptKey)
                   if (typeof script === 'undefined')
                     throw new Error(
                       `Content script refId is undefined: "${match}"`,
@@ -119,9 +125,12 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                       `Content script fileName is undefined: "${script.id}"`,
                     )
 
-                  return `${JSON.stringify(script.fileName)};`
+                  return `${JSON.stringify(
+                    script.loaderName ?? script.fileName,
+                  )};`
                 },
               )
+              // TODO: remove unused import_meta value?
               chunk.code = replaced
             }
           }
