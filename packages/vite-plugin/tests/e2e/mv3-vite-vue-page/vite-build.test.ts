@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { expect, test } from 'vitest'
 import { getPage } from '../helpers'
 import { build } from '../runners'
 
@@ -9,7 +9,7 @@ test('crx runs from build output', async () => {
   const app = page.locator('#app')
   await app.locator('img').waitFor()
 
-  // expect(await app.screenshot()).toMatchImageSnapshot({
-  //   customSnapshotIdentifier: __filename + 1,
-  // })
+  expect(await app.screenshot()).toMatchImageSnapshot({
+    customSnapshotIdentifier: __filename + 1,
+  })
 })

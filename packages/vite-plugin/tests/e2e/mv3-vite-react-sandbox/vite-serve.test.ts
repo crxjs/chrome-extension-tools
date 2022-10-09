@@ -12,7 +12,7 @@ test.skip('crx runs from server output', async () => {
   const app = page.locator('.App')
   await app.waitFor()
 
-  // expect(await app.screenshot()).toMatchImageSnapshot({
-  //   customSnapshotIdentifier: __filename + 1,
-  // })
+  expect(await app.screenshot()).toMatchImageSnapshot({
+    customSnapshotIdentifier: __filename + 1,
+  })
 })
