@@ -21,6 +21,9 @@ defaults:
   run:
     working-directory: "packages/vite-plugin"
 
+env:
+  DEBUG: "crx:hmr"
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Runs linter and unit tests
