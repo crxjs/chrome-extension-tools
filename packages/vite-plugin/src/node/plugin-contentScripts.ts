@@ -77,7 +77,7 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  * to all urls. This is secure enough for our purposes b/c the CRX origin is
  * changed randomly each runtime reload.
  */
-export const pluginResources: CrxPluginFn = ({ contentScripts = {} }) => {
+export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
   const { hmrTimeout = 5000, injectCss = true } = contentScripts
   const dynamicScriptsById = new Map<string, DynamicScriptData>()
   const dynamicScriptsByLoaderRefId = new Map<string, DynamicScriptData>()

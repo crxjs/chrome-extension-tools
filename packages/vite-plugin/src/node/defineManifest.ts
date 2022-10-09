@@ -1,6 +1,6 @@
 import { ConfigEnv } from 'vite'
 import { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
-import { dynamicResourcesName } from './plugin-content-scripts'
+import { dynamicResourcesName } from './plugin-contentScripts'
 
 export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 

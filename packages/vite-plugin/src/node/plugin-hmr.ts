@@ -13,25 +13,15 @@ export const crxRuntimeReload: CrxHMRPayload = {
 }
 
 export const pluginHMR: CrxPluginFn = () => {
-  let files: ManifestFiles
+  let finalManifestFiles: ManifestFiles
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
 
   return [
     {
       name: 'crx:hmr',
-      apply: 'build',
-      enforce: 'post',
-      async renderCrxManifest(manifest) {
-        if (this.meta.watchMode) {
-          files = await manifestFiles(manifest)
-        }
-        return null
-      },
-    },
-    {
-      name: 'crx:hmr',
       apply: 'serve',
       enforce: 'pre',
+      // server hmr host should be localhost
       config({ server = {}, ...config }) {
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
@@ -40,6 +30,7 @@ export const pluginHMR: CrxPluginFn = () => {
 
         return { server, ...config }
       },
+      // server should ignore outdir
       configResolved(config) {
         const { watch = {} } = config.server
         config.server.watch = watch
@@ -49,8 +40,9 @@ export const pluginHMR: CrxPluginFn = () => {
         const outDir = isAbsolute(config.build.outDir)
           ? config.build.outDir
           : join(config.root, config.build.outDir, '**/*')
-        watch.ignored.push(outDir)
+        if (!watch.ignored.includes(outDir)) watch.ignored.push(outDir)
       },
+      // emit hmr payloads for file writer
       configureServer(server) {
         if (server.ws.send !== decoratedSend) {
           // decorate server websocket send method
@@ -65,9 +57,11 @@ export const pluginHMR: CrxPluginFn = () => {
           })
         }
       },
+      // background changes require a full extension reload
       handleHotUpdate({ file, modules, server }) {
         const background =
-          files.background[0] && join(server.config.root, files.background[0])
+          finalManifestFiles.background[0] &&
+          join(server.config.root, finalManifestFiles.background[0])
 
         // check that the changed file is not a background dependency
         if (background)
@@ -76,6 +70,16 @@ export const pluginHMR: CrxPluginFn = () => {
             server.ws.send(crxRuntimeReload)
             return []
           }
+      },
+    },
+    {
+      name: 'crx:hmr',
+      apply: 'build',
+      enforce: 'post',
+      // get final output manifest for handleHotUpdate 👆
+      async renderCrxManifest(manifest) {
+        finalManifestFiles = await manifestFiles(manifest)
+        return null
       },
     },
   ]

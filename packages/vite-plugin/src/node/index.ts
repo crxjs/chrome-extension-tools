@@ -1,9 +1,9 @@
 import type { ManifestV3Export } from './defineManifest'
 import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginHMR } from './plugin-hmr'
-import { pluginHtmlAuditor } from './plugin-htmlAuditor'
+import { pluginHtmlInlineScripts } from './plugin-htmlInlineScripts'
 import { pluginManifest } from './plugin-manifest'
-import { pluginResources } from './plugin-content-scripts'
+import { pluginContentScripts } from './plugin-contentScripts'
 import type { CrxOptions, CrxPlugin, CrxPluginFn } from './types'
 import { pluginBackground } from './plugin-background'
 import type { PluginOption } from 'vite'
@@ -23,8 +23,8 @@ export const crx = ({
 } & CrxOptions): PluginOption[] => {
   const plugins = init(options, [
     pluginHMR,
-    pluginHtmlAuditor,
-    pluginResources,
+    pluginHtmlInlineScripts,
+    pluginContentScripts,
     pluginBackground,
     pluginManifest(manifest),
   ])
@@ -38,5 +38,5 @@ export const crx = ({
 export const chromeExtension = crx
 
 export { defineDynamicResource, defineManifest } from './defineManifest'
-export { filesReady, rebuildFiles } from './plugin-fileWriter--events'
+export { filesReady } from './plugin-fileWriter--events'
 export type { CrxPlugin, ManifestV3Export }
