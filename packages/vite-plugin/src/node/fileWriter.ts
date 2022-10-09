@@ -5,8 +5,10 @@ import { firstValueFrom, mergeMap, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { ScriptFile, scriptFiles } from './fileWriter-filesMap'
 import { close$, prepFileData, serverEvent$, start$ } from './fileWriter-rxjs'
-import { allFilesReady, getFileName } from './fileWriter-utilities'
-import { CrxDevAssetId, CrxDevScriptId } from './types'
+import { allFilesReady, fileReady, getFileName } from './fileWriter-utilities'
+import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
+
+export { allFilesReady, fileReady }
 
 /**
  * Starts the file writer.
@@ -21,20 +23,24 @@ export async function start({
   server,
 }: {
   server: ViteDevServer
-  preamble: boolean
 }): Promise<void> {
   serverEvent$.next({ type: 'start', server })
 
+  const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
+    p.name.startsWith('crx:'),
+  )
   const { rollupOptions, outDir } = server.config.build
   const inputOptions: RollupOptions = {
     ...rollupOptions,
+    plugins,
   }
-  // not supporting multiple output options
+  // handle the various output option types
   const rollupOutputOptions = [rollupOptions.output].flat()[0]
   const outputOptions: OutputOptions = {
     ...rollupOutputOptions,
     dir: outDir,
     format: 'es',
+    plugins, // TODO: 👈 not sure if this is necessary
   }
 
   const build = await rollup(inputOptions)
