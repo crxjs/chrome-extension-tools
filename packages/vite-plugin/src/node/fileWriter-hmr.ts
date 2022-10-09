@@ -1,4 +1,13 @@
-import { buffer, filter, map, merge, mergeMap, Observable, Subject } from 'rxjs'
+import {
+  buffer,
+  filter,
+  map,
+  merge,
+  mergeMap,
+  Observable,
+  Subject,
+  tap,
+} from 'rxjs'
 import {
   FullReloadPayload,
   HMRPayload,
@@ -89,5 +98,8 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = merge(
       event: 'crx:content-script-payload',
       data,
     }
+  }),
+  tap((p) => {
+    console.log('content script hmr event', p)
   }),
 )
