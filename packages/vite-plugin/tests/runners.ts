@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
+import { allFilesReady } from 'src/.'
 import { _debug } from 'src/helpers'
 import { join } from 'src/path'
-import { filesReady } from 'src/.'
 import type { CrxPlugin } from 'src/types'
 import { build as _build, createServer, ResolvedConfig } from 'vite'
 import inspect from 'vite-plugin-inspect'
@@ -85,7 +85,7 @@ export async function serve(dirname: string) {
 
   await server.listen()
   debug('listen')
-  await filesReady()
+  await allFilesReady()
   debug('bundle end')
 
   return { outDir, server, config: server.config }

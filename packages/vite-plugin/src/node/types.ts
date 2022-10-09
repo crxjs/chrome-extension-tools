@@ -39,6 +39,16 @@ export interface AcornTemplateElement extends AcornNode {
   }
 }
 
+export interface CrxDevAssetId {
+  id: string
+  type: 'asset'
+  source: string | Uint8Array
+}
+export interface CrxDevScriptId {
+  id: string
+  type: 'module' | 'iife'
+}
+
 export interface CrxPlugin extends VitePlugin {
   /** Runs during the transform hook for the manifest. */
   transformCrxManifest?: (
@@ -51,6 +61,16 @@ export interface CrxPlugin extends VitePlugin {
     manifest: ManifestV3,
     bundle: OutputBundle,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
+  /** Runs in the file writer on content scripts during development */
+  renderCrxDevScript?: (
+    code: string,
+    script: CrxDevScriptId,
+  ) =>
+    | Promise<string | { code: string; deps: string[] } | null | undefined>
+    | string
+    | { code: string; deps: string[] }
+    | null
+    | undefined
 }
 
 // change this to an interface when you want to add options

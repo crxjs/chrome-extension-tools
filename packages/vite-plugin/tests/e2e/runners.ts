@@ -1,6 +1,6 @@
 import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright-chromium'
-import { filesReady } from 'src/.'
+import { allFilesReady } from 'src/.'
 import { ViteDevServer } from 'vite'
 import { build as _build, serve as _serve } from '../runners'
 
@@ -32,7 +32,7 @@ export async function serve(dirname: string) {
   const { outDir, server: s, config } = await _serve(dirname)
   server = s
 
-  await filesReady()
+  await allFilesReady()
 
   const dataDir = path.join(config.cacheDir!, '.chromium')
   browser = (await chromium.launchPersistentContext(dataDir, {
