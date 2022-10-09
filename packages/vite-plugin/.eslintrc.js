@@ -32,7 +32,7 @@ module.exports = {
         vars: 'all',
         args: 'after-used',
         ignoreRestSiblings: true,
-        varsIgnorePattern: 'self',
+        varsIgnorePattern: 'self|debug',
       },
     ],
     'prefer-const': [
