@@ -123,8 +123,6 @@ export async function serve(
   debug('create server')
 
   await server.listen()
-  // @ts-expect-error Need to wait for dynamic scripts to finish
-  await server._optimizedDeps?.scanProcessing
 
   debug('listen')
   await allFilesReady()
