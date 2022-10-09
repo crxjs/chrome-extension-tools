@@ -9,11 +9,10 @@ import { ManifestV3Export } from './defineManifest'
 import {
   decodeManifest,
   encodeManifest,
-  htmlFiles,
   isString,
-  manifestFiles,
   structuredClone,
 } from './helpers'
+import { htmlFiles, manifestFiles } from './files'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'

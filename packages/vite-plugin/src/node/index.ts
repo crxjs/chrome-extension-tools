@@ -11,6 +11,7 @@ import { pluginWebAccessibleResources } from './plugin-webAccessibleResources'
 import { pluginFileWriterPolyfill } from './plugin-fileWriter-polyfill'
 import { pluginContentScripts } from './plugin-contentScripts'
 import { pluginContentScriptsCss } from './plugin-contentScripts_css'
+import { pluginFileWriterPublic } from './plugin-fileWriter_public'
 
 /** `init` initializes crx plugins with crx options */
 function init(options: CrxOptions, plugins: CrxPluginFn[]) {
@@ -36,6 +37,7 @@ export const crx = ({
     pluginDeclaredContentScripts,
     pluginDynamicContentScripts,
     pluginFileWriter,
+    pluginFileWriterPublic,
     pluginFileWriterPolyfill,
     pluginHtmlInlineScripts,
     pluginWebAccessibleResources,
