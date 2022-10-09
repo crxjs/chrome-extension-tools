@@ -39,12 +39,13 @@ export interface AcornTemplateElement extends AcornNode {
   }
 }
 
-export interface CrxDevAssetId {
+export type CrxDevAssetId = {
   id: string
   type: 'asset'
-  source: string | Uint8Array
+  source?: string | Uint8Array
 }
-export interface CrxDevScriptId {
+
+export type CrxDevScriptId = {
   id: string
   type: 'module' | 'iife'
 }

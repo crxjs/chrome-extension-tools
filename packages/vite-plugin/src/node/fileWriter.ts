@@ -109,8 +109,16 @@ export async function write(
       prepFileData(fileId),
       // output file and add dependencies to file writer
       mergeMap(async ({ target, source, deps }) => {
-        const files = deps.map((id: string) => add({ id, type: 'module' }))
-        await outputFile(target, source, { encoding: 'utf8' })
+        const files = deps
+          .map((id: string) => {
+            const r = [add({ id, type: 'module' })]
+            if (id.endsWith('?import'))
+              r.push(add({ id: id.slice(0, -'?import'.length), type: 'asset' }))
+            return r
+          })
+          .flat()
+        if (source instanceof Uint8Array) await outputFile(target, source)
+        else await outputFile(target, source, { encoding: 'utf8' })
         return files
       }),
       // abort write operation on close event

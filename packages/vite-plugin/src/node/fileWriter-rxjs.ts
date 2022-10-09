@@ -1,8 +1,8 @@
 import * as lexer from 'es-module-lexer'
+import { readFile } from 'fs-extra'
 import MagicString from 'magic-string'
 import {
   filter,
-  map,
   mergeMap,
   Observable,
   of,
@@ -13,6 +13,7 @@ import {
 } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
+import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
 /* ----------------- SERVER EVENTS ----------------- */
@@ -61,13 +62,17 @@ export function prepFileData(
 
 function prepAsset(
   fileName: string,
-  { source }: CrxDevAssetId,
+  { id, source }: CrxDevAssetId,
 ): OperatorFileData {
   return ($) =>
     $.pipe(
-      map(({ server }) => {
+      mergeMap(async ({ server }) => {
         const target = getOutputPath(server, fileName)
-        return { target, source, deps: [] }
+        return {
+          target,
+          source: source ?? (await readFile(join(server.config.root, id))),
+          deps: [],
+        }
       }),
     )
 }
