@@ -91,15 +91,19 @@ export const pluginManifest =
       },
       {
         name: 'crx:manifest-loader',
-        apply: 'build',
         enforce: 'pre',
         buildStart() {
-          refId = this.emitFile({
-            type: 'chunk',
-            id: manifestId,
-            name: 'crx-manifest.js',
-            preserveSignature: 'strict',
-          })
+          // TODO: how do we emit files in rollup while in serve?
+          try {
+            refId = this.emitFile({
+              type: 'chunk',
+              id: manifestId,
+              name: 'crx-manifest.js',
+              preserveSignature: 'strict',
+            })
+          } catch (error) {
+            // this means it's running on the dev server
+          }
         },
         resolveId(source) {
           if (source === manifestId) return manifestId
@@ -112,7 +116,6 @@ export const pluginManifest =
       },
       {
         name: 'crx:stub-input',
-        apply: 'build',
         enforce: 'pre',
         options({ input, ...options }) {
           /**
