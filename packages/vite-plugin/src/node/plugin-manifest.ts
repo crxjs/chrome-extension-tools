@@ -373,7 +373,7 @@ Public dir: "${config.publicDir}"`,
                   fileName: f,
                   source: precontrollerHtml.replace(
                     '%SCRIPT%',
-                    precontrollerJsName,
+                    `/${precontrollerJsName}`,
                   ),
                 }),
               ),
