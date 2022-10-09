@@ -14,9 +14,8 @@ export type FileWriterId = {
 /** Converts ScriptId to string */
 export function getFileName({ type, id }: FileWriterId): string {
   let fileName = id.replace(/\?/g, '__').replace(/&/g, '_').replace(/=/g, '--')
-  if (fileName.startsWith('/@fs')) {
+  if (fileName.includes('node_modules/')) {
     fileName = `vendor/${fileName
-      .slice(5)
       .split('node_modules/')
       .pop()!
       .replace(/\//g, '-')}`
