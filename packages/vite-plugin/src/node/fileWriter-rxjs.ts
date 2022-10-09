@@ -169,3 +169,17 @@ function prepScript(
       }),
     )
 }
+
+/** Resolves when all existing files in scriptFiles are written. */
+export async function allFilesReady(): Promise<void> {
+  await firstValueFrom(allFilesReady$)
+}
+
+/** Resolves when all existing files in scriptFiles are written. */
+export async function allFilesSuccess(): Promise<void> {
+  const result = await firstValueFrom(allFilesReady$)
+  const reason = result.find(isRejected)?.reason
+  if (typeof reason === 'undefined') return
+  if (reason instanceof Error) throw reason
+  throw new Error(reason.toString())
+}

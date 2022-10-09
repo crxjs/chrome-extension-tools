@@ -5,6 +5,7 @@ import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import {
+  allFilesReady,
   close$,
   fileWriterEvent$,
   prepFileData,
@@ -12,7 +13,6 @@ import {
   start$,
 } from './fileWriter-rxjs'
 import {
-  allFilesReady,
   fileReady,
   formatFileData,
   getFileName,
