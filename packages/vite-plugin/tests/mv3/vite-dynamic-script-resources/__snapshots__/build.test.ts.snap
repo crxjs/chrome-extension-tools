@@ -17,11 +17,11 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "assets/content1.hash.js",
-        "assets/content2.hash.js",
+        "assets/content1.ts.hash.js",
+        "assets/content2.ts.hash.js",
         "assets/font.hash.otf",
         "assets/image.hash.png",
-        "assets/script.hash.js",
+        "assets/script.ts.hash.js",
       ],
       "use_dynamic_url": true,
     },
@@ -32,61 +32,26 @@ Object {
 exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/background.ts.hash.js",
-  "assets/content-script-loader.content1.hash.js",
-  "assets/content-script-loader.content2.hash.js",
-  "assets/content1.hash.js",
-  "assets/content2.hash.js",
+  "assets/content1.ts-loader.hash.js",
+  "assets/content1.ts.hash.js",
+  "assets/content2.ts-loader.hash.js",
+  "assets/content2.ts.hash.js",
   "assets/font.hash.otf",
   "assets/image.hash.png",
-  "assets/script.hash.js",
+  "assets/script.ts.hash.js",
   "manifest.json",
   "service-worker-loader.js",
 ]
 `;
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
-"var content1 = \\"/assets/content-script-loader.content1.hash.js\\";
-var content2 = \\"/assets/content-script-loader.content2.hash.js\\";
+"const import_meta = {};
+var content1 = \\"assets/content1.ts-loader.hash.js\\";
+var content2 = \\"assets/content2.ts-loader.hash.js\\";
 chrome.scripting.executeScript({
   files: [content1, content2],
   target: { tabId: 1 }
 });
-"
-`;
-
-exports[`build fs output: assets/content-script-loader.content1.hash.js 1`] = `
-"(function () {
-  'use strict';
-
-  (async () => {
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content1.hash.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`build fs output: assets/content-script-loader.content2.hash.js 1`] = `
-"(function () {
-  'use strict';
-
-  (async () => {
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content2.hash.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`build fs output: assets/content1.hash.js 1`] = `
-"var script = \\"/assets/script.hash.js\\";
-console.log(\\"content.ts\\", { script });
 "
 `;
 
@@ -112,12 +77,6 @@ exports[`build fs output: assets/content1.ts-loader.hash.js 1`] = `
 "
 `;
 
-exports[`build fs output: assets/content2.hash.js 1`] = `
-"var font = \\"/assets/font.hash.otf\\";
-console.log(\\"content2.ts\\", { font });
-"
-`;
-
 exports[`build fs output: assets/content2.ts.hash.js 1`] = `
 "var font = \\"/assets/font.hash.otf\\";
 console.log(\\"content2.ts\\", { font });
@@ -136,12 +95,6 @@ exports[`build fs output: assets/content2.ts-loader.hash.js 1`] = `
   })().catch(console.error);
 
 })();
-"
-`;
-
-exports[`build fs output: assets/script.hash.js 1`] = `
-"var icon = \\"/assets/image.hash.png\\";
-console.log(\\"main world script\\", { icon });
 "
 `;
 
