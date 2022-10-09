@@ -53,7 +53,7 @@ export default defineConfig({
         web_accessible_resources: [
           {
             resources: ['src/images/*.png'],
-            matches: ['https://www.google.com/*'],
+            matches: ['https://example.com/*'],
           },
         ],
       },

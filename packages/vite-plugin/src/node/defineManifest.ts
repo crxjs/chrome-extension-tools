@@ -25,7 +25,7 @@ export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
  * const manifest = defineManifest({
  *   "web_accessible_resources": [
  *     defineDynamicResource({
- *       matches: ["https://google.com/*", "file:///*.mp3", "..."]
+ *       matches: ["https://example.com/*", "file:///*.mp3", "..."]
  *       use_dynamic_url?: true
  *     })
  *   ]

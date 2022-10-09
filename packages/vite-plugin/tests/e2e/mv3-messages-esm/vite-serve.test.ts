@@ -4,7 +4,7 @@ test('crx runs from server output', async () => {
   const { browser } = await serve(__dirname)
 
   const page = await browser.newPage()
-  await page.goto('https://google.com')
+  await page.goto('https://example.com')
 
   await page.waitForSelector('text="Content script loaded"')
   await page.waitForSelector('text="Background response"')
