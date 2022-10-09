@@ -78,8 +78,9 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
             contentScripts.set(finalId, {
               type,
               id,
-              matches: ['<dynamic_script>'],
+              isDynamicScript: true,
               refId,
+              matches: [],
             })
 
             return finalId

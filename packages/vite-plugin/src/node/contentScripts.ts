@@ -14,6 +14,7 @@ export interface ContentScript {
   loaderName?: string
   /** Filename of content script */
   fileName?: string
+  isDynamicScript?: boolean
   matches: string[]
 }
 
