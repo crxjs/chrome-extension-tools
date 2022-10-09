@@ -30,6 +30,7 @@ Array [
   "manifest.json",
   "service-worker-loader.js",
   "src/content1.ts-loader.js",
+  "src/content2.ts-loader.js",
 ]
 `;
 
@@ -63,6 +64,30 @@ exports[`serve fs output: src/content1.ts-loader.js 1`] = `
     await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"src/content1.ts.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output: src/content2.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content2.ts.js\\")
     );
   })().catch(console.error);
 

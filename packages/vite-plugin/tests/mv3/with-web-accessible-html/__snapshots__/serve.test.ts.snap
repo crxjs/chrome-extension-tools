@@ -12,7 +12,7 @@ Object {
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "https://www.google.com/*",
+        "https://example.com/*",
       ],
       "resources": Array [
         "public.html",
