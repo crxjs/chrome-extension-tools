@@ -5,8 +5,10 @@ import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
 
-afterEach(() => {
-  return new Promise<void>((r) => setTimeout(() => r(), 1000))
+afterEach(async (ctx) => {
+  console.log('afterEach', ctx)
+  await new Promise<void>((r) => setTimeout(() => r(), 1000))
+  console.log('after delay')
 })
 
 test(
