@@ -10,7 +10,9 @@ export interface ContentScript {
   id: string
   /** Hash of scriptId or Rollup file refId */
   refId?: string
-  /** Filename of content script or loader */
+  /** Filename of loader file, if present */
+  loaderName?: string
+  /** Filename of content script */
   fileName?: string
   matches: string[]
 }

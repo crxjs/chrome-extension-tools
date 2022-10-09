@@ -4,7 +4,7 @@ import { fileReady } from './fileWriter'
 import { basename } from './path'
 import { CrxPluginFn } from './types'
 
-const dynamicScriptRegEx = /import\.meta\.CRX_DYNAMIC_SCRIPT_(.?+);/g
+const dynamicScriptRegEx = /import\.meta\.CRX_DYNAMIC_SCRIPT_(.+?);/g
 
 /**
  * 1. Resolves `?script` import queries

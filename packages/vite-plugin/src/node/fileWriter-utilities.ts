@@ -18,7 +18,7 @@ export function getFileName({ type, id }: FileWriterId): string {
     case 'iife':
       return `${fileName}.iife.js`
     case 'loader':
-      return `${fileName}.loader.js`
+      return `${fileName}-loader.js`
     case 'module':
       return `${fileName}.js`
     case 'asset':

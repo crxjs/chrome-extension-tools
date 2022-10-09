@@ -65,6 +65,36 @@ exports[`build fs output: assets/content.js.hash.js 1`] = `
 "
 `;
 
+exports[`build fs output: assets/content.js.loader.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output: assets/content.js-loader.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
 exports[`build fs output: assets/content-script-loader.content.js.hash.hash.js 1`] = `
 "(function () {
   'use strict';
@@ -130,6 +160,11 @@ const App = () => {
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
 ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`build fs output: service-worker.loader.js 1`] = `
+"import './assets/background.js.hash.js';
 "
 `;
 

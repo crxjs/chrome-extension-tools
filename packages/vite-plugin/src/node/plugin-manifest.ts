@@ -265,9 +265,12 @@ export const pluginManifest =
                 return {
                   js: js.map((id) => {
                     const script = contentScripts.get(id)
-                    if (typeof script?.refId === 'undefined')
-                      throw new Error(`Content script was not emitted: "${id}"`)
-                    return this.getFileName(script.refId)
+                    const fileName = script?.loaderName ?? script?.fileName
+                    if (typeof fileName === 'undefined')
+                      throw new Error(
+                        `Content script fileName is undefined: "${id}"`,
+                      )
+                    return fileName
                   }),
                   ...rest,
                 }

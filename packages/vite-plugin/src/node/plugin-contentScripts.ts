@@ -42,12 +42,13 @@ export const pluginContentScripts: CrxPluginFn = (options) => {
             throw new Error(`Content script refId is undefined: "${script.id}"`)
           if (script.type === 'loader') {
             const fileName = this.getFileName(script.refId)
+            script.fileName = fileName
             const refId = this.emitFile({
               type: 'asset',
               name: getFileName({ type: 'loader', id: basename(script.id) }),
               source: createProLoader({ fileName }),
             })
-            script.fileName = this.getFileName(refId)
+            script.loaderName = this.getFileName(refId)
           } else if (script.type === 'iife') {
             throw new Error('IIFE content scripts are not implemented')
           }

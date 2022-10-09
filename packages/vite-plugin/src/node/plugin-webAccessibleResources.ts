@@ -60,36 +60,43 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
             bundle,
             'manifest.json',
           )
-          if (Object.keys(viteManifest).length === 0) return undefined
+          const viteFiles = new Map()
+          for (const [, file] of Object.entries(viteManifest))
+            viteFiles.set(file.file, file)
+          if (viteFiles.size === 0) return null
 
-          for (const { id, fileName, matches, type } of contentScripts.values())
-            if (matches?.length)
-              if (typeof fileName === 'undefined') {
-                throw new Error(
-                  `Content script filename is undefined for "${id}"`,
-                )
-              } else {
-                const { assets, css, imports } = compileFileResources(
-                  viteManifest,
-                  fileName,
-                )
+          // multiple entries for each content script, dedupe by key === id
+          for (const [key, { id, fileName, matches, type }] of contentScripts)
+            if (key === id)
+              if (matches?.length)
+                if (typeof fileName === 'undefined') {
+                  throw new Error(
+                    `Content script filename is undefined for "${id}"`,
+                  )
+                } else {
+                  const { assets, css, imports } = compileFileResources(
+                    fileName,
+                    viteFiles,
+                  )
 
-                // module content scripts use a loader file, so entry file must be web accessible
-                if (type === 'module') imports.add(fileName)
+                  // loader files import the entry, so entry file must be web accessible
+                  if (type === 'loader') imports.add(fileName)
 
-                const resource:
-                  | WebAccessibleResourceById
-                  | WebAccessibleResourceByMatch = {
-                  matches,
-                  resources: [...assets, ...imports, ...css],
-                  use_dynamic_url: true,
+                  const resource:
+                    | WebAccessibleResourceById
+                    | WebAccessibleResourceByMatch = {
+                    matches,
+                    resources: [...assets, ...imports, ...css],
+                    use_dynamic_url: true,
+                  }
+
+                  if (resource.resources.length) {
+                    resource.matches = resource.matches.map(
+                      getMatchPatternOrigin,
+                    )
+                    manifest.web_accessible_resources.push(resource)
+                  }
                 }
-
-                if (resource.resources.length) {
-                  resource.matches = resource.matches.map(getMatchPatternOrigin)
-                  manifest.web_accessible_resources.push(resource)
-                }
-              }
         }
 
         // TODO: combine redundant web accessible resources entries
