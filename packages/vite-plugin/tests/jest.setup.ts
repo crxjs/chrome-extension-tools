@@ -2,7 +2,7 @@ import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
 import { expect, vi, beforeEach, afterEach } from 'vitest'
 
 beforeEach(() => {
-  vi.useFakeTimers()
+  vi.useFakeTimers({ toFake: ['Date'] })
 })
 
 afterEach(() => {
