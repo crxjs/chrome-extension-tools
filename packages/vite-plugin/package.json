@@ -53,9 +53,10 @@
     "lint:types": "tsc --noEmit",
     "test": "vitest --mode unit",
     "test:e2e": "vitest --mode e2e",
-    "test:ci": "run-s test:ci:*",
-    "test:ci:unit": "vitest --run --mode unit",
-    "test:ci:e2e": "vitest --run --mode e2e"
+    "test:run": "run-s test:run:*",
+    "test:run:out": "vitest --run --mode out",
+    "test:run:e2e": "vitest --run --mode e2e",
+    "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.1.2",

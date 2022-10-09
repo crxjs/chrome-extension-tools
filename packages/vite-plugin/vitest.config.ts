@@ -9,8 +9,8 @@ console.log(__dirname)
 export default defineConfig(({ mode }) => {
   const exclude =
     mode === 'e2e'
-      ? ['**/src/**', '**/mv3/**'] // exclude non-e2e tests
-      : mode === 'unit'
+      ? ['**/src/**', '**/out/**'] // exclude non-e2e tests
+      : mode === 'out'
       ? ['**/e2e/**'] // exclude e2e tests
       : [] // for running any individual test
 
