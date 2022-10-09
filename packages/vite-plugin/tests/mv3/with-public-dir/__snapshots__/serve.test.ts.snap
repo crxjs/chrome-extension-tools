@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_icon": Object {
@@ -40,9 +40,9 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/precontroller.hash.js",
+  "assets/precontroller.hash0.js",
   "favicon.svg",
   "icons/action-icon-128.png",
   "icons/action-icon-16.png",
@@ -58,30 +58,30 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/popup.html",
 }
 `;
 
-exports[`serve fs output: assets/precontroller.hash.js 1`] = `
+exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
 "const id = setInterval(() => location.reload(), 100);
 setTimeout(() => clearInterval(id), 5e3);
 "
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 "
 `;
 
-exports[`serve fs output: src/popup.html 1`] = `
+exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.hash.js\\"></script>
+    <script src=\\"/assets/precontroller.hash0.js\\"></script>
   </head>
   <body>
     <h1>Waiting for service worker</h1>

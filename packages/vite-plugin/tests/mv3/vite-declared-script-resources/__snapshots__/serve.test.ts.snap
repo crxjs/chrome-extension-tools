@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -35,7 +35,7 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
   "manifest.json",
   "service-worker-loader.js",
@@ -54,19 +54,19 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.ts",
 }
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 "
 `;
 
-exports[`serve fs output: src/content.ts.js 1`] = `
+exports[`serve fs output > src/content.ts.js 1`] = `
 "import icon from \\"/src/image.png__import.js\\";
 import font from \\"/src/font.otf__import.js\\";
 import scriptUrl from \\"/src/script.ts__scriptId--zfEki.js\\";
@@ -78,7 +78,7 @@ document.body.append(script);
 "
 `;
 
-exports[`serve fs output: src/content.ts-loader.js 1`] = `
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -102,17 +102,17 @@ exports[`serve fs output: src/content.ts-loader.js 1`] = `
 "
 `;
 
-exports[`serve fs output: src/font.otf__import.js 1`] = `"export default \\"/src/font.otf\\""`;
+exports[`serve fs output > src/font.otf__import.js 1`] = `"export default \\"/src/font.otf\\""`;
 
-exports[`serve fs output: src/image.png__import.js 1`] = `"export default \\"/src/image.png\\""`;
+exports[`serve fs output > src/image.png__import.js 1`] = `"export default \\"/src/image.png\\""`;
 
-exports[`serve fs output: src/script.ts.js 1`] = `
+exports[`serve fs output > src/script.ts.js 1`] = `
 "console.log(\\"main world script\\");
 export {};
 "
 `;
 
-exports[`serve fs output: src/script.ts__scriptId--zfEki.js 1`] = `
+exports[`serve fs output > src/script.ts__scriptId--zfEki.js 1`] = `
 "export default \\"src/script.ts.js\\";
 "
 `;

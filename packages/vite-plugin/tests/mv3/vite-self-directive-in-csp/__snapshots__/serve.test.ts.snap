@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`works with 'self' directive: _00 manifest.json 1`] = `
+exports[`works with 'self' directive > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -42,9 +42,9 @@ Object {
 }
 `;
 
-exports[`works with 'self' directive: _01 output files 1`] = `
+exports[`works with 'self' directive > _01 output files 1`] = `
 Array [
-  "assets/precontroller.hash.js",
+  "assets/precontroller.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/content.ts-loader.js",
@@ -57,7 +57,7 @@ Array [
 ]
 `;
 
-exports[`works with 'self' directive: _02 optimized deps 1`] = `
+exports[`works with 'self' directive > _02 optimized deps 1`] = `
 Set {
   "src/content.ts",
   "src/background.ts",
@@ -65,26 +65,26 @@ Set {
 }
 `;
 
-exports[`works with 'self' directive: assets/precontroller.hash.js 1`] = `
+exports[`works with 'self' directive > assets/precontroller.hash0.js 1`] = `
 "const id = setInterval(() => location.reload(), 100);
 setTimeout(() => clearInterval(id), 5e3);
 "
 `;
 
-exports[`works with 'self' directive: service-worker-loader.js 1`] = `
+exports[`works with 'self' directive > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 import 'http://localhost:3000/src/background.ts';
 "
 `;
 
-exports[`works with 'self' directive: src/content.ts.js 1`] = `
+exports[`works with 'self' directive > src/content.ts.js 1`] = `
 "console.log(\\"content script\\");
 export {};
 "
 `;
 
-exports[`works with 'self' directive: src/content.ts-loader.js 1`] = `
+exports[`works with 'self' directive > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -108,12 +108,12 @@ exports[`works with 'self' directive: src/content.ts-loader.js 1`] = `
 "
 `;
 
-exports[`works with 'self' directive: src/popup.html 1`] = `
+exports[`works with 'self' directive > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.hash.js\\"></script>
+    <script src=\\"/assets/precontroller.hash0.js\\"></script>
   </head>
   <body>
     <h1>Waiting for service worker</h1>

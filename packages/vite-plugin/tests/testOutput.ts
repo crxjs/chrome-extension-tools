@@ -36,16 +36,26 @@ export async function testOutput(
     if ('matches' in r) r.matches.sort()
   }
 
+  const hashMap = new Map<string, string>()
+  const scrubHashes = (text: string) =>
+    text
+      .replace(/v--([a-z0-9]+)/g, 'v--hash')
+      .replace(/\.hash([a-z0-9]+)\./g, (found) => {
+        const replaced = hashMap.get(found) ?? `.hash${hashMap.size}.`
+        hashMap.set(found, replaced)
+        return replaced
+      })
+
   getTest('manifest.json', (source, name) => {
-    const manifest: ManifestV3 = JSON.parse(source)
+    const scrubbed = scrubHashes(source)
+    const manifest: ManifestV3 = JSON.parse(scrubbed)
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '_00 manifest.json')
 
   const files = await fg(`**/*`, { cwd: outDir })
 
-  expect(
-    files.map((f) => f.replace(/v--([a-z0-9]+)/g, 'v--hash')).sort(),
-  ).toMatchSnapshot('_01 output files')
+  const scrubbedFiles = files.map(scrubHashes).sort()
+  expect(scrubbedFiles).toMatchSnapshot('_01 output files')
 
   const rootRegex = new RegExp(jsesc(config.root), 'g')
   for (const file of files) {
@@ -55,14 +65,19 @@ export async function testOutput(
     if (file.includes('webcomponents-custom-elements')) continue
     if (isTextFile(file)) {
       const filename = join(outDir, file)
-      let source = await fs.readFile(filename, { encoding: 'utf8' })
-      if (config?.command === 'serve')
+      let source = scrubHashes(
+        await fs.readFile(filename, { encoding: 'utf8' }),
+      )
+      
+      if (config?.command === 'serve') {
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
-          .replace(/v--([a-z0-9]+)/g, 'v--hash')
           .replace(rootRegex, '<root>')
-      getTest(file)(source, file)
+      }
+      
+      const scrubbed = scrubHashes(file)
+      getTest(scrubbed)(source, scrubbed)
     }
   }
 

@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -35,7 +35,7 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
   "manifest.json",
   "service-worker-loader.js",
@@ -49,25 +49,25 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.ts",
 }
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 "
 `;
 
-exports[`serve fs output: src/content.ts.js 1`] = `
+exports[`serve fs output > src/content.ts.js 1`] = `
 "import \\"/src/styles.css.js\\";
 console.log(\\"content.ts\\");
 "
 `;
 
-exports[`serve fs output: src/content.ts-loader.js 1`] = `
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -91,7 +91,7 @@ exports[`serve fs output: src/content.ts-loader.js 1`] = `
 "
 `;
 
-exports[`serve fs output: src/styles.css.js 1`] = `
+exports[`serve fs output > src/styles.css.js 1`] = `
 "import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/styles.css.js\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
 const __vite__id = \\"<root>/src/styles.css\\"
 const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\"

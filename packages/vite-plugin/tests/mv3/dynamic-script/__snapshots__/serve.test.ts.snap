@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -35,7 +35,7 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
   "manifest.json",
   "service-worker-loader.js",
@@ -52,21 +52,21 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/declared-script.ts",
   "src/background.ts",
 }
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 import 'http://localhost:3000/src/background.ts';
 "
 `;
 
-exports[`serve fs output: src/declared-script.ts.js 1`] = `
+exports[`serve fs output > src/declared-script.ts.js 1`] = `
 "import fileName from \\"/src/main-world.ts__scriptId--2CK3p.js\\";
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
@@ -76,7 +76,7 @@ document.head.prepend(script);
 "
 `;
 
-exports[`serve fs output: src/declared-script.ts-loader.js 1`] = `
+exports[`serve fs output > src/declared-script.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -100,13 +100,13 @@ exports[`serve fs output: src/declared-script.ts-loader.js 1`] = `
 "
 `;
 
-exports[`serve fs output: src/dynamic-script.ts.js 1`] = `
+exports[`serve fs output > src/dynamic-script.ts.js 1`] = `
 "console.log(\\"dynamic script\\");
 export {};
 "
 `;
 
-exports[`serve fs output: src/dynamic-script.ts-loader.js 1`] = `
+exports[`serve fs output > src/dynamic-script.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -130,13 +130,13 @@ exports[`serve fs output: src/dynamic-script.ts-loader.js 1`] = `
 "
 `;
 
-exports[`serve fs output: src/main-world.ts.js 1`] = `
+exports[`serve fs output > src/main-world.ts.js 1`] = `
 "console.log(\\"main world script\\");
 export {};
 "
 `;
 
-exports[`serve fs output: src/main-world.ts__scriptId--2CK3p.js 1`] = `
+exports[`serve fs output > src/main-world.ts__scriptId--2CK3p.js 1`] = `
 "export default \\"src/main-world.ts.js\\";
 "
 `;

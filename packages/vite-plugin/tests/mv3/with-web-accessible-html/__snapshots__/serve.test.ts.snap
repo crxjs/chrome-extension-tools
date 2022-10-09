@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -34,7 +34,7 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
   "manifest.json",
   "public.html",
@@ -46,14 +46,14 @@ Array [
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/sidebar.html",
   "src/welcome.html",
 }
 `;
 
-exports[`serve fs output: public.html 1`] = `
+exports[`serve fs output > public.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -73,18 +73,18 @@ exports[`serve fs output: public.html 1`] = `
 "
 `;
 
-exports[`serve fs output: public.js 1`] = `
+exports[`serve fs output > public.js 1`] = `
 "console.log('static script')
 "
 `;
 
-exports[`serve fs output: service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http:/localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 "
 `;
 
-exports[`serve fs output: src/sidebar.html 1`] = `
+exports[`serve fs output > src/sidebar.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -104,7 +104,7 @@ exports[`serve fs output: src/sidebar.html 1`] = `
 "
 `;
 
-exports[`serve fs output: src/static.html 1`] = `
+exports[`serve fs output > src/static.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -125,7 +125,7 @@ exports[`serve fs output: src/static.html 1`] = `
 "
 `;
 
-exports[`serve fs output: static.js 1`] = `
+exports[`serve fs output > static.js 1`] = `
 "console.log('static script')
 "
 `;

@@ -25,5 +25,8 @@ export default defineConfig({
     ],
     watchExclude: [...configDefaults.watchExclude, '**/tests/templates'],
     testTimeout: process.env.TIMEOUT ? parseInt(process.env.TIMEOUT) : 30000,
+    snapshotFormat: {
+      printBasicPrototype: true,
+    }
   },
 })
