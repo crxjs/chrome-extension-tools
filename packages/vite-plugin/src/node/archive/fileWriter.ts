@@ -17,10 +17,10 @@ import {
   switchMap,
 } from 'rxjs'
 import { TransformResult, ViteDevServer } from 'vite'
-import { _debug } from './helpers'
-import { isAbsolute, join } from './path'
-import { CrxPlugin } from './types'
-import { stubId } from './virtualFileIds'
+import { _debug } from '../helpers'
+import { isAbsolute, join } from '../path'
+import { CrxPlugin } from '../types'
+import { stubId } from '../virtualFileIds'
 
 const debug = _debug('file-writer')
 
@@ -50,7 +50,7 @@ export const scriptModules = new Proxy(new Map<string, ScriptModule>(), {
   },
 })
 
-type BuildEvent =
+export const buildEvent$ = new ReplaySubject<
   | {
       type: 'buildStart'
       options: NormalizedInputOptions
@@ -60,19 +60,24 @@ type BuildEvent =
       options: NormalizedOutputOptions
       bundle: OutputBundle
     }
-
-export const build$ = new ReplaySubject<BuildEvent>()
-export const filesReady$ = build$.pipe(
+>()
+export const filesReady$ = buildEvent$.pipe(
   first(({ type }) => type === 'writeBundle'),
   switchMap(() => scriptModulesChange$),
   mergeMap(() =>
     Promise.all([...scriptModules.values()].map(({ file }) => file)),
   ),
 )
-export const server$ = new ReplaySubject<ViteDevServer | undefined>(1)
+export const serverEvent$ = new ReplaySubject<
+  | {
+      type: 'start'
+      server: ViteDevServer
+    }
+  | { type: 'close' }
+>(1)
 
-build$.subscribe(({ type }) => debug(type))
-server$.subscribe(() => debug('server'))
+buildEvent$.subscribe(({ type }) => debug(type))
+serverEvent$.subscribe(() => debug('server'))
 filesReady$.subscribe(() => debug('filesReady'))
 
 export async function filesReady(): Promise<typeof scriptModules> {
@@ -88,12 +93,12 @@ export async function start({
   server: ViteDevServer
   plugins: CrxPlugin[]
 }) {
-  server$.next(server)
+  serverEvent$.next({ type: 'start', server })
   try {
     for (const script of scriptModules.values()) {
       scriptModules.set(script.viteUrl, {
         ...script,
-        file: output(script),
+        file: write(script),
       })
     }
 
@@ -103,14 +108,14 @@ export async function start({
         {
           name: 'crx:file-writer-rollup-events',
           buildStart(options) {
-            build$.next({ type: 'buildStart', options })
+            buildEvent$.next({ type: 'buildStart', options })
           },
         },
         ...plugins,
         {
           name: 'crx:file-writer-rollup-events',
           writeBundle(options, bundle) {
-            build$.next({ type: 'writeBundle', options, bundle })
+            buildEvent$.next({ type: 'writeBundle', options, bundle })
           },
         },
       ],
@@ -129,14 +134,7 @@ export async function start({
 
 /** Signals file writer to abandon active write operations. */
 export function close() {
-  try {
-    server$.next(undefined)
-    for (const script of scriptModules.values()) {
-      delete script.file
-    }
-  } catch (error) {
-    console.error(error)
-  }
+  serverEvent$.next({ type: 'close' })
 }
 
 /**
@@ -150,19 +148,40 @@ export function add({
   type: ScriptType
   viteUrl: string
 }): ScriptModule {
-  const script = scriptModules.get(viteUrl) ?? {
+  const fileName = toFileName({ viteUrl, type })
+  const script = scriptModules.get(fileName) ?? {
     viteUrl,
     type,
-    file: output({ viteUrl, type }),
-    fileName: toFileName({ viteUrl, type }),
+    file: write({ viteUrl, type }),
+    fileName,
   }
   scriptModules.set(viteUrl, script)
   debug('add %o', script)
   return script
 }
 
-/** Call `output` to force a file write. Waits until the server is ready & writes the file. */
-export async function output({
+/**
+ * It's possible for multiple script types to have the same URL, this function
+ * updates all types.
+ */
+export function update(viteUrl: string): ScriptModule[] {
+  const types: ScriptType[] = ['iife', 'loader', 'module']
+  const result: ScriptModule[] = []
+  for (const type of types) {
+    const fileName = toFileName({ type, viteUrl })
+    const script = scriptModules.get(fileName)
+    if (script) {
+      script.file = write({ viteUrl, type })
+      result.push(script)
+      scriptModules.set(fileName, script)
+    }
+  }
+
+  if (result.length) return result
+}
+
+/** Call `write` to force a file write. Waits until the server is ready & writes the file. */
+export async function write({
   type,
   viteUrl,
 }: {
@@ -174,10 +193,10 @@ export async function output({
   // when update is cancelled this promise will never resolve
   // depending on when the switch happens, it may abort the file write
   const results = await firstValueFrom(
-    server$.pipe(
+    serverEvent$.pipe(
       // cancel previous update when file writer is closed
       // subsequent mappings points to possibly cut work short
-      switchMap((server) => (server ? of(server) : EMPTY)),
+      switchMap((event) => (event.type === 'start' ? of(event.server) : EMPTY)),
       // load the module
       mergeMap(async (server) => {
         let serverModule = await server.moduleGraph.getModuleByUrl(viteUrl)

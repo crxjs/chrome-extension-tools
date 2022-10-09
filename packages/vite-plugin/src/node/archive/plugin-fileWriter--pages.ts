@@ -1,7 +1,7 @@
 import precontrollerScript from 'client/es/page-precontroller-script.ts?client'
 import precontrollerHtml from 'client/html/precontroller.html?client'
-import { htmlFiles } from './helpers'
-import { CrxPlugin, CrxPluginFn } from './types'
+import { htmlFiles } from '../helpers'
+import { CrxPlugin, CrxPluginFn } from '../types'
 
 export const pluginFileWriterPages: CrxPluginFn = () => {
   let precontrollerName: string | undefined

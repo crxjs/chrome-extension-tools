@@ -18,5 +18,5 @@
     "strictNullChecks": true,
     "target": "esnext"
   },
-  "exclude": ["node_modules", "tests/templates", "dist"]
+  "exclude": ["node_modules", "tests/templates", "dist", "src/node/archive"]
 }

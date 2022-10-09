@@ -1,9 +1,9 @@
 import { HMRPayload } from 'vite'
-import { manifestFiles, _debug } from './helpers'
+import { manifestFiles, _debug } from '../helpers'
 import { crxHmrPayload$, hmrPayload$ } from './hmrPayload'
-import { isImporter } from './isImporter'
-import { isAbsolute, join } from './path'
-import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
+import { isImporter } from '../isImporter'
+import { isAbsolute, join } from '../path'
+import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from '../types'
 
 const debug = _debug('hmr')
 

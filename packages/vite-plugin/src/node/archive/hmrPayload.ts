@@ -17,7 +17,7 @@ import {
 } from 'vite'
 import { outputByOwner, transformResultByOwner } from './fileMeta'
 import { filesReady$ } from './fileWriter'
-import { CrxHMRPayload } from './types'
+import { CrxHMRPayload } from '../types'
 
 export function isUpdatePayload(p: HMRPayload): p is UpdatePayload {
   return p.type === 'update'

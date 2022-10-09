@@ -4,7 +4,6 @@ import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
 import { ManifestV3Export } from './defineManifest'
-import { add } from './fileWriter'
 import {
   decodeManifest,
   encodeManifest,

@@ -11,16 +11,16 @@ import {
   isString,
   stubMatchPattern,
   _debug,
-} from './helpers'
+} from '../helpers'
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
-} from './manifest'
-import { parse } from './path'
-import { filesReady } from './fileWriter'
-import { crxRuntimeReload } from './plugin-hmr'
-import { CrxPluginFn } from './types'
-import { contentHmrPortId, preambleId } from './virtualFileIds'
+} from '../manifest'
+import { parse } from '../path'
+import { filesReady } from '../fileWriter'
+import { crxRuntimeReload } from '../plugin-hmr'
+import { CrxPluginFn } from '../types'
+import { contentHmrPortId, preambleId } from '../virtualFileIds'
 
 interface Resources {
   assets: Set<string>
