@@ -1,4 +1,5 @@
 import { hashScriptId } from './contentScripts'
+import { test, expect } from 'vitest'
 
 test('hashScriptId returns a stable hash', async () => {
   const hashes = new Set<string>()

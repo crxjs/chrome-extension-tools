@@ -1,4 +1,5 @@
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
+import { expect } from 'vitest'
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({
@@ -8,6 +9,3 @@ expect.extend({
     allowSizeMismatch: true,
   }),
 })
-
-if (process.env.TIMEOUT) jest.setTimeout(parseInt(process.env.TIMEOUT))
-else jest.setTimeout(30000)

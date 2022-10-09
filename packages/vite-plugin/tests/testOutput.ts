@@ -7,6 +7,7 @@ import { ManifestV3 } from 'src/manifest'
 import { join } from 'src/path'
 import { ResolvedConfig } from 'vite'
 import { defaultTest, isTextFile } from './runners'
+import { expect } from 'vitest'
 
 export async function testOutput(
   { outDir, config }: { outDir: string; config: ResolvedConfig },
