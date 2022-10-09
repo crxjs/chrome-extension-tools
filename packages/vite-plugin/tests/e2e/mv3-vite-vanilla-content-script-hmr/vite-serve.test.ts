@@ -6,6 +6,7 @@ import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
 
+// TODO: Playwright stalls consistently in CI for this one test, why?
 test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')
