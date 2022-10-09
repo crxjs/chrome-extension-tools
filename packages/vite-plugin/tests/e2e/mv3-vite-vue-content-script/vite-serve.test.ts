@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test, expect } from 'vitest'
 import { serve } from '../runners'
 
 test('crx runs from server output', async () => {
