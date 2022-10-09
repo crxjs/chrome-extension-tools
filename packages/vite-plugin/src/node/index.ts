@@ -21,7 +21,7 @@ export const crx = (
   } & CrxOptions,
 ): PluginOption[] => {
   return [
-    pluginOptionsProvider({ options, override: false }),
+    pluginOptionsProvider(options),
     pluginBackground(),
     pluginContentScripts(),
     pluginDeclaredContentScripts(),

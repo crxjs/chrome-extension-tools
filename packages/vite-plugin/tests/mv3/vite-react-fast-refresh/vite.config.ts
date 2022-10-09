@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { crx } from 'src/.'
+import { crx } from 'tests/plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 import manifest from './manifest.config'
 

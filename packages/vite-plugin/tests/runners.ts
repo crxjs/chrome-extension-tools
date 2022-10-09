@@ -1,9 +1,14 @@
 import fs from 'fs-extra'
-import { allFilesReady } from 'src/.'
+import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
 import { join } from 'src/path'
 import type { CrxPlugin } from 'src/types'
-import { build as _build, createServer, ResolvedConfig } from 'vite'
+import {
+  build as _build,
+  createServer,
+  InlineConfig,
+  ResolvedConfig,
+} from 'vite'
 import inspect from 'vite-plugin-inspect'
 
 export async function build(dirname: string, configFile = 'vite.config.ts') {
@@ -18,7 +23,7 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
   await fs.remove(outDir)
 
   let config: ResolvedConfig
-  const output = await _build({
+  const inlineConfig: InlineConfig = {
     configFile: join(dirname, configFile),
     envFile: false,
     build: {
@@ -33,6 +38,8 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
     },
     cacheDir,
     plugins: [
+      // @ts-expect-error we're going to override this from the vite config
+      crx(null),
       {
         name: 'test:get-config',
         configResolved(_config) {
@@ -42,7 +49,8 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
     ],
     clearScreen: false,
     logLevel: 'error',
-  })
+  }
+  const output = await _build(inlineConfig)
 
   if (Array.isArray(output))
     throw new TypeError('received outputarray from vite build')
@@ -63,10 +71,13 @@ export async function serve(dirname: string) {
   await fs.remove(outDir)
   debug('clean dirs')
 
-  const plugins: CrxPlugin[] = []
+  const plugins: CrxPlugin[] = [
+    // @ts-expect-error we're going to override this from the vite config
+    crx(null),
+  ]
   if (process.env.DEBUG) plugins.push(inspect())
 
-  const server = await createServer({
+  const inlineConfig: InlineConfig = {
     configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir, minify: false },
@@ -80,7 +91,8 @@ export async function serve(dirname: string) {
         ignored: [cacheDir],
       },
     },
-  })
+  }
+  const server = await createServer(inlineConfig)
   debug('create server')
 
   await server.listen()

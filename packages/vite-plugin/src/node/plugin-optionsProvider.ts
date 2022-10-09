@@ -5,19 +5,13 @@ import { CrxOptions, CrxPlugin } from './types'
 export type CrxInputOptions = { manifest: ManifestV3Export } & CrxOptions
 
 const pluginName = 'crx:optionsProvider'
-export const pluginOptionsProvider = ({
-  options,
-  override,
-}: {
-  options: CrxInputOptions
-  override: boolean
-}) => {
+export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
   return {
     name: pluginName,
     api: {
       crx: {
+        // during testing this can be null, we don't provide options through the test config
         options,
-        override,
       },
     },
   }
@@ -43,9 +37,7 @@ export const getOptions = ({ plugins }: UserConfig): CrxInputOptions => {
     if (isCrxPlugin(p))
       if (p.name === pluginName) {
         options = p.api.crx.options
-        if (p.api.crx.override) {
-          break
-        }
+        if (options) break
       }
   }
 

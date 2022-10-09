@@ -98,7 +98,6 @@ export const pluginManifest: CrxPluginFn = () => {
       name: 'crx:manifest-loader',
       enforce: 'pre',
       buildStart() {
-        // TODO: how do we emit files in rollup while in serve?
         try {
           refId = this.emitFile({
             type: 'chunk',

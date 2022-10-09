@@ -1,4 +1,4 @@
-import { crx } from 'src/.'
+import { crx } from 'tests/plugin-testOptionsProvider'
 import { join } from 'src/path'
 import { defineConfig } from 'vite'
 

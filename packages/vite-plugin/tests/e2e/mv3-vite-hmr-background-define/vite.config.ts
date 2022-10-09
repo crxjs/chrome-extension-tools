@@ -1,4 +1,4 @@
-import { crx } from 'src/index'
+import { crx } from 'tests/plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 import manifest from './manifest.json'
 
