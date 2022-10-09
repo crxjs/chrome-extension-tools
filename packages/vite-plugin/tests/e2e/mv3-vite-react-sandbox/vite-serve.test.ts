@@ -1,7 +1,7 @@
+import { test } from 'vitest'
 import { getPage } from '../helpers'
 import { serve } from '../runners'
 
-jest.retryTimes(2)
 
 test.skip('crx runs from server output', async () => {
   const { browser } = await serve(__dirname)
@@ -13,7 +13,7 @@ test.skip('crx runs from server output', async () => {
   const app = page.locator('.App')
   await app.waitFor()
 
-  expect(await app.screenshot()).toMatchImageSnapshot({
-    customSnapshotIdentifier: __filename + 1,
-  })
+  // expect(await app.screenshot()).toMatchImageSnapshot({
+  //   customSnapshotIdentifier: __filename + 1,
+  // })
 })

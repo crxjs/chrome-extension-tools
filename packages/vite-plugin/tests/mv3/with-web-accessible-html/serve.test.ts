@@ -1,5 +1,6 @@
 import { serve } from 'tests/runners'
 import { testOutput } from 'tests/testOutput'
+import { afterAll, test} from 'vitest'
 
 let result: Awaited<ReturnType<typeof serve>> | undefined
 

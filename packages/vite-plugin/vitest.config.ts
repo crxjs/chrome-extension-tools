@@ -8,7 +8,7 @@ console.log(__dirname)
 
 export default defineConfig({
   test: {
-    exclude: ['**/e2e/**', '**/templates/**'],
+    exclude: ['**/e2e/**', '**/templates/**', '**/node_modules/**'],
     globalSetup: './tests/jest.globalSetup.ts',
     setupFiles: './tests/jest.setup.ts',
     alias: [

@@ -1,6 +1,5 @@
+import { test } from 'vitest'
 import { serve } from '../runners'
-
-jest.retryTimes(2)
 
 test.skip('crx runs from server output', async () => {
   const { browser } = await serve(__dirname)

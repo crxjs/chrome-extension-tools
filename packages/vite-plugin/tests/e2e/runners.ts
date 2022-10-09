@@ -2,6 +2,7 @@ import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright-chromium'
 import { allFilesReady } from 'src/.'
 import { ViteDevServer } from 'vite'
+import { afterAll } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
 let browser: ChromiumBrowserContext | undefined

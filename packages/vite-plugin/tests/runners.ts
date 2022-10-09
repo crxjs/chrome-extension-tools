@@ -1,16 +1,16 @@
 import fs from 'fs-extra'
+import { join } from 'path/posix'
 import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
-import { join } from 'src/path'
 import type { CrxPlugin } from 'src/types'
 import {
   build as _build,
   createServer,
   InlineConfig,
-  ResolvedConfig,
+  ResolvedConfig
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
-import { vi } from 'vitest'
+import { expect, vi } from 'vitest'
 
 export async function build(dirname: string, configFile = 'vite.config.ts') {
   const date = new Date('2022-01-26T00:00:00.000Z')
@@ -27,6 +27,7 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
 
   let config: ResolvedConfig
   const inlineConfig: InlineConfig = {
+    root: dirname,
     configFile: join(dirname, configFile),
     envFile: false,
     build: {
@@ -72,7 +73,6 @@ export async function serve(dirname: string) {
   const cacheDir = join(dirname, '.vite')
   const outDir = join(dirname, 'dist-serve')
 
-  process.chdir(dirname)
   await fs.remove(cacheDir)
   await fs.remove(outDir)
   debug('clean dirs')
@@ -84,6 +84,7 @@ export async function serve(dirname: string) {
   if (process.env.DEBUG) plugins.push(inspect())
 
   const inlineConfig: InlineConfig = {
+    root: dirname,
     configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir, minify: false },

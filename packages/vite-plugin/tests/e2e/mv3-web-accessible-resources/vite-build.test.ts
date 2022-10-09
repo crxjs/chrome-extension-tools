@@ -1,6 +1,5 @@
+import { test } from 'vitest'
 import { build } from '../runners'
-
-jest.retryTimes(2)
 
 test('crx runs from build output', async () => {
   const { browser } = await build(__dirname)
