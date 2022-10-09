@@ -1,6 +1,16 @@
+import { watch } from 'chokidar'
 import fs from 'fs-extra'
 import { join } from 'path/posix'
 import { RollupOutput } from 'rollup'
+import {
+  delay,
+  firstValueFrom,
+  fromEvent,
+  map,
+  of,
+  startWith,
+  switchMap,
+} from 'rxjs'
 import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
 import type { CrxPlugin } from 'src/types'
@@ -21,7 +31,7 @@ export interface BuildTestResult {
   outDir: string
 }
 export interface ServeTestResult {
-  command: 'serve',
+  command: 'serve'
   config: ResolvedConfig
   server: ViteDevServer
   outDir: string
@@ -81,9 +91,7 @@ export async function build(
   return { command: 'build', outDir, output, config: config! }
 }
 
-export async function serve(
-  dirname: string,
-): Promise<ServeTestResult> {
+export async function serve(dirname: string): Promise<ServeTestResult> {
   const date = new Date('2022-01-26T00:00:00.000Z')
   vi.setSystemTime(date)
 
@@ -127,6 +135,16 @@ export async function serve(
   debug('listen')
   await allFilesReady()
   debug('bundle end')
+
+  const outDirSettle$ = fromEvent(watch(outDir), 'all').pipe(
+    startWith(null),
+    map((x, i) => i),
+    // debounce relies on the Date object
+    switchMap((i) => of(i).pipe(delay(250))),
+  )
+
+  // watch for activity on outDir to settle, Vite may be pre-bundling
+  await firstValueFrom(outDirSettle$)
 
   return { command: 'serve', outDir, server, config: server.config }
 }
