@@ -2,7 +2,7 @@ import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
-import { contentScripts } from './contentScripts'
+import { contentScripts, hashScriptId } from './contentScripts'
 import { ManifestV3Export } from './defineManifest'
 import {
   decodeManifest,
@@ -185,7 +185,12 @@ export const pluginManifest =
             if (manifest.content_scripts)
               for (const { js = [], matches = [] } of manifest.content_scripts)
                 for (const id of js) {
-                  contentScripts.set(id, { type: 'loader', id, matches })
+                  contentScripts.set(id, {
+                    type: 'loader',
+                    id,
+                    matches,
+                    refId: hashScriptId({ type: 'loader', id }),
+                  })
                 }
           } else {
             // vite build emits content scripts, html files and service worker

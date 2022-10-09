@@ -38,11 +38,7 @@ export const pluginContentScripts: CrxPluginFn = (options) => {
       generateBundle() {
         // emit content script loaders
         for (const [key, script] of contentScripts)
-          if (key === script.id) {
-            if (typeof script.refId === 'undefined')
-              throw new Error(
-                `Content script refId is undefined: "${script.id}"`,
-              )
+          if (key === script.refId) {
             if (script.type === 'module') {
               const fileName = this.getFileName(script.refId)
               script.fileName = fileName

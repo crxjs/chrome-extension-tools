@@ -9,7 +9,9 @@ export interface ContentScript {
   /** Script entry file id */
   id: string
   /** Hash of scriptId or Rollup file refId */
-  refId?: string
+  refId: string
+  /** Resolved id for dynamic scripts */
+  resolvedId?: string
   /** Filename of loader file, if present */
   loaderName?: string
   /** Filename of content script */
@@ -34,7 +36,13 @@ export const contentScripts = new RxMap<string, ContentScript>()
 contentScripts.change$
   .pipe(filter(RxMap.isChangeType.set))
   .subscribe(({ map, value }) => {
-    const keyNames = ['refId', 'id', 'fileName', 'loaderName'] as const
+    const keyNames = [
+      'refId',
+      'id',
+      'fileName',
+      'loaderName',
+      'resolvedId',
+    ] as const
     for (const keyName of keyNames) {
       const key = value[keyName]
       // avoid runaway recursion

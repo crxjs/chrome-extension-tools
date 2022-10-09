@@ -63,27 +63,31 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
               type = 'iife'
             }
 
-            let refId: string
-            if (config.command === 'build') {
-              refId = this.emitFile({
-                type: 'chunk',
+            const scriptId = hashScriptId({ type, id })
+            const resolvedId = `${id}?scriptId=${scriptId}`
+            let script = contentScripts.get(resolvedId)
+            if (typeof script === 'undefined') {
+              let refId: string
+              if (config.command === 'build') {
+                refId = this.emitFile({
+                  type: 'chunk',
+                  id,
+                  name: basename(id),
+                })
+              } else {
+                refId = scriptId
+              }
+              script = {
+                type,
                 id,
-                name: basename(id),
-              })
-            } else {
-              refId = hashScriptId({ type, id })
+                isDynamicScript: true,
+                refId,
+                matches: [],
+              }
+              contentScripts.set(resolvedId, script)
             }
 
-            const finalId = `${id}?scriptId=${refId}`
-            contentScripts.set(finalId, {
-              type,
-              id,
-              isDynamicScript: true,
-              refId,
-              matches: [],
-            })
-
-            return finalId
+            return resolvedId
           } else if (url.searchParams.has('scriptId')) {
             return _source // was already resolved (happens with vite serve)
           }
