@@ -359,7 +359,7 @@ Public dir: "${config.publicDir}"`,
 
           /* ---------- SETUP HTML PLACEHOLDER FILES --------- */
 
-          if (files.html.length) {
+          if (config.command === 'serve' && files.html.length) {
             const refId = this.emitFile({
               type: 'asset',
               name: 'precontroller.js',
