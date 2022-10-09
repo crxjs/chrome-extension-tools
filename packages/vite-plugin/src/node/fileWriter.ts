@@ -112,8 +112,10 @@ export async function write(
         const files = deps
           .map((id: string) => {
             const r = [add({ id, type: 'module' })]
-            if (id.endsWith('?import'))
-              r.push(add({ id: id.slice(0, -'?import'.length), type: 'asset' }))
+            if (id.includes('?import')) {
+              const [imported] = id.split('?import')
+              r.push(add({ id: imported, type: 'asset' }))
+            }
             return r
           })
           .flat()
