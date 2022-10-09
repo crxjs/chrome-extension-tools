@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 
-declare module '*?client' {
+declare module 'client/*' {
   const code: string
   export default code
 }

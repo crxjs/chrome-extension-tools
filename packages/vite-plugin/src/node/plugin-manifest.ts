@@ -1,5 +1,5 @@
-import precontrollerJs from 'client/es/page-precontroller-script.ts?client'
-import precontrollerHtml from 'client/html/precontroller.html?client'
+import precontrollerJs from 'client/es/page-precontroller-script.ts'
+import precontrollerHtml from 'client/html/precontroller.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'

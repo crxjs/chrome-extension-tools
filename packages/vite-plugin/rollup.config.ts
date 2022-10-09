@@ -38,31 +38,26 @@ const bundleClientCode = (): Plugin => {
       return null
     },
     resolveId(source, importer) {
-      if (importer && source.includes('?client')) return source
+      if (importer && source.endsWith('?client')) return source
     },
     async load(id) {
-      if (id.includes('?client')) {
-        const url = new URL(id, 'stub://stub')
-        const filepath = url.pathname
-        const format = path.dirname(filepath).split('/').pop() as
+      if (id.endsWith('?client')) {
+        const format = path.dirname(id).split('/').pop() as
           | 'es'
           | 'iife'
           | 'html'
+        const input = id.split('?')[0]
 
         let result: string
         if (format === 'html') {
-          result = await fs.readFile(filepath, { encoding: 'utf8' })
+          result = await fs.readFile(input, { encoding: 'utf8' })
         } else {
-          const build = await rollup({
-            ...options,
-            input: filepath,
-          })
-
+          const build = await rollup({ ...options, input })
           const { output } = await build.generate({ format })
           result = output[0].code
         }
 
-        this.addWatchFile(filepath)
+        this.addWatchFile(id)
 
         return `export default "${jsesc(result, { quotes: 'double' })}"`
       }

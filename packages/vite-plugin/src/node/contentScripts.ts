@@ -1,5 +1,5 @@
-import contentDevLoader from 'client/iife/content-dev-loader.ts?client'
-import contentProLoader from 'client/iife/content-pro-loader.ts?client'
+import contentDevLoader from 'client/iife/content-dev-loader.ts'
+import contentProLoader from 'client/iife/content-pro-loader.ts'
 import { filter } from 'rxjs'
 import { hash } from './helpers'
 import { RxMap } from './RxMap'

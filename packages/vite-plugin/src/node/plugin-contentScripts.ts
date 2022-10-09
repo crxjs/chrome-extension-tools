@@ -1,4 +1,4 @@
-import contentHmrPort from 'client/es/hmr-content-port.ts?client'
+import contentHmrPort from 'client/es/hmr-content-port.ts'
 import { filter, Subscription } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import {

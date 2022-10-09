@@ -1,5 +1,5 @@
-import precontrollerScript from 'client/es/page-precontroller-script.ts?client'
-import precontrollerHtml from 'client/html/precontroller.html?client'
+import precontrollerScript from 'client/es/page-precontroller-script.ts'
+import precontrollerHtml from 'client/html/precontroller.html'
 import { htmlFiles } from '../helpers'
 import { CrxPlugin, CrxPluginFn } from '../types'
 

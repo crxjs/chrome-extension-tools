@@ -1,5 +1,5 @@
 import { load } from 'cheerio'
-import loader from 'client/es/page-inline-script-loader.ts?client'
+import loader from 'client/es/page-inline-script-loader.ts'
 import jsesc from 'jsesc'
 import {
   HtmlTagDescriptor,
