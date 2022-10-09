@@ -43,7 +43,7 @@ export async function testOutput(
   const files = await fg(`**/*`, { cwd: outDir })
 
   expect(
-    files.map((f) => f.replace(/v--([a-z0-9]+)/, 'v--hash')).sort(),
+    files.map((f) => f.replace(/v--([a-z0-9]+)/g, 'v--hash')).sort(),
   ).toMatchSnapshot('_01 output files')
 
   const rootRegex = new RegExp(jsesc(config.root), 'g')
@@ -59,6 +59,7 @@ export async function testOutput(
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
+          .replace(/v--([a-z0-9]+)/g, 'v--hash')
           .replace(rootRegex, '<root>')
       getTest(file)(source, file)
     }
