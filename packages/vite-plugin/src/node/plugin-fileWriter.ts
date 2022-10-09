@@ -11,7 +11,14 @@ export const pluginFileWriter: CrxPluginFn = () => {
     name: 'crx:file-writer',
     apply: 'serve',
     configureServer(server) {
-      return start({ server })
+      server.httpServer?.on('listening', async () => {
+        try {
+          await start({ server })
+        } catch (error) {
+          console.error(error)
+          server.close()
+        }
+      })
     },
     closeBundle() {
       return close()
