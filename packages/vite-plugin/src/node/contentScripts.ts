@@ -14,8 +14,12 @@ export interface ContentScript {
   loaderName?: string
   /** Filename of content script */
   fileName?: string
+  /** Content script from script import */
   isDynamicScript?: boolean
+  /** Match patterns from manifest content scripts */
   matches: string[]
+  /** CSS files imported by manifest */
+  css?: string[]
 }
 
 /**
@@ -38,6 +42,15 @@ contentScripts.change$
     if (typeof map.get(value.id) === 'undefined') {
       map.set(value.id, value)
     }
+
+    if (typeof value.fileName === 'string')
+      if (typeof map.get(value.fileName) === 'undefined') {
+        map.set(value.fileName, value)
+      }
+    if (typeof value.loaderName === 'string')
+      if (typeof map.get(value.loaderName) === 'undefined') {
+        map.set(value.loaderName, value)
+      }
   })
 
 /** Generates a hash of the script type and id */

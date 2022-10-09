@@ -16,7 +16,9 @@ import { CrxPluginFn } from './types'
 
 const debug = _debug('web-acc-res')
 
-export const pluginWebAccessibleResources: CrxPluginFn = () => {
+export const pluginWebAccessibleResources: CrxPluginFn = ({
+  contentScripts: { injectCss = true } = {},
+}) => {
   return [
     {
       name: 'crx:web-accessible-resources',
@@ -111,6 +113,9 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                     { chunks: bundleChunks, files: viteFiles },
                   )
 
+                  // update content script resources for use by css plugin
+                  contentScripts.get(key)!.css = [...css]
+
                   // loader files import the entry, so entry file must be web accessible
                   if (type === 'loader') imports.add(fileName)
 
@@ -120,10 +125,13 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                     matches: isDynamicScript
                       ? [...dynamicScriptMatches]
                       : matches,
-                    resources: [...assets, ...imports, ...css],
+                    resources: [...assets, ...imports],
                     use_dynamic_url: isDynamicScript
                       ? dynamicScriptDynamicUrl
                       : true,
+                  }
+                  if (isDynamicScript || !injectCss) {
+                    resource.resources.push(...css)
                   }
 
                   if (resource.resources.length)
@@ -138,12 +146,11 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                     }
                 }
 
-          // remove imported module scripts
+          // now we know loader and iife resources, can handle modules
           for (const r of web_accessible_resources)
             if (isResourceByMatch(r))
-              for (const res of r.resources)
-                if (moduleScriptResources.has(res))
-                  moduleScriptResources.delete(res)
+              // remove imported module scripts
+              for (const res of r.resources) moduleScriptResources.delete(res)
           // add remaining top-level module imports (could be executed main world scripts)
           web_accessible_resources.push(...moduleScriptResources.values())
         }

@@ -10,6 +10,7 @@ import { pluginDeclaredContentScripts } from './plugin-contentScripts_declared'
 import { pluginWebAccessibleResources } from './plugin-webAccessibleResources'
 import { pluginFileWriterPolyfill } from './plugin-fileWriter-polyfill'
 import { pluginContentScripts } from './plugin-contentScripts'
+import { pluginContentScriptsCss } from './plugin-contentScripts_css'
 
 /** `init` initializes crx plugins with crx options */
 function init(options: CrxOptions, plugins: CrxPluginFn[]) {
@@ -38,6 +39,7 @@ export const crx = ({
     pluginFileWriterPolyfill,
     pluginHtmlInlineScripts,
     pluginWebAccessibleResources,
+    pluginContentScriptsCss,
     /** Only manifest plugin uses manifest, other plugins get manifest in manifest hooks */
     pluginManifest(manifest),
   ])

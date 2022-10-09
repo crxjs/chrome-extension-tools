@@ -37,25 +37,30 @@ export const pluginContentScripts: CrxPluginFn = (options) => {
       enforce: 'pre',
       generateBundle() {
         // emit content script loaders
-        for (const script of contentScripts.values()) {
-          if (typeof script.refId === 'undefined')
-            throw new Error(`Content script refId is undefined: "${script.id}"`)
-          if (script.type === 'module') {
-            const fileName = this.getFileName(script.refId)
-            script.fileName = fileName
-          } else if (script.type === 'loader') {
-            const fileName = this.getFileName(script.refId)
-            script.fileName = fileName
-            const refId = this.emitFile({
-              type: 'asset',
-              name: getFileName({ type: 'loader', id: basename(script.id) }),
-              source: createProLoader({ fileName }),
-            })
-            script.loaderName = this.getFileName(refId)
-          } else if (script.type === 'iife') {
-            throw new Error('IIFE content scripts are not implemented')
+        for (const [key, script] of contentScripts)
+          if (key === script.id) {
+            if (typeof script.refId === 'undefined')
+              throw new Error(
+                `Content script refId is undefined: "${script.id}"`,
+              )
+            if (script.type === 'module') {
+              const fileName = this.getFileName(script.refId)
+              script.fileName = fileName
+            } else if (script.type === 'loader') {
+              const fileName = this.getFileName(script.refId)
+              script.fileName = fileName
+              const refId = this.emitFile({
+                type: 'asset',
+                name: getFileName({ type: 'loader', id: basename(script.id) }),
+                source: createProLoader({ fileName }),
+              })
+              script.loaderName = this.getFileName(refId)
+            } else if (script.type === 'iife') {
+              throw new Error('IIFE content scripts are not implemented')
+            }
+            // trigger update for other key values
+            contentScripts.set(key, script)
           }
-        }
       },
     },
     {
