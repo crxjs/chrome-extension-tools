@@ -18,7 +18,7 @@ import {
 } from 'rxjs'
 import { TransformResult, ViteDevServer } from 'vite'
 import { _debug } from './helpers'
-import { join } from './path'
+import { isAbsolute, join } from './path'
 import { CrxPlugin } from './types'
 import { stubId } from './virtualFileIds'
 
@@ -200,7 +200,9 @@ export async function output({
           root,
           build: { outDir },
         } = server.config
-        const target = join(root, outDir, fileName)
+        const target = isAbsolute(outDir)
+          ? join(outDir, fileName)
+          : join(root, outDir, fileName)
 
         return { target, code, deps: [deps, dynamicDeps].flat() }
       }),
