@@ -1,9 +1,13 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { expect, test } from 'vitest'
+import { expect, test, afterEach } from 'vitest'
 import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
+
+afterEach(() => {
+  return new Promise<void>((r) => setTimeout(() => r(), 1000))
+})
 
 test(
   'crx page update on hmr',
