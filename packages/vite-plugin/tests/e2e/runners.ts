@@ -52,6 +52,7 @@ export async function serve(dirname: string) {
   })) as ChromiumBrowserContext
 
   await browser.route('https://example.com', (route) => {
+    console.log('route example.com')
     route.fulfill({
       path: path.join(__dirname, 'example.html'),
     })
