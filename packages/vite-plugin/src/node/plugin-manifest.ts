@@ -121,17 +121,27 @@ export const pluginManifest =
         name: 'crx:stub-input',
         enforce: 'pre',
         options({ input, ...options }) {
+          let finalInput = input
+          if (isString(input) && input.endsWith('index.html')) {
+            finalInput = stubId
+          }
+          
+          // don't emit extra html files during serve
+          if (config.command === 'serve')
+            if (Array.isArray(input)) {
+              finalInput = input.filter((x) => x.endsWith('.html'))
+            } else if (typeof input === 'object') {
+              for (const [key, value] of Object.entries(input))
+                if (value.endsWith('.html')) delete input[key]
+            }
+
           /**
            * Rollup requires an initial input, but we don't need it By using a
            * stub instead of the default input, we can avoid extending
            * complicated inputs and easily find the manifest in
            * crx:manifest#generateBundle using a ref id.
            */
-          return {
-            input:
-              isString(input) && input.endsWith('index.html') ? stubId : input,
-            ...options,
-          }
+          return { input: finalInput, ...options }
         },
         resolveId(source) {
           if (source === stubId) return stubId
