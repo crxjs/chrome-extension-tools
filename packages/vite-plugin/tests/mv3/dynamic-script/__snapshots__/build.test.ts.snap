@@ -61,7 +61,7 @@ Array [
 
 exports[`build fs output: assets/background.ts.hash.js 1`] = `
 "const import_meta = {};
-var scriptFileName = \\"assets/dynamic-script.ts-loader.hash.js\\";
+var scriptFileName = \\"/assets/dynamic-script.ts-loader.hash.js\\";
 console.log(\\"background.ts\\");
 chrome.action.onClicked.addListener((tab) => {
   if (tab.id)
@@ -75,7 +75,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 exports[`build fs output: assets/declared-script.ts.hash.js 1`] = `
 "const import_meta = {};
-var fileName = \\"assets/main-world.ts.hash.js\\";
+var fileName = \\"/assets/main-world.ts.hash.js\\";
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);

@@ -1,5 +1,5 @@
 import { OutputChunk } from 'rollup'
-import { Manifest as ViteManifest } from 'vite'
+import { Manifest as ViteManifest, ResolvedConfig } from 'vite'
 import { compileFileResources } from './compileFileResources'
 import { contentScripts } from './contentScripts'
 import { DYNAMIC_RESOURCE } from './defineManifest'
@@ -20,6 +20,7 @@ const debug = _debug('web-acc-res')
 export const pluginWebAccessibleResources: CrxPluginFn = ({
   contentScripts: { injectCss = true } = {},
 }) => {
+  let config: ResolvedConfig
   return [
     {
       name: 'crx:web-accessible-resources',
@@ -57,6 +58,9 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
       enforce: 'post',
       config({ build, ...config }, { command }) {
         return { ...config, build: { ...build, manifest: command === 'build' } }
+      },
+      configResolved(_config) {
+        config = _config
       },
       renderCrxManifest(manifest, bundle) {
         const { web_accessible_resources: _war = [] } = manifest
@@ -112,7 +116,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
                 } else {
                   const { assets, css, imports } = compileFileResources(
                     fileName,
-                    { chunks: bundleChunks, files: viteFiles },
+                    { chunks: bundleChunks, files: viteFiles, config },
                   )
 
                   // update content script resources for use by css plugin

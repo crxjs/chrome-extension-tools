@@ -45,6 +45,7 @@ export function isObject<T>(
   return Object.prototype.toString.call(value) === '[object Object]'
 }
 
+/** Is web accessible resource with match pattern array */
 export const isResourceByMatch = (
   x: WebAccessibleResourceById | WebAccessibleResourceByMatch,
 ): x is WebAccessibleResourceByMatch => 'matches' in x
