@@ -7,7 +7,12 @@ import { allFileWriterErrors } from 'src/fileWriter-rxjs'
 import { _debug } from 'src/helpers'
 import { ManifestV3 } from 'src/manifest'
 import { expect } from 'vitest'
-import { BuildTestResult, defaultTest, isTextFile, ServeTestResult } from './runners'
+import {
+  BuildTestResult,
+  defaultTest,
+  isTextFile,
+  ServeTestResult,
+} from './runners'
 
 export async function testOutput(
   testResult: BuildTestResult | ServeTestResult,
@@ -22,7 +27,9 @@ export async function testOutput(
 
   if (testResult.command === 'serve') {
     testResult.server.close()
-    expect(await allFileWriterErrors).toEqual([])
+    const errors = await allFileWriterErrors
+    for (const error of errors) console.error(error)
+    expect(errors.length).toBe(0)
   }
 
   const getTest = (x: string, d = defaultTest): typeof defaultTest => {
