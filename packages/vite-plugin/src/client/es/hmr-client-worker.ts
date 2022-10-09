@@ -4,7 +4,7 @@
 declare const self: ServiceWorkerGlobalScope
 export {}
 
-import { CrxHMRPayload } from 'src/types'
+import type { CrxHMRPayload } from 'src/types'
 import type { HMRPayload } from 'vite'
 
 // injected by the hmr plugin when served

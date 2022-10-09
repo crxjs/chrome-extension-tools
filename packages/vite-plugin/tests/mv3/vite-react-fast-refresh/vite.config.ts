@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react'
-import { crx } from 'src/.'
+import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 import manifest from './manifest.config'
 
@@ -8,12 +8,12 @@ const { preambleCode } = react
 export default defineConfig({
   build: {
     minify: false,
-    rollupOptions: {
+        rollupOptions: {
       output: {
         // the hash randomly changes between environments
-        assetFileNames: 'assets/[name].hash.[ext]',
-        chunkFileNames: 'assets/[name].hash.js',
-        entryFileNames: 'assets/[name].hash.js',
+        assetFileNames: 'assets/[name].hash[hash].[ext]',
+        chunkFileNames: 'assets/[name].hash[hash].js',
+        entryFileNames: 'assets/[name].hash[hash].js',
       },
     },
   },

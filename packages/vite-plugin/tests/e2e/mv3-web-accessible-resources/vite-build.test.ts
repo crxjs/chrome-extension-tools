@@ -1,3 +1,4 @@
+import { test } from 'vitest'
 import { build } from '../runners'
 
 test('crx runs from build output', async () => {
@@ -8,7 +9,7 @@ test('crx runs from build output', async () => {
   const image = container.locator('.tags.image')
   const script = container.locator('.tags.script')
 
-  await page.goto('https://www.google.com')
+  await page.goto('https://example.com')
   await font.waitFor({ state: 'attached' })
   await image.waitFor({ state: 'attached' })
   await script.waitFor({ state: 'attached' })

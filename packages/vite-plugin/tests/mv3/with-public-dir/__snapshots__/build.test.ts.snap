@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`build fs output: _00 manifest.json 1`] = `
+exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_icon": Object {
@@ -24,9 +24,9 @@ Object {
 }
 `;
 
-exports[`build fs output: _01 output files 1`] = `
+exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/popup.html.hash.js",
+  "assets/popup.html.hash0.js",
   "favicon.svg",
   "icons/action-icon-128.png",
   "icons/action-icon-16.png",
@@ -41,8 +41,8 @@ Array [
 ]
 `;
 
-exports[`build fs output: assets/popup.html.hash.js 1`] = `
-"const p = function polyfill() {
+exports[`build fs output > assets/popup.html.hash0.js 1`] = `
+"(function polyfill() {
   const relList = document.createElement(\\"link\\").relList;
   if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
     return;
@@ -82,13 +82,12 @@ exports[`build fs output: assets/popup.html.hash.js 1`] = `
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
-};
-p();
+})();
 console.log(\\"popup script\\");
 "
 `;
 
-exports[`build fs output: src/popup.html 1`] = `
+exports[`build fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
@@ -96,7 +95,7 @@ exports[`build fs output: src/popup.html 1`] = `
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <link rel=\\"icon\\" type=\\"image/svg+xml\\" href=\\"/favicon.svg\\" />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash0.js\\"></script>
   </head>
   <body>
     <div id=\\"root\\"></div>

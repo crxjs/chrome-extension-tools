@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.ts.js.js",
+        "src/content.ts-loader.js",
       ],
       "matches": Array [
         "https://*/*",
@@ -39,22 +39,22 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content.ts.js.js",
-  "assets/crx-client-port.js",
-  "assets/precontroller.js.js",
-  "assets/webcomponents-custom-elements-z7FmG.js",
+  "assets/precontroller.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
+  "src/content.ts-loader.js",
   "src/content.ts.js",
   "src/popup.html",
-  "vendor/vite-client.mjs.js",
-  "vendor/vite-env.mjs.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.ts",
   "src/background.ts",
@@ -62,7 +62,26 @@ Set {
 }
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
+exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
+"const id = setInterval(() => location.reload(), 100);
+setTimeout(() => clearInterval(id), 5e3);
+"
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http:/localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/src/background.ts';
+"
+`;
+
+exports[`serve fs output > src/content.ts.js 1`] = `
+"console.log(\\"content script\\");
+export {};
+"
+`;
+
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -74,7 +93,7 @@ exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.mjs.js\\")
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -86,100 +105,12 @@ exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
 "
 `;
 
-exports[`serve fs output: assets/crx-client-port.js 1`] = `
-"function isCrxHMRPayload(x) {
-  return x.type === \\"custom\\" && x.event.startsWith(\\"crx:\\");
-}
-class HMRPort {
-  port;
-  callbacks = /* @__PURE__ */ new Map();
-  constructor() {
-    setInterval(() => {
-      try {
-        this.port?.postMessage({ data: \\"ping\\" });
-      } catch (error) {
-        if (error instanceof Error && error.message.includes(\\"Extension context invalidated.\\")) {
-          location.reload();
-        } else
-          throw error;
-      }
-    }, 5000);
-    setInterval(this.initPort, 5 * 60 * 1e3);
-    this.initPort();
-  }
-  initPort = () => {
-    this.port?.disconnect();
-    this.port = chrome.runtime.connect({ name: \\"@crx/client\\" });
-    this.port.onDisconnect.addListener(this.handleDisconnect.bind(this));
-    this.port.onMessage.addListener(this.handleMessage.bind(this));
-    this.port.postMessage({ type: \\"connected\\" });
-  };
-  handleDisconnect = () => {
-    if (this.callbacks.has(\\"close\\"))
-      for (const cb of this.callbacks.get(\\"close\\")) {
-        cb({ wasClean: true });
-      }
-  };
-  handleMessage = (message) => {
-    const forward = (data) => {
-      if (this.callbacks.has(\\"message\\"))
-        for (const cb of this.callbacks.get(\\"message\\")) {
-          cb({ data });
-        }
-    };
-    const payload = JSON.parse(message.data);
-    if (isCrxHMRPayload(payload)) {
-      if (payload.event === \\"crx:runtime-reload\\") {
-        console.log(\\"[crx] runtime reload\\");
-        setTimeout(() => location.reload(), 500);
-      } else {
-        forward(JSON.stringify(payload.data));
-      }
-    } else {
-      forward(message.data);
-    }
-  };
-  addEventListener = (event, callback) => {
-    const cbs = this.callbacks.get(event) ?? /* @__PURE__ */ new Set();
-    cbs.add(callback);
-    this.callbacks.set(event, cbs);
-  };
-  send = (data) => {
-    if (this.port)
-      this.port.postMessage({ data });
-    else
-      throw new Error(\\"HMRPort is not initialized\\");
-  };
-}
-
-export { HMRPort };
-"
-`;
-
-exports[`serve fs output: assets/precontroller.js.js 1`] = `
-"const id = setInterval(() => location.reload(), 100);
-setTimeout(() => clearInterval(id), 5e3);
-"
-`;
-
-exports[`serve fs output: service-worker-loader.js 1`] = `
-"import 'http:/localhost:3000/@vite/env';
-import 'http://localhost:3000/crx-client-worker';
-import 'http://localhost:3000/src/background.ts';
-"
-`;
-
-exports[`serve fs output: src/content.ts.js 1`] = `
-"console.log(\\"content script\\");
-"
-`;
-
-exports[`serve fs output: src/popup.html 1`] = `
+exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.js.js\\"></script>
+    <script src=\\"/assets/precontroller.hash0.js\\"></script>
   </head>
   <body>
     <h1>Waiting for service worker</h1>

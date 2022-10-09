@@ -1,14 +1,14 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`build fs output: _00 manifest.json 1`] = `
+exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "content_scripts": Array [
     Object {
       "css": Array [
-        "assets/content.ts.hash.css",
+        "assets/content.hash1.css",
       ],
       "js": Array [
-        "assets/content-script-loader.content.ts.hash.hash.js",
+        "assets/content.ts-loader.hash0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -26,7 +26,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "assets/content.ts.hash.js",
+        "assets/content.ts.hash2.js",
       ],
       "use_dynamic_url": true,
     },
@@ -34,36 +34,36 @@ Object {
 }
 `;
 
-exports[`build fs output: _01 output files 1`] = `
+exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content.ts.hash.hash.js",
-  "assets/content.ts.hash.css",
-  "assets/content.ts.hash.js",
+  "assets/content.hash1.css",
+  "assets/content.ts-loader.hash0.js",
+  "assets/content.ts.hash2.js",
   "manifest.json",
 ]
 `;
 
-exports[`build fs output: assets/content.ts.hash.css 1`] = `
+exports[`build fs output > assets/content.hash1.css 1`] = `
 "body {
   color: red;
 }
 "
 `;
 
-exports[`build fs output: assets/content.ts.hash.js 1`] = `
-"var styles = \\"\\";
+exports[`build fs output > assets/content.ts.hash2.js 1`] = `
+"const styles = \\"\\";
 console.log(\\"content.ts\\");
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content.ts.hash.hash.js 1`] = `
+exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content.ts.hash2.js\\")
     );
   })().catch(console.error);
 

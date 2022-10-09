@@ -1,5 +1,9 @@
-import { crx, defineManifest } from 'src/index'
+import { crx, defineManifest } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path/posix'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const manifest = defineManifest({
   background: {
@@ -16,7 +20,8 @@ export default defineConfig({
   build: {
     minify: false,
     rollupOptions: {
-      input: ['src/iframe.html'],
+      // input needs to be absolute b/c vitest doesn't support process.chdir
+      input: ['src/iframe.html'].map((f) => join(__dirname, f)),
     },
   },
   clearScreen: false,

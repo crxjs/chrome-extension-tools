@@ -1,6 +1,5 @@
 import { ConfigEnv } from 'vite'
 import { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
-import { dynamicResourcesName } from './plugin-content-scripts'
 
 export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 
@@ -26,7 +25,7 @@ export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
  * const manifest = defineManifest({
  *   "web_accessible_resources": [
  *     defineDynamicResource({
- *       matches: ["https://google.com/*", "file:///*.mp3", "..."]
+ *       matches: ["https://example.com/*", "file:///*.mp3", "..."]
  *       use_dynamic_url?: true
  *     })
  *   ]
@@ -41,6 +40,8 @@ export const defineDynamicResource = ({
   'resources'
 >): WebAccessibleResourceByMatch => ({
   matches,
-  resources: [dynamicResourcesName],
+  resources: [DYNAMIC_RESOURCE],
   use_dynamic_url,
 })
+
+export const DYNAMIC_RESOURCE = '<dynamic_resource>' as const

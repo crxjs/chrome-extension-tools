@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`build fs output: _00 manifest.json 1`] = `
+exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
     "default_popup": "src/popup.html",
@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.js.hash.hash.js",
+        "assets/content.js-loader.hash0.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -34,7 +34,7 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "assets/content.js.hash.js",
+        "assets/content.js.hash1.js",
       ],
       "use_dynamic_url": true,
     },
@@ -42,37 +42,37 @@ Object {
 }
 `;
 
-exports[`build fs output: _01 output files 1`] = `
+exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/background.js.hash.js",
-  "assets/content-script-loader.content.js.hash.hash.js",
-  "assets/content.js.hash.js",
-  "assets/popup.html.hash.js",
-  "assets/vendor.hash.js",
+  "assets/background.js.hash2.js",
+  "assets/content.js-loader.hash0.js",
+  "assets/content.js.hash1.js",
+  "assets/popup.html.hash3.js",
+  "assets/vendor.hash4.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/popup.html",
 ]
 `;
 
-exports[`build fs output: assets/background.js.hash.js 1`] = `
+exports[`build fs output > assets/background.js.hash2.js 1`] = `
 "console.log(\\"service_worker.js\\");
 "
 `;
 
-exports[`build fs output: assets/content.js.hash.js 1`] = `
+exports[`build fs output > assets/content.js.hash1.js 1`] = `
 "console.log(\\"content script\\");
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content.js.hash.hash.js 1`] = `
+exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
 
   (async () => {
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
+      chrome.runtime.getURL(\\"assets/content.js.hash1.js\\")
     );
   })().catch(console.error);
 
@@ -80,9 +80,9 @@ exports[`build fs output: assets/content-script-loader.content.js.hash.hash.js 1
 "
 `;
 
-exports[`build fs output: assets/popup.html.hash.js 1`] = `
-"import { R as React, a as ReactDOM } from \\"./vendor.hash.js\\";
-const p = function polyfill() {
+exports[`build fs output > assets/popup.html.hash3.js 1`] = `
+"import { R as React, a as ReactDOM } from \\"./vendor.hash4.js\\";
+(function polyfill() {
   const relList = document.createElement(\\"link\\").relList;
   if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
     return;
@@ -122,8 +122,7 @@ const p = function polyfill() {
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
-};
-p();
+})();
 const App = () => {
   return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
 };
@@ -133,20 +132,20 @@ ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
 "
 `;
 
-exports[`build fs output: service-worker-loader.js 1`] = `
-"import './assets/background.js.hash.js';
+exports[`build fs output > service-worker-loader.js 1`] = `
+"import './assets/background.js.hash2.js';
 "
 `;
 
-exports[`build fs output: src/popup.html 1`] = `
+exports[`build fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
     <meta charset=\\"UTF-8\\" />
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
-    <link rel=\\"modulepreload\\" href=\\"/assets/vendor.hash.js\\">
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash3.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash4.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>

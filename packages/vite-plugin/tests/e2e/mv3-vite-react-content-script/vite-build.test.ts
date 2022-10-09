@@ -1,9 +1,12 @@
+import { test } from 'vitest'
 import { build } from '../runners'
+import { expect } from 'vitest'
+import { getCustomId } from '../helpers'
 
-test('crx runs from build output', async () => {
+test('crx runs from build output', async (ctx) => {
   const { browser } = await build(__dirname)
   const page = await browser.newPage()
-  await page.goto('https://www.google.com')
+  await page.goto('https://example.com')
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
@@ -11,5 +14,7 @@ test('crx runs from build output', async () => {
 
   await app.waitFor()
 
-  expect(await app.screenshot()).toMatchImageSnapshot()
+  expect(await app.screenshot()).toMatchImageSnapshot({
+    customSnapshotIdentifier: getCustomId(ctx),
+  })
 })

@@ -1,13 +1,13 @@
 import { serve } from 'tests/runners'
 import { testOutput } from 'tests/testOutput'
-import { mockDate } from 'tests/helpers'
-
-mockDate()
+import { afterAll, test } from 'vitest'
 
 let result: Awaited<ReturnType<typeof serve>> | undefined
 
 afterAll(async () => {
-  await result?.server.close()
+  try {
+    await result?.server.close()
+  } catch (error) {}
 })
 
 test("works with 'self' directive", async () => {

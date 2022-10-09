@@ -1,5 +1,5 @@
-import { crx } from 'src/.'
-import { join } from 'src/path'
+import { crx } from '../../plugin-testOptionsProvider'
+import { join } from 'path/posix'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -41,7 +41,7 @@ export default defineConfig({
               // If you're using a content script to load a web accessible HTML file in an iframe,
               // the assets of the web accessible HTMl file don't need to be web accessible 🤯
             ],
-            matches: ['https://www.google.com/*'],
+            matches: ['https://example.com/*'],
           },
         ],
       },

@@ -1,8 +1,8 @@
 import type { Node as AcornNode } from 'acorn'
-import type { PluginContext, OutputBundle } from 'rollup'
-import type { HMRPayload, Plugin as VitePlugin, ViteDevServer } from 'vite'
-import { ManifestV3 } from './manifest'
 import type { Options as FastGlobOptions } from 'fast-glob'
+import type { OutputBundle, PluginContext } from 'rollup'
+import type { HMRPayload, Plugin as VitePlugin } from 'vite'
+import { ManifestV3 } from './manifest'
 
 export interface AcornLiteral extends AcornNode {
   type: 'Literal'
@@ -39,20 +39,37 @@ export interface AcornTemplateElement extends AcornNode {
   }
 }
 
+export type CrxDevAssetId = {
+  id: string
+  type: 'asset'
+  source?: string | Uint8Array
+}
+
+export type CrxDevScriptId = {
+  id: string
+  type: 'module' | 'iife'
+}
+
 export interface CrxPlugin extends VitePlugin {
-  /** Runs during dev mode when the file writer has started and server is listening. */
-  fileWriterStart?: (server: ViteDevServer) => Promise<void> | void
-  /** Runs during the transform hook for the manifest. */
+  /** Runs during the transform hook for the manifest. Filenames use input filenames. */
   transformCrxManifest?: (
     this: PluginContext,
     manifest: ManifestV3,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
-  /** Runs during generateBundle, before manifest output. */
+  /** Runs during generateBundle, before manifest output. Filenames use output filenames. */
   renderCrxManifest?: (
     this: PluginContext,
     manifest: ManifestV3,
     bundle: OutputBundle,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
+  /**
+   * Runs in the file writer on content scripts during development. `script.id`
+   * is Vite URL format.
+   */
+  renderCrxDevScript?: (
+    code: string,
+    script: CrxDevScriptId,
+  ) => Promise<string | null | undefined> | string | null | undefined
 }
 
 // change this to an interface when you want to add options
@@ -67,7 +84,7 @@ export interface CrxOptions {
 }
 
 export interface CrxPluginFn {
-  (options: CrxOptions): CrxPlugin | CrxPlugin[]
+  (): CrxPlugin | CrxPlugin[]
 }
 
 export type ManifestFiles = {

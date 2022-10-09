@@ -1,8 +1,6 @@
 import { build } from 'tests/runners'
 import { testOutput } from 'tests/testOutput'
-import { mockDate } from 'tests/helpers'
-
-mockDate()
+import { test } from 'vitest'
 
 test("works with 'self' directive", async () => {
   const result = await build(__dirname)

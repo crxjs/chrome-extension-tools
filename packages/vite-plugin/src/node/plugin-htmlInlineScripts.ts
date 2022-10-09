@@ -1,5 +1,5 @@
 import { load } from 'cheerio'
-import loader from 'client/es/page-inline-script-loader.ts?client'
+import loader from 'client/es/page-inline-script-loader.ts'
 import jsesc from 'jsesc'
 import {
   HtmlTagDescriptor,
@@ -35,7 +35,7 @@ const toKey = (ctx: IndexHtmlTransformContext) => {
  * This plugin audits the other plugins to see if they add inline scripts and
  * when needed it coordinates page script execution.
  */
-export const pluginHtmlAuditor: CrxPluginFn = () => {
+export const pluginHtmlInlineScripts: CrxPluginFn = () => {
   /** Page tags by filename converted to Base64 */
   const pages = new Map<
     string,

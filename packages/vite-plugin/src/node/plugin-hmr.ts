@@ -1,6 +1,13 @@
-import { HMRPayload } from 'vite'
-import { manifestFiles, _debug } from './helpers'
-import { crxHmrPayload$, hmrPayload$ } from './hmrPayload'
+// import { HMRPayload } from 'vite'
+import { merge } from 'rxjs'
+import { HMRPayload, ResolvedConfig } from 'vite'
+import { contentScripts } from './contentScripts'
+import { manifestFiles } from './files'
+import { update } from './fileWriter'
+import { crxHMRPayload$, hmrPayload$ } from './fileWriter-hmr'
+import { fileWriterError$ } from './fileWriter-rxjs'
+import { getFileName, prefix } from './fileWriter-utilities'
+import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
@@ -13,25 +20,16 @@ export const crxRuntimeReload: CrxHMRPayload = {
 }
 
 export const pluginHMR: CrxPluginFn = () => {
-  let files: ManifestFiles
+  let inputManifestFiles: ManifestFiles
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
+  let config: ResolvedConfig
 
   return [
     {
       name: 'crx:hmr',
-      apply: 'build',
-      enforce: 'post',
-      async renderCrxManifest(manifest) {
-        if (this.meta.watchMode) {
-          files = await manifestFiles(manifest)
-        }
-        return null
-      },
-    },
-    {
-      name: 'crx:hmr',
       apply: 'serve',
       enforce: 'pre',
+      // server hmr host should be localhost
       config({ server = {}, ...config }) {
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
@@ -40,7 +38,9 @@ export const pluginHMR: CrxPluginFn = () => {
 
         return { server, ...config }
       },
-      configResolved(config) {
+      // server should ignore outdir
+      configResolved(_config) {
+        config = _config
         const { watch = {} } = config.server
         config.server.watch = watch
         watch.ignored = watch.ignored
@@ -49,8 +49,9 @@ export const pluginHMR: CrxPluginFn = () => {
         const outDir = isAbsolute(config.build.outDir)
           ? config.build.outDir
           : join(config.root, config.build.outDir, '**/*')
-        watch.ignored.push(outDir)
+        if (!watch.ignored.includes(outDir)) watch.ignored.push(outDir)
       },
+      // TODO: emit hmr payloads for file writer
       configureServer(server) {
         if (server.ws.send !== decoratedSend) {
           // decorate server websocket send method
@@ -60,22 +61,73 @@ export const pluginHMR: CrxPluginFn = () => {
             send(payload) // don't interfere with normal hmr
           }
           server.ws.send = decoratedSend
-          crxHmrPayload$.subscribe((payload) => {
-            send(payload) // send crx hmr events
+          merge(crxHMRPayload$, fileWriterError$).subscribe((payload) => {
+            send(payload) // send crx hmr and error events
           })
         }
       },
-      handleHotUpdate({ file, modules, server }) {
-        const background =
-          files.background[0] && join(server.config.root, files.background[0])
+      // background changes require a full extension reload
+      handleHotUpdate({ modules, server }) {
+        const { root } = server.config
 
-        // check that the changed file is not a background dependency
-        if (background)
-          if (file === background || modules.some(isImporter(background))) {
+        const relFiles = new Set<string>()
+        for (const m of modules)
+          if (m.id?.startsWith(root)) {
+            relFiles.add(m.id.slice(server.config.root.length))
+          }
+
+        // check if changed file is a background dependency
+        if (inputManifestFiles.background.length) {
+          const background = prefix('/', inputManifestFiles.background[0])
+          if (
+            relFiles.has(background) ||
+            modules.some(isImporter(join(server.config.root, background)))
+          ) {
             debug('sending runtime reload')
             server.ws.send(crxRuntimeReload)
             return []
           }
+        }
+
+        for (const [key, script] of contentScripts)
+          if (key === script.id) {
+            // check if changed file is a content script dependency
+            if (
+              relFiles.has(script.id) ||
+              modules.some(isImporter(join(server.config.root, script.id)))
+            ) {
+              relFiles.forEach((relFile) => update(relFile))
+            }
+          }
+      },
+    },
+    {
+      name: 'crx:hmr',
+      apply: 'serve',
+      enforce: 'post',
+      // get final output manifest for handleHotUpdate 👆
+      async transformCrxManifest(manifest) {
+        inputManifestFiles = await manifestFiles(manifest, { cwd: config.root })
+        return null
+      },
+      renderCrxDevScript(code, { id: _id, type }) {
+        if (
+          type === 'module' &&
+          _id !== '/@vite/client' &&
+          code.includes('createHotContext')
+        ) {
+          const id = _id.replace(/t=\d+&/, '')
+          const escaped = id.replace(/([?&.])/g, '\\$1')
+          // using lookahead and lookbehind
+          const regexp = new RegExp(
+            `(?<=createHotContext\\(")${escaped}(?="\\))`,
+          )
+          const fileUrl = prefix('/', getFileName({ id, type }))
+          const replaced = code.replace(regexp, fileUrl)
+          return replaced
+        } else {
+          return code
+        }
       },
     },
   ]

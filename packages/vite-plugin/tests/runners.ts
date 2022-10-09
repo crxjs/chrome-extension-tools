@@ -1,24 +1,61 @@
+import { watch } from 'chokidar'
 import fs from 'fs-extra'
+import { join } from 'path/posix'
+import { RollupOutput } from 'rollup'
+import {
+  delay,
+  firstValueFrom,
+  fromEvent,
+  map,
+  of,
+  startWith,
+  switchMap,
+} from 'rxjs'
+import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
-import { join } from 'src/path'
-import { filesReady } from 'src/plugin-fileWriter--events'
 import type { CrxPlugin } from 'src/types'
-import { build as _build, createServer, ResolvedConfig } from 'vite'
+import {
+  build as _build,
+  createServer,
+  InlineConfig,
+  ResolvedConfig,
+  ViteDevServer,
+} from 'vite'
 import inspect from 'vite-plugin-inspect'
+import { expect, vi } from 'vitest'
 
-export async function build(dirname: string, configFile = 'vite.config.ts') {
+export interface BuildTestResult {
+  command: 'build'
+  config: ResolvedConfig
+  output: RollupOutput
+  outDir: string
+}
+export interface ServeTestResult {
+  command: 'serve'
+  config: ResolvedConfig
+  server: ViteDevServer
+  outDir: string
+}
+
+export async function build(
+  dirname: string,
+  configFile = 'vite.config.ts',
+): Promise<BuildTestResult> {
+  const date = new Date('2022-01-26T00:00:00.000Z')
+  vi.setSystemTime(date)
+
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
   const cacheDir = join(dirname, '.vite')
   const outDir = join(dirname, 'dist-build')
 
-  process.chdir(dirname)
   await fs.remove(cacheDir)
   await fs.remove(outDir)
 
   let config: ResolvedConfig
-  const output = await _build({
+  const inlineConfig: InlineConfig = {
+    root: dirname,
     configFile: join(dirname, configFile),
     envFile: false,
     build: {
@@ -33,6 +70,8 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
     },
     cacheDir,
     plugins: [
+      // @ts-expect-error we're going to override this from the vite config
+      crx(null),
       {
         name: 'test:get-config',
         configResolved(_config) {
@@ -42,31 +81,38 @@ export async function build(dirname: string, configFile = 'vite.config.ts') {
     ],
     clearScreen: false,
     logLevel: 'error',
-  })
+  }
+  const output = await _build(inlineConfig)
 
   if (Array.isArray(output))
     throw new TypeError('received outputarray from vite build')
   if ('close' in output) throw new TypeError('recieved watcher from vite build')
 
-  return { outDir, output, config: config! }
+  return { command: 'build', outDir, output, config: config! }
 }
 
-export async function serve(dirname: string) {
+export async function serve(dirname: string): Promise<ServeTestResult> {
+  const date = new Date('2022-01-26T00:00:00.000Z')
+  vi.setSystemTime(date)
+
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 
   const cacheDir = join(dirname, '.vite')
   const outDir = join(dirname, 'dist-serve')
 
-  process.chdir(dirname)
   await fs.remove(cacheDir)
   await fs.remove(outDir)
   debug('clean dirs')
 
-  const plugins: CrxPlugin[] = []
+  const plugins: CrxPlugin[] = [
+    // @ts-expect-error we're going to override this from the vite config
+    crx(null),
+  ]
   if (process.env.DEBUG) plugins.push(inspect())
 
-  const server = await createServer({
+  const inlineConfig: InlineConfig = {
+    root: dirname,
     configFile: join(dirname, 'vite.config.ts'),
     envFile: false,
     build: { outDir, minify: false },
@@ -80,15 +126,27 @@ export async function serve(dirname: string) {
         ignored: [cacheDir],
       },
     },
-  })
+  }
+  const server = await createServer(inlineConfig)
   debug('create server')
 
   await server.listen()
+
   debug('listen')
-  await filesReady()
+  await allFilesReady()
   debug('bundle end')
 
-  return { outDir, server, config: server.config }
+  const outDirSettle$ = fromEvent(watch(outDir), 'all').pipe(
+    startWith(null),
+    map((x, i) => i),
+    // debounce relies on the Date object
+    switchMap((i) => of(i).pipe(delay(250))),
+  )
+
+  // watch for activity on outDir to settle, Vite may be pre-bundling
+  await firstValueFrom(outDirSettle$)
+
+  return { command: 'serve', outDir, server, config: server.config }
 }
 
 export const isTextFile = (x: string) =>

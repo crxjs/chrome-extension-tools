@@ -1,5 +1,14 @@
 import jsesc from 'jsesc'
 import { BrowserContext, Locator, Page } from 'playwright-chromium'
+import { basename } from 'src/path'
+import { TestContext } from 'vitest'
+
+let count = 0
+export function getCustomId({ meta }: TestContext): string {
+  const filename = meta.file?.name
+  if (!filename) throw new TypeError('Test context filename is undefined')
+  return `${basename(filename, '.test.ts')}-${count++}`
+}
 
 export async function getPage(
   browser: BrowserContext,

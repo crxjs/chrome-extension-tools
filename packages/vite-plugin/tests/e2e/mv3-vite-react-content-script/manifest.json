@@ -4,7 +4,7 @@
   "name": "test extension",
   "content_scripts": [
     {
-      "matches": ["https://*.google.com/*"],
+      "matches": ["https://example.com/*"],
       "js": ["src/main.jsx"]
     }
   ],

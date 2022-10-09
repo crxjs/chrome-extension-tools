@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`serve fs output: _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -9,7 +9,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.ts.js.js",
+        "src/content.ts-loader.js",
       ],
       "matches": Array [
         "https://google.com/search*",
@@ -35,33 +35,50 @@ Object {
 }
 `;
 
-exports[`serve fs output: _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content.ts.js.js",
-  "assets/crx-client-port.js",
-  "assets/precontroller.js.js",
-  "assets/webcomponents-custom-elements-z7FmG.js",
   "manifest.json",
   "service-worker-loader.js",
+  "src/content.ts-loader.js",
   "src/content.ts.js",
   "src/font.otf",
-  "src/font.otf.js",
+  "src/font.otf__import.js",
   "src/image.png",
-  "src/image.png.js",
+  "src/image.png__import.js",
   "src/script.ts.js",
-  "src/script.ts2.js",
-  "vendor/vite-client.mjs.js",
-  "vendor/vite-env.mjs.js",
+  "src/script.ts__scriptId--0.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
 ]
 `;
 
-exports[`serve fs output: _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.ts",
 }
 `;
 
-exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http:/localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+"
+`;
+
+exports[`serve fs output > src/content.ts.js 1`] = `
+"import icon from \\"/src/image.png__import.js\\";
+import font from \\"/src/font.otf__import.js\\";
+import scriptUrl from \\"/src/script.ts__scriptId--0.js\\";
+console.log(\\"content.ts\\", { icon, font });
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(scriptUrl);
+script.type = \\"module\\";
+document.body.append(script);
+"
+`;
+
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -73,7 +90,7 @@ exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.mjs.js\\")
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
     );
     await import(
       /* @vite-ignore */
@@ -85,123 +102,17 @@ exports[`serve fs output: assets/content-script-loader.content.ts.js.js 1`] = `
 "
 `;
 
-exports[`serve fs output: assets/crx-client-port.js 1`] = `
-"function isCrxHMRPayload(x) {
-  return x.type === \\"custom\\" && x.event.startsWith(\\"crx:\\");
-}
-class HMRPort {
-  port;
-  callbacks = /* @__PURE__ */ new Map();
-  constructor() {
-    setInterval(() => {
-      try {
-        this.port?.postMessage({ data: \\"ping\\" });
-      } catch (error) {
-        if (error instanceof Error && error.message.includes(\\"Extension context invalidated.\\")) {
-          location.reload();
-        } else
-          throw error;
-      }
-    }, 5000);
-    setInterval(this.initPort, 5 * 60 * 1e3);
-    this.initPort();
-  }
-  initPort = () => {
-    this.port?.disconnect();
-    this.port = chrome.runtime.connect({ name: \\"@crx/client\\" });
-    this.port.onDisconnect.addListener(this.handleDisconnect.bind(this));
-    this.port.onMessage.addListener(this.handleMessage.bind(this));
-    this.port.postMessage({ type: \\"connected\\" });
-  };
-  handleDisconnect = () => {
-    if (this.callbacks.has(\\"close\\"))
-      for (const cb of this.callbacks.get(\\"close\\")) {
-        cb({ wasClean: true });
-      }
-  };
-  handleMessage = (message) => {
-    const forward = (data) => {
-      if (this.callbacks.has(\\"message\\"))
-        for (const cb of this.callbacks.get(\\"message\\")) {
-          cb({ data });
-        }
-    };
-    const payload = JSON.parse(message.data);
-    if (isCrxHMRPayload(payload)) {
-      if (payload.event === \\"crx:runtime-reload\\") {
-        console.log(\\"[crx] runtime reload\\");
-        setTimeout(() => location.reload(), 500);
-      } else {
-        forward(JSON.stringify(payload.data));
-      }
-    } else {
-      forward(message.data);
-    }
-  };
-  addEventListener = (event, callback) => {
-    const cbs = this.callbacks.get(event) ?? /* @__PURE__ */ new Set();
-    cbs.add(callback);
-    this.callbacks.set(event, cbs);
-  };
-  send = (data) => {
-    if (this.port)
-      this.port.postMessage({ data });
-    else
-      throw new Error(\\"HMRPort is not initialized\\");
-  };
-}
+exports[`serve fs output > src/font.otf__import.js 1`] = `"export default \\"/src/font.otf\\""`;
 
-export { HMRPort };
-"
-`;
+exports[`serve fs output > src/image.png__import.js 1`] = `"export default \\"/src/image.png\\""`;
 
-exports[`serve fs output: assets/precontroller.js.js 1`] = `
-"const id = setInterval(() => location.reload(), 100);
-setTimeout(() => clearInterval(id), 5e3);
-"
-`;
-
-exports[`serve fs output: service-worker-loader.js 1`] = `
-"import 'http:/localhost:3000/@vite/env';
-import 'http://localhost:3000/crx-client-worker';
-"
-`;
-
-exports[`serve fs output: src/content.ts.js 1`] = `
-"import icon from './image.png.js';
-import font from './font.otf.js';
-import scriptUrl from './script.ts2.js';
-
-console.log(\\"content.ts\\", { icon, font });
-const script = document.createElement(\\"script\\");
-script.src = chrome.runtime.getURL(scriptUrl);
-script.type = \\"module\\";
-document.body.append(script);
-"
-`;
-
-exports[`serve fs output: src/font.otf.js 1`] = `
-"var font = \\"/src/font.otf\\";
-
-export { font as default };
-"
-`;
-
-exports[`serve fs output: src/image.png.js 1`] = `
-"var icon = \\"/src/image.png\\";
-
-export { icon as default };
-"
-`;
-
-exports[`serve fs output: src/script.ts.js 1`] = `
+exports[`serve fs output > src/script.ts.js 1`] = `
 "console.log(\\"main world script\\");
+export {};
 "
 `;
 
-exports[`serve fs output: src/script.ts2.js 1`] = `
-"var scriptUrl = \\"/src/script.ts.js\\";
-
-export { scriptUrl as default };
+exports[`serve fs output > src/script.ts__scriptId--0.js 1`] = `
+"export default \\"src/script.ts.js\\";
 "
 `;
