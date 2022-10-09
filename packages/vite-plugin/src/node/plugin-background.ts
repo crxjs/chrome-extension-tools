@@ -1,29 +1,25 @@
 import workerHmrClient from 'client/es/hmr-client-worker.ts?client'
-import { ViteDevServer } from 'vite'
+import { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import type { CrxPluginFn } from './types'
 import { workerClientId } from './virtualFileIds'
 
 export const pluginBackground: CrxPluginFn = () => {
-  let port: string | undefined
-  let server: ViteDevServer
+  let config: ResolvedConfig
 
   return [
     {
       name: 'crx:background-client',
       apply: 'serve',
-      configureServer(_server) {
-        server = _server
-      },
       resolveId(source) {
         if (source === `/${workerClientId}`) return workerClientId
       },
       load(id) {
         if (id === workerClientId) {
-          const base = `http://localhost:${server.config.server.port}/`
+          const base = `http://localhost:${config.server.port}/`
           return defineClientValues(
             workerHmrClient.replace('__BASE__', JSON.stringify(base)),
-            server.config,
+            config,
           )
         }
       },
@@ -33,8 +29,8 @@ export const pluginBackground: CrxPluginFn = () => {
       apply: 'build',
       // this should happen after other plugins; the loader file is an implementation detail
       enforce: 'post',
-      fileWriterStart(server) {
-        port = server.config.server.port!.toString()
+      configResolved(_config) {
+        config = _config
       },
       renderCrxManifest(manifest) {
         const worker = manifest.background?.service_worker
@@ -54,7 +50,8 @@ export const pluginBackground: CrxPluginFn = () => {
          * development and production.
          */
         let loader: string
-        if (this.meta.watchMode) {
+        if (config.command === 'serve') {
+          const port = config.server.port?.toString()
           if (typeof port === 'undefined')
             throw new Error('server port is undefined in watch mode')
 

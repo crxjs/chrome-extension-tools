@@ -4,6 +4,7 @@ import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig } from 'vite'
 import { ManifestV3Export } from './defineManifest'
+import { add } from './fileWriter'
 import {
   decodeManifest,
   encodeManifest,
@@ -50,7 +51,8 @@ export const pluginManifest =
               `CRXJS does not support Manifest v${manifest.manifest_version}, please use Manifest v3`,
             )
 
-          // pre-bundle dependencies
+          /* ------- CONFIGURE PRE-BUNDLED DEPENDENCIES ------ */
+
           if (env.command === 'serve') {
             // Vite should crawl manifest entry files
             const {
@@ -115,9 +117,10 @@ export const pluginManifest =
         enforce: 'pre',
         options({ input, ...options }) {
           /**
-           * By using a stub as the default input, we can avoid extending
-           * complicated inputs and easily find the manifest in
-           * crx:manifest#generateBundle using a ref id.
+           * Rollup requires an initial input, but we don't need it By using a
+           * stub as the default input, we can avoid extending complicated
+           * inputs and easily find the manifest in crx:manifest#generateBundle
+           * using a ref id.
            */
           return {
             input:
@@ -175,12 +178,12 @@ export const pluginManifest =
             }
           }
 
-          /* ----------- EMIT SCRIPTS AND RESOURCES ---------- */
+          /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
 
-          // always emit content scripts
-          if (manifest.content_scripts?.length) {
+          // file writer does not emit scripts nor html files
+          if (config.command === 'build') {
             // css[] should be added and removed by crx:styles
-            manifest.content_scripts = manifest.content_scripts.map(
+            manifest.content_scripts = manifest.content_scripts?.map(
               ({ js = [], ...rest }) => {
                 const refJS = js.map((file) =>
                   this.emitFile({
@@ -193,10 +196,7 @@ export const pluginManifest =
                 return { js: refJS, ...rest }
               },
             )
-          }
 
-          if (!this.meta.watchMode) {
-            // file writer does not emit background
             if (manifest.background?.service_worker) {
               const file = manifest.background.service_worker
               const refId = this.emitFile({
@@ -206,7 +206,7 @@ export const pluginManifest =
               })
               manifest.background.service_worker = refId
             }
-            // file writer does not emit html files
+
             for (const file of htmlFiles(manifest)) {
               this.emitFile({
                 type: 'chunk',
@@ -214,6 +214,18 @@ export const pluginManifest =
                 name: basename(file),
               })
             }
+          } else {
+            // build plugin runs in file writer during serve
+            manifest.content_scripts = manifest.content_scripts?.map(
+              ({ js = [], ...rest }) => {
+                const loaders = js.map(
+                  // add is sync, rollup is unconcerned with file write status
+                  (f) => add({ viteUrl: `/${f}`, type: 'loader' }).fileName,
+                )
+
+                return { js: loaders, ...rest }
+              },
+            )
           }
 
           const encoded = encodeManifest(manifest)
@@ -226,22 +238,25 @@ export const pluginManifest =
 
           /* ----------- UPDATE EMITTED FILE NAMES ----------- */
 
-          // update background service worker filename from ref
-          // service worker not emitted during development, so don't update file name
-          if (manifest.background?.service_worker && !this.meta.watchMode) {
-            const ref = manifest.background.service_worker
-            const name = this.getFileName(ref)
-            manifest.background.service_worker = name
-          }
+          if (config.command === 'build') {
+            // transform hook emits files and replaces in manifest with ref ids
+            // update background service worker filename from ref
+            // service worker not emitted during development, so don't update file name
+            if (manifest.background?.service_worker) {
+              const ref = manifest.background.service_worker
+              const name = this.getFileName(ref)
+              manifest.background.service_worker = name
+            }
 
-          // update content script file names from refs
-          // TODO: emit and parse css
-          manifest.content_scripts = manifest.content_scripts?.map(
-            ({ js = [], ...rest }) => {
-              const refJS = js.map((ref) => this.getFileName(ref))
-              return { js: refJS, ...rest }
-            },
-          )
+            // update content script file names from refs
+            // TODO: emit and parse css
+            manifest.content_scripts = manifest.content_scripts?.map(
+              ({ js = [], ...rest }) => {
+                const refJS = js.map((ref) => this.getFileName(ref))
+                return { js: refJS, ...rest }
+              },
+            )
+          }
 
           /* ------------ RUN MANIFEST RENDER HOOK ----------- */
 

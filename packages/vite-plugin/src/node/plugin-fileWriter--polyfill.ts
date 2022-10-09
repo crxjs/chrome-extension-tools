@@ -31,10 +31,10 @@ const customElementsMap = readFileSync(`${customElementsPath}.map`, 'utf8')
  * TODO: Autodetect calls to `customElements.define` during build; import the
  * polyfill when appropriate.
  */
-export const pluginFileWriterPolyfill: CrxPluginFn = () => {
+export const pluginCustomElementsPolyfill: CrxPluginFn = () => {
   return {
-    name: 'crx:file-writer-polyfill',
-    apply: 'build',
+    name: 'crx:custom-elements-polyfill',
+    apply: 'serve',
     enforce: 'pre',
     load(id) {
       if (id === idByUrl.get(customElementsId)) {

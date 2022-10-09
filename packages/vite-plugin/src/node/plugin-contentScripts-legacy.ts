@@ -17,7 +17,7 @@ import {
   WebAccessibleResourceByMatch,
 } from './manifest'
 import { parse } from './path'
-import { filesReady, rebuildFiles } from './plugin-fileWriter--events'
+import { filesReady } from './fileWriter'
 import { crxRuntimeReload } from './plugin-hmr'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, preambleId } from './virtualFileIds'
@@ -171,7 +171,7 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
       name: 'crx:content-scripts-pre',
       apply: 'build',
       enforce: 'pre',
-      async fileWriterStart(_server) {
+      async configureServer(_server) {
         server = _server
         port = server.config.server.port!.toString()
         if (
@@ -360,7 +360,7 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
                     ({ data }) => !(data.loaderName ?? data.fileName),
                   )
                 ) {
-                  await rebuildFiles()
+                  // await rebuildFiles()
                   // new content scripts require a runtime reload
                   server.ws.send(crxRuntimeReload)
                 }

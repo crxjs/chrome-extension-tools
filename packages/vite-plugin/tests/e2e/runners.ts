@@ -1,6 +1,6 @@
 import path from 'path'
 import { chromium, ChromiumBrowserContext } from 'playwright-chromium'
-import { filesReady } from 'src/plugin-fileWriter--events'
+import { filesReady } from 'src/.'
 import { ViteDevServer } from 'vite'
 import { build as _build, serve as _serve } from '../runners'
 

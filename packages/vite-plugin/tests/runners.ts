@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import { _debug } from 'src/helpers'
 import { join } from 'src/path'
-import { filesReady } from 'src/plugin-fileWriter--events'
+import { filesReady } from 'src/.'
 import type { CrxPlugin } from 'src/types'
 import { build as _build, createServer, ResolvedConfig } from 'vite'
 import inspect from 'vite-plugin-inspect'
