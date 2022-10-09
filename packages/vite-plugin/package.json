@@ -51,7 +51,7 @@
     "lint": "run-s lint:eslint lint:types",
     "lint:eslint": "eslint \"{src,test}/**/*.ts\"",
     "lint:types": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest --mode unit",
     "test:e2e": "vitest --mode e2e",
     "test:ci": "run-s test:ci:*",
     "test:ci:unit": "vitest --run",

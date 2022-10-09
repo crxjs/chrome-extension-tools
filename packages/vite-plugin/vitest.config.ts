@@ -7,8 +7,13 @@ const __dirname = path.dirname(__filename)
 console.log(__dirname)
 
 export default defineConfig(({ mode }) => {
-  const isE2E = mode === 'e2e'
-  const exclude = isE2E ? ['**/src/**', '**/mv3/**'] : ['**/e2e/**']
+  const exclude =
+    mode === 'e2e'
+      ? ['**/src/**', '**/mv3/**'] // exclude non-e2e tests
+      : mode === 'unit'
+      ? ['**/e2e/**'] // exclude e2e tests
+      : [] // for running any individual test
+
   return {
     test: {
       alias: [
@@ -25,8 +30,8 @@ export default defineConfig(({ mode }) => {
       ],
       exclude: [...exclude, '**/templates/**', '**/node_modules/**'],
       globalSetup: './tests/jest.globalSetup.ts',
-      maxThreads: isE2E ? 1 : undefined,
-      minThreads: isE2E ? 1 : undefined,
+      maxThreads: mode === 'e2e' ? 1 : undefined,
+      minThreads: mode === 'e2e' ? 1 : undefined,
       setupFiles: './tests/jest.setup.ts',
       snapshotFormat: {
         printBasicPrototype: true,
