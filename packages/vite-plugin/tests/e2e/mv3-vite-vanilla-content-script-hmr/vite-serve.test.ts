@@ -1,7 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { ChromiumBrowserContext, Page, Route } from 'playwright-chromium'
-import { firstValueFrom, Observable } from 'rxjs'
+import { firstValueFrom } from 'rxjs'
 import { expect, test } from 'vitest'
 import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
@@ -14,22 +13,11 @@ test(
     const src1 = path.join(__dirname, 'src1')
     const src2 = path.join(__dirname, 'src2')
 
-    let browser: ChromiumBrowserContext | undefined
-    let routes: Observable<Route> | undefined
-    let optionsPage: Page | undefined
-    do {
-      try {
-        await fs.remove(src)
-        await fs.copy(src1, src, { recursive: true })
+    await fs.remove(src)
+    await fs.copy(src1, src, { recursive: true })
 
-        const result = await serve(__dirname)
-        browser = result.browser
-        routes = result.routes
-        optionsPage = await getPage(browser, /options.html$/)
-      } catch (error) {
-        console.error('Unable to get options page')
-      }
-    } while (!(browser && routes && optionsPage))
+    const { browser, routes } = await serve(__dirname)
+    const optionsPage = await getPage(browser, /options.html$/)
 
     const page = await browser.newPage()
     await page.goto('https://example.com')
@@ -55,6 +43,8 @@ test(
       },
     })
 
+    console.log('copy 1')
+
     await waitForInnerHtml(styles, (h) => h.includes('background-color: red;'))
     expect(reloads).toBe(0) // no reload on css update
     expect(optionsPage.isClosed()).toBe(false) // no runtime reload on css update
@@ -68,9 +58,13 @@ test(
       },
     })
 
+    console.log('copy 2')
+
     await page.locator('h1', { hasText: header }).waitFor()
     expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
     expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
+
+    console.log('pre-copy 3')
 
     // update background.ts file -> trigger runtime reload
     await Promise.all([
@@ -84,6 +78,8 @@ test(
         },
       }),
     ])
+
+    console.log('copy 3')
 
     await app.waitFor()
 
