@@ -31,6 +31,7 @@ export async function start({
   )
   const { rollupOptions, outDir } = server.config.build
   const inputOptions: RollupOptions = {
+    input: 'index.html',
     ...rollupOptions,
     plugins,
   }
@@ -40,7 +41,6 @@ export async function start({
     ...rollupOutputOptions,
     dir: outDir,
     format: 'es',
-    plugins, // TODO: 👈 not sure if this is necessary
   }
 
   const build = await rollup(inputOptions)
