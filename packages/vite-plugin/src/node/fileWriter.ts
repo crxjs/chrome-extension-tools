@@ -4,11 +4,20 @@ import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import { firstValueFrom, mergeMap, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { ScriptFile, scriptFiles } from './fileWriter-filesMap'
-import { close$, prepFileData, serverEvent$, start$ } from './fileWriter-rxjs'
+import {
+  close$,
+  fileWriterEvent$,
+  prepFileData,
+  serverEvent$,
+  start$,
+} from './fileWriter-rxjs'
 import { allFilesReady, fileReady, getFileName } from './fileWriter-utilities'
+import { _debug } from './helpers'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
 export { allFilesReady, fileReady }
+
+const debug = _debug('file-writer')
 
 /**
  * Starts the file writer.
@@ -43,8 +52,11 @@ export async function start({
     format: 'es',
   }
 
+  fileWriterEvent$.next({ type: 'build_start' })
   const build = await rollup(inputOptions)
   await build.write(outputOptions)
+  fileWriterEvent$.next({ type: 'build_end' })
+
   await allFilesReady()
 }
 

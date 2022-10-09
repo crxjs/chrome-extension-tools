@@ -39,6 +39,28 @@ export const start$ = serverEvent$.pipe(
   switchMap((e) => of(e)),
 )
 
+/* ------------------ BUILD EVENTS ----------------- */
+
+export interface FileWriterEventBuildStart {
+  type: 'build_start'
+}
+export interface FileWriterEventBuildEnd {
+  type: 'build_end'
+}
+
+/** Using a replay subject so we can get the last of either event */
+export const fileWriterEvent$ = new ReplaySubject<
+  FileWriterEventBuildStart | FileWriterEventBuildEnd
+>(1)
+export const buildEnd$ = fileWriterEvent$.pipe(
+  filter((e): e is FileWriterEventBuildEnd => e.type === 'build_end'),
+  switchMap((e) => of(e)),
+)
+export const buildStart$ = fileWriterEvent$.pipe(
+  filter((e): e is FileWriterEventBuildStart => e.type === 'build_start'),
+  switchMap((e) => of(e)),
+)
+
 /* ------------------- WRITE OPS ------------------- */
 
 interface OperatorFileData {
