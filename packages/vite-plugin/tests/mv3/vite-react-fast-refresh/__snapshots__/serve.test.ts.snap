@@ -46,12 +46,12 @@ Array [
   "src/content.tsx-loader.js",
   "src/content.tsx.js",
   "src/popup.html",
-  "vendor/chunk-EC6NZEJ6.js__v--6696b9bb.js",
+  "vendor/chunk-EC6NZEJ6.js__v--90ab3d1b.js",
   "vendor/crx-client-port.js",
   "vendor/crx-client-preamble.js",
-  "vendor/react-dom.js__v--90a5fb23.js",
+  "vendor/react-dom.js__v--988c8547.js",
   "vendor/react-refresh.js",
-  "vendor/react_jsx-dev-runtime.js__v--90a5fb23.js",
+  "vendor/react_jsx-dev-runtime.js__v--988c8547.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
   "vendor/webcomponents-custom-elements.js",
@@ -78,7 +78,7 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output: src/App.tsx.js 1`] = `
-"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/App.tsx\\");import RefreshRuntime from \\"/vendor/react-refresh.js\\";
+"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/App.tsx.js\\");import RefreshRuntime from \\"/vendor/react-refresh.js\\";
 let prevRefreshReg;
 let prevRefreshSig;
 if (import.meta.hot) {
@@ -93,7 +93,7 @@ if (import.meta.hot) {
   window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
 }
 var _jsxFileName = \\"<root>/src/App.tsx\\";
-import __vite__cjsImport2_react_jsxDevRuntime from \\"/vendor/react_jsx-dev-runtime.js__v--90a5fb23.js\\"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime[\\"jsxDEV\\"];
+import __vite__cjsImport2_react_jsxDevRuntime from \\"/vendor/react_jsx-dev-runtime.js__v--988c8547.js\\"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime[\\"jsxDEV\\"];
 const App = () => {
   return /* @__PURE__ */ _jsxDEV(\\"div\\", {
     children: [/* @__PURE__ */ _jsxDEV(\\"h1\\", {
@@ -135,9 +135,9 @@ if (import.meta.hot) {
 
 exports[`serve fs output: src/content.tsx.js 1`] = `
 "var _jsxFileName = \\"<root>/src/content.tsx\\";
-import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--90a5fb23.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
+import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--988c8547.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
 import App from \\"/src/App.tsx.js\\";
-import __vite__cjsImport2_react_jsxDevRuntime from \\"/vendor/react_jsx-dev-runtime.js__v--90a5fb23.js\\"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime[\\"jsxDEV\\"];
+import __vite__cjsImport2_react_jsxDevRuntime from \\"/vendor/react_jsx-dev-runtime.js__v--988c8547.js\\"; const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime[\\"jsxDEV\\"];
 console.log(\\"content script\\");
 const root = document.createElement(\\"div\\");
 root.id = \\"root\\";

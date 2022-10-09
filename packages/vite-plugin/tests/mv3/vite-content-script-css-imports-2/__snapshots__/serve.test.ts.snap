@@ -105,7 +105,7 @@ exports[`serve fs output: src/content1/index.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output: src/content1/styles.css.js 1`] = `
-"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/content1/styles.css\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
+"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/content1/styles.css.js\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
 const __vite__id = \\"<root>/src/content1/styles.css\\"
 const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\"
 __vite__updateStyle(__vite__id, __vite__css)
@@ -145,7 +145,7 @@ exports[`serve fs output: src/content2/index.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output: src/content2/styles.css.js 1`] = `
-"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/content2/styles.css\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
+"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/content2/styles.css.js\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
 const __vite__id = \\"<root>/src/content2/styles.css\\"
 const __vite__css = \\"body {\\\\n  color: blue;\\\\n}\\\\n\\"
 __vite__updateStyle(__vite__id, __vite__css)
