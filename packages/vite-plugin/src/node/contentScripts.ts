@@ -1,6 +1,7 @@
 import { RxMap } from './RxMap'
 
 export interface ContentScript {
+  type: 'module' | 'iife'
   id: string
   refId?: string
   fileName?: string

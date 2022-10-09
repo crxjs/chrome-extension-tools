@@ -2,7 +2,7 @@ import { simple } from 'acorn-walk'
 import { createHash as _hash } from 'crypto'
 import debug from 'debug'
 import fg from 'fast-glob'
-import { AcornNode, PluginContext } from 'rollup'
+import { AcornNode, OutputBundle, PluginContext } from 'rollup'
 import v8 from 'v8'
 import type {
   ManifestV3,
@@ -161,6 +161,19 @@ export function decodeManifest(this: PluginContext, code: string): ManifestV3 {
 export function encodeManifest(manifest: ManifestV3): string {
   const json = JSON.stringify(JSON.stringify(manifest))
   return `export default ${json}`
+}
+
+export function parseJsonAsset<T>(bundle: OutputBundle, key: string): T {
+  const asset = bundle[key]
+
+  if (typeof asset === 'undefined')
+    throw new TypeError(`OutputBundle["${key}"] is undefined.`)
+  if (asset.type !== 'asset')
+    throw new Error(`OutputBundle["${key}"] is not an OutputAsset.`)
+  if (typeof asset.source !== 'string')
+    throw new TypeError(`OutputBundle["${key}"].source is not a string.`)
+
+  return JSON.parse(asset.source)
 }
 
 /**
