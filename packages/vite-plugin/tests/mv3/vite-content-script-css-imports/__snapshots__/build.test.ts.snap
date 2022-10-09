@@ -8,7 +8,7 @@ Object {
         "assets/content.ts.hash.css",
       ],
       "js": Array [
-        "assets/content-script-loader.content.ts.hash.hash.js",
+        "assets/content.ts-loader.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -36,7 +36,7 @@ Object {
 
 exports[`build fs output: _01 output files 1`] = `
 Array [
-  "assets/content-script-loader.content.ts.hash.hash.js",
+  "assets/content.ts-loader.hash.js",
   "assets/content.ts.hash.css",
   "assets/content.ts.hash.js",
   "manifest.json",
@@ -56,7 +56,7 @@ console.log(\\"content.ts\\");
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content.ts.hash.hash.js 1`] = `
+exports[`build fs output: assets/content.ts-loader.hash.js 1`] = `
 "(function () {
   'use strict';
 

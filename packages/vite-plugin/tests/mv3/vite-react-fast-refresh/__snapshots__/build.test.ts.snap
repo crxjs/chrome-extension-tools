@@ -8,7 +8,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.tsx.hash.hash.js",
+        "assets/content.tsx-loader.hash.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -37,7 +37,7 @@ Object {
 exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/App.hash.js",
-  "assets/content-script-loader.content.tsx.hash.hash.js",
+  "assets/content.tsx-loader.hash.js",
   "assets/content.tsx.hash.js",
   "assets/popup.html.hash.js",
   "assets/vendor.hash.js",
@@ -74,7 +74,7 @@ reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
 "
 `;
 
-exports[`build fs output: assets/content-script-loader.content.tsx.hash.hash.js 1`] = `
+exports[`build fs output: assets/content.tsx-loader.hash.js 1`] = `
 "(function () {
   'use strict';
 

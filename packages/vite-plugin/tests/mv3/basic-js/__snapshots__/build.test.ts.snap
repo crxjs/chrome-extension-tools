@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.js.hash.hash.js",
+        "assets/content.js-loader.hash.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -45,7 +45,7 @@ Object {
 exports[`build fs output: _01 output files 1`] = `
 Array [
   "assets/background.js.hash.js",
-  "assets/content-script-loader.content.js.hash.hash.js",
+  "assets/content.js-loader.hash.js",
   "assets/content.js.hash.js",
   "assets/popup.html.hash.js",
   "assets/vendor.hash.js",
@@ -65,37 +65,7 @@ exports[`build fs output: assets/content.js.hash.js 1`] = `
 "
 `;
 
-exports[`build fs output: assets/content.js.loader.hash.js 1`] = `
-"(function () {
-  'use strict';
-
-  (async () => {
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
 exports[`build fs output: assets/content.js-loader.hash.js 1`] = `
-"(function () {
-  'use strict';
-
-  (async () => {
-    await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
-    );
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`build fs output: assets/content-script-loader.content.js.hash.hash.js 1`] = `
 "(function () {
   'use strict';
 
@@ -160,11 +130,6 @@ const App = () => {
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
 ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
-"
-`;
-
-exports[`build fs output: service-worker.loader.js 1`] = `
-"import './assets/background.js.hash.js';
 "
 `;
 

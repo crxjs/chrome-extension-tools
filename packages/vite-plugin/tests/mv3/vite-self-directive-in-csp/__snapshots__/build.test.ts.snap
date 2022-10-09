@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content-script-loader.content.ts.hash.hash.js",
+        "assets/content.ts-loader.hash.js",
       ],
       "matches": Array [
         "https://*/*",
@@ -45,7 +45,7 @@ Object {
 exports[`works with 'self' directive: _01 output files 1`] = `
 Array [
   "assets/background.ts.hash.js",
-  "assets/content-script-loader.content.ts.hash.hash.js",
+  "assets/content.ts-loader.hash.js",
   "assets/content.ts.hash.js",
   "assets/popup.html.hash.js",
   "assets/vendor.hash.js",
@@ -65,7 +65,7 @@ exports[`works with 'self' directive: assets/content.ts.hash.js 1`] = `
 "
 `;
 
-exports[`works with 'self' directive: assets/content-script-loader.content.ts.hash.hash.js 1`] = `
+exports[`works with 'self' directive: assets/content.ts-loader.hash.js 1`] = `
 "(function () {
   'use strict';
 

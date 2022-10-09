@@ -90,13 +90,62 @@ console.log(\\"content.ts\\", { script });
 "
 `;
 
+exports[`build fs output: assets/content1.ts.hash.js 1`] = `
+"const import_meta = {};
+var script = \\"assets/script.ts.hash.js\\";
+console.log(\\"content.ts\\", { script });
+"
+`;
+
+exports[`build fs output: assets/content1.ts-loader.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content1.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
 exports[`build fs output: assets/content2.hash.js 1`] = `
 "var font = \\"/assets/font.hash.otf\\";
 console.log(\\"content2.ts\\", { font });
 "
 `;
 
+exports[`build fs output: assets/content2.ts.hash.js 1`] = `
+"var font = \\"/assets/font.hash.otf\\";
+console.log(\\"content2.ts\\", { font });
+"
+`;
+
+exports[`build fs output: assets/content2.ts-loader.hash.js 1`] = `
+"(function () {
+  'use strict';
+
+  (async () => {
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content2.ts.hash.js\\")
+    );
+  })().catch(console.error);
+
+})();
+"
+`;
+
 exports[`build fs output: assets/script.hash.js 1`] = `
+"var icon = \\"/assets/image.hash.png\\";
+console.log(\\"main world script\\", { icon });
+"
+`;
+
+exports[`build fs output: assets/script.ts.hash.js 1`] = `
 "var icon = \\"/assets/image.hash.png\\";
 console.log(\\"main world script\\", { icon });
 "
