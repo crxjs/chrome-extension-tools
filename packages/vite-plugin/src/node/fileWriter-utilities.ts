@@ -116,7 +116,7 @@ export function getViteUrl({ type, id }: FileWriterId) {
   } else if (type === 'module') {
     // node_modules ids should not start with a slash
     if (id.startsWith('/@id/'))
-      return id.slice('/@id/'.length).replace('__x00__', '')
+      return id.slice('/@id/'.length).replace('__x00__', '\0')
     return prefix('/', id)
   } else {
     throw new Error(`Invalid file type: "${type}"`)
@@ -134,14 +134,14 @@ export async function fileReady(script: FileWriterId): Promise<void> {
 
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesReady(): Promise<void> {
-  const result = await firstValueFrom(allFilesReady$)
-  debug('allFilesReady %O', result)
+  await firstValueFrom(allFilesReady$)
 }
 
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesSuccess(): Promise<void> {
   const result = await firstValueFrom(allFilesReady$)
-  let reason = result.find(isRejected)?.reason
-  if (!(reason instanceof Error)) reason = new Error(reason.toString())
-  if (reason) throw reason
+  const reason = result.find(isRejected)?.reason
+  if (typeof reason === 'undefined') return
+  if (reason instanceof Error) throw reason
+  throw new Error(reason.toString())
 }
