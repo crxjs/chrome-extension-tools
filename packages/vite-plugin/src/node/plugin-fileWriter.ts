@@ -19,9 +19,7 @@ export const pluginFileWriter: CrxPluginFn = () => {
           server.close()
         }
       })
-    },
-    closeBundle() {
-      return close()
+      server.httpServer?.on('close', () => close())
     },
   }
 }
