@@ -60,10 +60,14 @@ export async function close(): Promise<void> {
  */
 export function add(script: CrxDevAssetId | CrxDevScriptId): ScriptFile {
   const fileName = getFileName(script)
-  const scriptFile: ScriptFile = scriptFiles.get(fileName) ?? {
-    ...script,
-    fileName,
-    file: write(script),
+  let scriptFile = scriptFiles.get(fileName)
+  if (typeof scriptFile === 'undefined') {
+    scriptFile = {
+      ...script,
+      fileName,
+      file: write(script),
+    }
+    scriptFiles.set(fileName, scriptFile)
   }
   return scriptFile
 }
