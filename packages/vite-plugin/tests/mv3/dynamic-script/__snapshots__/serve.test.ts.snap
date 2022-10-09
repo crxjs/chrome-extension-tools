@@ -44,7 +44,7 @@ Array [
   "src/dynamic-script.ts-loader.js",
   "src/dynamic-script.ts.js",
   "src/main-world.ts.js",
-  "src/main-world.ts__scriptId--2CK3p.js",
+  "src/main-world.ts__scriptId--0.js",
   "vendor/crx-client-port.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
@@ -67,7 +67,7 @@ import 'http://localhost:3000/src/background.ts';
 `;
 
 exports[`serve fs output > src/declared-script.ts.js 1`] = `
-"import fileName from \\"/src/main-world.ts__scriptId--2CK3p.js\\";
+"import fileName from \\"/src/main-world.ts__scriptId--0.js\\";
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);
@@ -136,7 +136,7 @@ export {};
 "
 `;
 
-exports[`serve fs output > src/main-world.ts__scriptId--2CK3p.js 1`] = `
+exports[`serve fs output > src/main-world.ts__scriptId--0.js 1`] = `
 "export default \\"src/main-world.ts.js\\";
 "
 `;
