@@ -14,7 +14,7 @@ test('crx page update on hmr', async () => {
 
   const { browser } = await serve(__dirname)
   const page = await browser.newPage()
-  await page.goto('https://www.google.com')
+  await page.goto('https://example.com')
 
   const styles = page.locator('head style')
   const app = page.locator('#app')

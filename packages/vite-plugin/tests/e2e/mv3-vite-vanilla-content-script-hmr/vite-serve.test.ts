@@ -16,7 +16,7 @@ test('crx page update on hmr', async () => {
   const optionsPage = await getPage(browser, /options.html$/)
 
   const page = await browser.newPage()
-  await page.goto('https://www.google.com')
+  await page.goto('https://example.com')
 
   const app = page.locator('#app')
   await app.waitFor()

@@ -44,6 +44,12 @@ export async function serve(dirname: string) {
     ],
   })) as ChromiumBrowserContext
 
+  await browser.route('https://example.com', (route) => {
+    route.fulfill({
+      path: path.join(__dirname, 'example.html'),
+    })
+  })
+
   await browser
     .pages()
     .find((p) => p.url() === 'about:blank')
