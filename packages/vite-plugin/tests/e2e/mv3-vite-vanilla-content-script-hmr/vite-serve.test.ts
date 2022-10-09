@@ -67,6 +67,13 @@ test(
 
     // update background.ts file -> trigger runtime reload
     await Promise.all([
+      // TODO: this should trigger a runtime reload
+      optionsPage
+        .waitForEvent('close', { timeout: 5000 })
+        .then(() => console.log('options page closed')), // options page should close
+      page
+        .waitForEvent('framenavigated', { timeout: 5000 })
+        .then(() => console.log('content script reload')), // content script should reload
       fs
         .copy(src2, src, {
           recursive: true,
@@ -76,13 +83,6 @@ test(
           },
         })
         .then(() => console.log('fs.copy done')),
-      // TODO: this should trigger a runtime reload
-      optionsPage
-        .waitForEvent('close', { timeout: 5000 })
-        .then(() => console.log('options page closed')), // options page should close
-      page
-        .waitForEvent('framenavigated', { timeout: 5000 })
-        .then(() => console.log('content script reload')), // content script should reload
     ])
 
     console.log('copy 3')
