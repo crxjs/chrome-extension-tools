@@ -54,10 +54,7 @@ export const pluginFileWriterPolyfill: CrxPluginFn = () => {
         const ws = 'new WebSocket'
         const index = code.indexOf(ws)
         magic.overwrite(index, index + ws.length, 'new HMRPort')
-        return {
-          code: magic.toString(),
-          deps: [customElementsId, contentHmrPortId],
-        }
+        return magic.toString()
       }
     },
   }

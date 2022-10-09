@@ -65,12 +65,7 @@ export interface CrxPlugin extends VitePlugin {
   renderCrxDevScript?: (
     code: string,
     script: CrxDevScriptId,
-  ) =>
-    | Promise<string | { code: string; deps: string[] } | null | undefined>
-    | string
-    | { code: string; deps: string[] }
-    | null
-    | undefined
+  ) => Promise<string | null | undefined> | string | null | undefined
 }
 
 // change this to an interface when you want to add options

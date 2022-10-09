@@ -12,6 +12,7 @@ import {
 import { ViteDevServer } from 'vite'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
+import * as lexer from 'es-module-lexer'
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -83,9 +84,8 @@ function prepScript(
         const transformResult = await server.transformRequest(viteUrl)
         if (!transformResult)
           throw new TypeError(`Unable to load "${script.id}" from server.`)
-
         const { code, deps = [], dynamicDeps = [] } = transformResult
-        return { target, code, deps: [deps, dynamicDeps].flat(), server }
+        return { target, code, deps: [...deps, ...dynamicDeps].flat(), server }
       }),
       // retry in case of dependency rebundle
       retry({ count: 10, delay: 100 }),
@@ -95,14 +95,16 @@ function prepScript(
         let { code, deps } = rest
         for (const plugin of plugins) {
           const r = await plugin.renderCrxDevScript?.(code, script)
-          if (typeof r === 'string') {
-            code = r
-          } else if (r) {
-            code = r.code
-            deps = [deps, r.deps].flat()
-          }
+          if (typeof r === 'string') code = r
         }
-        return { target, source: code, deps: [...new Set(deps)] }
+        return { target, code, deps }
+      }),
+      mergeMap(async ({ target, code, deps }) => {
+        await lexer.init
+        const [imports] = lexer.parse(code, fileName)
+        const depSet = new Set(deps)
+        for (const { n } of imports) if (n) depSet.add(n)
+        return { target, source: code, deps: [...depSet] }
       }),
     )
 }
