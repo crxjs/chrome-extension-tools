@@ -73,8 +73,8 @@ test(
         },
       }),
       // TODO: this should trigger a runtime reload
-      optionsPage.waitForEvent('close'), // options page should close
-      page.waitForEvent('framenavigated'), // content script should reload
+      optionsPage.waitForEvent('close', { timeout: 5000 }), // options page should close
+      page.waitForEvent('framenavigated', { timeout: 5000 }), // content script should reload
     ])
 
     console.log('copy 3')
