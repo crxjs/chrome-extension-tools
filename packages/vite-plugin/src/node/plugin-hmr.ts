@@ -1,9 +1,9 @@
-import { HMRPayload } from 'vite'
-import { manifestFiles, _debug } from '../helpers'
-import { crxHmrPayload$, hmrPayload$ } from './hmrPayload'
-import { isImporter } from '../isImporter'
-import { isAbsolute, join } from '../path'
-import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from '../types'
+// import { HMRPayload } from 'vite'
+import { _debug } from './helpers'
+import { isImporter } from './isImporter'
+import { isAbsolute, join } from './path'
+import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
+import { manifestFiles } from './files'
 
 const debug = _debug('hmr')
 
@@ -14,7 +14,7 @@ export const crxRuntimeReload: CrxHMRPayload = {
 
 export const pluginHMR: CrxPluginFn = () => {
   let finalManifestFiles: ManifestFiles
-  let decoratedSend: ((payload: HMRPayload) => void) | undefined
+  // let decoratedSend: ((payload: HMRPayload) => void) | undefined
 
   return [
     {
@@ -42,21 +42,21 @@ export const pluginHMR: CrxPluginFn = () => {
           : join(config.root, config.build.outDir, '**/*')
         if (!watch.ignored.includes(outDir)) watch.ignored.push(outDir)
       },
-      // emit hmr payloads for file writer
-      configureServer(server) {
-        if (server.ws.send !== decoratedSend) {
-          // decorate server websocket send method
-          const { send } = server.ws
-          decoratedSend = (payload: HMRPayload) => {
-            hmrPayload$.next(payload) // sniff hmr events
-            send(payload) // don't interfere with normal hmr
-          }
-          server.ws.send = decoratedSend
-          crxHmrPayload$.subscribe((payload) => {
-            send(payload) // send crx hmr events
-          })
-        }
-      },
+      // TODO: emit hmr payloads for file writer
+      // configureServer(server) {
+      //   if (server.ws.send !== decoratedSend) {
+      //     // decorate server websocket send method
+      //     const { send } = server.ws
+      //     decoratedSend = (payload: HMRPayload) => {
+      //       hmrPayload$.next(payload) // sniff hmr events
+      //       send(payload) // don't interfere with normal hmr
+      //     }
+      //     server.ws.send = decoratedSend
+      //     crxHmrPayload$.subscribe((payload) => {
+      //       send(payload) // send crx hmr events
+      //     })
+      //   }
+      // },
       // background changes require a full extension reload
       handleHotUpdate({ file, modules, server }) {
         const background =
