@@ -25,7 +25,7 @@ defaults:
 jobs:
   # Runs linter and unit tests
   checks:
-    name: Lint and Unit Tests
+    name: Lint
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -69,20 +69,12 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-      - name: Unit tests
-        run: pnpm test:units
-
   # Runs e2e tests in Playwright
   e2e:
     name: E2E Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        type: [build, serve]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -120,10 +112,10 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run ${{ matrix.type }} tests
+      - name: Run e2e tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: pnpm test:ci:e2e:${{ matrix.type }}
+          run: pnpm test:ci:e2e
           working-directory: "packages/vite-plugin"
 
       - uses: actions/upload-artifact@v3
@@ -132,17 +124,12 @@ jobs:
           name: image-diff-${{ matrix.type }}
           path: ${{ github.workspace }}/tests/**/__image_snapshots__/__diff_output__/*.png
 
-  # Runs output snapshot tests
-  output:
-    name: Output Snapshot Tests
+  # Runs unit and output tests
+  unit:
+    name: Unit and Output Tests
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        type: [build, serve]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -180,8 +167,8 @@ jobs:
       - name: Install dependencies
         run: pnpm i
 
-      - name: Run ${{ matrix.type }} tests
-        run: pnpm test:ci:mv3:${{ matrix.type }}
+      - name: Run unit and output tests
+        run: pnpm test:ci:unit
 
       - name: Check for diff
         id: diff
