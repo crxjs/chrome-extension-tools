@@ -72,7 +72,7 @@ test(
         .waitForEvent('close', { timeout: 5000 })
         .then(() => console.log('options page closed')), // options page should close
       page
-        .waitForEvent('framenavigated', { timeout: 5000 })
+        .waitForEvent('load', { timeout: 5000 })
         .then(() => console.log('content script reload')), // content script should reload
       fs
         .copy(src2, src, {
