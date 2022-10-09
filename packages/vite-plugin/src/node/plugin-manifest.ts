@@ -9,14 +9,13 @@ import { htmlFiles, manifestFiles } from './files'
 import {
   formatFileData,
   getFileName,
-  prefix,
-  strip,
+  prefix
 } from './fileWriter-utilities'
 import {
   decodeManifest,
   encodeManifest,
   isString,
-  structuredClone,
+  structuredClone
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
@@ -217,17 +216,18 @@ export const pluginManifest: CrxPluginFn = () => {
           // vite build emits content scripts, html files and service worker
           if (manifest.content_scripts)
             for (const { js = [], matches = [] } of manifest.content_scripts)
-              for (const id of js) {
+              for (const file of js) {
+                const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
-                  id: strip('/', id),
-                  name: basename(id),
+                  id,
+                  name: basename(file),
                 })
                 contentScripts.set(
-                  id,
+                  file,
                   formatFileData({
                     type: 'loader',
-                    id,
+                    id: file,
                     refId,
                     matches,
                   }),
@@ -236,18 +236,20 @@ export const pluginManifest: CrxPluginFn = () => {
 
           if (manifest.background?.service_worker) {
             const file = manifest.background.service_worker
+            const id = join(config.root, file)
             const refId = this.emitFile({
               type: 'chunk',
-              id: file,
+              id,
               name: basename(file),
             })
             manifest.background.service_worker = refId
           }
 
           for (const file of htmlFiles(manifest)) {
+            const id = join(config.root, file)
             this.emitFile({
               type: 'chunk',
-              id: file,
+              id,
               name: basename(file),
             })
           }
