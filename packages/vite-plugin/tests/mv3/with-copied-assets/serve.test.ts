@@ -5,7 +5,9 @@ import { afterAll, test } from 'vitest'
 let result: Awaited<ReturnType<typeof serve>> | undefined
 
 afterAll(async () => {
-  await result?.server.close()
+  try {
+    await result?.server.close()
+  } catch (error) {}
 })
 
 test('serve fs output', async () => {
