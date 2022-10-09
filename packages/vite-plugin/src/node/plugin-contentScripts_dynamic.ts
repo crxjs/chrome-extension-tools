@@ -1,7 +1,7 @@
 import { ResolvedConfig } from 'vite'
 import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
 import { fileReady } from './fileWriter'
-import { getFileName } from './fileWriter-utilities'
+import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
 import { CrxPluginFn } from './types'
 
@@ -87,16 +87,17 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                 if (type === 'loader')
                   loaderName = getFileName({ type, id: relId })
               }
-              script = {
+              script = formatFileData({
                 type,
                 id: relative(config.root, id),
                 isDynamicScript: true,
                 fileName,
                 loaderName,
                 refId,
+                scriptId,
                 matches: [],
-              }
-              contentScripts.set(scriptId, script)
+              })
+              contentScripts.set(script.id, script)
             }
 
             return resolvedId

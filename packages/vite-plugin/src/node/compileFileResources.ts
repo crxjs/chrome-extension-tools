@@ -1,6 +1,7 @@
 import { OutputChunk } from 'rollup'
 import { ManifestChunk, ResolvedConfig } from 'vite'
 import { contentScripts } from './contentScripts'
+import { prefix } from './fileWriter-utilities'
 import { relative } from './path'
 
 interface FileResources {
@@ -15,7 +16,11 @@ export function compileFileResources(
     chunks,
     files,
     config,
-  }: { chunks: Map<string, OutputChunk>; files: Map<string, ManifestChunk>, config: ResolvedConfig },
+  }: {
+    chunks: Map<string, OutputChunk>
+    files: Map<string, ManifestChunk>
+    config: ResolvedConfig
+  },
   resources: FileResources = {
     assets: new Set(),
     css: new Set(),
@@ -31,14 +36,18 @@ export function compileFileResources(
       compileFileResources(x, { chunks, files, config }, resources)
     for (const m of Object.keys(modules))
       if (m !== facadeModuleId) {
-        const key = relative(config.root, m.split('?')[0])
+        const key = prefix('/', relative(config.root, m.split('?')[0]))
         const script = contentScripts.get(key)
         if (script)
           if (typeof script.fileName === 'undefined') {
             throw new Error(`Content script fileName for ${m} is undefined`)
           } else {
             resources.imports.add(script.fileName)
-            compileFileResources(script.fileName, { chunks, files, config }, resources)
+            compileFileResources(
+              script.fileName,
+              { chunks, files, config },
+              resources,
+            )
           }
       }
   }

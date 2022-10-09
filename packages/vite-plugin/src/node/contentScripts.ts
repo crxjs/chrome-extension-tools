@@ -12,6 +12,8 @@ export interface ContentScript {
   refId: string
   /** Resolved id for dynamic scripts */
   resolvedId?: string
+  /** Script id for dynamic scripts */
+  scriptId?: string
   /** Filename of loader file, if present */
   loaderName?: string
   /** Filename of content script */
@@ -25,11 +27,16 @@ export interface ContentScript {
 }
 
 /**
- * This RxMap uses multiple keys that have very different formats:
+ * This RxMap supports a many-to-one relationship using multiple keys that have
+ * very different formats:
  *
  * - Id: `/src/entry.ts`
  * - ScriptId: `/src/entry.ts?scriptId=abcde`
  * - RefId: `ab3ge`
+ * - FileName: `src/entry.ts.js`
+ * - LoaderName: `src/entry.ts-loader.js`
+ *
+ * When emitting to Rollup, strip the leading slash from FileName and LoaderName
  */
 export const contentScripts = new RxMap<string, ContentScript>()
 // sync subscriptions to change$ run before RxMap#set returns.
@@ -42,7 +49,9 @@ contentScripts.change$
       'fileName',
       'loaderName',
       'resolvedId',
+      'scriptId',
     ] as const
+    // set many to one value for lookup by multiple keys (script.id, script.fileName, etc)
     for (const keyName of keyNames) {
       const key = value[keyName]
       // avoid runaway recursion

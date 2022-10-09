@@ -17,7 +17,12 @@ import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
-import { getFileName } from './fileWriter-utilities'
+import {
+  formatFileData,
+  getFileName,
+  prefix,
+  strip,
+} from './fileWriter-utilities'
 const { readFile } = fs
 
 // const debug = _debug('manifest')
@@ -200,13 +205,16 @@ export const pluginManifest =
             if (manifest.content_scripts)
               for (const { js = [], matches = [] } of manifest.content_scripts)
                 for (const id of js) {
-                  contentScripts.set(id, {
-                    type: 'loader',
-                    id,
-                    matches,
-                    refId: hashScriptId({ type: 'loader', id }),
-                    fileName: getFileName({ type: 'loader', id }),
-                  })
+                  contentScripts.set(
+                    prefix('/', id),
+                    formatFileData({
+                      type: 'loader',
+                      id,
+                      matches,
+                      refId: hashScriptId({ type: 'loader', id }),
+                      fileName: getFileName({ type: 'loader', id }),
+                    }),
+                  )
                 }
           } else {
             // vite build emits content scripts, html files and service worker
@@ -215,15 +223,18 @@ export const pluginManifest =
                 for (const id of js) {
                   const refId = this.emitFile({
                     type: 'chunk',
-                    id,
+                    id: strip('/', id),
                     name: basename(id),
                   })
-                  contentScripts.set(id, {
-                    type: 'loader',
+                  contentScripts.set(
                     id,
-                    refId,
-                    matches,
-                  })
+                    formatFileData({
+                      type: 'loader',
+                      id,
+                      refId,
+                      matches,
+                    }),
+                  )
                 }
 
             if (manifest.background?.service_worker) {
@@ -260,14 +271,9 @@ export const pluginManifest =
             // vite dev server sends html files through local host
             if (manifest.content_scripts)
               for (const script of manifest.content_scripts) {
-                script.js = script.js?.map((id) => {
-                  const f = contentScripts.get(id)?.fileName
-                  if (typeof f === 'undefined')
-                    throw new Error(
-                      `Content script fileName is undefined: ${id}`,
-                    )
-                  return f
-                })
+                script.js = script.js?.map((id) =>
+                  getFileName({ id, type: 'loader' }),
+                )
               }
           } else {
             // transform hook emits files and replaces in manifest with ref ids

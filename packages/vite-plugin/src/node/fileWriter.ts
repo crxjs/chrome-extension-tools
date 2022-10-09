@@ -3,7 +3,7 @@ import { performance } from 'perf_hooks'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
-import { ScriptFile, scriptFiles } from './fileWriter-filesMap'
+import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import {
   close$,
   fileWriterEvent$,
@@ -11,7 +11,13 @@ import {
   serverEvent$,
   start$,
 } from './fileWriter-rxjs'
-import { allFilesReady, fileReady, getFileName } from './fileWriter-utilities'
+import {
+  allFilesReady,
+  fileReady,
+  formatFileData,
+  getFileName,
+  prefix,
+} from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
@@ -70,18 +76,18 @@ export async function close(): Promise<void> {
  *
  * - Calls write() when creating, no-op if file exists.
  */
-export function add(script: CrxDevAssetId | CrxDevScriptId): ScriptFile {
+export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
   const fileName = getFileName(script)
-  let scriptFile = scriptFiles.get(fileName)
-  if (typeof scriptFile === 'undefined') {
-    scriptFile = {
+  let file = outputFiles.get(fileName)
+  if (typeof file === 'undefined') {
+    file = formatFileData({
       ...script,
       fileName,
       file: write(script),
-    }
-    scriptFiles.set(fileName, scriptFile)
+    })
+    outputFiles.set(file.fileName, file)
   }
-  return scriptFile
+  return file
 }
 
 /**
@@ -90,14 +96,18 @@ export function add(script: CrxDevAssetId | CrxDevScriptId): ScriptFile {
  * - It is possible for multiple scripts to have the same id with different types.
  * - Loaders don't get updated.
  */
-export function update(id: string): ScriptFile[] {
+export function update(_id: string): OutputFile[] {
+  const id = prefix('/', _id)
   const types = ['iife', 'module'] as const
-  const updatedFiles: ScriptFile[] = []
+  const updatedFiles: OutputFile[] = []
   for (const type of types) {
-    const scriptFile = scriptFiles.get(getFileName({ id, type }))
+    const fileName = getFileName({ id, type })
+    const scriptFile = outputFiles.get(fileName)
     if (scriptFile) {
       scriptFile.file = write({ id, type })
       updatedFiles.push(scriptFile)
+      // trigger scriptFiles change, scriptFile is already formatted
+      outputFiles.set(fileName, scriptFile)
     }
   }
   return updatedFiles
@@ -112,7 +122,7 @@ export function update(id: string): ScriptFile[] {
  */
 export async function write(
   fileId: CrxDevAssetId | CrxDevScriptId,
-): Promise<{ start: number; close: number; deps: ScriptFile[] }> {
+): Promise<{ start: number; close: number; deps: OutputFile[] }> {
   const start = performance.now()
   const deps = await firstValueFrom(
     // wait for start event

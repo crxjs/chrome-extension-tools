@@ -1,11 +1,14 @@
 // import { HMRPayload } from 'vite'
+import { HMRPayload } from 'vite'
+import { contentScripts } from './contentScripts'
+import { manifestFiles } from './files'
+import { update } from './fileWriter'
+import { crxHMRPayload$, hmrPayload$ } from './fileWriter-hmr'
+import { getFileName, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
-import { manifestFiles } from './files'
-import { HMRPayload } from 'vite'
-import { crxHMRPayload$, hmrPayload$ } from './fileWriter-hmr'
 
 const debug = _debug('hmr')
 
@@ -15,7 +18,7 @@ export const crxRuntimeReload: CrxHMRPayload = {
 }
 
 export const pluginHMR: CrxPluginFn = () => {
-  let finalManifestFiles: ManifestFiles
+  let inputManifestFiles: ManifestFiles
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
 
   return [
@@ -60,17 +63,37 @@ export const pluginHMR: CrxPluginFn = () => {
         }
       },
       // background changes require a full extension reload
-      handleHotUpdate({ file, modules, server }) {
-        const background =
-          finalManifestFiles.background[0] &&
-          join(server.config.root, finalManifestFiles.background[0])
+      handleHotUpdate({ modules, server }) {
+        const { root } = server.config
 
-        // check that the changed file is not a background dependency
-        if (background)
-          if (file === background || modules.some(isImporter(background))) {
+        const relFiles = new Set<string>()
+        for (const m of modules)
+          if (m.id?.startsWith(root)) {
+            relFiles.add(m.id.slice(server.config.root.length))
+          }
+
+        // check if changed file is a background dependency
+        if (inputManifestFiles.background.length) {
+          const background = prefix('/', inputManifestFiles.background[0])
+          if (
+            relFiles.has(background) ||
+            modules.some(isImporter(join(server.config.root, background)))
+          ) {
             debug('sending runtime reload')
             server.ws.send(crxRuntimeReload)
             return []
+          }
+        }
+
+        for (const [key, script] of contentScripts)
+          if (key === script.id) {
+            // check if changed file is a content script dependency
+            if (
+              relFiles.has(script.id) ||
+              modules.some(isImporter(join(server.config.root, script.id)))
+            ) {
+              relFiles.forEach((relFile) => update(relFile))
+            }
           }
       },
     },
@@ -79,9 +102,28 @@ export const pluginHMR: CrxPluginFn = () => {
       apply: 'serve',
       enforce: 'post',
       // get final output manifest for handleHotUpdate 👆
-      async renderCrxManifest(manifest) {
-        finalManifestFiles = await manifestFiles(manifest)
+      async transformCrxManifest(manifest) {
+        inputManifestFiles = await manifestFiles(manifest)
         return null
+      },
+      renderCrxDevScript(code, { id: _id, type }) {
+        if (
+          type === 'module' &&
+          _id !== '/@vite/client' &&
+          code.includes('createHotContext')
+        ) {
+          const id = _id.replace(/t=\d+&/, '')
+          const escaped = id.replace(/([?&.])/g, '\\$1')
+          // using lookahead and lookbehind
+          const regexp = new RegExp(
+            `(?<=createHotContext\\(")${escaped}(?="\\))`,
+          )
+          const fileUrl = prefix('/', getFileName({ id, type }))
+          const replaced = code.replace(regexp, fileUrl)
+          return replaced
+        } else {
+          return code
+        }
       },
     },
   ]

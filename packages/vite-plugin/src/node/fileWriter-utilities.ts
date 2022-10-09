@@ -1,6 +1,6 @@
 import { firstValueFrom, map, startWith, switchMap, tap } from 'rxjs'
 import { ViteDevServer } from 'vite'
-import { scriptFiles } from './fileWriter-filesMap'
+import { outputFiles } from './fileWriter-filesMap'
 import { buildEnd$ } from './fileWriter-rxjs'
 import { _debug } from './helpers'
 import { isAbsolute, join } from './path'
@@ -15,9 +15,40 @@ export type FileWriterId = {
 
 /* ------------------- UTILITIES ------------------- */
 
-/** Converts ScriptId to string */
+/** Ensure that text starts with prefix text */
+export function prefix(prefix: string, text: string) {
+  return text.startsWith(prefix) ? text : prefix + text
+}
+
+/** Strip prefix from text */
+export function strip(prefix: string, text: string) {
+  return text?.startsWith(prefix) ? text?.slice(prefix.length) : text
+}
+
+/** Format script object values */
+export function formatFileData<
+  T extends {
+    id: string
+    type: 'module' | 'iife' | 'loader' | 'asset'
+    fileName?: string
+    loaderName?: string
+  },
+>(script: T): T {
+  script.id = prefix('/', script.id)
+  if (script.fileName) script.fileName = strip('/', script.fileName)
+  if (script.loaderName) script.loaderName = strip('/', script.loaderName)
+  return script
+}
+
+/**
+ * Converts ScriptId to filename:
+ *
+ * - Filenames never start with a slash
+ * - URL queries are converted to underscores and dashes
+ */
 export function getFileName({ type, id }: FileWriterId): string {
   let fileName = id
+    .replace(/t=\d+&/, '') // filenames do not contain timestamps
     .replace(/^\//, '') // filenames do not start with a slash
     .replace(/\?/g, '__') // convert url queries
     .replace(/&/g, '_')
@@ -66,6 +97,14 @@ export function getOutputPath(server: ViteDevServer, fileName: string) {
 
 /** Converts a script to the correct Vite URL */
 export function getViteUrl({ type, id }: FileWriterId) {
+  // { timestamp = false }: { timestamp?: boolean } = {},
+  // if (timestamp && !id.startsWith('/@') && !id.includes('?v=')) {
+  //   const t = `t=${Date.now()}` + (id.includes('?') ? '&' : '')
+  //   const parts = id.split('?')
+  //   parts[1] = typeof parts[1] === 'undefined' ? t : t + parts[1]
+  //   id = parts.join('?')
+  // }
+
   if (type === 'asset') {
     // TODO: verify if assets need special handling
     throw new Error(`File type "${type}" not implemented.`)
@@ -75,8 +114,9 @@ export function getViteUrl({ type, id }: FileWriterId) {
   } else if (type === 'loader') {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {
+    // node_modules ids should not start with a slash
     if (id.startsWith('/@id/')) return id.slice('/@id/'.length)
-    return id.startsWith('/') ? id : `/${id}`
+    return prefix('/', id)
   } else {
     throw new Error(`Invalid file type: "${type}"`)
   }
@@ -84,11 +124,11 @@ export function getViteUrl({ type, id }: FileWriterId) {
 
 /** Resolves when file and dependencies are written. */
 export async function fileReady(script: FileWriterId): Promise<void> {
-  const key = getFileName(script)
-  const scriptFile = scriptFiles.get(key)
-  if (!scriptFile) throw new Error('unknown script type and id')
-  const file = await scriptFile.file
-  await Promise.all(file.deps.map(fileReady))
+  const fileName = getFileName(script)
+  const file = outputFiles.get(fileName)
+  if (!file) throw new Error('unknown script type and id')
+  const { deps } = await file.file
+  await Promise.all(deps.map(fileReady))
 }
 
 // only emit when all script files are written
@@ -96,11 +136,11 @@ export const allFilesReady$ = buildEnd$.pipe(
   tap((e) => {
     return debug('buildEnd %o', e)
   }),
-  switchMap(() => scriptFiles.change$.pipe(startWith({ type: 'start' }))),
+  switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
   tap((e) => {
     return debug('change$ %o', e)
   }),
-  map(() => [...scriptFiles.values()]),
+  map(() => [...outputFiles.values()]),
   switchMap((files) => Promise.all(files.map(({ file }) => file))),
   tap((e) => {
     return debug('buildEnd %o', e)

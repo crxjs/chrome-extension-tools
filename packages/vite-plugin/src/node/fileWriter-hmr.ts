@@ -5,7 +5,12 @@ import {
   PrunePayload,
   UpdatePayload,
 } from 'vite'
-import { allFilesReady$, getViteUrl } from './fileWriter-utilities'
+import {
+  allFilesReady$,
+  getFileName,
+  getViteUrl,
+  prefix,
+} from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { CrxHMRPayload } from './types'
 
@@ -53,10 +58,10 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       case 'update': {
         const update: UpdatePayload = {
           type: 'update',
-          updates: p.updates.map(({ acceptedPath, path, ...rest }) => ({
+          updates: p.updates.map(({ acceptedPath: ap, path: p, ...rest }) => ({
             ...rest,
-            acceptedPath: getViteUrl({ id: acceptedPath, type: 'module' }),
-            path: getViteUrl({ id: path, type: 'module' }),
+            acceptedPath: prefix('/', getFileName({ id: ap, type: 'module' })),
+            path: prefix('/', getFileName({ id: p, type: 'module' })),
           })),
         }
         return update

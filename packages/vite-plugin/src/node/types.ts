@@ -51,18 +51,21 @@ export type CrxDevScriptId = {
 }
 
 export interface CrxPlugin extends VitePlugin {
-  /** Runs during the transform hook for the manifest. */
+  /** Runs during the transform hook for the manifest. Filenames use input filenames. */
   transformCrxManifest?: (
     this: PluginContext,
     manifest: ManifestV3,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
-  /** Runs during generateBundle, before manifest output. */
+  /** Runs during generateBundle, before manifest output. Filenames use output filenames. */
   renderCrxManifest?: (
     this: PluginContext,
     manifest: ManifestV3,
     bundle: OutputBundle,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
-  /** Runs in the file writer on content scripts during development */
+  /**
+   * Runs in the file writer on content scripts during development. `script.id`
+   * is Vite URL format.
+   */
   renderCrxDevScript?: (
     code: string,
     script: CrxDevScriptId,

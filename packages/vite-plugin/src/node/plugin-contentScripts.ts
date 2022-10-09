@@ -7,7 +7,7 @@ import {
   createProLoader,
 } from './contentScripts'
 import { add } from './fileWriter'
-import { getFileName } from './fileWriter-utilities'
+import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename } from './path'
 import { RxMap } from './RxMap'
 import { CrxPluginFn } from './types'
@@ -55,7 +55,7 @@ export const pluginContentScripts: CrxPluginFn = (options) => {
               throw new Error('IIFE content scripts are not implemented')
             }
             // trigger update for other key values
-            contentScripts.set(key, script)
+            contentScripts.set(script.refId, formatFileData(script))
           }
       },
     },
