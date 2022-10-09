@@ -168,7 +168,7 @@ jobs:
         run: pnpm install --filter "vite-plugin"
 
       - name: Run unit and output tests
-        run: pnpm test:run:unit
+        run: pnpm test:run:out
 
       - name: Check for diff
         id: diff
