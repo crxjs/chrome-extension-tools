@@ -14,14 +14,14 @@ test(
     const src1 = path.join(__dirname, 'src1')
     const src2 = path.join(__dirname, 'src2')
 
+    await fs.remove(src)
+    await fs.copy(src1, src, { recursive: true })
+
     let browser: ChromiumBrowserContext | undefined
     let routes: Observable<Route> | undefined
     let optionsPage: Page | undefined
     do {
       try {
-        await fs.remove(src)
-        await fs.copy(src1, src, { recursive: true })
-
         const result = await serve(__dirname)
         browser = result.browser
         routes = result.routes
