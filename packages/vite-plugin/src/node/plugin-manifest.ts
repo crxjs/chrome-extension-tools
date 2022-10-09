@@ -125,7 +125,7 @@ export const pluginManifest =
           if (isString(input) && input.endsWith('index.html')) {
             finalInput = stubId
           }
-          
+
           // don't emit extra html files during serve
           if (config.command === 'serve')
             if (Array.isArray(input)) {
@@ -376,17 +376,15 @@ Public dir: "${config.publicDir}"`,
               source: precontrollerJs,
             })
             const precontrollerJsName = this.getFileName(refId)
-            await Promise.all(
-              files.html.map(async (f) =>
-                this.emitFile({
-                  type: 'asset',
-                  fileName: f,
-                  source: precontrollerHtml.replace(
-                    '%SCRIPT%',
-                    `/${precontrollerJsName}`,
-                  ),
-                }),
-              ),
+            files.html.map((f) =>
+              this.emitFile({
+                type: 'asset',
+                fileName: f,
+                source: precontrollerHtml.replace(
+                  '%SCRIPT%',
+                  `/${precontrollerJsName}`,
+                ),
+              }),
             )
           }
 
