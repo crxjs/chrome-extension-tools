@@ -35,13 +35,17 @@ export function getFileName({ type, id }: FileWriterId): string {
 
 /** Converts a file name to an absolute filename */
 export function getOutputPath(server: ViteDevServer, fileName: string) {
+  let outName = fileName
+  if (fileName.startsWith('/@'))
+    outName = `/vendor/${outName.slice(2).replace(/\//g, '-')}`
+
   const {
     root,
     build: { outDir },
   } = server.config
   const target = isAbsolute(outDir)
-    ? join(outDir, fileName)
-    : join(root, outDir, fileName)
+    ? join(outDir, outName)
+    : join(root, outDir, outName)
   return target
 }
 
@@ -56,7 +60,7 @@ export function getViteUrl({ type, id }: FileWriterId) {
   } else if (type === 'loader') {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {
-    return id
+    return id.startsWith('/') ? id : `/${id}`
   } else {
     throw new Error(`Invalid file type: "${type}"`)
   }
