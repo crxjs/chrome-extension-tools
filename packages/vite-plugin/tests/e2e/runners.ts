@@ -1,5 +1,6 @@
 import path from 'path'
-import { chromium, ChromiumBrowserContext } from 'playwright-chromium'
+import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
+import { Subject } from 'rxjs'
 import { allFilesSuccess } from 'src/fileWriter-utilities'
 import { ViteDevServer } from 'vite'
 import { afterAll } from 'vitest'
@@ -51,11 +52,12 @@ export async function serve(dirname: string) {
     ],
   })) as ChromiumBrowserContext
 
-  await browser.route('https://example.com', (route) => {
-    console.log('route example.com')
-    route.fulfill({
+  const routes = new Subject<Route>()
+  await browser.route('https://example.com', async (route) => {
+    await route.fulfill({
       path: path.join(__dirname, 'example.html'),
     })
+    routes.next(route)
   })
 
   await browser
@@ -63,5 +65,11 @@ export async function serve(dirname: string) {
     .find((p) => p.url() === 'about:blank')
     ?.goto('chrome://extensions')
 
-  return { browser, outDir, dataDir, devServer: server }
+  return {
+    browser,
+    outDir,
+    dataDir,
+    devServer: server,
+    routes: routes.asObservable(),
+  }
 }
