@@ -13,7 +13,17 @@ export type FileWriterId = {
 
 /** Converts ScriptId to string */
 export function getFileName({ type, id }: FileWriterId): string {
-  const fileName = id
+  let fileName = id
+  if (fileName.startsWith('/@fs')) {
+    fileName = `vendor/${fileName
+      .slice(5)
+      .split('node_modules/')
+      .pop()!
+      .replace(/\//g, '-')}`
+  } else if (fileName.startsWith('/@')) {
+    fileName = `vendor/${fileName.slice(2).replace(/\//g, '-')}`
+  }
+
   switch (type) {
     case 'iife':
       return `${fileName}.iife.js`
@@ -35,17 +45,13 @@ export function getFileName({ type, id }: FileWriterId): string {
 
 /** Converts a file name to an absolute filename */
 export function getOutputPath(server: ViteDevServer, fileName: string) {
-  let outName = fileName
-  if (fileName.startsWith('/@'))
-    outName = `/vendor/${outName.slice(2).replace(/\//g, '-')}`
-
   const {
     root,
     build: { outDir },
   } = server.config
   const target = isAbsolute(outDir)
-    ? join(outDir, outName)
-    : join(root, outDir, outName)
+    ? join(outDir, fileName)
+    : join(root, outDir, fileName)
   return target
 }
 
