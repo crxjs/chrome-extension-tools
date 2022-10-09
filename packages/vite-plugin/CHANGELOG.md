@@ -1,5 +1,43 @@
 # @crxjs/vite-plugin
 
+## 1.0.14
+
+### Patch Changes
+
+- 01f8e37: Allow <all_urls> in content_scripts.matches section of manifest.json
+- a65fe1f: CRXJS isn't fully compatible with Vite 3
+
+## 1.0.13
+
+### Patch Changes
+
+- 68c661f: Support Vite 3
+- a8d5670: Fixed the npm link of the npm badge.
+
+## 1.0.12
+
+### Patch Changes
+
+- 0027f1e: Fix manifest icons type
+
+## 1.0.11
+
+### Patch Changes
+
+- dc479d1: Fix global constant replacement in background
+
+## 1.0.10
+
+### Patch Changes
+
+- f35c49e: Update READMEs
+
+## 1.0.9
+
+### Patch Changes
+
+- 8941353: Remove & refactor use of fs-extra
+
 ## 1.0.8
 
 ### Patch Changes

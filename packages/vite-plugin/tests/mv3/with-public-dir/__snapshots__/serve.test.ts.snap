@@ -132,7 +132,8 @@ setTimeout(() => clearInterval(id), 5e3);
 `;
 
 exports[`serve fs output: service-worker-loader.js 1`] = `
-"import 'http://localhost:3000/crx-client-worker';
+"import 'http:/localhost:3000/@vite/env';
+import 'http://localhost:3000/crx-client-worker';
 "
 `;
 

@@ -69,8 +69,8 @@ export async function manifestFiles(
   const htmlPages = htmlFiles(manifest)
 
   const icons = [
-    Object.values(manifest.icons ?? {}) as string[],
-    Object.values(manifest.action?.default_icon ?? {}) as string[],
+    Object.values(isString(manifest.icons) ? [manifest.icons] : manifest.icons ?? {}) as string[],
+    Object.values(isString(manifest.action?.default_icon) ? [manifest.action?.default_icon] : manifest.action?.default_icon ?? {}) as string[],
   ].flat()
 
   let webAccessibleResources: string[] = []
@@ -162,6 +162,13 @@ export function encodeManifest(manifest: ManifestV3): string {
  * #282](https://github.com/crxjs/chrome-extension-tools/issues/282)
  */
 export const stubMatchPattern = (pattern: string): string => {
+  /**
+   * Allow <all_urls> in matches section. 
+   * [Issue #459](https://github.com/crxjs/chrome-extension-tools/issues/459)
+   */
+  if (pattern === "<all_urls>") {
+    return pattern;
+  }
   const [schema, rest] = pattern.split('://')
   const [origin, pathname] = rest.split('/')
   const root = `${schema}://${origin}`

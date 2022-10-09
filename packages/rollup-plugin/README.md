@@ -16,29 +16,7 @@ copied to the output folder.
 RPCE simplifies project config and supports many of Vite's features in the
 Chrome Extension evironment, including HMR.
 
-## Vite Usage
-
-Vite support is in beta! Check out this [90 second getting started guide]().
-
-```sh
-npm i rollup-plugin-chrome-extension@beta -D
-```
-
-```javascript
-// vite.config.js
-
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { chromeExtension } from 'rollup-plugin-chrome-extension'
-
-export default defineConfig({
-  plugins: [react(), chromeExtension()],
-})
-```
-
-Just add new features to your manifest and RPCE does the rest.
-
-## [Documentation for v3](https://www.extend-chrome.dev/rollup-plugin)
+## [Documentation](https://www.extend-chrome.dev/rollup-plugin)
 
 We have
 [v3 boilerplates](https://www.extend-chrome.dev/rollup-plugin#chrome-extension-boilerplates)
@@ -51,25 +29,12 @@ setting up your own project.
 See the [documentation](https://www.extend-chrome.dev/rollup-plugin) for usage
 and how to get started.
 
+## Supporting
+
+If these plugins have helped you ship your product faster, please consider
+[sponsoring me](https://github.com/sponsors/jacksteamdev) on GitHub.
+
 ## Contributing
 
-Your help is super welcome!
-
-🎯 Ongoing developement is for v4+ only.
-
-👀 Be sure to take a look at the issues before starting to work on a new
-feature.
-
-🙏 Please update the tests to cover bug fixes or new features.
-
-📕 Documentation for v4 has not yet begun, but you can open an issue for help.
-
-✨ If you enjoy using RPCE, please help spread the word!
-
-## Development
-
-Our preferred package manager is [pnpm](https://pnpm.io/), but npm or Yarn
-should work.
-
-If you're using VSCode you can run the default build task (Ctrl+Shift+B or ⇧⌘B
-for Mac) to start building and type checking.
+We encourage pull requests! This is a
+[pnpm monorepo](https://pnpm.io/workspaces), so use pnpm instead of Yarn or npm.

@@ -31,7 +31,7 @@ const config = {
           routeBasePath: '/',
           sidebarPath: require.resolve('./sidebars.js'),
           editUrl:
-            'https://github.com/crxjs/rollup-plugin-chrome-extension/tree/main/packages/vite-plugin-docs/',
+            'https://github.com/crxjs/chrome-extension-tools/tree/main/packages/vite-plugin-docs/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -63,7 +63,7 @@ const config = {
             position: 'left',
           },
           {
-            href: 'https://github.com/crxjs/rollup-plugin-chrome-extension',
+            href: 'https://github.com/crxjs/chrome-extension-tools',
             label: 'GitHub',
             position: 'right',
           },

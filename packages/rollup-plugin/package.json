@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-chrome-extension",
-  "version": "3.6.9",
+  "version": "3.6.10",
   "description": "Build Chrome Extensions with this Rollup plugin.",
   "keywords": [
     "rollup-plugin",
@@ -72,12 +72,12 @@
     "@rollup/plugin-json": "^4.0.2",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-sucrase": "^3.0.0",
-    "@rollup/plugin-typescript": "8.3.2",
+    "@rollup/plugin-typescript": "8.3.3",
     "@sucrase/jest-plugin": "^2.1.0",
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^5.1.1",
     "@types/cheerio": "0.22.22",
-    "@types/chrome": "0.0.188",
+    "@types/chrome": "0.0.190",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^7.1.1",
     "@types/jest": "^27.0.0",

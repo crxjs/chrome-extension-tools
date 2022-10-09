@@ -2,7 +2,8 @@ import { CrxPluginFn } from './types'
 import glob from 'fast-glob'
 import { ResolvedConfig } from 'vite'
 import { relative } from './path'
-import { readFile } from 'fs-extra'
+import { promises as fs } from 'fs'
+const { readFile } = fs
 
 export const pluginFileWriterPublic: CrxPluginFn = () => {
   let config: ResolvedConfig
