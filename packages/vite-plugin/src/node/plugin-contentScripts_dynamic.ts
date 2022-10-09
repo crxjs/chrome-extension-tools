@@ -32,6 +32,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
   return [
     {
       name: 'crx:dynamic-content-scripts-loader',
+      enforce: 'pre',
       configResolved(_config) {
         config = _config
       },
