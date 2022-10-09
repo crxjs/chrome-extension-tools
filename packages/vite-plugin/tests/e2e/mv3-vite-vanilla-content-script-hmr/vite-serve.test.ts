@@ -63,18 +63,26 @@ test(
     expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
     expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
 
+    console.log('pre-copy 3')
+
     // update background.ts file -> trigger runtime reload
     await Promise.all([
-      fs.copy(src2, src, {
-        recursive: true,
-        filter: (f) => {
-          if (fs.lstatSync(f).isDirectory()) return true
-          return f.endsWith('bg-onload.ts')
-        },
-      }),
+      fs
+        .copy(src2, src, {
+          recursive: true,
+          filter: (f) => {
+            if (fs.lstatSync(f).isDirectory()) return true
+            return f.endsWith('bg-onload.ts')
+          },
+        })
+        .then(() => console.log('fs.copy done')),
       // TODO: this should trigger a runtime reload
-      optionsPage.waitForEvent('close', { timeout: 5000 }), // options page should close
-      page.waitForEvent('framenavigated', { timeout: 5000 }), // content script should reload
+      optionsPage
+        .waitForEvent('close', { timeout: 5000 })
+        .then(() => console.log('options page closed')), // options page should close
+      page
+        .waitForEvent('framenavigated', { timeout: 5000 })
+        .then(() => console.log('content script reload')), // content script should reload
     ])
 
     console.log('copy 3')
