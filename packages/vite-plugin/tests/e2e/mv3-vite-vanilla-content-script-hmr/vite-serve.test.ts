@@ -1,15 +1,9 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { expect, test, afterEach } from 'vitest'
+import { expect, test } from 'vitest'
 import { getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
-
-afterEach(async (ctx) => {
-  console.log('afterEach', ctx)
-  await new Promise<void>((r) => setTimeout(() => r(), 1000))
-  console.log('after delay')
-})
 
 test(
   'crx page update on hmr',
@@ -48,6 +42,8 @@ test(
       },
     })
 
+    console.log('copy 1')
+
     await waitForInnerHtml(styles, (h) => h.includes('background-color: red;'))
     expect(reloads).toBe(0) // no reload on css update
     expect(optionsPage.isClosed()).toBe(false) // no runtime reload on css update
@@ -60,6 +56,8 @@ test(
         return f.endsWith('header.ts')
       },
     })
+
+    console.log('copy 2')
 
     await page.locator('h1', { hasText: header }).waitFor()
     expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
@@ -78,6 +76,8 @@ test(
       optionsPage.waitForEvent('close'), // options page should close
       page.waitForEvent('framenavigated'), // content script should reload
     ])
+
+    console.log('copy 3')
 
     await app.waitFor()
 
