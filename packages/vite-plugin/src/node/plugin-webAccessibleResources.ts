@@ -155,11 +155,36 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
           web_accessible_resources.push(...moduleScriptResources.values())
         }
 
-        // TODO: combine redundant web accessible resources entries
+        /* ---------- COMBINE REDUNDANT RESOURCES ---------- */
 
-        if (web_accessible_resources.length === 0)
+        const hashedResources = new Map<string, Set<string>>()
+        const combinedResources: typeof web_accessible_resources = []
+        for (const r of web_accessible_resources)
+          if (isResourceByMatch(r)) {
+            const { matches, resources, use_dynamic_url = false } = r
+            const key = JSON.stringify([use_dynamic_url, matches.sort()])
+            const combined = hashedResources.get(key) ?? new Set()
+            for (const res of resources) combined.add(res)
+            hashedResources.set(key, combined)
+          } else {
+            combinedResources.push(r)
+          }
+        for (const [key, resources] of hashedResources)
+          if (resources.size > 0) {
+            const [use_dynamic_url, matches]: [boolean, string[]] =
+              JSON.parse(key)
+            combinedResources.push({
+              matches,
+              resources: [...resources],
+              use_dynamic_url,
+            })
+          }
+
+        /* --------------- CLEAN UP MANIFEST --------------- */
+
+        if (combinedResources.length === 0)
           delete manifest.web_accessible_resources
-        else manifest.web_accessible_resources = web_accessible_resources
+        else manifest.web_accessible_resources = combinedResources
 
         return manifest
       },
