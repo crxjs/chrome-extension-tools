@@ -10,7 +10,8 @@ import {
 
 const _require =
   typeof require === 'undefined' ? createRequire(import.meta.url) : require
-const customElementsPath = _require.resolve(customElementsId)
+// customElementsId starts with a slash, remove it for require.
+const customElementsPath = _require.resolve(customElementsId.slice(1))
 const customElementsCode = readFileSync(customElementsPath, 'utf8')
 const customElementsMap = readFileSync(`${customElementsPath}.map`, 'utf8')
 
@@ -35,6 +36,11 @@ export const pluginFileWriterPolyfill: CrxPluginFn = () => {
     name: 'crx:file-writer-polyfill',
     apply: 'serve',
     enforce: 'pre',
+    resolveId(source) {
+      if (source === customElementsId) {
+        return customElementsId
+      }
+    },
     load(id) {
       if (id === customElementsId) {
         return { code: customElementsCode, map: customElementsMap }
