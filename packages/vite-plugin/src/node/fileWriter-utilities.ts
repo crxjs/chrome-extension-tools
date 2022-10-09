@@ -25,6 +25,9 @@ export function getFileName({ type, id }: FileWriterId): string {
       .replace(/\//g, '-')}`
   } else if (fileName.startsWith('@')) {
     fileName = `vendor/${fileName.slice('@'.length).replace(/\//g, '-')}`
+  } else if (fileName.startsWith('.vite/deps/')) {
+    fileName = `vendor/${fileName.slice('.vite/deps/'.length)}`
+    console.log(fileName)
   }
 
   switch (type) {
