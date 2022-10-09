@@ -66,7 +66,8 @@ export const pluginWebAccessibleResources: CrxPluginFn = ({
         for (const r of _war) {
           const i = r.resources.indexOf(DYNAMIC_RESOURCE)
           if (i > -1 && isResourceByMatch(r)) {
-            r.resources = [...r.resources].splice(i, 1)
+            r.resources = [...r.resources]
+            r.resources.splice(i, 1)
             for (const p of r.matches) dynamicScriptMatches.add(p)
             dynamicScriptDynamicUrl = r.use_dynamic_url ?? false
           }
