@@ -1,6 +1,7 @@
 import { ResolvedConfig } from 'vite'
 import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
 import { fileReady } from './fileWriter'
+import { getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
 import { CrxPluginFn } from './types'
 
@@ -68,6 +69,8 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
             let script = contentScripts.get(resolvedId)
             if (typeof script === 'undefined') {
               let refId: string
+              let fileName: string | undefined
+              let loaderName: string | undefined
               if (config.command === 'build') {
                 refId = this.emitFile({
                   type: 'chunk',
@@ -76,11 +79,20 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                 })
               } else {
                 refId = scriptId
+                const relId = relative(config.root, id)
+                fileName = getFileName({
+                  type: type === 'iife' ? 'iife' : 'module',
+                  id: relId,
+                })
+                if (type === 'loader')
+                  loaderName = getFileName({ type, id: relId })
               }
               script = {
                 type,
                 id: relative(config.root, id),
                 isDynamicScript: true,
+                fileName,
+                loaderName,
                 refId,
                 matches: [],
               }
