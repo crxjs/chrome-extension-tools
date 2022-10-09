@@ -13,7 +13,7 @@ export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
         // during testing this can be null, we don't provide options through the test config
         options,
       },
-    },
+    } as any,
   }
 }
 
@@ -36,7 +36,8 @@ export const getOptions = ({ plugins }: UserConfig): CrxInputOptions => {
   for (const p of plugins.flat()) {
     if (isCrxPlugin(p))
       if (p.name === pluginName) {
-        options = p.api.crx.options
+        const plugin = p as ReturnType<typeof pluginOptionsProvider>
+        options = plugin.api.crx.options
         if (options) break
       }
   }
