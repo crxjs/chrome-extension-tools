@@ -5,12 +5,8 @@ import {
   PrunePayload,
   UpdatePayload,
 } from 'vite'
-import {
-  allFilesReady$,
-  getFileName,
-  getViteUrl,
-  prefix,
-} from './fileWriter-utilities'
+import { allFilesReady$ } from './fileWriter-rxjs'
+import { getFileName, getViteUrl, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { CrxHMRPayload } from './types'
 

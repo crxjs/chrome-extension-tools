@@ -3,14 +3,17 @@ import { readFile } from 'fs-extra'
 import MagicString from 'magic-string'
 import {
   filter,
+  map,
   mergeMap,
   Observable,
   of,
   ReplaySubject,
   retry,
+  startWith,
   switchMap,
 } from 'rxjs'
 import { ViteDevServer } from 'vite'
+import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
@@ -58,6 +61,13 @@ export const buildEnd$ = fileWriterEvent$.pipe(
 export const buildStart$ = fileWriterEvent$.pipe(
   filter((e): e is FileWriterEventBuildStart => e.type === 'build_start'),
   switchMap((e) => of(e)),
+)
+
+/** Emit when all script files are written */
+export const allFilesReady$ = buildEnd$.pipe(
+  switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
+  map(() => [...outputFiles.values()]),
+  switchMap((files) => Promise.all(files.map(({ file }) => file))),
 )
 
 /* ------------------- WRITE OPS ------------------- */
