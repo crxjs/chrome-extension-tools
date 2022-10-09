@@ -10,4 +10,4 @@ expect.extend({
 })
 
 if (process.env.TIMEOUT) jest.setTimeout(parseInt(process.env.TIMEOUT))
-else jest.setTimeout(45000)
+else jest.setTimeout(30000)

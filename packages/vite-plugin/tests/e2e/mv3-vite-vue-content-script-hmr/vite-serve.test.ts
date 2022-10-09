@@ -3,7 +3,7 @@ import path from 'path'
 import { waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
-jest.retryTimes(2)
+jest.retryTimes(3)
 
 test('crx page update on hmr', async () => {
   const src = path.join(__dirname, 'src')
