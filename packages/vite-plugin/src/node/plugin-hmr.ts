@@ -4,6 +4,8 @@ import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 import { manifestFiles } from './files'
+import { HMRPayload } from 'vite'
+import { crxHMRPayload$, hmrPayload$ } from './fileWriter-hmr'
 
 const debug = _debug('hmr')
 
@@ -14,7 +16,7 @@ export const crxRuntimeReload: CrxHMRPayload = {
 
 export const pluginHMR: CrxPluginFn = () => {
   let finalManifestFiles: ManifestFiles
-  // let decoratedSend: ((payload: HMRPayload) => void) | undefined
+  let decoratedSend: ((payload: HMRPayload) => void) | undefined
 
   return [
     {
@@ -43,20 +45,20 @@ export const pluginHMR: CrxPluginFn = () => {
         if (!watch.ignored.includes(outDir)) watch.ignored.push(outDir)
       },
       // TODO: emit hmr payloads for file writer
-      // configureServer(server) {
-      //   if (server.ws.send !== decoratedSend) {
-      //     // decorate server websocket send method
-      //     const { send } = server.ws
-      //     decoratedSend = (payload: HMRPayload) => {
-      //       hmrPayload$.next(payload) // sniff hmr events
-      //       send(payload) // don't interfere with normal hmr
-      //     }
-      //     server.ws.send = decoratedSend
-      //     crxHmrPayload$.subscribe((payload) => {
-      //       send(payload) // send crx hmr events
-      //     })
-      //   }
-      // },
+      configureServer(server) {
+        if (server.ws.send !== decoratedSend) {
+          // decorate server websocket send method
+          const { send } = server.ws
+          decoratedSend = (payload: HMRPayload) => {
+            hmrPayload$.next(payload) // sniff hmr events
+            send(payload) // don't interfere with normal hmr
+          }
+          server.ws.send = decoratedSend
+          crxHMRPayload$.subscribe((payload) => {
+            send(payload) // send crx hmr events
+          })
+        }
+      },
       // background changes require a full extension reload
       handleHotUpdate({ file, modules, server }) {
         const background =
@@ -74,7 +76,7 @@ export const pluginHMR: CrxPluginFn = () => {
     },
     {
       name: 'crx:hmr',
-      apply: 'build',
+      apply: 'serve',
       enforce: 'post',
       // get final output manifest for handleHotUpdate 👆
       async renderCrxManifest(manifest) {

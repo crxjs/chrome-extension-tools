@@ -1,4 +1,4 @@
-import { firstValueFrom, map, startWith, switchMap } from 'rxjs'
+import { firstValueFrom, map, startWith, switchMap, tap } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { scriptFiles } from './fileWriter-filesMap'
 import { buildEnd$ } from './fileWriter-rxjs'
@@ -91,15 +91,24 @@ export async function fileReady(script: FileWriterId): Promise<void> {
   await Promise.all(file.deps.map(fileReady))
 }
 
+// only emit when all script files are written
+export const allFilesReady$ = buildEnd$.pipe(
+  tap((e) => {
+    return debug('buildEnd %o', e)
+  }),
+  switchMap(() => scriptFiles.change$.pipe(startWith({ type: 'start' }))),
+  tap((e) => {
+    return debug('change$ %o', e)
+  }),
+  map(() => [...scriptFiles.values()]),
+  switchMap((files) => Promise.all(files.map(({ file }) => file))),
+  tap((e) => {
+    return debug('buildEnd %o', e)
+  }),
+)
+
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesReady(): Promise<void> {
-  await firstValueFrom(buildEnd$)
-  await firstValueFrom(
-    scriptFiles.change$.pipe(
-      startWith(0),
-      map(() => [...scriptFiles.values()]),
-      switchMap((files) => Promise.all(files.map(({ file }) => file))),
-    ),
-  )
+  await firstValueFrom(allFilesReady$)
   debug('allFilesReady')
 }
