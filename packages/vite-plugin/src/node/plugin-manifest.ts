@@ -1,3 +1,5 @@
+import precontrollerHtml from 'client/html/precontroller.html?client'
+import precontrollerJs from 'client/es/page-precontroller-script.ts?client'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
@@ -352,6 +354,29 @@ Public dir: "${config.publicDir}"`,
                 }
               }),
           )
+
+          /* ---------- SETUP HTML PLACEHOLDER FILES --------- */
+
+          if (files.html.length) {
+            const refId = this.emitFile({
+              type: 'asset',
+              name: 'precontroller.js',
+              source: precontrollerJs,
+            })
+            const precontrollerJsName = this.getFileName(refId)
+            await Promise.all(
+              files.html.map(async (f) =>
+                this.emitFile({
+                  type: 'asset',
+                  fileName: f,
+                  source: precontrollerHtml.replace(
+                    '%SCRIPT%',
+                    precontrollerJsName,
+                  ),
+                }),
+              ),
+            )
+          }
 
           /* -------------- OUTPUT MANIFEST FILE ------------- */
 
