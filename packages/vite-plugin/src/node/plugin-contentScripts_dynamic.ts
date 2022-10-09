@@ -100,12 +100,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
           const script = contentScripts.get(scriptId)!
           if (config.command === 'build') {
             return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.refId};`
-          } else {
+          } else if (typeof script.fileName === 'string') {
             await fileReady(script)
-            const fileName = script.fileName?.startsWith('/')
-              ? script.fileName
-              : `/${script.fileName}`
-            return `export default ${JSON.stringify(fileName)};`
+            return `export default ${JSON.stringify(script.fileName)};`
+          } else {
+            throw new Error(
+              `Content script fileName is undefined: "${script.id}"`,
+            )
           }
         }
       },
@@ -137,7 +138,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                     )
 
                   return `${JSON.stringify(
-                    script.loaderName ?? script.fileName,
+                    `/${script.loaderName ?? script.fileName}`,
                   )};`
                 },
               )

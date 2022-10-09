@@ -109,7 +109,7 @@ function prepScript(
           if (i.n) {
             depSet.add(i.n)
             const fileName = getFileName({ type: 'module', id: i.n })
-            magic.overwrite(i.s, i.e, fileName)
+            magic.overwrite(i.s, i.e, `/${fileName}`)
           }
         return { target, source: magic.toString(), deps: [...depSet] }
       }),

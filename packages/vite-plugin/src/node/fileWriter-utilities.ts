@@ -13,14 +13,18 @@ export type FileWriterId = {
 
 /** Converts ScriptId to string */
 export function getFileName({ type, id }: FileWriterId): string {
-  let fileName = id.replace(/\?/g, '__').replace(/&/g, '_').replace(/=/g, '--')
+  let fileName = id
+    .replace(/^\//, '') // filenames do not start with a slash
+    .replace(/\?/g, '__') // convert url queries
+    .replace(/&/g, '_')
+    .replace(/=/g, '--')
   if (fileName.includes('node_modules/')) {
     fileName = `vendor/${fileName
       .split('node_modules/')
       .pop()!
       .replace(/\//g, '-')}`
-  } else if (fileName.startsWith('/@')) {
-    fileName = `vendor/${fileName.slice(2).replace(/\//g, '-')}`
+  } else if (fileName.startsWith('@')) {
+    fileName = `vendor/${fileName.slice('@'.length).replace(/\//g, '-')}`
   }
 
   switch (type) {
