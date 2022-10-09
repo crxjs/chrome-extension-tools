@@ -75,6 +75,7 @@ export function getViteUrl({ type, id }: FileWriterId) {
   } else if (type === 'loader') {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {
+    if (id.startsWith('/@id/')) return id.slice('/@id/'.length)
     return id.startsWith('/') ? id : `/${id}`
   } else {
     throw new Error(`Invalid file type: "${type}"`)
