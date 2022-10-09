@@ -13,6 +13,7 @@ export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
         // during testing this can be null, we don't provide options through the test config
         options,
       },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any,
   }
 }
