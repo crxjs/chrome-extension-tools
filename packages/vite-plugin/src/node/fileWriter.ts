@@ -1,7 +1,7 @@
 import { outputFile } from 'fs-extra'
 import { performance } from 'perf_hooks'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
-import { firstValueFrom, mergeMap, takeUntil } from 'rxjs'
+import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { ScriptFile, scriptFiles } from './fileWriter-filesMap'
 import {
@@ -137,6 +137,7 @@ export async function write(
       }),
       // abort write operation on close event
       takeUntil(close$),
+      concatWith(of([])),
     ),
   )
   const close = performance.now()

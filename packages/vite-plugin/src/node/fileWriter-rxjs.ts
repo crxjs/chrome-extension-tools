@@ -9,7 +9,6 @@ import {
   ReplaySubject,
   retry,
   switchMap,
-  throwError,
 } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
@@ -32,7 +31,7 @@ export const serverEvent$ = new ReplaySubject<
 >(1)
 export const close$ = serverEvent$.pipe(
   filter((e): e is ServerEventClose => e.type === 'close'),
-  switchMap(() => throwError(() => new Error('Server has closed'))),
+  switchMap((e) => of(e)),
 )
 export const start$ = serverEvent$.pipe(
   filter((e): e is ServerEventStart => e.type === 'start'),
