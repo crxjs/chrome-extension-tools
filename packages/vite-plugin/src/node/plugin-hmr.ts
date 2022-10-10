@@ -1,5 +1,6 @@
 // import { HMRPayload } from 'vite'
-import { merge } from 'rxjs'
+import getPort, { portNumbers } from 'get-port'
+import { Subscription } from 'rxjs'
 import { HMRPayload, ResolvedConfig } from 'vite'
 import { contentScripts } from './contentScripts'
 import { manifestFiles } from './files'
@@ -11,7 +12,6 @@ import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
-import getPort, { portNumbers } from 'get-port'
 
 const debug = _debug('hmr')
 
@@ -24,6 +24,7 @@ export const pluginHMR: CrxPluginFn = () => {
   let inputManifestFiles: ManifestFiles
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
   let config: ResolvedConfig
+  let subs: Subscription
 
   return [
     {
@@ -54,20 +55,36 @@ export const pluginHMR: CrxPluginFn = () => {
           : join(config.root, config.build.outDir, '**/*')
         if (!watch.ignored.includes(outDir)) watch.ignored.push(outDir)
       },
-      // TODO: emit hmr payloads for file writer
       configureServer(server) {
         if (server.ws.send !== decoratedSend) {
           // decorate server websocket send method
           const { send } = server.ws
           decoratedSend = (payload: HMRPayload) => {
-            hmrPayload$.next(payload) // sniff hmr events
+            if (payload.type === 'error') {
+              send({
+                type: 'custom',
+                event: 'crx:content-script-payload',
+                data: payload,
+              })
+            } else {
+              hmrPayload$.next(payload) // sniff hmr events
+            }
+
             send(payload) // don't interfere with normal hmr
           }
           server.ws.send = decoratedSend
-          merge(crxHMRPayload$, fileWriterError$).subscribe((payload) => {
-            send(payload) // send crx hmr and error events
-          })
+
+          subs = new Subscription(() => (subs = new Subscription()))
+          subs.add(fileWriterError$.subscribe(send))
+          subs.add(
+            crxHMRPayload$.subscribe((payload) => {
+              send(payload) // send crx hmr and error events
+            }),
+          )
         }
+      },
+      closeBundle() {
+        subs.unsubscribe()
       },
       // background changes require a full extension reload
       handleHotUpdate({ modules, server }) {

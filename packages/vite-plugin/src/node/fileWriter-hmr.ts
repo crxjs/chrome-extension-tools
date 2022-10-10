@@ -1,11 +1,11 @@
-import { buffer, filter, map, merge, mergeMap, Observable, Subject } from 'rxjs'
+import { buffer, filter, map, mergeMap, Observable, Subject } from 'rxjs'
 import {
   FullReloadPayload,
   HMRPayload,
   PrunePayload,
   UpdatePayload,
 } from 'vite'
-import { allFilesReady$, fileWriterError$ } from './fileWriter-rxjs'
+import { allFilesReady$ } from './fileWriter-rxjs'
 import { getFileName, getViteUrl, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { CrxHMRPayload } from './types'
@@ -17,10 +17,7 @@ const debug = _debug('file-writer').extend('hmr')
 const isCrxHMRPayload = (p: HMRPayload): p is CrxHMRPayload =>
   p.type === 'custom' && p.event.startsWith('crx:')
 export const hmrPayload$ = new Subject<HMRPayload>()
-export const crxHMRPayload$: Observable<CrxHMRPayload> = merge(
-  hmrPayload$,
-  fileWriterError$,
-).pipe(
+export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   filter((p) => !isCrxHMRPayload(p)),
   buffer(allFilesReady$),
   mergeMap((pps) => {

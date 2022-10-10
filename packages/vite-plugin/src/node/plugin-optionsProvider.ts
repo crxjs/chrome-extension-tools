@@ -47,6 +47,7 @@ export const getOptions = ({ plugins }: UserConfig): CrxInputOptions => {
     throw Error('Unable to get CRXJS options')
   }
 
+  // TODO: define defaults here
   return options
 }
 

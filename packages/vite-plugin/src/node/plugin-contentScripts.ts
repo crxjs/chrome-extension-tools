@@ -38,7 +38,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'serve',
       config(config) {
         const { contentScripts = {} } = getOptions(config)
-        hmrTimeout = contentScripts.hmrTimeout
+        hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
       },
       async configureServer(_server) {
