@@ -11,6 +11,7 @@ import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
+import getPort, { portNumbers } from 'get-port'
 
 const debug = _debug('hmr')
 
@@ -30,11 +31,13 @@ export const pluginHMR: CrxPluginFn = () => {
       apply: 'serve',
       enforce: 'pre',
       // server hmr host should be localhost
-      config({ server = {}, ...config }) {
+      async config({ server = {}, ...config }) {
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
         server.hmr = server.hmr ?? {}
         server.hmr.host = 'localhost'
+        server.hmr.port =
+          server.hmr.port ?? (await getPort({ port: portNumbers(5200, 5300) }))
 
         return { server, ...config }
       },
