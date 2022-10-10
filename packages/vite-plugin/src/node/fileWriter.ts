@@ -1,4 +1,4 @@
-import { outputFile } from 'fs-extra'
+import fsx from 'fs-extra'
 import { performance } from 'perf_hooks'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
@@ -22,6 +22,8 @@ import { _debug } from './helpers'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
 export { allFilesReady, fileReady }
+
+const { outputFile } = fsx
 
 const debug = _debug('file-writer')
 

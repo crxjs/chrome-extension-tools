@@ -1,5 +1,5 @@
 import * as lexer from 'es-module-lexer'
-import { readFile } from 'fs-extra'
+import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
 import {
   filter,
