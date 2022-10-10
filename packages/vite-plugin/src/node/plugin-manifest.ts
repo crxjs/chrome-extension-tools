@@ -92,16 +92,14 @@ export const pluginManifest: CrxPluginFn = () => {
     {
       name: 'crx:manifest-loader',
       enforce: 'pre',
-      buildStart() {
-        try {
+      buildStart(options) {
+        if (typeof options.input !== 'undefined') {
           refId = this.emitFile({
             type: 'chunk',
             id: manifestId,
             name: 'crx-manifest.js',
             preserveSignature: 'strict',
           })
-        } catch (error) {
-          // this means it's running on the dev server
         }
       },
       resolveId(source) {
