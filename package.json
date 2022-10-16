@@ -32,5 +32,12 @@
   },
   "devDependencies": {
     "vitest": "^0.23.4"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "jest"
+      ]
+    }
   }
 }

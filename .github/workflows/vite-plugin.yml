@@ -110,12 +110,12 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm i
+        run: pnpm install --filter "vite-plugin"
 
       - name: Run e2e tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: pnpm test:ci:e2e
+          run: pnpm test:run:e2e
           working-directory: "packages/vite-plugin"
 
       - uses: actions/upload-artifact@v3
@@ -165,10 +165,10 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm i
+        run: pnpm install --filter "vite-plugin"
 
       - name: Run unit and output tests
-        run: pnpm test:ci:unit
+        run: pnpm test:run:out
 
       - name: Check for diff
         id: diff

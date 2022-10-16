@@ -137,5 +137,8 @@ socket.addEventListener('close', async ({ wasClean }) => {
   if (wasClean) return
   console.log(`[vite] server connection lost. polling for restart...`)
   await waitForSuccessfulPing()
-  chrome.runtime.reload()
+  handleCrxHmrPayload({
+    type: 'custom',
+    event: 'crx:runtime-reload',
+  })
 })

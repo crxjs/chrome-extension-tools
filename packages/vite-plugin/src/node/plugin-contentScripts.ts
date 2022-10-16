@@ -38,14 +38,14 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'serve',
       config(config) {
         const { contentScripts = {} } = getOptions(config)
-        hmrTimeout = contentScripts.hmrTimeout
+        hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
       },
       async configureServer(_server) {
         server = _server
         if (
           typeof preambleCode === 'undefined' &&
-          server.config.plugins.some(({ name }) =>
+          server.config.plugins.some(({ name = 'none' }) =>
             name.toLowerCase().includes('react'),
           )
         ) {

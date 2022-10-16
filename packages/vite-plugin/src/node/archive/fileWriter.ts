@@ -1,4 +1,4 @@
-import fsExtra from 'fs-extra'
+import fsx from 'fs-extra'
 import {
   NormalizedInputOptions,
   NormalizedOutputOptions,
@@ -24,7 +24,7 @@ import { stubId } from '../virtualFileIds'
 
 const debug = _debug('file-writer')
 
-const { outputFile } = fsExtra
+const { outputFile } = fsx
 
 export type ScriptType = 'loader' | 'module' | 'iife'
 export interface ScriptModule {
@@ -41,10 +41,12 @@ const mapProps: MapProp[] = ['clear', 'set', 'delete']
 export const scriptModules = new Proxy(new Map<string, ScriptModule>(), {
   get(target, prop: MapProp) {
     const method = Reflect.get(target, prop)
+    // @ts-expect-error too dynamic for typescript
     if (!mapProps.includes(prop)) return method?.bind(target)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return function (this: typeof target, ...args: any[]) {
       scriptModulesChange$.next(undefined)
+      // @ts-expect-error too dynamic for typescript
       return method.call(this, ...args)
     }.bind(target)
   },
@@ -177,7 +179,7 @@ export function update(viteUrl: string): ScriptModule[] {
     }
   }
 
-  if (result.length) return result
+  return result
 }
 
 /** Call `write` to force a file write. Waits until the server is ready & writes the file. */

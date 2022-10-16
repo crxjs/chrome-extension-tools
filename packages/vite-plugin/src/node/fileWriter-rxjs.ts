@@ -1,5 +1,5 @@
 import * as lexer from 'es-module-lexer'
-import { readFile } from 'fs-extra'
+import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
 import {
   filter,
@@ -168,4 +168,18 @@ function prepScript(
         return { target, source: magic.toString(), deps: [...depSet] }
       }),
     )
+}
+
+/** Resolves when all existing files in scriptFiles are written. */
+export async function allFilesReady(): Promise<void> {
+  await firstValueFrom(allFilesReady$)
+}
+
+/** Resolves when all existing files in scriptFiles are written. */
+export async function allFilesSuccess(): Promise<void> {
+  const result = await firstValueFrom(allFilesReady$)
+  const reason = result.find(isRejected)?.reason
+  if (typeof reason === 'undefined') return
+  if (reason instanceof Error) throw reason
+  throw new Error(reason.toString())
 }

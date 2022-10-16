@@ -7,7 +7,8 @@ import _debug from 'debug'
 
 const debug = _debug('test:global-setup')
 
-const clientDir = path.resolve(__dirname, '..', 'src', 'client')
+const srcDir = path.resolve(__dirname, '..', 'src')
+const clientDir = path.join(srcDir, 'client')
 const outDir = normalizePath(path.join(__dirname, 'artifacts'))
 
 function getClientFiles() {
@@ -47,17 +48,18 @@ config.plugins?.push(
       debug('load %s', id)
       let importPath: string | undefined
       if (clientFiles.includes(id)) {
-        importPath = path.posix.join(clientDir, id)
+        importPath = path.posix.join('client', id)
       }
 
       if (importPath?.endsWith('.html')) {
+        const filename = path.join(srcDir, importPath)
         return `
-var clientCode = \`${fs.readFileSync(importPath, 'utf-8')}\`;
+var clientCode = \`${fs.readFileSync(filename, 'utf-8')}\`;
 export default clientCode;
         `.trim()
       } else if (importPath) {
         return `
-import clientCode from '${importPath}?client'
+import clientCode from '${importPath}'
 export default clientCode`.trim()
       }
 

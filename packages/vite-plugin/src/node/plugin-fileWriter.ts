@@ -2,14 +2,11 @@ import { close, start } from './fileWriter'
 import { fileWriterError$ } from './fileWriter-rxjs'
 import { CrxPluginFn } from './types'
 import { createLogger } from 'vite'
+import { outputFiles } from './fileWriter-filesMap'
 
 const logger = createLogger('error', { prefix: 'crxjs' })
 
-/**
- * Integrates file writer with Vite.
- *
- * TODO: Convert file writer events to HMR payloads for content scripts.
- */
+/** Integrates file writer with Vite. */
 export const pluginFileWriter: CrxPluginFn = () => {
   fileWriterError$.subscribe((error) => {
     logger.error(error.err.message, { error: error.err })
@@ -28,6 +25,9 @@ export const pluginFileWriter: CrxPluginFn = () => {
         }
       })
       server.httpServer?.on('close', () => close())
+    },
+    closeBundle() {
+      outputFiles.clear()
     },
   }
 }
