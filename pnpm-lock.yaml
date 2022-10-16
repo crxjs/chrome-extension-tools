@@ -40,7 +40,7 @@ importers:
       '@rollup/plugin-json': ^4.0.2
       '@rollup/plugin-node-resolve': ^13.3.0
       '@rollup/plugin-sucrase': ^3.0.0
-      '@rollup/plugin-typescript': 8.3.3
+      '@rollup/plugin-typescript': 8.5.0
       '@sucrase/jest-plugin': ^2.1.0
       '@testing-library/dom': ^6.12.2
       '@testing-library/jest-dom': ^5.1.1
@@ -122,7 +122,7 @@ importers:
       '@rollup/plugin-json': 4.1.0_rollup@2.72.1
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.72.1
       '@rollup/plugin-sucrase': 3.1.1_rollup@2.72.1
-      '@rollup/plugin-typescript': 8.3.3_dsrqihoegvzgycupzno43pt4sq
+      '@rollup/plugin-typescript': 8.5.0_dsrqihoegvzgycupzno43pt4sq
       '@sucrase/jest-plugin': 2.2.1
       '@testing-library/dom': 6.16.0
       '@testing-library/jest-dom': 5.16.4
@@ -486,7 +486,7 @@ packages:
       gensync: 1.0.0-beta.2
       json5: 2.2.1
       lodash: 4.17.21
-      resolve: 1.22.0
+      resolve: 1.22.1
       semver: 5.7.1
       source-map: 0.5.7
     transitivePeerDependencies:
@@ -762,7 +762,7 @@ packages:
       '@babel/traverse': 7.18.2
       debug: 4.3.4
       lodash.debounce: 4.0.8
-      resolve: 1.22.0
+      resolve: 1.22.1
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -779,7 +779,7 @@ packages:
       '@babel/traverse': 7.18.2
       debug: 4.3.4
       lodash.debounce: 4.0.8
-      resolve: 1.22.0
+      resolve: 1.22.1
       semver: 6.3.0
     transitivePeerDependencies:
       - supports-color
@@ -5113,8 +5113,8 @@ packages:
       sucrase: 3.21.0
     dev: true
 
-  /@rollup/plugin-typescript/8.3.3_dsrqihoegvzgycupzno43pt4sq:
-    resolution: {integrity: sha512-55L9SyiYu3r/JtqdjhwcwaECXP7JeJ9h1Sg1VWRJKIutla2MdZQodTgcCNybXLMCnqpNLEhS2vGENww98L1npg==}
+  /@rollup/plugin-typescript/8.5.0_dsrqihoegvzgycupzno43pt4sq:
+    resolution: {integrity: sha512-wMv1/scv0m/rXx21wD2IsBbJFba8wGF3ErJIr6IKRfRj49S85Lszbxb4DCo8iILpluTjk2GAAu9CoZt4G3ppgQ==}
     engines: {node: '>=8.0.0'}
     peerDependencies:
       rollup: ^2.14.0
@@ -5125,7 +5125,7 @@ packages:
         optional: true
     dependencies:
       '@rollup/pluginutils': 3.1.0_rollup@2.72.1
-      resolve: 1.22.0
+      resolve: 1.22.1
       rollup: 2.72.1
       tslib: 2.4.0
       typescript: 4.6.4
@@ -10958,6 +10958,7 @@ packages:
     resolution: {integrity: sha512-SdNCUs284hr40hFTFP6l0IfZ/RSrMXF3qgoRHd3/79unUTvrFO/JoXwkGm+5J/Oe3E/b5GsnG330uUNgRpu1PA==}
     dependencies:
       has: 1.0.3
+    dev: true
 
   /is-data-descriptor/0.1.4:
     resolution: {integrity: sha1-C17mSDiOLIYCgueT8YVv7D8wG1Y=}
@@ -11842,7 +11843,7 @@ packages:
       jest-pnp-resolver: 1.2.2_jest-resolve@26.6.2
       jest-util: 26.6.2
       read-pkg-up: 7.0.1
-      resolve: 1.22.0
+      resolve: 1.22.1
       slash: 3.0.0
     dev: true
 
@@ -11857,7 +11858,7 @@ packages:
       jest-pnp-resolver: 1.2.2_jest-resolve@27.5.1
       jest-util: 27.5.1
       jest-validate: 27.5.1
-      resolve: 1.22.0
+      resolve: 1.22.1
       resolve.exports: 1.1.0
       slash: 3.0.0
     dev: true
@@ -15077,7 +15078,7 @@ packages:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
     engines: {node: '>= 0.10'}
     dependencies:
-      resolve: 1.22.0
+      resolve: 1.22.1
     dev: false
 
   /recursive-readdir/2.2.2:
@@ -15318,6 +15319,7 @@ packages:
       is-core-module: 2.8.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
+    dev: true
 
   /resolve/1.22.1:
     resolution: {integrity: sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==}

@@ -73,7 +73,7 @@
     "@rollup/plugin-json": "^4.0.2",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-sucrase": "^3.0.0",
-    "@rollup/plugin-typescript": "8.3.3",
+    "@rollup/plugin-typescript": "8.5.0",
     "@sucrase/jest-plugin": "^2.1.0",
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^5.1.1",
