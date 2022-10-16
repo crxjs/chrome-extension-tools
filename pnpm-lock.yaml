@@ -171,7 +171,7 @@ importers:
       '@types/jest-image-snapshot': ^5.1.0
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
-      '@types/react': 17.0.44
+      '@types/react': 17.0.50
       '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.27.1
       '@typescript-eslint/parser': 5.27.1
@@ -244,7 +244,7 @@ importers:
       '@types/jest-image-snapshot': 5.1.0
       '@types/jsesc': 3.0.1
       '@types/node': 17.0.18
-      '@types/react': 17.0.44
+      '@types/react': 17.0.50
       '@types/react-dom': 17.0.17
       '@typescript-eslint/eslint-plugin': 5.27.1_bnfefdnvqpcyokeggdz5sotnli
       '@typescript-eslint/parser': 5.27.1_pm7osnb22e4oktq33hptgspr5i
@@ -3679,7 +3679,7 @@ packages:
       react-dom: '*'
     dependencies:
       '@docusaurus/types': 2.0.0-beta.20_sfoxds7t5ydpegc3knd667wn6m
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
       '@types/react-router-config': 5.0.6
       '@types/react-router-dom': 5.3.3
       react: 17.0.2
@@ -3699,7 +3699,7 @@ packages:
       react-dom: '*'
     dependencies:
       '@docusaurus/types': 2.0.0-beta.21_sfoxds7t5ydpegc3knd667wn6m
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
       '@types/react-router-config': 5.0.6
       '@types/react-router-dom': 5.3.3
       react: 17.0.2
@@ -4101,7 +4101,7 @@ packages:
     peerDependencies:
       react: '*'
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
@@ -5789,39 +5789,38 @@ packages:
   /@types/react-dom/17.0.17:
     resolution: {integrity: sha512-VjnqEmqGnasQKV0CWLevqMTXBYG9GbwuE6x3VetERLh0cq2LTptFE73MrQi2S7GkKXCf2GgwItB/melLnxfnsg==}
     dependencies:
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
     dev: true
 
   /@types/react-router-config/5.0.6:
     resolution: {integrity: sha512-db1mx37a1EJDf1XeX8jJN7R3PZABmJQXR8r28yUjVMFSjkmnQo6X6pOEEmNl+Tp2gYQOGPdYbFIipBtdElZ3Yg==}
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
       '@types/react-router': 5.1.18
 
   /@types/react-router-dom/5.3.3:
     resolution: {integrity: sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==}
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
       '@types/react-router': 5.1.18
 
   /@types/react-router/5.1.18:
     resolution: {integrity: sha512-YYknwy0D0iOwKQgz9v8nOzt2J6l4gouBmDnWqUUznltOTaon+r8US8ky8HvN0tXvc38U9m6z/t2RsVsnd1zM0g==}
     dependencies:
       '@types/history': 4.7.11
-      '@types/react': 17.0.45
+      '@types/react': 17.0.50
 
-  /@types/react/17.0.44:
-    resolution: {integrity: sha512-Ye0nlw09GeMp2Suh8qoOv0odfgCoowfM/9MG6WeRD60Gq9wS90bdkdRtYbRkNhXOpG4H+YXGvj4wOWhAC0LJ1g==}
+  /@types/react/17.0.45:
+    resolution: {integrity: sha512-YfhQ22Lah2e3CHPsb93tRwIGNiSwkuz1/blk4e6QrWS0jQzCSNbGLtOEYhPg02W0yGTTmpajp7dCTbBAMN3qsg==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
       csstype: 3.0.11
-    dev: true
 
-  /@types/react/17.0.45:
-    resolution: {integrity: sha512-YfhQ22Lah2e3CHPsb93tRwIGNiSwkuz1/blk4e6QrWS0jQzCSNbGLtOEYhPg02W0yGTTmpajp7dCTbBAMN3qsg==}
+  /@types/react/17.0.50:
+    resolution: {integrity: sha512-ZCBHzpDb5skMnc1zFXAXnL3l1FAdi+xZvwxK+PkglMmBrwjpp9nKaWuEvrGnSifCJmBFGxZOOFuwC6KH/s0NuA==}
     dependencies:
       '@types/prop-types': 15.7.5
       '@types/scheduler': 0.16.2
