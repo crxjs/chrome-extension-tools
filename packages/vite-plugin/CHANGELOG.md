@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 1.1.0-beta.0
+
+### Minor Changes
+
+- 9b0381b: Add Svelte support
+
 ## 1.0.14
 
 ### Patch Changes

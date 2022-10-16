@@ -1,0 +1,12 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "rollup-plugin-chrome-extension": "3.6.10",
+    "@crxjs/vite-plugin": "1.0.14",
+    "vite-plugin-docs": "0.0.2"
+  },
+  "changesets": [
+    "lucky-cows-tan"
+  ]
+}
