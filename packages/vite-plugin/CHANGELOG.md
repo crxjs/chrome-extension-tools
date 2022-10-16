@@ -1,5 +1,16 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.1
+
+### Major Changes
+
+- 628b14f: ## Vite 3 support and new file writer
+
+  This release adds Vite 3 support and includes a complete rewrite of the
+  content script file writer. There are no intentional breaking changes, but
+  Vite 3 support required significant changes under the hood, therefore this is
+  a major release.
+
 ## 1.1.0-beta.0
 
 ### Minor Changes
