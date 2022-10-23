@@ -12,14 +12,14 @@ import dts from 'rollup-plugin-dts'
 
 const debug = _debug('config:rollup')
 
-const { dependencies, optionalDependencies, peerDependencies } =
-  fs.readJsonSync(path.join(process.cwd(), 'package.json'))
+const { dependencies, devDependencies } = fs.readJsonSync(
+  path.join(process.cwd(), 'package.json'),
+)
 
 const external: (string | RegExp)[] = [
   ...Object.keys({
     ...dependencies,
-    ...optionalDependencies,
-    ...peerDependencies,
+    ...devDependencies,
   }),
   'v8',
   'fs',
@@ -28,6 +28,7 @@ const external: (string | RegExp)[] = [
   'node:module',
   'node:fs',
   'node:path',
+
   /%PORT%/,
   /%PATH%/,
 ]
