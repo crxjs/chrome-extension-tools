@@ -29,7 +29,10 @@
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
-    "./*": "./*"
+    "./*": "./*",
+    "./client": {
+      "types": "./client.d.ts"
+    }
   },
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
