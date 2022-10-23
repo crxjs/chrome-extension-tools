@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.2
+
+### Patch Changes
+
+- 53534d0: Remove peerDeps, optDeps, engines
+
 ## 2.0.0-beta.1
 
 ### Major Changes
