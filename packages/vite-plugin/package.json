@@ -101,7 +101,7 @@
     "@vitejs/plugin-vue": "3.1.2",
     "chokidar": "^3.5.3",
     "esbuild": "0.15.12",
-    "esbuild-runner": "2.2.1",
+    "esbuild-runner": "2.2.2",
     "eslint": "8.17.0",
     "eslint-plugin-react": "^7.29.4",
     "jest-image-snapshot": "^5.2.0",

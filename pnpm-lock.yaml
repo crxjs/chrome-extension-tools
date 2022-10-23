@@ -185,7 +185,7 @@ importers:
       debug: ^4.3.3
       es-module-lexer: ^0.10.0
       esbuild: 0.15.12
-      esbuild-runner: 2.2.1
+      esbuild-runner: 2.2.2
       eslint: 8.17.0
       eslint-plugin-react: ^7.29.4
       fast-glob: ^3.2.11
@@ -250,7 +250,7 @@ importers:
       '@vitejs/plugin-vue': 3.1.2_vite@3.1.7+vue@3.2.41
       chokidar: 3.5.3
       esbuild: 0.15.12
-      esbuild-runner: 2.2.1_esbuild@0.15.12
+      esbuild-runner: 2.2.2_esbuild@0.15.12
       eslint: 8.17.0
       eslint-plugin-react: 7.29.4_eslint@8.17.0
       jest-image-snapshot: 5.2.0
@@ -9097,15 +9097,15 @@ packages:
       tslib: 2.3.1
     dev: false
 
-  /esbuild-runner/2.2.1_esbuild@0.15.12:
-    resolution: {integrity: sha512-VP0VfJJZiZ3cKzdOH59ZceDxx/GzBKra7tiGM8MfFMLv6CR1/cpsvtQ3IsJI3pz7HyeYxtbPyecj3fHwR+3XcQ==}
+  /esbuild-runner/2.2.2_esbuild@0.15.12:
+    resolution: {integrity: sha512-fRFVXcmYVmSmtYm2mL8RlUASt2TDkGh3uRcvHFOKNr/T58VrfVeKD9uT9nlgxk96u0LS0ehS/GY7Da/bXWKkhw==}
     hasBin: true
     peerDependencies:
       esbuild: '*'
     dependencies:
       esbuild: 0.15.12
-      source-map-support: 0.5.19
-      tslib: 2.3.1
+      source-map-support: 0.5.21
+      tslib: 2.4.0
     dev: true
 
   /esbuild-sunos-64/0.15.10:
@@ -15608,6 +15608,7 @@ packages:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
+    dev: false
 
   /source-map-support/0.5.21:
     resolution: {integrity: sha512-uBHU3L3czsIyYXKX88fdrGovxdSCoTGDRZ6SYXtSRxLZUzHg5P/66Ht6uoUlHu9EZod+inXhKo3qQgwXUT/y1w==}
@@ -16280,6 +16281,7 @@ packages:
 
   /tslib/2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
+    dev: false
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
