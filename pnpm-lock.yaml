@@ -203,7 +203,7 @@ importers:
       rimraf: 3.0.2
       rollup: 2.78.1
       rollup-plugin-dts: ^4.2.0
-      rollup-plugin-esbuild: 4.9.1
+      rollup-plugin-esbuild: 4.10.1
       rxjs: 7.5.5
       svelte: ^3.48.0
       typescript: ^4.6.4
@@ -260,7 +260,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       rimraf: 3.0.2
       rollup-plugin-dts: 4.2.1_jjzidkftin3enz34jsjwztw6ai
-      rollup-plugin-esbuild: 4.9.1_slcgdbzfq7yxvu7odlvmynnytm
+      rollup-plugin-esbuild: 4.10.1_slcgdbzfq7yxvu7odlvmynnytm
       rxjs: 7.5.5
       svelte: 3.48.0
       typescript: 4.6.4
@@ -15129,8 +15129,8 @@ packages:
       '@babel/code-frame': 7.18.6
     dev: true
 
-  /rollup-plugin-esbuild/4.9.1_slcgdbzfq7yxvu7odlvmynnytm:
-    resolution: {integrity: sha512-qn/x7Wz9p3Xnva99qcb+nopH0d2VJwVnsxJTGEg+Sh2Z3tqQl33MhOwzekVo1YTKgv+yAmosjcBRJygMfGrtLw==}
+  /rollup-plugin-esbuild/4.10.1_slcgdbzfq7yxvu7odlvmynnytm:
+    resolution: {integrity: sha512-/ymcRB283zjFp1JTBXO8ekxv0c9vRc2L6OTljghsLthQ4vqeDSDWa9BVz1tHiVrx6SbUnUpDPLC0K/MXK7j5TA==}
     engines: {node: '>=12'}
     peerDependencies:
       esbuild: '>=0.10.1'
