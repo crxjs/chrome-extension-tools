@@ -208,7 +208,7 @@ importers:
       svelte: ^3.48.0
       typescript: ^4.6.4
       vite: ^3.1.7
-      vite-plugin-inspect: 0.7.2
+      vite-plugin-inspect: 0.7.5
       vitest: ^0.23.4
       vue: 3.2.41
     dependencies:
@@ -266,7 +266,7 @@ importers:
       svelte: 3.48.0
       typescript: 4.6.4
       vite: 3.1.7
-      vite-plugin-inspect: 0.7.2_vite@3.1.7
+      vite-plugin-inspect: 0.7.5_vite@3.1.7
       vitest: 0.23.4
       vue: 3.2.41
 
@@ -12117,8 +12117,8 @@ packages:
     engines: {node: '>= 8'}
     dev: false
 
-  /kolorist/1.5.1:
-    resolution: {integrity: sha512-lxpCM3HTvquGxKGzHeknB/sUjuVoUElLlfYnXZT73K8geR9jQbroGlSCFBax9/0mpGoD3kzcMLnOlGQPJJNyqQ==}
+  /kolorist/1.6.0:
+    resolution: {integrity: sha512-dLkz37Ab97HWMx9KTes3Tbi3D1ln9fCAy2zr2YVExJasDRPGRaKcoE4fycWNtnCAJfjFqe0cnY+f8KT2JePEXQ==}
     dev: true
 
   /latest-version/5.1.0:
@@ -16690,8 +16690,8 @@ packages:
       vfile-message: 2.0.4
     dev: false
 
-  /vite-plugin-inspect/0.7.2_vite@3.1.7:
-    resolution: {integrity: sha512-d6lR45+bjojVvBTNvDKssSdvHs238RLVIQ3sErRR5H0ktSncLQnjsm9TBMnxUDTFoIl75MIZZHsYpnCkh2a2mg==}
+  /vite-plugin-inspect/0.7.5_vite@3.1.7:
+    resolution: {integrity: sha512-O8xq6dbvD1G7le75u6BfQTXJDUMXcRYlMVPzUpRjSB6hLyqH6BNnNkNrb/cVgCNNmKwk7dX+H2I+XVU2xpJk9Q==}
     engines: {node: '>=14'}
     peerDependencies:
       vite: ^3.1.0
@@ -16699,7 +16699,7 @@ packages:
       '@rollup/pluginutils': 4.2.1
       debug: 4.3.4
       fs-extra: 10.1.0
-      kolorist: 1.5.1
+      kolorist: 1.6.0
       sirv: 2.0.2
       ufo: 0.8.5
       vite: 3.1.7
