@@ -119,14 +119,5 @@
     "vite-plugin-inspect": "0.7.5",
     "vitest": "^0.23.4",
     "vue": "3.2.41"
-  },
-  "peerDependencies": {
-    "vite": "^2.9.0 <= ^3.1.7"
-  },
-  "optionalDependencies": {
-    "@vitejs/plugin-react": "*"
-  },
-  "engines": {
-    "node": ">=14"
   }
 }
