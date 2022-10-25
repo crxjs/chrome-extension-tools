@@ -4510,14 +4510,14 @@ packages:
     dependencies:
       '@types/chrome': 0.0.99
       '@types/node': 13.13.52
-      rxjs: 7.5.5
+      rxjs: 7.5.7
     dev: true
 
   /@extend-chrome/storage/1.5.0:
     resolution: {integrity: sha512-JhoBZ1xIzu0/mauNR/MadUsfNsWP1lTmWR8RlVJvWStUifzNZdAxI2i8NFCkd4RfjyTn4FcDETik3SDlAfGQRA==}
     dependencies:
       chrome-promise: 3.0.5
-      rxjs: 7.5.5
+      rxjs: 7.5.7
     dev: true
 
   /@hapi/hoek/9.3.0:
@@ -15196,7 +15196,6 @@ packages:
     resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
     dependencies:
       tslib: 2.4.0
-    dev: false
 
   /sade/1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
