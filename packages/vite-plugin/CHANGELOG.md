@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- ec9e879: chore: move rxjs to package.deps
+
 ## 2.0.0-beta.2
 
 ### Patch Changes
