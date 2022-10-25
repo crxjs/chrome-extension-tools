@@ -204,7 +204,7 @@ importers:
       rollup: 2.78.1
       rollup-plugin-dts: ^4.2.0
       rollup-plugin-esbuild: 4.10.1
-      rxjs: 7.5.5
+      rxjs: 7.5.7
       svelte: ^3.48.0
       typescript: ^4.6.4
       vite: ^3.1.7
@@ -227,6 +227,7 @@ importers:
       picocolors: 1.0.0
       react-refresh: 0.13.0
       rollup: 2.78.1
+      rxjs: 7.5.7
     devDependencies:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
@@ -261,7 +262,6 @@ importers:
       rimraf: 3.0.2
       rollup-plugin-dts: 4.2.1_jjzidkftin3enz34jsjwztw6ai
       rollup-plugin-esbuild: 4.10.1_slcgdbzfq7yxvu7odlvmynnytm
-      rxjs: 7.5.5
       svelte: 3.48.0
       typescript: 4.6.4
       vite: 3.1.7
@@ -11462,11 +11462,7 @@ packages:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
     dev: true
 
   /jest-jasmine2/27.5.1:
@@ -15195,6 +15191,12 @@ packages:
     resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
     dependencies:
       tslib: 2.4.0
+
+  /rxjs/7.5.7:
+    resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
+    dependencies:
+      tslib: 2.4.0
+    dev: false
 
   /sade/1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
