@@ -1,4 +1,3 @@
-import getPort, { portNumbers } from 'get-port'
 import { Subscription } from 'rxjs'
 import { HMRPayload, ResolvedConfig } from 'vite'
 import { contentScripts } from './contentScripts'
@@ -36,8 +35,6 @@ export const pluginHMR: CrxPluginFn = () => {
         if (server.hmr === true) server.hmr = {}
         server.hmr = server.hmr ?? {}
         server.hmr.host = 'localhost'
-        server.hmr.port =
-          server.hmr.port ?? (await getPort({ port: portNumbers(5200, 5300) }))
 
         return { server, ...config }
       },
