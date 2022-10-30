@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.4
+
+### Patch Changes
+
+- d7949bf: Fix commonjs export
+
 ## 2.0.0-beta.3
 
 ### Patch Changes
