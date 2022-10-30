@@ -1,3 +1,4 @@
 dist
 node_modules
 tests/**/dist-*
+index.cjs

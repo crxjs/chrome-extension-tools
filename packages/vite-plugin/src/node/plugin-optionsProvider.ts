@@ -28,13 +28,16 @@ export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
  * The test options provider overrides the default options before the config
  * hook; options should be declared during the config hook.
  */
-export const getOptions = ({ plugins }: UserConfig): CrxInputOptions => {
+export const getOptions = async ({
+  plugins,
+}: UserConfig): Promise<CrxInputOptions> => {
   if (typeof plugins === 'undefined') {
     throw new Error('config.plugins is undefined')
   }
+  const awaitedPlugins = await Promise.all(plugins)
 
   let options: CrxInputOptions | undefined
-  for (const p of plugins.flat()) {
+  for (const p of awaitedPlugins.flat()) {
     if (isCrxPlugin(p))
       if (p.name === pluginName) {
         const plugin = p as ReturnType<typeof pluginOptionsProvider>

@@ -1,5 +1,5 @@
-import { ConfigEnv } from 'vite'
-import { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
+import type { ConfigEnv } from 'vite'
+import type { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
 
 export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 
@@ -18,7 +18,8 @@ export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
  *
  * You don't need to define a match pattern for dynamic content script
  * resources, but if you want to do so, you can use the helper function
- * `defineDynamicResource` to define your web accessible resources in a TypeScript file:
+ * `defineDynamicResource` to define your web accessible resources in a
+ * TypeScript file:
  *
  * ```typescript
  * import { crx, defineManifest, defineDynamicResource }

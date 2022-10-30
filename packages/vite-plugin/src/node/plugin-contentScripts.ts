@@ -36,8 +36,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
     {
       name: 'crx:content-scripts',
       apply: 'serve',
-      config(config) {
-        const { contentScripts = {} } = getOptions(config)
+      async config(config) {
+        const { contentScripts = {} } = await getOptions(config)
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
       },
