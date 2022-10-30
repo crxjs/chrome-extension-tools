@@ -28,8 +28,8 @@
     ]
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.21",
-    "@docusaurus/preset-classic": "2.0.0-beta.21",
+    "@docusaurus/core": "2.2.0",
+    "@docusaurus/preset-classic": "2.2.0",
     "@docusaurus/theme-classic": "^2.0.0-beta.20",
     "@mdx-js/react": "^1.6.22",
     "clsx": "^1.1.1",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@algolia/client-search": "^4.9.1",
-    "@docusaurus/module-type-aliases": "2.0.0-beta.21",
+    "@docusaurus/module-type-aliases": "2.2.0",
     "@tsconfig/docusaurus": "^1.0.5",
     "@types/react": "^17",
     "typescript": "^4.6.4"
