@@ -23,9 +23,10 @@
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
+  "type": "module",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
+      "require": "./index.cjs",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },

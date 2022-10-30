@@ -75,43 +75,43 @@ const bundleClientCode = (): Plugin => {
   }
 }
 
+const plugins = [
+  bundleClientCode(),
+  alias({
+    entries: [
+      {
+        find: /^src\/(.*)/,
+        replacement: path.resolve(__dirname, 'src/node/$1'),
+      },
+      {
+        find: /^client\/(.*)/,
+        replacement: path.resolve(__dirname, 'src/client/$1'),
+      },
+      {
+        find: /^tests\/(.*)/,
+        replacement: path.resolve(__dirname, 'tests/$1'),
+      },
+    ],
+  }),
+  json(),
+  resolve(),
+  commonjs(),
+  esbuild({ legalComments: 'inline' }),
+]
 const config = defineConfig([
   {
     external,
     input: 'src/node/index.ts',
-    output: [
-      {
-        file: 'dist/index.mjs',
-        format: 'esm',
-      },
-      {
-        file: 'dist/index.cjs',
-        format: 'cjs',
-      },
-    ],
-    plugins: [
-      bundleClientCode(),
-      alias({
-        entries: [
-          {
-            find: /^src\/(.*)/,
-            replacement: path.resolve(__dirname, 'src/node/$1'),
-          },
-          {
-            find: /^client\/(.*)/,
-            replacement: path.resolve(__dirname, 'src/client/$1'),
-          },
-          {
-            find: /^tests\/(.*)/,
-            replacement: path.resolve(__dirname, 'tests/$1'),
-          },
-        ],
-      }),
-      json(),
-      resolve(),
-      commonjs(),
-      esbuild({ legalComments: 'inline' }),
-    ],
+    output: {
+      file: 'dist/index.mjs',
+      format: 'esm',
+    },
+    plugins,
+  },
+  {
+    input: 'src/node/index.cjs.ts',
+    output: { file: 'dist/index.cjs', format: 'commonjs' },
+    plugins,
   },
   {
     input: 'src/node/index.ts',

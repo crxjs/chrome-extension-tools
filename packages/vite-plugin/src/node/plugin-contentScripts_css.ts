@@ -7,8 +7,8 @@ export const pluginContentScriptsCss: CrxPluginFn = () => {
   return {
     name: 'crx:content-scripts-css',
     enforce: 'post',
-    config(config) {
-      const { contentScripts = {} } = getOptions(config)
+    async config(config) {
+      const { contentScripts = {} } = await getOptions(config)
       injectCss = contentScripts.injectCss ?? true
     },
     renderCrxManifest(manifest) {
