@@ -84,7 +84,7 @@ importers:
       read-pkg-up: ^7.0.1
       rollup: ^2.72.1
       rollup-plugin-bundle-imports: ^1.4.5
-      rxjs: ^7.3.0
+      rxjs: 7.5.7
       slash: ^3.0.0
       ts-jest: ^27.1.4
       tslib: ^2.3.0
@@ -149,7 +149,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       read-pkg-up: 7.0.1
       rollup-plugin-bundle-imports: 1.5.1_3hu7c2prw5gtl3ctw3z4hopzpa
-      rxjs: 7.5.5
+      rxjs: 7.5.7
       ts-jest: 27.1.4_3zrv67zxupadxq3cjlrsg6vuqu
       tslib: 2.4.0
       typescript: 4.6.4
@@ -14838,12 +14838,6 @@ packages:
     resolution: {integrity: sha512-5l4VyZR86LZ/lDxZTR6jqL8AFE2S0IFLMP26AbjsLVADxHdhB/c0GUsH+y39UfCi3dzz8OlQuPmnaJOMoDHQBA==}
     dependencies:
       queue-microtask: 1.2.3
-
-  /rxjs/7.5.5:
-    resolution: {integrity: sha512-sy+H0pQofO95VDmFLzyaw9xNJU4KTRSwQIGM6+iG3SypAtCiLDzpeG8sJrNCWn2Up9km+KhkvTdbkrdy+yzZdw==}
-    dependencies:
-      tslib: 2.4.0
-    dev: true
 
   /rxjs/7.5.7:
     resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
