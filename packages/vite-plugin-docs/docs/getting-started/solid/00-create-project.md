@@ -31,6 +31,11 @@ npx degit solidjs/templates/js vite-solid-crxjs
 npx degit solidjs/templates/ts vite-solid-crxjs
 ```
 
+## `package.json`
+
+Check the `package.json` file to ensure that `"type": "module"` is set. If this
+package key is missing, Vite might not be able to build `vite.config.ts`.
+
 ## Install CRXJS Vite plugin
 
 Now install the CRXJS Vite plugin using your favorite package manager.
@@ -45,7 +50,7 @@ Update `vite.config.js` to match the code below.
 
 ```js title=vite.config.js
 import { defineConfig } from 'vite'
-import solidPlugin from "vite-plugin-solid";
+import solidPlugin from 'vite-plugin-solid'
 // highlight-start
 import { crx } from '@crxjs/vite-plugin'
 import manifest from './manifest.json'
@@ -53,12 +58,11 @@ import manifest from './manifest.json'
 
 export default defineConfig({
   plugins: [
-    solidPlugin(), 
+    solidPlugin(),
     // highlight-next-line
-    crx({ manifest })
+    crx({ manifest }),
   ],
-});
-
+})
 ```
 
 Create a file named `manifest.json` next to `vite.config.js`.
