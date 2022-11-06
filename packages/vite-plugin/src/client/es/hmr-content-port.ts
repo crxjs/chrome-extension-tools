@@ -18,7 +18,7 @@ export class HMRPort {
      * To keep extension background alive:
      *
      * - Ping service worker every 5 seconds
-     * - Re-initialize port every 4 minutes
+     * - Re-initialize port every 5 minutes
      */
     setInterval(() => {
       try {
