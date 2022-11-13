@@ -6,7 +6,7 @@ import { basename, relative } from './path'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
-const _dynamicScriptRegEx = /\b(import.meta).CRX_DYNAMIC_SCRIPT_(.+?);$/gm
+const _dynamicScriptRegEx = /\b(import.meta).CRX_DYNAMIC_SCRIPT_(.+?)[,;]/gm
 const dynamicScriptRegEx = () => {
   // stupid stateful JS RegExp
   _dynamicScriptRegEx.lastIndex = 0
