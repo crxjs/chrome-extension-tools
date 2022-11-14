@@ -1,5 +1,11 @@
 # vite-plugin-docs
 
+## 0.0.3-beta.0
+
+### Patch Changes
+
+- 9571335: Add type module warning to Vite plugin docs.
+
 ## 0.0.2
 
 ### Patch Changes

@@ -7,10 +7,12 @@
     "vite-plugin-docs": "0.0.2"
   },
   "changesets": [
+    "beige-snails-kiss",
     "fresh-suns-do",
     "long-kangaroos-work",
     "lucky-cows-tan",
     "sixty-mirrors-promise",
-    "swift-years-kick"
+    "swift-years-kick",
+    "tiny-planes-float"
   ]
 }

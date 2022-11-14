@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.5
+
+### Patch Changes
+
+- 088ab78: fix: build is broken when using minify with dynamic modules (#573)
+
 ## 2.0.0-beta.4
 
 ### Patch Changes
