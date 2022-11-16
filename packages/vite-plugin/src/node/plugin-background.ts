@@ -56,7 +56,7 @@ export const pluginBackground: CrxPluginFn = () => {
             throw new Error('server port is undefined in watch mode')
 
           // development, required to define env vars
-          loader = `import 'http:/localhost:${port}/@vite/env';\n`
+          loader = `import 'http://localhost:${port}/@vite/env';\n`
           // development, required hmr client
           loader += `import 'http://localhost:${port}${workerClientId}';\n`
           // development, optional service worker
