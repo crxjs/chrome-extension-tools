@@ -79,7 +79,7 @@ exports[`serve fs output > public.js 1`] = `
 `;
 
 exports[`serve fs output > service-worker-loader.js 1`] = `
-"import 'http:/localhost:3000/@vite/env';
+"import 'http://localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 "
 `;
