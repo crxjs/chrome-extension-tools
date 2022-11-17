@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.6
+
+### Patch Changes
+
+- cbce5e1: Hotfix background
+
 ## 2.0.0-beta.5
 
 ### Patch Changes
