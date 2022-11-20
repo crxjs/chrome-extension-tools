@@ -33,10 +33,10 @@ npx degit solidjs/templates/js vite-solid-crxjs
 npx degit solidjs/templates/ts vite-solid-crxjs
 ```
 
-:::caution package.json
+:::tip package.json
 
-Check the `package.json` file to ensure that `"type": "module"` is set. If this
-package key is missing, Vite might not be able to build `vite.config.ts`.
+Check `package.json` to ensure that `"type": "module"` is set. If this package
+key is missing, Vite might not be able to build `vite.config.ts`.
 
 :::
 
