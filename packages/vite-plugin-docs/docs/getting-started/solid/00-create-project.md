@@ -10,6 +10,8 @@ pagination_prev: null
 slug: create-project
 ---
 
+import CreateProjectTabs from '../\_create-project-tabs.mdx'
+
 # Get Started with Solid
 
 This quick guide will get you up and running with a Chrome Extension popup page.
@@ -31,18 +33,23 @@ npx degit solidjs/templates/js vite-solid-crxjs
 npx degit solidjs/templates/ts vite-solid-crxjs
 ```
 
-## `package.json`
+:::tip package.json
 
-Check the `package.json` file to ensure that `"type": "module"` is set. If this
-package key is missing, Vite might not be able to build `vite.config.ts`.
+Check `package.json` to ensure that `"type": "module"` is set. If this package
+key is missing, Vite might not be able to build `vite.config.ts`.
+
+:::
 
 ## Install CRXJS Vite plugin
 
 Now install the CRXJS Vite plugin using your favorite package manager.
 
 ```sh
-npm i @crxjs/vite-plugin -D
+npm i @crxjs/vite-plugin@beta -D
 ```
+
+The official SolidJS templates use Vite 3, but CRXJS support for Vite 3 is
+currently in beta.
 
 ## Update the Vite config
 
