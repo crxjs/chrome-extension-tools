@@ -12,6 +12,8 @@ tags:
 pagination_prev: null
 ---
 
+import CreateProjectTabs from '../\_create-project-tabs.mdx'
+
 # Get Started with Vanilla JS
 
 Sometimes you don't want to use a framework for your Chrome Extension, or you
@@ -25,22 +27,7 @@ reload.
 
 :::
 
-## Create a project
-
-Use your favorite package manager to scaffold a new project and follow the
-prompts to create a vanilla JS project.
-
-```sh
-npm init vite@latest
-```
-
-## Install CRXJS Vite plugin
-
-Now install the CRXJS Vite plugin using your favorite package manager.
-
-```sh
-npm i @crxjs/vite-plugin -D
-```
+<CreateProjectTabs />
 
 ## Create a Vite config file
 

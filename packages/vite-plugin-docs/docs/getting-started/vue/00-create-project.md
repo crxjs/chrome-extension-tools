@@ -10,28 +10,15 @@ pagination_prev: null
 slug: create-project
 ---
 
+import CreateProjectTabs from '../\_create-project-tabs.mdx'
+
 # Get Started with Vue
 
 This quick guide will get you up and running with a Chrome Extension popup page.
 You'll see how to integrate CRXJS with Vite, then explore Vite HMR in an
 extension Vue HTML page. The first two sections take about 90 seconds!
 
-## Create a Vite project
-
-Use your favorite package manager to scaffold a new project and follow the
-prompts to create a Vue project.
-
-```sh
-npm init vite@latest
-```
-
-## Install CRXJS Vite plugin
-
-Now install the CRXJS Vite plugin using your favorite package manager.
-
-```sh
-npm i @crxjs/vite-plugin -D
-```
+<CreateProjectTabs />
 
 ## Update the Vite config
 

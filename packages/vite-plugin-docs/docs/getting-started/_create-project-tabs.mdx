@@ -1,0 +1,51 @@
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+
+## Create a project
+
+Use your favorite package manager to scaffold a new project and follow the
+prompts to create a vanilla JS project.
+
+<Tabs groupId='vite-version'>
+  <TabItem value='vite2' label='Vite 2' default>
+
+```sh
+npm init vite@^2.9.4
+```
+
+  </TabItem>
+  <TabItem value='vite3' label='Vite 3 (beta)'>
+
+```sh
+npm init vite@latest
+```
+
+:::info beta
+
+CRXJS support for Vite 3 is in beta.
+
+:::
+
+  </TabItem>
+</Tabs>
+
+## Install CRXJS Vite plugin
+
+Now install the CRXJS Vite plugin using your favorite package manager.
+
+<Tabs groupId='vite-version'>
+  <TabItem value='vite2' label='Vite 2' default>
+
+```sh
+npm i @crxjs/vite-plugin@latest -D
+```
+
+  </TabItem>
+  <TabItem value='vite3' label='Vite 3 (beta)'>
+
+```sh
+npm i @crxjs/vite-plugin@beta -D
+```
+
+  </TabItem>
+</Tabs>
