@@ -40,7 +40,7 @@ importers:
       '@rollup/plugin-json': ^4.0.2
       '@rollup/plugin-node-resolve': ^13.3.0
       '@rollup/plugin-sucrase': ^3.0.0
-      '@rollup/plugin-typescript': 8.5.0
+      '@rollup/plugin-typescript': 9.0.2
       '@sucrase/jest-plugin': ^2.1.0
       '@testing-library/dom': ^6.12.2
       '@testing-library/jest-dom': ^5.1.1
@@ -122,7 +122,7 @@ importers:
       '@rollup/plugin-json': 4.1.0_rollup@2.72.1
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.72.1
       '@rollup/plugin-sucrase': 3.1.1_rollup@2.72.1
-      '@rollup/plugin-typescript': 8.5.0_dsrqihoegvzgycupzno43pt4sq
+      '@rollup/plugin-typescript': 9.0.2_dsrqihoegvzgycupzno43pt4sq
       '@sucrase/jest-plugin': 2.2.1
       '@testing-library/dom': 6.16.0
       '@testing-library/jest-dom': 5.16.4
@@ -5317,18 +5317,20 @@ packages:
       sucrase: 3.21.0
     dev: true
 
-  /@rollup/plugin-typescript/8.5.0_dsrqihoegvzgycupzno43pt4sq:
-    resolution: {integrity: sha512-wMv1/scv0m/rXx21wD2IsBbJFba8wGF3ErJIr6IKRfRj49S85Lszbxb4DCo8iILpluTjk2GAAu9CoZt4G3ppgQ==}
-    engines: {node: '>=8.0.0'}
+  /@rollup/plugin-typescript/9.0.2_dsrqihoegvzgycupzno43pt4sq:
+    resolution: {integrity: sha512-/sS93vmHUMjzDUsl5scNQr1mUlNE1QjBBvOhmRwJCH8k2RRhDIm3c977B3wdu3t3Ap17W6dDeXP3hj1P1Un1bA==}
+    engines: {node: '>=14.0.0'}
     peerDependencies:
-      rollup: ^2.14.0
+      rollup: ^2.14.0||^3.0.0
       tslib: '*'
       typescript: '>=3.7.0'
     peerDependenciesMeta:
+      rollup:
+        optional: true
       tslib:
         optional: true
     dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.72.1
+      '@rollup/pluginutils': 5.0.2_rollup@2.72.1
       resolve: 1.22.1
       rollup: 2.72.1
       tslib: 2.4.0
@@ -5365,6 +5367,21 @@ packages:
     dependencies:
       estree-walker: 2.0.2
       picomatch: 2.3.1
+
+  /@rollup/pluginutils/5.0.2_rollup@2.72.1:
+    resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.0
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+      rollup: 2.72.1
+    dev: true
 
   /@sheerun/mutationobserver-shim/0.3.3:
     resolution: {integrity: sha512-DetpxZw1fzPD5xUBrIAoplLChO2VB8DlL5Gg+I1IR9b2wPqYIca2WSUxL5g1vLeR4MsQq1NeWriXAVffV+U1Fw==}
@@ -5740,12 +5757,12 @@ packages:
     resolution: {integrity: sha512-PB3ldyrcnAicT35TWPs5IcwKD8S333HMaa2VVv4+wdvebJkjWuW/xESoB8IwRcog8HYVYamb1g/R31Qv5Bx03g==}
     dependencies:
       '@types/eslint': 8.4.2
-      '@types/estree': 0.0.51
+      '@types/estree': 1.0.0
 
   /@types/eslint/8.4.2:
     resolution: {integrity: sha512-Z1nseZON+GEnFjJc04sv4NSALGjhFwy6K0HXt7qsn5ArfAKtb63dXNJHf+1YW6IpOIYRBGUbu3GwJdj8DGnCjA==}
     dependencies:
-      '@types/estree': 0.0.51
+      '@types/estree': 1.0.0
       '@types/json-schema': 7.0.11
 
   /@types/estree/0.0.39:
@@ -5754,6 +5771,9 @@ packages:
 
   /@types/estree/0.0.51:
     resolution: {integrity: sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==}
+
+  /@types/estree/1.0.0:
+    resolution: {integrity: sha512-WulqXMDUTYAXCjZnk6JtIHPigp55cVtDgDrO2gHRwhyJto21+1zbVCtOYB2L1F9w4qCQ0rOGWBnBe0FNTiEJIQ==}
 
   /@types/express-serve-static-core/4.17.28:
     resolution: {integrity: sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==}
