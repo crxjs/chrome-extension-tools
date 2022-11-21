@@ -70,7 +70,7 @@
     "@extend-chrome/storage": "^1.5.0",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^21.0.0",
-    "@rollup/plugin-json": "^4.0.2",
+    "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "@rollup/plugin-sucrase": "^3.0.0",
     "@rollup/plugin-typescript": "8.5.0",
