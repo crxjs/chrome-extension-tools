@@ -152,7 +152,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
 
                   return `${JSON.stringify(
                     `/${script.loaderName ?? script.fileName}`,
-                  )};`
+                  )}${match.split(scriptKey)[1]}`
                 },
               )
               // TODO: remove unused import_meta value?

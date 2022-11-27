@@ -45,7 +45,7 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash5.js 1`] = `
-"const t=\\"/assets/content1.ts-loader.hash6.js\\";e=\\"/assets/content2.ts-loader.hash7.js\\";chrome.scripting.executeScript({files:[t,e],target:{tabId:1}});
+"const t=\\"/assets/content1.ts-loader.hash6.js\\",e=\\"/assets/content2.ts-loader.hash7.js\\";chrome.scripting.executeScript({files:[t,e],target:{tabId:1}});
 "
 `;
 
