@@ -41,7 +41,7 @@ importers:
       '@rollup/plugin-node-resolve': ^13.3.0
       '@rollup/plugin-sucrase': ^3.0.0
       '@rollup/plugin-typescript': 8.5.0
-      '@sucrase/jest-plugin': ^2.1.0
+      '@sucrase/jest-plugin': ^3.0.0
       '@testing-library/dom': ^6.12.2
       '@testing-library/jest-dom': ^5.1.1
       '@types/cheerio': 0.22.22
@@ -123,7 +123,7 @@ importers:
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.72.1
       '@rollup/plugin-sucrase': 3.1.1_rollup@2.72.1
       '@rollup/plugin-typescript': 8.5.0_dsrqihoegvzgycupzno43pt4sq
-      '@sucrase/jest-plugin': 2.2.1
+      '@sucrase/jest-plugin': 3.0.0_jest@27.5.1
       '@testing-library/dom': 6.16.0
       '@testing-library/jest-dom': 5.16.4
       '@types/cheerio': 0.22.22
@@ -5451,10 +5451,16 @@ packages:
       webpack-sources: 3.2.3
     dev: false
 
-  /@sucrase/jest-plugin/2.2.1:
-    resolution: {integrity: sha512-5fG+kHOlfwPNi82MCvTFQdAg50YQymGbdwH9nzTA9D9FhJVHynTjadXi58gb/Ae17RMvinY0+Fglx33MB056Rg==}
+  /@sucrase/jest-plugin/3.0.0_jest@27.5.1:
+    resolution: {integrity: sha512-VRY6YKYImVWiRg1H3Yu24hwB1UPJDSDR62R/n+lOHR3+yDrfHEIAoddJivblMYN6U3vD+ndfTSrecZ9Jl+iGNw==}
+    peerDependencies:
+      jest: '>=27'
+      sucrase: '>=3.25.0'
+    peerDependenciesMeta:
+      jest:
+        optional: true
     dependencies:
-      sucrase: 3.21.0
+      jest: 27.5.1
     dev: true
 
   /@sveltejs/vite-plugin-svelte/1.1.0_svelte@3.48.0+vite@3.1.7:
