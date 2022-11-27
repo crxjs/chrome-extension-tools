@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- badc910: fix: maintain ; and , during minification
+- 5ac019d: React conflicts with preact
+
 ## 2.0.0-beta.6
 
 ### Patch Changes
