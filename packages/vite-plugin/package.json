@@ -84,7 +84,7 @@
     "@extend-chrome/storage": "1.5.0",
     "@rollup/plugin-alias": "4.0.2",
     "@rollup/plugin-commonjs": "21.1.0",
-    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "13.2.0",
     "@sveltejs/vite-plugin-svelte": "1.1.0",
     "@types/acorn": "4.0.6",
