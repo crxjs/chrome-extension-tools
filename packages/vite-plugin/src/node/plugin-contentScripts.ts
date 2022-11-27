@@ -45,8 +45,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
         server = _server
         if (
           typeof preambleCode === 'undefined' &&
-          server.config.plugins.some(({ name = 'none' }) =>
-            name.toLowerCase().includes('react'),
+          server.config.plugins.some(
+            ({ name = 'none' }) =>
+              name.toLowerCase().includes('react') &&
+              !name.toLowerCase().includes('preact'),
           )
         ) {
           try {
