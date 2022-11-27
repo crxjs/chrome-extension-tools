@@ -80,7 +80,7 @@
     "@types/cheerio": "0.22.22",
     "@types/chrome": "0.0.198",
     "@types/fs-extra": "^8.0.1",
-    "@types/glob": "^7.1.1",
+    "@types/glob": "^8.0.0",
     "@types/jest": "^27.0.0",
     "@types/jest-in-case": "^1.0.3",
     "@types/lodash.difference": "^4.5.6",
