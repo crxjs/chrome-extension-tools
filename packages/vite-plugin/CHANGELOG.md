@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.9
+
+### Patch Changes
+
+- af2fdbc: fix: filter out vite serve plugin context
+
 ## 2.0.0-beta.7
 
 ### Patch Changes
