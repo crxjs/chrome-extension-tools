@@ -93,7 +93,7 @@ export const pluginManifest: CrxPluginFn = () => {
       name: 'crx:manifest-loader',
       enforce: 'pre',
       buildStart(options) {
-        if (typeof options.input !== 'undefined' && !('ssr' in this)) {
+        if (typeof options.input !== 'undefined') {
           refId = this.emitFile({
             type: 'chunk',
             id: manifestId,
