@@ -45,7 +45,7 @@ export async function manifestFiles(
           return r
         }),
     )
-    webAccessibleResources = resources.flat().filter(isString)
+    webAccessibleResources = [...new Set(resources.flat())].filter(isString)
   }
 
   return {
