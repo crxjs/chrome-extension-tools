@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.10
+
+### Patch Changes
+
+- 06c9c86: fix: pass war through a set to dedupe
+
 ## 2.0.0-beta.9
 
 ### Patch Changes
