@@ -1,6 +1,6 @@
 import fsx from 'fs-extra'
 import { performance } from 'perf_hooks'
-import { OutputOptions, rollup, RollupOptions } from 'rollup'
+import { OutputOptions, Plugin, rollup, RollupOptions } from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
@@ -43,19 +43,19 @@ export async function start({
 }): Promise<void> {
   serverEvent$.next({ type: 'start', server })
 
-  const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
+  const plugins = <Plugin[]> server.config.plugins.filter((p): p is CrxPlugin =>
     p.name?.startsWith('crx:'),
   )
   const { rollupOptions, outDir } = server.config.build
   const inputOptions: RollupOptions = {
     input: 'index.html',
-    ...rollupOptions,
+    ...<RollupOptions>rollupOptions,
     plugins,
   }
   // handle the various output option types
   const rollupOutputOptions = [rollupOptions.output].flat()[0]
   const outputOptions: OutputOptions = {
-    ...rollupOutputOptions,
+    ...<OutputOptions>rollupOutputOptions,
     dir: outDir,
     format: 'es',
   }
