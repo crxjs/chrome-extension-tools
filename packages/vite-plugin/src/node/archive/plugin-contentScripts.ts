@@ -5,7 +5,7 @@ import injector from 'connect-injector'
 import { createHash } from 'crypto'
 import MagicString from 'magic-string'
 import { OutputAsset, PluginContext } from 'rollup'
-import { Manifest, ManifestChunk, ViteDevServer } from 'vite'
+import { Manifest, ManifestChunk, ViteDevServer, UserConfig } from 'vite'
 import {
   isResourceByMatch,
   isString,
@@ -165,6 +165,8 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
   let { preambleCode } = contentScripts
   let preambleRefId: string
   let contentClientRefId: string
+
+  let config: UserConfig;
 
   return [
     {
@@ -388,7 +390,11 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
       apply: 'build',
       enforce: 'post',
       config({ build, ...config }, { command }) {
-        return { ...config, build: { ...build, manifest: command === 'build' } }
+        const manifest = command === "build" && (build.manifest || true)
+        return { ...config, build: { ...build, manifest } };
+      },
+      configResolved(_config) {
+        config = _config;
       },
       renderCrxManifest(manifest, bundle) {
         // set default value for web_accessible_resources
@@ -419,7 +425,7 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
               resources: ['**/*', '*'],
             })
           } else {
-            const vmAsset = bundle['manifest.json'] as OutputAsset
+            const vmAsset = bundle[config.build?.manifest || 'manifest.json'] as OutputAsset
             if (!vmAsset) throw new Error('vite manifest is missing')
             const viteManifest: Manifest = JSON.parse(vmAsset.source as string)
             debug('vite manifest %O', viteManifest)
