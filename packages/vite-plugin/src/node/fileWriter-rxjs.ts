@@ -163,7 +163,13 @@ function prepScript(
           if (i.n) {
             depSet.add(i.n)
             const fileName = getFileName({ type: 'module', id: i.n })
-            magic.overwrite(i.s, i.e, `/${fileName}`)
+            
+            // NOTE: Temporary fix for this bug: https://github.com/guybedford/es-module-lexer/issues/144
+            const fullImport = code.substring(i.s, i.e)
+            magic.overwrite(i.s, i.e, fullImport.replace(i.n, `/${fileName}`))
+
+            // NOTE: use this once the bug is fixed
+            // magic.overwrite(i.s, i.e, `/${fileName}`)
           }
         return { target, source: magic.toString(), deps: [...depSet] }
       }),
