@@ -68,7 +68,7 @@
     "@babel/preset-react": "^7.12.13",
     "@extend-chrome/messages": "^1.2.2",
     "@extend-chrome/storage": "^1.5.0",
-    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-babel": "^6.0.0",
     "@rollup/plugin-commonjs": "^21.0.0",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
