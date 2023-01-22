@@ -88,7 +88,7 @@
     "@rollup/plugin-node-resolve": "13.2.0",
     "@sveltejs/vite-plugin-svelte": "1.1.0",
     "@types/acorn": "4.0.6",
-    "@types/chrome": "0.0.198",
+    "@types/chrome": "0.0.209",
     "@types/debug": "4.1.7",
     "@types/fs-extra": "9.0.13",
     "@types/jest-image-snapshot": "^5.1.0",

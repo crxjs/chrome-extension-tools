@@ -165,7 +165,7 @@ importers:
       '@rollup/pluginutils': ^4.1.2
       '@sveltejs/vite-plugin-svelte': 1.1.0
       '@types/acorn': 4.0.6
-      '@types/chrome': 0.0.198
+      '@types/chrome': 0.0.209
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest-image-snapshot': ^5.1.0
@@ -235,7 +235,7 @@ importers:
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.78.1
       '@sveltejs/vite-plugin-svelte': 1.1.0_svelte@3.48.0+vite@3.1.7
       '@types/acorn': 4.0.6
-      '@types/chrome': 0.0.198
+      '@types/chrome': 0.0.209
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest-image-snapshot': 5.1.0
@@ -5751,6 +5751,13 @@ packages:
 
   /@types/chrome/0.0.198:
     resolution: {integrity: sha512-zLn6JZXwSOOY0pw+dkIxItxvjsQThDkqaFnsnmr412Wa0MqesymfdTQ/0d30J/0wiFp3TYw0i63hzGGy0W7Paw==}
+    dependencies:
+      '@types/filesystem': 0.0.32
+      '@types/har-format': 1.2.8
+    dev: true
+
+  /@types/chrome/0.0.209:
+    resolution: {integrity: sha512-YL3gz9cAKKym/b+u26p8BQuKAc3USsPRcOYZ1OWQmOw0kfYBXkxrh9ASvSRgwA8ywA4sIahio0z0chzmmLq2og==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.8
