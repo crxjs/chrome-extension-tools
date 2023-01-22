@@ -1,0 +1,10 @@
+{
+  "description": "test extension",
+  "manifest_version": 3,
+  "name": "test extension",
+  "background": { "service_worker": "src/background.ts" },
+  "options_page": "src/options.html",
+  "version": "1.0.0",
+  "host_permissions": ["<all_urls>"],
+  "permissions": ["scripting"]
+}
