@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.11
+
+### Patch Changes
+
+- ec2b79c: fix: avoid waiting for fileReady when serving
+- 0b69ce7: temporary fix for dynamic imports
+
 ## 2.0.0-beta.10
 
 ### Patch Changes
