@@ -1,6 +1,5 @@
 import { ResolvedConfig } from 'vite'
 import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
-import { fileReady } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
 import { CrxPluginFn } from './types'
@@ -26,7 +25,7 @@ const dynamicScriptRegEx = () => {
  * 2. Loads `?scriptId` queries as file name exports
  *
  * - Build: return import.meta.CRX_SCRIPT_<scriptId>
- * - Serve: await filesReady()
+ * - Serve: 
  *
  * 3. Renders dynamic script imports
  *
@@ -114,7 +113,6 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
           if (config.command === 'build') {
             return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.refId};`
           } else if (typeof script.fileName === 'string') {
-            await fileReady(script)
             return `export default ${JSON.stringify(script.fileName)};`
           } else {
             throw new Error(
