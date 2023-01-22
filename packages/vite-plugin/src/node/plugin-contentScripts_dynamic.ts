@@ -1,4 +1,5 @@
 import { ResolvedConfig } from 'vite'
+import { allFilesReady } from '.'
 import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
@@ -25,7 +26,7 @@ const dynamicScriptRegEx = () => {
  * 2. Loads `?scriptId` queries as file name exports
  *
  * - Build: return import.meta.CRX_SCRIPT_<scriptId>
- * - Serve: 
+ * - Serve:
  *
  * 3. Renders dynamic script imports
  *
@@ -41,6 +42,36 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       enforce: 'pre',
       configResolved(_config) {
         config = _config
+      },
+      configureServer(server) {
+        return () => {
+          server.middlewares.use(async (req, res, next) => {
+            try {
+              // wait for fs to finish writing content scripts
+              await allFilesReady()
+              next()
+            } catch (error) {
+              let err: Error
+              if (error instanceof Error) {
+                err = error
+              } else if (typeof error === 'string') {
+                err = new Error(error)
+              } else {
+                err = new Error(
+                  `Unexpected error "${error}" in middleware for "${req.url}"`,
+                )
+              }
+
+              server.ws.send({
+                type: 'error',
+                err: {
+                  message: err.message,
+                  stack: err.stack ?? 'no stack available',
+                },
+              })
+            }
+          })
+        }
       },
       async resolveId(_source: string, importer?: string) {
         if (importer && _source.includes('?script')) {
