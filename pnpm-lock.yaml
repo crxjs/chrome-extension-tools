@@ -39,7 +39,7 @@ importers:
       '@rollup/plugin-commonjs': ^21.0.0
       '@rollup/plugin-json': ^5.0.0
       '@rollup/plugin-node-resolve': ^13.3.0
-      '@rollup/plugin-sucrase': ^3.0.0
+      '@rollup/plugin-sucrase': ^5.0.0
       '@rollup/plugin-typescript': 8.5.0
       '@sucrase/jest-plugin': ^3.0.0
       '@testing-library/dom': ^6.12.2
@@ -121,7 +121,7 @@ importers:
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.72.1
       '@rollup/plugin-json': 5.0.1_rollup@2.72.1
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.72.1
-      '@rollup/plugin-sucrase': 3.1.1_rollup@2.72.1
+      '@rollup/plugin-sucrase': 5.0.1_rollup@2.72.1
       '@rollup/plugin-typescript': 8.5.0_dsrqihoegvzgycupzno43pt4sq
       '@sucrase/jest-plugin': 3.0.0_jest@27.5.1
       '@testing-library/dom': 6.16.0
@@ -5464,15 +5464,18 @@ packages:
       rollup: 2.72.1
     dev: true
 
-  /@rollup/plugin-sucrase/3.1.1_rollup@2.72.1:
-    resolution: {integrity: sha512-ifMWKtajaNvR2ybaJbBMkGZXxIUj0tovg5ARvlQHbAG7leJXe48D7TrZ7HIc8ROE/zs1Zh3UOXWmkNdjPGutZg==}
-    engines: {node: '>=8.0.0'}
+  /@rollup/plugin-sucrase/5.0.1_rollup@2.72.1:
+    resolution: {integrity: sha512-3mYe28rR/sUTkV8v10yPCP55TQ/oJkvcxKZBj6NGx9ZfCn9BdBtBL1v1S0TQrcOV4WD3FTHJaI7TbbukALx9wA==}
+    engines: {node: '>=14.0.0'}
     peerDependencies:
-      rollup: ^1.20.0 || ^2.0.0
+      rollup: ^2.53.1||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
     dependencies:
-      '@rollup/pluginutils': 3.1.0_rollup@2.72.1
+      '@rollup/pluginutils': 5.0.2_rollup@2.72.1
       rollup: 2.72.1
-      sucrase: 3.21.0
+      sucrase: 3.29.0
     dev: true
 
   /@rollup/plugin-typescript/8.5.0_dsrqihoegvzgycupzno43pt4sq:
@@ -7018,7 +7021,7 @@ packages:
     dev: false
 
   /any-promise/1.3.0:
-    resolution: {integrity: sha1-q8av7tzqUugJzcA3au0845Y10X8=}
+    resolution: {integrity: sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==}
     dev: true
 
   /anymatch/2.0.0:
@@ -13410,7 +13413,7 @@ packages:
     engines: {node: '>=8'}
 
   /path-is-absolute/1.0.1:
-    resolution: {integrity: sha1-F0uSaHNVNP+8es5r9TpanhtcX18=}
+    resolution: {integrity: sha512-AVbw3UJ2e9bq64vSaS9Am0fje1Pa8pbGqTTsmXfaIiMpnr5DlDhfJOuLj9Sf95ZPVDAUerDfEk88MPmPe7UCQg==}
     engines: {node: '>=0.10.0'}
 
   /path-is-inside/1.0.2:
@@ -15619,8 +15622,8 @@ packages:
       postcss-selector-parser: 6.0.10
     dev: false
 
-  /sucrase/3.21.0:
-    resolution: {integrity: sha512-FjAhMJjDcifARI7bZej0Bi1yekjWQHoEvWIXhLPwDhC6O4iZ5PtGb86WV56riW87hzpgB13wwBKO9vKAiWu5VQ==}
+  /sucrase/3.29.0:
+    resolution: {integrity: sha512-bZPAuGA5SdFHuzqIhTAqt9fvNEo9rESqXIG3oiKdF8K4UmkQxC4KlNL3lVyAErXp+mPvUqZ5l13qx6TrDIGf3A==}
     engines: {node: '>=8'}
     hasBin: true
     dependencies:
@@ -15782,7 +15785,7 @@ packages:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
 
   /thenify-all/1.6.0:
-    resolution: {integrity: sha1-GhkY1ALY/D+Y+/I02wvMjMEOlyY=}
+    resolution: {integrity: sha512-RNxQH/qI8/t3thXJDwcstUO4zeqo64+Uy/+sNVRBx4Xn2OX+OZ9oP+iJnNFqplFra2ZUVeKCSa2oVWi3T4uVmA==}
     engines: {node: '>=0.8'}
     dependencies:
       thenify: 3.3.1
