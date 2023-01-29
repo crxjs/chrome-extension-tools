@@ -14,12 +14,14 @@ import { pluginHtmlInlineScripts } from './plugin-htmlInlineScripts'
 import { pluginManifest } from './plugin-manifest'
 import { pluginWebAccessibleResources } from './plugin-webAccessibleResources'
 import type { CrxOptions, CrxPlugin } from './types'
+import { contentScripts } from './contentScripts'
 
 export const crx = (
   options: {
     manifest: ManifestV3Export
   } & CrxOptions,
 ): PluginOption[] => {
+  contentScripts.clear()
   return [
     pluginOptionsProvider(options),
     pluginBackground(),
