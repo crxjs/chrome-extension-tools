@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.12
+
+### Patch Changes
+
+- d0de5c8: fix: reset contentScripts when main plugin is initialized
+
 ## 2.0.0-beta.11
 
 ### Patch Changes
