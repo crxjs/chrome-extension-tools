@@ -1,7 +1,7 @@
 import fg from 'fast-glob'
+import { isString } from './helpers'
 import { ManifestV3 } from './manifest'
 import { ManifestFiles } from './types'
-import { isString } from './helpers'
 
 export async function manifestFiles(
   manifest: ManifestV3,
@@ -76,7 +76,7 @@ export function htmlFiles(manifest: ManifestV3): string[] {
   ]
     .flat()
     .filter(isString)
-    .map((s) => s.split('#')[0])
+    .map((s) => s.split(/[#?]/)[0])
     .sort()
   return [...new Set(files)]
 }
