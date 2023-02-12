@@ -16,7 +16,7 @@ export const convertMatchPatterns = (m: string): string => {
   const [x, y] = base.split(':3333')
   const final = isWildPort ? [x, port, y].join('') : base
 
-  // URL escapes asterixes
+  // URL escapes asterisks
   // Need to unescape them
   return unescape(`${scheme}://${final}/*`)
 }

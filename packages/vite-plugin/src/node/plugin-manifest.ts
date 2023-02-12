@@ -60,7 +60,7 @@ export const pluginManifest: CrxPluginFn = () => {
             html,
           } = await manifestFiles(manifest, { cwd: config.root })
           const { entries = [] } = config.optimizeDeps ?? {}
-          // Vite ignores build inputs if optimize depts has explicit entries,
+          // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
           let { input = [] } = config.build?.rollupOptions ?? {}
           if (typeof input === 'string') input = [input]
