@@ -1,7 +1,8 @@
 import jsesc from 'jsesc'
 import { BrowserContext, Locator, Page } from 'playwright-chromium'
 import { basename } from 'src/path'
-import { TestContext } from 'vitest'
+import { TestContext, vi } from 'vitest'
+import fs from 'fs-extra'
 
 let count = 0
 export function getCustomId({ meta }: TestContext): string {
@@ -64,3 +65,36 @@ export async function waitForInnerHtml(
   }
   throw new Error('could not find element')
 }
+
+export const createUpdate =
+  ({ page, target, src }: { page: Page; target: string; src: string }) =>
+  async (includes: string, srcDir = src) => {
+    await vi.advanceTimersByTimeAsync(1000)
+    return Promise.all([
+      pageLoad(page),
+      fs.copy(srcDir, target, {
+        recursive: true,
+        overwrite: true,
+        filter: (f) => {
+          if (fs.lstatSync(f).isDirectory()) return true
+          const base = basename(f)
+          return base.includes(includes)
+        },
+      }),
+    ])
+  }
+
+const pageLoad = (page: Page, { timeout } = { timeout: 5000 }) =>
+  new Promise<void>((resolve, reject) => {
+    const id = setTimeout(() => {
+      reject(new Error(`Page load took longer than ${timeout} ms`))
+    }, timeout)
+    page.on('load', () => {
+      clearTimeout(id)
+      resolve()
+    })
+    page.on('pageerror', (err) => {
+      clearTimeout(id)
+      reject(err)
+    })
+  })
