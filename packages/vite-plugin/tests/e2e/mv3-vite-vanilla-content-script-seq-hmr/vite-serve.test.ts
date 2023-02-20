@@ -14,7 +14,15 @@ test('crx page update on hmr', async () => {
 
   const { browser } = await serve(__dirname)
   const page = await browser.newPage()
-  const update = createUpdate({ page, target: src, src: src2 })
+  const update = createUpdate({
+    target: src,
+    src: src2,
+    plugins: [
+      async () => {
+        await page.waitForEvent('load')
+      },
+    ],
+  })
 
   const root = page.locator('#root')
   const h1 = root.locator('h1')

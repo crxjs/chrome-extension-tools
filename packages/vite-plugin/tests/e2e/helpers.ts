@@ -67,34 +67,27 @@ export async function waitForInnerHtml(
 }
 
 export const createUpdate =
-  ({ page, target, src }: { page: Page; target: string; src: string }) =>
+  ({
+    target,
+    src,
+    plugins = [],
+  }: {
+    target: string
+    src: string
+    plugins?: (() => Promise<void>)[]
+  }) =>
   async (includes: string, srcDir = src) => {
     await vi.advanceTimersByTimeAsync(1000)
     return Promise.all([
-      pageLoad(page),
+      ...plugins.map((p) => p()),
       fs.copy(srcDir, target, {
         recursive: true,
         overwrite: true,
         filter: (f) => {
           if (fs.lstatSync(f).isDirectory()) return true
           const base = basename(f)
-          return base.includes(includes)
+          return base.endsWith(includes)
         },
       }),
     ])
   }
-
-const pageLoad = (page: Page, { timeout } = { timeout: 5000 }) =>
-  new Promise<void>((resolve, reject) => {
-    const id = setTimeout(() => {
-      reject(new Error(`Page load took longer than ${timeout} ms`))
-    }, timeout)
-    page.on('load', () => {
-      clearTimeout(id)
-      resolve()
-    })
-    page.on('pageerror', (err) => {
-      clearTimeout(id)
-      reject(err)
-    })
-  })
