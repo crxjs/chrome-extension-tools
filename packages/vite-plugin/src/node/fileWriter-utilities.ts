@@ -47,6 +47,7 @@ export function formatFileData<
 export function getFileName({ type, id }: FileWriterId): string {
   let fileName = id
     .replace(/t=\d+&/, '') // filenames do not contain timestamps
+    .replace(/\?t=\d+$/, '') // filenames do not contain timestamps
     .replace(/^\//, '') // filenames do not start with a slash
     .replace(/\?/g, '__') // convert url queries
     .replace(/&/g, '_')
