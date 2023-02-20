@@ -29,8 +29,6 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-0')
     expect(text).toMatch('c2-0')
-
-    // TODO: assert timestamps in files
   }
 
   {
@@ -43,8 +41,6 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-1')
     expect(text).toMatch('c2-0')
-
-    // TODO: assert timestamps in files
   }
 
   {
@@ -57,8 +53,6 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-1')
     expect(text).toMatch('c2-0')
-
-    // TODO: assert timestamps in files
   }
 
   {
@@ -71,8 +65,6 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-1')
     expect(text).toMatch('c2-0')
-
-    // TODO: assert timestamps in files
   }
 
   {
@@ -85,8 +77,6 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-1')
     expect(text).toMatch('c2-0')
-
-    // TODO: assert timestamps in files
   }
 
   {
@@ -99,8 +89,6 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-1')
     expect(text).toMatch('c2-0')
-
-    // TODO: assert timestamps in files
   }
 
   {
@@ -113,7 +101,5 @@ test('crx page update on hmr', async () => {
     expect(text).toMatch('first')
     expect(text).toMatch('c1-1')
     expect(text).toMatch('c2-1')
-
-    // TODO: assert timestamps in files
   }
 })
