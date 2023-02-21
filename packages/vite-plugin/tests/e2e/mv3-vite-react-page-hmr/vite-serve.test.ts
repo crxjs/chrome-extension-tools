@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { expect, test } from 'vitest'
-import { getPage, waitForInnerHtml } from '../helpers'
+import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
 test(
@@ -16,6 +16,7 @@ test(
 
     const { browser } = await serve(__dirname)
     const page = await getPage(browser, 'chrome-extension')
+    const update = createUpdate({ target: src, src: src2 })
 
     await page.waitForLoadState()
 
@@ -34,27 +35,14 @@ test(
     })
 
     // update css files
-    await fs.copy(src2, src, {
-      recursive: true,
-      overwrite: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('css')
-      },
-    })
+    await update('css')
 
     await waitForInnerHtml(styles, (h) => h.includes('border: solid red;'))
     expect(reloaded).toBe(false) // no reload on css update
     buttonText.add(await button.innerText())
 
     // update jsx files
-    await fs.copy(src2, src, {
-      recursive: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('jsx')
-      },
-    })
+    await update('jsx')
 
     await page.locator('p', { hasText: 'Hello Vite + React + CRX!' }).waitFor()
     expect(reloaded).toBe(false) // no reload on jsx update

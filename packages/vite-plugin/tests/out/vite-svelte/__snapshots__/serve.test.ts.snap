@@ -114,8 +114,8 @@ import {
 } from \\"/vendor/svelte_internal.js__v--hash.js\\";
 
 const { Error: Error$, Object: Object$, console: console$ } = globals$;
-import logo from '/src/assets/svelte.png__import.js';
-import Counter from '/src/lib/Counter.svelte.js';
+import logo from '/src/assets/svelte.png__import.js?t=1643155200000';
+import Counter from '/src/lib/Counter.svelte.js?t=1643155200000';
 const file$ = \\"tests/out/vite-svelte/src/App.svelte\\";
 
 function create_fragment(ctx) {
@@ -259,7 +259,7 @@ import * as ___SVELTE_HMR_HOT_API from '/vendor/svelte-hmr-runtime-hot-api-esm.j
 export default App$;
 
 
-import \\"/src/App.svelte__svelte_type--style_lang.css.js\\";
+import \\"/src/App.svelte__svelte_type--style_lang.css.js?t=1643155200000\\";
 "
 `;
 
@@ -276,7 +276,7 @@ import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 exports[`serve fs output > src/assets/svelte.png__import.js 1`] = `"export default \\"/src/assets/svelte.png\\""`;
 
 exports[`serve fs output > src/content.js.js 1`] = `
-"import App from '/src/App.svelte.js'
+"import App from '/src/App.svelte.js?t=1643155200000'
 
 const html = \`<div id=\\"crx-app\\"></div>\`
 const target = new DOMParser().parseFromString(html, 'text/html').body
@@ -434,7 +434,7 @@ import * as ___SVELTE_HMR_HOT_API from '/vendor/svelte-hmr-runtime-hot-api-esm.j
 export default Counter$;
 
 
-import \\"/src/lib/Counter.svelte__svelte_type--style_lang.css.js\\";
+import \\"/src/lib/Counter.svelte__svelte_type--style_lang.css.js?t=1643155200000\\";
 "
 `;
 

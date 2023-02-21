@@ -1,6 +1,6 @@
 import { ResolvedConfig } from 'vite'
-import { allFilesReady } from '.'
 import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
+import { allFilesReady } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
 import { CrxPluginFn } from './types'

@@ -157,13 +157,18 @@ function prepScript(
       mergeMap(async ({ target, code, deps }) => {
         await lexer.init
         const [imports] = lexer.parse(code, fileName)
-        const depSet = new Set(deps)
+        const depSet = new Set<string>(deps)
         const magic = new MagicString(code)
+        const now = Date.now()
         for (const i of imports)
           if (i.n) {
             depSet.add(i.n)
-            const fileName = getFileName({ type: 'module', id: i.n })
-            
+            let fileName = getFileName({ type: 'module', id: i.n })
+            // exclude deps like React
+            if (!fileName.startsWith('vendor')) {
+              fileName = `${fileName}?t=${now}`
+            }
+
             // NOTE: Temporary fix for this bug: https://github.com/guybedford/es-module-lexer/issues/144
             const fullImport = code.substring(i.s, i.e)
             magic.overwrite(i.s, i.e, fullImport.replace(i.n, `/${fileName}`))

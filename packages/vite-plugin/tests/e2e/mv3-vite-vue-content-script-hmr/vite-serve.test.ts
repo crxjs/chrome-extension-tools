@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { expect, test } from 'vitest'
-import { waitForInnerHtml } from '../helpers'
+import { createUpdate, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
 test(
@@ -17,12 +17,13 @@ test(
 
     const { browser } = await serve(__dirname)
     const page = await browser.newPage()
-    await page.goto('https://example.com')
+    const update = createUpdate({ target: src, src: src2 })
 
     const styles = page.locator('head style')
     const app = page.locator('#app')
     const button = app.locator('button')
 
+    await page.goto('https://example.com')
     await app.waitFor()
 
     // check that page does not update during hmr update
@@ -37,14 +38,7 @@ test(
     buttonText.add(await button.innerText())
 
     // update template
-    await fs.copy(src2, src, {
-      recursive: true,
-      overwrite: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('vue')
-      },
-    })
+    await update('vue')
 
     await page
       .locator('p', { hasText: 'Make a Chrome Extension with Vite!' })
@@ -56,14 +50,7 @@ test(
     await new Promise((r) => setTimeout(r, 100))
 
     // update css
-    await fs.copy(src3, src, {
-      recursive: true,
-      overwrite: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('vue')
-      },
-    })
+    await update('vue', src3)
 
     await waitForInnerHtml(styles, (h) => {
       return h.includes('background-color: red;')

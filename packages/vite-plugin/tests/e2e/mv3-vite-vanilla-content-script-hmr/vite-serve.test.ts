@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import { firstValueFrom } from 'rxjs'
 import { expect, test } from 'vitest'
-import { getPage, waitForInnerHtml } from '../helpers'
+import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { header } from './src2/header'
 
@@ -18,12 +18,12 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   const { browser, routes } = await serve(__dirname)
 
   const page = await browser.newPage()
-  await page.goto('https://example.com')
-
+  const update = createUpdate({ target: src, src: src2 })
   const app = page.locator('#app')
-  await app.waitFor()
-
   const styles = page.locator('head style')
+
+  await page.goto('https://example.com')
+  await app.waitFor()
 
   // page reloads aren't reliable in CI, tracking route hits
   let reloads = 0
@@ -34,27 +34,14 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   const optionsPage = await getPage(browser, /options.html$/)
 
   // update css file -> trigger css update
-  await fs.copy(src2, src, {
-    recursive: true,
-    overwrite: true,
-    filter: (f) => {
-      if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('css')
-    },
-  })
+  await update('css')
 
   await waitForInnerHtml(styles, (h) => h.includes('background-color: red;'))
   expect(reloads).toBe(0) // no reload on css update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on css update
 
   // update header.ts file -> trigger full reload
-  await fs.copy(src2, src, {
-    recursive: true,
-    filter: (f) => {
-      if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('header.ts')
-    },
-  })
+  await update('header.ts')
 
   await page.locator('h1', { hasText: header }).waitFor()
   expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
@@ -64,13 +51,7 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   await Promise.all([
     optionsPage.waitForEvent('close', { timeout: 5000 }),
     firstValueFrom(routes),
-    fs.copy(src2, src, {
-      recursive: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('bg-onload.ts')
-      },
-    }),
+    update('bg-onload.ts'),
   ])
 
   await app.waitFor()

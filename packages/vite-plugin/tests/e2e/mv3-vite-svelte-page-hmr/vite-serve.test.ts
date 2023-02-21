@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { getPage, waitForInnerHtml } from '../helpers'
+import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { test, expect } from 'vitest'
 
@@ -17,6 +17,7 @@ test.skip('crx page update on hmr', async () => {
 
   const { browser } = await serve(__dirname)
   const page = await getPage(browser, 'chrome-extension')
+  const update = createUpdate({ target: src, src: src2 })
 
   await page.waitForLoadState()
 
@@ -29,14 +30,7 @@ test.skip('crx page update on hmr', async () => {
   })
 
   // update template
-  await fs.copy(src2, src, {
-    recursive: true,
-    overwrite: true,
-    filter: (f) => {
-      if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('App.svelte')
-    },
-  })
+  await update('App.svelte')
 
   await page
     .locator('h1', { hasText: 'Hello Vite + Svelte + CRXJS!' })
@@ -47,14 +41,7 @@ test.skip('crx page update on hmr', async () => {
   await new Promise((r) => setTimeout(r, 100))
 
   // update css
-  await fs.copy(src3, src, {
-    recursive: true,
-    overwrite: true,
-    filter: (f) => {
-      if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('App.svelte')
-    },
-  })
+  await update('App.svelte', src3)
 
   await waitForInnerHtml(styles, (h) => h.includes('color:blue;'))
   expect(reloaded).toBe(false) // no reload on css update

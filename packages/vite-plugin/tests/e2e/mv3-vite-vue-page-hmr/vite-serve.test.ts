@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'path'
 import { expect, test } from 'vitest'
-import { getPage, waitForInnerHtml } from '../helpers'
+import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
 test(
@@ -17,14 +17,12 @@ test(
 
     const { browser } = await serve(__dirname)
     const page = await getPage(browser, 'chrome-extension')
-
-    await page.waitForLoadState()
-
+    const update = createUpdate({ target: src, src: src2 })
     const styles = page.locator('head style')
     const button = page.locator('button')
-
     const buttonText = new Set<string>()
 
+    await page.waitForLoadState()
     await button.click()
     buttonText.add(await button.innerText())
 
@@ -35,14 +33,7 @@ test(
     })
 
     // update template
-    await fs.copy(src2, src, {
-      recursive: true,
-      overwrite: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('vue')
-      },
-    })
+    await update('vue')
 
     await page.locator('h1', { hasText: 'Hello Vue 3 + Vite + CRX' }).waitFor()
     expect(reloaded).toBe(false) // no reload on template update
@@ -52,14 +43,7 @@ test(
     await new Promise((r) => setTimeout(r, 100))
 
     // update css
-    await fs.copy(src3, src, {
-      recursive: true,
-      overwrite: true,
-      filter: (f) => {
-        if (fs.lstatSync(f).isDirectory()) return true
-        return f.endsWith('vue')
-      },
-    })
+    await update('vue', src3)
 
     await waitForInnerHtml(styles, (h) => h.includes('background: red;'))
     expect(reloaded).toBe(false) // no reload on css update
