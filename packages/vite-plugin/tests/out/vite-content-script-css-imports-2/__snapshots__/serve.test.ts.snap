@@ -75,7 +75,7 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content1/index.ts.js 1`] = `
-"import \\"/src/content1/styles.css.js\\";
+"import \\"/src/content1/styles.css.js?t=1643155200000\\";
 console.log(\\"content1\\");
 "
 `;
@@ -115,7 +115,7 @@ import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;
 
 exports[`serve fs output > src/content2/index.ts.js 1`] = `
-"import \\"/src/content2/styles.css.js\\";
+"import \\"/src/content2/styles.css.js?t=1643155200000\\";
 console.log(\\"content2\\");
 "
 `;

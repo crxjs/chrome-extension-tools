@@ -67,7 +67,7 @@ import 'http://localhost:3000/src/background.ts';
 `;
 
 exports[`serve fs output > src/declared-script.ts.js 1`] = `
-"import fileName from \\"/src/main-world.ts__scriptId--0.js\\";
+"import fileName from \\"/src/main-world.ts__scriptId--0.js?t=1643155200000\\";
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);
