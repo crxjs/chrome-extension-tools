@@ -86,7 +86,7 @@ export async function build(
 
   if (Array.isArray(output))
     throw new TypeError('received outputarray from vite build')
-  if ('close' in output) throw new TypeError('recieved watcher from vite build')
+  if ('close' in output) throw new TypeError('received watcher from vite build')
 
   return { command: 'build', outDir, output, config: config! }
 }
