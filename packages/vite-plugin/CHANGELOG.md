@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.13
+
+### Patch Changes
+
+- 3cf9305: Fix content scripts hmr
+
 ## 2.0.0-beta.12
 
 ### Patch Changes
