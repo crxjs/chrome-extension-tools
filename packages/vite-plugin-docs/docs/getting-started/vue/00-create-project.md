@@ -20,6 +20,13 @@ extension Vue HTML page. The first two sections take about 90 seconds!
 
 <CreateProjectTabs />
 
+:::tip package.json
+
+Check `package.json` to ensure that `"type": "module"` is set. If this package
+key is missing, Vite might not be able to build `vite.config.ts`.
+
+:::
+
 ## Update the Vite config
 
 Update `vite.config.js` to match the code below.
