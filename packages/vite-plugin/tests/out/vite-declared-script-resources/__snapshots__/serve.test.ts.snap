@@ -67,9 +67,9 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content.ts.js 1`] = `
-"import icon from \\"/src/image.png__import.js\\";
-import font from \\"/src/font.otf__import.js\\";
-import scriptUrl from \\"/src/script.ts__scriptId--0.js\\";
+"import icon from \\"/src/image.png__import.js?t=1643155200000\\";
+import font from \\"/src/font.otf__import.js?t=1643155200000\\";
+import scriptUrl from \\"/src/script.ts__scriptId--0.js?t=1643155200000\\";
 console.log(\\"content.ts\\", { icon, font });
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(scriptUrl);

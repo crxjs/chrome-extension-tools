@@ -23,7 +23,7 @@ import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
 export { allFilesReady, fileReady }
 
-const { outputFile } = fsx
+const { outputFile, remove } = fsx
 
 const debug = _debug('file-writer')
 
@@ -60,6 +60,7 @@ export async function start({
     format: 'es',
   }
 
+  if (server.config.build.emptyOutDir) await remove(server.config.build.outDir)
   fileWriterEvent$.next({ type: 'build_start' })
   const build = await rollup(inputOptions)
   await build.write(outputOptions)

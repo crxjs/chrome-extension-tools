@@ -12,7 +12,7 @@ jest.spyOn(console, 'log')
 jest.spyOn(console, 'error')
 jest.spyOn(console, 'warn')
 
-/* ---------- DONT LET ROLLUP PLUGINS WARN --------- */
+/* ---------- DON'T LET ROLLUP PLUGINS WARN --------- */
 
 beforeAll(() => {
   // eslint-disable-next-line
