@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.14
+
+### Patch Changes
+
+- 3dea230: Add tip `type: module` to vue page
+
 ## 2.0.0-beta.13
 
 ### Patch Changes

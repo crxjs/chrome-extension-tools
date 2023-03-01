@@ -1,5 +1,11 @@
 # vite-plugin-docs
 
+## 0.0.3-beta.1
+
+### Patch Changes
+
+- 3dea230: Add tip `type: module` to vue page
+
 ## 0.0.3-beta.0
 
 ### Patch Changes
