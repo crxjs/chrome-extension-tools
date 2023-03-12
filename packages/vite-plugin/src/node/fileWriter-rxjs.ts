@@ -2,6 +2,7 @@ import * as lexer from 'es-module-lexer'
 import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
 import {
+  BehaviorSubject,
   filter,
   first,
   firstValueFrom,
@@ -73,6 +74,12 @@ export const allFilesReady$ = buildEnd$.pipe(
   map(() => [...outputFiles.values()]),
   switchMap((files) => Promise.allSettled(files.map(({ file }) => file))),
 )
+
+const timestamp$ = new BehaviorSubject(Date.now())
+allFilesReady$.subscribe(() => {
+  // update timestamp when all files have emitted
+  timestamp$.next(Date.now())
+})
 
 export const isRejected = <T>(
   x: PromiseSettledResult<T> | undefined,
@@ -159,7 +166,7 @@ function prepScript(
         const [imports] = lexer.parse(code, fileName)
         const depSet = new Set<string>(deps)
         const magic = new MagicString(code)
-        const now = Date.now()
+        const now = await firstValueFrom(timestamp$)
         for (const i of imports)
           if (i.n) {
             depSet.add(i.n)
