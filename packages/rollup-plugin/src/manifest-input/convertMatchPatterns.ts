@@ -1,4 +1,5 @@
 export const convertMatchPatterns = (m: string): string => {
+  if (m === ('<all_urls>')) return m
   // Use URL to parse match pattern
   // URL must have valid url scheme
   const [scheme, rest] = m.split('://')
