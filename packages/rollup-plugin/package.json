@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-chrome-extension",
-  "version": "3.6.11-beta.0",
+  "version": "3.6.11",
   "description": "Build Chrome Extensions with this Rollup plugin.",
   "keywords": [
     "rollup-plugin",

@@ -1,5 +1,7 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.11
+
 ## 3.6.11-beta.0
 
 ### Patch Changes
