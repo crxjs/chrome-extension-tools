@@ -62,7 +62,7 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content.ts.js 1`] = `
-"import \\"/src/styles.css.js?t=1643155200000\\";
+"import \\"/src/styles.css.js\\";
 console.log(\\"content.ts\\");
 "
 `;

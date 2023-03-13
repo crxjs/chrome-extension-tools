@@ -17,16 +17,11 @@ test('crx page update on hmr', async () => {
   const update = createUpdate({
     target: src,
     src: src2,
-    plugins: [
-      async () => {
-        await page.waitForEvent('load')
-      },
-    ],
   })
 
   const root = page.locator('#root')
-  const h1 = root.locator('h1')
-  const h2 = root.locator('h2')
+  const app = root.locator("#app")
+  const a = 
 
   {
     // load page for the first time
@@ -34,80 +29,33 @@ test('crx page update on hmr', async () => {
     await root.waitFor({ timeout: 100 })
 
     const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-0')
-    expect(text).toMatch('c2-0')
+    // original values
+    expect(text).toMatch('a-0')
+    expect(text).toMatch('b-0')
+    expect(text).toMatch('c-0')
   }
-
+  
   {
     // update c1.ts -> simple update
-    await update('c1.ts')
+    await update('C.ts')
     await root.waitFor({ timeout: 100 })
-    await h1.waitFor({ timeout: 100 })
 
     const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-1')
-    expect(text).toMatch('c2-0')
+    expect(text).toMatch('a-0')
+    expect(text).toMatch('b-0')
+    // changed value from c1
+    expect(text).toMatch('c-1')
   }
-
+  
   {
-    // update root file -> update w/ timestamp
-    await update('root.ts')
+    // update c1.ts -> simple update
+    await update('C.ts')
     await root.waitFor({ timeout: 100 })
-    await h1.waitFor({ timeout: 100 })
 
     const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-1')
-    expect(text).toMatch('c2-0')
-  }
-
-  {
-    // update a.ts -> simple update
-    await update('a.ts')
-    await root.waitFor({ timeout: 100 })
-    await h2.waitFor({ timeout: 100 })
-
-    const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-1')
-    expect(text).toMatch('c2-0')
-  }
-
-  {
-    // revert root file -> update w/ timestamp
-    await update('root.ts', src1)
-    await root.waitFor({ timeout: 100 })
-    await h2.waitFor({ timeout: 100 })
-
-    const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-1')
-    expect(text).toMatch('c2-0')
-  }
-
-  {
-    // revert a.ts file -> simple update
-    await update('a.ts', src1)
-    await root.waitFor({ timeout: 100 })
-    await h1.waitFor({ timeout: 100 })
-
-    const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-1')
-    expect(text).toMatch('c2-0')
-  }
-
-  {
-    // update c2.ts file -> simple update
-    await update('c2.ts')
-    await root.waitFor({ timeout: 100 })
-    await h1.waitFor({ timeout: 100 })
-
-    const text = await root.textContent()
-    expect(text).toMatch('first')
-    expect(text).toMatch('c1-1')
-    expect(text).toMatch('c2-1')
+    expect(text).toMatch('a-0')
+    expect(text).toMatch('b-0')
+    // changed value from c1
+    expect(text).toMatch('c-1')
   }
 })

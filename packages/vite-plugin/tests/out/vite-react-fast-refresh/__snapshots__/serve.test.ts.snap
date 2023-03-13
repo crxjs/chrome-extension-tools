@@ -137,7 +137,7 @@ if (import.meta.hot) {
 exports[`serve fs output > src/content.tsx.js 1`] = `
 "var _jsxFileName = \\"<root>/src/content.tsx\\";
 import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--hash.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
-import App from \\"/src/App.tsx.js?t=1643155200000\\";
+import App from \\"/src/App.tsx.js\\";
 import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 console.log(\\"content script\\");
 const root = document.createElement(\\"div\\");
