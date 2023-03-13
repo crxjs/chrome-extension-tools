@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { expect, test, vi } from 'vitest'
+import { expect, test } from 'vitest'
 import { createUpdate } from '../helpers'
 import { serve } from '../runners'
 
@@ -74,6 +74,7 @@ test('crx page update on hmr', async () => {
   {
     await c1.click()
     await waitForText('c-1-1')
+
     expect(await c1.textContent()).toMatch('c-1-1')
     expect(await c2.textContent()).toMatch('c-1-1')
   }
