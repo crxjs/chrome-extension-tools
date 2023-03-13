@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.15
+
+### Patch Changes
+
+- ca0dfee: WIP: fix HMR singleton issue
+
 ## 2.0.0-beta.14
 
 ### Patch Changes
