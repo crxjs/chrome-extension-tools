@@ -166,15 +166,10 @@ function prepScript(
         const [imports] = lexer.parse(code, fileName)
         const depSet = new Set<string>(deps)
         const magic = new MagicString(code)
-        const now = await firstValueFrom(timestamp$)
         for (const i of imports)
           if (i.n) {
             depSet.add(i.n)
-            let fileName = getFileName({ type: 'module', id: i.n })
-            // exclude deps like React
-            if (!fileName.startsWith('vendor')) {
-              fileName = `${fileName}?t=${now}`
-            }
+            const fileName = getFileName({ type: 'module', id: i.n })
 
             // NOTE: Temporary fix for this bug: https://github.com/guybedford/es-module-lexer/issues/144
             const fullImport = code.substring(i.s, i.e)
