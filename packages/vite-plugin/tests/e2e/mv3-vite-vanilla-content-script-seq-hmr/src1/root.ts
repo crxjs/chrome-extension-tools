@@ -1,7 +1,7 @@
 import { a } from './a'
 
 const root = new DOMParser().parseFromString(
-  `<div id="root">${a}<p>root-0</p></div>`,
+  `<div id="root">${a}</div>`,
   'text/html',
 ).body.firstElementChild as HTMLDivElement
 
