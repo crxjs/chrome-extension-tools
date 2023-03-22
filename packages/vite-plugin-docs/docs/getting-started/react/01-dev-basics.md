@@ -18,11 +18,6 @@ import Installing from '../\_install-extension.md';
 
 <Intro/>
 
-## Install the extension
-
-<Installing/>
-
-![Chrome Extension icon context menu](./assets/start-context-menu-inspect.png)
 
 ## Opening the extension
 
@@ -35,6 +30,8 @@ import Installing from '../\_install-extension.md';
 Once you've found the extension icon, right-click it and choose "Inspect popup
 window". This will open the popup and the popup dev tools window. We need to
 inspect the popup to keep it open while making changes.
+
+![Chrome Extension icon context menu](./assets/start-context-menu-inspect.png)
 
 And boom! HMR magic at work.
 
