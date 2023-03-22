@@ -18,6 +18,12 @@ import Installing from '../\_install-extension.md';
 
 <Intro/>
 
+## Install the extension
+
+<Installing/>
+
+![Chrome Extension icon context menu](./assets/start-context-menu-inspect.png)
+
 ## Opening the extension
 
 <Opening/>
