@@ -6,6 +6,16 @@ import { ViteDevServer } from 'vite'
 import { afterAll } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
+const chromiumArgs = (outDir: string) => {
+  const args = [
+    `--disable-extensions-except=${outDir}`,
+    `--load-extension=${outDir}`,
+  ]
+  // run headless if not in debug mode
+  if (typeof process.env.DEBUG === 'undefined') args.unshift(`--headless=new`)
+  return args
+}
+
 let browser: ChromiumBrowserContext | undefined
 let server: ViteDevServer | undefined
 
@@ -21,10 +31,7 @@ export async function build(dirname: string) {
   browser = (await chromium.launchPersistentContext(dataDir, {
     headless: false,
     slowMo: 100,
-    args: [
-      `--disable-extensions-except=${outDir}`,
-      `--load-extension=${outDir}`,
-    ],
+    args: chromiumArgs(outDir),
   })) as ChromiumBrowserContext
 
   await browser.route('https://example.com', (route) => {
@@ -46,10 +53,7 @@ export async function serve(dirname: string) {
   browser = (await chromium.launchPersistentContext(dataDir, {
     headless: false,
     slowMo: 100,
-    args: [
-      `--disable-extensions-except=${outDir}`,
-      `--load-extension=${outDir}`,
-    ],
+    args: chromiumArgs(outDir),
   })) as ChromiumBrowserContext
 
   const routes = new Subject<Route>()
