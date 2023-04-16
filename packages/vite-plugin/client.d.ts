@@ -59,16 +59,16 @@ declare module '*?script&module' {
 }
 
 declare namespace ContentScriptAPI {
-  export interface RunOptions {
+  export interface ExecuteFnOptions {
     perf: {
       injectTime: number
       loadTime: number
     }
   }
-  export interface RunFunction {
-    (options: RunOptions): void
+  export interface ExecuteFn {
+    (options: ExecuteFnOptions): void
   }
   export interface ModuleExports {
-    run?: RunFunction
+    onExecute?: ExecuteFn
   }
 }
