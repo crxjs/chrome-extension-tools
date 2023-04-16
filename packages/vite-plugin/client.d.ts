@@ -57,3 +57,18 @@ declare module '*?script&module' {
   const fileName: string
   export default fileName
 }
+
+declare namespace ContentScriptAPI {
+  export interface RunOptions {
+    perf: {
+      injectTime: number
+      loadTime: number
+    }
+  }
+  export interface RunFunction {
+    (options: RunOptions): void
+  }
+  export interface ModuleExports {
+    run?: RunFunction
+  }
+}
