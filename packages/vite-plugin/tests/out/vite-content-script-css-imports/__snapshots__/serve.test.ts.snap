@@ -82,11 +82,11 @@ exports[`serve fs output > src/content.ts-loader.js 1`] = `
       /* @vite-ignore */
       chrome.runtime.getURL(\\"vendor/vite-client.js\\")
     );
-    const { run } = await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"src/content.ts.js\\")
     );
-    run?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();

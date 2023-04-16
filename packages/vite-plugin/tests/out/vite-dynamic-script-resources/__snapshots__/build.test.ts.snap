@@ -66,11 +66,11 @@ exports[`build fs output > assets/content1.ts-loader.hash6.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    const { run } = await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/content1.ts.hash0.js\\")
     );
-    run?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
@@ -89,11 +89,11 @@ exports[`build fs output > assets/content2.ts-loader.hash7.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    const { run } = await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/content2.ts.hash1.js\\")
     );
-    run?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
