@@ -1,8 +1,8 @@
 import { expect, test } from 'vitest'
-import { serve } from '../runners'
+import { build } from '../runners'
 
 test('content script export runs when script is injected', async () => {
-  const { browser } = await serve(__dirname)
+  const { browser } = await build(__dirname)
   const page = await browser.newPage()
 
   const root = page.locator('#root')

@@ -201,7 +201,10 @@ import \\"./vendor.hash.js\\";
 const html = \`<div id=\\"crx-app\\"></div>\`;
 const target = new DOMParser().parseFromString(html, \\"text/html\\").body.firstElementChild;
 document.body.append(target);
-new App$({ target });
+const app = new App$({ target });
+export {
+  app as default
+};
 "
 `;
 

@@ -6,7 +6,7 @@ root.addEventListener('click', () => {
 document.body.append(root)
 
 let injectCount = 0
-export function run({ perf }: ContentScriptAPI.ExecuteFnOptions) {
+export function onExecute({ perf }: ContentScriptAPI.ExecuteFnOptions) {
   injectCount++
   root.textContent = `injected ${injectCount}x`
   root.dataset.injected = injectCount.toString()
