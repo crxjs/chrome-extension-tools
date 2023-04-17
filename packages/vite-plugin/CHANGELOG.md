@@ -1,5 +1,14 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.16
+
+### Patch Changes
+
+- 1728bdd: Add newline to generated manifest.json (issue #668)
+- 00be1a1: fix: add new screenshot and remove the redudant code
+- 42baebb: React v18 ReactDOM.render changes
+- a4982e3: Add content script module API
+
 ## 2.0.0-beta.15
 
 ### Patch Changes
