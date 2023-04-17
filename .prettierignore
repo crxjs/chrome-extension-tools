@@ -7,3 +7,4 @@ schema
 *-lock.*
 .github/**/*.yaml
 .github/**/*.yml
+packages/vite-plugin/src/client/iife

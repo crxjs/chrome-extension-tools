@@ -2,9 +2,6 @@
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
-  "action": Object {
-    "default_popup": "src/popup.html",
-  },
   "background": Object {
     "service_worker": "service-worker-loader.js",
     "type": "module",
@@ -44,12 +41,10 @@ Object {
 
 exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/precontroller.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/content.js-loader.js",
   "src/content.js.js",
-  "src/popup.html",
   "vendor/crx-client-port.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
@@ -60,26 +55,20 @@ Array [
 exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.js",
-  "src/background.js",
-  "src/popup.html",
 }
-`;
-
-exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
-"const id = setInterval(() => location.reload(), 100);
-setTimeout(() => clearInterval(id), 5e3);
-"
 `;
 
 exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
-import 'http://localhost:3000/src/background.js';
 "
 `;
 
 exports[`serve fs output > src/content.js.js 1`] = `
 "console.log('content script')
+export function onExecute() {
+  console.log('onExecute')
+}
 "
 `;
 
@@ -106,25 +95,5 @@ exports[`serve fs output > src/content.js-loader.js 1`] = `
   })().catch(console.error);
 
 })();
-"
-`;
-
-exports[`serve fs output > src/popup.html 1`] = `
-"<!DOCTYPE html>
-<html lang=\\"en\\">
-  <head>
-    <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.hash0.js\\"></script>
-  </head>
-  <body>
-    <h1>Waiting for service worker</h1>
-
-    <p>
-      If you see this message, it means the service worker has not loaded fully.
-    </p>
-
-    <p>This page is never added in production.</p>
-  </body>
-</html>
 "
 `;

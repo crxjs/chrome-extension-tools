@@ -81,11 +81,13 @@ exports[`build fs output > assets/content.tsx-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/content.tsx.hash2.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
