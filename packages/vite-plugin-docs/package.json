@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-docs",
-  "version": "0.0.3-beta.1",
+  "version": "0.0.3-beta.2",
   "private": true,
   "scripts": {
     "build": "docusaurus build",
