@@ -169,7 +169,7 @@ export const pluginManifest: CrxPluginFn = () => {
         plugins.push(plugin)
       },
       async transform(code, id) {
-        if (id !== manifestId) return
+        if (id !== manifestId) return null
 
         /* ---------- RUN MANIFEST TRANSFORM HOOK ---------- */
 
@@ -250,7 +250,10 @@ export const pluginManifest: CrxPluginFn = () => {
         }
 
         const encoded = encodeManifest(manifest)
-        return encoded
+        return {
+          code: `export default ${encoded}`,
+          map: '',
+        }
       },
       async generateBundle(options, bundle) {
         const manifestName = this.getFileName(refId)
