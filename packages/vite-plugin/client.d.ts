@@ -57,3 +57,18 @@ declare module '*?script&module' {
   const fileName: string
   export default fileName
 }
+
+declare namespace ContentScriptAPI {
+  export interface ExecuteFnOptions {
+    perf: {
+      injectTime: number
+      loadTime: number
+    }
+  }
+  export interface ExecuteFn {
+    (options: ExecuteFnOptions): void
+  }
+  export interface ModuleExports {
+    onExecute?: ExecuteFn
+  }
+}

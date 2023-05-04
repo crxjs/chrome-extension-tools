@@ -4,29 +4,30 @@ exports[`build fs output > _00 manifest.json 1`] = `
 Object {
   "content_scripts": Array [
     Object {
-      "css": Array [
-        "assets/content.hash1.css",
-      ],
       "js": Array [
-        "assets/content.ts-loader.hash0.js",
+        "assets/content.js-loader.hash0.js",
       ],
       "matches": Array [
-        "http://*/*",
-        "https://*/*",
+        "https://a.com/*",
+        "http://b.com/*",
       ],
     },
   ],
+  "description": "test extension",
+  "host_permissions": Array [
+    "https://c.com/*",
+  ],
   "manifest_version": 3,
-  "name": "test extension",
-  "version": "0.1.0",
+  "name": "Test Extension",
+  "version": "1.0.0",
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
-        "http://*/*",
-        "https://*/*",
+        "http://b.com/*",
+        "https://a.com/*",
       ],
       "resources": Array [
-        "assets/content.ts.hash2.js",
+        "assets/content.js.hash1.js",
       ],
       "use_dynamic_url": true,
     },
@@ -36,27 +37,24 @@ Object {
 
 exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/content.hash1.css",
-  "assets/content.ts-loader.hash0.js",
-  "assets/content.ts.hash2.js",
+  "assets/content.js-loader.hash0.js",
+  "assets/content.js.hash1.js",
   "manifest.json",
 ]
 `;
 
-exports[`build fs output > assets/content.hash1.css 1`] = `
-"body {
-  color: red;
+exports[`build fs output > assets/content.js.hash1.js 1`] = `
+"console.log(\\"content script\\");
+function onExecute() {
+  console.log(\\"onExecute\\");
 }
+export {
+  onExecute
+};
 "
 `;
 
-exports[`build fs output > assets/content.ts.hash2.js 1`] = `
-"const styles = \\"\\";
-console.log(\\"content.ts\\");
-"
-`;
-
-exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
+exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
 
@@ -64,7 +62,7 @@ exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.hash2.js\\")
+      chrome.runtime.getURL(\\"assets/content.js.hash1.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
