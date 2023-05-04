@@ -1,0 +1,159 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.ts-loader.hash0.js",
+      ],
+      "matches": Array [
+        "https://*/*",
+        "http://*/*",
+      ],
+    },
+  ],
+  "description": "test extension",
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/content.ts.hash1.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/background.ts.hash2.js",
+  "assets/content.ts-loader.hash0.js",
+  "assets/content.ts.hash1.js",
+  "assets/popup.html.hash3.js",
+  "assets/vendor.hash4.js",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/popup.html",
+]
+`;
+
+exports[`build fs output > assets/background.ts.hash2.js 1`] = `
+"console.log(\\"service_worker.ts\\");
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYmFja2dyb3VuZC50cy5oYXNoYTM0MTg3OTYuanMiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9iYWNrZ3JvdW5kLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImNvbnNvbGUubG9nKCdzZXJ2aWNlX3dvcmtlci50cycpXG5cbmV4cG9ydCB7fVxuIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLFFBQVEsSUFBSSxtQkFBbUI7In0=
+"
+`;
+
+exports[`build fs output > assets/content.ts.hash1.js 1`] = `
+"const message = \\"content script\\";
+console.log(message);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29udGVudC50cy5oYXNoNWFmYjk4MDAuanMiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb250ZW50LnRzIl0sInNvdXJjZXNDb250ZW50IjpbInR5cGUgTG9nID0gJ2NvbnRlbnQgc2NyaXB0J1xuY29uc3QgbWVzc2FnZTogTG9nID0gJ2NvbnRlbnQgc2NyaXB0J1xuY29uc29sZS5sb2cobWVzc2FnZSlcbmV4cG9ydCB7fVxuIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUNBLE1BQU0sVUFBZTtBQUNyQixRQUFRLElBQUksT0FBTzsifQ==
+"
+`;
+
+exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.ts.hash1.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/popup.html.hash3.js 1`] = `
+"import { R as React, r as reactDom } from \\"./vendor.hash4.js\\";
+(function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+};
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicG9wdXAuaHRtbC5oYXNoYTVhMjdiM2MuanMiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uL3ZpdGUvbW9kdWxlcHJlbG9hZC1wb2x5ZmlsbCIsIi4uLy4uL3NyYy9BcHAudHN4IiwiLi4vLi4vc3JjL3BvcHVwLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJfX1ZJVEVfSVNfTU9ERVJOX18mJihmdW5jdGlvbiBwb2x5ZmlsbCgpIHtcbiAgICBjb25zdCByZWxMaXN0ID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnbGluaycpLnJlbExpc3Q7XG4gICAgaWYgKHJlbExpc3QgJiYgcmVsTGlzdC5zdXBwb3J0cyAmJiByZWxMaXN0LnN1cHBvcnRzKCdtb2R1bGVwcmVsb2FkJykpIHtcbiAgICAgICAgcmV0dXJuO1xuICAgIH1cbiAgICBmb3IgKGNvbnN0IGxpbmsgb2YgZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnbGlua1tyZWw9XCJtb2R1bGVwcmVsb2FkXCJdJykpIHtcbiAgICAgICAgcHJvY2Vzc1ByZWxvYWQobGluayk7XG4gICAgfVxuICAgIG5ldyBNdXRhdGlvbk9ic2VydmVyKChtdXRhdGlvbnMpID0+IHtcbiAgICAgICAgZm9yIChjb25zdCBtdXRhdGlvbiBvZiBtdXRhdGlvbnMpIHtcbiAgICAgICAgICAgIGlmIChtdXRhdGlvbi50eXBlICE9PSAnY2hpbGRMaXN0Jykge1xuICAgICAgICAgICAgICAgIGNvbnRpbnVlO1xuICAgICAgICAgICAgfVxuICAgICAgICAgICAgZm9yIChjb25zdCBub2RlIG9mIG11dGF0aW9uLmFkZGVkTm9kZXMpIHtcbiAgICAgICAgICAgICAgICBpZiAobm9kZS50YWdOYW1lID09PSAnTElOSycgJiYgbm9kZS5yZWwgPT09ICdtb2R1bGVwcmVsb2FkJylcbiAgICAgICAgICAgICAgICAgICAgcHJvY2Vzc1ByZWxvYWQobm9kZSk7XG4gICAgICAgICAgICB9XG4gICAgICAgIH1cbiAgICB9KS5vYnNlcnZlKGRvY3VtZW50LCB7IGNoaWxkTGlzdDogdHJ1ZSwgc3VidHJlZTogdHJ1ZSB9KTtcbiAgICBmdW5jdGlvbiBnZXRGZXRjaE9wdHMoc2NyaXB0KSB7XG4gICAgICAgIGNvbnN0IGZldGNoT3B0cyA9IHt9O1xuICAgICAgICBpZiAoc2NyaXB0LmludGVncml0eSlcbiAgICAgICAgICAgIGZldGNoT3B0cy5pbnRlZ3JpdHkgPSBzY3JpcHQuaW50ZWdyaXR5O1xuICAgICAgICBpZiAoc2NyaXB0LnJlZmVycmVycG9saWN5KVxuICAgICAgICAgICAgZmV0Y2hPcHRzLnJlZmVycmVyUG9saWN5ID0gc2NyaXB0LnJlZmVycmVycG9saWN5O1xuICAgICAgICBpZiAoc2NyaXB0LmNyb3Nzb3JpZ2luID09PSAndXNlLWNyZWRlbnRpYWxzJylcbiAgICAgICAgICAgIGZldGNoT3B0cy5jcmVkZW50aWFscyA9ICdpbmNsdWRlJztcbiAgICAgICAgZWxzZSBpZiAoc2NyaXB0LmNyb3Nzb3JpZ2luID09PSAnYW5vbnltb3VzJylcbiAgICAgICAgICAgIGZldGNoT3B0cy5jcmVkZW50aWFscyA9ICdvbWl0JztcbiAgICAgICAgZWxzZVxuICAgICAgICAgICAgZmV0Y2hPcHRzLmNyZWRlbnRpYWxzID0gJ3NhbWUtb3JpZ2luJztcbiAgICAgICAgcmV0dXJuIGZldGNoT3B0cztcbiAgICB9XG4gICAgZnVuY3Rpb24gcHJvY2Vzc1ByZWxvYWQobGluaykge1xuICAgICAgICBpZiAobGluay5lcClcbiAgICAgICAgICAgIC8vIGVwIG1hcmtlciA9IHByb2Nlc3NlZFxuICAgICAgICAgICAgcmV0dXJuO1xuICAgICAgICBsaW5rLmVwID0gdHJ1ZTtcbiAgICAgICAgLy8gcHJlcG9wdWxhdGUgdGhlIGxvYWQgcmVjb3JkXG4gICAgICAgIGNvbnN0IGZldGNoT3B0cyA9IGdldEZldGNoT3B0cyhsaW5rKTtcbiAgICAgICAgZmV0Y2gobGluay5ocmVmLCBmZXRjaE9wdHMpO1xuICAgIH1cbn0oKSk7IiwiaW1wb3J0IFJlYWN0IGZyb20gJ3JlYWN0J1xuXG5jb25zdCBBcHA6IFJlYWN0LkZDID0gKCkgPT4ge1xuICByZXR1cm4gKFxuICAgIDxkaXY+XG4gICAgICA8aDE+UG9wdXAgUGFnZTwvaDE+XG4gICAgICA8cD5JZiB5b3UgYXJlIHNlZWluZyB0aGlzLCBSZWFjdCBpcyB3b3JraW5nITwvcD5cbiAgICA8L2Rpdj5cbiAgKVxufVxuXG5leHBvcnQgZGVmYXVsdCBBcHBcbiIsImltcG9ydCBSZWFjdCBmcm9tICdyZWFjdCdcbmltcG9ydCB7IHJlbmRlciB9IGZyb20gJ3JlYWN0LWRvbSdcbmltcG9ydCBBcHAgZnJvbSAnLi9BcHAnXG5cbmNvbnNvbGUubG9nKCdwb3B1cCBzY3JpcHQnKVxuXG5jb25zdCByb290ID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3Jvb3QnKVxuXG5yZW5kZXIoPEFwcCAvPiwgcm9vdClcbiJdLCJuYW1lcyI6WyJyZW5kZXIiXSwibWFwcGluZ3MiOiI7Q0FBcUIsU0FBUyxXQUFXO0FBQ3JDLFFBQU0sVUFBVSxTQUFTLGNBQWMsTUFBTSxFQUFFO0FBQy9DLE1BQUksV0FBVyxRQUFRLFlBQVksUUFBUSxTQUFTLGVBQWUsR0FBRztBQUNsRTtBQUFBLEVBQ0g7QUFDRCxhQUFXLFFBQVEsU0FBUyxpQkFBaUIsMkJBQTJCLEdBQUc7QUFDdkUsbUJBQWUsSUFBSTtBQUFBLEVBQ3RCO0FBQ0QsTUFBSSxpQkFBaUIsQ0FBQyxjQUFjO0FBQ2hDLGVBQVcsWUFBWSxXQUFXO0FBQzlCLFVBQUksU0FBUyxTQUFTLGFBQWE7QUFDL0I7QUFBQSxNQUNIO0FBQ0QsaUJBQVcsUUFBUSxTQUFTLFlBQVk7QUFDcEMsWUFBSSxLQUFLLFlBQVksVUFBVSxLQUFLLFFBQVE7QUFDeEMseUJBQWUsSUFBSTtBQUFBLE1BQzFCO0FBQUEsSUFDSjtBQUFBLEVBQ1QsQ0FBSyxFQUFFLFFBQVEsVUFBVSxFQUFFLFdBQVcsTUFBTSxTQUFTLEtBQUksQ0FBRTtBQUN2RCxXQUFTLGFBQWEsUUFBUTtBQUMxQixVQUFNLFlBQVksQ0FBQTtBQUNsQixRQUFJLE9BQU87QUFDUCxnQkFBVSxZQUFZLE9BQU87QUFDakMsUUFBSSxPQUFPO0FBQ1AsZ0JBQVUsaUJBQWlCLE9BQU87QUFDdEMsUUFBSSxPQUFPLGdCQUFnQjtBQUN2QixnQkFBVSxjQUFjO0FBQUEsYUFDbkIsT0FBTyxnQkFBZ0I7QUFDNUIsZ0JBQVUsY0FBYztBQUFBO0FBRXhCLGdCQUFVLGNBQWM7QUFDNUIsV0FBTztBQUFBLEVBQ1Y7QUFDRCxXQUFTLGVBQWUsTUFBTTtBQUMxQixRQUFJLEtBQUs7QUFFTDtBQUNKLFNBQUssS0FBSztBQUVWLFVBQU0sWUFBWSxhQUFhLElBQUk7QUFDbkMsVUFBTSxLQUFLLE1BQU0sU0FBUztBQUFBLEVBQzdCO0FBQ0w7QUN4Q0EsTUFBTSxNQUFnQixNQUFNO0FBRXhCLFNBQUEsc0JBQUEsY0FBQyxhQUNFLHNCQUFBLGNBQUEsTUFBQSxNQUFHLFlBQVUsR0FDZCxzQkFBQSxjQUFDLEtBQUUsTUFBQSwyQ0FBeUMsQ0FDOUM7QUFFSjtBQ0xBLFFBQVEsSUFBSSxjQUFjO0FBRTFCLE1BQU0sT0FBTyxTQUFTLGNBQWMsT0FBTztBQUUzQ0EsU0FBTyxRQUFBLE9BQUEsc0JBQUEsY0FBQyxLQUFJLElBQUEsR0FBSSxJQUFJOyJ9
+"
+`;
+
+exports[`build fs output > service-worker-loader.js 1`] = `
+"import './assets/background.ts.hash2.js';
+"
+`;
+
+exports[`build fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
+    <title>Popup Page</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash3.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash4.js\\">
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    
+  </body>
+</html>
+"
+`;
