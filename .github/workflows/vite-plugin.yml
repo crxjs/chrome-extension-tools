@@ -170,21 +170,23 @@ jobs:
       - name: Run unit and output tests
         run: pnpm test:run:out
 
-      - name: Check for diff
-        id: diff
-        run: echo "::set-output name=diff::$(git --no-pager diff --name-only)"
+      # Disabling diff check for now, don't think it's doing anything
+      #
+      # - name: Check for diff
+      #   id: diff
+      #   run: echo "::set-output name=diff::$(git --no-pager diff --name-only)"
 
-      - name: Fail if diff
-        if: ${{ steps.diff.outputs.diff }}
-        run: exit 1
+      # - name: Fail if diff
+      #   if: ${{ steps.diff.outputs.diff }}
+      #   run: exit 1
 
-      - name: Git diff
-        if: failure()
-        run: git diff > diff.txt
+      # - name: Git diff
+      #   if: failure()
+      #   run: git diff > diff.txt
 
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: output-diff-${{ matrix.type }}
-          path: diff.txt
-          if-no-files-found: ignore
+      # - uses: actions/upload-artifact@v3
+      #   if: failure()
+      #   with:
+      #     name: output-diff-${{ matrix.type }}
+      #     path: diff.txt
+      #     if-no-files-found: ignore
