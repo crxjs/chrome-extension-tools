@@ -166,6 +166,7 @@ importers:
       '@sveltejs/vite-plugin-svelte': 1.1.0
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.209
+      '@types/convert-source-map': ^2.0.0
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest-image-snapshot': ^5.1.0
@@ -182,6 +183,7 @@ importers:
       cheerio: ^1.0.0-rc.10
       chokidar: ^3.5.3
       connect-injector: ^0.4.4
+      convert-source-map: ^1.7.0
       debug: ^4.3.3
       es-module-lexer: ^0.10.0
       esbuild: 0.17.14
@@ -216,6 +218,7 @@ importers:
       acorn-walk: 8.2.0
       cheerio: 1.0.0-rc.10
       connect-injector: 0.4.4
+      convert-source-map: 1.8.0
       debug: 4.3.4
       es-module-lexer: 0.10.5
       fast-glob: 3.2.11
@@ -236,6 +239,7 @@ importers:
       '@sveltejs/vite-plugin-svelte': 1.1.0_svelte@3.48.0+vite@3.1.7
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.209
+      '@types/convert-source-map': 2.0.0
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
       '@types/jest-image-snapshot': 5.1.0
@@ -6129,6 +6133,10 @@ packages:
     dependencies:
       '@types/node': 17.0.18
     dev: false
+
+  /@types/convert-source-map/2.0.0:
+    resolution: {integrity: sha512-QUm4YOC/ENo0VjPVl2o8HGyTbHHQGDOw8PCg3rXBucYHKyZN/XjXRbPFAV1tB2FvM0/wyFoDct4cTIctzKrQFg==}
+    dev: true
 
   /@types/debug/4.1.7:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}

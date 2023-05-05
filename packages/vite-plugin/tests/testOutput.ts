@@ -65,6 +65,7 @@ export async function testOutput(
         return replaced
       })
       .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
+      .replace(/^\/\/#(.+?base64,)(.+)$/m, '// #$1<base64>')
 
   getTest('manifest.json', (source, name) => {
     const scrubbed = scrubHashes(source)

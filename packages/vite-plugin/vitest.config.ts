@@ -48,6 +48,7 @@ export default defineConfig(({ mode }) => {
       },
       testTimeout,
       watchExclude: [...configDefaults.watchExclude, '**/tests/templates'],
+      chaiConfig: { includeStack: false, showDiff: true, truncateThreshold: 0 },
     },
   }
 })

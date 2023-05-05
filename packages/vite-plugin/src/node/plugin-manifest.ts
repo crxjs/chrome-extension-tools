@@ -250,7 +250,7 @@ export const pluginManifest: CrxPluginFn = () => {
         }
 
         const encoded = encodeManifest(manifest)
-        return encoded
+        return { code: encoded, map: null }
       },
       async generateBundle(options, bundle) {
         const manifestName = this.getFileName(refId)

@@ -22,6 +22,7 @@ import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
+import convertSourceMap from 'convert-source-map'
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -146,8 +147,25 @@ function prepScript(
         const transformResult = await server.transformRequest(viteUrl)
         if (!transformResult)
           throw new TypeError(`Unable to load "${script.id}" from server.`)
-        const { code, deps = [], dynamicDeps = [] } = transformResult
-        return { target, code, deps: [...deps, ...dynamicDeps].flat(), server }
+        const { deps = [], dynamicDeps = [], map } = transformResult
+        let { code } = transformResult
+        try {
+          if (map && server.config.build.sourcemap === 'inline') {
+            // remove existing source map (might be a url, which doesn't work in content scripts)
+            code = code.replace(/\n*\/\/# sourceMappingURL=[^\n]+/g, '')
+            // create a new inline source map
+            const sourceMap = convertSourceMap.fromObject(map).toComment()
+            code += `\n${sourceMap}\n`
+          }
+        } catch (error) {
+          console.warn('Failed to inline source map', error)
+        }
+        return {
+          target,
+          code,
+          deps: [...deps, ...dynamicDeps].flat(),
+          server,
+        }
       }),
       // retry in case of dependency rebundle
       retry({ count: 10, delay: 100 }),
