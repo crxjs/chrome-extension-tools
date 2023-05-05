@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.17
+
+### Patch Changes
+
+- 936ed77: Add inline sourcemap support to content scripts
+- bbc4d33: fix: schema of input_components
+
 ## 2.0.0-beta.16
 
 ### Patch Changes
