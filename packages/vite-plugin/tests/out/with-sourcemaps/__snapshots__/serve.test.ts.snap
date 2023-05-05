@@ -80,7 +80,7 @@ exports[`serve fs output > src/content.ts.js 1`] = `
 console.log(message);
 export {};
 
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9qYWNrc3RlYW1kZXYvRG9jdW1lbnRzL0NSWEpTL2NyeGpzL3BhY2thZ2VzL3ZpdGUtcGx1Z2luL3Rlc3RzL291dC93aXRoLXNvdXJjZW1hcHMvc3JjL2NvbnRlbnQudHMiXSwic291cmNlc0NvbnRlbnQiOlsidHlwZSBMb2cgPSAnY29udGVudCBzY3JpcHQnXG5jb25zdCBtZXNzYWdlOiBMb2cgPSAnY29udGVudCBzY3JpcHQnXG5jb25zb2xlLmxvZyhtZXNzYWdlKVxuZXhwb3J0IHt9XG4iXSwibWFwcGluZ3MiOiJBQUNBLE1BQU0sVUFBZTtBQUNyQixRQUFRLElBQUksT0FBTztBQUNuQjsiLCJuYW1lcyI6W119
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
 
