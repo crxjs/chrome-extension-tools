@@ -56,7 +56,7 @@
     "localforage": "^1.9.0",
     "lodash": "^4.17.21",
     "mem": "^6.0.1",
-    "playwright-chromium": "1.27.1",
+    "playwright-chromium": "1.33.0",
     "rollup": "^2.72.1",
     "slash": "^3.0.0",
     "webextension-polyfill": "^0.9.0"

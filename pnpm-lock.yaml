@@ -77,7 +77,7 @@ importers:
       lodash: ^4.17.21
       mem: ^6.0.1
       npm-run-all: ^4.1.5
-      playwright-chromium: 1.27.1
+      playwright-chromium: 1.33.0
       prettier: ^2.3.2
       react: ^17.0.2
       react-dom: ^17.0.2
@@ -106,7 +106,7 @@ importers:
       localforage: 1.10.0
       lodash: 4.17.21
       mem: 6.1.1
-      playwright-chromium: 1.27.1
+      playwright-chromium: 1.33.0
       rollup: 2.72.1
       slash: 3.0.0
       webextension-polyfill: 0.9.0
@@ -197,7 +197,7 @@ importers:
       magic-string: ^0.26.0
       npm-run-all: ^4.1.5
       picocolors: ^1.0.0
-      playwright-chromium: 1.31.2
+      playwright-chromium: 1.33.0
       react: 17.0.2
       react-dom: 17.0.2
       react-refresh: ^0.13.0
@@ -258,7 +258,7 @@ importers:
       eslint-plugin-react: 7.29.4_eslint@8.39.0
       jest-image-snapshot: 5.2.0
       npm-run-all: 4.1.5
-      playwright-chromium: 1.31.2
+      playwright-chromium: 1.33.0
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       rimraf: 3.0.2
@@ -13871,35 +13871,18 @@ packages:
       find-up: 3.0.0
     dev: false
 
-  /playwright-chromium/1.27.1:
-    resolution: {integrity: sha512-AXAfmNHVnqByo7dKLwLqEC3aKIUlATwDUHCBwVw/qyRCgGUEoufeFUxFXB7pJ4nppwThph7TFe3fHfoETPqSvg==}
+  /playwright-chromium/1.33.0:
+    resolution: {integrity: sha512-aG2IqRp7Q6vRltZFT+N2stWwDUH2fEUTOTv8RxSKMK5QmIQQoNL9nJvNMIJ3yLuin8+coaa3mhJXjjUheo0+/A==}
     engines: {node: '>=14'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      playwright-core: 1.27.1
-    dev: false
+      playwright-core: 1.33.0
 
-  /playwright-chromium/1.31.2:
-    resolution: {integrity: sha512-De3FSR5C5PUpyv6d7eZbOPGbG4opgjgLGKaNOyR/QN8gfiVQxZpudP1hJp0S/zPnP5W6qirohgqsjLFYLPVJlw==}
+  /playwright-core/1.33.0:
+    resolution: {integrity: sha512-aizyPE1Cj62vAECdph1iaMILpT0WUDCq3E6rW6I+dleSbBoGbktvJtzS6VHkZ4DKNEOG9qJpiom/ZxO+S15LAw==}
     engines: {node: '>=14'}
     hasBin: true
-    requiresBuild: true
-    dependencies:
-      playwright-core: 1.31.2
-    dev: true
-
-  /playwright-core/1.27.1:
-    resolution: {integrity: sha512-9EmeXDncC2Pmp/z+teoVYlvmPWUC6ejSSYZUln7YaP89Z6lpAaiaAnqroUt/BoLo8tn7WYShcfaCh+xofZa44Q==}
-    engines: {node: '>=14'}
-    hasBin: true
-    dev: false
-
-  /playwright-core/1.31.2:
-    resolution: {integrity: sha512-a1dFgCNQw4vCsG7bnojZjDnPewZcw7tZUNFN0ZkcLYKj+mPmXvg4MpaaKZ5SgqPsOmqIf2YsVRkgqiRDxD+fDQ==}
-    engines: {node: '>=14'}
-    hasBin: true
-    dev: true
 
   /pngjs/3.4.0:
     resolution: {integrity: sha512-NCrCHhWmnQklfH4MtJMRjZ2a8c80qXeMlQMv2uVp9ISJMTt562SbGd6n2oq0PaPgKm7Z6pL9E2UlLIhC+SHL3w==}
