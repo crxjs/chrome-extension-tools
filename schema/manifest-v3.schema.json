@@ -476,22 +476,22 @@
       "items": {
         "additionalProperties": false,
         "properties": {
-          "description": {
+          "name": {
             "type": "string"
           },
           "id": {
             "type": "string"
           },
           "language": {
-            "type": "string"
+            "type": ["string", "array"]
           },
           "layouts": {
-            "type": "array"
+            "type": ["string", "array"]
           },
-          "name": {
+          "input_view": {
             "type": "string"
           },
-          "type": {
+          "options_page": {
             "type": "string"
           }
         },
