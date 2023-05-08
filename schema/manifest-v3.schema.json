@@ -166,7 +166,8 @@
           "wallpaper",
           "webNavigation",
           "webRequest",
-          "webRequestBlocking"
+          "webRequestBlocking",
+          "offscreen"
         ],
         "type": "string"
       },
