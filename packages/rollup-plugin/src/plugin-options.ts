@@ -54,6 +54,8 @@ export interface ChromeExtensionOptions {
   // esmContentScripts?: boolean
   /** Escape hatch for content script dynamic import wrapper */
   wrapContentScripts?: boolean
+  /**Offscreen document html path */
+  offscreenHtml?: string
 }
 
 export type ChromeExtensionPlugin = Pick<

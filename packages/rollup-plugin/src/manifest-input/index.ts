@@ -79,6 +79,7 @@ export function manifestInput(
     publicKey,
     verbose = true,
     wrapContentScripts = true,
+    offscreenHtml = undefined,
     cache = {
       assetChanged: false,
       assets: [],
@@ -217,6 +218,7 @@ export function manifestInput(
             cache.srcDir,
             {
               contentScripts: true,
+              offscreenHtml
             },
           )
 

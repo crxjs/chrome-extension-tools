@@ -24,7 +24,7 @@ export const derivePermissions = (set: Set<string>, { code }: OutputChunk) =>
 export function deriveFiles(
   manifest: chrome.runtime.Manifest,
   srcDir: string,
-  options: { contentScripts: boolean },
+  options: { contentScripts: boolean, offscreenHtml?: string },
 ) {
   if (manifest.manifest_version === 3) {
     return deriveFilesMV3(manifest, srcDir, options)
@@ -36,7 +36,7 @@ export function deriveFiles(
 export function deriveFilesMV3(
   manifest: chrome.runtime.ManifestV3,
   srcDir: string,
-  options: { contentScripts: boolean },
+  options: { contentScripts: boolean, offscreenHtml?: string },
 ) {
   const locales = isString(manifest.default_locale)
     ? ['_locales/**/messages.json']
@@ -72,6 +72,7 @@ export function deriveFilesMV3(
 
   const html = [
     ...files.filter((f) => /\.html?$/.test(f)),
+    options.offscreenHtml,
     get(manifest, 'options_page'),
     get(manifest, 'options_ui.page'),
     get(manifest, 'devtools_page'),
