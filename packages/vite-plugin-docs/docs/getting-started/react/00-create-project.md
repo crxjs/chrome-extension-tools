@@ -41,6 +41,23 @@ export default defineConfig({
 })
 ```
 
+## Note: make sure update `tsconfig.node.json` file (TypeScript)
+When you updated your `vite.config.ts` file then you should get an error called (down below)
+```console
+manifest.json is not listed within the file list of project.
+Projects must list all files or use an 'include' pattern.
+```
+Don't worry, you have to do a simple thing to solve this error.
+- Open you `tsconfig.node.json` file from the project root directory.
+- Then find `include` propertry.
+- Now update the array with this code. Besides, no need to change anything...
+```json
+{
+  "include": ["vite.config.ts", "manifest.json"]
+}
+```
+> Now error is gone.😊
+
 Create a file named `manifest.json` next to `vite.config.js`.
 
 ```json title=manifest.json
