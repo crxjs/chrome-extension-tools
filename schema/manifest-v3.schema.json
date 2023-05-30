@@ -686,7 +686,7 @@
       "description": "The Side Panel API allows extensions to display their own UI in the side panel, enabling persistent experiences that complement the user's browsing journey.",
       "properties": {
         "default_path": {
-          "description": "The path to your sie panel page, relative to your extension's root.",
+          "description": "The path to your site panel page, relative to your extension's root.",
           "type": "string"
         }
       },
