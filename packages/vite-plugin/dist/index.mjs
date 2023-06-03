@@ -1,15 +1,16 @@
 import { simple } from 'acorn-walk';
 import { createHash } from 'crypto';
-import debug$2 from 'debug';
+import debug$3 from 'debug';
 import v8 from 'v8';
 import { posix } from 'path';
-import { Subject, filter, ReplaySubject, switchMap, of, startWith, map, mergeMap, firstValueFrom, takeUntil, first, toArray, retry, concatWith, Subscription, buffer } from 'rxjs';
+import { Subject, filter, ReplaySubject, switchMap, of, startWith, map, BehaviorSubject, mergeMap, firstValueFrom, takeUntil, first, toArray, retry, concatWith, Subscription, buffer } from 'rxjs';
 import fsx from 'fs-extra';
 import { performance } from 'perf_hooks';
 import { rollup } from 'rollup';
 import * as lexer from 'es-module-lexer';
 import { readFile as readFile$1 } from 'fs/promises';
 import MagicString from 'magic-string';
+import convertSourceMap from 'convert-source-map';
 import { createLogger } from 'vite';
 import { readFileSync, existsSync, promises } from 'fs';
 import { createRequire } from 'module';
@@ -60,7 +61,7 @@ function isCrxPlugin(p) {
 
 var workerHmrClient = "const ownOrigin = new URL(chrome.runtime.getURL(\"/\")).origin;\nself.addEventListener(\"fetch\", (fetchEvent) => {\n  const url = new URL(fetchEvent.request.url);\n  if (url.origin === ownOrigin) {\n    fetchEvent.respondWith(sendToServer(url));\n  }\n});\nasync function sendToServer(url) {\n  url.protocol = \"http:\";\n  url.host = \"localhost\";\n  url.port = __SERVER_PORT__;\n  url.searchParams.set(\"t\", Date.now().toString());\n  const response = await fetch(url.href.replace(/=$|=(?=&)/g, \"\"));\n  return new Response(response.body, {\n    headers: {\n      \"Content-Type\": response.headers.get(\"Content-Type\") ?? \"text/javascript\"\n    }\n  });\n}\nconst ports = /* @__PURE__ */ new Set();\nchrome.runtime.onConnect.addListener((port) => {\n  if (port.name === \"@crx/client\") {\n    ports.add(port);\n    port.onDisconnect.addListener((port2) => ports.delete(port2));\n    port.onMessage.addListener((message) => {\n    });\n    port.postMessage({ data: JSON.stringify({ type: \"connected\" }) });\n  }\n});\nfunction notifyContentScripts(payload) {\n  const data = JSON.stringify(payload);\n  for (const port of ports)\n    port.postMessage({ data });\n}\nconsole.log(\"[vite] connecting...\");\nconst socketProtocol = __HMR_PROTOCOL__ || (location.protocol === \"https:\" ? \"wss\" : \"ws\");\nconst socketHost = `${__HMR_HOSTNAME__ || location.hostname}:${__HMR_PORT__}`;\nconst socket = new WebSocket(`${socketProtocol}://${socketHost}`, \"vite-hmr\");\nconst base = __BASE__ || \"/\";\nsocket.addEventListener(\"message\", async ({ data }) => {\n  handleSocketMessage(JSON.parse(data));\n});\nfunction isCrxHmrPayload(x) {\n  return x.type === \"custom\" && x.event.startsWith(\"crx:\");\n}\nfunction handleSocketMessage(payload) {\n  if (isCrxHmrPayload(payload)) {\n    handleCrxHmrPayload(payload);\n  } else if (payload.type === \"connected\") {\n    console.log(`[vite] connected.`);\n    const interval = setInterval(() => socket.send(\"ping\"), __HMR_TIMEOUT__);\n    socket.addEventListener(\"close\", () => clearInterval(interval));\n  }\n}\nfunction handleCrxHmrPayload(payload) {\n  notifyContentScripts(payload);\n  switch (payload.event) {\n    case \"crx:runtime-reload\":\n      console.log(\"[crx] runtime reload\");\n      chrome.runtime.reload();\n      break;\n  }\n}\nasync function waitForSuccessfulPing(ms = 1e3) {\n  while (true) {\n    try {\n      await fetch(`${base}__vite_ping`);\n      break;\n    } catch (e) {\n      await new Promise((resolve) => setTimeout(resolve, ms));\n    }\n  }\n}\nsocket.addEventListener(\"close\", async ({ wasClean }) => {\n  if (wasClean)\n    return;\n  console.log(`[vite] server connection lost. polling for restart...`);\n  await waitForSuccessfulPing();\n  handleCrxHmrPayload({\n    type: \"custom\",\n    event: \"crx:runtime-reload\"\n  });\n});\n";
 
-const _debug = (id) => debug$2("crx").extend(id);
+const _debug = (id) => debug$3("crx").extend(id);
 const structuredClone = (obj) => {
   return v8.deserialize(v8.serialize(obj));
 };
@@ -206,7 +207,7 @@ function formatFileData(script) {
   return script;
 }
 function getFileName({ type, id }) {
-  let fileName = id.replace(/t=\d+&/, "").replace(/^\//, "").replace(/\?/g, "__").replace(/&/g, "_").replace(/=/g, "--");
+  let fileName = id.replace(/t=\d+&/, "").replace(/\?t=\d+$/, "").replace(/^\//, "").replace(/\?/g, "__").replace(/&/g, "_").replace(/=/g, "--");
   if (fileName.includes("node_modules/")) {
     fileName = `vendor/${fileName.split("node_modules/").pop().replace(/\//g, "-")}`;
   } else if (fileName.startsWith("@")) {
@@ -337,9 +338,9 @@ const pluginBackground = () => {
 
 var contentHmrPort = "function isCrxHMRPayload(x) {\n  return x.type === \"custom\" && x.event.startsWith(\"crx:\");\n}\nclass HMRPort {\n  port;\n  callbacks = /* @__PURE__ */ new Map();\n  constructor() {\n    setInterval(() => {\n      try {\n        this.port?.postMessage({ data: \"ping\" });\n      } catch (error) {\n        if (error instanceof Error && error.message.includes(\"Extension context invalidated.\")) {\n          location.reload();\n        } else\n          throw error;\n      }\n    }, __CRX_HMR_TIMEOUT__);\n    setInterval(this.initPort, 5 * 60 * 1e3);\n    this.initPort();\n  }\n  initPort = () => {\n    this.port?.disconnect();\n    this.port = chrome.runtime.connect({ name: \"@crx/client\" });\n    this.port.onDisconnect.addListener(this.handleDisconnect.bind(this));\n    this.port.onMessage.addListener(this.handleMessage.bind(this));\n    this.port.postMessage({ type: \"connected\" });\n  };\n  handleDisconnect = () => {\n    if (this.callbacks.has(\"close\"))\n      for (const cb of this.callbacks.get(\"close\")) {\n        cb({ wasClean: true });\n      }\n  };\n  handleMessage = (message) => {\n    const forward = (data) => {\n      if (this.callbacks.has(\"message\"))\n        for (const cb of this.callbacks.get(\"message\")) {\n          cb({ data });\n        }\n    };\n    const payload = JSON.parse(message.data);\n    if (isCrxHMRPayload(payload)) {\n      if (payload.event === \"crx:runtime-reload\") {\n        console.log(\"[crx] runtime reload\");\n        setTimeout(() => location.reload(), 500);\n      } else {\n        forward(JSON.stringify(payload.data));\n      }\n    } else {\n      forward(message.data);\n    }\n  };\n  addEventListener = (event, callback) => {\n    const cbs = this.callbacks.get(event) ?? /* @__PURE__ */ new Set();\n    cbs.add(callback);\n    this.callbacks.set(event, cbs);\n  };\n  send = (data) => {\n    if (this.port)\n      this.port.postMessage({ data });\n    else\n      throw new Error(\"HMRPort is not initialized\");\n  };\n}\n\nexport { HMRPort };\n";
 
-var contentDevLoader = "(function () {\n  'use strict';\n\n  (async () => {\n    if (__PREAMBLE__)\n      await import(\n        /* @vite-ignore */\n        chrome.runtime.getURL(__PREAMBLE__)\n      );\n    await import(\n      /* @vite-ignore */\n      chrome.runtime.getURL(__CLIENT__)\n    );\n    await import(\n      /* @vite-ignore */\n      chrome.runtime.getURL(__SCRIPT__)\n    );\n  })().catch(console.error);\n\n})();\n";
+var contentDevLoader = "(function () {\n  'use strict';\n\n  const injectTime = performance.now();\n  (async () => {\n    if (__PREAMBLE__)\n      await import(\n        /* @vite-ignore */\n        chrome.runtime.getURL(__PREAMBLE__)\n      );\n    await import(\n      /* @vite-ignore */\n      chrome.runtime.getURL(__CLIENT__)\n    );\n    const { onExecute } = await import(\n      /* @vite-ignore */\n      chrome.runtime.getURL(__SCRIPT__)\n    );\n    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });\n  })().catch(console.error);\n\n})();\n";
 
-var contentProLoader = "(function () {\n  'use strict';\n\n  (async () => {\n    await import(\n      /* @vite-ignore */\n      chrome.runtime.getURL(__SCRIPT__)\n    );\n  })().catch(console.error);\n\n})();\n";
+var contentProLoader = "(function () {\n  'use strict';\n\n  const injectTime = performance.now();\n  (async () => {\n    const { onExecute } = await import(\n      /* @vite-ignore */\n      chrome.runtime.getURL(__SCRIPT__)\n    );\n    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });\n  })().catch(console.error);\n\n})();\n";
 
 const contentScripts = new RxMap();
 contentScripts.change$.pipe(filter(RxMap.isChangeType.set)).subscribe(({ map, value }) => {
@@ -397,6 +398,10 @@ const allFilesReady$ = buildEnd$.pipe(
   map(() => [...outputFiles.values()]),
   switchMap((files) => Promise.allSettled(files.map(({ file }) => file)))
 );
+const timestamp$ = new BehaviorSubject(Date.now());
+allFilesReady$.subscribe(() => {
+  timestamp$.next(Date.now());
+});
 const isRejected = (x) => x?.status === "rejected";
 const fileWriterError$ = allFilesReady$.pipe(
   mergeMap((results) => results.filter(isRejected)),
@@ -437,8 +442,25 @@ function prepScript(fileName, script) {
       const transformResult = await server.transformRequest(viteUrl);
       if (!transformResult)
         throw new TypeError(`Unable to load "${script.id}" from server.`);
-      const { code, deps = [], dynamicDeps = [] } = transformResult;
-      return { target, code, deps: [...deps, ...dynamicDeps].flat(), server };
+      const { deps = [], dynamicDeps = [], map: map2 } = transformResult;
+      let { code } = transformResult;
+      try {
+        if (map2 && server.config.build.sourcemap === "inline") {
+          code = code.replace(/\n*\/\/# sourceMappingURL=[^\n]+/g, "");
+          const sourceMap = convertSourceMap.fromObject(map2).toComment();
+          code += `
+${sourceMap}
+`;
+        }
+      } catch (error) {
+        console.warn("Failed to inline source map", error);
+      }
+      return {
+        target,
+        code,
+        deps: [...deps, ...dynamicDeps].flat(),
+        server
+      };
     }),
     // retry in case of dependency rebundle
     retry({ count: 10, delay: 100 }),
@@ -645,6 +667,19 @@ const pluginContentScripts = () => {
       name: "crx:content-scripts",
       apply: "build",
       enforce: "pre",
+      config(config) {
+        return {
+          ...config,
+          build: {
+            ...config.build,
+            rollupOptions: {
+              ...config.build?.rollupOptions,
+              // keep exports for content script module api
+              preserveEntrySignatures: config.build?.rollupOptions?.preserveEntrySignatures ?? "exports-only"
+            }
+          }
+        };
+      },
       generateBundle() {
         for (const [key, script] of contentScripts)
           if (key === script.refId) {
@@ -862,29 +897,42 @@ const pluginDynamicContentScripts = () => {
   ];
 };
 
+const { remove } = fsx;
 const logger = createLogger("error", { prefix: "crxjs" });
 const pluginFileWriter = () => {
   fileWriterError$.subscribe((error) => {
     logger.error(error.err.message, { error: error.err });
   });
-  return {
-    name: "crx:file-writer",
-    apply: "serve",
-    configureServer(server) {
-      server.httpServer?.on("listening", async () => {
-        try {
-          await start({ server });
-        } catch (error) {
-          console.error(error);
-          server.close();
+  return [
+    {
+      name: "crx:file-writer-empty-out-dir",
+      apply: "serve",
+      enforce: "pre",
+      async configResolved(config) {
+        if (config.build.emptyOutDir) {
+          await remove(config.build.outDir);
         }
-      });
-      server.httpServer?.on("close", () => close());
+      }
     },
-    closeBundle() {
-      outputFiles.clear();
+    {
+      name: "crx:file-writer",
+      apply: "serve",
+      configureServer(server) {
+        server.httpServer?.on("listening", async () => {
+          try {
+            await start({ server });
+          } catch (error) {
+            console.error(error);
+            server.close();
+          }
+        });
+        server.httpServer?.on("close", () => close());
+      },
+      closeBundle() {
+        outputFiles.clear();
+      }
     }
-  };
+  ];
 };
 
 const _require = typeof require === "undefined" ? createRequire(import.meta.url) : require;
@@ -999,11 +1047,13 @@ const pluginFileWriterPublic = () => {
   };
 };
 
-_debug("file-writer").extend("hmr");
-const isCrxHMRPayload = (p) => p.type === "custom" && p.event.startsWith("crx:");
+const debug$2 = _debug("file-writer").extend("hmr");
+const isCustomPayload = (p) => {
+  return p.type === "custom";
+};
 const hmrPayload$ = new Subject();
 const crxHMRPayload$ = hmrPayload$.pipe(
-  filter((p) => !isCrxHMRPayload(p)),
+  filter((p) => !isCustomPayload(p)),
   buffer(allFilesReady$),
   mergeMap((pps) => {
     let fullReload;
@@ -1062,6 +1112,7 @@ const crxHMRPayload$ = hmrPayload$.pipe(
     }
   }),
   map((data) => {
+    debug$2(`hmr payload`, data);
     return {
       type: "custom",
       event: "crx:content-script-payload",
@@ -1535,7 +1586,7 @@ const pluginManifest = () => {
           }
         }
         const encoded = encodeManifest(manifest2);
-        return encoded;
+        return { code: encoded, map: null };
       },
       async generateBundle(options, bundle) {
         const manifestName = this.getFileName(refId);
@@ -1642,10 +1693,10 @@ Public dir: "${config.publicDir}"`
           this.emitFile({
             type: "asset",
             fileName: "manifest.json",
-            source: JSON.stringify(manifest2, null, 2)
+            source: JSON.stringify(manifest2, null, 2) + "\n"
           });
         } else {
-          manifestJson.source = JSON.stringify(manifest2, null, 2);
+          manifestJson.source = JSON.stringify(manifest2, null, 2) + "\n";
         }
         delete bundle[manifestName];
       }
