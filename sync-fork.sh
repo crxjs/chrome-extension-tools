@@ -21,4 +21,4 @@ git add .;
 git commit -m "Update on $date";
 git push origin "$branch";
 
-open "$(git ls-remote --get-url | perl -pe 's|^git@|https://|' | perl -pe 's|com:|com/|g' | perl -pe 's/.git$//')";
+open "https://github.com/Cside/chrome-extension-tools/compare/Cside:main...Cside:chrome-vite-plugin:$branch"
