@@ -158,12 +158,12 @@ export interface ManifestV3 {
   incognito?: string | undefined
   input_components?:
     | {
-        name?: string | undefined
-        type?: string | undefined
+        name: string
         id?: string | undefined
-        description?: string | undefined
-        language?: string | undefined
-        layouts?: string[] | undefined
+        language?: string | string[] | undefined
+        layouts?: string | string[] | undefined
+        input_view?: string | undefined
+        options_page?: string | undefined
       }[]
     | undefined
   key?: string | undefined

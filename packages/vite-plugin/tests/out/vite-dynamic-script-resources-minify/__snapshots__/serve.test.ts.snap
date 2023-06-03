@@ -60,7 +60,7 @@ import 'http://localhost:3000/src/background.ts';
 `;
 
 exports[`serve fs output > src/content1.ts.js 1`] = `
-"import script from \\"/src/script.ts__scriptId--0.js?t=1643155200000\\";
+"import script from \\"/src/script.ts__scriptId--0.js\\";
 console.log(\\"content.ts\\", { script });
 "
 `;
@@ -69,6 +69,7 @@ exports[`serve fs output > src/content1.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
     if (\\"\\")
       await import(
@@ -79,10 +80,11 @@ exports[`serve fs output > src/content1.ts-loader.js 1`] = `
       /* @vite-ignore */
       chrome.runtime.getURL(\\"vendor/vite-client.js\\")
     );
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"src/content1.ts.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
@@ -90,7 +92,7 @@ exports[`serve fs output > src/content1.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output > src/content2.ts.js 1`] = `
-"import font from \\"/src/font.otf__import_url.js?t=1643155200000\\";
+"import font from \\"/src/font.otf__import_url.js\\";
 console.log(\\"content2.ts\\", { font });
 "
 `;
@@ -99,6 +101,7 @@ exports[`serve fs output > src/content2.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
     if (\\"\\")
       await import(
@@ -109,10 +112,11 @@ exports[`serve fs output > src/content2.ts-loader.js 1`] = `
       /* @vite-ignore */
       chrome.runtime.getURL(\\"vendor/vite-client.js\\")
     );
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"src/content2.ts.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
@@ -124,7 +128,7 @@ exports[`serve fs output > src/font.otf__import_url.js 1`] = `"export default \\
 exports[`serve fs output > src/image.png__import.js 1`] = `"export default \\"/src/image.png\\""`;
 
 exports[`serve fs output > src/script.ts.js 1`] = `
-"import icon from \\"/src/image.png__import.js?t=1643155200000\\";
+"import icon from \\"/src/image.png__import.js\\";
 console.log(\\"main world script\\", { icon });
 export {};
 "

@@ -1,0 +1,72 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.js-loader.hash0.js",
+      ],
+      "matches": Array [
+        "https://a.com/*",
+        "http://b.com/*",
+      ],
+    },
+  ],
+  "description": "test extension",
+  "host_permissions": Array [
+    "https://c.com/*",
+  ],
+  "manifest_version": 3,
+  "name": "Test Extension",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+      ],
+      "resources": Array [
+        "assets/content.js.hash1.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/content.js-loader.hash0.js",
+  "assets/content.js.hash1.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output > assets/content.js.hash1.js 1`] = `
+"console.log(\\"content script\\");
+function onExecute() {
+  console.log(\\"onExecute\\");
+}
+export {
+  onExecute
+};
+"
+`;
+
+exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.js.hash1.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;

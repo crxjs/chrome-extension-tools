@@ -2,6 +2,7 @@ import * as lexer from 'es-module-lexer'
 import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
 import {
+  BehaviorSubject,
   filter,
   first,
   firstValueFrom,
@@ -21,6 +22,7 @@ import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
+import convertSourceMap from 'convert-source-map'
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -73,6 +75,12 @@ export const allFilesReady$ = buildEnd$.pipe(
   map(() => [...outputFiles.values()]),
   switchMap((files) => Promise.allSettled(files.map(({ file }) => file))),
 )
+
+const timestamp$ = new BehaviorSubject(Date.now())
+allFilesReady$.subscribe(() => {
+  // update timestamp when all files have emitted
+  timestamp$.next(Date.now())
+})
 
 export const isRejected = <T>(
   x: PromiseSettledResult<T> | undefined,
@@ -139,8 +147,25 @@ function prepScript(
         const transformResult = await server.transformRequest(viteUrl)
         if (!transformResult)
           throw new TypeError(`Unable to load "${script.id}" from server.`)
-        const { code, deps = [], dynamicDeps = [] } = transformResult
-        return { target, code, deps: [...deps, ...dynamicDeps].flat(), server }
+        const { deps = [], dynamicDeps = [], map } = transformResult
+        let { code } = transformResult
+        try {
+          if (map && server.config.build.sourcemap === 'inline') {
+            // remove existing source map (might be a url, which doesn't work in content scripts)
+            code = code.replace(/\n*\/\/# sourceMappingURL=[^\n]+/g, '')
+            // create a new inline source map
+            const sourceMap = convertSourceMap.fromObject(map).toComment()
+            code += `\n${sourceMap}\n`
+          }
+        } catch (error) {
+          console.warn('Failed to inline source map', error)
+        }
+        return {
+          target,
+          code,
+          deps: [...deps, ...dynamicDeps].flat(),
+          server,
+        }
       }),
       // retry in case of dependency rebundle
       retry({ count: 10, delay: 100 }),
@@ -159,15 +184,10 @@ function prepScript(
         const [imports] = lexer.parse(code, fileName)
         const depSet = new Set<string>(deps)
         const magic = new MagicString(code)
-        const now = Date.now()
         for (const i of imports)
           if (i.n) {
             depSet.add(i.n)
-            let fileName = getFileName({ type: 'module', id: i.n })
-            // exclude deps like React
-            if (!fileName.startsWith('vendor')) {
-              fileName = `${fileName}?t=${now}`
-            }
+            const fileName = getFileName({ type: 'module', id: i.n })
 
             // NOTE: Temporary fix for this bug: https://github.com/guybedford/es-module-lexer/issues/144
             const fullImport = code.substring(i.s, i.e)

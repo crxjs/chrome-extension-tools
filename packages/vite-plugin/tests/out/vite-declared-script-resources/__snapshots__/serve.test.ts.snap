@@ -67,9 +67,9 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content.ts.js 1`] = `
-"import icon from \\"/src/image.png__import.js?t=1643155200000\\";
-import font from \\"/src/font.otf__import.js?t=1643155200000\\";
-import scriptUrl from \\"/src/script.ts__scriptId--0.js?t=1643155200000\\";
+"import icon from \\"/src/image.png__import.js\\";
+import font from \\"/src/font.otf__import.js\\";
+import scriptUrl from \\"/src/script.ts__scriptId--0.js\\";
 console.log(\\"content.ts\\", { icon, font });
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(scriptUrl);
@@ -82,6 +82,7 @@ exports[`serve fs output > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
     if (\\"\\")
       await import(
@@ -92,10 +93,11 @@ exports[`serve fs output > src/content.ts-loader.js 1`] = `
       /* @vite-ignore */
       chrome.runtime.getURL(\\"vendor/vite-client.js\\")
     );
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"src/content.ts.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();

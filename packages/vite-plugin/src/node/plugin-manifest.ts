@@ -250,7 +250,7 @@ export const pluginManifest: CrxPluginFn = () => {
         }
 
         const encoded = encodeManifest(manifest)
-        return encoded
+        return { code: encoded, map: null }
       },
       async generateBundle(options, bundle) {
         const manifestName = this.getFileName(refId)
@@ -389,10 +389,10 @@ Public dir: "${config.publicDir}"`,
           this.emitFile({
             type: 'asset',
             fileName: 'manifest.json',
-            source: JSON.stringify(manifest, null, 2),
+            source: JSON.stringify(manifest, null, 2) + '\n',
           })
         } else {
-          manifestJson.source = JSON.stringify(manifest, null, 2)
+          manifestJson.source = JSON.stringify(manifest, null, 2) + '\n'
         }
 
         // remove manifest js file, we're done with it :)

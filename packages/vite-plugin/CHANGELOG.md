@@ -1,5 +1,33 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.17
+
+### Patch Changes
+
+- 936ed77: Add inline sourcemap support to content scripts
+- bbc4d33: fix: schema of input_components
+
+## 2.0.0-beta.16
+
+### Patch Changes
+
+- 1728bdd: Add newline to generated manifest.json (issue #668)
+- 00be1a1: fix: add new screenshot and remove the redudant code
+- 42baebb: React v18 ReactDOM.render changes
+- a4982e3: Add content script module API
+
+## 2.0.0-beta.15
+
+### Patch Changes
+
+- ca0dfee: WIP: fix HMR singleton issue
+
+## 2.0.0-beta.14
+
+### Patch Changes
+
+- 3dea230: Add tip `type: module` to vue page
+
 ## 2.0.0-beta.13
 
 ### Patch Changes

@@ -120,6 +120,21 @@ export const pluginContentScripts: CrxPluginFn = () => {
       name: 'crx:content-scripts',
       apply: 'build',
       enforce: 'pre',
+      config(config) {
+        return {
+          ...config,
+          build: {
+            ...config.build,
+            rollupOptions: {
+              ...config.build?.rollupOptions,
+              // keep exports for content script module api
+              preserveEntrySignatures:
+                config.build?.rollupOptions?.preserveEntrySignatures ??
+                'exports-only',
+            },
+          },
+        }
+      },
       generateBundle() {
         // emit content script loaders
         for (const [key, script] of contentScripts)
