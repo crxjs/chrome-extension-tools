@@ -122,7 +122,7 @@ jobs:
         if: failure()
         with:
           name: image-diff-${{ matrix.type }}
-          path: ${{ github.workspace }}/tests/**/__image_snapshots__/__diff_output__/*.png
+          path: ${{ github.workspace }}/packages/vite-plugin/tests/**/__image_snapshots__/__diff_output__/*.png
 
   # Runs unit and output tests
   unit:
