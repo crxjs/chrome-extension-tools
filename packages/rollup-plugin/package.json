@@ -78,7 +78,7 @@
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^5.1.1",
     "@types/cheerio": "0.22.22",
-    "@types/chrome": "0.0.209",
+    "@types/chrome": "0.0.237",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^8.0.0",
     "@types/jest": "^27.0.0",
