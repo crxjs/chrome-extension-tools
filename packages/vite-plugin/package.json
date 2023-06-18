@@ -83,7 +83,7 @@
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
-    "@rollup/plugin-alias": "4.0.2",
+    "@rollup/plugin-alias": "4.0.4",
     "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "13.2.0",

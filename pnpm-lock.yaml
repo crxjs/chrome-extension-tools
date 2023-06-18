@@ -158,7 +158,7 @@ importers:
     specifiers:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
-      '@rollup/plugin-alias': 4.0.2
+      '@rollup/plugin-alias': 4.0.4
       '@rollup/plugin-commonjs': 21.1.0
       '@rollup/plugin-json': ^5.0.0
       '@rollup/plugin-node-resolve': 13.2.0
@@ -232,7 +232,7 @@ importers:
     devDependencies:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
-      '@rollup/plugin-alias': 4.0.2_rollup@2.78.1
+      '@rollup/plugin-alias': 4.0.4_rollup@2.78.1
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.78.1
       '@rollup/plugin-json': 5.0.1_rollup@2.78.1
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.78.1
@@ -5555,8 +5555,8 @@ packages:
   /@polka/url/1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
 
-  /@rollup/plugin-alias/4.0.2_rollup@2.78.1:
-    resolution: {integrity: sha512-1hv7dBOZZwo3SEupxn4UA2N0EDThqSSS+wI1St1TNTBtOZvUchyIClyHcnDcjjrReTPZ47Faedrhblv4n+T5UQ==}
+  /@rollup/plugin-alias/4.0.4_rollup@2.78.1:
+    resolution: {integrity: sha512-0CaAY238SMtYAWEXXptWSR8iz8NYZnH7zNBKuJ14xFJSGwLtPgjvXYsoApAHfzYXXH1ejxpVw7WlHss3zhh9SQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0
