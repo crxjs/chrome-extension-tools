@@ -87,7 +87,7 @@
     "@types/lodash.flatten": "^4.4.6",
     "@types/lodash.get": "^4.4.6",
     "@types/node": "^13.7.0",
-    "@types/prettier": "^1.19.0",
+    "@types/prettier": "^2.0.0",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
     "jest": "^27.5.1",

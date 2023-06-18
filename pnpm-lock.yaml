@@ -55,7 +55,7 @@ importers:
       '@types/lodash.flatten': ^4.4.6
       '@types/lodash.get': ^4.4.6
       '@types/node': ^13.7.0
-      '@types/prettier': ^1.19.0
+      '@types/prettier': ^2.0.0
       '@types/react': ^17.0.3
       '@types/react-dom': ^17.0.3
       ajv: ^8.6.2
@@ -136,7 +136,7 @@ importers:
       '@types/lodash.flatten': 4.4.7
       '@types/lodash.get': 4.4.7
       '@types/node': 13.13.52
-      '@types/prettier': 1.19.1
+      '@types/prettier': 2.6.0
       '@types/react': 17.0.45
       '@types/react-dom': 17.0.16
       jest: 27.5.1
@@ -6381,10 +6381,6 @@ packages:
     resolution: {integrity: sha512-HDaSHIAv9kwpMN7zlmwfTv6gax0PiporJOipcrGsVNF3Ba+kryOZc0Pio5pn6NhisgWr7TaajlPEKTbTAypIBQ==}
     dependencies:
       '@types/node': 17.0.18
-    dev: true
-
-  /@types/prettier/1.19.1:
-    resolution: {integrity: sha512-5qOlnZscTn4xxM5MeGXAMOsIOIKIbh9e85zJWfBRVPlRMEVawzoPhINYbRGkBZCI8LxvBe7tJCdWiarA99OZfQ==}
     dev: true
 
   /@types/prettier/2.6.0:
