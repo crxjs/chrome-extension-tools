@@ -1,9 +1,21 @@
-import { crx } from "@crxjs/vite-plugin";
-import { defineConfig } from 'vite';
-import manifest from "./manifest.json";
+import { crx } from '../../plugin-testOptionsProvider'
+import { defineConfig } from 'vite'
+import manifest from './manifest.json'
 
 export default defineConfig({
-    plugins: [
-        crx({ manifest }),
-    ]
-});
+  build: {
+    sourcemap: 'inline',
+    minify: false,
+    rollupOptions: {
+      output: {
+        // the hash randomly changes between environments
+        assetFileNames: 'assets/[name].hash[hash].[ext]',
+        chunkFileNames: 'assets/[name].hash[hash].js',
+        entryFileNames: 'assets/[name].hash[hash].js',
+      },
+    },
+  },
+  clearScreen: false,
+  logLevel: 'error',
+  plugins: [crx({ manifest })],
+})
