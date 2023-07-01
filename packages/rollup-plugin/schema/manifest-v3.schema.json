@@ -115,6 +115,7 @@
           "declarativeContent",
           "declarativeNetRequest",
           "declarativeNetRequestFeedback",
+          "declarativeNetRequestWithHostAccess",
           "declarativeWebRequest",
           "desktopCapture",
           "documentScan",
