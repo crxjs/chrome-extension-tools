@@ -338,6 +338,15 @@
               "document_idle"
             ],
             "type": "string"
+          },
+          "world": {
+            "type": "string",
+            "description": "The JavaScript world for a script to execute within.",
+            "enum": [
+              "ISOLATED",
+              "MAIN"
+            ],
+            "default": "ISOLATED"
           }
         },
         "required": ["matches"],
