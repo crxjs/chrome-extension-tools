@@ -1,0 +1,318 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "index.html",
+  },
+  "content_scripts": Array [
+    Object {
+      "all_frames": true,
+      "js": Array [
+        "assets/content.ts-loader.hash0.js",
+      ],
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "run_at": "document_start",
+    },
+  ],
+  "manifest_version": 3,
+  "name": "CRXJS Vanilla JS Example",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "assets/content.ts.hash1.js",
+        "assets/module.hash2.js",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/content.ts-loader.hash0.js",
+  "assets/content.ts.hash1.js",
+  "assets/index.hash3.css",
+  "assets/index.html.hash4.js",
+  "assets/module.hash2.js",
+  "assets/typescript.hash5.svg",
+  "index.html",
+  "manifest.json",
+  "vite.svg",
+]
+`;
+
+exports[`build fs output > assets/content.ts.hash1.js 1`] = `
+"const scriptRel = \\"modulepreload\\";
+const assetsURL = function(dep) {
+  return \\"/\\" + dep;
+};
+const seen = {};
+const __vitePreload = function preload(baseModule, deps, importerUrl) {
+  if (!deps || deps.length === 0) {
+    return baseModule();
+  }
+  return Promise.all(deps.map((dep) => {
+    dep = assetsURL(dep);
+    if (dep in seen)
+      return;
+    seen[dep] = true;
+    const isCss = dep.endsWith(\\".css\\");
+    const cssSelector = isCss ? '[rel=\\"stylesheet\\"]' : \\"\\";
+    if (document.querySelector(\`link[href=\\"\${dep}\\"]\${cssSelector}\`)) {
+      return;
+    }
+    const link = document.createElement(\\"link\\");
+    link.rel = isCss ? \\"stylesheet\\" : scriptRel;
+    if (!isCss) {
+      link.as = \\"script\\";
+      link.crossOrigin = \\"\\";
+    }
+    link.href = dep;
+    document.head.appendChild(link);
+    if (isCss) {
+      return new Promise((res, rej) => {
+        link.addEventListener(\\"load\\", res);
+        link.addEventListener(\\"error\\", () => rej(new Error(\`Unable to preload CSS for \${dep}\`)));
+      });
+    }
+  })).then(() => baseModule());
+};
+const sharedUtil = () => {
+  console.log(\\"util\\");
+};
+sharedUtil();
+__vitePreload(() => import(\\"./module.hash2.js\\"), true ? [] : void 0);
+export {
+  sharedUtil as s
+};
+// # sourceMappingURL=data:application/json;base64,<base64>
+"
+`;
+
+exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/content.ts.hash1.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/index.hash3.css 1`] = `
+":root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.vanilla:hover {
+  filter: drop-shadow(0 0 2em #3178c6aa);
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+"
+`;
+
+exports[`build fs output > assets/index.html.hash4.js 1`] = `
+"(function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+const style = \\"\\";
+const typescriptLogo = \\"/assets/typescript.hash5.svg\\";
+const viteLogo = \\"/vite.svg\\";
+function setupCounter(element) {
+  let counter = 0;
+  const setCounter = (count) => {
+    counter = count;
+    element.innerHTML = \`count is \${counter}\`;
+  };
+  element.addEventListener(\\"click\\", () => setCounter(counter + 1));
+  setCounter(0);
+}
+document.querySelector(\\"#app\\").innerHTML = \`
+  <div>
+    <a href=\\"https://vitejs.dev\\" target=\\"_blank\\">
+      <img src=\\"\${viteLogo}\\" class=\\"logo\\" alt=\\"Vite logo\\" />
+    </a>
+    <a href=\\"https://www.typescriptlang.org/\\" target=\\"_blank\\">
+      <img src=\\"\${typescriptLogo}\\" class=\\"logo vanilla\\" alt=\\"TypeScript logo\\" />
+    </a>
+    <h1>Vite + TypeScript</h1>
+    <div class=\\"card\\">
+      <button id=\\"counter\\" type=\\"button\\"></button>
+    </div>
+    <p class=\\"read-the-docs\\">
+      Click on the Vite and TypeScript logos to learn more
+    </p>
+  </div>
+\`;
+setupCounter(document.querySelector(\\"#counter\\"));
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
+
+exports[`build fs output > assets/module.hash2.js 1`] = `
+"import { s as sharedUtil } from \\"./content.ts.hash1.js\\";
+sharedUtil();
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
+
+exports[`build fs output > index.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <link rel=\\"icon\\" type=\\"image/svg+xml\\" href=\\"/vite.svg\\" />
+    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <title>Vite + TS</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/index.html.hash4.js\\"></script>
+    <link rel=\\"stylesheet\\" href=\\"/assets/index.hash3.css\\">
+  </head>
+  <body>
+    <div id=\\"app\\"></div>
+    
+  </body>
+</html>
+"
+`;

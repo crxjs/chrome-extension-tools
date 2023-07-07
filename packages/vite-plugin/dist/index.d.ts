@@ -166,6 +166,9 @@ interface ManifestV3 {
         pages: string[];
         content_security_policy?: string | undefined;
     } | undefined;
+    side_panel?: {
+        default_path?: string | undefined;
+    } | undefined;
     short_name?: string | undefined;
     spellcheck?: {
         dictionary_language?: string | undefined;

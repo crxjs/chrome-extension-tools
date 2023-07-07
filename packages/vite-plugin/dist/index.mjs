@@ -1022,7 +1022,8 @@ function htmlFiles(manifest) {
     manifest.devtools_page,
     manifest.options_page,
     manifest.options_ui?.page,
-    manifest.sandbox?.pages
+    manifest.sandbox?.pages,
+    manifest.side_panel?.default_path
   ].flat().filter(isString).map((s) => s.split(/[#?]/)[0]).sort();
   return [...new Set(files)];
 }
@@ -1712,7 +1713,11 @@ function compileFileResources(fileName, {
   assets: /* @__PURE__ */ new Set(),
   css: /* @__PURE__ */ new Set(),
   imports: /* @__PURE__ */ new Set()
-}) {
+}, processedFiles = /* @__PURE__ */ new Set()) {
+  if (processedFiles.has(fileName)) {
+    return resources;
+  }
+  processedFiles.add(fileName);
   const chunk = chunks.get(fileName);
   if (chunk) {
     const { modules, facadeModuleId, imports, dynamicImports } = chunk;
@@ -1721,7 +1726,7 @@ function compileFileResources(fileName, {
     for (const x of dynamicImports)
       resources.imports.add(x);
     for (const x of [...imports, ...dynamicImports])
-      compileFileResources(x, { chunks, files, config }, resources);
+      compileFileResources(x, { chunks, files, config }, resources, processedFiles);
     for (const m of Object.keys(modules))
       if (m !== facadeModuleId) {
         const key = prefix$1("/", relative(config.root, m.split("?")[0]));
@@ -1734,7 +1739,8 @@ function compileFileResources(fileName, {
             compileFileResources(
               script.fileName,
               { chunks, files, config },
-              resources
+              resources,
+              processedFiles
             );
           }
       }

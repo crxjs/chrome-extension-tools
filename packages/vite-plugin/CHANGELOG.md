@@ -1,5 +1,13 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.18
+
+### Patch Changes
+
+- 47eeda7: fix(package): update cjs export path
+- 557721e: fix: infinite recursion on circular dependency
+- a6ee0d2: Test: infinite recursion on circular dependency
+
 ## 2.0.0-beta.17
 
 ### Patch Changes

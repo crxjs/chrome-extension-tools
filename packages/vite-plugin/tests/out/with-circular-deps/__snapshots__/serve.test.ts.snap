@@ -1,0 +1,149 @@
+// Vitest Snapshot v1
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "index.html",
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "all_frames": true,
+      "js": Array [
+        "src/content.ts-loader.js",
+      ],
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "run_at": "document_start",
+    },
+  ],
+  "manifest_version": 3,
+  "name": "CRXJS Vanilla JS Example",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+      "use_dynamic_url": true,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "assets/precontroller.hash0.js",
+  "index.html",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/content.ts-loader.js",
+  "src/content.ts.js",
+  "src/module.ts.js",
+  "src/utils.ts.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+  "vite.svg",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/content.ts",
+  "index.html",
+}
+`;
+
+exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
+"const id = setInterval(() => location.reload(), 100);
+setTimeout(() => clearInterval(id), 5e3);
+"
+`;
+
+exports[`serve fs output > index.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <title>Waiting for the extension service worker...</title>
+    <script src=\\"/assets/precontroller.hash0.js\\"></script>
+  </head>
+  <body>
+    <h1>Waiting for service worker</h1>
+
+    <p>
+      If you see this message, it means the service worker has not loaded fully.
+    </p>
+
+    <p>This page is never added in production.</p>
+  </body>
+</html>
+"
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+"
+`;
+
+exports[`serve fs output > src/content.ts.js 1`] = `
+"import { sharedUtil } from \\"/src/utils.ts.js\\";
+sharedUtil();
+import(\\"/src/module.ts.js\\");
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
+
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content.ts.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/module.ts.js 1`] = `
+"import { sharedUtil } from \\"/src/utils.ts.js\\";
+sharedUtil();
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
+
+exports[`serve fs output > src/utils.ts.js 1`] = `
+"export const sharedUtil = () => {
+  console.log(\\"util\\");
+};
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
