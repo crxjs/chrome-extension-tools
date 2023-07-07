@@ -1865,9 +1865,11 @@ const pluginWebAccessibleResources = () => {
                     if (type === "module") {
                       moduleScriptResources.set(fileName, resource);
                     } else {
-                      resource.matches = resource.matches.map(
-                        getMatchPatternOrigin
-                      );
+                      resource.matches = [
+                        ...new Set(
+                          resource.matches.map(getMatchPatternOrigin).filter((match) => match.endsWith("/*"))
+                        )
+                      ];
                       web_accessible_resources.push(resource);
                     }
                 }
