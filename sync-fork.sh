@@ -17,6 +17,9 @@ git merge upstream/main;
 pnpm install;
 pnpm build:vite-plugin;
 
+read -p $'Edit the version of package.json [OK]\n'
+vi packages/vite-plugin/package.json
+
 git add .;
 git commit -m "Update on $date";
 git push origin "$branch";

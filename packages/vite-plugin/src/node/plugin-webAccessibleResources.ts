@@ -1,13 +1,13 @@
 import { OutputChunk } from 'rollup'
-import { Manifest as ViteManifest, ResolvedConfig } from 'vite'
+import { ResolvedConfig, Manifest as ViteManifest } from 'vite'
 import { compileFileResources } from './compileFileResources'
 import { contentScripts } from './contentScripts'
 import { DYNAMIC_RESOURCE } from './defineManifest'
 import {
+  _debug,
   getMatchPatternOrigin,
   isResourceByMatch,
   parseJsonAsset,
-  _debug,
 } from './helpers'
 import {
   WebAccessibleResourceById,
@@ -150,9 +150,15 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                       // add conditionally after loaders and iife's
                       moduleScriptResources.set(fileName, resource)
                     } else {
-                      resource.matches = resource.matches.map(
-                        getMatchPatternOrigin,
-                      )
+                      // Google Chrome emits an "Invalid match pattern" error if the pattern has a path other than '/*'.
+                      // https://developer.chrome.com/docs/extensions/mv3/manifest/web_accessible_resources/
+                      resource.matches = [
+                        ...new Set(
+                          resource.matches
+                            .map(getMatchPatternOrigin)
+                            .filter((match) => match.endsWith('/*')),
+                        ),
+                      ]
                       web_accessible_resources.push(resource)
                     }
                 }
