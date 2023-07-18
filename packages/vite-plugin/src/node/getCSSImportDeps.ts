@@ -6,10 +6,6 @@ export const CSS_LANGS_RE =
 export const isCSSRequest = (request: string): boolean =>
   CSS_LANGS_RE.test(request)
 
-/**
- * 深层循环获取 node.importers 中的 css 依赖
- * https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/hmr.ts#L266
- */
 const getCSSImportDeps = (
   node: ModuleNode,
   selfAccepting = true,
