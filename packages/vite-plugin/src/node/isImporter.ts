@@ -1,14 +1,9 @@
 import { ModuleNode } from 'vite'
 
-export type FullModuleNode = ModuleNode & {
-  file: string
-  importers: Set<FullModuleNode>
-}
-
 /** Determine if a changed file was imported by a file */
 export function isImporter(file: string) {
   const seen = new Set<ModuleNode>()
-  const pred = (changedNode: ModuleNode): changedNode is FullModuleNode => {
+  const pred = (changedNode: ModuleNode) => {
     seen.add(changedNode)
 
     if (changedNode.file === file) return true
