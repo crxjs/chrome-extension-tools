@@ -6,7 +6,8 @@ export const CSS_LANGS_RE =
 export const isCSSRequest = (request: string): boolean =>
   CSS_LANGS_RE.test(request)
 
-const getCSSImportDeps = (
+/** Find all CSS importers of a given node. */
+const findCSSImportDeps = (
   node: ModuleNode,
   selfAccepting = true,
 ): Set<ModuleNode> => {
@@ -24,4 +25,4 @@ const getCSSImportDeps = (
   return addDeps(node.importers)
 }
 
-export default getCSSImportDeps
+export default findCSSImportDeps

@@ -10,8 +10,7 @@ import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
-
-import getCSSImportDeps from './getCSSImportDeps'
+import findCSSImportDeps from './findCSSImportDeps'
 
 const debug = _debug('hmr')
 
@@ -98,7 +97,7 @@ export const pluginHMR: CrxPluginFn = () => {
          * https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/hmr.ts#L266
          */
         const additionalCSSFiles = modules
-          .flatMap((module) => [...getCSSImportDeps(module)])
+          .flatMap((module) => [...findCSSImportDeps(module)])
           .map((module) => module.url)
 
         if (inputManifestFiles.background.length) {
