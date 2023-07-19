@@ -11,16 +11,16 @@ const findCSSImportDeps = (
   node: ModuleNode,
   selfAccepting = true,
 ): Set<ModuleNode> => {
-  const addDeps = (importers: Set<ModuleNode>, nodes = new Set<ModuleNode>()) =>
-    [...importers].reduce((nodes, node): Set<ModuleNode> => {
-      if (nodes.has(node)) return nodes
-      if (selfAccepting && !node.isSelfAccepting) return nodes
+  const addDeps = (importers: Set<ModuleNode>, deps = new Set<ModuleNode>()) =>
+    [...importers].reduce((deps, node): Set<ModuleNode> => {
+      if (deps.has(node)) return deps
+      if (selfAccepting && !node.isSelfAccepting) return deps
       if (isCSSRequest(node.url)) {
-        return addDeps(node.importers, new Set([...nodes, node]))
+        return addDeps(node.importers, new Set([...deps, node]))
       } else {
-        return nodes
+        return deps
       }
-    }, nodes)
+    }, deps)
 
   return addDeps(node.importers)
 }
