@@ -1,7 +1,7 @@
 import fg from 'fast-glob'
-import { ManifestV3 } from './manifest'
-import { ManifestFiles } from './types'
 import { isString } from './helpers'
+import { ChromeManifestBackground, ManifestV3 } from './manifest'
+import { ManifestFiles } from './types'
 
 export async function manifestFiles(
   manifest: ManifestV3,
@@ -19,8 +19,10 @@ export async function manifestFiles(
 
   const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
   const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
-  const serviceWorker = manifest.background?.service_worker
   const htmlPages = htmlFiles(manifest)
+  const serviceWorker = (
+    manifest.background as ChromeManifestBackground | undefined
+  )?.service_worker
 
   const icons = [
     Object.values(
