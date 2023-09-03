@@ -32,7 +32,13 @@ export default defineConfig(({ mode }) => {
           replacement: `${path.resolve(__dirname, 'tests/artifacts')}/$1.js`,
         },
       ],
-      exclude: [...exclude, '**/templates/**', '**/node_modules/**'],
+      exclude: [
+        ...exclude,
+        '**/templates/**',
+        '**/node_modules/**',
+        '**/dist*/**',
+        '**/.vite/**',
+      ],
       globalSetup: './tests/jest.globalSetup.ts',
       maxThreads: mode === 'e2e' ? 1 : undefined,
       minThreads: mode === 'e2e' ? 1 : undefined,
@@ -42,6 +48,7 @@ export default defineConfig(({ mode }) => {
       },
       testTimeout,
       watchExclude: [...configDefaults.watchExclude, '**/tests/templates'],
+      chaiConfig: { includeStack: false, showDiff: true, truncateThreshold: 0 },
     },
   }
 })

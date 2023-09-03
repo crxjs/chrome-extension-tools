@@ -86,11 +86,13 @@ exports[`build fs output > assets/declared-script.ts-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/declared-script.ts.hash1.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
@@ -106,11 +108,13 @@ exports[`build fs output > assets/dynamic-script.ts-loader.hash5.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/dynamic-script.ts.hash3.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();

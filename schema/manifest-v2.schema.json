@@ -517,7 +517,7 @@
       "description": "The omnibox API allows you to register a keyword with Google Chrome's address bar, which is also known as the omnibox.",
       "properties": {
         "keyword": {
-          "description": "The keyward that will trigger your extension.",
+          "description": "The keyword that will trigger your extension.",
           "type": "string"
         }
       },

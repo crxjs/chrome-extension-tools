@@ -149,6 +149,7 @@
           "scripting",
           "search",
           "sessions",
+          "sidePanel",
           "signedInDevices",
           "storage",
           "system.cpu",
@@ -476,22 +477,22 @@
       "items": {
         "additionalProperties": false,
         "properties": {
-          "description": {
+          "name": {
             "type": "string"
           },
           "id": {
             "type": "string"
           },
           "language": {
-            "type": "string"
+            "type": ["string", "array"]
           },
           "layouts": {
-            "type": "array"
+            "type": ["string", "array"]
           },
-          "name": {
+          "input_view": {
             "type": "string"
           },
-          "type": {
+          "options_page": {
             "type": "string"
           }
         },
@@ -574,7 +575,7 @@
       "description": "The omnibox API allows you to register a keyword with Google Chrome's address bar, which is also known as the omnibox.",
       "properties": {
         "keyword": {
-          "description": "The keyward that will trigger your extension.",
+          "description": "The keyword that will trigger your extension.",
           "type": "string"
         }
       },
@@ -680,6 +681,17 @@
       "description": "The short name is typically used where there is insufficient space to display the full name.",
       "maxLength": 12,
       "type": "string"
+    },
+    "side_panel": {
+      "description": "The Side Panel API allows extensions to display their own UI in the side panel, enabling persistent experiences that complement the user's browsing journey.",
+      "properties": {
+        "default_path": {
+          "description": "The path to your site panel page, relative to your extension's root.",
+          "type": "string"
+        }
+      },
+      "required": ["default_path"],
+      "type": "object"
     },
     "signature": {},
     "spellcheck": {},

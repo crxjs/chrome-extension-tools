@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "CRXJS Vanilla JS Example",
+    "version": "1.0.0",
+    "action": { 
+        "default_popup": "index.html" 
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["src/content.ts"],
+            "run_at": "document_start",
+            "all_frames": true
+        }
+    ]
+}

@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'path'
-import { waitForInnerHtml } from '../helpers'
+import { createUpdate, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { test, expect } from 'vitest'
 
@@ -15,12 +15,13 @@ test('crx page update on hmr', async () => {
 
   const { browser } = await serve(__dirname)
   const page = await browser.newPage()
-  await page.goto('https://www.google.com')
+  const update = createUpdate({ target: src, src: src2 })
 
   const styles = page.locator('head style')
   const app = page.locator('#crx-app')
   const button = app.locator('button')
 
+  await page.goto('https://www.google.com')
   await app.waitFor()
 
   // check that page does not update during hmr update
@@ -35,14 +36,7 @@ test('crx page update on hmr', async () => {
   buttonText.add(await button.innerText())
 
   // update template
-  await fs.copy(src2, src, {
-    recursive: true,
-    overwrite: true,
-    filter: (f) => {
-      if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('App.svelte')
-    },
-  })
+  await update('App.svelte')
 
   await page
     .locator('p', { hasText: 'Make a Chrome Extension with Svelte and Vite!' })
@@ -54,14 +48,7 @@ test('crx page update on hmr', async () => {
   await new Promise((r) => setTimeout(r, 100))
 
   // update css
-  await fs.copy(src3, src, {
-    recursive: true,
-    overwrite: true,
-    filter: (f) => {
-      if (fs.lstatSync(f).isDirectory()) return true
-      return f.endsWith('App.svelte')
-    },
-  })
+  await update('App.svelte', src3)
 
   await waitForInnerHtml(styles, (h) => {
     return h.includes('background-color:blue;')

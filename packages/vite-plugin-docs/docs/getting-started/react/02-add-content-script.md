@@ -42,6 +42,15 @@ with `https://www.google.com`.
 Content scripts don't use an HTML file, so we need to create our root element
 and append it to the DOM before mounting our React app.
 
+:::info
+
+<!-- Look for React v18 implementation for newer projects -->
+
+Vite now defaults to React v18 which uses ReactDOM.createRoot instead of previous ReactDOM.render
+https://reactjs.org/blog/2022/03/29/react-v18.html
+
+:::
+
 ```jsx title=src/main.jsx
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -57,6 +66,21 @@ ReactDOM.render(
   document.getElementById('root'),
   // highlight-end
 )
+```
+
+### Implementation for React 18+
+
+```jsx title=src/main.jsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from './App'
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+     <App />
+  </React.StrictMode>
+);
 ```
 
 Let's add that root element. Make a copy of `src/main.jsx` and name it
@@ -81,6 +105,27 @@ ReactDOM.render(
   // highlight-next-line
   root,
 )
+```
+
+### Implementation for React 18+
+
+```jsx title=src/content.jsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+
+// highlight-start
+const root = document.createElement("div");
+root.id = "crx-root";
+document.body.appendChild(root);
+// highlight-end
+
+ReactDOM.createRoot(root).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
 ```
 
 ## Get the right URL

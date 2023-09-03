@@ -14,7 +14,7 @@ Use `manifest.json` as the input. Every file in the manifest will be bundled or
 copied to the output folder.
 
 RPCE simplifies project config and supports many of Vite's features in the
-Chrome Extension evironment, including HMR.
+Chrome Extension environment, including HMR.
 
 ## [Documentation](https://www.extend-chrome.dev/rollup-plugin)
 

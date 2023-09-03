@@ -201,7 +201,10 @@ import \\"./vendor.hash.js\\";
 const html = \`<div id=\\"crx-app\\"></div>\`;
 const target = new DOMParser().parseFromString(html, \\"text/html\\").body.firstElementChild;
 document.body.append(target);
-new App$({ target });
+const app = new App$({ target });
+export {
+  app as default
+};
 "
 `;
 
@@ -209,11 +212,13 @@ exports[`build fs output > assets/content.js-loader.hash.js 1`] = `
 "(function () {
   'use strict';
 
+  const injectTime = performance.now();
   (async () => {
-    await import(
+    const { onExecute } = await import(
       /* @vite-ignore */
       chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
     );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();

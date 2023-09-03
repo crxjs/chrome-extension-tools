@@ -16,5 +16,5 @@ test(
     await image.waitFor({ state: 'attached' })
     await script.waitFor({ state: 'attached' })
   },
-  { retry: process.env.CI ? 5 : 0 },
+  { retry: process.env.CI ? 5 : 2 },
 )

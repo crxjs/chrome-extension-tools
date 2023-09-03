@@ -1,5 +1,18 @@
 # vite-plugin-docs
 
+## 0.0.3-beta.2
+
+### Patch Changes
+
+- 00be1a1: fix: add new screenshot and remove the redudant code
+- 42baebb: React v18 ReactDOM.render changes
+
+## 0.0.3-beta.1
+
+### Patch Changes
+
+- 3dea230: Add tip `type: module` to vue page
+
 ## 0.0.3-beta.0
 
 ### Patch Changes

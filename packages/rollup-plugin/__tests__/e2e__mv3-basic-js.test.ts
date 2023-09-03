@@ -39,7 +39,7 @@ test('bundles assets', async () => {
   expect(assets.length).toBe(2)
 })
 
-test('entries in manifest match entriess in output', async () => {
+test('entries in manifest match entries in output', async () => {
   const { output } = await outputPromise
 
   const assets = output.filter(isAsset)

@@ -1,4 +1,5 @@
 export const convertMatchPatterns = (m: string): string => {
+  if (m === ('<all_urls>')) return m
   // Use URL to parse match pattern
   // URL must have valid url scheme
   const [scheme, rest] = m.split('://')
@@ -16,7 +17,7 @@ export const convertMatchPatterns = (m: string): string => {
   const [x, y] = base.split(':3333')
   const final = isWildPort ? [x, port, y].join('') : base
 
-  // URL escapes asterixes
+  // URL escapes asterisks
   // Need to unescape them
   return unescape(`${scheme}://${final}/*`)
 }

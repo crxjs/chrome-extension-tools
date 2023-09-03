@@ -1,5 +1,6 @@
 import { buffer, filter, map, mergeMap, Observable, Subject } from 'rxjs'
 import {
+  CustomPayload,
   FullReloadPayload,
   HMRPayload,
   PrunePayload,
@@ -14,11 +15,12 @@ const debug = _debug('file-writer').extend('hmr')
 
 /* ------------------- HMR EVENTS ------------------ */
 
-const isCrxHMRPayload = (p: HMRPayload): p is CrxHMRPayload =>
-  p.type === 'custom' && p.event.startsWith('crx:')
+const isCustomPayload = (p: HMRPayload): p is CustomPayload => {
+  return p.type === 'custom'
+}
 export const hmrPayload$ = new Subject<HMRPayload>()
 export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
-  filter((p) => !isCrxHMRPayload(p)),
+  filter((p) => !isCustomPayload(p)),
   buffer(allFilesReady$),
   mergeMap((pps) => {
     let fullReload: FullReloadPayload | undefined
@@ -81,6 +83,7 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
     }
   }),
   map((data): CrxHMRPayload => {
+    debug(`hmr payload`, data)
     return {
       type: 'custom',
       event: 'crx:content-script-payload',
