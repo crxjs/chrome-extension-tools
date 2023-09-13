@@ -1,7 +1,7 @@
 import fg from 'fast-glob'
-import { isString } from './helpers'
-import { ChromeManifestBackground, ManifestV3 } from './manifest'
+import { ManifestV3 } from './manifest'
 import { ManifestFiles } from './types'
+import { isString } from './helpers'
 
 export async function manifestFiles(
   manifest: ManifestV3,
@@ -19,10 +19,12 @@ export async function manifestFiles(
 
   const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
   const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
+
+  const serviceWorker = manifest.background && "service_worker" in manifest.background ? manifest.background.service_worker : undefined;
+  const backgroundScripts = manifest.background && "scripts" in manifest.background ? manifest.background.scripts : undefined;
+  const background = serviceWorker ? [serviceWorker].filter(isString) : backgroundScripts ? backgroundScripts.filter(isString) : [];
+
   const htmlPages = htmlFiles(manifest)
-  const serviceWorker = (
-    manifest.background as ChromeManifestBackground | undefined
-  )?.service_worker
 
   const icons = [
     Object.values(
@@ -57,7 +59,7 @@ export async function manifestFiles(
     icons: [...new Set(icons)].filter(isString),
     locales: [...new Set(locales)].filter(isString),
     rulesets: [...new Set(rulesets)].filter(isString),
-    background: [serviceWorker].filter(isString),
+    background: background,
     webAccessibleResources,
   }
 }
