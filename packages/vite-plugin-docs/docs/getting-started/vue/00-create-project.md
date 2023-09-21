@@ -46,6 +46,13 @@ export default defineConfig({
     // highlight-next-line
     crx({ manifest }),
   ],
+  server: {
+    hmr: {
+      port: 5173,
+    },
+    port: 5173,
+    strictPort: true,
+  }
 })
 ```
 
