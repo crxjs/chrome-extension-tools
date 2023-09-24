@@ -167,7 +167,7 @@ importers:
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.237
       '@types/convert-source-map': ^2.0.0
-      '@types/debug': 4.1.7
+      '@types/debug': 4.1.9
       '@types/fs-extra': 9.0.13
       '@types/jest-image-snapshot': ^5.1.0
       '@types/jsesc': 3.0.1
@@ -240,7 +240,7 @@ importers:
       '@types/acorn': 4.0.6
       '@types/chrome': 0.0.237
       '@types/convert-source-map': 2.0.0
-      '@types/debug': 4.1.7
+      '@types/debug': 4.1.9
       '@types/fs-extra': 9.0.13
       '@types/jest-image-snapshot': 5.1.0
       '@types/jsesc': 3.0.1
@@ -6144,8 +6144,8 @@ packages:
     resolution: {integrity: sha512-QUm4YOC/ENo0VjPVl2o8HGyTbHHQGDOw8PCg3rXBucYHKyZN/XjXRbPFAV1tB2FvM0/wyFoDct4cTIctzKrQFg==}
     dev: true
 
-  /@types/debug/4.1.7:
-    resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
+  /@types/debug/4.1.9:
+    resolution: {integrity: sha512-8Hz50m2eoS56ldRlepxSBa6PWEVCtzUo/92HgLc2qTMnotJNIm7xP+UZhyWoYsyOdd5dxZ+NZLb24rsKyFs2ow==}
     dependencies:
       '@types/ms': 0.7.31
 
@@ -13040,7 +13040,7 @@ packages:
   /micromark/3.0.10:
     resolution: {integrity: sha512-ryTDy6UUunOXy2HPjelppgJ2sNfcPz1pLlMdA6Rz9jPzhLikWXv/irpWV/I2jd68Uhmny7hHxAlAhk4+vWggpg==}
     dependencies:
-      '@types/debug': 4.1.7
+      '@types/debug': 4.1.9
       debug: 4.3.4
       decode-named-character-reference: 1.0.1
       micromark-core-commonmark: 1.0.6

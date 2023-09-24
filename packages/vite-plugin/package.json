@@ -91,7 +91,7 @@
     "@types/acorn": "4.0.6",
     "@types/chrome": "0.0.237",
     "@types/convert-source-map": "^2.0.0",
-    "@types/debug": "4.1.7",
+    "@types/debug": "4.1.9",
     "@types/fs-extra": "9.0.13",
     "@types/jest-image-snapshot": "^5.1.0",
     "@types/jsesc": "3.0.1",
