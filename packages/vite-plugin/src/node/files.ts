@@ -19,7 +19,11 @@ export async function manifestFiles(
 
   const contentScripts = manifest.content_scripts?.flatMap(({ js }) => js) ?? []
   const contentStyles = manifest.content_scripts?.flatMap(({ css }) => css)
-  const serviceWorker = manifest.background?.service_worker
+
+  const serviceWorker = manifest.background && "service_worker" in manifest.background ? manifest.background.service_worker : undefined;
+  const backgroundScripts = manifest.background && "scripts" in manifest.background ? manifest.background.scripts : undefined;
+  const background = serviceWorker ? [serviceWorker].filter(isString) : backgroundScripts ? backgroundScripts.filter(isString) : [];
+
   const htmlPages = htmlFiles(manifest)
 
   const icons = [
@@ -55,7 +59,7 @@ export async function manifestFiles(
     icons: [...new Set(icons)].filter(isString),
     locales: [...new Set(locales)].filter(isString),
     rulesets: [...new Set(rulesets)].filter(isString),
-    background: [serviceWorker].filter(isString),
+    background: background,
     webAccessibleResources,
   }
 }

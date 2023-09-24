@@ -2,7 +2,9 @@ import workerHmrClient from 'client/es/hmr-client-worker.ts'
 import { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import { getFileName } from './fileWriter-utilities'
-import type { CrxPluginFn } from './types'
+import { ChromeManifestBackground, FirefoxManifestBackground } from './manifest'
+import { getOptions } from './plugin-optionsProvider'
+import type { Browser, CrxPluginFn } from './types'
 import { workerClientId } from './virtualFileIds'
 
 /**
@@ -21,6 +23,7 @@ import { workerClientId } from './virtualFileIds'
  */
 export const pluginBackground: CrxPluginFn = () => {
   let config: ResolvedConfig
+  let browser: Browser
 
   return [
     {
@@ -43,11 +46,18 @@ export const pluginBackground: CrxPluginFn = () => {
       name: 'crx:background-loader-file',
       // this should happen after other plugins; the loader file is an implementation detail
       enforce: 'post',
+      async config(config) {
+        const opts = await getOptions(config)
+        browser = opts.browser || 'chrome'
+      },
       configResolved(_config) {
         config = _config
       },
       renderCrxManifest(manifest) {
-        const worker = manifest.background?.service_worker
+        const worker =
+          browser === 'firefox'
+            ? (manifest.background as FirefoxManifestBackground)?.scripts[0]
+            : (manifest.background as ChromeManifestBackground)?.service_worker
 
         let loader: string
         if (config.command === 'serve') {
@@ -55,12 +65,26 @@ export const pluginBackground: CrxPluginFn = () => {
           if (typeof port === 'undefined')
             throw new Error('server port is undefined in watch mode')
 
-          // development, required to define env vars
-          loader = `import 'http://localhost:${port}/@vite/env';\n`
-          // development, required hmr client
-          loader += `import 'http://localhost:${port}${workerClientId}';\n`
-          // development, optional service worker
-          if (worker) loader += `import 'http://localhost:${port}/${worker}';\n`
+          if (browser === 'firefox') {
+            // in FF, our "service worker" is actually a background page so we
+            // can't use import statements
+
+            // development, required to define env vars
+            loader = `import('http://localhost:${port}/@vite/env');\n`
+            // development, required hmr client
+            loader += `import('http://localhost:${port}${workerClientId}');\n`
+            // development, optional service worker
+            if (worker)
+              loader += `import('http://localhost:${port}/${worker}');\n`
+          } else {
+            // development, required to define env vars
+            loader = `import 'http://localhost:${port}/@vite/env';\n`
+            // development, required hmr client
+            loader += `import 'http://localhost:${port}${workerClientId}';\n`
+            // development, optional service worker
+            if (worker)
+              loader += `import 'http://localhost:${port}/${worker}';\n`
+          }
         } else if (worker) {
           // production w/ service worker loader at root, see comment at top of file.
           loader = `import './${worker}';\n`
@@ -76,9 +100,15 @@ export const pluginBackground: CrxPluginFn = () => {
           source: loader,
         })
 
-        manifest.background = {
-          service_worker: this.getFileName(refId),
-          type: 'module',
+        if (browser !== 'firefox') {
+          manifest.background = {
+            service_worker: this.getFileName(refId),
+            type: 'module',
+          }
+        } else {
+          manifest.background = {
+            scripts: [this.getFileName(refId)],
+          }
         }
 
         return manifest
