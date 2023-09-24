@@ -45,7 +45,7 @@ importers:
       '@testing-library/dom': ^6.12.2
       '@testing-library/jest-dom': ^5.1.1
       '@types/cheerio': 0.22.22
-      '@types/chrome': 0.0.237
+      '@types/chrome': 0.0.246
       '@types/fs-extra': ^8.0.1
       '@types/glob': ^8.0.0
       '@types/jest': ^27.0.0
@@ -127,7 +127,7 @@ importers:
       '@testing-library/dom': 6.16.0
       '@testing-library/jest-dom': 5.16.4
       '@types/cheerio': 0.22.22
-      '@types/chrome': 0.0.237
+      '@types/chrome': 0.0.246
       '@types/fs-extra': 8.1.2
       '@types/glob': 8.0.0
       '@types/jest': 27.5.0
@@ -165,7 +165,7 @@ importers:
       '@rollup/pluginutils': ^4.1.2
       '@sveltejs/vite-plugin-svelte': 1.4.0
       '@types/acorn': 4.0.6
-      '@types/chrome': 0.0.237
+      '@types/chrome': 0.0.246
       '@types/convert-source-map': ^2.0.0
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
@@ -238,7 +238,7 @@ importers:
       '@rollup/plugin-node-resolve': 13.2.0_rollup@2.78.1
       '@sveltejs/vite-plugin-svelte': 1.4.0_svelte@3.48.0+vite@3.1.7
       '@types/acorn': 4.0.6
-      '@types/chrome': 0.0.237
+      '@types/chrome': 0.0.246
       '@types/convert-source-map': 2.0.0
       '@types/debug': 4.1.7
       '@types/fs-extra': 9.0.13
@@ -6114,8 +6114,8 @@ packages:
       '@types/node': 13.13.52
     dev: true
 
-  /@types/chrome/0.0.237:
-    resolution: {integrity: sha512-krsRmyfMlck5r+H1EapsrrucDRq6iRm0NAi5fapr93CgnpVMDdK+h2+z4x79GegdW7BNH9Vb//gkptORwwwVIQ==}
+  /@types/chrome/0.0.246:
+    resolution: {integrity: sha512-MxGxEomGxsJiL9xe/7ZwVgwdn8XVKWbPvxpVQl3nWOjrS0Ce63JsfzxUc4aU3GvRcUPYsfufHmJ17BFyKxeA4g==}
     dependencies:
       '@types/filesystem': 0.0.32
       '@types/har-format': 1.2.8
