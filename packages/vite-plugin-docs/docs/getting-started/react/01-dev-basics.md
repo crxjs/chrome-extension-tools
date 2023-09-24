@@ -18,6 +18,9 @@ import Installing from '../\_install-extension.md';
 
 <Intro/>
 
+## Install the extension
+
+<Installing/>
 
 ## Opening the extension
 
