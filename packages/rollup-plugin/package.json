@@ -77,7 +77,7 @@
     "@sucrase/jest-plugin": "^3.0.0",
     "@testing-library/dom": "^6.12.2",
     "@testing-library/jest-dom": "^5.1.1",
-    "@types/cheerio": "0.22.22",
+    "@types/cheerio": "0.22.32",
     "@types/chrome": "0.0.237",
     "@types/fs-extra": "^8.0.1",
     "@types/glob": "^8.0.0",
