@@ -86,7 +86,7 @@
     "@rollup/plugin-alias": "4.0.4",
     "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-json": "^5.0.0",
-    "@rollup/plugin-node-resolve": "13.2.0",
+    "@rollup/plugin-node-resolve": "15.2.1",
     "@sveltejs/vite-plugin-svelte": "1.4.0",
     "@types/acorn": "4.0.6",
     "@types/chrome": "0.0.237",
