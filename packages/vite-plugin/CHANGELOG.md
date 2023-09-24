@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.19
+
+### Patch Changes
+
+- 34980de: feat: add compatibility mode for Firefox
+
 ## 2.0.0-beta.18
 
 ### Patch Changes
