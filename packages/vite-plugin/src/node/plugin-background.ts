@@ -108,6 +108,7 @@ export const pluginBackground: CrxPluginFn = () => {
         } else {
           manifest.background = {
             scripts: [this.getFileName(refId)],
+            type: 'module',
           }
         }
 
