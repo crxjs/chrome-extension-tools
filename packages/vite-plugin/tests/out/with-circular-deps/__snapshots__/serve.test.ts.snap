@@ -78,13 +78,11 @@ exports[`serve fs output > index.html 1`] = `
     <script src=\\"/assets/precontroller.hash0.js\\"></script>
   </head>
   <body>
-    <h1>Waiting for service worker</h1>
-
-    <p>
-      If you see this message, it means the service worker has not loaded fully.
-    </p>
-
-    <p>This page is never added in production.</p>
+    <h1>Vite Dev Mode</h1>
+    <ul>
+      <li>Waiting for the extension to connect with Vite dev server...</li>
+      <li>If Vite is running, this message will go away shortly.</li>
+    </ul>
   </body>
 </html>
 "
