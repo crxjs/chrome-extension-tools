@@ -41,7 +41,7 @@ Object {
 
 exports[`serve fs output > _01 output files 1`] = `
 Array [
-  "assets/precontroller.hash0.js",
+  "assets/loading-page.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/content.ts-loader.js",
@@ -62,7 +62,7 @@ Set {
 }
 `;
 
-exports[`serve fs output > assets/precontroller.hash0.js 1`] = `
+exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
 "const id = setInterval(() => location.reload(), 100);
 setTimeout(() => clearInterval(id), 5e3);
 "
@@ -115,7 +115,7 @@ exports[`serve fs output > src/popup.html 1`] = `
 <html lang=\\"en\\">
   <head>
     <title>Waiting for the extension service worker...</title>
-    <script src=\\"/assets/precontroller.hash0.js\\"></script>
+    <script src=\\"/assets/loading-page.hash0.js\\"></script>
   </head>
   <body>
     <h1>Vite Dev Mode</h1>
