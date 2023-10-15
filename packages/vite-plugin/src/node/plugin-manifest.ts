@@ -1,5 +1,5 @@
-import loadingPageScript from 'client/es/page-precontroller-script.ts'
-import loadingPageHtml from 'client/html/precontroller.html'
+import loadingPageScript from 'client/es/loading-page-script.ts'
+import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
