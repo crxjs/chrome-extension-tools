@@ -1,5 +1,5 @@
-import precontrollerJs from 'client/es/page-precontroller-script.ts'
-import precontrollerHtml from 'client/html/precontroller.html'
+import loadingPageScript from 'client/es/loading-page-script.ts'
+import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
@@ -382,17 +382,20 @@ Public dir: "${config.publicDir}"`,
         if (config.command === 'serve' && files.html.length) {
           const refId = this.emitFile({
             type: 'asset',
-            name: 'precontroller.js',
-            source: precontrollerJs,
+            name: 'loading-page.js',
+            source: loadingPageScript.replace(
+              '%PORT%',
+              `${config.server.port ?? 0}`,
+            ),
           })
-          const precontrollerJsName = this.getFileName(refId)
+          const loadingPageScriptName = this.getFileName(refId)
           files.html.map((f) =>
             this.emitFile({
               type: 'asset',
               fileName: f,
-              source: precontrollerHtml.replace(
+              source: loadingPageHtml.replace(
                 '%SCRIPT%',
-                `/${precontrollerJsName}`,
+                `/${loadingPageScriptName}`,
               ),
             }),
           )
