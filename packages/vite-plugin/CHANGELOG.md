@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.20
+
+### Patch Changes
+
+- f5c4bd7: fix: background scripts for firefox build
+
 ## 2.0.0-beta.19
 
 ### Patch Changes
