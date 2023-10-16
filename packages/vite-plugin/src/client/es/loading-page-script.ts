@@ -17,10 +17,10 @@ document.body.innerHTML = `
     >
       <h1 style="color: #333">Vite Dev Mode</h1>
       <p style="color: #666">
-        The Vite Dev Server is not available on <a href="${VITE_URL}">${VITE_URL}</a>
+        Cannot connect to the Vite Dev Server on <a href="${VITE_URL}">${VITE_URL}</a>
       </p>
       <p style="color: #666">
-        Double-check that Vite is running and reload the extension.
+        Double-check that Vite is working and reload the extension.
       </p>
       <p style="color: #666">
         This page will close when the extension reloads.
