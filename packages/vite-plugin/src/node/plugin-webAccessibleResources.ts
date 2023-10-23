@@ -14,19 +14,24 @@ import {
   WebAccessibleResourceByMatch,
 } from './manifest'
 import { getOptions } from './plugin-optionsProvider'
-import { CrxPluginFn } from './types'
+import type { CrxPluginFn, Browser } from './types'
 
 const debug = _debug('web-acc-res')
 
 export const pluginWebAccessibleResources: CrxPluginFn = () => {
   let config: ResolvedConfig
   let injectCss: boolean
+  let browser: Browser
 
   return [
     {
       name: 'crx:web-accessible-resources',
       apply: 'serve',
       enforce: 'post',
+      async config(config) {
+        const opts = await getOptions(config)
+        browser = opts.browser || 'chrome'
+      },
       renderCrxManifest(manifest) {
         // set default value for web_accessible_resources
         manifest.web_accessible_resources =
@@ -40,15 +45,22 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           }))
           .filter(({ resources }) => resources.length)
 
-        // during development don't do specific resources
-        manifest.web_accessible_resources.push({
-          // change the extension origin on every reload
-          use_dynamic_url: true,
+        // during development don't specific resources
+        const war: WebAccessibleResourceByMatch = {
           // all web origins can access
           matches: ['<all_urls>'],
           // all resources are web accessible
           resources: ['**/*', '*'],
-        })
+          // change the extension origin on every reload
+          use_dynamic_url: true,
+        }
+
+        if (browser === 'firefox') {
+          // not allowed in FF b/c FF does this by default
+          delete war.use_dynamic_url
+        }
+
+        manifest.web_accessible_resources.push(war)
 
         return manifest
       },
@@ -58,7 +70,9 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
       apply: 'build',
       enforce: 'post',
       async config({ build, ...config }, { command }) {
-        const { contentScripts = {} } = await getOptions(config)
+        const opts = await getOptions(config)
+        const contentScripts = opts.contentScripts || {}
+        browser = opts.browser || 'chrome'
         injectCss = contentScripts.injectCss ?? true
 
         return { ...config, build: { ...build, manifest: command === 'build' } }
@@ -190,6 +204,13 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
               use_dynamic_url,
             })
           }
+
+        /* ------------- BROWSER COMPATIBILITY ------------- */
+        if (browser === 'firefox') {
+          for (const war of combinedResources) {
+            delete war.use_dynamic_url
+          }
+        }
 
         /* --------------- CLEAN UP MANIFEST --------------- */
 

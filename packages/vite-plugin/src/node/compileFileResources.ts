@@ -26,14 +26,20 @@ export function compileFileResources(
     css: new Set(),
     imports: new Set(),
   },
+  processedFiles = new Set(),
 ): FileResources {
+  if (processedFiles.has(fileName)) {
+    return resources
+  }
+  processedFiles.add(fileName)
+
   const chunk = chunks.get(fileName)
   if (chunk) {
     const { modules, facadeModuleId, imports, dynamicImports } = chunk
     for (const x of imports) resources.imports.add(x)
     for (const x of dynamicImports) resources.imports.add(x)
     for (const x of [...imports, ...dynamicImports])
-      compileFileResources(x, { chunks, files, config }, resources)
+      compileFileResources(x, { chunks, files, config }, resources, processedFiles)
     for (const m of Object.keys(modules))
       if (m !== facadeModuleId) {
         const key = prefix('/', relative(config.root, m.split('?')[0]))
@@ -47,6 +53,7 @@ export function compileFileResources(
               script.fileName,
               { chunks, files, config },
               resources,
+              processedFiles,
             )
           }
       }

@@ -1,9 +1,9 @@
 // Vitest Snapshot v1
 
-exports[`works with 'self' directive > _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "action": Object {
-    "default_popup": "src/popup.html",
+    "default_popup": "index.html",
   },
   "background": Object {
     "service_worker": "service-worker-loader.js",
@@ -11,22 +11,19 @@ Object {
   },
   "content_scripts": Array [
     Object {
+      "all_frames": true,
       "js": Array [
         "src/content.ts-loader.js",
       ],
       "matches": Array [
-        "https://*/*",
-        "http://*/*",
+        "<all_urls>",
       ],
+      "run_at": "document_start",
     },
   ],
-  "content_security_policy": Object {
-    "extension_pages": "script-src 'self'; object-src 'self';",
-  },
-  "description": "test extension",
   "manifest_version": 3,
-  "name": "test extension",
-  "version": "0.1.0",
+  "name": "CRXJS Vanilla JS Example",
+  "version": "1.0.0",
   "web_accessible_resources": Array [
     Object {
       "matches": Array [
@@ -42,30 +39,32 @@ Object {
 }
 `;
 
-exports[`works with 'self' directive > _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
   "assets/loading-page.hash0.js",
+  "index.html",
   "manifest.json",
   "service-worker-loader.js",
   "src/content.ts-loader.js",
   "src/content.ts.js",
-  "src/popup.html",
+  "src/module.ts.js",
+  "src/utils.ts.js",
   "vendor/crx-client-port.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
   "vendor/webcomponents-custom-elements.js",
+  "vite.svg",
 ]
 `;
 
-exports[`works with 'self' directive > _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "src/content.ts",
-  "src/background.ts",
-  "src/popup.html",
+  "index.html",
 }
 `;
 
-exports[`works with 'self' directive > assets/loading-page.hash0.js 1`] = `
+exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
 "const VITE_URL = \\"http://localhost:3000\\";
 document.body.innerHTML = \`
 <div
@@ -120,20 +119,38 @@ chrome.runtime.reload();
 "
 `;
 
-exports[`works with 'self' directive > service-worker-loader.js 1`] = `
+exports[`serve fs output > index.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <title>Vite Dev Mode</title>
+    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
+  </head>
+  <body
+    style=\\"font-family: Arial, sans-serif; padding: 20px; text-align: center\\"
+  >
+    <h1>Vite Dev Mode</h1>
+  </body>
+</html>
+"
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
-import 'http://localhost:3000/src/background.ts';
 "
 `;
 
-exports[`works with 'self' directive > src/content.ts.js 1`] = `
-"console.log(\\"content script\\");
-export {};
+exports[`serve fs output > src/content.ts.js 1`] = `
+"import { sharedUtil } from \\"/src/utils.ts.js\\";
+sharedUtil();
+import(\\"/src/module.ts.js\\");
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
 
-exports[`works with 'self' directive > src/content.ts-loader.js 1`] = `
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -159,18 +176,19 @@ exports[`works with 'self' directive > src/content.ts-loader.js 1`] = `
 "
 `;
 
-exports[`works with 'self' directive > src/popup.html 1`] = `
-"<!DOCTYPE html>
-<html lang=\\"en\\">
-  <head>
-    <title>Vite Dev Mode</title>
-    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
-  </head>
-  <body
-    style=\\"font-family: Arial, sans-serif; padding: 20px; text-align: center\\"
-  >
-    <h1>Vite Dev Mode</h1>
-  </body>
-</html>
+exports[`serve fs output > src/module.ts.js 1`] = `
+"import { sharedUtil } from \\"/src/utils.ts.js\\";
+sharedUtil();
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
+
+exports[`serve fs output > src/utils.ts.js 1`] = `
+"export const sharedUtil = () => {
+  console.log(\\"util\\");
+};
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
