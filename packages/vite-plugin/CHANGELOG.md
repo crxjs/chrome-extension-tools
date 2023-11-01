@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.21
+
+### Patch Changes
+
+- cbfd0b3: Delete invalid changeset
+
 ## 2.0.0-beta.20
 
 ### Patch Changes
