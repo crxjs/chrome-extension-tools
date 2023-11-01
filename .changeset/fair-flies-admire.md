@@ -1,5 +1,5 @@
 ---
-"vite-plugin": patch
+"@crxjs/vite-plugin": patch
 ---
 
 Delete invalid changeset
