@@ -39,7 +39,7 @@ Here we're telling Chrome to execute `src/content.js` on all pages that start
 with `https://www.google.com`. In this case, the Google homepage is the content
 script's host page.
 
-## Add an visual element
+## Add a visual element
 
 We're not using a framework, but we can use plain JavaScript to add the
 [CRXJS logo](./assets/image.png) to a host page. Notice how Vite still allows
