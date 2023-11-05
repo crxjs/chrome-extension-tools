@@ -163,7 +163,7 @@ export interface ManifestV3 {
         whitelist?: string[] | undefined
       }
     | undefined
-  incognito?: string | undefined
+  incognito?: "spanning" | "split" | "not_allowed" | undefined
   input_components?:
     | {
         name: string
