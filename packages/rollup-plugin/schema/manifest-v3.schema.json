@@ -149,6 +149,7 @@
           "scripting",
           "search",
           "sessions",
+          "sidePanel",
           "signedInDevices",
           "storage",
           "system.cpu",
@@ -676,6 +677,17 @@
       "description": "The short name is typically used where there is insufficient space to display the full name.",
       "maxLength": 12,
       "type": "string"
+    },
+    "side_panel": {
+      "description": "The Side Panel API allows extensions to display their own UI in the side panel, enabling persistent experiences that complement the user's browsing journey.",
+      "properties": {
+        "default_path": {
+          "description": "The path to your site panel page, relative to your extension's root.",
+          "type": "string"
+        }
+      },
+      "required": ["default_path"],
+      "type": "object"
     },
     "signature": {},
     "spellcheck": {},

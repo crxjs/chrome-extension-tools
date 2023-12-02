@@ -16,6 +16,16 @@ export interface WebAccessibleResourceById {
   use_dynamic_url?: boolean
 }
 
+export interface ChromeManifestBackground {
+  service_worker: string
+  type?: 'module' // If the service worker uses ES modules
+}
+
+export interface FirefoxManifestBackground {
+  scripts: string[]
+  persistent?: false
+}
+
 export interface ManifestV3 {
   // Required
   manifest_version: number
@@ -32,10 +42,8 @@ export interface ManifestV3 {
   action?: chrome.runtime.ManifestAction | undefined
   author?: string | undefined
   background?:
-    | {
-        service_worker: string
-        type?: 'module' // If the service worker uses ES modules
-      }
+    | ChromeManifestBackground
+    | FirefoxManifestBackground
     | undefined
   chrome_settings_overrides?:
     | {
