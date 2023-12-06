@@ -104,7 +104,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         if (contentScripts.size > 0) {
           const viteManifest = parseJsonAsset<ViteManifest>(
             bundle,
-            'manifest.json',
+            '.vite/manifest.json',
           )
           const viteFiles = new Map()
           for (const [, file] of Object.entries(viteManifest))
