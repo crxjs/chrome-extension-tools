@@ -209,7 +209,11 @@ export const pluginManifest: CrxPluginFn = () => {
         } else {
           // vite build emits content scripts, html files and service worker
           if (manifest.content_scripts)
-            for (const { js = [], matches = [] } of manifest.content_scripts)
+            for (const {
+              js = [],
+              matches = [],
+              world = 'ISOLATED',
+            } of manifest.content_scripts)
               for (const file of js) {
                 const id = join(config.root, file)
                 const refId = this.emitFile({
@@ -220,7 +224,7 @@ export const pluginManifest: CrxPluginFn = () => {
                 contentScripts.set(
                   file,
                   formatFileData({
-                    type: 'loader',
+                    type: world === 'ISOLATED' ? 'loader' : 'module',
                     id: file,
                     refId,
                     matches,
