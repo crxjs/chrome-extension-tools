@@ -224,10 +224,11 @@ export const pluginManifest: CrxPluginFn = () => {
                 contentScripts.set(
                   file,
                   formatFileData({
-                    type: world === 'ISOLATED' ? 'loader' : 'module',
+                    type: 'loader' ,
                     id: file,
                     refId,
                     matches,
+                    world
                   }),
                 )
               }

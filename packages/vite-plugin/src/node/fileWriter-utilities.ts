@@ -30,6 +30,7 @@ export function formatFileData<
     type: 'module' | 'iife' | 'loader' | 'asset'
     fileName?: string
     loaderName?: string
+    world?: 'MAIN' | 'ISOLATED'
   },
 >(script: T): T {
   script.id = prefix('/', script.id)
