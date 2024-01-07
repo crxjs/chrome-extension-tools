@@ -31,7 +31,7 @@
     "node": ">=14"
   },
   "devDependencies": {
-    "vitest": "0.24.3"
+    "vitest": "0.34.6"
   },
   "pnpm": {
     "peerDependencyRules": {
