@@ -84,7 +84,7 @@ importers:
       read-pkg-up: ^7.0.1
       rollup: ^2.72.1
       rollup-plugin-bundle-imports: ^1.4.5
-      rxjs: 7.5.7
+      rxjs: 7.8.1
       slash: ^3.0.0
       ts-jest: ^27.1.4
       tslib: ^2.3.0
@@ -149,7 +149,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       read-pkg-up: 7.0.1
       rollup-plugin-bundle-imports: 1.5.1_3hu7c2prw5gtl3ctw3z4hopzpa
-      rxjs: 7.5.7
+      rxjs: 7.8.1
       ts-jest: 27.1.4_g7bgvgzxcnot56lqrcj5zvjzha
       tslib: 2.4.0
       typescript: 4.6.4
@@ -205,7 +205,7 @@ importers:
       rollup: 2.78.1
       rollup-plugin-dts: ^4.2.0
       rollup-plugin-esbuild: 4.10.3
-      rxjs: 7.5.7
+      rxjs: 7.8.1
       svelte: ^3.48.0
       typescript: ^4.6.4
       vite: ^3.1.7
@@ -228,7 +228,7 @@ importers:
       picocolors: 1.0.0
       react-refresh: 0.13.0
       rollup: 2.78.1
-      rxjs: 7.5.7
+      rxjs: 7.8.1
     devDependencies:
       '@extend-chrome/messages': 1.2.2
       '@extend-chrome/storage': 1.5.0
@@ -5047,14 +5047,14 @@ packages:
     dependencies:
       '@types/chrome': 0.0.99
       '@types/node': 13.13.52
-      rxjs: 7.5.7
+      rxjs: 7.8.1
     dev: true
 
   /@extend-chrome/storage/1.5.0:
     resolution: {integrity: sha512-JhoBZ1xIzu0/mauNR/MadUsfNsWP1lTmWR8RlVJvWStUifzNZdAxI2i8NFCkd4RfjyTn4FcDETik3SDlAfGQRA==}
     dependencies:
       chrome-promise: 3.0.5
-      rxjs: 7.5.7
+      rxjs: 7.8.1
     dev: true
 
   /@hapi/hoek/9.3.0:
@@ -15238,8 +15238,8 @@ packages:
     dependencies:
       queue-microtask: 1.2.3
 
-  /rxjs/7.5.7:
-    resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
+  /rxjs/7.8.1:
+    resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
     dependencies:
       tslib: 2.4.0
 
@@ -17011,7 +17011,7 @@ packages:
       joi: 17.6.0
       lodash: 4.17.21
       minimist: 1.2.6
-      rxjs: 7.5.7
+      rxjs: 7.8.1
     transitivePeerDependencies:
       - debug
     dev: false
