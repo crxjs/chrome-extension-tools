@@ -108,7 +108,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         if (contentScripts.size > 0) {
           // Vite 5 changed the manifest.json location to .vite/manifest.json.
           // In order to support both Vite <=4 and Vite 5, we need to check the Vite version and determine the path accordingly.
-		  const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+          const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
           const manifestPath = viteMajorVersion > 4 ? '.vite/manifest.json' : 'manifest.json'
 
           const viteManifest = parseJsonAsset<ViteManifest>(
