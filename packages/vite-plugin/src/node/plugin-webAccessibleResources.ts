@@ -141,7 +141,8 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                   contentScripts.get(key)!.css = [...css]
 
                   // loader files import the entry, so entry file must be web accessible
-                  if (type === 'loader') imports.add(fileName)
+                  if (type === 'loader' || isDynamicScript)
+                    imports.add(fileName)
 
                   const resource:
                     | WebAccessibleResourceById
