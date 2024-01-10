@@ -109,13 +109,13 @@ do {
     await fetch(VITE_URL);
     ready = true;
   } catch {
-    const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
+    const timeout = Math.min(10 * Math.pow(2, ++tries), 1e3);
     console.log(\`[CRXJS] Vite Dev Server is not available on \${VITE_URL}\`);
     console.log(\`[CRXJS] Retrying in \${timeout}ms...\`);
     await new Promise((resolve) => setTimeout(resolve, timeout));
   }
 } while (!ready);
-chrome.runtime.reload();
+location.reload();
 "
 `;
 
