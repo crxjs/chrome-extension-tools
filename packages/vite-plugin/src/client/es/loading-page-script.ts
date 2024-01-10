@@ -58,7 +58,7 @@ do {
   }
 } while (!ready)
 
-// reload the extension to load the built files from the dev server
-chrome.runtime.reload()
+// reload the page to load the built files from the dev server
+location.reload()
 
 export {}
