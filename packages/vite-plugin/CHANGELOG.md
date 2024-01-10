@@ -1,5 +1,14 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.22
+
+### Patch Changes
+
+- ce9fe1c: Fix/web accessible resources script modules
+- 48d8c68: Vite 5 moved vite manifest from 'manifest.json' to
+  '.vite/manifest.json'. This change updates the plugin to use the new location
+  if Vite major version is >4, old location otherwise.
+
 ## 2.0.0-beta.21
 
 ### Patch Changes
