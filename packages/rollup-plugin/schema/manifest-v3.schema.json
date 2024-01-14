@@ -279,6 +279,11 @@
             "description": "Controls whether the content script runs in all frames of the matching page, or only the top frame.",
             "type": "boolean"
           },
+          "match_origin_as_fallback": {
+            "type": "boolean",
+            "description": "Controls whether the content script runs in frames that are related to a matching frame.",
+            "default": false
+          },
           "css": {
             "description": "The list of CSS files to be injected into matching pages. These are injected in the order they appear in this array, before any DOM is constructed or displayed for the page.",
             "items": {
