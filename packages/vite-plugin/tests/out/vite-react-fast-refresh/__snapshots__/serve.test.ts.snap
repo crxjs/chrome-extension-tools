@@ -117,7 +117,7 @@ do {
     await new Promise((resolve) => setTimeout(resolve, timeout));
   }
 } while (!ready);
-chrome.runtime.reload();
+location.reload();
 "
 `;
 
