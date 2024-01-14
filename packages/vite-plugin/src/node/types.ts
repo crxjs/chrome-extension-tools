@@ -51,12 +51,18 @@ export type CrxDevScriptId = {
 }
 
 export interface CrxPlugin extends VitePlugin {
-  /** Runs during the transform hook for the manifest. Filenames use input filenames. */
+  /**
+   * Runs during the transform hook for the manifest. Filenames use input
+   * filenames.
+   */
   transformCrxManifest?: (
     this: PluginContext,
     manifest: ManifestV3,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
-  /** Runs during generateBundle, before manifest output. Filenames use output filenames. */
+  /**
+   * Runs during generateBundle, before manifest output. Filenames use output
+   * filenames.
+   */
   renderCrxManifest?: (
     this: PluginContext,
     manifest: ManifestV3,
@@ -73,7 +79,6 @@ export interface CrxPlugin extends VitePlugin {
 }
 
 // change this to an interface when you want to add options
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface CrxOptions {
   contentScripts?: {
     preambleCode?: string | false
@@ -81,10 +86,17 @@ export interface CrxOptions {
     injectCss?: boolean
   }
   fastGlobOptions?: FastGlobOptions
+  /**
+   * The browser that this extension is targeting, can be "firefox" or "chrome".
+   * Default is "chrome".
+   */
+  browser?: Browser
 }
 
+export type Browser = 'firefox' | 'chrome'
+
 export interface CrxPluginFn {
-  (): CrxPlugin | CrxPlugin[]
+  (options?: CrxOptions): CrxPlugin | CrxPlugin[]
 }
 
 export type ManifestFiles = {

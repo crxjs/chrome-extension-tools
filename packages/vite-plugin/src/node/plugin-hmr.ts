@@ -113,7 +113,6 @@ export const pluginHMR: CrxPluginFn = () => {
           ) {
             debug('sending runtime reload')
             server.ws.send(crxRuntimeReload)
-            return []
           }
         }
 

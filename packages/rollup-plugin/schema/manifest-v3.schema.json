@@ -149,6 +149,7 @@
           "scripting",
           "search",
           "sessions",
+          "sidePanel",
           "signedInDevices",
           "storage",
           "system.cpu",
@@ -277,6 +278,11 @@
             "default": false,
             "description": "Controls whether the content script runs in all frames of the matching page, or only the top frame.",
             "type": "boolean"
+          },
+          "match_origin_as_fallback": {
+            "type": "boolean",
+            "description": "Controls whether the content script runs in frames that are related to a matching frame.",
+            "default": false
           },
           "css": {
             "description": "The list of CSS files to be injected into matching pages. These are injected in the order they appear in this array, before any DOM is constructed or displayed for the page.",
@@ -676,6 +682,17 @@
       "description": "The short name is typically used where there is insufficient space to display the full name.",
       "maxLength": 12,
       "type": "string"
+    },
+    "side_panel": {
+      "description": "The Side Panel API allows extensions to display their own UI in the side panel, enabling persistent experiences that complement the user's browsing journey.",
+      "properties": {
+        "default_path": {
+          "description": "The path to your site panel page, relative to your extension's root.",
+          "type": "string"
+        }
+      },
+      "required": ["default_path"],
+      "type": "object"
     },
     "signature": {},
     "spellcheck": {},

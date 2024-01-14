@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.13-beta.1
+
+### Patch Changes
+
+- a0d4592: Add match_origin_as_fallback to manifest-v3.schema.json
+
 ## 3.6.13-beta.0
 
 ### Patch Changes
