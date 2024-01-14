@@ -77,7 +77,10 @@ export const dynamicResourcesName = '<dynamic_resource>' as const
  * to all urls. This is secure enough for our purposes b/c the CRX origin is
  * changed randomly each runtime reload.
  */
-export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
+export const pluginContentScripts: CrxPluginFn = ({
+  contentScripts = {},
+  browser = 'chrome',
+}) => {
   const { hmrTimeout = 5000, injectCss = true } = contentScripts
   const dynamicScriptsById = new Map<string, DynamicScriptData>()
   const dynamicScriptsByLoaderRefId = new Map<string, DynamicScriptData>()
@@ -410,14 +413,20 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
                 .filter(({ resources }) => resources.length)
 
             // during development don't specific resources
-            manifest.web_accessible_resources.push({
-              // change the extension origin on every reload
-              use_dynamic_url: true,
+            const war: WebAccessibleResourceByMatch = {
               // all web origins can access
               matches: ['<all_urls>'],
               // all resources are web accessible
               resources: ['**/*', '*'],
-            })
+            }
+
+            if (browser !== 'firefox') {
+              // change the extension origin on every reload
+              // not allowed in FF b/c FF does this by default
+              war.use_dynamic_url = true
+            }
+
+            manifest.web_accessible_resources.push(war)
           } else {
             const vmAsset = bundle['manifest.json'] as OutputAsset
             if (!vmAsset) throw new Error('vite manifest is missing')
@@ -564,13 +573,13 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
 
         // clean up web_accessible_resources
         if (manifest.web_accessible_resources?.length) {
-          const war = manifest.web_accessible_resources
+          const wars = manifest.web_accessible_resources
           manifest.web_accessible_resources = []
           const map = new Map<string, Set<string>>()
-          for (const r of war)
-            if (isResourceByMatch(r)) {
+          for (const war of wars)
+            if (isResourceByMatch(war)) {
               // combine resources that share match patterns
-              const { matches, resources, use_dynamic_url = false } = r
+              const { matches, resources, use_dynamic_url = false } = war
               const key = [use_dynamic_url, matches.sort()]
                 .map((x) => JSON.stringify(x))
                 .join('::')
@@ -578,19 +587,32 @@ export const pluginContentScripts: CrxPluginFn = ({ contentScripts = {} }) => {
               resources.forEach((r) => set.add(r))
               map.set(key, set)
             } else {
+              // FF does not allow the use_dynamic_url key b/c the urls are always
+              // dynamic in FF
+              if (browser === 'firefox' && 'use_dynamic_url' in war)
+                delete war.use_dynamic_url
+
               // don't touch resources by CRX_id
-              manifest.web_accessible_resources.push(r)
+              manifest.web_accessible_resources.push(war)
             }
           // rebuild combined resources
           for (const [key, set] of map) {
             const [use_dynamic_url, matches] = key
               .split('::')
               .map((x) => JSON.parse(x)) as [boolean, string[]]
-            manifest.web_accessible_resources.push({
+
+            const war:
+              | WebAccessibleResourceById
+              | WebAccessibleResourceByMatch = {
               matches,
               resources: [...set],
-              use_dynamic_url,
-            })
+            }
+
+            // FF does not allow the use_dynamic_url key b/c the urls are always
+            // dynamic in FF
+            if (browser !== 'firefox') war.use_dynamic_url = use_dynamic_url
+
+            manifest.web_accessible_resources.push(war)
           }
         } else {
           // array is empty or undefined
