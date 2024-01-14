@@ -10,6 +10,7 @@ import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
+import findCSSImportDeps from './findCSSImportDeps'
 
 const debug = _debug('hmr')
 
@@ -79,25 +80,36 @@ export const pluginHMR: CrxPluginFn = () => {
           )
         }
       },
+
       closeBundle() {
         subs.unsubscribe()
       },
+
       // background changes require a full extension reload
       handleHotUpdate({ modules, server }) {
-        const { root } = server.config
+        const updateFiles = modules
+          .filter((module) => module.isSelfAccepting)
+          .map((module) => prefix('/', module.url))
 
-        const relFiles = new Set<string>()
-        for (const m of modules)
-          if (m.id?.startsWith(root)) {
-            relFiles.add(m.id.slice(server.config.root.length))
-          }
+        /**
+         * Additionally check for CSS importers, since a PostCSS plugin like
+         * Tailwind JIT may register any file as a dependency to a CSS file.
+         * https://github.com/vitejs/vite/blob/main/packages/vite/src/node/server/hmr.ts#L266
+         */
+        const additionalCSSFiles = modules
+          .flatMap((module) => [...findCSSImportDeps(module)])
+          .map((module) => module.url)
 
-        // check if changed file is a background dependency
         if (inputManifestFiles.background.length) {
           const background = prefix('/', inputManifestFiles.background[0])
+          // check if changed file is a background dependency
+          const isDependency = modules.some(
+            isImporter(join(server.config.root, background)),
+          )
           if (
-            relFiles.has(background) ||
-            modules.some(isImporter(join(server.config.root, background)))
+            updateFiles.includes(background) ||
+            additionalCSSFiles.length ||
+            isDependency
           ) {
             debug('sending runtime reload')
             server.ws.send(crxRuntimeReload)
@@ -107,11 +119,15 @@ export const pluginHMR: CrxPluginFn = () => {
         for (const [key, script] of contentScripts)
           if (key === script.id) {
             // check if changed file is a content script dependency
+            const isDependency = modules.some(
+              isImporter(join(server.config.root, script.id)),
+            )
             if (
-              relFiles.has(script.id) ||
-              modules.some(isImporter(join(server.config.root, script.id)))
+              updateFiles.includes(script.id) ||
+              additionalCSSFiles.length ||
+              isDependency
             ) {
-              relFiles.forEach((relFile) => update(relFile))
+              new Set([...updateFiles, ...additionalCSSFiles]).forEach(update)
             }
           }
       },
