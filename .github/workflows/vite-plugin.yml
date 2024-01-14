@@ -113,7 +113,7 @@ jobs:
         run: pnpm install --filter "vite-plugin"
 
       - name: Run e2e tests
-        uses: xvfb-run -a npm test
+        uses: coactions/setup-xvfb@v1
         with:
           run: pnpm test:run:e2e
           working-directory: "packages/vite-plugin"

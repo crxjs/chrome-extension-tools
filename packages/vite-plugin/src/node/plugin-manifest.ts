@@ -1,5 +1,5 @@
-import precontrollerJs from 'client/es/page-precontroller-script.ts'
-import precontrollerHtml from 'client/html/precontroller.html'
+import loadingPageScript from 'client/es/loading-page-script.ts'
+import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
@@ -239,6 +239,17 @@ export const pluginManifest: CrxPluginFn = () => {
             manifest.background.service_worker = refId
           }
 
+          if (manifest.background && 'scripts' in manifest.background) {
+            const file = manifest.background.scripts[0]
+            const id = join(config.root, file)
+            const refId = this.emitFile({
+              type: 'chunk',
+              id,
+              name: basename(file),
+            })
+            manifest.background.scripts = [refId]
+          }
+
           for (const file of htmlFiles(manifest)) {
             const id = join(config.root, file)
             this.emitFile({
@@ -276,6 +287,12 @@ export const pluginManifest: CrxPluginFn = () => {
             const ref = manifest.background.service_worker
             const name = this.getFileName(ref)
             manifest.background.service_worker = name
+          }
+
+          if (manifest.background && 'scripts' in manifest.background) {
+            const ref = manifest.background.scripts[0]
+            const name = this.getFileName(ref)
+            manifest.background.scripts = [name]
           }
 
           // update content script file names from refs
@@ -365,17 +382,20 @@ Public dir: "${config.publicDir}"`,
         if (config.command === 'serve' && files.html.length) {
           const refId = this.emitFile({
             type: 'asset',
-            name: 'precontroller.js',
-            source: precontrollerJs,
+            name: 'loading-page.js',
+            source: loadingPageScript.replace(
+              '%PORT%',
+              `${config.server.port ?? 0}`,
+            ),
           })
-          const precontrollerJsName = this.getFileName(refId)
+          const loadingPageScriptName = this.getFileName(refId)
           files.html.map((f) =>
             this.emitFile({
               type: 'asset',
               fileName: f,
-              source: precontrollerHtml.replace(
+              source: loadingPageHtml.replace(
                 '%SCRIPT%',
-                `/${precontrollerJsName}`,
+                `/${loadingPageScriptName}`,
               ),
             }),
           )

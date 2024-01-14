@@ -1,5 +1,9 @@
 import { OutputChunk } from 'rollup'
-import { Manifest as ViteManifest, ResolvedConfig } from 'vite'
+import {
+  Manifest as ViteManifest,
+  ResolvedConfig,
+  version as ViteVersion,
+} from 'vite'
 import { compileFileResources } from './compileFileResources'
 import { contentScripts } from './contentScripts'
 import { DYNAMIC_RESOURCE } from './defineManifest'
@@ -102,10 +106,16 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
 
         // derive content script resources from vite file manifest
         if (contentScripts.size > 0) {
+          // Vite 5 changed the manifest.json location to .vite/manifest.json.
+          // In order to support both Vite <=4 and Vite 5, we need to check the Vite version and determine the path accordingly.
+          const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+          const manifestPath = viteMajorVersion > 4 ? '.vite/manifest.json' : 'manifest.json'
+
           const viteManifest = parseJsonAsset<ViteManifest>(
             bundle,
-            'manifest.json',
+            manifestPath,
           )
+
           const viteFiles = new Map()
           for (const [, file] of Object.entries(viteManifest))
             viteFiles.set(file.file, file)
@@ -141,7 +151,8 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                   contentScripts.get(key)!.css = [...css]
 
                   // loader files import the entry, so entry file must be web accessible
-                  if (type === 'loader') imports.add(fileName)
+                  if (type === 'loader' || isDynamicScript)
+                    imports.add(fileName)
 
                   const resource:
                     | WebAccessibleResourceById
