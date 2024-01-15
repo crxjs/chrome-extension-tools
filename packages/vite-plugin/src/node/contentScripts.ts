@@ -1,5 +1,7 @@
 import contentDevLoader from 'client/iife/content-dev-loader.ts'
 import contentProLoader from 'client/iife/content-pro-loader.ts'
+import contentMainProLoad from 'client/iife/content-main-pro-loader.ts'
+
 import { filter } from 'rxjs'
 import { hash } from './helpers'
 import { RxMap } from './RxMap'
@@ -84,6 +86,14 @@ export function createDevLoader({
     .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
 }
 
-export function createProLoader({ fileName }: { fileName: string }): string {
+export function createProLoader(params: {
+  fileName: string
+  world?: 'ISOLATED' | 'MAIN'
+}): string {
+  const { fileName, world = 'ISOLATED' } = params || {}
+
+  if (world === 'MAIN') {
+    return contentMainProLoad.replace(/__SCRIPT__/g, JSON.stringify(fileName))
+  }
   return contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
 }

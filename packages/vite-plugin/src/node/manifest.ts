@@ -41,10 +41,7 @@ export interface ManifestV3 {
 
   action?: chrome.runtime.ManifestAction | undefined
   author?: string | undefined
-  background?:
-    | ChromeManifestBackground
-    | FirefoxManifestBackground
-    | undefined
+  background?: ChromeManifestBackground | FirefoxManifestBackground | undefined
   chrome_settings_overrides?:
     | {
         homepage?: string | undefined
@@ -103,6 +100,7 @@ export interface ManifestV3 {
         match_about_blank?: boolean | undefined
         include_globs?: string[] | undefined
         exclude_globs?: string[] | undefined
+        world?: 'MAIN' | 'ISOLATED'
       }[]
     | undefined
   content_security_policy?: {
@@ -240,7 +238,7 @@ export interface ManifestV3 {
     | undefined
   side_panel?:
     | {
-      default_path?: string | undefined
+        default_path?: string | undefined
       }
     | undefined
   short_name?: string | undefined
