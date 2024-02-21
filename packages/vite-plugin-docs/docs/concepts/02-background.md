@@ -8,6 +8,8 @@ title: Background
 Chrome Extensions use a **service worker** to listen for Chrome API Events in
 the background.
 
+# Add details of what a service worker is and why would you need it? Give an example of src/background.ts
+
 Add a service worker to your extension in the manifest under
 `background.service_worker`. CRXJS uses module-type service workers because Vite
 uses the ES module format.
