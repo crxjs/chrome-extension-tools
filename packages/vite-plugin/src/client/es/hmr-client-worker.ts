@@ -18,9 +18,10 @@ declare const __SERVER_PORT__: string
 /* -------- REDIRECT FETCH TO THE DEV SERVER ------- */
 
 const ownOrigin = new URL(chrome.runtime.getURL('/')).origin
+const ignoreURLPaths = ['/_favicon/']
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
-  if (url.origin === ownOrigin) {
+  if (url.origin === ownOrigin && !ignoreURLPaths.some(p => url.href.includes(p))) {
     fetchEvent.respondWith(sendToServer(url))
   }
 })
