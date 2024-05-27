@@ -87,10 +87,17 @@ export const pluginHMR: CrxPluginFn = () => {
         const { root } = server.config
 
         const relFiles = new Set<string>()
-        for (const m of modules)
+        const fsFiles = new Set<string>()
+        for (const m of modules) {
           if (m.id?.startsWith(root)) {
             relFiles.add(m.id.slice(server.config.root.length))
+          } else if (m.url?.startsWith('/@fs')) {
+            fsFiles.add(m.url)
           }
+        }
+
+        // update local vendor build if change detected from monorepo packages
+        fsFiles.forEach((file) => update(file))
 
         // check if changed file is a background dependency
         if (inputManifestFiles.background.length) {
