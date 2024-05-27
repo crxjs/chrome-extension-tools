@@ -11,7 +11,6 @@ import {
   decodeManifest,
   encodeManifest,
   isString,
-  structuredClone,
 } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
