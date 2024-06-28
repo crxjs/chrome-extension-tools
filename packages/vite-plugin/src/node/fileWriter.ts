@@ -1,5 +1,5 @@
 import fsx from 'fs-extra'
-import path from 'path'
+import { posix as path } from 'path'
 import { performance } from 'perf_hooks'
 import { OutputOptions, rollup, RollupOptions } from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
