@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.23
+
+### Patch Changes
+
+- cc76555: fix: hmr error
+
 ## 2.0.0-beta.22
 
 ### Patch Changes
