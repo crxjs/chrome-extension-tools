@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.25
+
+### Patch Changes
+
+- ce84b68: Update manifest author field schema to match documentation.
+
 ## 2.0.0-beta.24
 
 ### Patch Changes
