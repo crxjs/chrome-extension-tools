@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.24
+
+### Patch Changes
+
+- b0ba786: fix: monorepo hmr
+
 ## 2.0.0-beta.23
 
 ### Patch Changes
