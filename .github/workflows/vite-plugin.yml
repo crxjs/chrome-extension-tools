@@ -42,7 +42,7 @@ jobs:
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
         # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
           version: 7.9.5
@@ -88,7 +88,7 @@ jobs:
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
         # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
           version: 7.9.5
@@ -143,7 +143,7 @@ jobs:
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
         # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
           version: 7.9.5
