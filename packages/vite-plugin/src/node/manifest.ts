@@ -40,7 +40,10 @@ export interface ManifestV3 {
   // Optional
 
   action?: chrome.runtime.ManifestAction | undefined
-  author?: string | undefined
+  /**
+   * @see https://developer.chrome.com/docs/extensions/reference/manifest/author
+   */
+  author?: { email: string } | undefined
   background?:
     | ChromeManifestBackground
     | FirefoxManifestBackground
