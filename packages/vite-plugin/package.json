@@ -77,7 +77,7 @@
     "magic-string": "^0.26.0",
     "picocolors": "^1.0.0",
     "react-refresh": "^0.13.0",
-    "rollup": "2.78.1",
+    "rollup": "3.29.5",
     "rxjs": "7.5.7"
   },
   "devDependencies": {
