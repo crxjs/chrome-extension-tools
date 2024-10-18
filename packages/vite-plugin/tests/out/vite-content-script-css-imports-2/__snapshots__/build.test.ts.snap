@@ -41,7 +41,7 @@ Object {
         "assets/index.ts.hash4.js",
         "assets/index.ts.hash5.js",
       ],
-      "use_dynamic_url": true,
+      "use_dynamic_url": false,
     },
   ],
 }
