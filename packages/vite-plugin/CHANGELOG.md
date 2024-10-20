@@ -1,5 +1,13 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.26
+
+### Major Changes
+
+- f4eb4d4: fix: workaround for the issue with chrome.runtime.getURL introduced
+  in Chrome 130 causing CSP rejecting script due to different origin (GUID
+  instead of chrome extension id)
+
 ## 2.0.0-beta.25
 
 ### Patch Changes
