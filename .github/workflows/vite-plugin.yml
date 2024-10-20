@@ -45,7 +45,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 7.9.5
+          version: 8.9.0
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -91,7 +91,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 7.9.5
+          version: 8.9.0
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -146,7 +146,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 7.9.5
+          version: 8.9.0
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
