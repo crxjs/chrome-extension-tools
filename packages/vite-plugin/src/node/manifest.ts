@@ -18,7 +18,7 @@ export interface WebAccessibleResourceById {
 
 export interface ChromeManifestBackground {
   service_worker: string
-  type?: 'module' // If the service worker uses ES modules
+  type?: 'module' | (string & {}) // If the service worker uses ES modules
 }
 
 export interface FirefoxManifestBackground {
