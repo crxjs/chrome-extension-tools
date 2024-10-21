@@ -46,6 +46,7 @@ async function sendToServer(url: URL): Promise<Response> {
   return new Response(response.body, {
     headers: {
       'Content-Type': response.headers.get('Content-Type') ?? 'text/javascript',
+      'Cache-Control': response.headers.get('Cache-Control') ?? '',
     },
   })
 }
