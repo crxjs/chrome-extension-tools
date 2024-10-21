@@ -137,6 +137,7 @@
           "management",
           "nativeMessaging",
           "notifications",
+          "offscreen",
           "pageCapture",
           "platformKeys",
           "power",
