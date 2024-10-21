@@ -12,7 +12,7 @@ tags:
 pagination_prev: null
 ---
 
-import CreateProjectTabs from '../\_create-project-tabs.mdx'
+import {CreateProjectTabs} from '../\_create-project-tabs.mdx'
 
 # Get Started with Vanilla JS
 
@@ -27,7 +27,7 @@ reload.
 
 :::
 
-<CreateProjectTabs />
+<CreateProjectTabs projectType="vanilla JS"/>
 
 ## Create a Vite config file
 
