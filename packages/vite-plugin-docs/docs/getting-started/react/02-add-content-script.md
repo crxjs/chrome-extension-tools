@@ -128,51 +128,9 @@ ReactDOM.createRoot(root).render(
 );
 ```
 
-## Get the right URL
+import GetUrlForImages from '@site/docs/common/\_get-url-for-images.mdx'
 
-:::info
-
-<!-- Add link to Chrome Dev Docs -->
-
-Content scripts share the origin of the page where they run.
-
-:::
-
-The browser treats the imported value `logo` as a URL from the host page. If the
-content script is running on `https://google.com`, the following `img` tag will
-try to load from `https://google.com/logo.svg`.
-
-```jsx title=src/App.jsx
-<img
-  // highlight-next-line
-  src={logo}
-  className='App-logo'
-  alt='logo'
-/>
-```
-
-Images and icons, must be specified in the `web_accessible_resources` field in your `manifest.json` file:
-
-
-```json title="manifest.json"
-  "web_accessible_resources": [
-    {
-      "resources": [ "icons/*.png"],
-      "matches": [ ]
-    }
-  ]
-```
-
-Then you reference the image in your content script using the `chrome.runtime.getURL` method:
-
-```jsx title=src/App.jsx
-<img
-  // highlight-next-line
-  src={chrome.runtime.getURL('icons/logo.png')}
-  className='App-logo'
-  alt='logo'
-/>
-```
+<GetUrlForImages framework="react"/>
 
 Now our content script is ready for action! Let's try it out in the next
 section.

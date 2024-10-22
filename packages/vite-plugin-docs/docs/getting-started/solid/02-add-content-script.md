@@ -49,7 +49,7 @@ import './index.css';
 import App from './App';
 
 render(
-  () => <App />, 
+  () => <App />,
   // highlight-start
   // this element doesn't exist
   document.getElementById('root')
@@ -73,46 +73,12 @@ document.body.append(root)
 // highlight-end
 
 render(
-  () => <App />, 
+  () => <App />,
   // highlight-next-line
   root
 );
 ```
 
-## Get the right URL
+import GetUrlForImages from '@site/docs/common/\_get-url-for-images.mdx'
 
-:::info
-
-<!-- Add link to Chrome Dev Docs -->
-
-Content scripts share the origin of the page where they run.
-
-:::
-
-The browser treats the imported value `logo` as a URL from the host page. If the
-content script is running on `https://google.com`, the following `img` tag will
-try to load from `https://google.com/logo.svg`.
-
-```jsx title=src/App.jsx
-<img
-  // highlight-next-line
-  src={logo}
-  className='App-logo'
-  alt='logo'
-/>
-```
-
-We need to get a URL with our extension id for static assets like images. Use
-the `getURL()` method to get the extension url for our logo:
-
-```jsx title=src/App.jsx
-<img
-  // highlight-next-line
-  src={chrome.runtime.getURL(logo)}
-  className='App-logo'
-  alt='logo'
-/>
-```
-
-Now our content script is ready for action! Let's try it out in the next
-section.
+<GetUrlForImages framework="solid"/>
