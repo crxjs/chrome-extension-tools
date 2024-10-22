@@ -151,13 +151,24 @@ try to load from `https://google.com/logo.svg`.
 />
 ```
 
-We need to get a URL with our extension id for static assets like images. Use
-the `getURL()` method to get the extension url for our logo:
+Images and icons, must be specified in the `web_accessible_resources` field in your `manifest.json` file:
+
+
+```json title="manifest.json"
+  "web_accessible_resources": [
+    {
+      "resources": [ "icons/*.png"],
+      "matches": [ ]
+    }
+  ]
+```
+
+Then you reference the image in your content script using the `chrome.runtime.getURL` method:
 
 ```jsx title=src/App.jsx
 <img
   // highlight-next-line
-  src={chrome.runtime.getURL(logo)}
+  src={chrome.runtime.getURL('icons/logo.png')}
   className='App-logo'
   alt='logo'
 />
