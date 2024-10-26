@@ -7,7 +7,7 @@ const dedent = (str) => {
   const minIndent = Math.min(
     ...lines.filter(line => line.trim()).map(line => line.match(/^ */)[0].length)
   );
-  return lines.map(line => line.slice(minIndent)).join('\n');
+  return lines.map(line => line.slice(minIndent)).join('\n').trim();
 };
 
 const reactCodeBlock = () => {
