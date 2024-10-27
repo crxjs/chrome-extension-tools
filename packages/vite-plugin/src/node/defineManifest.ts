@@ -35,7 +35,7 @@ export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
  */
 export const defineDynamicResource = ({
   matches = ['http://*/*', 'https://*/*'],
-  use_dynamic_url = true,
+  use_dynamic_url = false,
 }: Omit<
   WebAccessibleResourceByMatch,
   'resources'

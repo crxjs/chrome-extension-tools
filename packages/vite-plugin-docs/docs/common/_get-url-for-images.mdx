@@ -1,0 +1,31 @@
+import { ImageCodeBlock } from './ImageCodeBlock';
+
+## Get the right URL
+
+:::info
+
+<!-- Add link to Chrome Dev Docs -->
+
+Content scripts share the origin of the page where they run.
+
+:::
+
+The browser treats the imported value `logo` as a URL from the host page. If the
+content script is running on `https://google.com`, the `img` tag will
+try to load from `https://google.com/logo.svg`.
+
+Images first must be specified in the `web_accessible_resources` field in your `manifest.json` file:
+
+
+```json title="manifest.json"
+"web_accessible_resources": [
+  {
+    "resources": [ "icons/*.png"],
+    "matches": []
+  }
+]
+```
+
+Then you reference the image in your content script using the [chrome.runtime.getURL](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/getURL) method:
+
+<ImageCodeBlock framework={props.framework} />
