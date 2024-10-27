@@ -74,48 +74,9 @@ app.mount(root)
 
 ```
 
-## Get the right URL
+import GetUrlForImages from '@site/docs/common/\_get-url-for-images.mdx'
 
-:::info
-
-<!-- Add link to Chrome Dev Docs -->
-
-Content scripts share the origin of the page where they run.
-
-:::
-
-The browser treats the imported value `logo` as a URL from the host page. If the
-content script is running on `https://google.com`, the following `img` tag will
-try to load from `https://google.com/src/assets/image.png`.
-
-```vue title=src/App.vue
-<script setup>
-import logo from './assets/image.png';
-
-</script>
-<img
-  // highlight-next-line 
-  :src="logo" 
-  className='App-logo' 
-  alt='logo' 
-/>
-
-```
-
-We need to get a URL with our extension id for static assets like images. Use
-the `getURL()` method to get the extension url for our logo:
-
-```vue title=src/App.vue
-<script setup>
-import logo from './assets/image.png';
-// highlight-next-line
-const logoUrl = chrome.runtime.getURL(logo);
-</script>
-
-<template>
-  <img :src="logoUrl" className='App-logo' alt='logo' />
-</template>
-```
+<GetUrlForImages framework="vue"/>
 
 Now our content script is ready for action! Let's try it out in the next
 section.
