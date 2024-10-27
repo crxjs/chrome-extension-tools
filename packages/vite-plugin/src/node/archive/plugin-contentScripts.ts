@@ -420,11 +420,11 @@ export const pluginContentScripts: CrxPluginFn = ({
               resources: ['**/*', '*'],
             }
 
-            if (browser !== 'firefox') {
-              // change the extension origin on every reload
-              // not allowed in FF b/c FF does this by default
-              war.use_dynamic_url = true
-            }
+            // if (browser !== 'firefox') {
+            //   // change the extension origin on every reload
+            //   // not allowed in FF b/c FF does this by default
+            //   war.use_dynamic_url = true
+            // }
 
             manifest.web_accessible_resources.push(war)
           } else {
@@ -522,7 +522,7 @@ export const pluginContentScripts: CrxPluginFn = ({
                       | WebAccessibleResourceByMatch = {
                       matches: script.matches,
                       resources: [...assets, ...imports],
-                      use_dynamic_url: true,
+                      use_dynamic_url: false,
                     }
 
                     if (css.size)

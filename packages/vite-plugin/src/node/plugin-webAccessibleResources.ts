@@ -56,7 +56,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           // all resources are web accessible
           resources: ['**/*', '*'],
           // change the extension origin on every reload
-          use_dynamic_url: true,
+          use_dynamic_url: false,
         }
 
         if (browser === 'firefox') {
@@ -163,7 +163,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                     resources: [...assets, ...imports],
                     use_dynamic_url: isDynamicScript
                       ? dynamicScriptDynamicUrl
-                      : true,
+                      : false,
                   }
 
                   if (isDynamicScript || !injectCss) {
