@@ -59,6 +59,7 @@ const __vitePreload = function preload(baseModule, deps, importerUrl) {
   if (!deps || deps.length === 0) {
     return baseModule();
   }
+  const links = document.getElementsByTagName(\\"link\\");
   return Promise.all(deps.map((dep) => {
     dep = assetsURL(dep);
     if (dep in seen)
@@ -66,7 +67,15 @@ const __vitePreload = function preload(baseModule, deps, importerUrl) {
     seen[dep] = true;
     const isCss = dep.endsWith(\\".css\\");
     const cssSelector = isCss ? '[rel=\\"stylesheet\\"]' : \\"\\";
-    if (document.querySelector(\`link[href=\\"\${dep}\\"]\${cssSelector}\`)) {
+    const isBaseRelative = !!importerUrl;
+    if (isBaseRelative) {
+      for (let i = links.length - 1; i >= 0; i--) {
+        const link2 = links[i];
+        if (link2.href === dep && (!isCss || link2.rel === \\"stylesheet\\")) {
+          return;
+        }
+      }
+    } else if (document.querySelector(\`link[href=\\"\${dep}\\"]\${cssSelector}\`)) {
       return;
     }
     const link = document.createElement(\\"link\\");
