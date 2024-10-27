@@ -1,5 +1,5 @@
 ---
-"@fake-scope/fake-pkg": patch
+"@crxjs/vite-plugin": patch
 ---
 
 Clean up archived files and update magic-string
