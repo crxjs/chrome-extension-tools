@@ -1,57 +1,26 @@
-import Tabs from '@theme/Tabs'
-import TabItem from '@theme/TabItem'
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import Admonition from '@theme/Admonition';
 
-## Create a project
-
-Use your favorite package manager to scaffold a new project and follow the
-prompts to create a vanilla JS project.
-
-<Tabs groupId='vite-version'>
-  <TabItem value='vite2' label='Vite 2' default>
-
-```sh
-npm init vite@^2.9.4
-```
-
-  </TabItem>
-  <TabItem value='vite3' label='Vite 3 (beta)'>
-
-```sh
-npm init vite@latest
-```
-
-:::info beta
-
-CRXJS support for Vite 3 is in beta.
-
-:::
-
-:::info react users
-
-HMR in CRXJS is incompatible with `@vite/plugin-react-swc`. We recommend using @vitejs/plugin-react instead.
-
-:::
-
-  </TabItem>
-</Tabs>
-
-## Install CRXJS Vite plugin
-
-Now install the CRXJS Vite plugin using your favorite package manager.
-
-<Tabs groupId='vite-version'>
-  <TabItem value='vite2' label='Vite 2' default>
-
-```sh
-npm i @crxjs/vite-plugin@latest -D
-```
-
-  </TabItem>
-  <TabItem value='vite3' label='Vite 3 (beta)'>
-
-```sh
-npm i @crxjs/vite-plugin@beta -D
-```
-
-  </TabItem>
-</Tabs>
+export  const CreateProjectTabs = ({ projectType }) => 
+    <>
+      <p>Use your favorite package manager to scaffold a new project and follow the prompts to create a {projectType} project.</p>
+      <Tabs groupId='vite-version'>
+        <TabItem value='vite2' label='Vite 2' default>
+          <pre>
+            <code>npm init vite@^2.9.4</code>
+          </pre>
+        </TabItem>
+        <TabItem value='vite3' label='Vite 3 (beta)'>
+          <pre>
+            <code>npm init vite@latest</code>
+          </pre>
+          <Admonition type="info" title="beta">
+            CRXJS support for Vite 3 is in beta.
+          </Admonition>
+          <Admonition type="info" title="React Users">
+            HMR in CRXJS is incompatible with <code>@vite/plugin-react-swc</code>. We recommend using <code>@vitejs/plugin-react</code> instead.
+          </Admonition>
+        </TabItem>
+      </Tabs>
+    </>
