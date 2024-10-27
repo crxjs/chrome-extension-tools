@@ -67,7 +67,6 @@
     "@webcomponents/custom-elements": "^1.5.0",
     "acorn-walk": "^8.2.0",
     "cheerio": "^1.0.0-rc.10",
-    "connect-injector": "^0.4.4",
     "convert-source-map": "^1.7.0",
     "debug": "^4.3.3",
     "es-module-lexer": "^0.10.0",
