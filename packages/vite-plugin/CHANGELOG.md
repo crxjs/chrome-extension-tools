@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.28
+
+### Patch Changes
+
+- 0dac0e3: Clean up archived files and update magic-string
+
 ## 2.0.0-beta.27
 
 ### Patch Changes
