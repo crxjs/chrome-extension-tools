@@ -29,6 +29,12 @@ reload.
 
 <CreateProjectTabs projectType="vanilla JS"/>
 
+## Install CRXJS
+
+```sh
+npm install --save-dev @crxjs/vite-plugin
+```
+
 ## Create a Vite config file
 
 Create `vite.config.js` with the code below.
