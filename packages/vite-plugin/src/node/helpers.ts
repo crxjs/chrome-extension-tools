@@ -2,7 +2,6 @@ import { simple } from 'acorn-walk'
 import { createHash as _hash } from 'crypto'
 import debug from 'debug'
 import { AcornNode, OutputBundle, PluginContext } from 'rollup'
-import v8 from 'v8'
 import type {
   ManifestV3,
   WebAccessibleResourceById,
@@ -16,10 +15,6 @@ import type {
 } from './types'
 
 export const _debug = (id: string) => debug('crx').extend(id)
-
-export const structuredClone = <T>(obj: T): T => {
-  return v8.deserialize(v8.serialize(obj))
-}
 
 export const hash = (data: string, length = 5): string =>
   _hash('sha1')
