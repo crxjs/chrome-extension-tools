@@ -20,6 +20,13 @@ extension React HTML page. The first two sections take about 90 seconds!
 
 <CreateProjectTabs projectType="react"/>
 
+:::tip package.json
+
+Check `package.json` to ensure that `"type": "module"` is set. If this package
+key is missing, Vite might not be able to build `vite.config.js`. 
+
+:::
+
 ## Install CRXJS
 
 ```sh
