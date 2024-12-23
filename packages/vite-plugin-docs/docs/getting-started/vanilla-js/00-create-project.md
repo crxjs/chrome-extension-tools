@@ -32,7 +32,7 @@ reload.
 ## Install CRXJS
 
 ```sh
-npm install --save-dev @crxjs/vite-plugin
+npm install --save-dev @crxjs/vite-plugin@beta
 ```
 
 ## Create a Vite config file
