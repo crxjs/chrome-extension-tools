@@ -30,7 +30,7 @@ key is missing, Vite might not be able to build `vite.config.ts`.
 ## Install CRXJS
 
 ```sh
-npm install --save-dev @crxjs/vite-plugin
+npm install --save-dev @crxjs/vite-plugin@beta
 ```
 
 ## Update the Vite config
