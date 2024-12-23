@@ -23,7 +23,7 @@ extension React HTML page. The first two sections take about 90 seconds!
 ## Install CRXJS
 
 ```sh
-npm install --save-dev @crxjs/vite-plugin
+npm install --save-dev @crxjs/vite-plugin@beta
 ```
 
 ## Update the Vite config
