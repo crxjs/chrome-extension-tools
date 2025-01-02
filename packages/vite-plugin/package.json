@@ -35,14 +35,13 @@
       "types": "./client.d.ts"
     }
   },
-  "main": "/index.cjs",
+  "main": "index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
     "types",
     "manifest.schema.json",
-    "schema",
     "index.cjs",
     "client.d.ts"
   ],
