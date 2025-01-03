@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.29
+
+### Patch Changes
+
+- 459a38e: fix: cjs require file
+
 ## 2.0.0-beta.28
 
 ### Patch Changes
