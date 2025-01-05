@@ -16267,11 +16267,7 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:
@@ -18417,9 +18413,9 @@ snapshots:
 
   rollup-plugin-bundle-imports@1.5.1(@rollup/plugin-commonjs@21.1.0(rollup@2.79.2))(@rollup/plugin-node-resolve@13.3.0(rollup@2.79.2))(rollup@2.79.2):
     dependencies:
-      '@rollup/plugin-commonjs': 21.1.0(rollup@2.72.1)
-      '@rollup/plugin-node-resolve': 13.3.0(rollup@2.72.1)
-      rollup: 2.72.1
+      '@rollup/plugin-commonjs': 21.1.0(rollup@2.79.2)
+      '@rollup/plugin-node-resolve': 13.3.0(rollup@2.79.2)
+      rollup: 2.79.2
       rollup-pluginutils: 2.8.2
 
   rollup-plugin-dts@4.2.1(rollup@2.79.2)(typescript@4.6.4):
