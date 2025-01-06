@@ -18,6 +18,7 @@ export interface WebAccessibleResourceById {
 
 export interface ChromeManifestBackground {
   service_worker: string
+  // eslint-disable-next-line @typescript-eslint/ban-types
   type?: 'module' | (string & {}) // If the service worker uses ES modules
 }
 
