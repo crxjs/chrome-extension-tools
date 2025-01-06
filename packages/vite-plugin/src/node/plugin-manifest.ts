@@ -7,11 +7,7 @@ import { ResolvedConfig } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
-import {
-  decodeManifest,
-  encodeManifest,
-  isString,
-} from './helpers'
+import { decodeManifest, encodeManifest, isString } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
@@ -19,7 +15,7 @@ import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
 
-// const debug = _debug('manifest')
+declare const structuredClone: <T>(value: T) => T
 
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
