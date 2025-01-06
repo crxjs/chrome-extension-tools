@@ -1,17 +1,16 @@
 import {
-  Plugin,
+  ModuleFormat,
   OutputBundle,
   OutputOptions,
   PluginContext,
-  ModuleFormat,
 } from 'rollup'
 import { isChunk } from '../helpers'
-import { ManifestInputPlugin } from '../plugin-options'
+import { ManifestInputPlugin, PluginWithFunctionHooks } from '../plugin-options'
 import { regenerateBundle } from './regenerateBundle'
 
 export function mixedFormat(
   options: Pick<ManifestInputPlugin, 'formatMap'>,
-): Pick<Required<Plugin>, 'name' | 'generateBundle'> {
+): Pick<PluginWithFunctionHooks, 'name' | 'generateBundle'> {
   return {
     name: 'mixed-format',
     async generateBundle(

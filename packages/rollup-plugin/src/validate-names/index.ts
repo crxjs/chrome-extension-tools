@@ -1,12 +1,13 @@
 import { basename } from 'path'
-import { OutputAsset, OutputChunk, Plugin } from 'rollup'
+import { OutputAsset, OutputChunk } from 'rollup'
+import { PluginWithFunctionHooks } from '../plugin-options'
 
 interface ManifestAsset extends OutputAsset {
   source: string
 }
 
 export type ValidateNamesPlugin = Pick<
-  Required<Plugin>,
+  PluginWithFunctionHooks,
   'name' | 'generateBundle'
 >
 
