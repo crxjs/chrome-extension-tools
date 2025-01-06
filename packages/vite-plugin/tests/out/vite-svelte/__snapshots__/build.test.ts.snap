@@ -32,7 +32,7 @@ Object {
         "assets/svelte.hash.png",
         "assets/vendor.hash.js",
       ],
-      "use_dynamic_url": true,
+      "use_dynamic_url": false,
     },
   ],
 }

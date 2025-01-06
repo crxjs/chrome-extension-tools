@@ -15,11 +15,11 @@ jobs:
     environment: production
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: "22"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -27,14 +27,14 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 6.3.0
+          version: 9.15.2
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
           # run_install: true
 
       - name: Cache pnpm modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-pnpm-modules
         with:

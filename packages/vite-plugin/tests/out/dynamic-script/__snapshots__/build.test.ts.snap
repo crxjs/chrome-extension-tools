@@ -30,7 +30,7 @@ Object {
         "assets/declared-script.ts.hash1.js",
         "assets/main-world.ts.hash2.js",
       ],
-      "use_dynamic_url": true,
+      "use_dynamic_url": false,
     },
     Object {
       "matches": Array [

@@ -10,7 +10,7 @@ pagination_prev: null
 slug: create-project
 ---
 
-import CreateProjectTabs from '../\_create-project-tabs.mdx'
+import {CreateProjectTabs} from '../\_create-project-tabs.mdx'
 
 # Get Started with React
 
@@ -18,7 +18,20 @@ This quick guide will get you up and running with a Chrome Extension popup page.
 You'll see how to integrate CRXJS with Vite, then explore Vite HMR in an
 extension React HTML page. The first two sections take about 90 seconds!
 
-<CreateProjectTabs />
+<CreateProjectTabs projectType="react"/>
+
+:::tip package.json
+
+Check `package.json` to ensure that `"type": "module"` is set. If this package
+key is missing, Vite might not be able to build `vite.config.js`. 
+
+:::
+
+## Install CRXJS
+
+```sh
+npm install --save-dev @crxjs/vite-plugin@beta
+```
 
 ## Update the Vite config
 

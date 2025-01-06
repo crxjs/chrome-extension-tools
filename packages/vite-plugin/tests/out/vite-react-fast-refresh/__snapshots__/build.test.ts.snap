@@ -28,7 +28,7 @@ Object {
         "assets/content.tsx.hash2.js",
         "assets/vendor.hash3.js",
       ],
-      "use_dynamic_url": true,
+      "use_dynamic_url": false,
     },
   ],
 }

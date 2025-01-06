@@ -55,7 +55,7 @@ Object {
         "*",
         "**/*",
       ],
-      "use_dynamic_url": true,
+      "use_dynamic_url": false,
     },
   ],
 }

@@ -67,18 +67,8 @@ document.body.append(doc.body.firstElementChild)
 }
 ```
 
-## Get the right URL
+import GetUrlForImages from '@site/docs/common/\_get-url-for-images.mdx'
 
-Content scripts share the origin of their host page. We need to get a URL with
-our extension id for static assets like images. Let's go to `src/content.js` and
-do that now.
-
-```html title="An imported asset path won't work"
-<img src="${src}" />
-```
-
-```html title="Use chrome.runtime.getURL() to get the right url"
-<img src="${chrome.runtime.getURL(src)}" />
-```
+<GetUrlForImages framework="vanilla"/>
 
 Now our content script is ready for action!

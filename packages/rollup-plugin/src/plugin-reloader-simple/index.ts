@@ -3,8 +3,9 @@ import { code as ctClientCode } from 'code ./client/content.ts'
 import { outputJson } from 'fs-extra'
 import { set } from 'lodash'
 import { join } from 'path'
-import { OutputChunk, Plugin } from 'rollup'
+import { OutputChunk } from 'rollup'
 import { updateManifest } from '../helpers'
+import { PluginWithFunctionHooks } from '../plugin-options'
 import {
   backgroundPageReloader,
   contentScriptReloader,
@@ -19,7 +20,7 @@ import {
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export type SimpleReloaderPlugin = Pick<
-  Required<Plugin>,
+  PluginWithFunctionHooks,
   'name' | 'generateBundle' | 'writeBundle'
 >
 
