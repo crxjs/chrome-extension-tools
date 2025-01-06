@@ -1,15 +1,18 @@
 import { code as executeScriptPolyfill } from 'code ./browser/executeScriptPolyfill.ts'
 import fs from 'fs-extra'
-import { Plugin } from 'rollup'
 import { isAsset } from '../helpers'
 import { isMV3 } from '../manifest-types'
-import { ChromeExtensionPlugin, ManifestInputPlugin } from '../plugin-options'
+import {
+  ChromeExtensionPlugin,
+  ManifestInputPlugin,
+  PluginWithFunctionHooks,
+} from '../plugin-options'
 
 const defaultOptions = { executeScript: true }
 export function browserPolyfill({
   browserPolyfill: options = defaultOptions,
 }: Pick<ManifestInputPlugin, 'browserPolyfill'>): Pick<
-  Required<Plugin>,
+  PluginWithFunctionHooks,
   'name' | 'generateBundle'
 > {
   if (options === false)

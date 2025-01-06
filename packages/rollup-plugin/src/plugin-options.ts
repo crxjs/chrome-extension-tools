@@ -1,7 +1,16 @@
-import { ModuleFormat, Plugin, PluginHooks } from 'rollup'
+import { ModuleFormat, Plugin } from 'rollup'
 import { CheerioFile } from './html-inputs/cheerio'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
 import { ValidateNamesPlugin } from './validate-names/index'
+
+// eslint-disable-next-line @typescript-eslint/ban-types -- Just to extract whatever function is defined
+type ExtractFunction<T> = Extract<T, Function>
+type RequiredPlugin = Required<Plugin>
+export type PluginWithFunctionHooks = {
+  [K in keyof RequiredPlugin]: ExtractFunction<RequiredPlugin[K]> extends never
+    ? RequiredPlugin[K]
+    : ExtractFunction<RequiredPlugin[K]>
+}
 
 /* -------------- MAIN PLUGIN OPTIONS -------------- */
 
@@ -57,7 +66,7 @@ export interface ChromeExtensionOptions {
 }
 
 export type ChromeExtensionPlugin = Pick<
-  Required<Plugin>,
+  PluginWithFunctionHooks,
   'name' | ManifestInputPluginHooks | HtmlInputsPluginHooks
 > & {
   // For testing
@@ -102,7 +111,7 @@ type ManifestInputPluginHooks =
   | 'generateBundle'
 
 export type ManifestInputPlugin = Pick<
-  PluginHooks,
+  PluginWithFunctionHooks,
   ManifestInputPluginHooks
 > & {
   name: string
@@ -141,6 +150,9 @@ export interface HtmlInputsPluginCache {
 
 type HtmlInputsPluginHooks = 'name' | 'options' | 'buildStart' | 'watchChange'
 
-export type HtmlInputsPlugin = Pick<Required<Plugin>, HtmlInputsPluginHooks> & {
+export type HtmlInputsPlugin = Pick<
+  PluginWithFunctionHooks,
+  HtmlInputsPluginHooks
+> & {
   cache: HtmlInputsPluginCache
 }

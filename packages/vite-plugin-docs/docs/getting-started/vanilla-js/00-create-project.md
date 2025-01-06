@@ -29,6 +29,19 @@ reload.
 
 <CreateProjectTabs projectType="vanilla JS"/>
 
+:::tip package.json
+
+Check `package.json` to ensure that `"type": "module"` is set. If this package
+key is missing, Vite might not be able to build `vite.config.js`.
+
+:::
+
+## Install CRXJS
+
+```sh
+npm install --save-dev @crxjs/vite-plugin@beta
+```
+
 ## Create a Vite config file
 
 Create `vite.config.js` with the code below.
