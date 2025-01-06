@@ -1,6 +1,6 @@
 {
   "name": "@crxjs/vite-plugin",
-  "version": "2.0.0-beta.26",
+  "version": "2.0.0-beta.29",
   "description": "Build Chrome Extensions with this Vite plugin.",
   "keywords": [
     "rollup-plugin",
@@ -26,7 +26,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
+      "require": "./index.cjs",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
     },
@@ -35,14 +35,14 @@
       "types": "./client.d.ts"
     }
   },
-  "main": "dist/index.cjs",
+  "main": "index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
     "types",
     "manifest.schema.json",
-    "schema",
+    "index.cjs",
     "client.d.ts"
   ],
   "scripts": {
@@ -67,14 +67,13 @@
     "@webcomponents/custom-elements": "^1.5.0",
     "acorn-walk": "^8.2.0",
     "cheerio": "^1.0.0-rc.10",
-    "connect-injector": "^0.4.4",
     "convert-source-map": "^1.7.0",
     "debug": "^4.3.3",
     "es-module-lexer": "^0.10.0",
     "fast-glob": "^3.2.11",
     "fs-extra": "^10.0.1",
     "jsesc": "^3.0.2",
-    "magic-string": "^0.26.0",
+    "magic-string": "^0.30.12",
     "picocolors": "^1.0.0",
     "react-refresh": "^0.13.0",
     "rollup": "2.79.2",

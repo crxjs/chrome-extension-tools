@@ -1,5 +1,26 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.29
+
+### Patch Changes
+
+- 459a38e: fix: cjs require file
+
+## 2.0.0-beta.28
+
+### Patch Changes
+
+- 0dac0e3: Clean up archived files and update magic-string
+
+## 2.0.0-beta.27
+
+### Patch Changes
+
+- 0a9ed4f: Proxy Cache-Control header
+- ef545f6: build(deps): bump rollup from 2.78.1 to 2.79.2 in
+  /packages/vite-plugin build(deps): bump vite from 3.1.7 to 3.2.11 in
+  /packages/vite-plugin
+
 ## 2.0.0-beta.26
 
 ### Major Changes

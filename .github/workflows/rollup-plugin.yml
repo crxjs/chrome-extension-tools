@@ -39,7 +39,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "22"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -47,7 +47,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 6.3.0
+          version: 9.15.2
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -89,7 +89,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: "22"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -97,7 +97,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 6.3.0
+          version: 9.15.2
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
