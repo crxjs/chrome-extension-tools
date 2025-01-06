@@ -1,5 +1,11 @@
 # vite-plugin-docs
 
+## 0.0.3-beta.3
+
+### Patch Changes
+
+- 4d32116: Update vite-plugin-docs getting-started with crxjs install step
+
 ## 0.0.3-beta.2
 
 ### Patch Changes
