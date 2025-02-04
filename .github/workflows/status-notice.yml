@@ -20,7 +20,8 @@ jobs:
     - uses: actions/github-script@v6
       with:
         script: |
-          const message = `⚠️ **Important Notice:** CRXJS is currently seeking new maintainers. 
+          const tagline = '⚠️ **Important Notice:** CRXJS is currently seeking new maintainers';
+          const message = `${tagline}. 
 
           - New issues and PRs may not receive immediate attention
           - If no maintenance team is established by March 31, 2025, this repository will be archived on June 1, 2025.
@@ -35,8 +36,7 @@ jobs:
             console.log('Existing comments:', comments.data);
             const botLogin = 'github-actions[bot]';
             return comments.data.some(comment => 
-              comment.user.login === botLogin && 
-              comment.body.includes('Important Notice: CRXJS is currently seeking new maintainers')
+              comment.user.login === botLogin && comment.body.includes(tagline)
             );
           }
           
