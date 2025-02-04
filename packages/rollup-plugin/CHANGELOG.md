@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.13-beta.3
+
+### Patch Changes
+
+- 3ad36f0: Add project status announcements
+
 ## 3.6.13-beta.2
 
 ### Patch Changes
