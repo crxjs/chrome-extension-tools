@@ -22,6 +22,11 @@ const config = {
     locales: ['en'],
   },
 
+  // Add custom scripts to inject the banner
+  customFields: {
+    maintenanceBanner: true,
+  },
+
   presets: [
     [
       'classic',
@@ -34,7 +39,9 @@ const config = {
             'https://github.com/crxjs/chrome-extension-tools/tree/main/packages/vite-plugin-docs/',
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: [
+            require.resolve('./src/css/custom.css'),
+          ],
         },
         blog: false,
       }),
@@ -76,48 +83,6 @@ const config = {
       },
       footer: {
         style: 'dark',
-        // Add these later: GitHub, Discord, Community (GH Discussions)
-        // links: [
-        //   {
-        //     title: 'Docs',
-        //     items: [
-        //       {
-        //         label: 'Tutorial',
-        //         to: '/docs/intro',
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     title: 'Community',
-        //     items: [
-        //       {
-        //         label: 'Stack Overflow',
-        //         href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-        //       },
-        //       {
-        //         label: 'Discord',
-        //         href: 'https://discordapp.com/invite/docusaurus',
-        //       },
-        //       {
-        //         label: 'Twitter',
-        //         href: 'https://twitter.com/docusaurus',
-        //       },
-        //     ],
-        //   },
-        //   {
-        //     title: 'More',
-        //     items: [
-        //       {
-        //         label: 'Blog',
-        //         to: '/blog',
-        //       },
-        //       {
-        //         label: 'GitHub',
-        //         href: 'https://github.com/facebook/docusaurus',
-        //       },
-        //     ],
-        //   },
-        // ],
         copyright: `Copyright © ${new Date().getFullYear()} CRXJS`,
       },
       prism: {

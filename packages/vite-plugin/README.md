@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> CRXJS is seeking new maintainers. If no maintenance team is established by March 31, 2025, this repository will be archived. [Learn more](https://github.com/crxjs/chrome-extension-tools/discussions/974).
+
 # ![CRXJS](./banner-github.png)
 
 [![npm (scoped)](https://img.shields.io/npm/v/@crxjs/vite-plugin.svg)](https://www.npmjs.com/package/@crxjs/vite-plugin)
