@@ -20,11 +20,11 @@ jobs:
     - uses: actions/github-script@v6
       with:
         script: |
-          const tagline = '⚠️ **Important Notice:** CRXJS is currently seeking new maintainers';
+          const tagline = '⚠️ **Important Notice:** CRXJS is seeking new maintainers';
           const message = `${tagline}. 
 
           - New issues and PRs may not receive immediate attention
-          - If no maintenance team is established by March 31, 2025, this repository will be archived on June 1, 2025.
+          - A new maintenance team must establish itself by March 31, 2025 or this repository will be archived on June 1, 2025
           - [Learn more about the transition](https://github.com/crxjs/chrome-extension-tools/discussions/974)
 
           ---
