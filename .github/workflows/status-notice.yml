@@ -40,7 +40,7 @@ jobs:
               );
             } catch (error) {
               console.error('Error checking existing comments:', error);
-              return true; // Fail safe - don't post if we can't check
+              throw error; // Re-throw to ensure GitHub Action shows as failed
             }
           }
           
