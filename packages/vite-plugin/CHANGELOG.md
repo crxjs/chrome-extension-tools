@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.31
+
+### Patch Changes
+
+- 3ad36f0: Add project status announcements
+
 ## 2.0.0-beta.30
 
 ### Patch Changes
