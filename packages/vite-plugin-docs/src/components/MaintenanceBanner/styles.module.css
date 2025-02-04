@@ -1,0 +1,28 @@
+.banner {
+  width: 100%;
+  background-color: #fff3cd;
+  color: #856404;
+  border-bottom: 1px solid #ffeeba;
+  padding: 0.75rem 1.25rem;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.bannerContent {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.banner a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Dark mode styles */
+[data-theme='dark'] .banner {
+  background-color: #352c1a;
+  color: #ffe69c;
+  border-bottom-color: #665328;
+}
