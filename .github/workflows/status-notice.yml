@@ -23,7 +23,7 @@ jobs:
           const message = `⚠️ **Important Notice:** CRXJS is currently seeking new maintainers. 
 
           - New issues and PRs may not receive immediate attention
-          - If no maintenance team is established by March 31, 2025, this repository will be archived
+          - If no maintenance team is established by March 31, 2025, this repository will be archived on June 1, 2025.
           - [Learn more about the transition](https://github.com/crxjs/chrome-extension-tools/discussions/974)
 
           ---
