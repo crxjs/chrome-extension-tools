@@ -5,6 +5,8 @@
 
 ## What is CRXJS?
 
+Test the status notice action
+
 CRXJS is a project to bring a modern developer experience to the Chrome
 Extension ecosystem. This repo houses two bundling libraries: a
 [modern Vite plugin](./packages/vite-plugin/README.md) and a
