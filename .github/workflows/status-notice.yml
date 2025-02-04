@@ -1,0 +1,72 @@
+name: 'Maintenance Status Notice'
+on:
+  issues:
+    types: [opened]
+  pull_request:
+    types: [opened]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  add-notice:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const message = `⚠️ **Important Notice:** CRXJS is currently seeking new maintainers. 
+
+            - New issues and PRs may not receive immediate attention
+            - If no maintenance team is established by March 31, 2025, this repository will be archived on June 1, 2025
+            - [Learn more about the transition](https://github.com/crxjs/chrome-extension-tools/discussions/974)
+
+            ---
+            *This is an automated message. Please do not reply to this comment.*`;
+            
+            async function hasExistingNotice(comments) {
+              const botLogin = 'github-actions[bot]';
+              return comments.data.some(comment => 
+                comment.user.login === botLogin && 
+                comment.body.includes('Important Notice: CRXJS is currently seeking new maintainers')
+              );
+            }
+            
+            try {
+              let commentList;
+              let issueNumber;
+              
+              // Determine context and get issue/PR number
+              if (context.eventName === 'issues' || context.eventName === 'issue_comment') {
+                issueNumber = context.issue.number;
+                commentList = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.name,
+                  issue_number: issueNumber
+                });
+              } else {
+                issueNumber = context.payload.pull_request.number;
+                commentList = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.name,
+                  issue_number: issueNumber
+                });
+              }
+              
+              // Only post if no existing notice found
+              if (!await hasExistingNotice(commentList)) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.name,
+                  issue_number: issueNumber,
+                  body: message
+                });
+              }
+            } catch (error) {
+              console.error('Error in Maintenance Notice Action:', error);
+            }
