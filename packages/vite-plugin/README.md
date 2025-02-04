@@ -1,11 +1,11 @@
+> [!IMPORTANT]
+> CRXJS is seeking new maintainers. If no maintenance team is established by March 31, 2025, this repository will be archived. [Learn more](https://github.com/crxjs/chrome-extension-tools/discussions/974).
+
 # ![CRXJS](./banner-github.png)
 
 [![npm (scoped)](https://img.shields.io/npm/v/@crxjs/vite-plugin.svg)](https://www.npmjs.com/package/@crxjs/vite-plugin)
 [![GitHub last commit](https://img.shields.io/github/last-commit/crxjs/chrome-extension-tools.svg?logo=github)](https://github.com/crxjs/rollup-plugin-chrome-extension)
 ![GitHub action badge](https://github.com/crxjs/chrome-extension-tools/actions/workflows/vite-plugin.yml/badge.svg)
-
-> [!IMPORTANT]
-> CRXJS is seeking new maintainers. If no maintenance team is established by March 31, 2025, this repository will be archived. [Learn more](https://github.com/crxjs/chrome-extension-tools/discussions/974).
 
 ## CRXJS Vite Plugin
 
