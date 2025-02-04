@@ -1,5 +1,8 @@
 # ![CRXJS](./banner-github.png)
 
+> [!IMPORTANT]
+> CRXJS is seeking new maintainers. If no maintenance team is established by March 31, 2025, this repository will be archived. [Learn more](https://github.com/crxjs/chrome-extension-tools/discussions/974).
+
 ## What is CRXJS?
 
 CRXJS is a project to bring a modern developer experience to the Chrome
