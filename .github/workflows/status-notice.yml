@@ -31,9 +31,7 @@ jobs:
           *This is an automated message. Please do not reply to this comment.*`;
           
           async function hasExistingNotice(params) {
-            console.log(Object.keys(github.rest));
             const comments = await github.rest.issues.listComments(params);
-            console.log('Existing comments:', comments.data);
             const botLogin = 'github-actions[bot]';
             return comments.data.some(comment => 
               comment.user.login === botLogin && comment.body.includes(tagline)
@@ -59,16 +57,13 @@ jobs:
             };
             
             // Only post if no existing notice found
-            const shouldPostNotice = !await hasExistingNotice(params);
-            console.log('Should post notice:', shouldPostNotice);
-
-            if (shouldPostNotice) {
+            if (!await hasExistingNotice(params)) {
               await github.rest.issues.createComment({ ...params, body: message });
               console.log('Maintenance notice posted successfully.');
             } else {
               console.log('Maintenance notice already exists. Skipping comment.');
             }
           } catch (error) {
-            console.error('Error in Maintenance Notice Action:', error);
+            console.error(error);
             throw error; // Re-throw to ensure GitHub Action shows as failed
           }
