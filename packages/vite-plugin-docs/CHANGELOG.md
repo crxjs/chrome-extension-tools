@@ -1,5 +1,11 @@
 # vite-plugin-docs
 
+## 0.0.3-beta.4
+
+### Patch Changes
+
+- 3ad36f0: Add project status announcements
+
 ## 0.0.3-beta.3
 
 ### Patch Changes
