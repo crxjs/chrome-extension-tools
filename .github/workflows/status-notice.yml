@@ -17,55 +17,56 @@ jobs:
       pull-requests: write
     
     steps:
-      - uses: actions/github-script@v6
-        with:
-          script: |
-            const message = `⚠️ **Important Notice:** CRXJS is currently seeking new maintainers. 
+    - uses: actions/github-script@v6
+      with:
+        script: |
+          const message = `⚠️ **Important Notice:** CRXJS is currently seeking new maintainers. 
 
-            - New issues and PRs may not receive immediate attention
-            - If no maintenance team is established by March 31, 2025, this repository will be archived
-            - [Learn more about the transition](https://github.com/crxjs/chrome-extension-tools/discussions/974)
+          - New issues and PRs may not receive immediate attention
+          - If no maintenance team is established by March 31, 2025, this repository will be archived
+          - [Learn more about the transition](https://github.com/crxjs/chrome-extension-tools/discussions/974)
 
-            ---
-            *This is an automated message. Please do not reply to this comment.*`;
-            
-            async function hasExistingNotice(octokit, params) {
-              try {
-                const comments = await octokit.rest.issues.listComments(params);
-                const botLogin = 'github-actions[bot]';
-                return comments.data.some(comment => 
-                  comment.user.login === botLogin && 
-                  comment.body.includes('Important Notice: CRXJS is currently seeking new maintainers')
-                );
-              } catch (error) {
-                console.error('Error checking existing comments:', error);
-                return true; // Fail safe - don't post if we can't check
-              }
-            }
-            
+          ---
+          *This is an automated message. Please do not reply to this comment.*`;
+          
+          async function hasExistingNotice(octokit, params) {
             try {
-              const owner = 'crxjs';
-              const repo = 'chrome-extension-tools';
-              let issueNumber;
-              
-              // Determine context and get issue/PR number
-              if (context.eventName === 'issues' || context.eventName === 'issue_comment') {
-                issueNumber = context.issue.number;
-              } else {
-                issueNumber = context.payload.pull_request.number;
-              }
-
-              const params = {
-                owner,
-                repo,
-                issue_number: issueNumber
-              };
-              
-              // Only post if no existing notice found
-              if (!await hasExistingNotice(github, params)) {
-                await github.rest.issues.createComment(params);
-              }
+              const comments = await octokit.rest.issues.listComments(params);
+              const botLogin = 'github-actions[bot]';
+              return comments.data.some(comment => 
+                comment.user.login === botLogin && 
+                comment.body.includes('Important Notice: CRXJS is currently seeking new maintainers')
+              );
             } catch (error) {
-              console.error('Error in Maintenance Notice Action:', error);
-              throw error; // Re-throw to ensure GitHub Action shows as failed
+              console.error('Error checking existing comments:', error);
+              return true; // Fail safe - don't post if we can't check
             }
+          }
+          
+          try {
+            const owner = 'crxjs';
+            const repo = 'chrome-extension-tools';
+            let issueNumber;
+            
+            // Determine context and get issue/PR number
+            if (context.eventName === 'issues' || context.eventName === 'issue_comment') {
+              issueNumber = context.issue.number;
+            } else {
+              issueNumber = context.payload.pull_request.number;
+            }
+
+            const params = {
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body: message
+            };
+            
+            // Only post if no existing notice found
+            if (!await hasExistingNotice(github, params)) {
+              await github.rest.issues.createComment(params);
+            }
+          } catch (error) {
+            console.error('Error in Maintenance Notice Action:', error);
+            throw error; // Re-throw to ensure GitHub Action shows as failed
+          }
