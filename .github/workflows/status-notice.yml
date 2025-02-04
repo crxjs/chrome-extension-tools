@@ -32,6 +32,7 @@ jobs:
           async function hasExistingNotice(octokit, params) {
             try {
               const comments = await octokit.rest.issues.listComments(params);
+              console.log('Existing comments:', comments.data);
               const botLogin = 'github-actions[bot]';
               return comments.data.some(comment => 
                 comment.user.login === botLogin && 
@@ -63,8 +64,13 @@ jobs:
             };
             
             // Only post if no existing notice found
-            if (!await hasExistingNotice(github, params)) {
+            const shouldPostNotice = !await hasExistingNotice(github.rest, params);
+            console.log('Should post notice:', shouldPostNotice);
+            if (shouldPostNotice) {
               await github.rest.issues.createComment(params);
+              console.log('Maintenance notice posted successfully.');
+            } else {
+              console.log('Maintenance notice already exists. Skipping comment.');
             }
           } catch (error) {
             console.error('Error in Maintenance Notice Action:', error);
