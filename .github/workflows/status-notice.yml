@@ -29,19 +29,14 @@ jobs:
           ---
           *This is an automated message. Please do not reply to this comment.*`;
           
-          async function hasExistingNotice(octokit, params) {
-            try {
-              const comments = await octokit.rest.issues.listComments(params);
-              console.log('Existing comments:', comments.data);
-              const botLogin = 'github-actions[bot]';
-              return comments.data.some(comment => 
-                comment.user.login === botLogin && 
-                comment.body.includes('Important Notice: CRXJS is currently seeking new maintainers')
-              );
-            } catch (error) {
-              console.error('Error checking existing comments:', error);
-              throw error; // Re-throw to ensure GitHub Action shows as failed
-            }
+          async function hasExistingNotice(params) {
+            const comments = await github.issues.listComments(params);
+            console.log('Existing comments:', comments.data);
+            const botLogin = 'github-actions[bot]';
+            return comments.data.some(comment => 
+              comment.user.login === botLogin && 
+              comment.body.includes('Important Notice: CRXJS is currently seeking new maintainers')
+            );
           }
           
           try {
@@ -64,7 +59,7 @@ jobs:
             };
             
             // Only post if no existing notice found
-            const shouldPostNotice = !await hasExistingNotice(github.rest, params);
+            const shouldPostNotice = !await hasExistingNotice(params);
             console.log('Should post notice:', shouldPostNotice);
             if (shouldPostNotice) {
               await github.rest.issues.createComment(params);
