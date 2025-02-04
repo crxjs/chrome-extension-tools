@@ -30,8 +30,8 @@ jobs:
           *This is an automated message. Please do not reply to this comment.*`;
           
           async function hasExistingNotice(params) {
-            console.log(Object.keys(github));
-            const comments = await github.issues.listComments(params);
+            console.log(Object.keys(github.rest));
+            const comments = await github.rest.issues.listComments(params);
             console.log('Existing comments:', comments.data);
             const botLogin = 'github-actions[bot]';
             return comments.data.some(comment => 
