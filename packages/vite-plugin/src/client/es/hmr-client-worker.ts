@@ -21,7 +21,7 @@ const ownOrigin = `chrome-extension://${chrome.runtime.id}`;
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
   if (url.origin === ownOrigin) {
-    fetchEvent.respondWith(sendToServer(url))
+    fetchEvent.respondWith(sendToServer(fetchEvent.request))
   }
 })
 
@@ -33,7 +33,10 @@ self.addEventListener('fetch', (fetchEvent) => {
  * the extension CSP, but Chromium currently ignores custom CSP's:
  * https://bugs.chromium.org/p/chromium/issues/detail?id=1247690#c_ts1631117342
  */
-async function sendToServer(url: URL): Promise<Response> {
+async function sendToServer(req: Request): Promise<Response> {
+  const url = new URL(req.url);
+  const requestHeaders = new Headers(req.headers);
+
   // change the url to point to the dev server
   url.protocol = 'http:'
   url.host = 'localhost'
@@ -41,13 +44,19 @@ async function sendToServer(url: URL): Promise<Response> {
   // add a timestamp to force Chrome to do a new request
   url.searchParams.set('t', Date.now().toString())
   // URLSearchParams adds "=" to every empty param & vite doesn't like it
-  const response = await fetch(url.href.replace(/=$|=(?=&)/g, ''))
+  const response = await fetch(url.href.replace(/=$|=(?=&)/g, ''),{
+    headers: requestHeaders,
+  });
+
+
+  const responseHeaders = new Headers(response.headers);
+  responseHeaders.set('Content-Type', responseHeaders.get('Content-Type') ?? 'text/javascript');
+  responseHeaders.set('Cache-Control', responseHeaders.get('Cache-Control') ?? '');
+
+
   // circumvent extension CSP by creating response from extension origin
   return new Response(response.body, {
-    headers: {
-      'Content-Type': response.headers.get('Content-Type') ?? 'text/javascript',
-      'Cache-Control': response.headers.get('Cache-Control') ?? '',
-    },
+    headers: responseHeaders,
   })
 }
 
