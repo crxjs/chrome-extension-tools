@@ -118,7 +118,7 @@ jobs:
           run: pnpm test:run:e2e
           working-directory: "packages/vite-plugin"
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: image-diff-${{ matrix.type }}
@@ -184,7 +184,7 @@ jobs:
       #   if: failure()
       #   run: git diff > diff.txt
 
-      # - uses: actions/upload-artifact@v3
+      # - uses: actions/upload-artifact@v4
       #   if: failure()
       #   with:
       #     name: output-diff-${{ matrix.type }}

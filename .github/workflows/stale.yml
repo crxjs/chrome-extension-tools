@@ -1,0 +1,17 @@
+name: 'Close stale issues and PRs'
+on:
+  schedule:
+    - cron: '30 1 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-issue-message: 'Thanks for contributing to CRXJS! This issue has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs within 7 days.'
+          stale-pr-message: 'Thanks for contributing to CRXJS! This PR has been automatically marked as stale because it has not had recent activity. It will be closed if no further activity occurs within 7 days.'
+          days-before-stale: 90
+          exempt-pr-labels: 'dependencies,not-stale'
+          exempt-issue-labels: 'not-stale'
+          exempt-all-assignees: true

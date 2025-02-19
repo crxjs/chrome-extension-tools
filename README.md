@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> CRXJS is seeking new maintainers. If no maintenance team is established by March 31, 2025, this repository will be archived. [Learn more](https://github.com/crxjs/chrome-extension-tools/discussions/974).
+
 # ![CRXJS](./banner-github.png)
 
 ## What is CRXJS?
