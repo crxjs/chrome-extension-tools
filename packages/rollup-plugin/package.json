@@ -47,7 +47,7 @@
     "cheerio": "1.0.0-rc.11",
     "convert-source-map": "^1.7.0",
     "cosmiconfig": "^6.0.0",
-    "esbuild": "^0.17.0",
+    "esbuild": "^0.25.0",
     "esbuild-runner": "^2.2.0",
     "fs-extra": "^8.1.0",
     "glob": "^8.0.0",
