@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.32
+
+### Patch Changes
+
+- 8525e04: Propagate headers in hmr-client-worker.ts/sendToServer
+
 ## 2.0.0-beta.31
 
 ### Patch Changes
