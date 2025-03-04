@@ -13,16 +13,30 @@ CRXJS is a monorepo managed with pnpm workspaces, containing multiple packages:
 
 ### For Contributors
 
-1. **Creating a Changeset**: 
-   - After making changes, run `pnpm changeset` in the repository root
+1. **When to Create a Changeset**:
+   - Not all PRs require a changeset
+   - Only create a changeset if your changes should trigger a release of one of the packages
+   - Examples requiring changesets:
+     - Bug fixes
+     - New features
+     - API changes
+     - Documentation updates that are published as part of the package
+   - Examples NOT requiring changesets:
+     - Repository maintenance (CI changes, test improvements)
+     - Updates to documentation outside of the package
+     - Code refactoring that doesn't affect functionality
+
+2. **Creating a Changeset**: 
+   - After making release-worthy changes, run `pnpm changeset` in the repository root
    - Select the packages that were modified
    - Choose the appropriate semver bump (patch, minor, major)
    - Write a description of the changes
    - This creates a new markdown file in the `.changeset` directory
 
-2. **Changeset Bot in PRs**:
-   - The Changeset bot automatically checks if PRs include a changeset
-   - If no changeset is detected, it will comment on the PR requesting one
+3. **Changeset Bot in PRs**:
+   - The Changeset bot automatically checks PRs
+   - If your PR contains package changes that should trigger a release but no changeset is detected, the bot will comment on the PR requesting one
+   - If your changes don't require a release, you can ignore the bot's request
 
 ### For Maintainers
 
@@ -119,6 +133,24 @@ For standard releases, follow the normal release process:
 1. Accumulate changesets on `main`
 2. Let the GitHub Action create the "Version Packages" PR
 3. Review and merge that PR to publish
+
+### New Prerelease Series
+
+To start a new prerelease series (e.g., for a major version):
+
+1. Enter prerelease mode:
+   ```bash
+   pnpm changeset pre enter <tag>
+   ```
+   Where `<tag>` might be `alpha`, `beta`, `rc`, etc.
+
+2. Create a PR for entering prerelease mode and merge it
+
+3. Continue development, merging changesets into `main`
+
+4. Publish prerelease versions by merging "Version Packages" PRs
+
+5. When ready for stable release, exit prerelease mode as described above
 
 ## Important Notes
 
