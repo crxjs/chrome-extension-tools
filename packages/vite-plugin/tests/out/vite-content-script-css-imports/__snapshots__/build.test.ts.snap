@@ -8,7 +8,7 @@ Object {
         "assets/content.hash1.css",
       ],
       "js": Array [
-        "assets/content.ts-loader.hash0.js",
+        "assets/content.ts.hash0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -26,7 +26,7 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "assets/content.ts.hash2.js",
+        "assets/content.ts.hash0.js",
       ],
       "use_dynamic_url": false,
     },
@@ -37,8 +37,7 @@ Object {
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/content.hash1.css",
-  "assets/content.ts-loader.hash0.js",
-  "assets/content.ts.hash2.js",
+  "assets/content.ts.hash0.js",
   "manifest.json",
 ]
 `;
@@ -50,25 +49,8 @@ exports[`build fs output > assets/content.hash1.css 1`] = `
 "
 `;
 
-exports[`build fs output > assets/content.ts.hash2.js 1`] = `
-"const styles = \\"\\";
+exports[`build fs output > assets/content.ts.hash0.js 1`] = `
+"(function(){const styles = \\"\\";
 console.log(\\"content.ts\\");
-"
-`;
-
-exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
-"(function () {
-  'use strict';
-
-  const injectTime = performance.now();
-  (async () => {
-    const { onExecute } = await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.hash2.js\\")
-    );
-    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
-  })().catch(console.error);
-
-})();
-"
+})()"
 `;

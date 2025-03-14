@@ -135,7 +135,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
           },
         }
       },
-      generateBundle() {
+      generateBundle(_options, bundle) {
         // emit content script loaders
         for (const [key, script] of contentScripts)
           if (key === script.refId) {
@@ -145,12 +145,38 @@ export const pluginContentScripts: CrxPluginFn = () => {
             } else if (script.type === 'loader') {
               const fileName = this.getFileName(script.refId)
               script.fileName = fileName
-              const refId = this.emitFile({
-                type: 'asset',
-                name: getFileName({ type: 'loader', id: basename(script.id) }),
-                source: createProLoader({ fileName }),
-              })
-              script.loaderName = this.getFileName(refId)
+
+              const bundleFileInfo = bundle[fileName]
+              // the loader loads scripts asynchronously which in this case needlessly
+              // delays content script execution which may not be desired
+              const shouldUseLoader = !(
+                bundleFileInfo.type === 'chunk' &&
+                bundleFileInfo.imports.length === 0 &&
+                bundleFileInfo.dynamicImports.length === 0 &&
+                bundleFileInfo.exports.length === 0
+              )
+
+              if (shouldUseLoader) {
+                const refId = this.emitFile({
+                  type: 'asset',
+                  name: getFileName({
+                    type: 'loader',
+                    id: basename(script.id),
+                  }),
+                  source: createProLoader({ fileName }),
+                })
+
+                script.loaderName = this.getFileName(refId)
+              } else {
+                // make sure the code is wrapped in a function invocation
+                // to have the same scope isolation as the loader provides
+                //
+                // note that loaders may also call an `onExecute` function
+                // if exported by the content script, but given we
+                // require content scripts in this branch to have no exports
+                // there is obviously no need to handle onExecute() here
+                bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()`
+              }
             } else if (script.type === 'iife') {
               throw new Error('IIFE content scripts are not implemented')
             }
