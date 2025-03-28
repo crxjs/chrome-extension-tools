@@ -69,7 +69,7 @@ chrome.runtime.onConnect.addListener((port) => {
     ports.add(port)
     port.onDisconnect.addListener((port) => {
       if (chrome.runtime.lastError) {
-        console.log(chrome.runtime.lastError)
+        console.error(chrome.runtime.lastError)
       }
       ports.delete(port)
     })
