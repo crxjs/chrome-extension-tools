@@ -167,6 +167,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 })
 
                 script.loaderName = this.getFileName(refId)
+              } else {
+                // make sure the code is wrapped in a function invocation
+                // to have the same scope isolation as the loader provides
+                bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()`
               }
             } else if (script.type === 'iife') {
               throw new Error('IIFE content scripts are not implemented')
