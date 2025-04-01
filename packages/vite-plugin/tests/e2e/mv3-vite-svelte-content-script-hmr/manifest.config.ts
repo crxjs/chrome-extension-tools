@@ -4,7 +4,7 @@ export default defineManifest({
   manifest_version: 3,
   content_scripts: [
     {
-      matches: ['https://www.google.com/*'],
+      matches: ['https://example.com/*'],
       js: ['src/content.js'],
     },
   ],

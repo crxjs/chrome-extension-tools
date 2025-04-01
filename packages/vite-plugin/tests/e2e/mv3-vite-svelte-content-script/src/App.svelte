@@ -4,7 +4,6 @@
 </script>
 
 <main>
-  <img src={logo} alt="Svelte Logo" />
   <h1>Hello world!</h1>
 
   <Counter />
@@ -30,11 +29,6 @@
     text-align: center;
     padding: 1em;
     margin: 0 auto;
-  }
-
-  img {
-    height: 16rem;
-    width: 16rem;
   }
 
   h1 {
