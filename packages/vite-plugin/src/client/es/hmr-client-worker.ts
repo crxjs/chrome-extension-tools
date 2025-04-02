@@ -67,7 +67,12 @@ const ports = new Set<chrome.runtime.Port>()
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === '@crx/client') {
     ports.add(port)
-    port.onDisconnect.addListener((port) => ports.delete(port))
+    port.onDisconnect.addListener((port) => {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError)
+      }
+      ports.delete(port)
+    })
     port.onMessage.addListener((message: string) => {
       // console.log(
       //   `${JSON.stringify(message, null, 2)} from ${port.sender?.origin}`,
