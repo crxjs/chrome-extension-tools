@@ -8,7 +8,7 @@ test('crx runs from server output', async (ctx) => {
   await page.goto('https://example.com/')
 
   const app = page.locator('#crx-app')
-  await app.locator('img').waitFor()
+  await app.locator('img').evaluate(image => image.complete)
 
   expect(await app.screenshot()).toMatchImageSnapshot({
     customSnapshotIdentifier: getCustomId(ctx),
