@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content.ts-loader.hash0.js",
+        "assets/content.ts.hash0.js",
       ],
       "matches": Array [
         "https://google.com/search*",
@@ -23,10 +23,10 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "assets/content.ts.hash1.js",
-        "assets/font.hash2.otf",
-        "assets/image.hash3.png",
-        "assets/script.ts.hash4.js",
+        "assets/content.ts.hash0.js",
+        "assets/font.hash1.otf",
+        "assets/image.hash2.png",
+        "assets/script.ts.hash3.js",
       ],
       "use_dynamic_url": false,
     },
@@ -36,45 +36,27 @@ Object {
 
 exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/content.ts-loader.hash0.js",
-  "assets/content.ts.hash1.js",
-  "assets/font.hash2.otf",
-  "assets/image.hash3.png",
-  "assets/script.ts.hash4.js",
+  "assets/content.ts.hash0.js",
+  "assets/font.hash1.otf",
+  "assets/image.hash2.png",
+  "assets/script.ts.hash3.js",
   "manifest.json",
 ]
 `;
 
-exports[`build fs output > assets/content.ts.hash1.js 1`] = `
-"const icon = \\"/assets/image.hash3.png\\";
-const font = \\"/assets/font.hash2.otf\\";
-const scriptUrl = \\"/assets/script.ts.hash4.js\\";
+exports[`build fs output > assets/content.ts.hash0.js 1`] = `
+"(function(){const icon = \\"/assets/image.hash2.png\\";
+const font = \\"/assets/font.hash1.otf\\";
+const scriptUrl = \\"/assets/script.ts.hash3.js\\";
 console.log(\\"content.ts\\", { icon, font });
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(scriptUrl);
 script.type = \\"module\\";
 document.body.append(script);
-"
+})()"
 `;
 
-exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
-"(function () {
-  'use strict';
-
-  const injectTime = performance.now();
-  (async () => {
-    const { onExecute } = await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.hash1.js\\")
-    );
-    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`build fs output > assets/script.ts.hash4.js 1`] = `
+exports[`build fs output > assets/script.ts.hash3.js 1`] = `
 "console.log(\\"main world script\\");
 "
 `;
