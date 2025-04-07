@@ -4,7 +4,7 @@
 </script>
 
 <main>
-  <img src={logo} alt="Svelte Logo" />
+  <img src={chrome.runtime.getURL(logo)} alt="Svelte Logo" />
   <h1>Hello world!</h1>
 
   <Counter />

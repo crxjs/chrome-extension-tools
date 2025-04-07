@@ -7,7 +7,7 @@ test(
   async (ctx) => {
     const { browser } = await build(__dirname)
     const page = await browser.newPage()
-    await page.goto('http://www.google.com')
+    await page.goto('https://example.com')
 
     const app = page.locator('#crx-app')
     await app.locator('img').waitFor()
