@@ -21,7 +21,7 @@ test('crx page update on hmr', async () => {
   const app = page.locator('#crx-app')
   const button = app.locator('button')
 
-  await page.goto('https://example.com/')
+  await page.goto('https://example.com')
   await app.waitFor()
 
   // check that page does not update during hmr update
