@@ -1,7 +1,7 @@
 import type { Node as AcornNode } from 'acorn'
 import type { Options as FastGlobOptions } from 'fast-glob'
 import type { OutputBundle, PluginContext } from 'rollup'
-import type { HMRPayload, Plugin as VitePlugin } from 'vite'
+import type { HMRPayload, ResolvedConfig, Plugin as VitePlugin } from 'vite'
 import { ManifestV3 } from './manifest'
 
 export interface AcornLiteral extends AcornNode {
@@ -125,3 +125,7 @@ export type CrxHMRPayload =
       event: 'crx:content-script-payload'
       data: HMRPayload
     }
+
+export interface ResolvedConfigWithHMRToken extends ResolvedConfig {
+  webSocketToken?: string
+}
