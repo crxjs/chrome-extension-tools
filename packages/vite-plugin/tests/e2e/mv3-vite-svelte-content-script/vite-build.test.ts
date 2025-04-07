@@ -10,6 +10,7 @@ test(
     await page.goto('https://example.com')
 
     const app = page.locator('#crx-app')
+    await app.locator('img').waitFor()
 
     expect(await app.screenshot()).toMatchImageSnapshot({
       customSnapshotIdentifier: getCustomId(ctx),
