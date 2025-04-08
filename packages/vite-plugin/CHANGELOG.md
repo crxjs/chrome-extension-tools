@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.33
+
+### Patch Changes
+
+- 3333d30: Bug/back forward cache
+
 ## 2.0.0-beta.32
 
 ### Patch Changes
