@@ -1,8 +1,8 @@
-import { ResolvedConfig } from 'vite'
+import { ResolvedConfigWithHMRToken } from './types'
 import { isObject } from './helpers'
 import { join, normalize } from './path'
 
-export function defineClientValues(code: string, config: ResolvedConfig) {
+export function defineClientValues(code: string, config: ResolvedConfigWithHMRToken) {
   let options = config.server.hmr
   options = options && typeof options !== 'boolean' ? options : {}
   const host = options.host || null
@@ -30,6 +30,8 @@ export function defineClientValues(code: string, config: ResolvedConfig) {
     .replace(`__MODE__`, JSON.stringify(config.mode))
     .replace(`__BASE__`, JSON.stringify(config.base))
     .replace(`__DEFINES__`, serializeDefine(config.define || {}))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .replace(`__HMR_TOKEN__`, JSON.stringify(config.webSocketToken || ""))
     .replace(`__HMR_PROTOCOL__`, JSON.stringify(protocol))
     .replace(`__HMR_HOSTNAME__`, JSON.stringify(host))
     .replace(`__HMR_PORT__`, JSON.stringify(hmrPort))
