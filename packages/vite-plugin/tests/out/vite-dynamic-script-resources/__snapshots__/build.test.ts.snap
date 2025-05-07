@@ -32,9 +32,7 @@ Object {
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/background.ts.hash5.js",
-  "assets/content1.ts-loader.hash6.js",
   "assets/content1.ts.hash0.js",
-  "assets/content2.ts-loader.hash7.js",
   "assets/content2.ts.hash1.js",
   "assets/font.hash2.otf",
   "assets/image.hash3.png",
@@ -45,8 +43,8 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash5.js 1`] = `
-"const content1 = \\"/assets/content1.ts-loader.hash6.js\\";
-const content2 = \\"/assets/content2.ts-loader.hash7.js\\";
+"const content1 = \\"/assets/content1.ts.hash0.js\\";
+const content2 = \\"/assets/content2.ts.hash1.js\\";
 chrome.scripting.executeScript({
   files: [content1, content2],
   target: { tabId: 1 }
@@ -55,49 +53,15 @@ chrome.scripting.executeScript({
 `;
 
 exports[`build fs output > assets/content1.ts.hash0.js 1`] = `
-"const script = \\"/assets/script.ts.hash4.js\\";
+"(function(){const script = \\"/assets/script.ts.hash4.js\\";
 console.log(\\"content.ts\\", { script });
-"
-`;
-
-exports[`build fs output > assets/content1.ts-loader.hash6.js 1`] = `
-"(function () {
-  'use strict';
-
-  const injectTime = performance.now();
-  (async () => {
-    const { onExecute } = await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content1.ts.hash0.js\\")
-    );
-    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
-  })().catch(console.error);
-
-})();
-"
+})()"
 `;
 
 exports[`build fs output > assets/content2.ts.hash1.js 1`] = `
-"const font = \\"/assets/font.hash2.otf\\";
+"(function(){const font = \\"/assets/font.hash2.otf\\";
 console.log(\\"content2.ts\\", { font });
-"
-`;
-
-exports[`build fs output > assets/content2.ts-loader.hash7.js 1`] = `
-"(function () {
-  'use strict';
-
-  const injectTime = performance.now();
-  (async () => {
-    const { onExecute } = await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content2.ts.hash1.js\\")
-    );
-    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
-  })().catch(console.error);
-
-})();
-"
+})()"
 `;
 
 exports[`build fs output > assets/script.ts.hash4.js 1`] = `
