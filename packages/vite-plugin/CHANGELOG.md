@@ -1,5 +1,14 @@
 # @crxjs/vite-plugin
 
+## 2.0.0-beta.33
+
+### Patch Changes
+
+- a336cdf: fix: make HMR working again with latest vite version
+- fcd4f85: fix: do not use loader for contents scripts that have no imports or
+  exports
+- 3333d30: Bug/back forward cache
+
 ## 2.0.0-beta.32
 
 ### Patch Changes
