@@ -10,6 +10,7 @@ import type { HMRPayload } from 'vite'
 // injected by the hmr plugin when served
 declare const __BASE__: string
 declare const __HMR_PROTOCOL__: string
+declare const __HMR_TOKEN__: string
 declare const __HMR_HOSTNAME__: string
 declare const __HMR_PORT__: string
 declare const __HMR_TIMEOUT__: number
@@ -94,8 +95,9 @@ console.log('[vite] connecting...')
 // use server configuration, then fallback to inference
 const socketProtocol =
   __HMR_PROTOCOL__ || (location.protocol === 'https:' ? 'wss' : 'ws')
+const socketToken = __HMR_TOKEN__;
 const socketHost = `${__HMR_HOSTNAME__ || location.hostname}:${__HMR_PORT__}`
-const socket = new WebSocket(`${socketProtocol}://${socketHost}`, 'vite-hmr')
+const socket = new WebSocket(`${socketProtocol}://${socketHost}?token=${socketToken}`, 'vite-hmr')
 const base = __BASE__ || '/'
 
 // Listen for messages
