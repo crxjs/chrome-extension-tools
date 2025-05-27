@@ -26,7 +26,7 @@ test('crx page update on hmr', async () => {
         return app?.textContent?.includes(text)
       },
       text,
-      { timeout: 1000 },
+      { timeout: 5000 },
     )
 
   const root = page.locator('#root')

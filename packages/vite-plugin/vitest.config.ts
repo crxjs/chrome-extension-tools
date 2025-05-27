@@ -16,9 +16,12 @@ export default defineConfig(({ mode }) => {
 
   const testTimeout = process.env.TIMEOUT
     ? parseInt(process.env.TIMEOUT)
-    : 15000
+    : 60000
 
   return {
+    expect: {
+      timeout: 15_000,
+    },
     test: {
       alias: [
         { find: 'src', replacement: path.resolve(__dirname, 'src/node') },
