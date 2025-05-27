@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'pathe'
 import { expect, test } from 'vitest'
 import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'

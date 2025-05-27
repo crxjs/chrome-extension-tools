@@ -1,5 +1,5 @@
 import { defineConfig, configDefaults } from 'vitest/config'
-import path from 'path'
+import path from 'pathe'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
