@@ -1,6 +1,6 @@
 import { watch } from 'chokidar'
 import fs from 'fs-extra'
-import { join } from 'path/posix'
+import { join } from 'pathe'
 import { RollupOutput } from 'rollup'
 import {
   delay,
@@ -29,12 +29,14 @@ export interface BuildTestResult {
   config: ResolvedConfig
   output: RollupOutput
   outDir: string
+  rootDir: string;
 }
 export interface ServeTestResult {
   command: 'serve'
   config: ResolvedConfig
   server: ViteDevServer
   outDir: string
+  rootDir: string
 }
 
 export async function build(
@@ -88,7 +90,7 @@ export async function build(
     throw new TypeError('received outputarray from vite build')
   if ('close' in output) throw new TypeError('received watcher from vite build')
 
-  return { command: 'build', outDir, output, config: config! }
+  return { command: 'build', outDir, output, config: config!, rootDir: dirname }
 }
 
 export async function serve(dirname: string): Promise<ServeTestResult> {
@@ -146,7 +148,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   // watch for activity on outDir to settle, Vite may be pre-bundling
   await firstValueFrom(outDirSettle$)
 
-  return { command: 'serve', outDir, server, config: server.config }
+  return { command: 'serve', outDir, server, config: server.config, rootDir: dirname }
 }
 
 export const isTextFile = (x: string) =>

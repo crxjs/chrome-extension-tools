@@ -1,7 +1,7 @@
 import { crx, defineManifest } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
 import { fileURLToPath } from 'url'
-import { dirname, join } from 'path/posix'
+import { dirname, join } from 'pathe'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
