@@ -19,7 +19,7 @@ test('crx page update on hmr', async () => {
     src: src2,
     plugins: [
       async () => {
-        await page.waitForEvent('load')
+        await page.waitForEvent('load', { timeout: 5_000})
       },
     ],
   })
