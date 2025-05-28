@@ -142,7 +142,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     startWith(null),
     map((x, i) => i),
     // debounce relies on the Date object
-    switchMap((i) => of(i).pipe(delay(250))),
+    switchMap((i) => of(i).pipe(delay(500))),
   )
 
   // watch for activity on outDir to settle, Vite may be pre-bundling
