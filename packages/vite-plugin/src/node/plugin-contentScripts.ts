@@ -175,7 +175,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 // if exported by the content script, but given we
                 // require content scripts in this branch to have no exports
                 // there is obviously no need to handle onExecute() here
-                bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()`
+                bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()\n`
               }
             } else if (script.type === 'iife') {
               throw new Error('IIFE content scripts are not implemented')

@@ -77,12 +77,14 @@ const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);
 script.type = \\"module\\";
 document.head.prepend(script);
-})()"
+})()
+"
 `;
 
 exports[`build fs output > assets/dynamic-script.ts.hash2.js 1`] = `
 "(function(){console.log(\\"dynamic script\\");
-})()"
+})()
+"
 `;
 
 exports[`build fs output > assets/main-world.ts.hash1.js 1`] = `

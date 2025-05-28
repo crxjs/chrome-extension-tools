@@ -74,11 +74,13 @@ exports[`build fs output > assets/index.hash3.css 1`] = `
 exports[`build fs output > assets/index.ts.hash0.js 1`] = `
 "(function(){const styles = \\"\\";
 console.log(\\"content1\\");
-})()"
+})()
+"
 `;
 
 exports[`build fs output > assets/index.ts.hash2.js 1`] = `
 "(function(){const styles = \\"\\";
 console.log(\\"content2\\");
-})()"
+})()
+"
 `;
