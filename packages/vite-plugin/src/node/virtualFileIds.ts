@@ -3,6 +3,7 @@ export const customElementsId = '/@webcomponents/custom-elements'
 export const reactRefreshId = '/@react-refresh'
 
 export const contentHmrPortId = '/@crx/client-port'
+export const hmrWebSocketClientId = '/@crx/hmr-websocket-client'
 export const manifestId = '/@crx/manifest'
 export const preambleId = '/@crx/client-preamble'
 export const stubId = '/@crx/stub'

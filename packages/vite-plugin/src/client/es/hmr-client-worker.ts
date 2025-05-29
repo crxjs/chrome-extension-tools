@@ -18,7 +18,7 @@ declare const __SERVER_PORT__: string
 
 /* -------- REDIRECT FETCH TO THE DEV SERVER ------- */
 
-const ownOrigin = `chrome-extension://${chrome.runtime.id}`;
+const ownOrigin = `chrome-extension://${chrome.runtime.id}`
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
   if (url.origin === ownOrigin) {
@@ -35,8 +35,8 @@ self.addEventListener('fetch', (fetchEvent) => {
  * https://bugs.chromium.org/p/chromium/issues/detail?id=1247690#c_ts1631117342
  */
 async function sendToServer(req: Request): Promise<Response> {
-  const url = new URL(req.url);
-  const requestHeaders = new Headers(req.headers);
+  const url = new URL(req.url)
+  const requestHeaders = new Headers(req.headers)
 
   // change the url to point to the dev server
   url.protocol = 'http:'
@@ -45,15 +45,19 @@ async function sendToServer(req: Request): Promise<Response> {
   // add a timestamp to force Chrome to do a new request
   url.searchParams.set('t', Date.now().toString())
   // URLSearchParams adds "=" to every empty param & vite doesn't like it
-  const response = await fetch(url.href.replace(/=$|=(?=&)/g, ''),{
+  const response = await fetch(url.href.replace(/=$|=(?=&)/g, ''), {
     headers: requestHeaders,
-  });
+  })
 
-
-  const responseHeaders = new Headers(response.headers);
-  responseHeaders.set('Content-Type', responseHeaders.get('Content-Type') ?? 'text/javascript');
-  responseHeaders.set('Cache-Control', responseHeaders.get('Cache-Control') ?? '');
-
+  const responseHeaders = new Headers(response.headers)
+  responseHeaders.set(
+    'Content-Type',
+    responseHeaders.get('Content-Type') ?? 'text/javascript',
+  )
+  responseHeaders.set(
+    'Cache-Control',
+    responseHeaders.get('Cache-Control') ?? '',
+  )
 
   // circumvent extension CSP by creating response from extension origin
   return new Response(response.body, {
@@ -95,9 +99,12 @@ console.log('[vite] connecting...')
 // use server configuration, then fallback to inference
 const socketProtocol =
   __HMR_PROTOCOL__ || (location.protocol === 'https:' ? 'wss' : 'ws')
-const socketToken = __HMR_TOKEN__;
+const socketToken = __HMR_TOKEN__
 const socketHost = `${__HMR_HOSTNAME__ || location.hostname}:${__HMR_PORT__}`
-const socket = new WebSocket(`${socketProtocol}://${socketHost}?token=${socketToken}`, 'vite-hmr')
+const socket = new WebSocket(
+  `${socketProtocol}://${socketHost}?token=${socketToken}`,
+  'vite-hmr',
+)
 const base = __BASE__ || '/'
 
 // Listen for messages
@@ -122,7 +129,7 @@ function handleSocketMessage(payload: HMRPayload) {
 }
 
 function handleCrxHmrPayload(payload: CrxHMRPayload) {
-  // everything goes to the content scripts
+  // Forward to content scripts first
   notifyContentScripts(payload)
 
   switch (payload.event) {

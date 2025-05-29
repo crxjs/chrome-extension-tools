@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket HMR Test</title>
+    <style>
+      body {
+        width: 300px;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+      .status {
+        padding: 10px;
+        border-radius: 5px;
+        margin: 10px 0;
+      }
+      .status.connected {
+        background-color: #4caf50;
+        color: white;
+      }
+      .status.disconnected {
+        background-color: #f44336;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket HMR Test Extension</h1>
+    <div id="status" class="status connected">HMR Connected</div>
+    <p>Change any source file to test HMR functionality.+</p>
+    <p id="update-count">Updates.HTML2: 0</p>
+    <script type="module" src="./popup.ts"></script>
+  </body>
+</html>
