@@ -19,24 +19,33 @@ async function generateLoaderFile(
   isContentScript = false,
 ): Promise<string> {
   if (isContentScript) {
-    // Content scripts can't use ES modules, so we need to inject a script tag
-    const scripts: string[] = []
-    if (includeHmrClient) {
-      scripts.push(`http://localhost:${port}/@vite/client`)
+    // Content scripts need to fetch and eval the code
+    return `(async function() {
+  try {
+    ${
+      includeHmrClient
+        ? `
+    // Load Vite HMR client
+    const hmrResponse = await fetch('http://localhost:${port}/@vite/client');
+    const hmrCode = await hmrResponse.text();
+    const hmrScript = document.createElement('script');
+    hmrScript.type = 'module';
+    hmrScript.textContent = hmrCode;
+    (document.head || document.documentElement).appendChild(hmrScript);
+    `
+        : ''
     }
-    scripts.push(`http://localhost:${port}/${scriptPath}`)
-
-    return `(function() {
-  ${scripts
-    .map(
-      (src, index) => `
-  const script${index} = document.createElement('script');
-  script${index}.type = 'module';
-  script${index}.src = '${src}';
-  (document.head || document.documentElement).appendChild(script${index});
-  `,
-    )
-    .join('')}
+    
+    // Load the actual content script
+    const response = await fetch('http://localhost:${port}/${scriptPath}');
+    const code = await response.text();
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.textContent = code;
+    (document.head || document.documentElement).appendChild(script);
+  } catch (error) {
+    console.error('[CRXJS] Failed to load content script:', error);
+  }
 })();
 `
   }
@@ -149,6 +158,7 @@ async function generateDevDist(
   if (devManifest.background && 'service_worker' in devManifest.background) {
     ;(devManifest.background as ChromeManifestBackground).service_worker =
       'service-worker-loader.js'
+    ;(devManifest.background as ChromeManifestBackground).type = 'module'
   }
 
   // CSP is already handled by plugin-manifest.ts for dev mode
