@@ -112,6 +112,10 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     crx(null),
   ]
   if (process.env.DEBUG) plugins.push(inspect())
+    
+  const minPort = 5200
+  const maxPort = 5500
+  const randomPort = Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort
 
   const inlineConfig: InlineConfig = {
     root: dirname,
@@ -123,10 +127,10 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     clearScreen: false,
     logLevel: 'error',
     server: {
-      port: 5137,
+      port: randomPort, 
       strictPort: true,
       hmr: {
-        port: 5137,
+        port: randomPort,
       },
       watch: {
         // cache dir should not trigger update in these tests
