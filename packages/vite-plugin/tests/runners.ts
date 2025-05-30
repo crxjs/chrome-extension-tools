@@ -123,6 +123,11 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     clearScreen: false,
     logLevel: 'error',
     server: {
+      port: 5137,
+      strictPort: true,
+      hmr: {
+        port: 5137,
+      },
       watch: {
         // cache dir should not trigger update in these tests
         ignored: [cacheDir],
