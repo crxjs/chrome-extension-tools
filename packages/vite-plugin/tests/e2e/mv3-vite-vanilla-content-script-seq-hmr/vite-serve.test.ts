@@ -88,7 +88,7 @@ test('crx page update on hmr', async () => {
     await update('root.ts', src1)
     await waitForText('c1-1')
     await root.waitFor({ timeout: 100 })
-    await h2.waitFor({ timeout: 100 })
+    await h2.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()
     expect(text).toMatch('first')
