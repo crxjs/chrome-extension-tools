@@ -1,7 +1,7 @@
 import jsesc from 'jsesc'
 import { BrowserContext, Locator, Page } from 'playwright-chromium'
-import { basename } from 'src/path'
-import { TestContext, vi } from 'vitest'
+import { basename, join, resolve } from 'src/path'
+import { TestContext } from 'vitest'
 import fs from 'fs-extra'
 
 let count = 0
@@ -46,7 +46,7 @@ export async function getPage(
   return page
 }
 
-/** WaitForFunction uses eval, which doesn't work for CRX */
+/** WaitForFunction uses eval, which doesn't work for CRX (chrome csp issues) */
 export async function waitForInnerHtml(
   locator: Locator,
   pred: (html: string) => boolean = () => true,
@@ -66,6 +66,24 @@ export async function waitForInnerHtml(
   throw new Error('could not find element')
 }
 
+const ensureViteHMRWillPickupChangedFiled = async (filesToModify: string[]) => {
+  const now = new Date()
+  for (const f of filesToModify) {
+    // Add a newline to trigger change detection
+    await fs.appendFile(f, '\n')
+
+    await fs.utimes(f, now, now)
+
+    // Remove the last line
+    const content = await fs.readFile(f, 'utf8')
+    const lines = content.split('\n')
+    if (lines.length > 0 && lines[lines.length - 1] === '') {
+      lines.pop()
+      await fs.writeFile(f, lines.join('\n'))
+    }
+  }
+}
+
 export const createUpdate =
   ({
     target,
@@ -77,8 +95,8 @@ export const createUpdate =
     plugins?: (() => Promise<void>)[]
   }) =>
   async (includes: string, srcDir = src) => {
-    await vi.advanceTimersByTimeAsync(1000)
-    return Promise.all([
+    const updatedFiles: string[] = []
+    await Promise.all([
       ...plugins.map((p) => p()),
       fs.copy(srcDir, target, {
         recursive: true,
@@ -86,8 +104,16 @@ export const createUpdate =
         filter: (f) => {
           if (fs.lstatSync(f).isDirectory()) return true
           const base = basename(f)
-          return base.endsWith(includes)
+          const willCopy = base.endsWith(includes)
+          if (willCopy) {
+            updatedFiles.push(join(target, resolve(f).replace(srcDir, '')))
+          }
+          return willCopy
         },
       }),
     ])
+
+    if (process.platform === 'win32') {
+      await ensureViteHMRWillPickupChangedFiled(updatedFiles)
+    }
   }

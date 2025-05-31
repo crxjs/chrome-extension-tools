@@ -22,14 +22,14 @@ import {
   ViteDevServer,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
-import { expect, vi } from 'vitest'
+import { expect } from 'vitest'
 
 export interface BuildTestResult {
   command: 'build'
   config: ResolvedConfig
   output: RollupOutput
   outDir: string
-  rootDir: string;
+  rootDir: string
 }
 export interface ServeTestResult {
   command: 'serve'
@@ -43,9 +43,6 @@ export async function build(
   dirname: string,
   configFile = 'vite.config.ts',
 ): Promise<BuildTestResult> {
-  const date = new Date('2022-01-26T00:00:00.000Z')
-  vi.setSystemTime(date)
-
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
@@ -94,9 +91,6 @@ export async function build(
 }
 
 export async function serve(dirname: string): Promise<ServeTestResult> {
-  const date = new Date('2022-01-26T00:00:00.000Z')
-  vi.setSystemTime(date)
-
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 
@@ -112,10 +106,11 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     crx(null),
   ]
   if (process.env.DEBUG) plugins.push(inspect())
-    
+
   const minPort = 5200
   const maxPort = 5500
-  const randomPort = Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort
+  const randomPort =
+    Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort
 
   const inlineConfig: InlineConfig = {
     root: dirname,
@@ -127,7 +122,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     clearScreen: false,
     logLevel: 'error',
     server: {
-      port: randomPort, 
+      port: randomPort,
       strictPort: true,
       hmr: {
         port: randomPort,
@@ -157,7 +152,13 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   // watch for activity on outDir to settle, Vite may be pre-bundling
   await firstValueFrom(outDirSettle$)
 
-  return { command: 'serve', outDir, server, config: server.config, rootDir: dirname }
+  return {
+    command: 'serve',
+    outDir,
+    server,
+    config: server.config,
+    rootDir: dirname,
+  }
 }
 
 export const isTextFile = (x: string) =>
