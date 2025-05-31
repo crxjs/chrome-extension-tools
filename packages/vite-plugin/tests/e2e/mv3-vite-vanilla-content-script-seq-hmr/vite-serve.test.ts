@@ -17,11 +17,6 @@ test('crx page update on hmr', async () => {
   const update = createUpdate({
     target: src,
     src: src2,
-    plugins: [
-      async () => {
-        await page.waitForEvent('load', { timeout: 15_000 })
-      },
-    ],
   })
   const waitForText = (text: string) =>
     page.waitForFunction(
