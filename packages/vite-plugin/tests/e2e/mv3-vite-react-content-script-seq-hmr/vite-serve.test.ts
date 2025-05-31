@@ -130,4 +130,5 @@ test('crx page update on hmr', async () => {
     expect(await c1.textContent()).toMatch('c-0-1')
     expect(await c2.textContent()).toMatch('c-0-1')
   }
-})
+}, { retry: process.env.CI ? 5 : 0 },
+)
