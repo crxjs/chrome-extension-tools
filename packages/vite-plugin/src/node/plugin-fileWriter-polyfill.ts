@@ -3,9 +3,9 @@ import MagicString from 'magic-string'
 import { createRequire } from 'module'
 import { CrxPluginFn } from './types'
 import {
-  contentHmrPortId,
   customElementsId,
   viteClientId,
+  hmrWebSocketClientId,
 } from './virtualFileIds'
 
 const _require =
@@ -18,8 +18,8 @@ const customElementsMap = readFileSync(`${customElementsPath}.map`, 'utf8')
 /**
  * Adds polyfills for content scripts:
  *
- * - In `@vite/client`, replace WebSocket with HMRPort to connect content scripts
- *   to background, which uses custom client to connect to server
+ * - In `@vite/client`, replace WebSocket with HMRWebSocketClient to connect
+ *   content scripts directly to Vite's HMR server
  * - Enable custom elements in content scripts during development, used by Vite
  *   HMR Error Overlay.
  *
@@ -40,20 +40,41 @@ export const pluginFileWriterPolyfill: CrxPluginFn = () => {
       if (source === customElementsId) {
         return customElementsId
       }
+      if (source === hmrWebSocketClientId) {
+        return hmrWebSocketClientId
+      }
     },
     load(id) {
       if (id === customElementsId) {
         return { code: customElementsCode, map: customElementsMap }
+      }
+      if (id === hmrWebSocketClientId) {
+        // Return the path to the actual HMR WebSocket client file
+        return `export { HMRWebSocketClient } from '${
+          new URL('../client/es/hmr-websocket-client.ts', import.meta.url)
+            .pathname
+        }'`
       }
     },
     renderCrxDevScript(code, { type, id }) {
       if (type === 'module' && id === viteClientId) {
         const magic = new MagicString(code)
         magic.prepend(`import '${customElementsId}';`)
-        magic.prepend(`import { HMRPort } from '${contentHmrPortId}';`)
-        const ws = 'new WebSocket'
-        const index = code.indexOf(ws)
-        magic.overwrite(index, index + ws.length, 'new HMRPort')
+        magic.prepend(
+          `import { HMRWebSocketClient } from '/@crx/hmr-websocket-client';`,
+        )
+
+        // Replace WebSocket with HMRWebSocketClient
+        const wsRegex = /new\s+WebSocket\s*\(/g
+        let match
+        while ((match = wsRegex.exec(code)) !== null) {
+          magic.overwrite(
+            match.index,
+            match.index + match[0].length,
+            'new HMRWebSocketClient(',
+          )
+        }
+
         return magic.toString()
       }
     },

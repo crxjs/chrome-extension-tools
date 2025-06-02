@@ -1,11 +1,7 @@
-import { Subscription } from 'rxjs'
 import { HMRPayload, ResolvedConfig } from 'vite'
 import { contentScripts } from './contentScripts'
 import { manifestFiles } from './files'
-import { update } from './fileWriter'
-import { crxHMRPayload$, hmrPayload$ } from './fileWriter-hmr'
-import { fileWriterError$ } from './fileWriter-rxjs'
-import { getFileName, prefix } from './fileWriter-utilities'
+import { prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
@@ -22,7 +18,6 @@ export const pluginHMR: CrxPluginFn = () => {
   let inputManifestFiles: ManifestFiles
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
   let config: ResolvedConfig
-  let subs: Subscription
 
   return [
     {
@@ -62,25 +57,12 @@ export const pluginHMR: CrxPluginFn = () => {
                 event: 'crx:content-script-payload',
                 data: payload,
               })
-            } else {
-              hmrPayload$.next(payload) // sniff hmr events
             }
 
             send(payload) // don't interfere with normal hmr
           }
           server.ws.send = decoratedSend
-
-          subs = new Subscription(() => (subs = new Subscription()))
-          subs.add(fileWriterError$.subscribe(send))
-          subs.add(
-            crxHMRPayload$.subscribe((payload) => {
-              send(payload) // send crx hmr and error events
-            }),
-          )
         }
-      },
-      closeBundle() {
-        subs.unsubscribe()
       },
       // background changes require a full extension reload
       handleHotUpdate({ modules, server }) {
@@ -95,9 +77,6 @@ export const pluginHMR: CrxPluginFn = () => {
             fsFiles.add(m.url)
           }
         }
-
-        // update local vendor build if change detected from monorepo packages
-        fsFiles.forEach((file) => update(file))
 
         // check if changed file is a background dependency
         if (inputManifestFiles.background.length) {
@@ -118,7 +97,7 @@ export const pluginHMR: CrxPluginFn = () => {
               relFiles.has(script.id) ||
               modules.some(isImporter(join(server.config.root, script.id)))
             ) {
-              relFiles.forEach((relFile) => update(relFile))
+              // no need to update since no fileWriter
             }
           }
       },
@@ -132,25 +111,7 @@ export const pluginHMR: CrxPluginFn = () => {
         inputManifestFiles = await manifestFiles(manifest, { cwd: config.root })
         return null
       },
-      renderCrxDevScript(code, { id: _id, type }) {
-        if (
-          type === 'module' &&
-          _id !== '/@vite/client' &&
-          code.includes('createHotContext')
-        ) {
-          const id = _id.replace(/t=\d+&/, '')
-          const escaped = id.replace(/([?&.])/g, '\\$1')
-          // using lookahead and lookbehind
-          const regexp = new RegExp(
-            `(?<=createHotContext\\(")${escaped}(?="\\))`,
-          )
-          const fileUrl = prefix('/', getFileName({ id, type }))
-          const replaced = code.replace(regexp, fileUrl)
-          return replaced
-        } else {
-          return code
-        }
-      },
+      // remove this since no fileWriter
     },
   ]
 }

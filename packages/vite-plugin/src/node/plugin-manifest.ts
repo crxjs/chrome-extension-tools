@@ -335,6 +335,18 @@ export const pluginManifest: CrxPluginFn = () => {
           }
         }
 
+        if (config.command === 'serve') {
+          if (!manifest.content_security_policy) {
+            manifest.content_security_policy = {}
+          }
+          if (!manifest.content_security_policy.extension_pages) {
+            manifest.content_security_policy.extension_pages =
+              "script-src 'self' 'unsafe-eval'; object-src 'self'"
+          }
+          manifest.content_security_policy.extension_pages +=
+            '; connect-src ws://localhost:* http://localhost:*'
+        }
+
         /* ---------- COPY MISSING MANIFEST ASSETS --------- */
 
         const assetTypes: (keyof ManifestFiles)[] = [

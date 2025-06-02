@@ -38,6 +38,9 @@
       "ignoreMissing": [
         "jest"
       ]
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

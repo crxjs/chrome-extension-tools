@@ -1,0 +1,36 @@
+{
+  "name": "@extension/hmr",
+  "version": "0.5.0",
+  "description": "chrome extension - hot module reload/refresh",
+  "type": "module",
+  "private": true,
+  "sideEffects": true,
+  "files": [
+    "dist/**"
+  ],
+  "types": "index.mts",
+  "main": "dist/index.mjs",
+  "scripts": {
+    "clean:bundle": "rimraf dist && pnpx rimraf build",
+    "clean:node_modules": "pnpx rimraf node_modules",
+    "clean:turbo": "rimraf .turbo",
+    "clean": "pnpm clean:bundle && pnpm clean:node_modules && pnpm clean:turbo",
+    "ready": "tsc -b && rollup --config dist/rollup.config.js",
+    "dev": "tsx lib/initializers/init-reload-server.ts",
+    "lint": "eslint .",
+    "lint:fix": "pnpm lint --fix",
+    "format": "prettier . --write --ignore-path ../../.prettierignore",
+    "type-check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@extension/env": "workspace:*",
+    "@extension/tsconfig": "workspace:*",
+    "@rollup/plugin-sucrase": "^5.0.2",
+    "@types/ws": "^8.18.1",
+    "esbuild": "^0.25.4",
+    "esm": "^3.2.25",
+    "rollup": "^4.41.0",
+    "ts-node": "^10.9.2",
+    "ws": "^8.18.2"
+  }
+}
