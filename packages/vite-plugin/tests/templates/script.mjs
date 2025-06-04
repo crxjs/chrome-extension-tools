@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'pathe'
 import { fileURLToPath } from 'url'
 import _debug from 'debug'
 import fs from 'fs-extra'

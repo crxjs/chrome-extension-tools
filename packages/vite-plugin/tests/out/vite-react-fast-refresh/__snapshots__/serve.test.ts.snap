@@ -170,15 +170,42 @@ export default App;
 var _c;
 $RefreshReg$(_c, \\"App\\");
 if (import.meta.hot) {
+  let isReactRefreshBoundary = function(mod) {
+    if (mod == null || typeof mod !== \\"object\\") {
+      return false;
+    }
+    let hasExports = false;
+    let areAllExportsComponents = true;
+    for (const exportName in mod) {
+      hasExports = true;
+      if (exportName === \\"__esModule\\") {
+        continue;
+      }
+      const desc = Object.getOwnPropertyDescriptor(mod, exportName);
+      if (desc && desc.get) {
+        return false;
+      }
+      const exportValue = mod[exportName];
+      if (!RefreshRuntime.isLikelyComponentType(exportValue)) {
+        areAllExportsComponents = false;
+      }
+    }
+    return hasExports && areAllExportsComponents;
+  };
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
-  import.meta.hot.accept();
-  if (!window.__vite_plugin_react_timeout) {
-    window.__vite_plugin_react_timeout = setTimeout(() => {
-      window.__vite_plugin_react_timeout = 0;
-      RefreshRuntime.performReactRefresh();
-    }, 30);
-  }
+  import.meta.hot.accept((mod) => {
+    if (isReactRefreshBoundary(mod)) {
+      if (!window.__vite_plugin_react_timeout) {
+        window.__vite_plugin_react_timeout = setTimeout(() => {
+          window.__vite_plugin_react_timeout = 0;
+          RefreshRuntime.performReactRefresh();
+        }, 30);
+      }
+    } else {
+      import.meta.hot.invalidate();
+    }
+  });
 }
 "
 `;

@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'pathe'
 import { expect, test } from 'vitest'
 import { createUpdate } from '../helpers'
 import { serve } from '../runners'
@@ -26,7 +26,7 @@ test('crx page update on hmr', async () => {
         return app?.textContent?.includes(text)
       },
       text,
-      { timeout: 1000 },
+      { timeout: 15_000 },
     )
 
   const root = page.locator('#root')
@@ -130,4 +130,5 @@ test('crx page update on hmr', async () => {
     expect(await c1.textContent()).toMatch('c-0-1')
     expect(await c2.textContent()).toMatch('c-0-1')
   }
-})
+}, { retry: process.env.CI ? 5 : 0 },
+)

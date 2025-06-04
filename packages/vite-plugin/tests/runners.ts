@@ -1,6 +1,6 @@
 import { watch } from 'chokidar'
 import fs from 'fs-extra'
-import { join } from 'path/posix'
+import { join } from 'pathe'
 import { RollupOutput } from 'rollup'
 import {
   delay,
@@ -22,28 +22,27 @@ import {
   ViteDevServer,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
-import { expect, vi } from 'vitest'
+import { expect } from 'vitest'
 
 export interface BuildTestResult {
   command: 'build'
   config: ResolvedConfig
   output: RollupOutput
   outDir: string
+  rootDir: string
 }
 export interface ServeTestResult {
   command: 'serve'
   config: ResolvedConfig
   server: ViteDevServer
   outDir: string
+  rootDir: string
 }
 
 export async function build(
   dirname: string,
   configFile = 'vite.config.ts',
 ): Promise<BuildTestResult> {
-  const date = new Date('2022-01-26T00:00:00.000Z')
-  vi.setSystemTime(date)
-
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
@@ -88,13 +87,10 @@ export async function build(
     throw new TypeError('received outputarray from vite build')
   if ('close' in output) throw new TypeError('received watcher from vite build')
 
-  return { command: 'build', outDir, output, config: config! }
+  return { command: 'build', outDir, output, config: config!, rootDir: dirname }
 }
 
 export async function serve(dirname: string): Promise<ServeTestResult> {
-  const date = new Date('2022-01-26T00:00:00.000Z')
-  vi.setSystemTime(date)
-
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 
@@ -111,6 +107,11 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   ]
   if (process.env.DEBUG) plugins.push(inspect())
 
+  const minPort = 5200
+  const maxPort = 5500
+  const randomPort =
+    Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort
+
   const inlineConfig: InlineConfig = {
     root: dirname,
     configFile: join(dirname, 'vite.config.ts'),
@@ -121,9 +122,18 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     clearScreen: false,
     logLevel: 'error',
     server: {
+      port: randomPort,
+      strictPort: true,
+      hmr: {
+        port: randomPort,
+      },
       watch: {
         // cache dir should not trigger update in these tests
         ignored: [cacheDir],
+        // During tests we edit the files too fast and sometimes chokidar
+        // misses change events, so enforce polling for consistency
+        usePolling: true,
+        interval: 100,
       },
     },
   }
@@ -140,13 +150,19 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     startWith(null),
     map((x, i) => i),
     // debounce relies on the Date object
-    switchMap((i) => of(i).pipe(delay(250))),
+    switchMap((i) => of(i).pipe(delay(500))),
   )
 
   // watch for activity on outDir to settle, Vite may be pre-bundling
   await firstValueFrom(outDirSettle$)
 
-  return { command: 'serve', outDir, server, config: server.config }
+  return {
+    command: 'serve',
+    outDir,
+    server,
+    config: server.config,
+    rootDir: dirname,
+  }
 }
 
 export const isTextFile = (x: string) =>

@@ -1,4 +1,4 @@
-import path from 'path'
+import path from 'pathe'
 import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'

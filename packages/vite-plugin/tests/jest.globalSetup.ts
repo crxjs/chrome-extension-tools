@@ -1,5 +1,5 @@
 import fs from 'fs'
-import path from 'path'
+import path from 'pathe'
 import { OutputOptions, rollup } from 'rollup'
 import configs from '../rollup.config'
 import { normalizePath } from '@rollup/pluginutils'

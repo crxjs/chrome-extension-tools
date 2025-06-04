@@ -2,6 +2,7 @@ import fg from 'fast-glob'
 import { ManifestV3 } from './manifest'
 import { ManifestFiles } from './types'
 import { isString } from './helpers'
+import { join } from 'pathe';
 
 export async function manifestFiles(
   manifest: ManifestV3,
@@ -65,7 +66,7 @@ export async function manifestFiles(
 }
 
 export async function dirFiles(dir: string): Promise<string[]> {
-  const files = await fg(`${dir}/**/*`)
+  const files = await fg(join(dir,'**','*'));
   return files
 }
 

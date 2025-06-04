@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'pathe'
 import { firstValueFrom } from 'rxjs'
 import { expect, test } from 'vitest'
 import { createUpdate, getPage, waitForInnerHtml } from '../helpers'

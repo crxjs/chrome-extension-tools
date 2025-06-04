@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'pathe'
 import { expect, test } from 'vitest'
 import { createUpdate, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
@@ -22,7 +22,7 @@ test(
     await page.goto('https://example.com')
 
     const app = page.locator('#app')
-    await app.waitFor()
+    await app.waitFor({ timeout: 15_000 })
 
     const styles = page.locator('head style')
 

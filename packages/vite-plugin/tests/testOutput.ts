@@ -1,7 +1,7 @@
 import fg from 'fast-glob'
 import fs from 'fs-extra'
 import jsesc from 'jsesc'
-import { join } from 'path/posix'
+import { join } from 'pathe'
 import { manifestFiles } from 'src/files'
 import { allFileWriterErrors } from 'src/fileWriter-rxjs'
 import { _debug } from 'src/helpers'
@@ -21,7 +21,7 @@ export async function testOutput(
     (source: string, name: string) => void
   > = new Map(),
 ) {
-  const { outDir, config } = testResult
+  const { outDir, config, rootDir } = testResult
   const debug = _debug('test:output')
   debug('start %s', outDir)
 
@@ -65,7 +65,7 @@ export async function testOutput(
         return replaced
       })
       .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
-      .replace(/^\/\/#(.+?base64,)(.+)$/m, '// #$1<base64>')
+      .replaceAll(/\/\/#(.+?base64,)([^\s]+)/g, '// #$1<base64>')
 
   getTest('manifest.json', (source, name) => {
     const scrubbed = scrubHashes(source)
@@ -78,7 +78,6 @@ export async function testOutput(
   const scrubbedFiles = files.map(scrubHashes).sort()
   expect(scrubbedFiles).toMatchSnapshot('_01 output files')
 
-  const rootRegex = new RegExp(jsesc(config.root), 'g')
   for (const file of files) {
     if (file.includes('vendor')) continue
     if (file.includes('react-refresh')) continue
@@ -94,7 +93,17 @@ export async function testOutput(
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
-          .replace(rootRegex, '<root>')
+
+        source = source
+          .replaceAll(config.root, '<root>')
+          .replaceAll(jsesc(rootDir), '<root>')
+          .replaceAll('\\r\\n', '\\n')
+          .replaceAll('\\\\', '\\')
+
+        source = source.replace(
+            new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+          (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
+        )
       }
 
       const scrubbed = scrubHashes(file)

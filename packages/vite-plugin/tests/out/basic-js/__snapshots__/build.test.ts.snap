@@ -61,7 +61,8 @@ exports[`build fs output > assets/background.js.hash1.js 1`] = `
 
 exports[`build fs output > assets/content.js.hash0.js 1`] = `
 "(function(){console.log(\\"content script\\");
-})()"
+})()
+"
 `;
 
 exports[`build fs output > assets/popup.html.hash2.js 1`] = `

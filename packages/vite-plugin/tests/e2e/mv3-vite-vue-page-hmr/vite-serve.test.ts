@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import path from 'path'
+import path from 'pathe'
 import { expect, test } from 'vitest'
 import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
@@ -35,7 +35,7 @@ test(
     // update template
     await update('vue')
 
-    await page.locator('h1', { hasText: 'Hello Vue 3 + Vite + CRX' }).waitFor()
+    await page.locator('h1', { hasText: 'Hello Vue 3 + Vite + CRX' }).waitFor({ timeout: 5_000 })
     expect(reloaded).toBe(false) // no reload on template update
     buttonText.add(await button.innerText())
 

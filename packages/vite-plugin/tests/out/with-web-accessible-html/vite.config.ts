@@ -1,5 +1,5 @@
 import { crx } from '../../plugin-testOptionsProvider'
-import { join } from 'path/posix'
+import { join } from 'pathe'
 import { defineConfig } from 'vite'
 
 export default defineConfig({

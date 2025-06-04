@@ -60,7 +60,8 @@ exports[`build fs output > assets/background.ts.hash1.js 1`] = `
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
 "(function(){const message = \\"content script\\";
 console.log(message);
-})()//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY29udGVudC50cy5oYXNoNWFmYjk4MDAuanMiLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jb250ZW50LnRzIl0sInNvdXJjZXNDb250ZW50IjpbInR5cGUgTG9nID0gJ2NvbnRlbnQgc2NyaXB0J1xuY29uc3QgbWVzc2FnZTogTG9nID0gJ2NvbnRlbnQgc2NyaXB0J1xuY29uc29sZS5sb2cobWVzc2FnZSlcbmV4cG9ydCB7fVxuIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUNBLE1BQU0sVUFBZTtBQUNyQixRQUFRLElBQUksT0FBTzsifQ==
+})()
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
 
