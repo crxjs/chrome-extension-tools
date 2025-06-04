@@ -46,5 +46,9 @@ module.exports = {
     'no-extra-semi': 'off',
     '@typescript-eslint/no-extra-semi': 'off',
     'no-empty': ['error', { allowEmptyCatch: true }],
+    "no-restricted-imports": ["warn", {
+      "name": "path",
+      "message": "Please use pathe instead to be cross-platform"
+    }]
   },
 }
