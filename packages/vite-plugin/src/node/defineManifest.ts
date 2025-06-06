@@ -1,12 +1,16 @@
 import type { ConfigEnv } from 'vite'
 import type { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
 
-export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
+export type ManifestV3Export<T extends string> = ManifestV3<T> | Promise<ManifestV3<T>> | ManifestV3Fn<T>
 
-export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
+export type ManifestV3Fn<T extends string> = (env: ConfigEnv) => ManifestV3<T> | Promise<ManifestV3<T>>
 
-export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
-  manifest
+// export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
+//   manifest
+
+export function defineManifest<T extends string>(manifest: ManifestV3Export<T>): ManifestV3Export<T> {
+  return manifest
+}
 
 /**
  * Content script resources like CSS and image files must be declared in the

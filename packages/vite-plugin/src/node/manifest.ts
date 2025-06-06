@@ -16,8 +16,8 @@ export interface WebAccessibleResourceById {
   use_dynamic_url?: boolean
 }
 
-export interface ChromeManifestBackground {
-  service_worker: string
+export interface ChromeManifestBackground<T extends string> {
+  service_worker: ManifestFilePath<T>
   // eslint-disable-next-line @typescript-eslint/ban-types
   type?: 'module' | (string & {}) // If the service worker uses ES modules
 }
@@ -27,253 +27,236 @@ export interface FirefoxManifestBackground {
   persistent?: false
 }
 
-export interface ManifestV3 {
+type Code = '.' | '/' | '\\'
+
+export type ManifestFilePath<T extends string> =
+  T extends `${Code}${string}`
+    ? never
+    : T extends `${string}.${infer Ext}`
+      ? Ext extends ''
+        ? never
+        : T
+      : never
+
+export interface ManifestIcons<T extends string> {
+  [size: number]: ManifestFilePath<T>
+}
+
+export interface ManifestV3<T extends string> {
   // Required
-  manifest_version: number
+  manifest_version: 2 | 3
   name: string
   version: string
 
   // Recommended
-  default_locale?: string | undefined
-  description?: string | undefined
-  icons?: chrome.runtime.ManifestIcons | undefined
+  default_locale?: string
+  description?: string
+  icons?: ManifestIcons<T>
 
   // Optional
-
-  action?: chrome.runtime.ManifestAction | undefined
+  action?: {
+    default_icon?: ManifestIcons<T>
+    default_title?: string
+    default_popup?: ManifestFilePath<T>
+  }
   /**
    * @see https://developer.chrome.com/docs/extensions/reference/manifest/author
    */
-  author?: { email: string } | undefined
+  author?: { email: string }
   background?:
-    | ChromeManifestBackground
+    | ChromeManifestBackground<T>
     | FirefoxManifestBackground
-    | undefined
-  chrome_settings_overrides?:
-    | {
-        homepage?: string | undefined
-        search_provider?: chrome.runtime.SearchProvider | undefined
-        startup_pages?: string[] | undefined
+
+  chrome_settings_overrides?: {
+    homepage?: string
+    search_provider?: chrome.runtime.SearchProvider
+    startup_pages?: string[]
+  }
+
+  chrome_ui_overrides?: {
+    bookmarks_ui?:{
+      remove_bookmark_shortcut?: boolean
+      remove_button?: boolean
+    }
+  }
+
+  chrome_url_overrides?: {
+    bookmarks?: string
+    history?: string
+    newtab?: string
+  }
+
+  commands?: {
+    [name: string]: {
+      suggested_key?: {
+        default?: string
+        windows?: string
+        mac?: string
+        chromeos?: string
+        linux?: string
       }
-    | undefined
-  chrome_ui_overrides?:
-    | {
-        bookmarks_ui?:
-          | {
-              remove_bookmark_shortcut?: boolean | undefined
-              remove_button?: boolean | undefined
-            }
-          | undefined
-      }
-    | undefined
-  chrome_url_overrides?:
-    | {
-        bookmarks?: string | undefined
-        history?: string | undefined
-        newtab?: string | undefined
-      }
-    | undefined
-  commands?:
-    | {
-        [name: string]: {
-          suggested_key?:
-            | {
-                default?: string | undefined
-                windows?: string | undefined
-                mac?: string | undefined
-                chromeos?: string | undefined
-                linux?: string | undefined
-              }
-            | undefined
-          description?: string | undefined
-          global?: boolean | undefined
-        }
-      }
-    | undefined
-  content_capabilities?:
-    | {
-        matches?: string[] | undefined
-        permissions?: string[] | undefined
-      }
-    | undefined
-  content_scripts?:
-    | {
-        matches?: string[] | undefined
-        exclude_matches?: string[] | undefined
-        css?: string[] | undefined
-        js?: string[] | undefined
-        run_at?: string | undefined
-        all_frames?: boolean | undefined
-        match_about_blank?: boolean | undefined
-        include_globs?: string[] | undefined
-        exclude_globs?: string[] | undefined
-      }[]
-    | undefined
+      description?: string
+      global?: boolean
+    }
+  }
+
+  content_capabilities?: {
+    matches?: string[]
+    permissions?: string[]
+  }
+
+  content_scripts?: {
+    matches?: string[]
+    exclude_matches?: string[]
+    css?: ManifestFilePath<T>[]
+    js?: ManifestFilePath<T>[]
+    run_at?: string
+    all_frames?: boolean
+    match_about_blank?: boolean
+    include_globs?: string[]
+    exclude_globs?: string[]
+  }[]
+
   content_security_policy?: {
     extension_pages?: string
     sandbox?: string
   }
-  converted_from_user_script?: boolean | undefined
-  current_locale?: string | undefined
+  converted_from_user_script?: boolean
+  current_locale?: string
   declarative_net_request?: {
     rule_resources: DeclarativeNetRequestResource[]
   }
-  devtools_page?: string | undefined
-  event_rules?:
-    | {
-        event?: string | undefined
-        actions?:
-          | {
-              type: string
-            }[]
-          | undefined
-        conditions?:
-          | chrome.declarativeContent.PageStateMatcherProperties[]
-          | undefined
-      }[]
-    | undefined
-  externally_connectable?:
-    | {
-        ids?: string[] | undefined
-        matches?: string[] | undefined
-        accepts_tls_channel_id?: boolean | undefined
-      }
-    | undefined
-  file_browser_handlers?:
-    | {
-        id?: string | undefined
-        default_title?: string | undefined
-        file_filters?: string[] | undefined
-      }[]
-    | undefined
-  file_system_provider_capabilities?:
-    | {
-        configurable?: boolean | undefined
-        watchable?: boolean | undefined
-        multiple_mounts?: boolean | undefined
-        source?: string | undefined
-      }
-    | undefined
-  homepage_url?: string | undefined
-  host_permissions?: string[] | undefined
-  import?:
-    | {
-        id: string
-        minimum_version?: string | undefined
-      }[]
-    | undefined
-  export?:
-    | {
-        whitelist?: string[] | undefined
-      }
-    | undefined
-  incognito?: string | undefined
-  input_components?:
-    | {
-        name: string
-        id?: string | undefined
-        language?: string | string[] | undefined
-        layouts?: string | string[] | undefined
-        input_view?: string | undefined
-        options_page?: string | undefined
-      }[]
-    | undefined
-  key?: string | undefined
-  minimum_chrome_version?: string | undefined
-  nacl_modules?:
-    | {
-        path: string
-        mime_type: string
-      }[]
-    | undefined
-  oauth2?:
-    | {
-        client_id: string
-        scopes?: string[] | undefined
-      }
-    | undefined
-  offline_enabled?: boolean | undefined
-  omnibox?:
-    | {
-        keyword: string
-      }
-    | undefined
+  devtools_page?: string
+  event_rules?: {
+    event?: string
+    actions?: {
+      type: string
+    }[]
+    conditions?: chrome.declarativeContent.PageStateMatcherProperties[]
+  }[]
+
+  externally_connectable?: {
+    ids?: string[]
+    matches?: string[]
+    accepts_tls_channel_id?: boolean
+  }
+
+  file_browser_handlers?: {
+    id?: string
+    default_title?: string
+    file_filters?: string[]
+  }[]
+
+  file_system_provider_capabilities?: {
+    configurable?: boolean
+    watchable?: boolean
+    multiple_mounts?: boolean
+    source?: string
+  }
+
+  homepage_url?: string
+  host_permissions?: string[]
+  import?: {
+    id: string
+    minimum_version?: string
+  }[]
+
+  export?: {
+    whitelist?: string[]
+  }
+
+  incognito?: string
+  input_components?: {
+    name: string
+    id?: string
+    language?: string | string[]
+    layouts?: string | string[]
+    input_view?: string
+    options_page?: ManifestFilePath<T>
+  }[]
+
+  key?: string
+  minimum_chrome_version?: string
+  nacl_modules?: {
+    path: string
+    mime_type: string
+  }[]
+
+  oauth2?: {
+    client_id: string
+    scopes?: string[]
+  }
+
+  offline_enabled?: boolean
+  omnibox?: {
+    keyword: string
+  }
+
   optional_permissions?:
     | chrome.runtime.ManifestPermissions[]
     | string[]
-    | undefined
-  options_page?: string | undefined
-  options_ui?:
-    | {
-        page?: string | undefined
-        chrome_style?: boolean | undefined
-        open_in_tab?: boolean | undefined
-      }
-    | undefined
-  permissions?: chrome.runtime.ManifestPermissions[] | string[] | undefined
-  platforms?:
-    | {
-        nacl_arch?: string | undefined
-        sub_package_path: string
-      }[]
-    | undefined
-  plugins?:
-    | {
-        path: string
-      }[]
-    | undefined
-  requirements?:
-    | {
-        '3D'?:
-          | {
-              features?: string[] | undefined
-            }
-          | undefined
-        plugins?:
-          | {
-              npapi?: boolean | undefined
-            }
-          | undefined
-      }
-    | undefined
-  sandbox?:
-    | {
-        pages: string[]
-        content_security_policy?: string | undefined
-      }
-    | undefined
-  side_panel?:
-    | {
-      default_path?: string | undefined
-      }
-    | undefined
-  short_name?: string | undefined
-  spellcheck?:
-    | {
-        dictionary_language?: string | undefined
-        dictionary_locale?: string | undefined
-        dictionary_format?: string | undefined
-        dictionary_path?: string | undefined
-      }
-    | undefined
-  storage?:
-    | {
-        managed_schema: string
-      }
-    | undefined
-  tts_engine?:
-    | {
-        voices: {
-          voice_name: string
-          lang?: string | undefined
-          gender?: string | undefined
-          event_types?: string[] | undefined
-        }[]
-      }
-    | undefined
-  update_url?: string | undefined
-  version_name?: string | undefined
-  web_accessible_resources?:
-    | (WebAccessibleResourceById | WebAccessibleResourceByMatch)[]
-    | undefined
+
+  options_page?: string
+  options_ui?: {
+    page?: string
+    chrome_style?: boolean
+    open_in_tab?: boolean
+  }
+
+  permissions?:
+    | chrome.runtime.ManifestPermissions[]
+    | string[]
+
+  platforms?: {
+    nacl_arch?: string
+    sub_package_path: string
+  }[]
+
+  plugins?: {
+    path: string
+  }[]
+
+  requirements?: {
+    '3D'?: {
+      features?: string[]
+    }
+
+    'plugins'?: {
+      npapi?: boolean
+    }
+  }
+
+  sandbox?: {
+    pages: string[]
+    content_security_policy?: string
+  }
+
+  side_panel?: {
+    default_path?: string
+  }
+
+  short_name?: string
+  spellcheck?: {
+    dictionary_language?: string
+    dictionary_locale?: string
+    dictionary_format?: string
+    dictionary_path?: string
+  }
+
+  storage?: {
+    managed_schema: string
+  }
+
+  tts_engine?: {
+    voices: {
+      voice_name: string
+      lang?: string
+      gender?: string
+      event_types?: string[]
+    }[]
+  }
+
+  update_url?: string
+  version_name?: string
+  web_accessible_resources?: (WebAccessibleResourceById | WebAccessibleResourceByMatch)[]
 }
