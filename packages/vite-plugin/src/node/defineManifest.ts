@@ -3,9 +3,6 @@ import type { FirefoxManifestBackground, ManifestV3, WebAccessibleResourceByMatc
 
 type Code = '.' | '/' | '\\'
 
-/**
- * aaaaaaaa
- */
 export type ManifestFilePath<T extends string> =
   T extends `${Code}${string}`
     ? never
