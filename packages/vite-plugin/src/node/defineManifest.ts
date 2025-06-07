@@ -1,16 +1,74 @@
 import type { ConfigEnv } from 'vite'
-import type { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
+import type { FirefoxManifestBackground, ManifestV3, WebAccessibleResourceByMatch } from './manifest'
 
-export type ManifestV3Export<T extends string> = ManifestV3<T> | Promise<ManifestV3<T>> | ManifestV3Fn<T>
+type Code = '.' | '/' | '\\'
 
-export type ManifestV3Fn<T extends string> = (env: ConfigEnv) => ManifestV3<T> | Promise<ManifestV3<T>>
+/**
+ * aaaaaaaa
+ */
+export type ManifestFilePath<T extends string> =
+  T extends `${Code}${string}`
+    ? never
+    : T extends `${string}.${infer Ext}`
+      ? Ext extends ''
+        ? never
+        : T
+      : never
 
-// export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
-//   manifest
-
-export function defineManifest<T extends string>(manifest: ManifestV3Export<T>): ManifestV3Export<T> {
-  return manifest
+export interface ManifestIcons<T extends string> {
+  [size: number]: ManifestFilePath<T>
 }
+
+type FilePathFields<T extends string> = {
+  icons?: ManifestIcons<T>
+
+  action?: {
+    default_icon?: ManifestIcons<T>
+    default_title?: string
+    default_popup?: ManifestFilePath<T>
+  }
+
+  background?:
+    | {
+        service_worker: ManifestFilePath<T>
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        type?: 'module' | (string & {}) // If the service worker uses ES modules
+      }
+    | FirefoxManifestBackground
+
+  content_scripts?: {
+    matches?: string[]
+    exclude_matches?: string[]
+    css?: ManifestFilePath<T>[]
+    js?: ManifestFilePath<T>[]
+    run_at?: string
+    all_frames?: boolean
+    match_about_blank?: boolean
+    include_globs?: string[]
+    exclude_globs?: string[]
+  }[]
+
+  input_components?: {
+    name: string
+    id?: string
+    language?: string | string[]
+    layouts?: string | string[]
+    input_view?: string
+    options_page?: ManifestFilePath<T>
+  }[]
+
+  options_page?:  ManifestFilePath<T>
+  devtools_page?: ManifestFilePath<T>
+};
+
+type ManifestOptions<T extends string> = Omit<ManifestV3, keyof FilePathFields<any>> & FilePathFields<T>
+
+export type ManifestV3Export<T extends string = string> = ManifestOptions<T> | Promise<ManifestOptions<T>> | ManifestV3Fn<T>
+
+export type ManifestV3Fn<T extends string> = (env: ConfigEnv) => ManifestOptions<T> | Promise<ManifestOptions<T>>
+
+export const defineManifest = <T extends string>(manifest: ManifestV3Export<T>): ManifestV3Export<T> =>
+  manifest
 
 /**
  * Content script resources like CSS and image files must be declared in the
