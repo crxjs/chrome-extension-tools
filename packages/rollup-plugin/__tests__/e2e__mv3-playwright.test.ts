@@ -22,7 +22,11 @@ beforeAll(async () => {
   browserContext = (await chromium.launchPersistentContext(dataDirPath, {
     headless: false,
     slowMo: 100,
-    args: [`--disable-extensions-except=${distDirPath}`, `--load-extension=${distDirPath}`],
+    args: [
+      `--disable-extensions-except=${distDirPath}`,
+      `--load-extension=${distDirPath}`,
+      '--disable-features=ExtensionDisableUnsupportedDeveloper',
+    ],
   })) as ChromiumBrowserContext
 }, 60000)
 
