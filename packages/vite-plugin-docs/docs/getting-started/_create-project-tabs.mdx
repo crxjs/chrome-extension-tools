@@ -1,26 +1,20 @@
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import Admonition from '@theme/Admonition';
+import Tabs from '@theme/Tabs'
+import TabItem from '@theme/TabItem'
+import Admonition from '@theme/Admonition'
 
-export  const CreateProjectTabs = ({ projectType }) => 
-    <>
-      <p>Use your favorite package manager to scaffold a new project and follow the prompts to create a {projectType} project.</p>
-      <Tabs groupId='vite-version'>
-        <TabItem value='vite2' label='Vite 2' default>
-          <pre>
-            <code>npm init vite@^2.9.4</code>
-          </pre>
-        </TabItem>
-        <TabItem value='vite3' label='Vite 3 (beta)'>
-          <pre>
-            <code>npm init vite@latest</code>
-          </pre>
-          <Admonition type="info" title="beta">
-            CRXJS support for Vite 3 is in beta.
-          </Admonition>
-          <Admonition type="info" title="React Users">
-            HMR in CRXJS is incompatible with <code>@vite/plugin-react-swc</code>. We recommend using <code>@vitejs/plugin-react</code> instead.
-          </Admonition>
-        </TabItem>
-      </Tabs>
-    </>
+export const CreateProjectTabs = ({ projectType }) => (
+  <>
+    <p>
+      Use your favorite package manager to scaffold a new project and follow the
+      prompts to create a {projectType} project.
+    </p>
+    <pre>
+      <code>npm create vite@latest</code>
+    </pre>
+    <Admonition type='info' title='Compatibility'>
+      CRXJS supports Vite 3 and above. For React users, HMR in CRXJS is
+      incompatible with <code>@vite/plugin-react-swc</code>. We recommend using{' '}
+      <code>@vitejs/plugin-react</code> instead.
+    </Admonition>
+  </>
+)
