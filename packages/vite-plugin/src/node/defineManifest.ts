@@ -1,11 +1,121 @@
 import type { ConfigEnv } from 'vite'
-import type { ManifestV3, WebAccessibleResourceByMatch } from './manifest'
-
-export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
+import type { FirefoxManifestBackground, ManifestV3, WebAccessibleResourceByMatch } from './manifest'
 
 export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
+export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 
-export const defineManifest = (manifest: ManifestV3Export): ManifestV3Export =>
+type Code = '.' | '/' | '\\'
+
+export type ManifestFilePath<T extends string> =
+  T extends `${Code}${string}`
+    ? never
+    : T extends `${string}.${infer Ext}`
+      ? Ext extends ''
+        ? never
+        : T
+      : never
+
+export interface ManifestIcons<T extends string> {
+  [size: number]: ManifestFilePath<T>
+}
+
+type FilePathFields<T extends string> = {
+  icons?: ManifestIcons<T>
+
+  action?: {
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/icon.png" (no leading ./ or /)
+     * 
+     * @example "assets/icon.png"
+     */
+    default_icon?: ManifestIcons<T>
+    default_title?: string
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/index.html" (no leading ./ or /)
+     * 
+     * @example "src/popup.html"
+     */
+    default_popup?: ManifestFilePath<T>
+  }
+
+  background?:
+    | {
+        /**
+         * - Relative to Vite project root (where vite.config.js is)
+         * - Format: "subdir/index.js" (no leading ./ or /)
+         * 
+         * @example "src/background.js"
+         */
+        service_worker: ManifestFilePath<T>
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        type?: 'module' | (string & {}) // If the service worker uses ES modules
+      }
+    | FirefoxManifestBackground
+
+  content_scripts?: {
+    matches?: string[]
+    exclude_matches?: string[]
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/content.css" (no leading ./ or /)
+     * 
+     * @example "src/content.css"
+     */
+    css?: ManifestFilePath<T>[]
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/content.js" (no leading ./ or /)
+     * 
+     * @example "src/content.js"
+     */
+    js?: ManifestFilePath<T>[]
+    run_at?: string
+    all_frames?: boolean
+    match_about_blank?: boolean
+    include_globs?: string[]
+    exclude_globs?: string[]
+  }[]
+
+  input_components?: {
+    name: string
+    id?: string
+    language?: string | string[]
+    layouts?: string | string[]
+    input_view?: string
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/options.html" (no leading ./ or /)
+     * 
+     * @example "src/options.html"
+     */
+    options_page?: ManifestFilePath<T>
+  }[]
+
+  /**
+   * - Relative to Vite project root (where vite.config.js is)
+   * - Format: "subdir/options.html" (no leading ./ or /)
+   * 
+   * @example "src/options.html"
+   */
+  options_page?:  ManifestFilePath<T>
+  /**
+   * - Relative to Vite project root (where vite.config.js is)
+   * - Format: "subdir/devtools.html" (no leading ./ or /)
+   * 
+   * @example "src/devtools.html"
+   */
+  devtools_page?: ManifestFilePath<T>
+};
+
+type ManifestOptions<T extends string> = Omit<ManifestV3, keyof FilePathFields<string>> & FilePathFields<T>
+
+export type ManifestV3Options<T extends string = string> = ManifestOptions<T> | Promise<ManifestOptions<T>> | ManifestV3Define<T>
+
+export type ManifestV3Define<T extends string> = (env: ConfigEnv) => ManifestOptions<T> | Promise<ManifestOptions<T>>
+
+export const defineManifest = <T extends string>(manifest: ManifestV3Options<T>): ManifestV3Export =>
   manifest
 
 /**

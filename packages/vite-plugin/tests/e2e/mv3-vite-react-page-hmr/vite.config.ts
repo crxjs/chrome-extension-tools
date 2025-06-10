@@ -1,11 +1,9 @@
 import react from '@vitejs/plugin-react'
-import { crx, defineManifest } from '../../plugin-testOptionsProvider'
+import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
-import _manifest from './manifest.json'
+import manifest from './manifest.json'
 
 const { preambleCode } = react
-
-const manifest = defineManifest(_manifest)
 
 export default defineConfig({
   build: { minify: false },
