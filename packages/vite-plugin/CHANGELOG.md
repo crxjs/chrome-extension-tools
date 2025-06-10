@@ -1,5 +1,77 @@
 # @crxjs/vite-plugin
 
+## 2.0.0
+
+### Major Changes
+
+- 628b14f: ## Vite 3 support and new file writer
+
+  This release adds Vite 3 support and includes a complete rewrite of the
+  content script file writer. There are no intentional breaking changes, but
+  Vite 3 support required significant changes under the hood, therefore this is
+  a major release.
+
+- f4eb4d4: fix: workaround for the issue with chrome.runtime.getURL introduced
+  in Chrome 130 causing CSP rejecting script due to different origin (GUID
+  instead of chrome extension id)
+
+### Minor Changes
+
+- 9b0381b: Add Svelte support
+
+### Patch Changes
+
+- a336cdf: fix: make HMR working again with latest vite version
+- ca0dfee: WIP: fix HMR singleton issue
+- cc76555: fix: hmr error
+- 459a38e: fix: cjs require file
+- 0a9ed4f: Proxy Cache-Control header
+- ce9fe1c: Fix/web accessible resources script modules
+- 3dea230: Add tip `type: module` to vue page
+- 47eeda7: fix(package): update cjs export path
+- b0ba786: fix: monorepo hmr
+- 1728bdd: Add newline to generated manifest.json (issue #668)
+- cbfd0b3: Delete invalid changeset
+- f5c4bd7: fix: background scripts for firefox build
+- badc910: fix: maintain ; and , during minification
+- ec9e879: chore: move rxjs to package.deps
+- ec2b79c: fix: avoid waiting for fileReady when serving
+- 8525e04: Propagate headers in hmr-client-worker.ts/sendToServer
+- d0de5c8: fix: reset contentScripts when main plugin is initialized
+- af2fdbc: fix: filter out vite serve plugin context
+- 34980de: feat: add compatibility mode for Firefox
+- fcd4f85: fix: do not use loader for contents scripts that have no imports or
+  exports
+- a3d1540: Make PR/CI checks run on windows
+- 00be1a1: fix: add new screenshot and remove the redudant code
+- 136c34f: removing unnecessary v8 dependency
+- 0dac0e3: Clean up archived files and update magic-string
+- 3ad36f0: Add project status announcements
+- 557721e: fix: infinite recursion on circular dependency
+- 0b69ce7: temporary fix for dynamic imports
+- 3333d30: Bug/back forward cache
+- 936ed77: Add inline sourcemap support to content scripts
+- a6ee0d2: Test: infinite recursion on circular dependency
+- 53534d0: Remove peerDeps, optDeps, engines
+- 42baebb: React v18 ReactDOM.render changes
+- a4982e3: Add content script module API
+- 06c9c86: fix: pass war through a set to dedupe
+- d7949bf: Fix commonjs export
+- ce84b68: Update manifest author field schema to match documentation.
+- cbce5e1: Hotfix background
+- ee860e7: fix background.type manifest property typescript type
+- 088ab78: fix: build is broken when using minify with dynamic modules (#573)
+- 3cf9305: Fix content scripts hmr
+- 7873d9a: fix(vite): replace path.posix with pathe to fix windows build
+- bbc4d33: fix: schema of input_components
+- ef545f6: build(deps): bump rollup from 2.78.1 to 2.79.2 in
+  /packages/vite-plugin build(deps): bump vite from 3.1.7 to 3.2.11 in
+  /packages/vite-plugin
+- 48d8c68: Vite 5 moved vite manifest from 'manifest.json' to
+  '.vite/manifest.json'. This change updates the plugin to use the new location
+  if Vite major version is >4, old location otherwise.
+- 5ac019d: React conflicts with preact
+
 ## 2.0.0-beta.33
 
 ### Patch Changes
