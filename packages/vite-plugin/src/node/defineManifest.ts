@@ -23,13 +23,31 @@ type FilePathFields<T extends string> = {
   icons?: ManifestIcons<T>
 
   action?: {
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/icon.png" (no leading ./ or /)
+     * 
+     * @example "assets/icon.png"
+     */
     default_icon?: ManifestIcons<T>
     default_title?: string
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/index.html" (no leading ./ or /)
+     * 
+     * @example "src/popup.html"
+     */
     default_popup?: ManifestFilePath<T>
   }
 
   background?:
     | {
+        /**
+         * - Relative to Vite project root (where vite.config.js is)
+         * - Format: "subdir/index.js" (no leading ./ or /)
+         * 
+         * @example "src/background.js"
+         */
         service_worker: ManifestFilePath<T>
         // eslint-disable-next-line @typescript-eslint/ban-types
         type?: 'module' | (string & {}) // If the service worker uses ES modules
@@ -39,7 +57,19 @@ type FilePathFields<T extends string> = {
   content_scripts?: {
     matches?: string[]
     exclude_matches?: string[]
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/content.css" (no leading ./ or /)
+     * 
+     * @example "src/content.css"
+     */
     css?: ManifestFilePath<T>[]
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/content.js" (no leading ./ or /)
+     * 
+     * @example "src/content.js"
+     */
     js?: ManifestFilePath<T>[]
     run_at?: string
     all_frames?: boolean
@@ -54,10 +84,28 @@ type FilePathFields<T extends string> = {
     language?: string | string[]
     layouts?: string | string[]
     input_view?: string
+    /**
+     * - Relative to Vite project root (where vite.config.js is)
+     * - Format: "subdir/options.html" (no leading ./ or /)
+     * 
+     * @example "src/options.html"
+     */
     options_page?: ManifestFilePath<T>
   }[]
 
+  /**
+   * - Relative to Vite project root (where vite.config.js is)
+   * - Format: "subdir/options.html" (no leading ./ or /)
+   * 
+   * @example "src/options.html"
+   */
   options_page?:  ManifestFilePath<T>
+  /**
+   * - Relative to Vite project root (where vite.config.js is)
+   * - Format: "subdir/devtools.html" (no leading ./ or /)
+   * 
+   * @example "src/devtools.html"
+   */
   devtools_page?: ManifestFilePath<T>
 };
 
