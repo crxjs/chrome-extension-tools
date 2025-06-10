@@ -1,5 +1,16 @@
 # vite-plugin-docs
 
+## 0.0.3
+
+### Patch Changes
+
+- 9571335: Add type module warning to Vite plugin docs.
+- 3dea230: Add tip `type: module` to vue page
+- 00be1a1: fix: add new screenshot and remove the redudant code
+- 3ad36f0: Add project status announcements
+- 4d32116: Update vite-plugin-docs getting-started with crxjs install step
+- 42baebb: React v18 ReactDOM.render changes
+
 ## 0.0.3-beta.4
 
 ### Patch Changes

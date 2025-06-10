@@ -1,5 +1,15 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.13
+
+### Patch Changes
+
+- 2fd88aa: Allows <all_urls> match in manifest.json within rollup package
+- 3ad36f0: Add project status announcements
+- 64dc6bc: build(deps): bump jsonpath-plus from 4.0.0 to 10.0.7
+- a0d4592: Add match_origin_as_fallback to manifest-v3.schema.json
+- bbc4d33: fix: schema of input_components
+
 ## 3.6.13-beta.3
 
 ### Patch Changes
