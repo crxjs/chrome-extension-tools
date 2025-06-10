@@ -25,39 +25,25 @@ npm create crxjs@latest
 
 > [!IMPORTANT]
 > `@latest` MUST NOT be omitted, otherwise `npm` may resolve to a cached and outdated version of the package.
-<!-- ## Features
-
-If you're starting a new Chrome Extension project, consider using
-[`@crxjs/vite-plugin`](https://crxjs.dev/vite-plugin). This Vite plugin brings
-all the features of Vite to the Chrome Extension developer experience.
-
-|                               |                                          [`@crxjs/vite-plugin`](./packages/vite-plugin/README.md)                                           |                                         [`rollup-plugin-chrome-extension`](./packages/rollup-plugin/README.md)                                          |
-| :---------------------------- | :-----------------------------------------------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------: |
-| Works on                      |                                                        [Vite](https://vitejs.dev) ⚡                                                        |                                                             [Rollup](https://rollupjs.org)                                                              |
-| Simple Config                 |                                                                     Yes                                                                     |                                                                           Yes                                                                           |
-| HMR                           |                                                                  True HMR                                                                   |                                                                       Auto-reload                                                                       |
-| Static Asset Imports          |                                                                     Yes                                                                     |                                                                       With config                                                                       |
-| MV3                           |                                                                     Yes                                                                     |                                                                           Yes                                                                           |
-| MV2                           |                                                                      -                                                                      |                                                                           Yes                                                                           |
-| Auto Web-accessible Resources |                                                                     Yes                                                                     |                                                                            -                                                                            |
-| Documentation                 |                                           [CRXJS Vite Plugin Docs](https://crxjs.dev/vite-plugin)                                           |                                              [Extend Chrome Docs](https://www.extend-chrome.dev/rollup-plugin)                                              |
-| NPM                           | [![npm (scoped)](https://img.shields.io/npm/v/@crxjs/vite-plugin/latest.svg)](https://www.npmjs.com/package/@crxjs/vite-plugin) | [![npm (scoped)](https://img.shields.io/npm/v/rollup-plugin-chrome-extension/latest.svg)](https://www.npmjs.com/package/rollup-plugin-chrome-extension) | -->
 
 ## ✨ Features
 
 - 🧩 **Full Vite Plugin Ecosystem** - Leverage any Vite-compatible plugins with zero extra setup  
 - ⚙️ **Zero Configuration** - Start developing immediately with intelligent defaults  
 - 3️⃣ **Manifest V3 Support** - Built for modern Chrome extensions with enhanced security  
-- 🔥 **True Hot Module Replacement** - Instant UI updates while preserving extension state  
+- 🔥 **True Hot Module Replacement** - Instant UI updates while preserving extension state 🎈**works with content scripts**
 - 📁 **Static Asset Import** - Directly reference images/fonts in your code
 - 🤖 **Auto Web-Accessible Resources** - Automatic generation of `web_accessible_resources` manifest entries  
+
+> [!IMPORTANT]  
+> Looking for MV2 support? See [`rollup-plugin`](packages/rollup-plugin/README.md)  
 
 ## 💻 Development
 
 - Clone this repository
 - Install [pnpm](https://pnpm.io)
 - Install dependencies using `pnpm install`
-- cd into the `vite-plugin` directory useing `cd packages/vite-plugin`
+- cd into the `vite-plugin` directory using `cd packages/vite-plugin`
 - test using `pnpm run test`
 - use [DeepWiki](https://deepwiki.com/crxjs/chrome-extension-tools) to learn more about CRXJS
 
