@@ -35,8 +35,8 @@ export async function build(dirname: string) {
     args: chromiumArgs(outDir),
   })) as ChromiumBrowserContext
 
-  await browser.route('https://example.com', (route) => {
-    route.fulfill({
+  await browser.route('https://example.com', async (route) => {
+    await route.fulfill({
       path: path.join(__dirname, 'example.html'),
     })
   })
