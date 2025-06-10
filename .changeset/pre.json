@@ -1,5 +1,5 @@
 {
-  "mode": "pre",
+  "mode": "exit",
   "tag": "beta",
   "initialVersions": {
     "rollup-plugin-chrome-extension": "3.6.10",
