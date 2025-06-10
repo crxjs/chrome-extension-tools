@@ -47,14 +47,17 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
 
-  // update background.ts file -> trigger runtime reload
-  await Promise.all([
-    optionsPage.waitForEvent('close', { timeout: 5000 }),
-    firstValueFrom(routes),
-    update('bg-onload.ts'),
-  ])
 
-  await app.waitFor()
+  // update background.ts file -> trigger runtime reload
+  const closeEvent= optionsPage.waitForEvent('close', { timeout: 5000 })
+  await update('bg-onload.ts')
+  await firstValueFrom(routes)
+  await closeEvent;
+  
+
+
+  expect(reloads).toBeGreaterThanOrEqual(2) // full reload on background script update
+  await app.waitFor({ timeout: 15_000 })
 
   expect(optionsPage.isClosed()).toBe(true)
 })
