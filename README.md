@@ -35,7 +35,7 @@ npm create crxjs@latest
 - 📁 **Static Asset Import** - Directly reference images/fonts in your code
 - 🤖 **Auto Web-Accessible Resources** - Automatic generation of `web_accessible_resources` manifest entries  
 
-> [!IMPORTANT]  
+> [!NOTE]  
 > Looking for MV2 support? See [`rollup-plugin`](packages/rollup-plugin/README.md)  
 
 ## 💻 Development
