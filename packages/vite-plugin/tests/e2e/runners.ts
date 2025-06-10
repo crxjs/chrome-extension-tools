@@ -10,6 +10,7 @@ const chromiumArgs = (outDir: string) => {
   const args = [
     `--disable-extensions-except=${outDir}`,
     `--load-extension=${outDir}`,
+    '--disable-features=ExtensionDisableUnsupportedDeveloper',
   ]
   // run headless if not in debug mode
   if (typeof process.env.DEBUG === 'undefined') args.unshift(`--headless=new`)
@@ -34,8 +35,8 @@ export async function build(dirname: string) {
     args: chromiumArgs(outDir),
   })) as ChromiumBrowserContext
 
-  await browser.route('https://example.com', (route) => {
-    route.fulfill({
+  await browser.route('https://example.com', async (route) => {
+    await route.fulfill({
       path: path.join(__dirname, 'example.html'),
     })
   })
