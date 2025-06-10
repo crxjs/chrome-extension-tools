@@ -1,8 +1,6 @@
-import { crx, defineManifest } from '../../plugin-testOptionsProvider'
+import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
-import _manifest from './manifest.json'
-
-const manifest = defineManifest(_manifest)
+import manifest from './manifest.json'
 
 export default defineConfig({
   build: { minify: false },

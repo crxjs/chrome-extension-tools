@@ -1,6 +1,9 @@
 import type { ConfigEnv } from 'vite'
 import type { FirefoxManifestBackground, ManifestV3, WebAccessibleResourceByMatch } from './manifest'
 
+export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
+export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
+
 type Code = '.' | '/' | '\\'
 
 export type ManifestFilePath<T extends string> =
@@ -58,13 +61,13 @@ type FilePathFields<T extends string> = {
   devtools_page?: ManifestFilePath<T>
 };
 
-type ManifestOptions<T extends string> = Omit<ManifestV3, keyof FilePathFields<any>> & FilePathFields<T>
+type ManifestOptions<T extends string> = Omit<ManifestV3, keyof FilePathFields<string>> & FilePathFields<T>
 
-export type ManifestV3Export<T extends string = string> = ManifestOptions<T> | Promise<ManifestOptions<T>> | ManifestV3Fn<T>
+export type ManifestV3Options<T extends string = string> = ManifestOptions<T> | Promise<ManifestOptions<T>> | ManifestV3Define<T>
 
-export type ManifestV3Fn<T extends string> = (env: ConfigEnv) => ManifestOptions<T> | Promise<ManifestOptions<T>>
+export type ManifestV3Define<T extends string> = (env: ConfigEnv) => ManifestOptions<T> | Promise<ManifestOptions<T>>
 
-export const defineManifest = <T extends string>(manifest: ManifestV3Export<T>): ManifestV3Export<T> =>
+export const defineManifest = <T extends string>(manifest: ManifestV3Options<T>): ManifestV3Export =>
   manifest
 
 /**

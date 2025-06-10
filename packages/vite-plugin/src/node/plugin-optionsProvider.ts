@@ -2,12 +2,12 @@ import { PluginOption, UserConfig } from 'vite'
 import { ManifestV3Export } from './defineManifest'
 import { CrxOptions, CrxPlugin } from './types'
 
-export interface CrxInputOptions<T extends string =string> extends CrxOptions {
-  manifest: ManifestV3Export<T>
+export interface CrxInputOptions extends CrxOptions {
+  manifest: ManifestV3Export
 }
 
 const pluginName = 'crx:optionsProvider'
-export const pluginOptionsProvider = <T extends string>(options: CrxInputOptions<T> | null) => {
+export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
   return {
     name: pluginName,
     api: {
