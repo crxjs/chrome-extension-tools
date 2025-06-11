@@ -1,0 +1,23 @@
+{
+  "name": "solid",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.5"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "@types/chrome": "^0.0.313",
+    "@types/node": "^22.13.14",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0",
+    "vite-plugin-solid": "^2.11.2",
+    "vite-plugin-zip-pack": "^1.2.4"
+  }
+}

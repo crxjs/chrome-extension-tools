@@ -1,0 +1,22 @@
+{
+  "name": "svelte",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "svelte": "^5.28.1"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tsconfig/svelte": "^5.0.4",
+    "@types/chrome": "^0.0.313",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vite-plugin-zip-pack": "^1.2.4"
+  }
+}
