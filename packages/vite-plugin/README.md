@@ -38,15 +38,6 @@ npm create crxjs@latest
 > [!NOTE]  
 > Looking for MV2 support? See [`rollup-plugin`](packages/rollup-plugin/README.md)  
 
-## 💻 Development
-
-- Clone this repository
-- Install [pnpm](https://pnpm.io)
-- Install dependencies using `pnpm install`
-- cd into the `vite-plugin` directory using `cd packages/vite-plugin`
-- test using `pnpm run test`
-- use [DeepWiki](https://deepwiki.com/crxjs/chrome-extension-tools) to learn more about CRXJS
-
 ## 💝 Contributors
 
 This project exists thanks to all the people who contribute.
