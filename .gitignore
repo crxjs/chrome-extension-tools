@@ -6,6 +6,8 @@
 .vscode
 **/chromium-data-dir-*
 **/tests/e2e/mv3-*/src
+**/tests/e2e/mv3-*-hmr/src
+**/tests/e2e/mv3-*-build-watch/src
 **/__diff_output__
 TODO
 pnpm-global
