@@ -26,9 +26,6 @@ importers:
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
-      pnpm:
-        specifier: 10.11.1
-        version: 10.11.1
       prettier:
         specifier: ^2.6.2
         version: 2.8.8
@@ -39,6 +36,9 @@ importers:
         specifier: ^4.6.4
         version: 4.9.5
     devDependencies:
+      pnpm:
+        specifier: 9.15.2
+        version: 9.15.2
       vitest:
         specifier: 0.24.3
         version: 0.24.3(jsdom@16.7.0)(terser@5.40.0)
@@ -7720,8 +7720,8 @@ packages:
     resolution: {integrity: sha512-rf5+2/ioHeQxR6IxuYNYGFytUyG3lma/WW1nsmjeHlWwtb2aByla6dkVc8pmJ9nplzkTA0q2xx7mMWrOTqT4Gg==}
     engines: {node: '>=8.0.0'}
 
-  pnpm@10.11.1:
-    resolution: {integrity: sha512-5Rm592OYadyNXDxd/vc7PwkQlLCgBtcxc1PHKxJOgOGv1ClzLihwWta/oe6HnB/ORsEozOvTGSEB9D3WfGZ5Eg==}
+  pnpm@9.15.2:
+    resolution: {integrity: sha512-k+V7ASbw33TOa/8paAOUwLpU7Ecka5zzIfASHY2bsD91CnBfJO3DwRgIU6/XwsO5QZbQo9U9PgadnieT7xHzIQ==}
     engines: {node: '>=18.12'}
     hasBin: true
 
@@ -18448,7 +18448,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:
@@ -19916,7 +19920,7 @@ snapshots:
 
   pngjs@4.0.1: {}
 
-  pnpm@10.11.1: {}
+  pnpm@9.15.2: {}
 
   posix-character-classes@0.1.1: {}
 
