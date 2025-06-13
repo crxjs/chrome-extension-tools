@@ -7,11 +7,13 @@ on:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - ".github/workflows/vite-plugin.yml"
       - "!**.md"
 
   # Allows you to run this workflow manually from the Actions tab
