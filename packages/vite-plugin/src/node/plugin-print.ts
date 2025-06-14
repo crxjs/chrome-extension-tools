@@ -7,7 +7,7 @@ import pc from 'picocolors'
  * https://github.com/nyaggah/bedframe/blob/main/packages/core/src/lib/get-manifest.ts#L66
  */
 function printStr(dir:string) {
-  return `  ${pc.magentaBright('C H R O M E')}
+  return `  ${pc.magentaBright('B R O W S E R')}
   ${pc.greenBright('E X T E N S I O N')}
   ${pc.blueBright('T O O L S')}
   
