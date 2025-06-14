@@ -9,11 +9,13 @@ on:
     branches: [main]
     paths:
       - "packages/rollup-plugin/**"
+      - ".github/workflows/rollup-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/rollup-plugin/**"
+      - ".github/workflows/rollup-plugin.yml"
       - "!**.md"
 
   # Allows you to run this workflow manually from the Actions tab
