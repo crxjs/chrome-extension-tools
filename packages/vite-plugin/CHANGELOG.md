@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.1
+
+### Patch Changes
+
+- b7e41e0: beatiful terminal
+
 ## 2.0.0
 
 ### Major Changes
