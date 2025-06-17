@@ -1,13 +1,14 @@
 .banner {
   width: 100%;
-  background-color: #fff3cd;
-  color: #856404;
-  border-bottom: 1px solid #ffeeba;
+  background-color: #e6f2ff;
+  color: #004085;
+  border-bottom: 1px solid #b8daff;
   padding: 0.75rem 1.25rem;
   text-align: center;
   position: sticky;
   top: 0;
   z-index: 100;
+  font-weight: 500;
 }
 
 .bannerContent {
@@ -16,13 +17,28 @@
 }
 
 .banner a {
-  color: inherit;
+  color: #0066cc;
   text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
-/* Dark mode styles */
+.banner a:hover {
+  color: #004d99;
+  text-decoration: none;
+}
+
+/* 暗色模式适配 */
 [data-theme='dark'] .banner {
-  background-color: #352c1a;
-  color: #ffe69c;
-  border-bottom-color: #665328;
+  background-color: #001a33;
+  color: #cce5ff;
+  border-bottom-color: #004280;
+}
+
+[data-theme='dark'] .banner a {
+  color: #4da6ff;
+}
+
+[data-theme='dark'] .banner a:hover {
+  color: #80bfff;
 }
