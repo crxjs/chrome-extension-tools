@@ -13,13 +13,14 @@
     "browser",
     "browser-extension"
   ],
-  "homepage": "https://github.com/crxjs/rollup-plugin-chrome-extension",
+  "homepage": "https://crxjs.dev/vite-plugin",
   "bugs": {
-    "url": "https://github.com/crxjs/rollup-plugin-chrome-extension/issues"
+    "url": "https://github.com/crxjs/chrome-extension-tools/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/crxjs/rollup-plugin-chrome-extension.git"
+    "url": "git+https://github.com/crxjs/chrome-extension-tools",
+    "directory": "packages/vite-plugin"
   },
   "license": "MIT",
   "author": "Jack and Amy Steam <jacksteamdev@gmail.com>",
