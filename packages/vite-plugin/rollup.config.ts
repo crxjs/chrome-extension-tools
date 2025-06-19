@@ -29,6 +29,7 @@ const external: (string | RegExp)[] = [
   'node:fs',
   'node:path',
 
+  /%PROTO%/,
   /%PORT%/,
   /%PATH%/,
 ]
