@@ -34,7 +34,7 @@ export const pluginBackground: CrxPluginFn = () => {
       },
       load(id) {
         if (id === workerClientId) {
-          const base = `http://localhost:${config.server.port}/`
+          const base = `${config.server.https ? 'https' : 'http'}://localhost:${config.server.port}/`
           return defineClientValues(
             workerHmrClient.replace('__BASE__', JSON.stringify(base)),
             config,
@@ -61,6 +61,7 @@ export const pluginBackground: CrxPluginFn = () => {
 
         let loader: string
         if (config.command === 'serve') {
+          const proto = config.server.https ? 'https' : 'http';
           const port = config.server.port?.toString()
           if (typeof port === 'undefined')
             throw new Error('server port is undefined in watch mode')
@@ -70,20 +71,20 @@ export const pluginBackground: CrxPluginFn = () => {
             // can't use import statements
 
             // development, required to define env vars
-            loader = `import('http://localhost:${port}/@vite/env');\n`
+            loader = `import('${proto}://localhost:${port}/@vite/env');\n`
             // development, required hmr client
-            loader += `import('http://localhost:${port}${workerClientId}');\n`
+            loader += `import('${proto}://localhost:${port}${workerClientId}');\n`
             // development, optional service worker
             if (worker)
-              loader += `import('http://localhost:${port}/${worker}');\n`
+              loader += `import('${proto}://localhost:${port}/${worker}');\n`
           } else {
             // development, required to define env vars
-            loader = `import 'http://localhost:${port}/@vite/env';\n`
+            loader = `import '${proto}://localhost:${port}/@vite/env';\n`
             // development, required hmr client
-            loader += `import 'http://localhost:${port}${workerClientId}';\n`
+            loader += `import '${proto}://localhost:${port}${workerClientId}';\n`
             // development, optional service worker
             if (worker)
-              loader += `import 'http://localhost:${port}/${worker}';\n`
+              loader += `import '${proto}://localhost:${port}/${worker}';\n`
           }
         } else if (worker) {
           // production w/ service worker loader at root, see comment at top of file.
