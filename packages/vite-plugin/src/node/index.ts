@@ -10,6 +10,7 @@ import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginFileWriterPolyfill } from './plugin-fileWriter-polyfill'
 import { pluginFileWriterPublic } from './plugin-fileWriter_public'
 import { pluginHMR } from './plugin-hmr'
+import { pluginPrint } from './plugin-print'
 import { pluginHtmlInlineScripts } from './plugin-htmlInlineScripts'
 import { pluginManifest } from './plugin-manifest'
 import { pluginWebAccessibleResources } from './plugin-webAccessibleResources'
@@ -36,6 +37,7 @@ export const crx = (
     pluginContentScriptsCss(),
     pluginHMR(),
     pluginManifest(),
+    pluginPrint(),
   ].flat()
 }
 

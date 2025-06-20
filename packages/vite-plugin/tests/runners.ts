@@ -52,6 +52,25 @@ export async function build(
   await fs.remove(cacheDir)
   await fs.remove(outDir)
 
+  const plugins: CrxPlugin[] = [
+      // @ts-expect-error we're going to override this from the vite config
+      crx(null),
+      {
+        name: 'test:get-config',
+        configResolved(_config) {
+          config = _config;
+        },
+      },
+  ];
+
+  if (process.env.DEBUG) {
+    plugins.push(inspect({
+      build: true,
+      outputDir: '.vite-inspect'
+    }));
+  }
+
+
   let config: ResolvedConfig
   const inlineConfig: InlineConfig = {
     root: dirname,
@@ -68,16 +87,7 @@ export async function build(
       },
     },
     cacheDir,
-    plugins: [
-      // @ts-expect-error we're going to override this from the vite config
-      crx(null),
-      {
-        name: 'test:get-config',
-        configResolved(_config) {
-          config = _config
-        },
-      },
-    ],
+    plugins,
     clearScreen: false,
     logLevel: 'error',
   }

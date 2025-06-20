@@ -7,11 +7,13 @@ on:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - ".github/workflows/vite-plugin.yml"
       - "!**.md"
 
   # Allows you to run this workflow manually from the Actions tab
@@ -97,7 +99,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 9.15.2
+          version: 10.11.1
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`
@@ -155,7 +157,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           # Version of PNPM to install
-          version: 9.15.2
+          version: 10.11.1
           # Where to store PNPM files
           # dest: # optional, default is ~/setup-pnpm
           # If specified, run `pnpm install`

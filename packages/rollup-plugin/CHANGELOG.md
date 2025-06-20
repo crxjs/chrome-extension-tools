@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.14
+
+### Patch Changes
+
+- dcd88ee: fix: update repository url
+
 ## 3.6.13
 
 ### Patch Changes
