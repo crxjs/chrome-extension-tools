@@ -584,6 +584,14 @@
       "required": ["keyword"],
       "type": "object"
     },
+    "optional_host_permissions": {
+      "description": "Use the chrome.permissions API to request declared optional host permissions at run time rather than install time, so users understand why the permissions are needed and grant only those that are necessary.",
+      "items": {
+        "$ref": "#/definitions/match_pattern"
+      },
+      "type": "array",
+      "uniqueItems": true
+    },
     "optional_permissions": {
       "$ref": "#/definitions/permissions",
       "description": "Use the chrome.permissions API to request declared optional permissions at run time rather than install time, so users understand why the permissions are needed and grant only those that are necessary."
