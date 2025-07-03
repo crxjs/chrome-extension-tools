@@ -198,6 +198,7 @@ export interface ManifestV3 {
         keyword: string
       }
     | undefined
+  optional_host_permissions?: string[] | undefined
   optional_permissions?:
     | chrome.runtime.ManifestPermissions[]
     | string[]
