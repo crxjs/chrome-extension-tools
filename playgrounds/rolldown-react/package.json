@@ -1,0 +1,26 @@
+{
+  "name": "play-rolldown-react",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "@types/chrome": "^0.0.313",
+    "@types/node": "^22.13.14",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react-oxc": "^0.2.3",
+    "typescript": "~5.7.2",
+    "vite": "npm:rolldown-vite@latest",
+    "vite-plugin-zip-pack": "^1.2.4"
+  }
+}
