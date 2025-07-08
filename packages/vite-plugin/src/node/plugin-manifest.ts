@@ -25,7 +25,7 @@ declare const structuredClone: <T>(value: T) => T
  */
 export const pluginManifest: CrxPluginFn = () => {
   let manifest: ManifestV3
-  let plugins: CrxPlugin[] = [];
+  let plugins: CrxPlugin[];
   let refId: string
   let config: ResolvedConfig
 
@@ -82,6 +82,9 @@ export const pluginManifest: CrxPluginFn = () => {
       },
       buildStart(options) {
         if (options.plugins) plugins = options.plugins as CrxPlugin[]
+      },
+      configResolved(config) {
+        if (config.plugins) plugins = config.plugins as CrxPlugin[]
       },
     },
     {
