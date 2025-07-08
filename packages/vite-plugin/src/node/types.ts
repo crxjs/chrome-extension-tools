@@ -126,6 +126,7 @@ export type CrxHMRPayload =
       data: HMRPayload
     }
 
+// @ts-ignore
 export interface ResolvedConfigWithHMRToken extends ResolvedConfig {
   webSocketToken?: string
 }

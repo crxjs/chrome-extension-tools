@@ -44,16 +44,19 @@ export async function start({
   serverEvent$.next({ type: 'start', server })
 
   const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
+    // @ts-ignore
     p.name?.startsWith('crx:'),
   )
   const { rollupOptions, outDir } = server.config.build
   const inputOptions: RollupOptions = {
     input: 'index.html',
     ...rollupOptions,
+    // @ts-ignore
     plugins,
   }
   // handle the various output option types
   const rollupOutputOptions = [rollupOptions.output].flat()[0]
+    // @ts-ignore
   const outputOptions: OutputOptions = {
     ...rollupOutputOptions,
     dir: outDir,
