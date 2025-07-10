@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.0.3
+
+### Patch Changes
+
+- 548fb58: Add optional_host_permissions to manifest schemas
+
 ## 2.0.2
 
 ### Patch Changes
