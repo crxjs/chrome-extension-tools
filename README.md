@@ -13,7 +13,7 @@ Modern Chrome extension development with built-in <code>HMR</code> and <code>zer
 </p>
 
 <h2 align="center">
-<a href="https://crxjs.dev/vite-plugin">📚 Documentation</a> |
+<a href="https://crxjs.dev">📚 Documentation</a> |
 <a href="https://discord.com/invite/FnnE4XR7Wj">💬 Discord </a>
 </h2>
 
