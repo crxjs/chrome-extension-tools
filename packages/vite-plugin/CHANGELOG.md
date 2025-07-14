@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 2.0.3
+
+### Patch Changes
+
+- 96c942b: fix: usage of newer picocolor api when using old dependency #1038
+- 548fb58: Add optional_host_permissions to manifest schemas
+
 ## 2.0.2
 
 ### Patch Changes
