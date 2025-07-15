@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.15
+
+### Patch Changes
+
+- 548fb58: Add optional_host_permissions to manifest schemas
+
 ## 3.6.14
 
 ### Patch Changes
