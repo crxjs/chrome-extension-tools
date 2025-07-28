@@ -180,7 +180,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
 }
 
 export const isTextFile = (x: string) =>
-  ['.html', '.css', '.js'].some((y) => x.endsWith(y))
+  ['.html', '.css', '.js', '.js.map'].some((y) => x.endsWith(y))
 export const defaultTest = (source: string, name: string) => {
   expect(source).toMatchSnapshot(name)
 }
