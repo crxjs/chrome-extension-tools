@@ -1,0 +1,153 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.ts.hash0.js",
+      ],
+      "matches": Array [
+        "https://*/*",
+        "http://*/*",
+      ],
+    },
+  ],
+  "description": "test extension",
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/content.ts.hash0.js",
+        "assets/content.ts.hash0.js.map",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/background.ts.hash1.js",
+  "assets/background.ts.hash1.js.map",
+  "assets/content.ts.hash0.js",
+  "assets/content.ts.hash0.js.map",
+  "assets/popup.html.hash2.js",
+  "assets/popup.html.hash2.js.map",
+  "assets/vendor.hash3.js",
+  "assets/vendor.hash3.js.map",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/popup.html",
+]
+`;
+
+exports[`build fs output > assets/background.ts.hash1.js 1`] = `
+"console.log(\\"service_worker.ts\\");
+//# sourceMappingURL=background.ts.hash1.js.map
+"
+`;
+
+exports[`build fs output > assets/background.ts.hash1.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"background.ts.hash1.js\\",\\"sources\\":[\\"../../src/background.ts\\"],\\"sourcesContent\\":[\\"console.log('service_worker.ts')\\\\n\\\\nexport {}\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"AAAA,QAAQ,IAAI,mBAAmB;\\"}"`;
+
+exports[`build fs output > assets/content.ts.hash0.js 1`] = `
+"(function(){const message = \\"content script\\";
+console.log(message);
+})()
+//# sourceMappingURL=content.ts.hash0.js.map
+"
+`;
+
+exports[`build fs output > assets/content.ts.hash0.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"content.ts.hash0.js\\",\\"sources\\":[\\"../../src/content.ts\\"],\\"sourcesContent\\":[\\"type Log = 'content script'\\\\nconst message: Log = 'content script'\\\\nconsole.log(message)\\\\nexport {}\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"AACA,MAAM,UAAe;AACrB,QAAQ,IAAI,OAAO;\\"}"`;
+
+exports[`build fs output > assets/popup.html.hash2.js 1`] = `
+"import { R as React, r as reactDom } from \\"./vendor.hash3.js\\";
+(function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+};
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+//# sourceMappingURL=popup.html.hash2.js.map
+"
+`;
+
+exports[`build fs output > assets/popup.html.hash2.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"popup.html.hash2.js\\",\\"sources\\":[\\"../../../../../vite/modulepreload-polyfill\\",\\"../../src/App.tsx\\",\\"../../src/popup.tsx\\"],\\"sourcesContent\\":[\\"__VITE_IS_MODERN__&&(function polyfill() {\\\\n    const relList = document.createElement('link').relList;\\\\n    if (relList && relList.supports && relList.supports('modulepreload')) {\\\\n        return;\\\\n    }\\\\n    for (const link of document.querySelectorAll('link[rel=\\\\\\"modulepreload\\\\\\"]')) {\\\\n        processPreload(link);\\\\n    }\\\\n    new MutationObserver((mutations) => {\\\\n        for (const mutation of mutations) {\\\\n            if (mutation.type !== 'childList') {\\\\n                continue;\\\\n            }\\\\n            for (const node of mutation.addedNodes) {\\\\n                if (node.tagName === 'LINK' && node.rel === 'modulepreload')\\\\n                    processPreload(node);\\\\n            }\\\\n        }\\\\n    }).observe(document, { childList: true, subtree: true });\\\\n    function getFetchOpts(script) {\\\\n        const fetchOpts = {};\\\\n        if (script.integrity)\\\\n            fetchOpts.integrity = script.integrity;\\\\n        if (script.referrerpolicy)\\\\n            fetchOpts.referrerPolicy = script.referrerpolicy;\\\\n        if (script.crossorigin === 'use-credentials')\\\\n            fetchOpts.credentials = 'include';\\\\n        else if (script.crossorigin === 'anonymous')\\\\n            fetchOpts.credentials = 'omit';\\\\n        else\\\\n            fetchOpts.credentials = 'same-origin';\\\\n        return fetchOpts;\\\\n    }\\\\n    function processPreload(link) {\\\\n        if (link.ep)\\\\n            // ep marker = processed\\\\n            return;\\\\n        link.ep = true;\\\\n        // prepopulate the load record\\\\n        const fetchOpts = getFetchOpts(link);\\\\n        fetch(link.href, fetchOpts);\\\\n    }\\\\n}());\\",\\"import React from 'react'\\\\n\\\\nconst App: React.FC = () => {\\\\n  return (\\\\n    <div>\\\\n      <h1>Popup Page</h1>\\\\n      <p>If you are seeing this, React is working!</p>\\\\n    </div>\\\\n  )\\\\n}\\\\n\\\\nexport default App\\\\n\\",\\"import React from 'react'\\\\nimport { render } from 'react-dom'\\\\nimport App from './App'\\\\n\\\\nconsole.log('popup script')\\\\n\\\\nconst root = document.querySelector('#root')\\\\n\\\\nrender(<App />, root)\\\\n\\"],\\"names\\":[\\"render\\"],\\"mappings\\":\\";CAAqB,SAAS,WAAW;AACrC,QAAM,UAAU,SAAS,cAAc,MAAM,EAAE;AAC/C,MAAI,WAAW,QAAQ,YAAY,QAAQ,SAAS,eAAe,GAAG;AAClE;AAAA,EACH;AACD,aAAW,QAAQ,SAAS,iBAAiB,2BAA2B,GAAG;AACvE,mBAAe,IAAI;AAAA,EACtB;AACD,MAAI,iBAAiB,CAAC,cAAc;AAChC,eAAW,YAAY,WAAW;AAC9B,UAAI,SAAS,SAAS,aAAa;AAC/B;AAAA,MACH;AACD,iBAAW,QAAQ,SAAS,YAAY;AACpC,YAAI,KAAK,YAAY,UAAU,KAAK,QAAQ;AACxC,yBAAe,IAAI;AAAA,MAC1B;AAAA,IACJ;AAAA,EACT,CAAK,EAAE,QAAQ,UAAU,EAAE,WAAW,MAAM,SAAS,KAAI,CAAE;AACvD,WAAS,aAAa,QAAQ;AAC1B,UAAM,YAAY,CAAA;AAClB,QAAI,OAAO;AACP,gBAAU,YAAY,OAAO;AACjC,QAAI,OAAO;AACP,gBAAU,iBAAiB,OAAO;AACtC,QAAI,OAAO,gBAAgB;AACvB,gBAAU,cAAc;AAAA,aACnB,OAAO,gBAAgB;AAC5B,gBAAU,cAAc;AAAA;AAExB,gBAAU,cAAc;AAC5B,WAAO;AAAA,EACV;AACD,WAAS,eAAe,MAAM;AAC1B,QAAI,KAAK;AAEL;AACJ,SAAK,KAAK;AAEV,UAAM,YAAY,aAAa,IAAI;AACnC,UAAM,KAAK,MAAM,SAAS;AAAA,EAC7B;AACL;ACxCA,MAAM,MAAgB,MAAM;AAExB,SAAA,sBAAA,cAAC,aACE,sBAAA,cAAA,MAAA,MAAG,YAAU,GACd,sBAAA,cAAC,KAAE,MAAA,2CAAyC,CAC9C;AAEJ;ACLA,QAAQ,IAAI,cAAc;AAE1B,MAAM,OAAO,SAAS,cAAc,OAAO;AAE3CA,SAAO,QAAA,OAAA,sBAAA,cAAC,KAAI,IAAA,GAAI,IAAI;\\"}"`;
+
+exports[`build fs output > service-worker-loader.js 1`] = `
+"import './assets/background.ts.hash1.js';
+"
+`;
+
+exports[`build fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
+    <title>Popup Page</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash2.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    
+  </body>
+</html>
+"
+`;
