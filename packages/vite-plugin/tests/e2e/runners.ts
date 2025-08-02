@@ -1,3 +1,4 @@
+import fs from 'fs-extra'
 import path from 'pathe'
 import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
@@ -29,6 +30,7 @@ export async function build(dirname: string) {
   const { outDir, config } = await _build(dirname)
 
   const dataDir = path.join(config.cacheDir!, '.chromium')
+  await fs.remove(dataDir);
   browser = (await chromium.launchPersistentContext(dataDir, {
     headless: false,
     slowMo: 100,
@@ -51,6 +53,7 @@ export async function serve(dirname: string) {
   await allFilesSuccess()
 
   const dataDir = path.join(config.cacheDir!, '.chromium')
+  await fs.rm(dataDir, { recursive: true, force: true, maxRetries: 5 });
   browser = (await chromium.launchPersistentContext(dataDir, {
     headless: false,
     slowMo: 100,
