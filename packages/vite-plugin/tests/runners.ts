@@ -117,11 +117,6 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   ]
   if (process.env.DEBUG) plugins.push(inspect())
 
-  const minPort = 5200
-  const maxPort = 5500
-  const randomPort =
-    Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort
-
   const inlineConfig: InlineConfig = {
     root: dirname,
     configFile: join(dirname, 'vite.config.ts'),
@@ -132,11 +127,8 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     clearScreen: false,
     logLevel: 'error',
     server: {
-      port: randomPort,
-      strictPort: true,
-      hmr: {
-        port: randomPort,
-      },
+      port: 5200,
+      hmr: true,
       watch: {
         // cache dir should not trigger update in these tests
         ignored: [cacheDir],
