@@ -7,9 +7,6 @@ test(
     const { browser } = await serve(__dirname)
 
     const contentPage = await browser.newPage()
-    // make sure the browser loads the github favicon
-    await contentPage.goto('https://github.com')
-    // then test loading it in the content script
     await contentPage.goto('https://example.com')
 
     await contentPage.waitForSelector('#favicon-test-container', {
