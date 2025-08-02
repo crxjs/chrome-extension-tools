@@ -68,11 +68,6 @@ export async function serve(dirname: string) {
     routes.next(route)
   })
 
-  await browser
-    .pages()
-    .find((p) => p.url() === 'about:blank')
-    ?.goto('chrome://extensions')
-
   return {
     browser,
     outDir,
