@@ -19,11 +19,9 @@ const chromiumArgs = (outDir: string) => {
 }
 
 let browser: ChromiumBrowserContext | undefined
-let server: ViteDevServer | undefined
 
 afterEach(async () => {
   await browser?.close()
-  await server?.close()
 })
 
 export async function build(dirname: string) {
@@ -47,8 +45,7 @@ export async function build(dirname: string) {
 }
 
 export async function serve(dirname: string) {
-  const { outDir, server: s, config } = await _serve(dirname)
-  server = s
+  const { outDir, server, config } = await _serve(dirname)
 
   await allFilesSuccess()
 

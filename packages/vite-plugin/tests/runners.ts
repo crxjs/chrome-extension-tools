@@ -22,7 +22,7 @@ import {
   ViteDevServer,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
-import { expect } from 'vitest'
+import { afterEach, expect } from 'vitest'
 
 export interface BuildTestResult {
   command: 'build'
@@ -38,6 +38,18 @@ export interface ServeTestResult {
   outDir: string
   rootDir: string
 }
+
+let server: ViteDevServer | undefined
+
+afterEach(async () => {
+  try {
+    await server?.close()
+  } catch (err) {
+    if (!`${err}`.match(/server is not running/)) {
+      throw err
+    }
+  }
+})
 
 export async function build(
   dirname: string,
@@ -139,7 +151,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
       },
     },
   }
-  const server = await createServer(inlineConfig)
+  server = await createServer(inlineConfig)
   debug('create server')
 
   await server.listen()
