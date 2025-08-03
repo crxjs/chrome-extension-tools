@@ -46,7 +46,7 @@ export async function build(
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
-  const cacheDir = join(dirname, '.vite')
+  const cacheDir = join(dirname, '.vite-build')
   const outDir = join(dirname, 'dist-build')
 
   await fs.remove(cacheDir)
