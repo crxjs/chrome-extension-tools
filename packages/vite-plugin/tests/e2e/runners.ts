@@ -4,7 +4,7 @@ import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'
 import { ViteDevServer } from 'vite'
-import { afterAll } from 'vitest'
+import { afterEach } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
 const chromiumArgs = (outDir: string) => {
@@ -21,7 +21,7 @@ const chromiumArgs = (outDir: string) => {
 let browser: ChromiumBrowserContext | undefined
 let server: ViteDevServer | undefined
 
-afterAll(async () => {
+afterEach(async () => {
   await browser?.close()
   await server?.close()
 })
