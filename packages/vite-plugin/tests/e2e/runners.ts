@@ -1,9 +1,10 @@
+import fs from 'fs-extra'
 import path from 'pathe'
 import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'
 import { ViteDevServer } from 'vite'
-import { afterAll } from 'vitest'
+import { afterEach } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
 const chromiumArgs = (outDir: string) => {
@@ -18,17 +19,16 @@ const chromiumArgs = (outDir: string) => {
 }
 
 let browser: ChromiumBrowserContext | undefined
-let server: ViteDevServer | undefined
 
-afterAll(async () => {
+afterEach(async () => {
   await browser?.close()
-  await server?.close()
 })
 
 export async function build(dirname: string) {
   const { outDir, config } = await _build(dirname)
 
   const dataDir = path.join(config.cacheDir!, '.chromium')
+  await fs.remove(dataDir);
   browser = (await chromium.launchPersistentContext(dataDir, {
     headless: false,
     slowMo: 100,
@@ -45,12 +45,12 @@ export async function build(dirname: string) {
 }
 
 export async function serve(dirname: string) {
-  const { outDir, server: s, config } = await _serve(dirname)
-  server = s
+  const { outDir, server, config } = await _serve(dirname)
 
   await allFilesSuccess()
 
   const dataDir = path.join(config.cacheDir!, '.chromium')
+  await fs.rm(dataDir, { recursive: true, force: true, maxRetries: 5 });
   browser = (await chromium.launchPersistentContext(dataDir, {
     headless: false,
     slowMo: 100,
@@ -64,11 +64,6 @@ export async function serve(dirname: string) {
     })
     routes.next(route)
   })
-
-  await browser
-    .pages()
-    .find((p) => p.url() === 'about:blank')
-    ?.goto('chrome://extensions')
 
   return {
     browser,
