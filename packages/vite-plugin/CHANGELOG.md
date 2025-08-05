@@ -1,5 +1,12 @@
 # @crxjs/vite-plugin
 
+## 2.1.0
+
+### Minor Changes
+
+- 637e12c: feat: include sourcemaps in web_accessible_resources
+- 3e7a1b3: feat: allow query string in manifest html urls
+
 ## 2.0.3
 
 ### Patch Changes
