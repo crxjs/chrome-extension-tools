@@ -223,6 +223,35 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           }
         }
 
+        /* -------------- INCLUDE SOURCEMAPS --------------- */
+        for (const war of combinedResources) {
+          const resourcesWithMaps = []
+          for (const res of war.resources) {
+            resourcesWithMaps.push(res)
+            if (bundle[res]?.type === 'chunk') {
+              const chunk = bundle[res] as OutputChunk & {
+                // OutputChunk.sourcemapFileName available in Vite >=5 (Rollup 3.29).
+                sourcemapFileName: string
+              }
+              if (chunk.map) {
+                const sourcemapFileName =
+                  chunk.sourcemapFileName || `${chunk.fileName}.map`
+                // Vite 3 doesn't include source map files in the bundle object.
+                // To support both Vite 3 and Vite >=4, check the Vite version and fall back to checking the
+                // Vite config.
+                const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+                if (
+                  sourcemapFileName in bundle ||
+                  (viteMajorVersion < 4 && config.build.sourcemap == true)
+                ) {
+                  resourcesWithMaps.push(sourcemapFileName)
+                }
+              }
+            }
+          }
+          war.resources = resourcesWithMaps
+        }
+
         /* --------------- CLEAN UP MANIFEST --------------- */
 
         if (combinedResources.length === 0)
