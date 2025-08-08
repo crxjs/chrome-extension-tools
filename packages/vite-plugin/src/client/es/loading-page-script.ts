@@ -3,7 +3,7 @@
  * service worker takes control of fetch (e.g., in the onInstalled event).
  */
 
-const VITE_URL = 'http://localhost:%PORT%'
+const VITE_URL = '%PROTO%://localhost:%PORT%'
 
 document.body.innerHTML = `
 <div
