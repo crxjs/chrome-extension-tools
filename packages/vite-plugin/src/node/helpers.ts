@@ -118,5 +118,5 @@ export const getMatchPatternOrigin = (pattern: string): string => {
   if (isSlashAfterOriginPresent) {
     return `${root}/*`
   }
-  return root;
+  return root
 }
