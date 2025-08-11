@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.2.0
+
+### Minor Changes
+
+- 1b0ada4: feat: add support for root url content script match in firefox #1056
+
 ## 2.1.0
 
 ### Minor Changes
