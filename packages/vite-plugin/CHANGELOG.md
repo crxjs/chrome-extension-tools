@@ -1,5 +1,25 @@
 # @crxjs/vite-plugin
 
+## 2.2.0
+
+### Minor Changes
+
+- 1b0ada4: feat: add support for root url content script match in firefox #1056
+
+## 2.1.0
+
+### Minor Changes
+
+- 637e12c: feat: include sourcemaps in web_accessible_resources
+- 3e7a1b3: feat: allow query string in manifest html urls
+
+## 2.0.3
+
+### Patch Changes
+
+- 96c942b: fix: usage of newer picocolor api when using old dependency #1038
+- 548fb58: Add optional_host_permissions to manifest schemas
+
 ## 2.0.2
 
 ### Patch Changes

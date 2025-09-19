@@ -3,7 +3,7 @@ import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ResolvedConfig } from 'vite'
+import { ResolvedConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
@@ -354,13 +354,26 @@ export const pluginManifest: CrxPluginFn = () => {
                 // get assets from project root or from public dir
                 let filename = join(config.root, f)
                 if (!existsSync(filename)) filename = join(config.publicDir, f)
-                if (!existsSync(filename))
+                if (!existsSync(filename)) {
+                  // Vite 3 doesn't write source map files until after this plugin is called.
+                  // To support Vite 3, check the file extension and assume the source map
+                  // files will be written to disk later.
+                  const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+                  if (
+                    viteMajorVersion < 4 &&
+                    filename.endsWith('.map') &&
+                    config.build.sourcemap === true
+                  ) {
+                    return
+                  }
+
                   throw new Error(
                     `ENOENT: Could not load manifest asset "${f}".
 Manifest assets must exist in one of these directories:
 Project root: "${config.root}"
 Public dir: "${config.publicDir}"`,
                   )
+                }
 
                 this.emitFile({
                   type: 'asset',

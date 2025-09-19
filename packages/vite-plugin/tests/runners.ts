@@ -22,7 +22,7 @@ import {
   ViteDevServer,
 } from 'vite'
 import inspect from 'vite-plugin-inspect'
-import { expect } from 'vitest'
+import { afterEach, expect } from 'vitest'
 
 export interface BuildTestResult {
   command: 'build'
@@ -39,6 +39,18 @@ export interface ServeTestResult {
   rootDir: string
 }
 
+let server: ViteDevServer | undefined
+
+afterEach(async () => {
+  try {
+    await server?.close()
+  } catch (err) {
+    if (!`${err}`.match(/server is not running/)) {
+      throw err
+    }
+  }
+})
+
 export async function build(
   dirname: string,
   configFile = 'vite.config.ts',
@@ -46,7 +58,7 @@ export async function build(
   const debug = _debug('test:build')
   debug('start %s', dirname)
 
-  const cacheDir = join(dirname, '.vite')
+  const cacheDir = join(dirname, '.vite-build')
   const outDir = join(dirname, 'dist-build')
 
   await fs.remove(cacheDir)
@@ -117,11 +129,6 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   ]
   if (process.env.DEBUG) plugins.push(inspect())
 
-  const minPort = 5200
-  const maxPort = 5500
-  const randomPort =
-    Math.floor(Math.random() * (maxPort - minPort + 1)) + minPort
-
   const inlineConfig: InlineConfig = {
     root: dirname,
     configFile: join(dirname, 'vite.config.ts'),
@@ -132,11 +139,8 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     clearScreen: false,
     logLevel: 'error',
     server: {
-      port: randomPort,
-      strictPort: true,
-      hmr: {
-        port: randomPort,
-      },
+      port: 5200,
+      hmr: true,
       watch: {
         // cache dir should not trigger update in these tests
         ignored: [cacheDir],
@@ -147,7 +151,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
       },
     },
   }
-  const server = await createServer(inlineConfig)
+  server = await createServer(inlineConfig)
   debug('create server')
 
   await server.listen()
@@ -176,7 +180,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
 }
 
 export const isTextFile = (x: string) =>
-  ['.html', '.css', '.js'].some((y) => x.endsWith(y))
+  ['.html', '.css', '.js', '.js.map'].some((y) => x.endsWith(y))
 export const defaultTest = (source: string, name: string) => {
   expect(source).toMatchSnapshot(name)
 }

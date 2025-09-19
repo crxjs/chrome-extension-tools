@@ -5,5 +5,10 @@
   "background": { "service_worker": "src/background.ts" },
   "version": "1.0.0",
   "host_permissions": ["<all_urls>"],
-  "permissions": ["scripting"]
+  "permissions": ["scripting"],
+  "web_accessible_resources": [{
+    "matches": [ "<all_urls>" ],
+    "resources": [ "src/redirect.html" ],
+    "use_dynamic_url": false
+  }]
 }

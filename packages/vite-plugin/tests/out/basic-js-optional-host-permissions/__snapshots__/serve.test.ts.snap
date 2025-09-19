@@ -1,0 +1,202 @@
+// Vitest Snapshot v1
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "src/content.js-loader.js",
+      ],
+      "matches": Array [
+        "https://a.com/*",
+        "http://b.com/*",
+        "https://example.com/*",
+      ],
+    },
+  ],
+  "description": "test extension",
+  "host_permissions": Array [
+    "https://c.com/*",
+  ],
+  "manifest_version": 3,
+  "name": "Test Extension",
+  "optional_host_permissions": Array [
+    "https://*/*",
+    "http://*/*",
+  ],
+  "optional_permissions": Array [
+    "tabs",
+  ],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "assets/loading-page.hash0.js",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/content.js-loader.js",
+  "src/content.js.js",
+  "src/popup.html",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/content.js",
+  "src/background.js",
+  "src/popup.html",
+}
+`;
+
+exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
+"const VITE_URL = \\"http://localhost:3000\\";
+document.body.innerHTML = \`
+<div
+      id=\\"app\\"
+      style=\\"
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      \\"
+    >
+      <h1 style=\\"color: #333\\">Vite Dev Mode</h1>
+      <p style=\\"color: #666\\">
+        Cannot connect to the Vite Dev Server on <a href=\\"\${VITE_URL}\\">\${VITE_URL}</a>
+      </p>
+      <p style=\\"color: #666\\">
+        Double-check that Vite is working and reload the extension.
+      </p>
+      <p style=\\"color: #666\\">
+        This page will close when the extension reloads.
+      </p>
+      <button
+        style=\\"
+          padding: 10px 20px;
+          border: none;
+          background-color: #007bff;
+          color: #fff;
+          border-radius: 5px;
+          cursor: pointer;
+        \\"
+      >
+        Reload Extension
+      </button>
+    </div>\`;
+document.body.querySelector(\\"button\\")?.addEventListener(\\"click\\", () => {
+  chrome.runtime.reload();
+});
+let tries = 0;
+let ready = false;
+do {
+  try {
+    await fetch(VITE_URL);
+    ready = true;
+  } catch {
+    const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
+    console.log(\`[CRXJS] Vite Dev Server is not available on \${VITE_URL}\`);
+    console.log(\`[CRXJS] Retrying in \${timeout}ms...\`);
+    await new Promise((resolve) => setTimeout(resolve, timeout));
+  }
+} while (!ready);
+location.reload();
+"
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/src/background.js';
+"
+`;
+
+exports[`serve fs output > src/content.js.js 1`] = `
+"console.log('content script')
+
+const requesting = browser.permissions.request({
+    permissions: ['tabs'],
+});
+requesting.then(
+    function (result) {
+        if (result) {
+            console.log('Permission granted. Opening a tab');
+            browser.tabs.open({
+                url: 'https://example.com',
+                active: true,
+            });
+        } else {
+            console.log('Permission denied');
+        }
+    },
+    function () {
+        console.error('Error requesting permissions');
+    }
+);"
+`;
+
+exports[`serve fs output > src/content.js-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content.js.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <title>Vite Dev Mode</title>
+    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
+  </head>
+  <body
+    style=\\"font-family: Arial, sans-serif; padding: 20px; text-align: center\\"
+  >
+    <h1>Vite Dev Mode</h1>
+  </body>
+</html>
+"
+`;
