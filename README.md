@@ -3,7 +3,7 @@
 <h1 align="center">CRXJS</h1>
 
 <p align="center">
-Modern Chrome extension development with built-in <code>HMR</code> and <code>zero-config</code> setup
+Build cross-browser extensions with native <code>HMR</code> and <code>zero-config</code> setup
 </p>
 
 <p align="center">
@@ -13,8 +13,8 @@ Modern Chrome extension development with built-in <code>HMR</code> and <code>zer
 </p>
 
 <h2 align="center">
-<a href="https://crxjs.dev/vite-plugin">📚 Documentation</a> |
-<a href="https://discord.gg/5yHKEa9v">💬 Discord </a>
+<a href="https://crxjs.dev">📚 Documentation</a> |
+<a href="https://discord.com/invite/FnnE4XR7Wj">💬 Discord </a>
 </h2>
 
 

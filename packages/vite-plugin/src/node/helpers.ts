@@ -107,8 +107,16 @@ export const getMatchPatternOrigin = (pattern: string): string => {
    * #459](https://github.com/crxjs/chrome-extension-tools/issues/459)
    */
   if (pattern.startsWith('<')) return pattern
+
   const [schema, rest] = pattern.split('://')
-  const [origin, pathname] = rest.split('/')
+  const slashIndex = rest.indexOf('/')
+  const isSlashAfterOriginPresent = slashIndex !== -1;
+  
+  const origin = isSlashAfterOriginPresent ? rest.slice(0, slashIndex) : rest
   const root = `${schema}://${origin}`
-  return pathname ? `${root}/*` : root
+
+  if (isSlashAfterOriginPresent) {
+    return `${root}/*`
+  }
+  return root
 }

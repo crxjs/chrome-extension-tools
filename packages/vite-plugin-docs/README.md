@@ -1,3 +1,8 @@
+> [!WARNING]  
+> **Deprecated Document**  
+> This version is obsolete. See current version at:  
+> <https://github.com/crxjs/website>
+
 # CRXJS Vite Plugin Docs
 
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern

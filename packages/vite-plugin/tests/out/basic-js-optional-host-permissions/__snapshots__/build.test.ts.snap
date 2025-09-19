@@ -1,0 +1,193 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.js.hash0.js",
+      ],
+      "matches": Array [
+        "https://a.com/*",
+        "http://b.com/*",
+        "https://example.com/*",
+      ],
+    },
+  ],
+  "description": "test extension",
+  "host_permissions": Array [
+    "https://c.com/*",
+  ],
+  "manifest_version": 3,
+  "name": "Test Extension",
+  "optional_host_permissions": Array [
+    "https://*/*",
+    "http://*/*",
+  ],
+  "optional_permissions": Array [
+    "tabs",
+  ],
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://b.com/*",
+        "https://a.com/*",
+        "https://example.com/*",
+      ],
+      "resources": Array [
+        "assets/content.js.hash0.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/background.js.hash1.js",
+  "assets/content.js.hash0.js",
+  "assets/popup.html.hash2.js",
+  "assets/vendor.hash3.js",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/popup.html",
+]
+`;
+
+exports[`build fs output > assets/background.js.hash1.js 1`] = `
+"console.log(\\"service_worker.js\\");
+"
+`;
+
+exports[`build fs output > assets/content.js.hash0.js 1`] = `
+"(function(){console.log(\\"content script\\");
+const requesting = browser.permissions.request({
+  permissions: [\\"tabs\\"]
+});
+requesting.then(
+  function(result) {
+    if (result) {
+      console.log(\\"Permission granted. Opening a tab\\");
+      browser.tabs.open({
+        url: \\"https://example.com\\",
+        active: true
+      });
+    } else {
+      console.log(\\"Permission denied\\");
+    }
+  },
+  function() {
+    console.error(\\"Error requesting permissions\\");
+  }
+);
+})()
+"
+`;
+
+exports[`build fs output > assets/popup.html.hash2.js 1`] = `
+"import { R as React, a as ReactDOM } from \\"./vendor.hash3.js\\";
+(function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+const App = () => {
+  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"), /* @__PURE__ */ React.createElement(
+    \\"button\\",
+    {
+      onClick: () => {
+        chrome.permissions.request(
+          {
+            permissions: [\\"tabs\\"],
+            origins: [\\"https://www.google.com/\\"]
+          },
+          (granted) => {
+            if (granted) {
+              console.log(\\"Permissions granted\\");
+              chrome.tabs.create({
+                url: \\"https://www.example.com/\\",
+                active: true
+              });
+            } else {
+              console.log(\\"Permissions denied\\");
+            }
+          }
+        );
+      }
+    },
+    \\"Click me to request permissions and open new tab\\"
+  ));
+};
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`build fs output > service-worker-loader.js 1`] = `
+"import './assets/background.js.hash1.js';
+"
+`;
+
+exports[`build fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
+    <title>Popup Page</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash2.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    
+  </body>
+</html>
+"
+`;

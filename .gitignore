@@ -1,5 +1,6 @@
 # Artifacts
 **/tests/**/.vite
+**/tests/**/.vite-build
 **/tests/**/dist*
 **/tests/artifacts
 .vscode
