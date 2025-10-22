@@ -1,12 +1,13 @@
 import type { ConfigEnv } from 'vite'
 import type { FirefoxManifestBackground, ManifestV3, WebAccessibleResourceByMatch } from './manifest'
+import type { IsStringLiteral } from 'type-fest'
 
 export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
 export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 
 type Code = '.' | '/' | '\\'
 
-export type ManifestFilePath<T extends string> =
+type LiteralManifestFilePath<T extends string> =
   T extends `${Code}${string}`
     ? never
     : T extends `${string}.${infer Ext}`
@@ -14,6 +15,10 @@ export type ManifestFilePath<T extends string> =
         ? never
         : T
       : never
+
+export type ManifestFilePath<T extends string> = IsStringLiteral<T> extends true
+  ? LiteralManifestFilePath<T>
+  : T
 
 export interface ManifestIcons<T extends string> {
   [size: number]: ManifestFilePath<T>
