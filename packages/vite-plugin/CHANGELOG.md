@@ -1,5 +1,11 @@
 # @crxjs/vite-plugin
 
+## 2.2.1
+
+### Patch Changes
+
+- 5ff5465: feat(vite-plugin): limit path string checking to literals
+
 ## 2.2.0
 
 ### Minor Changes
