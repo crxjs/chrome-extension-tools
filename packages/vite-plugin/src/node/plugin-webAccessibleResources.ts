@@ -263,8 +263,6 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           delete manifest.web_accessible_resources
         else manifest.web_accessible_resources = combinedResources
 
-        /* ---------- REMOVE VITE MANIFEST IF UNWANTED --------- */
-
         // If the user didn't explicitly enable build.manifest, remove the Vite manifest
         // from the bundle to keep the distribution clean
         if (!userWantsViteManifest) {
