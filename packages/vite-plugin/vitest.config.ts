@@ -23,6 +23,12 @@ export default defineConfig(({ mode }) => {
       timeout: 15_000,
     },
     test: {
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          singleFork: true,
+        },
+      },
       alias: [
         { find: 'src', replacement: path.resolve(__dirname, 'src/node') },
         { find: 'tests', replacement: path.resolve(__dirname, 'tests') },
