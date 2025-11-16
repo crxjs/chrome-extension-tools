@@ -7,6 +7,7 @@ import { header } from './src2/header'
 
 test(
   'crx page update on hmr',
+  { retry: 2 },
   async () => {
     const src = path.join(__dirname, 'src')
     const src1 = path.join(__dirname, 'src1')
@@ -42,6 +43,5 @@ test(
 
     await page.locator('h1', { hasText: header }).waitFor()
     expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
-  },
-  { retry: 2 },
+  }
 )

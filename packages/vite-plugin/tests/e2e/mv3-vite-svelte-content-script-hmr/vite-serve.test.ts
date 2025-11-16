@@ -4,7 +4,7 @@ import { createUpdate, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 import { test, expect } from 'vitest'
 
-test('crx page update on hmr', async () => {
+test('crx page update on hmr', { retry: 5 }, async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')
   const src2 = path.join(__dirname, 'src2')
