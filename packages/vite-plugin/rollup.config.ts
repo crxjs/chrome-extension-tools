@@ -9,6 +9,10 @@ import path from 'pathe'
 import { defineConfig, Plugin, rollup, RollupOptions } from 'rollup'
 import esbuild from 'rollup-plugin-esbuild'
 import dts from 'rollup-plugin-dts'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const debug = _debug('config:rollup')
 
@@ -81,7 +85,7 @@ const plugins = [
     entries: [
       {
         find: /^src\/(.*)/,
-        replacement: path.resolve(__dirname, 'src/node/$1'),
+        replacement: path.resolve(__dirname, 'src/$1'),
       },
       {
         find: /^client\/(.*)/,
@@ -96,7 +100,7 @@ const plugins = [
   json(),
   resolve(),
   commonjs(),
-  esbuild({ legalComments: 'inline' }),
+  esbuild({ legalComments: 'inline', target: 'es2022' }),
 ]
 const config = defineConfig([
   {
@@ -116,8 +120,8 @@ const config = defineConfig([
   {
     input: 'src/node/index.ts',
     output: { file: 'dist/index.d.ts', format: 'es' },
-    plugins: [dts()],
+    plugins: [dts()] as any,
   },
-])
+] as any)
 
 export default config

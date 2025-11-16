@@ -7,7 +7,7 @@ export interface CrxInputOptions extends CrxOptions {
 }
 
 const pluginName = 'crx:optionsProvider'
-export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
+export const pluginOptionsProvider = (options: CrxInputOptions | null) : PluginOption => {
   return {
     name: pluginName,
     api: {
