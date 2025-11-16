@@ -4,8 +4,8 @@ import manifest from './manifest.json'
 
 export default defineConfig({
   build: {
-    // Explicitly set manifest to false to test that it gets removed
-    manifest: false,
+    // Explicitly set manifest to true - Vite manifest SHOULD be in output
+    manifest: true,
     minify: false,
     rollupOptions: {
       output: {
