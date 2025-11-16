@@ -1,0 +1,15 @@
+{
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://example.com/*"]
+    }
+  ],
+  "description": "Test that Vite manifest is kept when enabled",
+  "manifest_version": 3,
+  "name": "Vite Manifest Enabled Test",
+  "version": "1.0.0"
+}
