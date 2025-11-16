@@ -17,5 +17,14 @@ export default defineConfig({
   },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest }), svelte()],
+  plugins: [
+    crx({ manifest }),
+    svelte({
+      compilerOptions: {
+        compatibility: {
+          componentApi: 4,
+        },
+      },
+    }),
+  ],
 })
