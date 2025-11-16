@@ -52,19 +52,25 @@ export async function testOutput(
   const hashMap = new Map<string, string>()
   const scrubHashes = (text: string) =>
     text
-      .replace(/(\.hash)([a-z0-9]+)\./g, (found, p1) => {
+      .replace(/(\.hash)([a-zA-Z0-9_=-]+)\./g, (found, p1) => {
         const replaced =
           hashMap.get(found) ?? `${p1.toString()}${hashMap.size.toString()}.`
         hashMap.set(found, replaced)
         return replaced
       })
-      .replace(/(scriptId--)([a-zA-Z0-9]+)\./g, (found, p1) => {
+      .replace(/(scriptId--)([a-zA-Z0-9_=-]+)\./g, (found, p1) => {
         const replaced =
           hashMap.get(found) ?? `${p1.toString()}${hashMap.size.toString()}.`
         hashMap.set(found, replaced)
         return replaced
       })
-      .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
+      .replace(/(chunk-)([a-zA-Z0-9_=-]+)\./g, (found, p1) => {
+        const replaced =
+          hashMap.get(found) ?? `${p1.toString()}${hashMap.size.toString()}.`
+        hashMap.set(found, replaced)
+        return replaced
+      })
+      .replace(/(v--)([a-zA-Z0-9_=-]+)\./g, '$1hash.')
       .replaceAll(/\/\/#(.+?base64,)([^\s]+)/g, '// #$1<base64>')
 
   getTest('manifest.json', (source, name) => {
@@ -73,7 +79,7 @@ export async function testOutput(
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '_00 manifest.json')
 
-  const files = await fg(`**/*`, { cwd: outDir })
+  const files = await fg(`**/*`, { cwd: outDir, dot: true })
 
   const scrubbedFiles = files.map(scrubHashes).sort()
   expect(scrubbedFiles).toMatchSnapshot('_01 output files')
@@ -100,10 +106,19 @@ export async function testOutput(
           .replaceAll('\\\\', '\\')
 
         source = source.replace(
-            new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+          new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
           (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
         )
       }
+
+      // Scrub absolute paths in build output (e.g., from React JSX dev runtime)
+      source = source
+        .replaceAll(config?.root ?? rootDir, '<root>')
+        .replaceAll(jsesc(rootDir), '<root>')
+        .replace(
+          new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+          (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
+        )
 
       source = source.replaceAll('\\r\\n', '\\n')
 

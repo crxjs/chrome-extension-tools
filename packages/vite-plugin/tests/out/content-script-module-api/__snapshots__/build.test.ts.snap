@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -44,9 +44,9 @@ Array [
 `;
 
 exports[`build fs output > assets/content.js.hash1.js 1`] = `
-"console.log(\\"content script\\");
+"console.log("content script");
 function onExecute() {
-  console.log(\\"onExecute\\");
+  console.log("onExecute");
 }
 export {
   onExecute
@@ -62,7 +62,7 @@ exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.hash1.js\\")
+      chrome.runtime.getURL("assets/content.js.hash1.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);

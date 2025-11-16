@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -38,8 +38,8 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "assets/index.ts.hash2.js",
         "assets/index.ts.hash0.js",
+        "assets/index.ts.hash2.js",
       ],
       "use_dynamic_url": false,
     },
@@ -72,15 +72,13 @@ exports[`build fs output > assets/index.hash3.css 1`] = `
 `;
 
 exports[`build fs output > assets/index.ts.hash0.js 1`] = `
-"(function(){const styles = \\"\\";
-console.log(\\"content1\\");
+"(function(){console.log("content1");
 })()
 "
 `;
 
 exports[`build fs output > assets/index.ts.hash2.js 1`] = `
-"(function(){const styles = \\"\\";
-console.log(\\"content2\\");
+"(function(){console.log("content2");
 })()
 "
 `;

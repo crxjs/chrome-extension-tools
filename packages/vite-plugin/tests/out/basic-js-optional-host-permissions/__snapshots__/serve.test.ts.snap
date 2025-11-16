@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -74,41 +74,41 @@ Set {
 `;
 
 exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
-"const VITE_URL = \\"http://localhost:3000\\";
+"const VITE_URL = "http://localhost:3000";
 document.body.innerHTML = \`
 <div
-      id=\\"app\\"
-      style=\\"
+      id="app"
+      style="
         border: 1px solid #ddd;
         padding: 20px;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      \\"
+      "
     >
-      <h1 style=\\"color: #333\\">Vite Dev Mode</h1>
-      <p style=\\"color: #666\\">
-        Cannot connect to the Vite Dev Server on <a href=\\"\${VITE_URL}\\">\${VITE_URL}</a>
+      <h1 style="color: #333">Vite Dev Mode</h1>
+      <p style="color: #666">
+        Cannot connect to the Vite Dev Server on <a href="\${VITE_URL}">\${VITE_URL}</a>
       </p>
-      <p style=\\"color: #666\\">
+      <p style="color: #666">
         Double-check that Vite is working and reload the extension.
       </p>
-      <p style=\\"color: #666\\">
+      <p style="color: #666">
         This page will close when the extension reloads.
       </p>
       <button
-        style=\\"
+        style="
           padding: 10px 20px;
           border: none;
           background-color: #007bff;
           color: #fff;
           border-radius: 5px;
           cursor: pointer;
-        \\"
+        "
       >
         Reload Extension
       </button>
     </div>\`;
-document.body.querySelector(\\"button\\")?.addEventListener(\\"click\\", () => {
+document.body.querySelector("button")?.addEventListener("click", () => {
   chrome.runtime.reload();
 });
 let tries = 0;
@@ -165,18 +165,18 @@ exports[`serve fs output > src/content.js-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"\\")
+    if ("")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL("")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.js.js\\")
+      chrome.runtime.getURL("src/content.js.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -187,13 +187,13 @@ exports[`serve fs output > src/content.js-loader.js 1`] = `
 
 exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
     <title>Vite Dev Mode</title>
-    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
+    <script src="/assets/loading-page.hash0.js" type="module"></script>
   </head>
   <body
-    style=\\"font-family: Arial, sans-serif; padding: 20px; text-align: center\\"
+    style="font-family: Arial, sans-serif; padding: 20px; text-align: center"
   >
     <h1>Vite Dev Mode</h1>
   </body>

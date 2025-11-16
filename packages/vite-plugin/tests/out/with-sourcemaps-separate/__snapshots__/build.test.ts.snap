@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -46,10 +46,12 @@ Array [
   "assets/background.ts.hash1.js.map",
   "assets/content.ts.hash0.js",
   "assets/content.ts.hash0.js.map",
-  "assets/popup.html.hash2.js",
-  "assets/popup.html.hash2.js.map",
-  "assets/vendor.hash3.js",
-  "assets/vendor.hash3.js.map",
+  "assets/crx-manifest.js.hash2.js.map",
+  "assets/popup.html.hash3.js",
+  "assets/popup.html.hash3.js.map",
+  "assets/stub.hash4.js.map",
+  "assets/vendor.hash5.js",
+  "assets/vendor.hash5.js.map",
   "manifest.json",
   "service-worker-loader.js",
   "src/popup.html",
@@ -57,77 +59,88 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash1.js 1`] = `
-"console.log(\\"service_worker.ts\\");
+"console.log("service_worker.ts");
 //# sourceMappingURL=background.ts.hash1.js.map
 "
 `;
 
-exports[`build fs output > assets/background.ts.hash1.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"background.ts.hash1.js\\",\\"sources\\":[\\"../../src/background.ts\\"],\\"sourcesContent\\":[\\"console.log('service_worker.ts')\\\\n\\\\nexport {}\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"AAAA,QAAQ,IAAI,mBAAmB;\\"}"`;
+exports[`build fs output > assets/background.ts.hash1.js.map 1`] = `"{"version":3,"file":"background.ts.hash1.js","sources":["../../src/background.ts"],"sourcesContent":["console.log('service_worker.ts')\\n\\nexport {}\\n"],"names":[],"mappings":"AAAA,QAAQ,IAAI,mBAAmB;"}"`;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){const message = \\"content script\\";
+"(function(){const message = "content script";
 console.log(message);
-})()
 //# sourceMappingURL=content.ts.hash0.js.map
+})()
 "
 `;
 
-exports[`build fs output > assets/content.ts.hash0.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"content.ts.hash0.js\\",\\"sources\\":[\\"../../src/content.ts\\"],\\"sourcesContent\\":[\\"type Log = 'content script'\\\\nconst message: Log = 'content script'\\\\nconsole.log(message)\\\\nexport {}\\\\n\\"],\\"names\\":[],\\"mappings\\":\\"AACA,MAAM,UAAe;AACrB,QAAQ,IAAI,OAAO;\\"}"`;
+exports[`build fs output > assets/content.ts.hash0.js.map 1`] = `"{"version":3,"file":"content.ts.hash0.js","sources":["../../src/content.ts"],"sourcesContent":["type Log = 'content script'\\nconst message: Log = 'content script'\\nconsole.log(message)\\nexport {}\\n"],"names":[],"mappings":"AACA,MAAM,UAAe;AACrB,QAAQ,IAAI,OAAO;"}"`;
 
-exports[`build fs output > assets/popup.html.hash2.js 1`] = `
-"import { R as React, r as reactDom } from \\"./vendor.hash3.js\\";
+exports[`build fs output > assets/crx-manifest.js.hash2.js.map 1`] = `"{"version":3,"file":"crx-manifest.js.hash2.js","sources":["../../../../../../../../../../../@crx/manifest"],"sourcesContent":["export default \\"{\\\\\\"action\\\\\\":{\\\\\\"default_popup\\\\\\":\\\\\\"src/popup.html\\\\\\"},\\\\\\"background\\\\\\":{\\\\\\"service_worker\\\\\\":\\\\\\"src/background.ts\\\\\\"},\\\\\\"content_scripts\\\\\\":[{\\\\\\"js\\\\\\":[\\\\\\"src/content.ts\\\\\\"],\\\\\\"matches\\\\\\":[\\\\\\"https://*/*\\\\\\",\\\\\\"http://*/*\\\\\\"]}],\\\\\\"manifest_version\\\\\\":3,\\\\\\"name\\\\\\":\\\\\\"test extension\\\\\\",\\\\\\"description\\\\\\":\\\\\\"test extension\\\\\\",\\\\\\"version\\\\\\":\\\\\\"0.1.0\\\\\\"}\\""],"names":[],"mappings":"AAAA,MAAA,WAAe;"}"`;
+
+exports[`build fs output > assets/popup.html.hash3.js 1`] = `
+"import { j as jsxDevRuntimeExports, r as reactDomExports } from "./vendor.hash5.js";
 (function polyfill() {
-  const relList = document.createElement(\\"link\\").relList;
-  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
-    return;
-  }
-  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-    processPreload(link);
-  }
+  const relList = document.createElement("link").relList;
+  if (relList && relList.supports && relList.supports("modulepreload")) return;
+  for (const link of document.querySelectorAll('link[rel="modulepreload"]')) processPreload(link);
   new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-      if (mutation.type !== \\"childList\\") {
-        continue;
-      }
-      for (const node of mutation.addedNodes) {
-        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
-          processPreload(node);
-      }
+      if (mutation.type !== "childList") continue;
+      for (const node of mutation.addedNodes) if (node.tagName === "LINK" && node.rel === "modulepreload") processPreload(node);
     }
-  }).observe(document, { childList: true, subtree: true });
-  function getFetchOpts(script) {
+  }).observe(document, {
+    childList: true,
+    subtree: true
+  });
+  function getFetchOpts(link) {
     const fetchOpts = {};
-    if (script.integrity)
-      fetchOpts.integrity = script.integrity;
-    if (script.referrerpolicy)
-      fetchOpts.referrerPolicy = script.referrerpolicy;
-    if (script.crossorigin === \\"use-credentials\\")
-      fetchOpts.credentials = \\"include\\";
-    else if (script.crossorigin === \\"anonymous\\")
-      fetchOpts.credentials = \\"omit\\";
-    else
-      fetchOpts.credentials = \\"same-origin\\";
+    if (link.integrity) fetchOpts.integrity = link.integrity;
+    if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+    if (link.crossOrigin === "use-credentials") fetchOpts.credentials = "include";
+    else if (link.crossOrigin === "anonymous") fetchOpts.credentials = "omit";
+    else fetchOpts.credentials = "same-origin";
     return fetchOpts;
   }
   function processPreload(link) {
-    if (link.ep)
-      return;
+    if (link.ep) return;
     link.ep = true;
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
 })();
 const App = () => {
-  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+  return /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("div", { children: [
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("h1", { children: "Popup Page" }, void 0, false, {
+      fileName: "<root>/src/App.tsx",
+      lineNumber: 6,
+      columnNumber: 7
+    }, void 0),
+    /* @__PURE__ */ jsxDevRuntimeExports.jsxDEV("p", { children: "If you are seeing this, React is working!" }, void 0, false, {
+      fileName: "<root>/src/App.tsx",
+      lineNumber: 7,
+      columnNumber: 7
+    }, void 0)
+  ] }, void 0, true, {
+    fileName: "<root>/src/App.tsx",
+    lineNumber: 5,
+    columnNumber: 5
+  }, void 0);
 };
-console.log(\\"popup script\\");
-const root = document.querySelector(\\"#root\\");
-reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
-//# sourceMappingURL=popup.html.hash2.js.map
+console.log("popup script");
+const root = document.querySelector("#root");
+reactDomExports.render(/* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(App, {}, void 0, false, {
+  fileName: "<root>/src/popup.tsx",
+  lineNumber: 9,
+  columnNumber: 8
+}, void 0), root);
+//# sourceMappingURL=popup.html.hash3.js.map
 "
 `;
 
-exports[`build fs output > assets/popup.html.hash2.js.map 1`] = `"{\\"version\\":3,\\"file\\":\\"popup.html.hash2.js\\",\\"sources\\":[\\"../../../../../vite/modulepreload-polyfill\\",\\"../../src/App.tsx\\",\\"../../src/popup.tsx\\"],\\"sourcesContent\\":[\\"__VITE_IS_MODERN__&&(function polyfill() {\\\\n    const relList = document.createElement('link').relList;\\\\n    if (relList && relList.supports && relList.supports('modulepreload')) {\\\\n        return;\\\\n    }\\\\n    for (const link of document.querySelectorAll('link[rel=\\\\\\"modulepreload\\\\\\"]')) {\\\\n        processPreload(link);\\\\n    }\\\\n    new MutationObserver((mutations) => {\\\\n        for (const mutation of mutations) {\\\\n            if (mutation.type !== 'childList') {\\\\n                continue;\\\\n            }\\\\n            for (const node of mutation.addedNodes) {\\\\n                if (node.tagName === 'LINK' && node.rel === 'modulepreload')\\\\n                    processPreload(node);\\\\n            }\\\\n        }\\\\n    }).observe(document, { childList: true, subtree: true });\\\\n    function getFetchOpts(script) {\\\\n        const fetchOpts = {};\\\\n        if (script.integrity)\\\\n            fetchOpts.integrity = script.integrity;\\\\n        if (script.referrerpolicy)\\\\n            fetchOpts.referrerPolicy = script.referrerpolicy;\\\\n        if (script.crossorigin === 'use-credentials')\\\\n            fetchOpts.credentials = 'include';\\\\n        else if (script.crossorigin === 'anonymous')\\\\n            fetchOpts.credentials = 'omit';\\\\n        else\\\\n            fetchOpts.credentials = 'same-origin';\\\\n        return fetchOpts;\\\\n    }\\\\n    function processPreload(link) {\\\\n        if (link.ep)\\\\n            // ep marker = processed\\\\n            return;\\\\n        link.ep = true;\\\\n        // prepopulate the load record\\\\n        const fetchOpts = getFetchOpts(link);\\\\n        fetch(link.href, fetchOpts);\\\\n    }\\\\n}());\\",\\"import React from 'react'\\\\n\\\\nconst App: React.FC = () => {\\\\n  return (\\\\n    <div>\\\\n      <h1>Popup Page</h1>\\\\n      <p>If you are seeing this, React is working!</p>\\\\n    </div>\\\\n  )\\\\n}\\\\n\\\\nexport default App\\\\n\\",\\"import React from 'react'\\\\nimport { render } from 'react-dom'\\\\nimport App from './App'\\\\n\\\\nconsole.log('popup script')\\\\n\\\\nconst root = document.querySelector('#root')\\\\n\\\\nrender(<App />, root)\\\\n\\"],\\"names\\":[\\"render\\"],\\"mappings\\":\\";CAAqB,SAAS,WAAW;AACrC,QAAM,UAAU,SAAS,cAAc,MAAM,EAAE;AAC/C,MAAI,WAAW,QAAQ,YAAY,QAAQ,SAAS,eAAe,GAAG;AAClE;AAAA,EACH;AACD,aAAW,QAAQ,SAAS,iBAAiB,2BAA2B,GAAG;AACvE,mBAAe,IAAI;AAAA,EACtB;AACD,MAAI,iBAAiB,CAAC,cAAc;AAChC,eAAW,YAAY,WAAW;AAC9B,UAAI,SAAS,SAAS,aAAa;AAC/B;AAAA,MACH;AACD,iBAAW,QAAQ,SAAS,YAAY;AACpC,YAAI,KAAK,YAAY,UAAU,KAAK,QAAQ;AACxC,yBAAe,IAAI;AAAA,MAC1B;AAAA,IACJ;AAAA,EACT,CAAK,EAAE,QAAQ,UAAU,EAAE,WAAW,MAAM,SAAS,KAAI,CAAE;AACvD,WAAS,aAAa,QAAQ;AAC1B,UAAM,YAAY,CAAA;AAClB,QAAI,OAAO;AACP,gBAAU,YAAY,OAAO;AACjC,QAAI,OAAO;AACP,gBAAU,iBAAiB,OAAO;AACtC,QAAI,OAAO,gBAAgB;AACvB,gBAAU,cAAc;AAAA,aACnB,OAAO,gBAAgB;AAC5B,gBAAU,cAAc;AAAA;AAExB,gBAAU,cAAc;AAC5B,WAAO;AAAA,EACV;AACD,WAAS,eAAe,MAAM;AAC1B,QAAI,KAAK;AAEL;AACJ,SAAK,KAAK;AAEV,UAAM,YAAY,aAAa,IAAI;AACnC,UAAM,KAAK,MAAM,SAAS;AAAA,EAC7B;AACL;ACxCA,MAAM,MAAgB,MAAM;AAExB,SAAA,sBAAA,cAAC,aACE,sBAAA,cAAA,MAAA,MAAG,YAAU,GACd,sBAAA,cAAC,KAAE,MAAA,2CAAyC,CAC9C;AAEJ;ACLA,QAAQ,IAAI,cAAc;AAE1B,MAAM,OAAO,SAAS,cAAc,OAAO;AAE3CA,SAAO,QAAA,OAAA,sBAAA,cAAC,KAAI,IAAA,GAAI,IAAI;\\"}"`;
+exports[`build fs output > assets/popup.html.hash3.js.map 1`] = `"{"version":3,"file":"popup.html.hash3.js","sources":["../../src/App.tsx","../../src/popup.tsx"],"sourcesContent":["import React from 'react'\\n\\nconst App: React.FC = () => {\\n  return (\\n    <div>\\n      <h1>Popup Page</h1>\\n      <p>If you are seeing this, React is working!</p>\\n    </div>\\n  )\\n}\\n\\nexport default App\\n","import React from 'react'\\nimport { render } from 'react-dom'\\nimport App from './App'\\n\\nconsole.log('popup script')\\n\\nconst root = document.querySelector('#root')\\n\\nrender(<App />, root)\\n"],"names":["jsxDEV","this","render"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAEA,MAAM,MAAgB,MAAM;AAC1B,qDACG,OAAA,EACC,UAAA;AAAA,IAAAA,qCAAAA,OAAC,QAAG,UAAA,aAAA,GAAJ,QAAA,OAAA;AAAA,MAAA,UAAA;AAAA,MAAA,YAAA;AAAA,MAAA,cAAA;AAAA,IAAA,GAAAC,MAAc;AAAA,IACdD,qCAAAA,OAAC,OAAE,UAAA,4CAAA,GAAH,QAAA,OAAA;AAAA,MAAA,UAAA;AAAA,MAAA,YAAA;AAAA,MAAA,cAAA;AAAA,IAAA,GAAAC,MAA4C;AAAA,EAAA,EAAA,GAF9C,QAAA,MAAA;AAAA,IAAA,UAAA;AAAA,IAAA,YAAA;AAAA,IAAA,cAAA;AAAA,EAAA,GAAAA,MAGA;AAEJ;ACLA,QAAQ,IAAI,cAAc;AAE1B,MAAM,OAAO,SAAS,cAAc,OAAO;AAE3CC,gBAAAA,mDAAQ,KAAA,IAAD,QAAA,OAAA;AAAA,EAAA,UAAA;AAAA,EAAA,YAAA;AAAA,EAAA,cAAA;AAAA,GAAAD,MAAK,GAAI,IAAI;"}"`;
+
+exports[`build fs output > assets/stub.hash4.js.map 1`] = `"{"version":3,"file":"stub.hash4.js","sources":["../../../../../../../../../../../@crx/stub"],"sourcesContent":["console.log('stub')"],"names":[],"mappings":"AAAA,QAAQ,IAAI,MAAM;"}"`;
 
 exports[`build fs output > service-worker-loader.js 1`] = `
 "import './assets/background.ts.hash1.js';
@@ -136,17 +149,16 @@ exports[`build fs output > service-worker-loader.js 1`] = `
 
 exports[`build fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
-    <meta charset=\\"UTF-8\\" />
-    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1000, initial-scale=1.0" />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash2.js\\"></script>
-    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+    <script type="module" crossorigin src="/assets/popup.html.hash3.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/vendor.hash5.js">
   </head>
   <body>
-    <div id=\\"root\\"></div>
-    
+    <div id="root"></div>
   </body>
 </html>
 "
