@@ -4,6 +4,7 @@ import {
   FullReloadPayload,
   HMRPayload,
   PrunePayload,
+  Update,
   UpdatePayload,
 } from 'vite'
 import { allFilesReady$ } from './fileWriter-rxjs'
@@ -61,7 +62,9 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       case 'prune': {
         const prune: PrunePayload = {
           type: 'prune',
-          paths: p.paths.map((id) => getViteUrl({ id, type: 'module' })),
+          paths: p.paths.map((id: string) =>
+            getViteUrl({ id, type: 'module' }),
+          ),
         }
         return prune
       }
@@ -69,11 +72,16 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       case 'update': {
         const update: UpdatePayload = {
           type: 'update',
-          updates: p.updates.map(({ acceptedPath: ap, path: p, ...rest }) => ({
+          updates: p.updates.map(
+            ({ acceptedPath: ap, path: p, ...rest }: Update) => ({
               ...rest,
-            acceptedPath: prefix('/', getFileName({ id: ap, type: 'module' })),
+              acceptedPath: prefix(
+                '/',
+                getFileName({ id: ap, type: 'module' }),
+              ),
               path: prefix('/', getFileName({ id: p, type: 'module' })),
-          })),
+            }),
+          ),
         }
         return update
       }
