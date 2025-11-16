@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -67,11 +67,11 @@ import 'http://localhost:3000/src/background.ts';
 `;
 
 exports[`serve fs output > src/declared-script.ts.js 1`] = `
-"import fileName from \\"/src/main-world.ts__scriptId--0.js\\";
-console.log(\\"declared script\\");
-const script = document.createElement(\\"script\\");
+"import fileName from "/src/main-world.ts__scriptId--0.js";
+console.log("declared script");
+const script = document.createElement("script");
 script.src = chrome.runtime.getURL(fileName);
-script.type = \\"module\\";
+script.type = "module";
 document.head.prepend(script);
 "
 `;
@@ -82,18 +82,18 @@ exports[`serve fs output > src/declared-script.ts-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"\\")
+    if ("")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL("")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/declared-script.ts.js\\")
+      chrome.runtime.getURL("src/declared-script.ts.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -103,7 +103,7 @@ exports[`serve fs output > src/declared-script.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output > src/dynamic-script.ts.js 1`] = `
-"console.log(\\"dynamic script\\");
+"console.log("dynamic script");
 export {};
 "
 `;
@@ -114,18 +114,18 @@ exports[`serve fs output > src/dynamic-script.ts-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"\\")
+    if ("")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL("")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/dynamic-script.ts.js\\")
+      chrome.runtime.getURL("src/dynamic-script.ts.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -135,12 +135,12 @@ exports[`serve fs output > src/dynamic-script.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output > src/main-world.ts.js 1`] = `
-"console.log(\\"main world script\\");
+"console.log("main world script");
 export {};
 "
 `;
 
 exports[`serve fs output > src/main-world.ts__scriptId--0.js 1`] = `
-"export default \\"src/main-world.ts.js\\";
+"export default "src/main-world.ts.js";
 "
 `;

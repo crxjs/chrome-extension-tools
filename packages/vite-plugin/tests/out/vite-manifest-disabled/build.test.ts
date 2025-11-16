@@ -7,7 +7,7 @@ test('build fs output - manifest disabled', async () => {
   const result = await build(__dirname)
   
   // Get all files from output directory
-  const files = await fg(`**/*`, { cwd: result.outDir })
+  const files = await fg(`**/*`, { cwd: result.outDir, dot: true })
   
   // When build.manifest is false, Vite manifest should NOT be in the output
   expect(files).not.toContain('.vite/manifest.json')

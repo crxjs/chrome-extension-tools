@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -46,10 +46,9 @@ Array [
   "src/content.tsx-loader.js",
   "src/content.tsx.js",
   "src/popup.html",
-  "vendor/chunk-B65QLFCX.js__v--hash.js",
+  "vendor/chunk-1.js__v--hash.js",
   "vendor/crx-client-port.js",
   "vendor/crx-client-preamble.js",
-  "vendor/id-__x00__react-jsx-dev-runtime.js",
   "vendor/react-dom.js__v--hash.js",
   "vendor/react-refresh.js",
   "vendor/react_jsx-dev-runtime.js__v--hash.js",
@@ -67,41 +66,41 @@ Set {
 `;
 
 exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
-"const VITE_URL = \\"http://localhost:3000\\";
+"const VITE_URL = "http://localhost:3000";
 document.body.innerHTML = \`
 <div
-      id=\\"app\\"
-      style=\\"
+      id="app"
+      style="
         border: 1px solid #ddd;
         padding: 20px;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      \\"
+      "
     >
-      <h1 style=\\"color: #333\\">Vite Dev Mode</h1>
-      <p style=\\"color: #666\\">
-        Cannot connect to the Vite Dev Server on <a href=\\"\${VITE_URL}\\">\${VITE_URL}</a>
+      <h1 style="color: #333">Vite Dev Mode</h1>
+      <p style="color: #666">
+        Cannot connect to the Vite Dev Server on <a href="\${VITE_URL}">\${VITE_URL}</a>
       </p>
-      <p style=\\"color: #666\\">
+      <p style="color: #666">
         Double-check that Vite is working and reload the extension.
       </p>
-      <p style=\\"color: #666\\">
+      <p style="color: #666">
         This page will close when the extension reloads.
       </p>
       <button
-        style=\\"
+        style="
           padding: 10px 20px;
           border: none;
           background-color: #007bff;
           color: #fff;
           border-radius: 5px;
           cursor: pointer;
-        \\"
+        "
       >
         Reload Extension
       </button>
     </div>\`;
-document.body.querySelector(\\"button\\")?.addEventListener(\\"click\\", () => {
+document.body.querySelector("button")?.addEventListener("click", () => {
   chrome.runtime.reload();
 });
 let tries = 0;
@@ -128,99 +127,65 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/App.tsx.js 1`] = `
-"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/App.tsx.js\\");import RefreshRuntime from \\"/vendor/react-refresh.js\\";
-let prevRefreshReg;
-let prevRefreshSig;
-if (import.meta.hot) {
-  if (!window.__vite_plugin_react_preamble_installed__) {
-    throw new Error(\\"@vitejs/plugin-react can't detect preamble. Something is wrong. See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201\\");
-  }
-  prevRefreshReg = window.$RefreshReg$;
-  prevRefreshSig = window.$RefreshSig$;
-  window.$RefreshReg$ = (type, id) => {
-    RefreshRuntime.register(type, \\"<root>/src/App.tsx \\" + id);
-  };
-  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
-}
-var _jsxFileName = \\"<root>/src/App.tsx\\";
-import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
+"import { createHotContext as __vite__createHotContext } from "/vendor/vite-client.js";import.meta.hot = __vite__createHotContext("/src/App.tsx.js");import __vite__cjsImport0_react_jsxDevRuntime from "/vendor/react_jsx-dev-runtime.js__v--hash.js"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
 const App = () => {
-  return /* @__PURE__ */ _jsxDEV(\\"div\\", {
-    children: [/* @__PURE__ */ _jsxDEV(\\"h1\\", {
-      children: \\"Popup Page\\"
-    }, void 0, false, {
-      fileName: _jsxFileName,
+  return /* @__PURE__ */ jsxDEV("div", { children: [
+    /* @__PURE__ */ jsxDEV("h1", { children: "Popup Page" }, void 0, false, {
+      fileName: "<root>/src/App.tsx",
       lineNumber: 6,
       columnNumber: 7
-    }, void 0), /* @__PURE__ */ _jsxDEV(\\"p\\", {
-      children: \\"If you are seeing this, React is working!\\"
-    }, void 0, false, {
-      fileName: _jsxFileName,
+    }, this),
+    /* @__PURE__ */ jsxDEV("p", { children: "If you are seeing this, React is working!" }, void 0, false, {
+      fileName: "<root>/src/App.tsx",
       lineNumber: 7,
       columnNumber: 7
-    }, void 0)]
-  }, void 0, true, {
-    fileName: _jsxFileName,
+    }, this)
+  ] }, void 0, true, {
+    fileName: "<root>/src/App.tsx",
     lineNumber: 5,
     columnNumber: 5
-  }, void 0);
+  }, this);
 };
 _c = App;
 export default App;
 var _c;
-$RefreshReg$(_c, \\"App\\");
-if (import.meta.hot) {
-  let isReactRefreshBoundary = function(mod) {
-    if (mod == null || typeof mod !== \\"object\\") {
-      return false;
-    }
-    let hasExports = false;
-    let areAllExportsComponents = true;
-    for (const exportName in mod) {
-      hasExports = true;
-      if (exportName === \\"__esModule\\") {
-        continue;
-      }
-      const desc = Object.getOwnPropertyDescriptor(mod, exportName);
-      if (desc && desc.get) {
-        return false;
-      }
-      const exportValue = mod[exportName];
-      if (!RefreshRuntime.isLikelyComponentType(exportValue)) {
-        areAllExportsComponents = false;
-      }
-    }
-    return hasExports && areAllExportsComponents;
-  };
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-  import.meta.hot.accept((mod) => {
-    if (isReactRefreshBoundary(mod)) {
-      if (!window.__vite_plugin_react_timeout) {
-        window.__vite_plugin_react_timeout = setTimeout(() => {
-          window.__vite_plugin_react_timeout = 0;
-          RefreshRuntime.performReactRefresh();
-        }, 30);
-      }
-    } else {
-      import.meta.hot.invalidate();
-    }
+$RefreshReg$(_c, "App");
+import * as RefreshRuntime from "/vendor/react-refresh.js";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("<root>/src/App.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("<root>/src/App.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
   });
+}
+function $RefreshReg$(type, id) {
+  return RefreshRuntime.register(type, "<root>/src/App.tsx " + id);
+}
+function $RefreshSig$() {
+  return RefreshRuntime.createSignatureFunctionForTransform();
 }
 "
 `;
 
 exports[`serve fs output > src/content.tsx.js 1`] = `
-"var _jsxFileName = \\"<root>/src/content.tsx\\";
-import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--hash.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
-import App from \\"/src/App.tsx.js\\";
-import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
-console.log(\\"content script\\");
-const root = document.createElement(\\"div\\");
-root.id = \\"root\\";
+"import __vite__cjsImport0_react_jsxDevRuntime from "/vendor/react_jsx-dev-runtime.js__v--hash.js"; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import __vite__cjsImport1_reactDom from "/vendor/react-dom.js__v--hash.js"; const render = __vite__cjsImport1_reactDom["render"];
+import App from "/src/App.tsx.js";
+console.log("content script");
+const root = document.createElement("div");
+root.id = "root";
 document.body.append(root);
-render(/* @__PURE__ */ _jsxDEV(App, {}, void 0, false, {
-  fileName: _jsxFileName,
+render(/* @__PURE__ */ jsxDEV(App, {}, void 0, false, {
+  fileName: "<root>/src/content.tsx",
   lineNumber: 10,
   columnNumber: 8
 }, this), root);
@@ -233,18 +198,18 @@ exports[`serve fs output > src/content.tsx-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"vendor/crx-client-preamble.js\\")
+    if ("vendor/crx-client-preamble.js")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"vendor/crx-client-preamble.js\\")
+        chrome.runtime.getURL("vendor/crx-client-preamble.js")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.tsx.js\\")
+      chrome.runtime.getURL("src/content.tsx.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -255,13 +220,13 @@ exports[`serve fs output > src/content.tsx-loader.js 1`] = `
 
 exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
     <title>Vite Dev Mode</title>
-    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
+    <script src="/assets/loading-page.hash0.js" type="module"></script>
   </head>
   <body
-    style=\\"font-family: Arial, sans-serif; padding: 20px; text-align: center\\"
+    style="font-family: Arial, sans-serif; padding: 20px; text-align: center"
   >
     <h1>Vite Dev Mode</h1>
   </body>

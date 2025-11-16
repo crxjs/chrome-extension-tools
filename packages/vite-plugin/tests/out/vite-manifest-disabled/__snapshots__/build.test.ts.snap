@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output - manifest disabled > _00 manifest.json 1`] = `
 Object {
@@ -44,12 +44,12 @@ Array [
 `;
 
 exports[`build fs output - manifest disabled > assets/background.js.hash1.js 1`] = `
-"console.log(\\"background script\\");
+"console.log("background script");
 "
 `;
 
 exports[`build fs output - manifest disabled > assets/content.js.hash0.js 1`] = `
-"(function(){console.log(\\"content script\\");
+"(function(){console.log("content script");
 })()
 "
 `;

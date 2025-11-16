@@ -1,7 +1,8 @@
 import { simple } from 'acorn-walk'
 import { createHash as _hash } from 'crypto'
 import debug from 'debug'
-import { AcornNode, OutputBundle, PluginContext } from 'rollup'
+import type { Node as AcornNode } from 'acorn'
+import type { OutputBundle, PluginContext } from 'rollup'
 import type {
   ManifestV3,
   WebAccessibleResourceById,

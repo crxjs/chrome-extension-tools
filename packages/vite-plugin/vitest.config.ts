@@ -1,4 +1,4 @@
-import { defineConfig, configDefaults } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 import path from 'pathe'
 import { fileURLToPath } from 'url'
 
@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
         '**/node_modules/**',
         '**/dist*/**',
         '**/.vite/**',
+        '**/tests/templates/**',
       ],
       globalSetup: './tests/jest.globalSetup.ts',
       maxThreads: mode === 'e2e' ? 1 : undefined,
@@ -54,7 +55,6 @@ export default defineConfig(({ mode }) => {
         printBasicPrototype: true,
       },
       testTimeout,
-      watchExclude: [...configDefaults.watchExclude, '**/tests/templates'],
       chaiConfig: { includeStack: false, showDiff: true, truncateThreshold: 0 },
     },
   }
