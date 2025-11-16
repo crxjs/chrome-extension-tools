@@ -1,11 +1,14 @@
 import jsesc from 'jsesc'
 import { BrowserContext, Locator, Page } from 'playwright-chromium'
 import { basename, join, resolve } from 'src/path'
-import { TestContext } from 'vitest'
 import fs from 'fs-extra'
 
 let count = 0
-export function getCustomId({ task }: TestContext): string {
+export function getCustomId({
+  task,
+}: {
+  task?: { file?: { name: string } }
+}): string {
   const filename = task?.file?.name
   if (!filename) throw new TypeError('Test context filename is undefined')
   return `${basename(filename, '.test.ts')}-${count++}`
