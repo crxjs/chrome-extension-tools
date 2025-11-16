@@ -1,0 +1,15 @@
+{
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://example.com/*"]
+    }
+  ],
+  "description": "Test that Vite manifest is removed",
+  "manifest_version": 3,
+  "name": "Vite Manifest Removal Test",
+  "version": "1.0.0"
+}
