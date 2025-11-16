@@ -3,7 +3,6 @@ import path from 'pathe'
 import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'
-import { ViteDevServer } from 'vite'
 import { afterEach } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
