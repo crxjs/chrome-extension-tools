@@ -1,3 +1,4 @@
+// @ts-expect-error - Test configuration
 import vue from '@vitejs/plugin-vue'
 import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'

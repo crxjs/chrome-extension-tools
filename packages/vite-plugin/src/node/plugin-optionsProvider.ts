@@ -7,7 +7,7 @@ export interface CrxInputOptions extends CrxOptions {
 }
 
 const pluginName = 'crx:optionsProvider'
-export const pluginOptionsProvider = (options: CrxInputOptions | null) : PluginOption => {
+export const pluginOptionsProvider = (options: CrxInputOptions | null) => {
   return {
     name: pluginName,
     api: {
@@ -15,8 +15,7 @@ export const pluginOptionsProvider = (options: CrxInputOptions | null) : PluginO
         // during testing this can be null, we don't provide options through the test config
         options,
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any,
+    } as const,
   }
 }
 
@@ -38,17 +37,17 @@ export const getOptions = async ({
   }
   const awaitedPlugins = await Promise.all(plugins)
 
-  let options: CrxInputOptions | undefined
+  let options: CrxInputOptions | undefined | null
   for (const p of awaitedPlugins.flat()) {
     if (isCrxPlugin(p))
       if (p.name === pluginName) {
         const plugin = p as ReturnType<typeof pluginOptionsProvider>
-        options = plugin.api.crx.options
+        options = plugin?.api?.crx?.options
         if (options) break
       }
   }
 
-  if (typeof options === 'undefined') {
+  if (typeof options === 'undefined' || options === null) {
     throw Error('Unable to get CRXJS options')
   }
 

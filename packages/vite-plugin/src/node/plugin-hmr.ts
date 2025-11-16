@@ -41,7 +41,7 @@ export const pluginHMR: CrxPluginFn = () => {
       // server should ignore outdir
       configResolved(_config) {
         config = _config
-        const { watch = {} } = config.server
+        const watch = config.server.watch || {}
         config.server.watch = watch
         watch.ignored = watch.ignored
           ? [...new Set([watch.ignored].flat())]

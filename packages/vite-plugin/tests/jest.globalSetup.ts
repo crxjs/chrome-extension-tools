@@ -31,20 +31,21 @@ function getClientFiles() {
 const clientFiles = getClientFiles()
 debug('client files %o', clientFiles)
 
+// @ts-expect-error - Rollup config array handling
 const [config] = configs
 config.input = clientFiles.map((f) => normalizePath(f))
 config.output = { dir: outDir, format: 'esm', sourcemap: true, plugins: [] }
 config.plugins?.push(
   {
     name: 'load virtual import files',
-    resolveId(source, importer) {
+    resolveId(source: string, importer: string) {
       if (!importer) {
         debug('entry file %s', source)
         return source
       }
       return null
     },
-    load(id) {
+    load(id: string) {
       debug('load %s', id)
       let importPath: string | undefined
       if (clientFiles.includes(id)) {
@@ -68,8 +69,8 @@ export default clientCode`.trim()
   },
   {
     name: 'fix output filename',
-    generateBundle(options, bundle) {
-      for (const chunk of Object.values(bundle)) {
+    generateBundle(options: any, bundle: any) {
+      for (const chunk of Object.values(bundle) as any[]) {
         if (chunk.type === 'chunk') {
           const format = path
             .dirname(chunk.facadeModuleId!)
