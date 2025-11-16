@@ -65,19 +65,19 @@ export async function build(
   await fs.remove(outDir)
 
   const plugins: CrxPlugin[] = [
-      // @ts-expect-error we're going to override this from the vite config
-      crx(null),
-      {
-        name: 'test:get-config',
-        configResolved(_config) {
+    // @ts-expect-error we're going to override this from the vite config
+    crx(null),
+    {
+      name: 'test:get-config',
+      configResolved(_config) {
           config = _config;
-        },
       },
+    },
   ];
 
   if (process.env.DEBUG) {
     plugins.push(inspect({
-      build: true,
+        build: true,
       outputDir: '.vite-inspect'
     }));
   }
@@ -141,6 +141,9 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     server: {
       port: 5200,
       hmr: true,
+      cors: {
+        origin: [/chrome-extension:\/\//],
+      },
       watch: {
         // cache dir should not trigger update in these tests
         ignored: [cacheDir],

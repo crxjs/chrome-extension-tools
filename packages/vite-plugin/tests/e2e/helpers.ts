@@ -5,8 +5,8 @@ import { TestContext } from 'vitest'
 import fs from 'fs-extra'
 
 let count = 0
-export function getCustomId({ meta }: TestContext): string {
-  const filename = meta.file?.name
+export function getCustomId({ task }: TestContext): string {
+  const filename = task?.file?.name
   if (!filename) throw new TypeError('Test context filename is undefined')
   return `${basename(filename, '.test.ts')}-${count++}`
 }
