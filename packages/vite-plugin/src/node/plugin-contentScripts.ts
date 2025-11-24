@@ -56,7 +56,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
       const name = `[${pluginName}]`
       const message = colors.yellow(
         [
-          `${name} Some of content-scripts doesn't support HMR because the world is MAIN:`,
+          `${name} Some content-scripts don't support HMR because the world is MAIN:`,
           ...[...worldMainIds].map((id) => `  ${id}`),
         ].join('\r\n'),
       )
