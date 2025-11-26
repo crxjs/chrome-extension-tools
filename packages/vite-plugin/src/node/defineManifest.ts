@@ -82,6 +82,13 @@ type FilePathFields<T extends string> = {
     match_about_blank?: boolean
     include_globs?: string[]
     exclude_globs?: string[]
+    /**
+     * - 'ISOLATED' (default): Content script runs in an isolated world.
+     * - 'MAIN': Content script runs in the main world.
+     * NOTE: MAIN currently does NOT support crxjs HMR
+     * @see https://developer.chrome.com/docs/extensions/mv3/content_scripts/#world
+     */
+    world?: 'ISOLATED' | 'MAIN'
   }[]
 
   input_components?: {
