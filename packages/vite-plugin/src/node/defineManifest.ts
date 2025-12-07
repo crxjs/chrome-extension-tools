@@ -2,6 +2,7 @@ import type { ConfigEnv } from 'vite'
 import type { FirefoxManifestBackground, ManifestV3, WebAccessibleResourceByMatch } from './manifest'
 import type { IsStringLiteral } from 'type-fest'
 
+export type { ManifestV3 }
 export type ManifestV3Fn = (env: ConfigEnv) => ManifestV3 | Promise<ManifestV3>
 export type ManifestV3Export = ManifestV3 | Promise<ManifestV3> | ManifestV3Fn
 
@@ -31,7 +32,7 @@ type FilePathFields<T extends string> = {
     /**
      * - Relative to Vite project root (where vite.config.js is)
      * - Format: "subdir/icon.png" (no leading ./ or /)
-     * 
+     *
      * @example "assets/icon.png"
      */
     default_icon?: ManifestIcons<T>
@@ -39,7 +40,7 @@ type FilePathFields<T extends string> = {
     /**
      * - Relative to Vite project root (where vite.config.js is)
      * - Format: "subdir/index.html" (no leading ./ or /)
-     * 
+     *
      * @example "src/popup.html"
      */
     default_popup?: ManifestFilePath<T>
@@ -50,7 +51,7 @@ type FilePathFields<T extends string> = {
         /**
          * - Relative to Vite project root (where vite.config.js is)
          * - Format: "subdir/index.js" (no leading ./ or /)
-         * 
+         *
          * @example "src/background.js"
          */
         service_worker: ManifestFilePath<T>
@@ -65,14 +66,14 @@ type FilePathFields<T extends string> = {
     /**
      * - Relative to Vite project root (where vite.config.js is)
      * - Format: "subdir/content.css" (no leading ./ or /)
-     * 
+     *
      * @example "src/content.css"
      */
     css?: ManifestFilePath<T>[]
     /**
      * - Relative to Vite project root (where vite.config.js is)
      * - Format: "subdir/content.js" (no leading ./ or /)
-     * 
+     *
      * @example "src/content.js"
      */
     js?: ManifestFilePath<T>[]
@@ -81,6 +82,13 @@ type FilePathFields<T extends string> = {
     match_about_blank?: boolean
     include_globs?: string[]
     exclude_globs?: string[]
+    /**
+     * - 'ISOLATED' (default): Content script runs in an isolated world.
+     * - 'MAIN': Content script runs in the main world.
+     * NOTE: MAIN currently does NOT support crxjs HMR
+     * @see https://developer.chrome.com/docs/extensions/mv3/content_scripts/#world
+     */
+    world?: 'ISOLATED' | 'MAIN'
   }[]
 
   input_components?: {
@@ -92,7 +100,7 @@ type FilePathFields<T extends string> = {
     /**
      * - Relative to Vite project root (where vite.config.js is)
      * - Format: "subdir/options.html" (no leading ./ or /)
-     * 
+     *
      * @example "src/options.html"
      */
     options_page?: ManifestFilePath<T>
@@ -101,14 +109,14 @@ type FilePathFields<T extends string> = {
   /**
    * - Relative to Vite project root (where vite.config.js is)
    * - Format: "subdir/options.html" (no leading ./ or /)
-   * 
+   *
    * @example "src/options.html"
    */
   options_page?:  ManifestFilePath<T>
   /**
    * - Relative to Vite project root (where vite.config.js is)
    * - Format: "subdir/devtools.html" (no leading ./ or /)
-   * 
+   *
    * @example "src/devtools.html"
    */
   devtools_page?: ManifestFilePath<T>

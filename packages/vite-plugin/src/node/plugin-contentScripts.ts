@@ -1,18 +1,21 @@
 import contentHmrPort from 'client/es/hmr-content-port.ts'
 import { filter, Subscription } from 'rxjs'
-import { ViteDevServer } from 'vite'
+import { ConfigEnv, UserConfig, ViteDevServer } from 'vite'
 import {
   contentScripts,
   createDevLoader,
+  createDevMainLoader,
   createProLoader,
+  createProMainLoader,
 } from './contentScripts'
 import { add } from './fileWriter'
-import { formatFileData, getFileName } from './fileWriter-utilities'
+import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { getOptions } from './plugin-optionsProvider'
 import { basename } from './path'
 import { RxMap } from './RxMap'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
+import colors from 'picocolors';
 
 /**
  * Emits content scripts and loaders.
@@ -27,16 +30,46 @@ import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
  * - This plugin emits content scripts and loaders
  */
 export const pluginContentScripts: CrxPluginFn = () => {
+  const pluginName = 'crx:content-scripts';
+
   let server: ViteDevServer
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
   let sub = new Subscription()
 
+  const worldMainIds = new Set<string>();
+
+  const findWorldMainIds = async (config: UserConfig, env: ConfigEnv) => {
+    const { manifest: _manifest } = await getOptions(config)
+
+    const manifest = await (typeof _manifest === 'function'
+      ? _manifest(env)
+      : _manifest);
+
+    (manifest.content_scripts || []).forEach(({ world, js }) => {
+      if (world === 'MAIN' && js) {
+        js.forEach((path) => worldMainIds.add(prefix('/', path)))
+      }
+    })
+
+    if (worldMainIds.size) {
+      const name = `[${pluginName}]`
+      const message = colors.yellow(
+        [
+          `${name} Some content-scripts don't support HMR because the world is MAIN:`,
+          ...[...worldMainIds].map((id) => `  ${id}`),
+        ].join('\r\n'),
+      )
+      console.log(message)
+    }
+  }
+
   return [
     {
-      name: 'crx:content-scripts',
+      name: pluginName,
       apply: 'serve',
-      async config(config) {
+      async config(config, env) {
+        await findWorldMainIds(config, env);
         const { contentScripts = {} } = await getOptions(config)
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
@@ -77,11 +110,15 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 const loader = add({
                   type: 'asset',
                   id: getFileName({ type: 'loader', id }),
-                  source: createDevLoader({
-                    preamble: preamble.fileName,
-                    client: client.fileName,
-                    fileName: file.fileName,
-                  }),
+                  source: worldMainIds.has(file.id)
+                    ? createDevMainLoader({
+                      fileName: `./${file.fileName.split('/').at(-1)}`
+                    })
+                    : createDevLoader({
+                      preamble: preamble.fileName,
+                      client: client.fileName,
+                      fileName: file.fileName,
+                    }),
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
@@ -117,10 +154,12 @@ export const pluginContentScripts: CrxPluginFn = () => {
       },
     },
     {
-      name: 'crx:content-scripts',
+      name: pluginName,
       apply: 'build',
       enforce: 'pre',
-      config(config) {
+      async config(config, env) {
+        await findWorldMainIds(config, env);
+
         return {
           ...config,
           build: {
@@ -163,7 +202,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
                     type: 'loader',
                     id: basename(script.id),
                   }),
-                  source: createProLoader({ fileName }),
+                  source: worldMainIds.has(script.id)
+                    ? createProMainLoader({ fileName: `./${fileName.split('/').at(-1)}` })
+                    : createProLoader({ fileName }),
                 })
 
                 script.loaderName = this.getFileName(refId)

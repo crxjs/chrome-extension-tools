@@ -1,0 +1,45 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.js.hash0.js",
+      ],
+      "matches": Array [
+        "https://example.com/*",
+      ],
+      "world": "MAIN",
+    },
+  ],
+  "description": "test content script with world MAIN",
+  "manifest_version": 3,
+  "name": "Test Content Script World Main",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://example.com/*",
+      ],
+      "resources": Array [
+        "assets/content.js.hash0.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/content.js.hash0.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output > assets/content.js.hash0.js 1`] = `
+"(function(){console.log(\\"content script running in MAIN world\\");
+})()
+"
+`;

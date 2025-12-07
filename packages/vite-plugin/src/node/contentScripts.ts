@@ -1,5 +1,7 @@
 import contentDevLoader from 'client/iife/content-dev-loader.ts'
+import contentDevMainLoader from 'client/iife/content-dev-main-loader.ts'
 import contentProLoader from 'client/iife/content-pro-loader.ts'
+import contentProMainLoader from 'client/iife/content-pro-main-loader.ts'
 import { filter } from 'rxjs'
 import { hash } from './helpers'
 import { RxMap } from './RxMap'
@@ -86,4 +88,18 @@ export function createDevLoader({
 
 export function createProLoader({ fileName }: { fileName: string }): string {
   return contentProLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
+}
+
+export function createDevMainLoader({
+  fileName,
+}: {
+  fileName: string
+}): string {
+  return contentDevMainLoader
+    .replace(/__SCRIPT__/g, JSON.stringify(fileName))
+    .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
+}
+
+export function createProMainLoader({ fileName }: { fileName: string }): string {
+  return contentProMainLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
 }
