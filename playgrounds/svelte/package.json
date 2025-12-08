@@ -16,7 +16,7 @@
     "@tsconfig/svelte": "^5.0.4",
     "@types/chrome": "^0.0.313",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5",
+    "vite": "^5.4.21",
     "vite-plugin-zip-pack": "^1.2.4"
   }
 }
