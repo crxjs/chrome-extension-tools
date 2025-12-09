@@ -1,5 +1,41 @@
 # @crxjs/vite-plugin
 
+## 2.3.0
+
+### Minor Changes
+
+- ee17090: \* adds support for main world content scripts declared from manifest
+  - shows warning during development for detected main world scripts so that the
+    dev is not surprised the hmr does not work for it
+  - does not touch `chrome.scripting.registerContentScripts` scripts, as they
+    already work
+
+## 2.2.1
+
+### Patch Changes
+
+- 5ff5465: feat(vite-plugin): limit path string checking to literals
+
+## 2.2.0
+
+### Minor Changes
+
+- 1b0ada4: feat: add support for root url content script match in firefox #1056
+
+## 2.1.0
+
+### Minor Changes
+
+- 637e12c: feat: include sourcemaps in web_accessible_resources
+- 3e7a1b3: feat: allow query string in manifest html urls
+
+## 2.0.3
+
+### Patch Changes
+
+- 96c942b: fix: usage of newer picocolor api when using old dependency #1038
+- 548fb58: Add optional_host_permissions to manifest schemas
+
 ## 2.0.2
 
 ### Patch Changes

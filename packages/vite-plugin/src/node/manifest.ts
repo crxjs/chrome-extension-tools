@@ -107,6 +107,8 @@ export interface ManifestV3 {
         match_about_blank?: boolean | undefined
         include_globs?: string[] | undefined
         exclude_globs?: string[] | undefined
+        // Accept string to support JSON imports where type inference gives string instead of literal types
+        world?: chrome.scripting.ExecutionWorld | string | undefined
       }[]
     | undefined
   content_security_policy?: {
@@ -198,6 +200,7 @@ export interface ManifestV3 {
         keyword: string
       }
     | undefined
+  optional_host_permissions?: string[] | undefined
   optional_permissions?:
     | chrome.runtime.ManifestPermissions[]
     | string[]

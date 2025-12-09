@@ -1,0 +1,85 @@
+// Vitest Snapshot v1
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "src/content.js-loader.js",
+      ],
+      "matches": Array [
+        "https://example.com/*",
+      ],
+      "world": "MAIN",
+    },
+  ],
+  "description": "test content script with world MAIN",
+  "manifest_version": 3,
+  "name": "Test Content Script World Main",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/content.js-loader.js",
+  "src/content.js.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/content.js",
+}
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+"
+`;
+
+exports[`serve fs output > src/content.js.js 1`] = `
+"console.log('content script running in MAIN world')
+"
+`;
+
+exports[`serve fs output > src/content.js-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    console.warn(\\"./content.js.js\\", \\"Content-script doesn't support HMR because the world is MAIN\\");
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      \\"./content.js.js\\"
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;

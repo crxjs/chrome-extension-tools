@@ -45,6 +45,10 @@ export default defineConfig(({ mode }) => {
       globalSetup: './tests/jest.globalSetup.ts',
       maxThreads: mode === 'e2e' ? 1 : undefined,
       minThreads: mode === 'e2e' ? 1 : undefined,
+      outputDiffLines: Infinity,
+      outputDiffMaxLines: Infinity,
+      outputDiffMaxSize: Infinity,
+      outputTruncateLength: Infinity,
       setupFiles: './tests/jest.setup.ts',
       snapshotFormat: {
         printBasicPrototype: true,
