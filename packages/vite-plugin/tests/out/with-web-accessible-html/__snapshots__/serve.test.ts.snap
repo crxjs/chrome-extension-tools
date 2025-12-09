@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -55,11 +55,11 @@ Set {
 
 exports[`serve fs output > public.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
-    <meta charset=\\"UTF-8\\" />
-    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
-    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Public</title>
   </head>
   <body>
@@ -67,7 +67,7 @@ exports[`serve fs output > public.html 1`] = `
       This HTML file is a web accessible resource and CRXJS copies it directly
       without any processing.
     </p>
-    <script src=\\"/public.js\\"></script>
+    <script src="/public.js"></script>
   </body>
 </html>
 "
@@ -86,11 +86,11 @@ import 'http://localhost:3000/@crx/client-worker';
 
 exports[`serve fs output > src/sidebar.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
-    <meta charset=\\"UTF-8\\" />
-    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
-    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sidebar</title>
   </head>
   <body>
@@ -98,7 +98,7 @@ exports[`serve fs output > src/sidebar.html 1`] = `
       This HTML page is a sidebar in a content script. It is web accessible and
       supports HMR and build optimizations.
     </p>
-    <script src=\\"./sidebar.js\\" type=\\"module\\"></script>
+    <script src="./sidebar.js" type="module"></script>
   </body>
 </html>
 "
@@ -106,11 +106,11 @@ exports[`serve fs output > src/sidebar.html 1`] = `
 
 exports[`serve fs output > src/static.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
-    <meta charset=\\"UTF-8\\" />
-    <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\" />
-    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Static</title>
   </head>
   <body>
@@ -119,7 +119,7 @@ exports[`serve fs output > src/static.html 1`] = `
       without any processing. Static HTML file assets should go in the public
       dir.
     </p>
-    <script src=\\"/static.js\\"></script>
+    <script src="/static.js"></script>
   </body>
 </html>
 "

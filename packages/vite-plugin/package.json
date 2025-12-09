@@ -27,9 +27,9 @@
   "type": "module",
   "exports": {
     ".": {
-      "require": "./index.cjs",
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "default": "./index.cjs"
     },
     "./*": "./*",
     "./client": {
@@ -64,7 +64,7 @@
     "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
   },
   "dependencies": {
-    "@rollup/pluginutils": "^4.1.2",
+    "@rollup/pluginutils": "^5.1.0",
     "@webcomponents/custom-elements": "^1.5.0",
     "acorn-walk": "^8.2.0",
     "cheerio": "^1.0.0-rc.10",
@@ -78,17 +78,17 @@
     "pathe": "^2.0.1",
     "picocolors": "^1.1.1",
     "react-refresh": "^0.13.0",
-    "rollup": "2.79.2",
+    "rollup": "^4.53.2",
     "rxjs": "7.5.7"
   },
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
-    "@rollup/plugin-alias": "4.0.4",
-    "@rollup/plugin-commonjs": "21.1.0",
-    "@rollup/plugin-json": "^5.0.0",
-    "@rollup/plugin-node-resolve": "13.2.0",
-    "@sveltejs/vite-plugin-svelte": "1.4.0",
+    "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
     "@types/acorn": "4.0.6",
     "@types/chrome": "0.0.237",
     "@types/convert-source-map": "^2.0.0",
@@ -96,15 +96,15 @@
     "@types/fs-extra": "9.0.13",
     "@types/jest-image-snapshot": "^5.1.0",
     "@types/jsesc": "3.0.1",
-    "@types/node": "17.0.18",
+    "@types/node": "^22.12.0",
     "@types/react": "17.0.52",
     "@types/react-dom": "17.0.18",
     "@typescript-eslint/eslint-plugin": "5.41.0",
     "@typescript-eslint/parser": "5.41.0",
-    "@vitejs/plugin-react": "^2.2.0",
-    "@vitejs/plugin-vue": "3.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "@vitejs/plugin-vue": "^6.0.0",
     "chokidar": "^3.5.3",
-    "esbuild": "0.17.14",
+    "esbuild": "^0.24.2",
     "esbuild-runner": "2.2.2",
     "eslint": "8.43.0",
     "eslint-plugin-react": "^7.29.4",
@@ -114,14 +114,14 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "rimraf": "3.0.2",
-    "rollup-plugin-dts": "^4.2.0",
-    "rollup-plugin-esbuild": "4.10.3",
-    "svelte": "^3.48.0",
+    "rollup-plugin-dts": "^6.1.0",
+    "rollup-plugin-esbuild": "^6.1.0",
+    "svelte": "^5.0.0",
     "type-fest": "^5.1.0",
-    "typescript": "^4.6.4",
-    "vite": "^3.2.11",
-    "vite-plugin-inspect": "0.7.25",
-    "vitest": "0.28.5",
-    "vue": "3.2.47"
+    "typescript": "^5.9.3",
+    "vite": "^7.2.2",
+    "vite-plugin-inspect": "^11.3.3",
+    "vitest": "^2.1.0",
+    "vue": "^3.5.0"
   }
 }

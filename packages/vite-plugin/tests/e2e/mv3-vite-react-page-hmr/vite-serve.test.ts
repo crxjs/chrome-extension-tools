@@ -6,6 +6,7 @@ import { serve } from '../runners'
 
 test(
   'crx page update on hmr',
+  { retry: 5  },
   async () => {
     const src = path.join(__dirname, 'src')
     const src1 = path.join(__dirname, 'src1')
@@ -50,6 +51,5 @@ test(
 
     expect(buttonText.size).toBe(1)
     expect(buttonText.has('count is: 1')).toBe(true)
-  },
-  { retry: process.env.CI ? 5 : 0 },
+  }
 )

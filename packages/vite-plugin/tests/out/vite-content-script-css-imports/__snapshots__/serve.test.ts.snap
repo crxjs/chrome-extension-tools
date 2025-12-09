@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -62,8 +62,8 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content.ts.js 1`] = `
-"import \\"/src/styles.css.js\\";
-console.log(\\"content.ts\\");
+"import "/src/styles.css.js";
+console.log("content.ts");
 "
 `;
 
@@ -73,18 +73,18 @@ exports[`serve fs output > src/content.ts-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"\\")
+    if ("")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL("")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content.ts.js\\")
+      chrome.runtime.getURL("src/content.ts.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -94,11 +94,10 @@ exports[`serve fs output > src/content.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output > src/styles.css.js 1`] = `
-"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/styles.css.js\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
-const __vite__id = \\"<root>/src/styles.css\\"
-const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\"
+"import { createHotContext as __vite__createHotContext } from "/vendor/vite-client.js";import.meta.hot = __vite__createHotContext("/src/styles.css.js");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from "/vendor/vite-client.js"
+const __vite__id = "<root>/src/styles.css"
+const __vite__css = "body {\\n  color: red;\\n}\\n"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;

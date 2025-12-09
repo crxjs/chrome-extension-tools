@@ -16,8 +16,8 @@
     "@types/chrome": "^0.0.313",
     "@types/node": "^22.13.14",
     "typescript": "~5.7.2",
-    "vite": "^6.2.0",
-    "vite-plugin-solid": "^2.11.2",
+    "vite": "^7.2.2",
+    "vite-plugin-solid": "^2.11.10",
     "vite-plugin-zip-pack": "^1.2.4"
   }
 }

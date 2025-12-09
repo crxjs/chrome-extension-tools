@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
     "lib": ["esnext", "DOM", "WebWorker"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    "noEmit": true,
     "paths": {
       "client/*": ["src/client/*"],
       "src/*": ["src/node/*"],

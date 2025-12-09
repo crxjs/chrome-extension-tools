@@ -5,7 +5,6 @@ import manifest from './manifest.json'
 
 const { preambleCode } = react
 
-
 export default defineConfig({
   build: { minify: false },
   clearScreen: false,

@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -42,7 +42,6 @@ Array [
   "assets/index.hash3.css",
   "assets/index.html.hash4.js",
   "assets/module.hash2.js",
-  "assets/typescript.hash5.svg",
   "index.html",
   "manifest.json",
   "vite.svg",
@@ -50,60 +49,71 @@ Array [
 `;
 
 exports[`build fs output > assets/content.ts.hash1.js 1`] = `
-"const scriptRel = \\"modulepreload\\";
+"const scriptRel = "modulepreload";
 const assetsURL = function(dep) {
-  return \\"/\\" + dep;
+  return "/" + dep;
 };
 const seen = {};
 const __vitePreload = function preload(baseModule, deps, importerUrl) {
-  if (!deps || deps.length === 0) {
-    return baseModule();
-  }
-  const links = document.getElementsByTagName(\\"link\\");
-  return Promise.all(deps.map((dep) => {
-    dep = assetsURL(dep);
-    if (dep in seen)
-      return;
-    seen[dep] = true;
-    const isCss = dep.endsWith(\\".css\\");
-    const cssSelector = isCss ? '[rel=\\"stylesheet\\"]' : \\"\\";
-    const isBaseRelative = !!importerUrl;
-    if (isBaseRelative) {
-      for (let i = links.length - 1; i >= 0; i--) {
-        const link2 = links[i];
-        if (link2.href === dep && (!isCss || link2.rel === \\"stylesheet\\")) {
-          return;
-        }
-      }
-    } else if (document.querySelector(\`link[href=\\"\${dep}\\"]\${cssSelector}\`)) {
-      return;
-    }
-    const link = document.createElement(\\"link\\");
-    link.rel = isCss ? \\"stylesheet\\" : scriptRel;
-    if (!isCss) {
-      link.as = \\"script\\";
-      link.crossOrigin = \\"\\";
-    }
-    link.href = dep;
-    document.head.appendChild(link);
-    if (isCss) {
-      return new Promise((res, rej) => {
-        link.addEventListener(\\"load\\", res);
-        link.addEventListener(\\"error\\", () => rej(new Error(\`Unable to preload CSS for \${dep}\`)));
+  let promise = Promise.resolve();
+  if (deps && deps.length > 0) {
+    let allSettled = function(promises$2) {
+      return Promise.all(promises$2.map((p) => Promise.resolve(p).then((value$1) => ({
+        status: "fulfilled",
+        value: value$1
+      }), (reason) => ({
+        status: "rejected",
+        reason
+      }))));
+    };
+    document.getElementsByTagName("link");
+    const cspNonceMeta = document.querySelector("meta[property=csp-nonce]");
+    const cspNonce = cspNonceMeta?.nonce || cspNonceMeta?.getAttribute("nonce");
+    promise = allSettled(deps.map((dep) => {
+      dep = assetsURL(dep);
+      if (dep in seen) return;
+      seen[dep] = true;
+      const isCss = dep.endsWith(".css");
+      const cssSelector = isCss ? '[rel="stylesheet"]' : "";
+      if (document.querySelector(\`link[href="\${dep}"]\${cssSelector}\`)) return;
+      const link = document.createElement("link");
+      link.rel = isCss ? "stylesheet" : scriptRel;
+      if (!isCss) link.as = "script";
+      link.crossOrigin = "";
+      link.href = dep;
+      if (cspNonce) link.setAttribute("nonce", cspNonce);
+      document.head.appendChild(link);
+      if (isCss) return new Promise((res, rej) => {
+        link.addEventListener("load", res);
+        link.addEventListener("error", () => rej(/* @__PURE__ */ new Error(\`Unable to preload CSS for \${dep}\`)));
       });
+    }));
+  }
+  function handlePreloadError(err$2) {
+    const e$1 = new Event("vite:preloadError", { cancelable: true });
+    e$1.payload = err$2;
+    window.dispatchEvent(e$1);
+    if (!e$1.defaultPrevented) throw err$2;
+  }
+  return promise.then((res) => {
+    for (const item of res || []) {
+      if (item.status !== "rejected") continue;
+      handlePreloadError(item.reason);
     }
-  })).then(() => baseModule());
+    return baseModule().catch(handlePreloadError);
+  });
 };
 const sharedUtil = () => {
-  console.log(\\"util\\");
+  console.log("util");
 };
 sharedUtil();
-__vitePreload(() => import(\\"./module.hash2.js\\"), true ? [] : void 0);
+__vitePreload(() => import("./module.hash2.js"), true ? [] : void 0);
 export {
   sharedUtil as s
 };
-// # sourceMappingURL=data:application/json;base64,<base64>
-"
+
+
+// # sourceMappingURL=data:application/json;base64,<base64>"
 `;
 
 exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
@@ -114,7 +124,7 @@ exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.hash1.js\\")
+      chrome.runtime.getURL("assets/content.ts.hash1.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -226,82 +236,69 @@ button:focus-visible {
 
 exports[`build fs output > assets/index.html.hash4.js 1`] = `
 "(function polyfill() {
-  const relList = document.createElement(\\"link\\").relList;
-  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
-    return;
-  }
-  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-    processPreload(link);
-  }
+  const relList = document.createElement("link").relList;
+  if (relList && relList.supports && relList.supports("modulepreload")) return;
+  for (const link of document.querySelectorAll('link[rel="modulepreload"]')) processPreload(link);
   new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-      if (mutation.type !== \\"childList\\") {
-        continue;
-      }
-      for (const node of mutation.addedNodes) {
-        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
-          processPreload(node);
-      }
+      if (mutation.type !== "childList") continue;
+      for (const node of mutation.addedNodes) if (node.tagName === "LINK" && node.rel === "modulepreload") processPreload(node);
     }
-  }).observe(document, { childList: true, subtree: true });
-  function getFetchOpts(script) {
+  }).observe(document, {
+    childList: true,
+    subtree: true
+  });
+  function getFetchOpts(link) {
     const fetchOpts = {};
-    if (script.integrity)
-      fetchOpts.integrity = script.integrity;
-    if (script.referrerpolicy)
-      fetchOpts.referrerPolicy = script.referrerpolicy;
-    if (script.crossorigin === \\"use-credentials\\")
-      fetchOpts.credentials = \\"include\\";
-    else if (script.crossorigin === \\"anonymous\\")
-      fetchOpts.credentials = \\"omit\\";
-    else
-      fetchOpts.credentials = \\"same-origin\\";
+    if (link.integrity) fetchOpts.integrity = link.integrity;
+    if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+    if (link.crossOrigin === "use-credentials") fetchOpts.credentials = "include";
+    else if (link.crossOrigin === "anonymous") fetchOpts.credentials = "omit";
+    else fetchOpts.credentials = "same-origin";
     return fetchOpts;
   }
   function processPreload(link) {
-    if (link.ep)
-      return;
+    if (link.ep) return;
     link.ep = true;
     const fetchOpts = getFetchOpts(link);
     fetch(link.href, fetchOpts);
   }
 })();
-const style = \\"\\";
-const typescriptLogo = \\"/assets/typescript.hash5.svg\\";
-const viteLogo = \\"/vite.svg\\";
+const typescriptLogo = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%20aria-hidden='true'%20role='img'%20class='iconify%20iconify--logos'%20width='32'%20height='32'%20preserveAspectRatio='xMidYMid%20meet'%20viewBox='0%200%20256%20256'%3e%3cpath%20fill='%23007ACC'%20d='M0%20128v128h256V0H0z'%3e%3c/path%3e%3cpath%20fill='%23FFF'%20d='m56.612%20128.85l-.081%2010.483h33.32v94.68h23.568v-94.68h33.321v-10.28c0-5.69-.122-10.444-.284-10.566c-.122-.162-20.4-.244-44.983-.203l-44.74.122l-.121%2010.443Zm149.955-10.742c6.501%201.625%2011.459%204.51%2016.01%209.224c2.357%202.52%205.851%207.111%206.136%208.208c.08.325-11.053%207.802-17.798%2011.988c-.244.162-1.22-.894-2.317-2.52c-3.291-4.795-6.745-6.867-12.028-7.233c-7.76-.528-12.759%203.535-12.718%2010.321c0%201.992.284%203.17%201.097%204.795c1.707%203.536%204.876%205.649%2014.832%209.956c18.326%207.883%2026.168%2013.084%2031.045%2020.48c5.445%208.249%206.664%2021.415%202.966%2031.208c-4.063%2010.646-14.14%2017.879-28.323%2020.276c-4.388.772-14.79.65-19.504-.203c-10.28-1.828-20.033-6.908-26.047-13.572c-2.357-2.6-6.949-9.387-6.664-9.874c.122-.163%201.178-.813%202.356-1.504c1.138-.65%205.446-3.129%209.509-5.485l7.355-4.267l1.544%202.276c2.154%203.29%206.867%207.801%209.712%209.305c8.167%204.307%2019.383%203.698%2024.909-1.26c2.357-2.153%203.332-4.388%203.332-7.68c0-2.966-.366-4.266-1.91-6.501c-1.99-2.845-6.054-5.242-17.595-10.24c-13.206-5.69-18.895-9.224-24.096-14.832c-3.007-3.25-5.852-8.452-7.03-12.8c-.975-3.617-1.22-12.678-.447-16.335c2.723-12.76%2012.353-21.659%2026.25-24.3c4.51-.853%2014.994-.528%2019.424.569Z'%3e%3c/path%3e%3c/svg%3e";
+const viteLogo = "/vite.svg";
 function setupCounter(element) {
   let counter = 0;
   const setCounter = (count) => {
     counter = count;
     element.innerHTML = \`count is \${counter}\`;
   };
-  element.addEventListener(\\"click\\", () => setCounter(counter + 1));
+  element.addEventListener("click", () => setCounter(counter + 1));
   setCounter(0);
 }
-document.querySelector(\\"#app\\").innerHTML = \`
+document.querySelector("#app").innerHTML = \`
   <div>
-    <a href=\\"https://vitejs.dev\\" target=\\"_blank\\">
-      <img src=\\"\${viteLogo}\\" class=\\"logo\\" alt=\\"Vite logo\\" />
+    <a href="https://vitejs.dev" target="_blank">
+      <img src="\${viteLogo}" class="logo" alt="Vite logo" />
     </a>
-    <a href=\\"https://www.typescriptlang.org/\\" target=\\"_blank\\">
-      <img src=\\"\${typescriptLogo}\\" class=\\"logo vanilla\\" alt=\\"TypeScript logo\\" />
+    <a href="https://www.typescriptlang.org/" target="_blank">
+      <img src="\${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
     </a>
     <h1>Vite + TypeScript</h1>
-    <div class=\\"card\\">
-      <button id=\\"counter\\" type=\\"button\\"></button>
+    <div class="card">
+      <button id="counter" type="button"></button>
     </div>
-    <p class=\\"read-the-docs\\">
+    <p class="read-the-docs">
       Click on the Vite and TypeScript logos to learn more
     </p>
   </div>
 \`;
-setupCounter(document.querySelector(\\"#counter\\"));
+setupCounter(document.querySelector("#counter"));
 // # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
 
 exports[`build fs output > assets/module.hash2.js 1`] = `
-"import { s as sharedUtil } from \\"./content.ts.hash1.js\\";
+"import { s as sharedUtil } from "./content.ts.hash1.js";
 sharedUtil();
 // # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
@@ -309,18 +306,17 @@ sharedUtil();
 
 exports[`build fs output > index.html 1`] = `
 "<!DOCTYPE html>
-<html lang=\\"en\\">
+<html lang="en">
   <head>
-    <meta charset=\\"UTF-8\\" />
-    <link rel=\\"icon\\" type=\\"image/svg+xml\\" href=\\"/vite.svg\\" />
-    <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\" />
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/index.html.hash4.js\\"></script>
-    <link rel=\\"stylesheet\\" href=\\"/assets/index.hash3.css\\">
+    <script type="module" crossorigin src="/assets/index.html.hash4.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index.hash3.css">
   </head>
   <body>
-    <div id=\\"app\\"></div>
-    
+    <div id="app"></div>
   </body>
 </html>
 "

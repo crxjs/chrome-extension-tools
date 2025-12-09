@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -60,8 +60,8 @@ import 'http://localhost:3000/src/background.ts';
 `;
 
 exports[`serve fs output > src/content1.ts.js 1`] = `
-"import script from \\"/src/script.ts__scriptId--0.js\\";
-console.log(\\"content.ts\\", { script });
+"import script from "/src/script.ts__scriptId--0.js";
+console.log("content.ts", { script });
 "
 `;
 
@@ -71,18 +71,18 @@ exports[`serve fs output > src/content1.ts-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"\\")
+    if ("")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL("")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content1.ts.js\\")
+      chrome.runtime.getURL("src/content1.ts.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -92,8 +92,8 @@ exports[`serve fs output > src/content1.ts-loader.js 1`] = `
 `;
 
 exports[`serve fs output > src/content2.ts.js 1`] = `
-"import font from \\"/src/font.otf__import_url.js\\";
-console.log(\\"content2.ts\\", { font });
+"import font from "/src/font.otf__import_url.js";
+console.log("content2.ts", { font });
 "
 `;
 
@@ -103,18 +103,18 @@ exports[`serve fs output > src/content2.ts-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    if (\\"\\")
+    if ("")
       await import(
         /* @vite-ignore */
-        chrome.runtime.getURL(\\"\\")
+        chrome.runtime.getURL("")
       );
     await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+      chrome.runtime.getURL("vendor/vite-client.js")
     );
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"src/content2.ts.js\\")
+      chrome.runtime.getURL("src/content2.ts.js")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -123,18 +123,18 @@ exports[`serve fs output > src/content2.ts-loader.js 1`] = `
 "
 `;
 
-exports[`serve fs output > src/font.otf__import_url.js 1`] = `"export default \\"/src/font.otf\\""`;
+exports[`serve fs output > src/font.otf__import_url.js 1`] = `"export default "/src/font.otf""`;
 
-exports[`serve fs output > src/image.png__import.js 1`] = `"export default \\"/src/image.png\\""`;
+exports[`serve fs output > src/image.png__import.js 1`] = `"export default "/src/image.png""`;
 
 exports[`serve fs output > src/script.ts.js 1`] = `
-"import icon from \\"/src/image.png__import.js\\";
-console.log(\\"main world script\\", { icon });
+"import icon from "/src/image.png__import.js";
+console.log("main world script", { icon });
 export {};
 "
 `;
 
 exports[`serve fs output > src/script.ts__scriptId--0.js 1`] = `
-"export default \\"src/script.ts.js\\";
+"export default "src/script.ts.js";
 "
 `;

@@ -18,7 +18,10 @@ const prefix = '@crx/inline-script'
 const isInlineTag = (t: HtmlTagDescriptor): boolean =>
   t.tag === 'script' && !t.attrs?.src
 
-/** Adds prefix and removes file extension so Vite doesn't resolve it as an html file */
+/**
+ * Adds prefix and removes file extension so Vite doesn't resolve it as an html
+ * file
+ */
 const toKey = (ctx: IndexHtmlTransformContext) => {
   const { dir, name } = parse(ctx.path)
   return join(prefix, dir, name)
@@ -41,18 +44,24 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
     string,
     IndexHtmlTransformContext & { scripts: HtmlTagDescriptor[] }
   >()
-  /** Wrap transformIndexHtml hooks in auditor function to check for inline scripts */
+  /**
+   * Wrap transformIndexHtml hooks in auditor function to check for inline
+   * scripts
+   */
   const auditTransformIndexHtml = (p: CrxPlugin): void => {
     let transform: IndexHtmlTransformHook
     if (typeof p.transformIndexHtml === 'function') {
       transform = p.transformIndexHtml
       p.transformIndexHtml = auditor
     } else if (typeof p.transformIndexHtml === 'object') {
+      // @ts-expect-error - Vite type definition mismatch
       transform = p.transformIndexHtml.transform
+      // @ts-expect-error - Vite type definition mismatch
       p.transformIndexHtml.transform = auditor
     }
 
     async function auditor(_html: string, ctx: IndexHtmlTransformContext) {
+      // @ts-expect-error - Context compatibility
       const result = await transform(_html, ctx)
       if (!result || typeof result === 'string') return result
 
