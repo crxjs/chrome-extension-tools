@@ -111,7 +111,8 @@ export async function testOutput(
         )
 
       // Normalize Windows line endings (CRLF -> LF) for cross-platform compatibility
-      source = source.replaceAll('\r\n', '\n')
+      // Handle both actual CRLF and escaped \r\n in string literals (e.g., in sourcemaps)
+      source = source.replaceAll('\r\n', '\n').replaceAll('\\r\\n', '\\n')
 
       // Normalize relative path prefixes in sourcemaps (e.g., "../../../@crx/manifest")
       // The number of "../" varies based on the directory depth of the CI runner
