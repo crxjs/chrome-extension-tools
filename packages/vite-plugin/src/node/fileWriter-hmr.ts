@@ -120,9 +120,9 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   }),
   filter((p) => {
     switch (p.type) {
+      // TODO: why not reload when path is defined?
       case 'full-reload':
-        // Allow full-reload events even with path defined - content scripts need to reload
-        return true
+        return typeof p.path === 'undefined'
       case 'prune':
         return p.paths.length > 0
       case 'update':
