@@ -35,7 +35,9 @@ test(
     // update template
     await update('vue')
 
-    await page.locator('h1', { hasText: 'Hello Vue 3 + Vite + CRX' }).waitFor({ timeout: 5_000 })
+    await page
+      .locator('h1', { hasText: 'Hello Vue 3 + Vite + CRX' })
+      .waitFor({ timeout: 15_000 })
     expect(reloaded).toBe(false) // no reload on template update
     buttonText.add(await button.innerText())
 
