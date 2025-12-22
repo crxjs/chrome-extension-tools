@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -39,7 +39,7 @@ Array [
 `;
 
 exports[`build fs output > assets/content.js.hash0.js 1`] = `
-"(function(){console.log(\\"content script running in MAIN world\\");
+"(function(){console.log("content script running in MAIN world");
 })()
 "
 `;

@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -72,10 +72,10 @@ exports[`serve fs output > src/content.js-loader.js 1`] = `
 
   const injectTime = performance.now();
   (async () => {
-    console.warn(\\"./content.js.js\\", \\"Content-script doesn't support HMR because the world is MAIN\\");
+    console.warn("./content.js.js", "Content-script doesn't support HMR because the world is MAIN");
     const { onExecute } = await import(
       /* @vite-ignore */
-      \\"./content.js.js\\"
+      "./content.js.js"
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
