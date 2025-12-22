@@ -110,7 +110,8 @@ export async function testOutput(
           (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
         )
 
-      source = source.replaceAll('\\r\\n', '\\n')
+      // Normalize Windows line endings (CRLF -> LF) for cross-platform compatibility
+      source = source.replaceAll('\r\n', '\n')
 
       // Normalize relative path prefixes in sourcemaps (e.g., "../../../@crx/manifest")
       // The number of "../" varies based on the directory depth of the CI runner
