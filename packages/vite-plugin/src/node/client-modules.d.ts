@@ -9,6 +9,16 @@ declare module 'client/iife/content-pro-loader.ts' {
   export default content
 }
 
+declare module 'client/iife/content-dev-main-loader.ts' {
+  const content: string
+  export default content
+}
+
+declare module 'client/iife/content-pro-main-loader.ts' {
+  const content: string
+  export default content
+}
+
 declare module 'client/es/hmr-client-worker.ts' {
   const content: string
   export default content
@@ -28,4 +38,3 @@ declare module 'client/es/loading-page-script.ts' {
   const content: string
   export default content
 }
-
