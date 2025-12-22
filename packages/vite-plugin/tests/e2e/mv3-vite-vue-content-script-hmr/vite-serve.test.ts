@@ -5,8 +5,7 @@ import { createUpdate, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
 test(
-  'crx page update on hmr', 
-  { retry: process.env.CI ? 5 : 0 },
+  'crx page update on hmr',
   async () => {
     const src = path.join(__dirname, 'src')
     const src1 = path.join(__dirname, 'src1')
@@ -50,16 +49,17 @@ test(
     // vite doesn't hot update if the change is too quick
     await new Promise((r) => setTimeout(r, 100))
 
-    // TODO: Vue CSS HMR in content scripts needs investigation
-    // Skipping CSS update test for now since template HMR works
-    // await update('vue', src3)
-    // await waitForInnerHtml(styles, (h) => {
-    //   return h.includes('background-color: red;')
-    // })
-    // expect(reloaded).toBe(false) // no reload on css update
-    // buttonText.add(await button.innerText())
+    // update css
+    await update('vue', src3)
+
+    await waitForInnerHtml(styles, (h) => {
+      return h.includes('background-color: red;')
+    })
+    expect(reloaded).toBe(false) // no reload on css update
+    buttonText.add(await button.innerText())
 
     expect(buttonText.size).toBe(1)
     expect(buttonText.has('count is: 1')).toBe(true)
-  }
+  },
+  { retry: process.env.CI ? 5 : 0 },
 )
