@@ -4,7 +4,10 @@ import manifest from './manifest.config'
 
 export default defineConfig({
   build: {
-        rollupOptions: {
+    // Disable minification to ensure consistent output across platforms
+    // (esbuild produces different variable names on different platforms)
+    minify: false,
+    rollupOptions: {
       output: {
         // the hash randomly changes between environments
         assetFileNames: 'assets/[name].hash[hash].[ext]',

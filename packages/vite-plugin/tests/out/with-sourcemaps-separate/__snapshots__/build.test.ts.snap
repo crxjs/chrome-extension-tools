@@ -64,7 +64,7 @@ exports[`build fs output > assets/background.ts.hash1.js 1`] = `
 "
 `;
 
-exports[`build fs output > assets/background.ts.hash1.js.map 1`] = `"{"version":3,"file":"background.ts.hash1.js","sources":["../../src/background.ts"],"sourcesContent":["console.log('service_worker.ts')\\n\\nexport {}\\n"],"names":[],"mappings":"AAAA,QAAQ,IAAI,mBAAmB;"}"`;
+exports[`build fs output > assets/background.ts.hash1.js.map 1`] = `"{"version":3,"file":"background.ts.hash1.js","sources":["<root>/src/background.ts"],"sourcesContent":["console.log('service_worker.ts')\\n\\nexport {}\\n"],"names":[],"mappings":"AAAA,QAAQ,IAAI,mBAAmB;"}"`;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
 "(function(){const message = "content script";
@@ -74,9 +74,9 @@ console.log(message);
 "
 `;
 
-exports[`build fs output > assets/content.ts.hash0.js.map 1`] = `"{"version":3,"file":"content.ts.hash0.js","sources":["../../src/content.ts"],"sourcesContent":["type Log = 'content script'\\nconst message: Log = 'content script'\\nconsole.log(message)\\nexport {}\\n"],"names":[],"mappings":"AACA,MAAM,UAAe;AACrB,QAAQ,IAAI,OAAO;"}"`;
+exports[`build fs output > assets/content.ts.hash0.js.map 1`] = `"{"version":3,"file":"content.ts.hash0.js","sources":["<root>/src/content.ts"],"sourcesContent":["type Log = 'content script'\\nconst message: Log = 'content script'\\nconsole.log(message)\\nexport {}\\n"],"names":[],"mappings":"AACA,MAAM,UAAe;AACrB,QAAQ,IAAI,OAAO;"}"`;
 
-exports[`build fs output > assets/crx-manifest.js.hash2.js.map 1`] = `"{"version":3,"file":"crx-manifest.js.hash2.js","sources":["../../../../../../../../../../../@crx/manifest"],"sourcesContent":["export default \\"{\\\\\\"action\\\\\\":{\\\\\\"default_popup\\\\\\":\\\\\\"src/popup.html\\\\\\"},\\\\\\"background\\\\\\":{\\\\\\"service_worker\\\\\\":\\\\\\"src/background.ts\\\\\\"},\\\\\\"content_scripts\\\\\\":[{\\\\\\"js\\\\\\":[\\\\\\"src/content.ts\\\\\\"],\\\\\\"matches\\\\\\":[\\\\\\"https://*/*\\\\\\",\\\\\\"http://*/*\\\\\\"]}],\\\\\\"manifest_version\\\\\\":3,\\\\\\"name\\\\\\":\\\\\\"test extension\\\\\\",\\\\\\"description\\\\\\":\\\\\\"test extension\\\\\\",\\\\\\"version\\\\\\":\\\\\\"0.1.0\\\\\\"}\\""],"names":[],"mappings":"AAAA,MAAA,WAAe;"}"`;
+exports[`build fs output > assets/crx-manifest.js.hash2.js.map 1`] = `"{"version":3,"file":"crx-manifest.js.hash2.js","sources":["<root>/@crx/manifest"],"sourcesContent":["export default \\"{\\\\\\"action\\\\\\":{\\\\\\"default_popup\\\\\\":\\\\\\"src/popup.html\\\\\\"},\\\\\\"background\\\\\\":{\\\\\\"service_worker\\\\\\":\\\\\\"src/background.ts\\\\\\"},\\\\\\"content_scripts\\\\\\":[{\\\\\\"js\\\\\\":[\\\\\\"src/content.ts\\\\\\"],\\\\\\"matches\\\\\\":[\\\\\\"https://*/*\\\\\\",\\\\\\"http://*/*\\\\\\"]}],\\\\\\"manifest_version\\\\\\":3,\\\\\\"name\\\\\\":\\\\\\"test extension\\\\\\",\\\\\\"description\\\\\\":\\\\\\"test extension\\\\\\",\\\\\\"version\\\\\\":\\\\\\"0.1.0\\\\\\"}\\""],"names":[],"mappings":"AAAA,MAAA,WAAe;"}"`;
 
 exports[`build fs output > assets/popup.html.hash3.js 1`] = `
 "import { j as jsxDevRuntimeExports, r as reactDomExports } from "./vendor.hash5.js";
@@ -138,9 +138,9 @@ reactDomExports.render(/* @__PURE__ */ jsxDevRuntimeExports.jsxDEV(App, {}, void
 "
 `;
 
-exports[`build fs output > assets/popup.html.hash3.js.map 1`] = `"{"version":3,"file":"popup.html.hash3.js","sources":["../../src/App.tsx","../../src/popup.tsx"],"sourcesContent":["import React from 'react'\\n\\nconst App: React.FC = () => {\\n  return (\\n    <div>\\n      <h1>Popup Page</h1>\\n      <p>If you are seeing this, React is working!</p>\\n    </div>\\n  )\\n}\\n\\nexport default App\\n","import React from 'react'\\nimport { render } from 'react-dom'\\nimport App from './App'\\n\\nconsole.log('popup script')\\n\\nconst root = document.querySelector('#root')\\n\\nrender(<App />, root)\\n"],"names":["jsxDEV","this","render"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAEA,MAAM,MAAgB,MAAM;AAC1B,qDACG,OAAA,EACC,UAAA;AAAA,IAAAA,qCAAAA,OAAC,QAAG,UAAA,aAAA,GAAJ,QAAA,OAAA;AAAA,MAAA,UAAA;AAAA,MAAA,YAAA;AAAA,MAAA,cAAA;AAAA,IAAA,GAAAC,MAAc;AAAA,IACdD,qCAAAA,OAAC,OAAE,UAAA,4CAAA,GAAH,QAAA,OAAA;AAAA,MAAA,UAAA;AAAA,MAAA,YAAA;AAAA,MAAA,cAAA;AAAA,IAAA,GAAAC,MAA4C;AAAA,EAAA,EAAA,GAF9C,QAAA,MAAA;AAAA,IAAA,UAAA;AAAA,IAAA,YAAA;AAAA,IAAA,cAAA;AAAA,EAAA,GAAAA,MAGA;AAEJ;ACLA,QAAQ,IAAI,cAAc;AAE1B,MAAM,OAAO,SAAS,cAAc,OAAO;AAE3CC,gBAAAA,mDAAQ,KAAA,IAAD,QAAA,OAAA;AAAA,EAAA,UAAA;AAAA,EAAA,YAAA;AAAA,EAAA,cAAA;AAAA,GAAAD,MAAK,GAAI,IAAI;"}"`;
+exports[`build fs output > assets/popup.html.hash3.js.map 1`] = `"{"version":3,"file":"popup.html.hash3.js","sources":["<root>/src/App.tsx","<root>/src/popup.tsx"],"sourcesContent":["import React from 'react'\\n\\nconst App: React.FC = () => {\\n  return (\\n    <div>\\n      <h1>Popup Page</h1>\\n      <p>If you are seeing this, React is working!</p>\\n    </div>\\n  )\\n}\\n\\nexport default App\\n","import React from 'react'\\nimport { render } from 'react-dom'\\nimport App from './App'\\n\\nconsole.log('popup script')\\n\\nconst root = document.querySelector('#root')\\n\\nrender(<App />, root)\\n"],"names":["jsxDEV","this","render"],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAEA,MAAM,MAAgB,MAAM;AAC1B,qDACG,OAAA,EACC,UAAA;AAAA,IAAAA,qCAAAA,OAAC,QAAG,UAAA,aAAA,GAAJ,QAAA,OAAA;AAAA,MAAA,UAAA;AAAA,MAAA,YAAA;AAAA,MAAA,cAAA;AAAA,IAAA,GAAAC,MAAc;AAAA,IACdD,qCAAAA,OAAC,OAAE,UAAA,4CAAA,GAAH,QAAA,OAAA;AAAA,MAAA,UAAA;AAAA,MAAA,YAAA;AAAA,MAAA,cAAA;AAAA,IAAA,GAAAC,MAA4C;AAAA,EAAA,EAAA,GAF9C,QAAA,MAAA;AAAA,IAAA,UAAA;AAAA,IAAA,YAAA;AAAA,IAAA,cAAA;AAAA,EAAA,GAAAA,MAGA;AAEJ;ACLA,QAAQ,IAAI,cAAc;AAE1B,MAAM,OAAO,SAAS,cAAc,OAAO;AAE3CC,gBAAAA,mDAAQ,KAAA,IAAD,QAAA,OAAA;AAAA,EAAA,UAAA;AAAA,EAAA,YAAA;AAAA,EAAA,cAAA;AAAA,GAAAD,MAAK,GAAI,IAAI;"}"`;
 
-exports[`build fs output > assets/stub.hash4.js.map 1`] = `"{"version":3,"file":"stub.hash4.js","sources":["../../../../../../../../../../../@crx/stub"],"sourcesContent":["console.log('stub')"],"names":[],"mappings":"AAAA,QAAQ,IAAI,MAAM;"}"`;
+exports[`build fs output > assets/stub.hash4.js.map 1`] = `"{"version":3,"file":"stub.hash4.js","sources":["<root>/@crx/stub"],"sourcesContent":["console.log('stub')"],"names":[],"mappings":"AAAA,QAAQ,IAAI,MAAM;"}"`;
 
 exports[`build fs output > service-worker-loader.js 1`] = `
 "import './assets/background.ts.hash1.js';

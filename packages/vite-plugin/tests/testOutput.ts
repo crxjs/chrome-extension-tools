@@ -99,16 +99,6 @@ export async function testOutput(
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
-
-        source = source
-          .replaceAll(config.root, '<root>')
-          .replaceAll(jsesc(rootDir), '<root>')
-          .replaceAll('\\\\', '\\')
-
-        source = source.replace(
-          new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
-          (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
-        )
       }
 
       // Scrub absolute paths in build output (e.g., from React JSX dev runtime)
@@ -121,6 +111,10 @@ export async function testOutput(
         )
 
       source = source.replaceAll('\\r\\n', '\\n')
+
+      // Normalize relative path prefixes in sourcemaps (e.g., "../../../@crx/manifest")
+      // The number of "../" varies based on the directory depth of the CI runner
+      source = source.replaceAll(/(\.\.\/)+([@a-zA-Z])/g, '<root>/$2')
 
       const scrubbed = scrubHashes(file)
       getTest(scrubbed)(source, scrubbed)
