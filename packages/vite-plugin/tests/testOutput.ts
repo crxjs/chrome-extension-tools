@@ -76,6 +76,15 @@ export async function testOutput(
   getTest('manifest.json', (source, name) => {
     const scrubbed = scrubHashes(source)
     const manifest: ManifestV3 = JSON.parse(scrubbed)
+    // Sort web_accessible_resources arrays for cross-platform consistency
+    // (file processing order may differ between Windows and Linux)
+    if (manifest.web_accessible_resources) {
+      for (const war of manifest.web_accessible_resources) {
+        if (war.resources) {
+          war.resources.sort()
+        }
+      }
+    }
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '_00 manifest.json')
 
