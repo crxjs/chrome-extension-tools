@@ -1,0 +1,20 @@
+{
+  "name": "vite7-manifest-test",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Test playground to verify Vite manifest removal works with Vite 7",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:with-manifest": "vite build --config vite.config.with-manifest.ts",
+    "test": "node test-manifest.js"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "@types/chrome": "^0.0.313",
+    "@types/node": "^22.13.14",
+    "typescript": "~5.7.2",
+    "vite": "^7.0.0"
+  }
+}

@@ -26,6 +26,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
   let config: ResolvedConfig
   let injectCss: boolean
   let browser: Browser
+  let userWantsViteManifest: boolean | string | undefined
 
   return [
     {
@@ -79,6 +80,10 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         browser = opts.browser || 'chrome'
         injectCss = contentScripts.injectCss ?? true
 
+        // Save the user's original manifest setting
+        userWantsViteManifest = build?.manifest
+
+        // Only force manifest generation if we're building - we need it to derive content script resources
         return { ...config, build: { ...build, manifest: command === 'build' } }
       },
       configResolved(_config) {
@@ -257,6 +262,24 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         if (combinedResources.length === 0)
           delete manifest.web_accessible_resources
         else manifest.web_accessible_resources = combinedResources
+
+        // If the user didn't explicitly enable build.manifest, remove the Vite manifest
+        // from the bundle to keep the distribution clean
+        if (!userWantsViteManifest) {
+          // Vite 5+ uses .vite/manifest.json, older versions use manifest.json
+          // Check both paths since the imported version might not match the runtime version
+          const manifestPaths = ['.vite/manifest.json', 'manifest.json']
+          for (const manifestPath of manifestPaths) {
+            if (bundle[manifestPath]) {
+              debug(
+                'Removing Vite manifest: %s (userWantsViteManifest=%s)',
+                manifestPath,
+                userWantsViteManifest,
+              )
+              delete bundle[manifestPath]
+            }
+          }
+        }
 
         return manifest
       },
