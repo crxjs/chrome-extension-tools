@@ -54,7 +54,12 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       case 'full-reload': {
         const fullReload: FullReloadPayload = {
           type: 'full-reload',
-          path: p.path && getViteUrl({ id: p.path, type: 'module' }),
+          // In Vite 7, path can be "*" to mean "reload all" - preserve it as-is
+          // For specific paths, transform them to Vite URLs
+          path:
+            p.path === '*' || !p.path
+              ? p.path
+              : getViteUrl({ id: p.path, type: 'module' }),
         }
         return fullReload
       }
@@ -120,9 +125,10 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
   }),
   filter((p) => {
     switch (p.type) {
-      // TODO: why not reload when path is defined?
+      // Allow full-reload when path is undefined (Vite 3-6) or "*" (Vite 7+)
+      // which means "reload all pages"
       case 'full-reload':
-        return typeof p.path === 'undefined'
+        return typeof p.path === 'undefined' || p.path === '*'
       case 'prune':
         return p.paths.length > 0
       case 'update':
