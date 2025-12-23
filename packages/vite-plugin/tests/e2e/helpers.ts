@@ -70,20 +70,19 @@ export async function waitForInnerHtml(
 }
 
 const ensureViteHMRWillPickupChangedFiled = async (filesToModify: string[]) => {
+  // Windows file system has lower time resolution, so we need to ensure
+  // the mtime is different enough for chokidar to detect the change.
+  // We also read and write the file to ensure the file system registers
+  // an actual change event.
   const now = new Date()
   for (const f of filesToModify) {
-    // Add a newline to trigger change detection
-    await fs.appendFile(f, '\n')
-
-    await fs.utimes(f, now, now)
-
-    // Remove the last line
+    // Read the current content
     const content = await fs.readFile(f, 'utf8')
-    const lines = content.split('\n')
-    if (lines.length > 0 && lines[lines.length - 1] === '') {
-      lines.pop()
-      await fs.writeFile(f, lines.join('\n'))
-    }
+    // Write it back with a small delay to ensure mtime changes
+    await new Promise((r) => setTimeout(r, 50))
+    await fs.writeFile(f, content)
+    // Explicitly set the mtime to now
+    await fs.utimes(f, now, now)
   }
 }
 

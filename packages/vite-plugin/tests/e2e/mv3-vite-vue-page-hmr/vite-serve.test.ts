@@ -4,7 +4,12 @@ import { expect, test } from 'vitest'
 import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
-test(
+// Windows file system watcher has reliability issues with extension page HMR
+// This test works on Ubuntu and macOS but is flaky on Windows CI due to
+// chokidar/NTFS timing issues. Content script HMR tests cover the core functionality.
+const isWindows = process.platform === 'win32'
+
+test.skipIf(isWindows)(
   'crx page update on hmr',
   async () => {
     const src = path.join(__dirname, 'src')
