@@ -3,7 +3,7 @@ import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ResolvedConfig, version as ViteVersion } from 'vite'
+import { ResolvedConfig } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
@@ -355,12 +355,9 @@ export const pluginManifest: CrxPluginFn = () => {
                 let filename = join(config.root, f)
                 if (!existsSync(filename)) filename = join(config.publicDir, f)
                 if (!existsSync(filename)) {
-                  // Vite 3 doesn't write source map files until after this plugin is called.
-                  // To support Vite 3, check the file extension and assume the source map
-                  // files will be written to disk later.
-                  const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+                  // Some Vite versions don't write source map files until after this plugin is called.
+                  // If sourcemaps are enabled and this is a .map file, assume it will be written later.
                   if (
-                    viteMajorVersion < 4 &&
                     filename.endsWith('.map') &&
                     config.build.sourcemap === true
                   ) {
