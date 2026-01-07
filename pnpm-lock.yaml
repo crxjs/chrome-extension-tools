@@ -55,8 +55,8 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       cheerio:
-        specifier: 1.0.0-rc.11
-        version: 1.0.0-rc.11
+        specifier: 1.0.0-rc.12
+        version: 1.0.0-rc.12
       convert-source-map:
         specifier: ^1.7.0
         version: 1.9.0
@@ -241,9 +241,6 @@ importers:
       acorn-walk:
         specifier: ^8.2.0
         version: 8.3.4
-      cheerio:
-        specifier: ^1.0.0-rc.10
-        version: 1.0.0-rc.11
       convert-source-map:
         specifier: ^1.7.0
         version: 1.9.0
@@ -265,6 +262,9 @@ importers:
       magic-string:
         specifier: ^0.30.12
         version: 0.30.17
+      node-html-parser:
+        specifier: ^6.1.13
+        version: 6.1.13
       pathe:
         specifier: ^2.0.1
         version: 2.0.3
@@ -606,7 +606,7 @@ importers:
     dependencies:
       '@crxjs/vite-plugin':
         specifier: workspace:*
-        version: file:packages/vite-plugin(vite@7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0))
+        version: link:../../packages/vite-plugin
     dependenciesMeta:
       '@crxjs/vite-plugin':
         injected: true
@@ -1575,11 +1575,6 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
-
-  '@crxjs/vite-plugin@file:packages/vite-plugin':
-    resolution: {directory: packages/vite-plugin, type: directory}
-    peerDependencies:
-      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -4445,12 +4440,8 @@ packages:
   cheerio-select@2.1.0:
     resolution: {integrity: sha512-9v9kG0LvzrlcungtnJtpGNxY+fzECQKhK4EGJX2vByejiMX84MFNQw4UxPJl3bFbTMw+Dfs37XaIkCwTZfLh4g==}
 
-  cheerio@1.0.0:
-    resolution: {integrity: sha512-quS9HgjQpdaXOvsZz82Oz7uxtXiy6UIsIQcpBj7HRw2M63Skasm9qlDocAM7jNuaxdhpPU7c4kJN+gA5MCu4ww==}
-    engines: {node: '>=18.17'}
-
-  cheerio@1.0.0-rc.11:
-    resolution: {integrity: sha512-bQwNaDIBKID5ts/DsdhxrjqFXYfLw4ste+wMKqWA8DyKcS4qwsPP4Bk8ZNaTJjvpiX/qW3BT4sU7d6Bh5i+dag==}
+  cheerio@1.0.0-rc.12:
+    resolution: {integrity: sha512-VqR8m68vM46BNnuZ5NtnGBKIE/DfN0cRIzg9n40EIq9NOv90ayxLBXA8fXC5gquFRGJSTRqBq25Jt2ECLR431Q==}
     engines: {node: '>= 6'}
 
   chokidar@3.6.0:
@@ -5250,9 +5241,6 @@ packages:
   encodeurl@2.0.0:
     resolution: {integrity: sha512-Q0n9HRi4m6JuGIV1eFlmvJB7ZEVxu93IrMyiMsGC0lrMJMWzRgx6WGquyfQgZVb31vhGgXnfmPNNXmxnOkRBrg==}
     engines: {node: '>= 0.8'}
-
-  encoding-sniffer@0.2.0:
-    resolution: {integrity: sha512-ju7Wq1kg04I3HtiYIOrUrdfdDvkyO9s5XM8QAj/bN61Yo/Vb4vgJxy5vi4Yxk01gWHbrofpPtpxM8bKger9jhg==}
 
   end-of-stream@1.4.4:
     resolution: {integrity: sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q==}
@@ -6256,9 +6244,6 @@ packages:
   htmlparser2@8.0.1:
     resolution: {integrity: sha512-4lVbmc1diZC7GUJQtRQ5yBAeUCL1exyMwmForWkRLnwyzWBFxN633SALPMGYaWZvKe9j1pRZJpauvmxENSp/EA==}
 
-  htmlparser2@9.1.0:
-    resolution: {integrity: sha512-5zfg6mHUoaer/97TxnGpxmbR7zJtPwIYFMZ/H5ucTlPZhKvtum05yiPK3Mgai3a0DyVxv7qYqoweaEd2nrYQzQ==}
-
   http-cache-semantics@4.1.0:
     resolution: {integrity: sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==}
 
@@ -6316,10 +6301,6 @@ packages:
 
   iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
-    engines: {node: '>=0.10.0'}
-
-  iconv-lite@0.6.3:
-    resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
 
   icss-utils@5.1.0:
@@ -7701,6 +7682,9 @@ packages:
     resolution: {integrity: sha512-dPEtOeMvF9VMcYV/1Wb8CPoVAXtp6MKMlcbAt4ddqmGqUJ6fQZFXkNZNkNlfevtNkGtaSoXf/vNNNSvgrdXwtA==}
     engines: {node: '>= 6.13.0'}
 
+  node-html-parser@6.1.13:
+    resolution: {integrity: sha512-qIsTMOY4C/dAa5Q5vsobRpOOvPfC4pB61UVW2uSwZNUp0QU/jCekTal1vMmbO0DgdHeLUJpv/ARmDqErVxA3Sg==}
+
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
 
@@ -7950,9 +7934,6 @@ packages:
 
   parse5-htmlparser2-tree-adapter@7.1.0:
     resolution: {integrity: sha512-ruw5xyKs6lrpo9x9rCZqZZnIUntICjQAd0Wsmp396Ul9lN/h+ifgVV1x1gZHi8euej6wTfpqX8j+BFQxF0NS/g==}
-
-  parse5-parser-stream@7.1.2:
-    resolution: {integrity: sha512-JyeQc9iwFLn5TbvvqACIF/VXG6abODeB3Fwmv/TGdLk2LfbWkaySGY72at4+Ty7EkPZj854u4CrICqNk2qIbow==}
 
   parse5@6.0.1:
     resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
@@ -9872,10 +9853,6 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
-  undici@6.21.3:
-    resolution: {integrity: sha512-gBLkYIlEnSp8pFbT64yFgGE6UIB9tAkhukC23PmMDCe5Nd+cRqKxSjw5y54MK2AZMgZfJWMaNE4nYUHgi1XEOw==}
-    engines: {node: '>=18.17'}
-
   unherit@1.1.3:
     resolution: {integrity: sha512-Ft16BJcnapDKp0+J/rqFC3Rrk6Y/Ng4nzsC028k2jdDII/rdZ7Wd3pPT/6+vIIxRagwRc9K0IUX0Ra4fKvw+WQ==}
 
@@ -10493,17 +10470,8 @@ packages:
     resolution: {integrity: sha512-b5lim54JOPN9HtzvK9HFXvBma/rnfFeqsic0hSpjtDbVxR3dJKLc+KB4V6GgiGOvl7CY/KNh8rxSo9DKQrnUEw==}
     deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
 
-  whatwg-encoding@3.1.1:
-    resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
-    engines: {node: '>=18'}
-    deprecated: Use @exodus/bytes instead for a more spec-conformant and faster implementation
-
   whatwg-mimetype@2.3.0:
     resolution: {integrity: sha512-M4yMwr6mAnQz76TbJm914+gPpB/nCwvZbJU28cUD6dR004SAxDLOOSUaB1JDRqLtaOV/vi0IC5lEAGFgrjGv/g==}
-
-  whatwg-mimetype@4.0.0:
-    resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
-    engines: {node: '>=18'}
 
   whatwg-url@5.0.0:
     resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
@@ -12019,28 +11987,6 @@ snapshots:
   '@colors/colors@1.5.0':
     optional: true
 
-  '@crxjs/vite-plugin@file:packages/vite-plugin(vite@7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0))':
-    dependencies:
-      '@rollup/pluginutils': 4.2.1
-      '@webcomponents/custom-elements': 1.6.0
-      acorn-walk: 8.3.4
-      cheerio: 1.0.0-rc.11
-      convert-source-map: 1.9.0
-      debug: 4.4.1
-      es-module-lexer: 0.10.5
-      fast-glob: 3.3.3
-      fs-extra: 10.1.0
-      jsesc: 3.1.0
-      magic-string: 0.30.17
-      pathe: 2.0.3
-      picocolors: 1.1.1
-      react-refresh: 0.13.0
-      rollup: 2.79.2
-      rxjs: 7.5.7
-      vite: 7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0)
-    transitivePeerDependencies:
-      - supports-color
-
   '@discoveryjs/json-ext@0.5.7': {}
 
   '@docsearch/css@3.3.0': {}
@@ -12490,7 +12436,7 @@ snapshots:
       '@docusaurus/utils': 2.2.0(@docusaurus/types@2.2.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2))
       '@docusaurus/utils-common': 2.2.0(@docusaurus/types@2.2.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2))
       '@docusaurus/utils-validation': 2.2.0(@docusaurus/types@2.2.0(react-dom@17.0.2(react@17.0.2))(react@17.0.2))
-      cheerio: 1.0.0
+      cheerio: 1.0.0-rc.12
       feed: 4.2.2
       fs-extra: 10.1.0
       lodash: 4.17.21
@@ -12525,7 +12471,7 @@ snapshots:
       '@docusaurus/utils': 2.4.3(@docusaurus/types@2.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2))
       '@docusaurus/utils-common': 2.4.3(@docusaurus/types@2.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2))
       '@docusaurus/utils-validation': 2.4.3(@docusaurus/types@2.4.3(react-dom@17.0.2(react@17.0.2))(react@17.0.2))
-      cheerio: 1.0.0
+      cheerio: 1.0.0-rc.12
       feed: 4.2.2
       fs-extra: 10.1.0
       lodash: 4.17.21
@@ -16154,21 +16100,7 @@ snapshots:
       domhandler: 5.0.3
       domutils: 3.2.2
 
-  cheerio@1.0.0:
-    dependencies:
-      cheerio-select: 2.1.0
-      dom-serializer: 2.0.0
-      domhandler: 5.0.3
-      domutils: 3.2.2
-      encoding-sniffer: 0.2.0
-      htmlparser2: 9.1.0
-      parse5: 7.3.0
-      parse5-htmlparser2-tree-adapter: 7.1.0
-      parse5-parser-stream: 7.1.2
-      undici: 6.21.3
-      whatwg-mimetype: 4.0.0
-
-  cheerio@1.0.0-rc.11:
+  cheerio@1.0.0-rc.12:
     dependencies:
       cheerio-select: 2.1.0
       dom-serializer: 2.0.0
@@ -16177,7 +16109,6 @@ snapshots:
       htmlparser2: 8.0.1
       parse5: 7.3.0
       parse5-htmlparser2-tree-adapter: 7.1.0
-      tslib: 2.8.1
 
   chokidar@3.6.0:
     dependencies:
@@ -17106,11 +17037,6 @@ snapshots:
   encodeurl@1.0.2: {}
 
   encodeurl@2.0.0: {}
-
-  encoding-sniffer@0.2.0:
-    dependencies:
-      iconv-lite: 0.6.3
-      whatwg-encoding: 3.1.1
 
   end-of-stream@1.4.4:
     dependencies:
@@ -18500,13 +18426,6 @@ snapshots:
       domutils: 3.2.2
       entities: 4.5.0
 
-  htmlparser2@9.1.0:
-    dependencies:
-      domelementtype: 2.3.0
-      domhandler: 5.0.3
-      domutils: 3.2.2
-      entities: 4.5.0
-
   http-cache-semantics@4.1.0: {}
 
   http-deceiver@1.2.7: {}
@@ -18580,10 +18499,6 @@ snapshots:
   human-signals@2.1.0: {}
 
   iconv-lite@0.4.24:
-    dependencies:
-      safer-buffer: 2.1.2
-
-  iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
 
@@ -19332,11 +19247,7 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:
@@ -20426,6 +20337,11 @@ snapshots:
 
   node-forge@1.3.1: {}
 
+  node-html-parser@6.1.13:
+    dependencies:
+      css-select: 5.1.0
+      he: 1.2.0
+
   node-int64@0.4.0: {}
 
   node-releases@2.0.19: {}
@@ -20701,10 +20617,6 @@ snapshots:
   parse5-htmlparser2-tree-adapter@7.1.0:
     dependencies:
       domhandler: 5.0.3
-      parse5: 7.3.0
-
-  parse5-parser-stream@7.1.2:
-    dependencies:
       parse5: 7.3.0
 
   parse5@6.0.1: {}
@@ -23206,8 +23118,6 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici@6.21.3: {}
-
   unherit@1.1.3:
     dependencies:
       inherits: 2.0.4
@@ -23986,13 +23896,7 @@ snapshots:
     dependencies:
       iconv-lite: 0.4.24
 
-  whatwg-encoding@3.1.1:
-    dependencies:
-      iconv-lite: 0.6.3
-
   whatwg-mimetype@2.3.0: {}
-
-  whatwg-mimetype@4.0.0: {}
 
   whatwg-url@5.0.0:
     dependencies:
