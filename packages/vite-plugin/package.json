@@ -81,6 +81,9 @@
     "rollup": "2.79.2",
     "rxjs": "7.5.7"
   },
+  "peerDependencies": {
+    "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
+  },
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",

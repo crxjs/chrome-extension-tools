@@ -9,10 +9,17 @@
     "test:watch": "vitest"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "workspace:*",
     "@types/node": "^22.13.14",
     "typescript": "~5.7.2",
     "vite": "^7.0.0",
     "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@crxjs/vite-plugin": "workspace:*"
+  },
+  "dependenciesMeta": {
+    "@crxjs/vite-plugin": {
+      "injected": true
+    }
   }
 }

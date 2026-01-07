@@ -454,24 +454,6 @@ importers:
         specifier: ^4.6.4
         version: 4.9.5
 
-  packages/vite7-manifest-test:
-    devDependencies:
-      '@crxjs/vite-plugin':
-        specifier: workspace:*
-        version: link:../vite-plugin
-      '@types/node':
-        specifier: ^22.13.14
-        version: 22.15.29
-      typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
-      vite:
-        specifier: ^7.0.0
-        version: 7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0)
-      vitest:
-        specifier: ^3.0.0
-        version: 3.2.4(@types/node@22.15.29)(jiti@1.21.7)(jsdom@16.7.0)(terser@5.40.0)
-
   playgrounds/react:
     dependencies:
       react:
@@ -619,6 +601,28 @@ importers:
       vue-tsc:
         specifier: ^2.2.4
         version: 2.2.10(typescript@5.7.3)
+
+  tests/vite7-manifest-test:
+    dependencies:
+      '@crxjs/vite-plugin':
+        specifier: workspace:*
+        version: file:packages/vite-plugin(vite@7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0))
+    dependenciesMeta:
+      '@crxjs/vite-plugin':
+        injected: true
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.14
+        version: 22.15.29
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0)
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.15.29)(jiti@1.21.7)(jsdom@16.7.0)(terser@5.40.0)
 
 packages:
 
@@ -1571,6 +1575,11 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
+
+  '@crxjs/vite-plugin@file:packages/vite-plugin':
+    resolution: {directory: packages/vite-plugin, type: directory}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -12007,6 +12016,28 @@ snapshots:
 
   '@colors/colors@1.5.0':
     optional: true
+
+  '@crxjs/vite-plugin@file:packages/vite-plugin(vite@7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0))':
+    dependencies:
+      '@rollup/pluginutils': 4.2.1
+      '@webcomponents/custom-elements': 1.6.0
+      acorn-walk: 8.3.4
+      cheerio: 1.0.0-rc.11
+      convert-source-map: 1.9.0
+      debug: 4.4.1
+      es-module-lexer: 0.10.5
+      fast-glob: 3.3.3
+      fs-extra: 10.1.0
+      jsesc: 3.1.0
+      magic-string: 0.30.17
+      pathe: 2.0.3
+      picocolors: 1.1.1
+      react-refresh: 0.13.0
+      rollup: 2.79.2
+      rxjs: 7.5.7
+      vite: 7.3.0(@types/node@22.15.29)(jiti@1.21.7)(terser@5.40.0)
+    transitivePeerDependencies:
+      - supports-color
 
   '@discoveryjs/json-ext@0.5.7': {}
 

@@ -7,14 +7,14 @@ on:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
-      - "packages/vite7-manifest-test/**"
+      - "tests/vite7-manifest-test/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
-      - "packages/vite7-manifest-test/**"
+      - "tests/vite7-manifest-test/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
 
@@ -216,7 +216,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: "packages/vite7-manifest-test"
+        working-directory: "tests/vite7-manifest-test"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
