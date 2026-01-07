@@ -275,8 +275,8 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           delete manifest.web_accessible_resources
         else manifest.web_accessible_resources = combinedResources
 
-        // If the user didn't explicitly enable build.manifest, remove the Vite manifest
-        // from the bundle to keep the distribution clean
+        // If the user didn't explicitly set build.manifest to true (i.e. it is disabled
+        // or left at its default), remove the Vite manifest from the bundle to keep the distribution clean
         if (!userWantsViteManifest) {
           // Vite 5+ uses .vite/manifest.json, older versions use manifest.json
           // Check both paths since the imported version might not match the runtime version
