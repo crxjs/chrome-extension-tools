@@ -1,7 +1,8 @@
-import { OutputBundle, OutputChunk } from 'rollup'
+import { OutputChunk } from 'rollup'
 import {
   Manifest as ViteManifest,
   ResolvedConfig,
+  version as ViteVersion,
 } from 'vite'
 import { compileFileResources } from './compileFileResources'
 import { contentScripts } from './contentScripts'
@@ -12,18 +13,6 @@ import {
   parseJsonAsset,
   _debug,
 } from './helpers'
-
-/**
- * Vite 5+ uses .vite/manifest.json, older versions use manifest.json.
- * We detect the path dynamically from the bundle rather than relying on
- * the imported Vite version, since the plugin's dependency version may
- * differ from the user's runtime Vite version.
- */
-function getViteManifestPath(bundle: OutputBundle): string | undefined {
-  if (bundle['.vite/manifest.json']) return '.vite/manifest.json'
-  if (bundle['manifest.json']) return 'manifest.json'
-  return undefined
-}
 import {
   WebAccessibleResourceById,
   WebAccessibleResourceByMatch,
@@ -122,13 +111,11 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
 
         // derive content script resources from vite file manifest
         if (contentScripts.size > 0) {
-          // Detect the Vite manifest path dynamically from the bundle
-          const manifestPath = getViteManifestPath(bundle)
-          if (!manifestPath) {
-            throw new Error(
-              'Vite manifest not found in bundle. Expected .vite/manifest.json or manifest.json',
-            )
-          }
+          // Vite 5 changed the manifest.json location to .vite/manifest.json.
+          // In order to support both Vite <=4 and Vite 5, we need to check the Vite version and determine the path accordingly.
+          const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+          const manifestPath =
+            viteMajorVersion > 4 ? '.vite/manifest.json' : 'manifest.json'
 
           const viteManifest = parseJsonAsset<ViteManifest>(
             bundle,
@@ -255,11 +242,13 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
               if (chunk.map) {
                 const sourcemapFileName =
                   chunk.sourcemapFileName || `${chunk.fileName}.map`
-                // Include sourcemap if it exists in the bundle or if sourcemaps are enabled in config
-                // (older Vite versions may not include sourcemap files in the bundle object)
+                // Vite 3 doesn't include source map files in the bundle object.
+                // To support both Vite 3 and Vite >=4, check the Vite version and fall back to checking the
+                // Vite config.
+                const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
                 if (
                   sourcemapFileName in bundle ||
-                  config.build.sourcemap === true
+                  (viteMajorVersion < 4 && config.build.sourcemap == true)
                 ) {
                   resourcesWithMaps.push(sourcemapFileName)
                 }
@@ -279,17 +268,16 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         // or left at its default), remove the Vite manifest from the bundle to keep the distribution clean
         if (!userWantsViteManifest) {
           // Vite 5+ uses .vite/manifest.json, older versions use manifest.json
-          // Check both paths since the imported version might not match the runtime version
-          const manifestPaths = ['.vite/manifest.json', 'manifest.json']
-          for (const manifestPath of manifestPaths) {
-            if (bundle[manifestPath]) {
-              debug(
-                'Removing Vite manifest: %s (userWantsViteManifest=%s)',
-                manifestPath,
-                userWantsViteManifest,
-              )
-              delete bundle[manifestPath]
-            }
+          const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+          const manifestPath =
+            viteMajorVersion > 4 ? '.vite/manifest.json' : 'manifest.json'
+          if (bundle[manifestPath]) {
+            debug(
+              'Removing Vite manifest: %s (userWantsViteManifest=%s)',
+              manifestPath,
+              userWantsViteManifest,
+            )
+            delete bundle[manifestPath]
           }
         }
 
