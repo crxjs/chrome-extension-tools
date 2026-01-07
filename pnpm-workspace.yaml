@@ -3,5 +3,7 @@ packages:
   - 'packages/**'
   # all playground apps
   - 'playgrounds/**'
+  # integration tests
+  - 'tests/**'
   # exclude packages that are inside test directories
   - '!**/test/**'

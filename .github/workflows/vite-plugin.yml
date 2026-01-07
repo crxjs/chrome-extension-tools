@@ -7,12 +7,14 @@ on:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - "tests/vite7-manifest-test/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - "tests/vite7-manifest-test/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
 
@@ -201,3 +203,55 @@ jobs:
       #     name: output-diff-${{ matrix.type }}
       #     path: diff.txt
       #     if-no-files-found: ignore
+
+  # Runs Vite 7 compatibility tests
+  vite7:
+    name: Vite 7 Compatibility Tests
+
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    defaults:
+      run:
+        working-directory: "tests/vite7-manifest-test"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: pnpm install
+        working-directory: .
+
+      - name: Build vite-plugin
+        run: pnpm build
+        working-directory: packages/vite-plugin
+
+      - name: Re-install to link built plugin
+        run: pnpm install
+        working-directory: .
+
+      - name: Run Vite 7 tests
+        run: pnpm test
