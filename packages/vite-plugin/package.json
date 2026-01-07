@@ -67,7 +67,7 @@
     "@rollup/pluginutils": "^4.1.2",
     "@webcomponents/custom-elements": "^1.5.0",
     "acorn-walk": "^8.2.0",
-    "cheerio": "1.0.0-rc.12",
+    "node-html-parser": "^6.1.13",
     "convert-source-map": "^1.7.0",
     "debug": "^4.3.3",
     "es-module-lexer": "^0.10.0",
