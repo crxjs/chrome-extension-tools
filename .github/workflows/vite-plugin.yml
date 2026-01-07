@@ -249,5 +249,9 @@ jobs:
         run: pnpm build
         working-directory: packages/vite-plugin
 
+      - name: Re-install to link built plugin
+        run: pnpm install
+        working-directory: .
+
       - name: Run Vite 7 tests
         run: pnpm test
