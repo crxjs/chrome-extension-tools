@@ -1,5 +1,5 @@
-import { load } from 'cheerio'
 import loader from 'client/es/page-inline-script-loader.ts'
+import { extractScriptsAndRemove } from './html'
 import jsesc from 'jsesc'
 import {
   HtmlTagDescriptor,
@@ -18,7 +18,10 @@ const prefix = '@crx/inline-script'
 const isInlineTag = (t: HtmlTagDescriptor): boolean =>
   t.tag === 'script' && !t.attrs?.src
 
-/** Adds prefix and removes file extension so Vite doesn't resolve it as an html file */
+/**
+ * Adds prefix and removes file extension so Vite doesn't resolve it as an html
+ * file
+ */
 const toKey = (ctx: IndexHtmlTransformContext) => {
   const { dir, name } = parse(ctx.path)
   return join(prefix, dir, name)
@@ -41,7 +44,10 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
     string,
     IndexHtmlTransformContext & { scripts: HtmlTagDescriptor[] }
   >()
-  /** Wrap transformIndexHtml hooks in auditor function to check for inline scripts */
+  /**
+   * Wrap transformIndexHtml hooks in auditor function to check for inline
+   * scripts
+   */
   const auditTransformIndexHtml = (p: CrxPlugin): void => {
     let transform: IndexHtmlTransformHook
     if (typeof p.transformIndexHtml === 'function') {
@@ -111,20 +117,15 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
       const key = toKey(ctx)
       const p = pages.get(key)
       if (p?.scripts.some(isInlineTag)) {
-        const $ = load(html)
+        const { scriptSrcs, html: cleanedHtml } = extractScriptsAndRemove(html)
 
         // add existing scripts to run in the loader
         p.scripts.push(
-          ...$('script')
-            .toArray()
-            .map((el) => ({
-              tag: 'script',
-              attrs: { src: $(el).attr('src'), type: 'module' },
-            })),
+          ...scriptSrcs.map((src) => ({
+            tag: 'script',
+            attrs: { src, type: 'module' },
+          })),
         )
-
-        // we only want our loader script to run
-        $('script').remove()
 
         // this will load all the other scripts
         const loader = {
@@ -132,7 +133,7 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
           attrs: { src: `${key}?t=${Date.now()}`, type: 'module' },
         }
 
-        return { html: $.html()!, tags: [loader] }
+        return { html: cleanedHtml, tags: [loader] }
       }
 
       return p?.scripts ?? undefined
