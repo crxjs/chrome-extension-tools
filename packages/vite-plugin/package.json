@@ -67,7 +67,6 @@
     "@rollup/pluginutils": "^4.1.2",
     "@webcomponents/custom-elements": "^1.5.0",
     "acorn-walk": "^8.2.0",
-    "cheerio": "^1.0.0-rc.10",
     "convert-source-map": "^1.7.0",
     "debug": "^4.3.3",
     "es-module-lexer": "^0.10.0",
@@ -75,6 +74,7 @@
     "fs-extra": "^10.0.1",
     "jsesc": "^3.0.2",
     "magic-string": "^0.30.12",
+    "node-html-parser": "^7.0.2",
     "pathe": "^2.0.1",
     "picocolors": "^1.1.1",
     "react-refresh": "^0.13.0",
@@ -123,5 +123,8 @@
     "vite-plugin-inspect": "0.7.25",
     "vitest": "0.28.5",
     "vue": "3.2.47"
+  },
+  "peerDependencies": {
+    "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0"
   }
 }

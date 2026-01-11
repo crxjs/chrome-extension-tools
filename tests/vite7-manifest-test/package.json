@@ -8,18 +8,18 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "devDependencies": {
-    "@types/node": "^22.13.14",
-    "typescript": "~5.7.2",
-    "vite": "^7.0.0",
-    "vitest": "^3.0.0"
-  },
   "dependencies": {
-    "@crxjs/vite-plugin": "workspace:*"
+    "@crxjs/vite-plugin": "workspace:*",
+    "vite": "^7.0.0"
   },
   "dependenciesMeta": {
     "@crxjs/vite-plugin": {
       "injected": true
     }
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "typescript": "~5.7.2",
+    "vitest": "^3.0.0"
   }
 }
