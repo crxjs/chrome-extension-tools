@@ -1,106 +1,109 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { build, type Plugin } from 'vite'
-import { crx } from '@crxjs/vite-plugin'
-import { resolve, dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { existsSync, rmSync } from 'fs'
+import { existsSync, rmSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { build } from 'vite'
+import { crx, type CrxPlugin } from '@crxjs/vite-plugin'
+import { describe, test, expect, beforeEach } from 'vitest'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const outDir = resolve(__dirname, 'dist-plugins-test')
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+const distDir = join(__dirname, 'dist')
 
 const manifest = {
-  manifest_version: 3,
-  name: 'CRXJS Plugins Test',
+  manifest_version: 3 as const,
+  name: 'Test Extension',
   version: '1.0.0',
   content_scripts: [
     {
-      matches: ['<all_urls>'],
       js: ['src/content.js'],
+      matches: ['https://example.com/*'],
     },
   ],
 }
 
-describe('Plugins Test', () => {
-  beforeAll(async () => {
-    if (existsSync(outDir)) {
-      rmSync(outDir, { recursive: true })
+describe('Plugins initialization', () => {
+  beforeEach(() => {
+    if (existsSync(distDir)) {
+      rmSync(distDir, { recursive: true, force: true })
     }
   })
 
-  afterAll(() => {
-    if (existsSync(outDir)) {
-      rmSync(outDir, { recursive: true })
-    }
+  test('build succeeds without "plugins is not iterable" error', async () => {
+    // This test verifies that the configResolved hook properly initializes
+    // the plugins array in Vite 7 (rolldown-vite) where buildStart doesn't
+    // receive options.plugins
+    await build({
+      root: __dirname,
+      logLevel: 'silent',
+      build: {
+        outDir: 'dist',
+        minify: false,
+      },
+      plugins: [crx({ manifest })],
+    })
+
+    // Chrome extension manifest should exist
+    expect(existsSync(join(distDir, 'manifest.json'))).toBe(true)
+
+    // Content script should be built
+    const manifestJson = JSON.parse(
+      readFileSync(join(distDir, 'manifest.json'), 'utf-8'),
+    )
+    expect(manifestJson.content_scripts).toBeDefined()
+    expect(manifestJson.content_scripts[0].js).toBeDefined()
+    expect(manifestJson.content_scripts[0].js.length).toBeGreaterThan(0)
   })
 
-  it('should call plugin hooks in correct order', async () => {
-    const hooksCalled: string[] = []
-
-    const testPlugin: Plugin = {
-      name: 'test-plugin',
-      configResolved() {
-        hooksCalled.push('configResolved')
-      },
-      buildStart() {
-        hooksCalled.push('buildStart')
-      },
-      buildEnd() {
-        hooksCalled.push('buildEnd')
-      },
-    }
+  test('transformCrxManifest hook is called during build', async () => {
+    let transformCalled = false
 
     await build({
       root: __dirname,
       logLevel: 'silent',
       build: {
-        outDir,
-        emptyOutDir: true,
+        outDir: 'dist',
         minify: false,
       },
-      plugins: [crx({ manifest }), testPlugin],
+      plugins: [
+        crx({ manifest }),
+        {
+          name: 'test-transform-hook',
+          transformCrxManifest(manifest: unknown) {
+            transformCalled = true
+            return manifest
+          },
+        } as CrxPlugin,
+      ],
     })
 
-    // Verify hooks were called
-    expect(hooksCalled).toContain('configResolved')
-    expect(hooksCalled).toContain('buildStart')
-    expect(hooksCalled).toContain('buildEnd')
-
-    // Verify order: configResolved should be before buildStart
-    const configResolvedIndex = hooksCalled.indexOf('configResolved')
-    const buildStartIndex = hooksCalled.indexOf('buildStart')
-    expect(configResolvedIndex).toBeLessThan(buildStartIndex)
+    // The transformCrxManifest hook should have been called
+    // This proves that plugins array was properly initialized and iterated
+    expect(transformCalled).toBe(true)
   })
 
-  it('should work with multiple plugins', async () => {
-    const pluginACalled: string[] = []
-    const pluginBCalled: string[] = []
-
-    const pluginA: Plugin = {
-      name: 'plugin-a',
-      buildStart() {
-        pluginACalled.push('buildStart')
-      },
-    }
-
-    const pluginB: Plugin = {
-      name: 'plugin-b',
-      buildStart() {
-        pluginBCalled.push('buildStart')
-      },
-    }
+  test('renderCrxManifest hook is called during build', async () => {
+    let renderCalled = false
 
     await build({
       root: __dirname,
       logLevel: 'silent',
       build: {
-        outDir,
-        emptyOutDir: true,
+        outDir: 'dist',
         minify: false,
       },
-      plugins: [pluginA, crx({ manifest }), pluginB],
+      plugins: [
+        crx({ manifest }),
+        {
+          name: 'test-render-hook',
+          renderCrxManifest(manifest: unknown) {
+            renderCalled = true
+            return manifest
+          },
+        } as CrxPlugin,
+      ],
     })
 
-    expect(pluginACalled).toContain('buildStart')
-    expect(pluginBCalled).toContain('buildStart')
+    // The renderCrxManifest hook should have been called
+    // This proves that plugins array was properly initialized and iterated
+    expect(renderCalled).toBe(true)
   })
 })
