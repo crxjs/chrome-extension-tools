@@ -625,6 +625,28 @@ importers:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.5)(jiti@1.21.7)(jsdom@16.7.0)(terser@5.44.1)
 
+  tests/vite7-e2e-test:
+    dependencies:
+      '@crxjs/vite-plugin':
+        specifier: workspace:*
+        version: file:packages/vite-plugin(vite@7.3.1(@types/node@22.19.5)(jiti@1.21.7)(terser@5.44.1))
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.1(@types/node@22.19.5)(jiti@1.21.7)(terser@5.44.1)
+    dependenciesMeta:
+      '@crxjs/vite-plugin':
+        injected: true
+    devDependencies:
+      '@types/node':
+        specifier: ^22.13.14
+        version: 22.19.5
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(@types/node@22.19.5)(jiti@1.21.7)(jsdom@16.7.0)(terser@5.44.1)
+
   tests/vite7-manifest-test:
     dependencies:
       '@crxjs/vite-plugin':
