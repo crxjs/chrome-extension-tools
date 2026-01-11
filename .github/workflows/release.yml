@@ -50,9 +50,11 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
+        if: inputs.test_discord != true
         run: pnpm install
 
       - name: Create Release Pull Request or Publish to npm
+        if: inputs.test_discord != true
         id: changesets
         uses: changesets/action@v1
         with:
