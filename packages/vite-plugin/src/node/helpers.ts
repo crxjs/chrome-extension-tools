@@ -98,6 +98,24 @@ export function parseJsonAsset<T>(bundle: OutputBundle, key: string): T {
 }
 
 /**
+ * Get the Vite manifest path from the bundle. Vite 5+ uses .vite/manifest.json,
+ * while Vite <=4 uses manifest.json. This function checks the bundle to
+ * determine the actual path dynamically, avoiding issues with bundled Vite
+ * version imports.
+ */
+export function getViteManifestPath(bundle: OutputBundle): string | null {
+  // Vite 5+ path
+  if ('.vite/manifest.json' in bundle) {
+    return '.vite/manifest.json'
+  }
+  // Vite <=4 path (legacy)
+  if ('manifest.json' in bundle) {
+    return 'manifest.json'
+  }
+  return null
+}
+
+/**
  * [Strip paths for `web_accessible_resources`'s `matches` · Issue
  * #282](https://github.com/crxjs/chrome-extension-tools/issues/282)
  */
@@ -110,8 +128,8 @@ export const getMatchPatternOrigin = (pattern: string): string => {
 
   const [schema, rest] = pattern.split('://')
   const slashIndex = rest.indexOf('/')
-  const isSlashAfterOriginPresent = slashIndex !== -1;
-  
+  const isSlashAfterOriginPresent = slashIndex !== -1
+
   const origin = isSlashAfterOriginPresent ? rest.slice(0, slashIndex) : rest
   const root = `${schema}://${origin}`
 

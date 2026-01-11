@@ -1,14 +1,11 @@
 import { OutputChunk } from 'rollup'
-import {
-  Manifest as ViteManifest,
-  ResolvedConfig,
-  version as ViteVersion,
-} from 'vite'
+import { Manifest as ViteManifest, ResolvedConfig } from 'vite'
 import { compileFileResources } from './compileFileResources'
 import { contentScripts } from './contentScripts'
 import { DYNAMIC_RESOURCE } from './defineManifest'
 import {
   getMatchPatternOrigin,
+  getViteManifestPath,
   isResourceByMatch,
   parseJsonAsset,
   _debug,
@@ -111,11 +108,14 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
 
         // derive content script resources from vite file manifest
         if (contentScripts.size > 0) {
-          // Vite 5 changed the manifest.json location to .vite/manifest.json.
-          // In order to support both Vite <=4 and Vite 5, we need to check the Vite version and determine the path accordingly.
-          const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
-          const manifestPath =
-            viteMajorVersion > 4 ? '.vite/manifest.json' : 'manifest.json'
+          // Determine the Vite manifest path dynamically from the bundle.
+          // This avoids issues with the bundled ViteVersion not matching the consumer's Vite version.
+          const manifestPath = getViteManifestPath(bundle)
+          if (!manifestPath) {
+            throw new Error(
+              'Could not find Vite manifest in bundle. Ensure build.manifest is enabled.',
+            )
+          }
 
           const viteManifest = parseJsonAsset<ViteManifest>(
             bundle,
@@ -242,13 +242,12 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
               if (chunk.map) {
                 const sourcemapFileName =
                   chunk.sourcemapFileName || `${chunk.fileName}.map`
-                // Vite 3 doesn't include source map files in the bundle object.
-                // To support both Vite 3 and Vite >=4, check the Vite version and fall back to checking the
-                // Vite config.
-                const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
+                // Include sourcemap file if it exists in the bundle, or if separate sourcemaps are enabled
+                // (config.build.sourcemap === true means separate files, 'inline' means embedded)
+                // Older Vite versions may write sourcemaps separately after this hook runs
                 if (
                   sourcemapFileName in bundle ||
-                  (viteMajorVersion < 4 && config.build.sourcemap == true)
+                  config.build.sourcemap === true
                 ) {
                   resourcesWithMaps.push(sourcemapFileName)
                 }
@@ -267,11 +266,9 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         // If the user didn't explicitly set build.manifest to true (i.e. it is disabled
         // or left at its default), remove the Vite manifest from the bundle to keep the distribution clean
         if (!userWantsViteManifest) {
-          // Vite 5+ uses .vite/manifest.json, older versions use manifest.json
-          const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
-          const manifestPath =
-            viteMajorVersion > 4 ? '.vite/manifest.json' : 'manifest.json'
-          if (bundle[manifestPath]) {
+          // Determine manifest path dynamically from the bundle
+          const manifestPath = getViteManifestPath(bundle)
+          if (manifestPath && bundle[manifestPath]) {
             debug(
               'Removing Vite manifest: %s (userWantsViteManifest=%s)',
               manifestPath,

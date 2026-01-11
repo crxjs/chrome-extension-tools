@@ -1,7 +1,7 @@
 {
   "name": "crxjs-monorepo",
   "private": "true",
-  "packageManager": "pnpm@10.11.1",
+  "packageManager": "bun@1.2.15",
   "keywords": [
     "rollup-plugin",
     "vite-plugin",
@@ -15,14 +15,14 @@
   ],
   "homepage": "https://crxjs.dev",
   "scripts": {
-    "build:vite-plugin": "pnpm -C packages/vite-plugin run build",
-    "play": "pnpm run play:vanilla",
-    "play:react": "pnpm -C playgrounds/react run dev",
-    "play:solid": "pnpm -C playgrounds/solid run dev",
-    "play:svelte": "pnpm -C playgrounds/svelte run dev",
-    "play:vanilla": "pnpm -C playgrounds/vanilla run dev",
-    "play:vue": "pnpm -C playgrounds/vue run dev",
-    "release": "pnpm --filter \"*plugin*\" build && changeset publish"
+    "build:vite-plugin": "bun run --cwd packages/vite-plugin build",
+    "play": "bun run play:vanilla",
+    "play:react": "bun run --cwd playgrounds/react dev",
+    "play:solid": "bun run --cwd playgrounds/solid dev",
+    "play:svelte": "bun run --cwd playgrounds/svelte dev",
+    "play:vanilla": "bun run --cwd playgrounds/vanilla dev",
+    "play:vue": "bun run --cwd playgrounds/vue dev",
+    "release": "bun run --filter \"*plugin*\" build && changeset publish"
   },
   "dependencies": {
     "@changesets/cli": "^2.22.0",
@@ -31,7 +31,6 @@
     "eslint": "8.43.0",
     "eslint-plugin-react": "^7.29.4",
     "npm-run-all": "^4.1.5",
-    "pnpm": "10.27.0",
     "prettier": "^2.6.2",
     "prettier-plugin-jsdoc": "0.4.2",
     "typescript": "^4.6.4"
@@ -42,14 +41,10 @@
   "devDependencies": {
     "vitest": "0.24.3"
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "jest"
-      ]
-    },
-    "onlyBuiltDependencies": [
-      "playwright-chromium"
-    ]
-  }
+  "workspaces": [
+    "packages/**",
+    "playgrounds/**",
+    "tests/**",
+    "!**/test/**"
+  ]
 }

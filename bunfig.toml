@@ -1,0 +1,9 @@
+# Bun configuration for crxjs monorepo
+
+[install]
+# Equivalent to pnpm's peerDependencyRules.ignoreMissing
+peer = false
+
+[install.scopes]
+# Allow missing peer dependencies for packages that optionally depend on jest
+"@crxjs" = { peer = false }
