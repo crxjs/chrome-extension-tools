@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      test_discord:
+        description: 'Test Discord notification (will be marked as [TEST])'
+        required: false
+        type: boolean
+        default: false
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
@@ -55,28 +62,39 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - if: steps.changesets.outputs.published == 'true'
+      - if: steps.changesets.outputs.published == 'true' || inputs.test_discord == true
         name: Notify Discord about new release
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          IS_TEST: ${{ inputs.test_discord == true }}
         run: |
-          # Parse the published packages and create a Discord message
-          PACKAGES=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "• \(.name)@\(.version)"' 2>/dev/null || echo "• New packages published")
+          # Determine if this is a test run
+          if [ "$IS_TEST" = "true" ]; then
+            TEST_PREFIX="[TEST] "
+            TITLE="${TEST_PREFIX}Test Discord Notification"
+            PACKAGES="• This is a test notification to verify Discord webhook integration"
+          else
+            TEST_PREFIX=""
+            TITLE="New packages have been published to npm"
+            # Parse the published packages and create a Discord message
+            PACKAGES=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "• \(.name)@\(.version)"' 2>/dev/null || echo "• New packages published")
+          fi
           
           # Create the Discord webhook payload
           PAYLOAD=$(jq -n \
-            --arg content "🚀 **New Release Published!**" \
+            --arg title "$TITLE" \
             --arg description "$PACKAGES" \
+            --arg test_prefix "$TEST_PREFIX" \
             '{
               "username": "CRXJS Release Bot",
               "avatar_url": "https://crxjs.dev/logo.svg",
               "embeds": [{
-                "title": "New packages have been published to npm",
+                "title": $title,
                 "description": $description,
                 "color": 2105893,
                 "footer": {
-                  "text": "CRXJS Chrome Extension Tools"
+                  "text": ($test_prefix + "CRXJS Chrome Extension Tools")
                 },
                 "timestamp": (now | strftime("%Y-%m-%dT%H:%M:%SZ"))
               }]
