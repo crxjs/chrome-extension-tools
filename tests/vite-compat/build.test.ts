@@ -58,5 +58,18 @@ describe('Build Test', () => {
     expect(outputManifest.version).toBe('1.0.0')
     expect(outputManifest.content_scripts).toBeDefined()
     expect(outputManifest.content_scripts.length).toBeGreaterThan(0)
+
+    // Verify content script files referenced in manifest actually exist
+    for (const contentScript of outputManifest.content_scripts) {
+      if (contentScript.js) {
+        for (const jsFile of contentScript.js) {
+          const jsPath = resolve(outDir, jsFile)
+          expect(
+            existsSync(jsPath),
+            `Content script file should exist: ${jsFile}`,
+          ).toBe(true)
+        }
+      }
+    }
   })
 })
