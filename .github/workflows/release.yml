@@ -55,12 +55,36 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # - if: steps.changesets.outputs.published == 'true'
-      #   name: Github Releases To Discord
-      #   uses: sillyangel/releases-to-discord@v1
-      #   with:
-      #     webhook_url: ${{ secrets.WEBHOOK_URL }}
-      #     color: "2105893"
-      #     username: "Release Changelog"
-      #     avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
-      # FIXME: https://github.com/crxjs/chrome-extension-tools/actions/runs/13581366932/job/37967884502
+      - if: steps.changesets.outputs.published == 'true'
+        name: Notify Discord about new release
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          # Parse the published packages and create a Discord message
+          PACKAGES=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "• \(.name)@\(.version)"' 2>/dev/null || echo "• New packages published")
+          
+          # Create the Discord webhook payload
+          PAYLOAD=$(jq -n \
+            --arg content "🚀 **New Release Published!**" \
+            --arg description "$PACKAGES" \
+            '{
+              "username": "CRXJS Release Bot",
+              "avatar_url": "https://crxjs.dev/logo.svg",
+              "embeds": [{
+                "title": "New packages have been published to npm",
+                "description": $description,
+                "color": 2105893,
+                "footer": {
+                  "text": "CRXJS Chrome Extension Tools"
+                },
+                "timestamp": (now | strftime("%Y-%m-%dT%H:%M:%SZ"))
+              }]
+            }')
+          
+          # Send to Discord
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+          
+          echo "Discord notification sent successfully!"
