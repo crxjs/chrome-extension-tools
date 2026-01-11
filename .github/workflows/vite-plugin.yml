@@ -46,35 +46,29 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          # Version of PNPM to install
-          version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
+          bun-version: "1.2.15"
 
       - name: Check CWD
         run: node -e "console.log('cwd', process.cwd())"
 
-      - name: Cache pnpm modules
+      - name: Cache bun modules
         uses: actions/cache@v3
         env:
-          cache-name: cache-pnpm-modules
+          cache-name: cache-bun-modules
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/bun.lock') }}
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install --filter "vite-plugin"
+        run: bun install --filter "vite-plugin"
+        working-directory: .
 
       - name: Lint files
-        run: pnpm lint
+        run: bun run lint
 
   # Runs e2e tests in Playwright
   e2e:
@@ -95,37 +89,31 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          # Version of PNPM to install
-          version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
+          bun-version: "1.2.15"
 
       - name: Check CWD
         run: node -e "console.log('cwd', process.cwd())"
 
-      - name: Cache pnpm modules
+      - name: Cache bun modules
         uses: actions/cache@v3
         env:
-          cache-name: cache-pnpm-modules
+          cache-name: cache-bun-modules
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/bun.lock') }}
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install --filter "vite-plugin"
+        run: bun install --filter "vite-plugin"
+        working-directory: .
 
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: pnpm test:run:e2e
+          run: bun run test:run:e2e
           working-directory: "packages/vite-plugin"
 
       - uses: actions/upload-artifact@v4
@@ -153,35 +141,29 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          # Version of PNPM to install
-          version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
+          bun-version: "1.2.15"
 
       - name: Check CWD
         run: node -e "console.log('cwd', process.cwd())"
 
-      - name: Cache pnpm modules
+      - name: Cache bun modules
         uses: actions/cache@v3
         env:
-          cache-name: cache-pnpm-modules
+          cache-name: cache-bun-modules
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/bun.lock') }}
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install --filter "vite-plugin"
+        run: bun install --filter "vite-plugin"
+        working-directory: .
 
       - name: Run unit and output tests
-        run: pnpm test:run:out
+        run: bun run test:run:out
 
       # Disabling diff check for now, don't think it's doing anything
       #
@@ -227,31 +209,31 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 10.11.1
+          bun-version: "1.2.15"
 
-      - name: Cache pnpm modules
+      - name: Cache bun modules
         uses: actions/cache@v3
         env:
-          cache-name: cache-pnpm-modules
+          cache-name: cache-bun-modules
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/bun.lock') }}
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
         working-directory: .
 
       - name: Build vite-plugin
-        run: pnpm build
+        run: bun run build
         working-directory: packages/vite-plugin
 
       - name: Re-install to link built plugin
-        run: pnpm install
+        run: bun install
         working-directory: .
 
       - name: Run Vite 7 tests
-        run: pnpm test
+        run: bun run test

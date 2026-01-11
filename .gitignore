@@ -8,7 +8,6 @@
 **/tests/e2e/mv3-*-hmr/src
 **/__diff_output__
 TODO
-pnpm-global
 __image_snapshot_diffs__
 
 .DS_Store

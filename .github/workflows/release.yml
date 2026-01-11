@@ -21,36 +21,29 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          # Version of PNPM to install
-          version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
+          bun-version: "1.2.15"
 
-      - name: Cache pnpm modules
+      - name: Cache bun modules
         uses: actions/cache@v4
         env:
-          cache-name: cache-pnpm-modules
+          cache-name: cache-bun-modules
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/bun.lock') }}
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: pnpm release
+          publish: bun run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
