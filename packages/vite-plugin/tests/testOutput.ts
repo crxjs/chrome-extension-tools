@@ -64,6 +64,7 @@ export async function testOutput(
         hashMap.set(found, replaced)
         return replaced
       })
+      .replace(/(chunk-)([A-Za-z0-9]+)(\.js)/g, '$1HASH$3')
       .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
       .replaceAll(/\/\/#(.+?base64,)([^\s]+)/g, '// #$1<base64>')
 
@@ -100,7 +101,7 @@ export async function testOutput(
           .replaceAll('\\\\', '\\')
 
         source = source.replace(
-            new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+          new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
           (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
         )
       }
