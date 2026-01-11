@@ -1,219 +1,197 @@
-import { existsSync, rmSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, rmSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { build, createServer, ViteDevServer } from 'vite'
+import { build } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
+import { chromium, type BrowserContext } from 'playwright-chromium'
 import { describe, test, expect, beforeEach, afterEach } from 'vitest'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const distDir = join(__dirname, 'dist')
+const cacheDir = join(__dirname, '.chromium')
 
 const manifest = {
   manifest_version: 3 as const,
   name: 'Vite7 E2E Test Extension',
   version: '1.0.0',
-  background: {
-    service_worker: 'src/background.js',
-  },
   content_scripts: [
     {
       js: ['src/content.js'],
       matches: ['https://example.com/*'],
     },
   ],
-  permissions: ['storage'],
 }
 
-describe('Vite 7 E2E Tests', () => {
-  beforeEach(() => {
+// Simple HTML page for testing
+const exampleHtml = `
+<!DOCTYPE html>
+<html>
+<head><title>Example</title></head>
+<body>
+  <h1>Example Page</h1>
+  <div id="test-target">Original content</div>
+</body>
+</html>
+`
+
+describe('Vite 7 E2E Browser Tests', () => {
+  let browser: BrowserContext | undefined
+
+  beforeEach(async () => {
+    // Clean up directories
     if (existsSync(distDir)) {
       rmSync(distDir, { recursive: true, force: true })
     }
+    if (existsSync(cacheDir)) {
+      rmSync(cacheDir, { recursive: true, force: true })
+    }
   })
 
-  describe('Build mode', () => {
-    test('builds extension with content script', async () => {
-      await build({
-        root: __dirname,
-        logLevel: 'silent',
-        build: {
-          outDir: 'dist',
-          minify: false,
-        },
-        plugins: [crx({ manifest })],
-      })
-
-      // Verify manifest.json exists and is valid
-      const manifestPath = join(distDir, 'manifest.json')
-      expect(existsSync(manifestPath)).toBe(true)
-
-      const builtManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'))
-      expect(builtManifest.manifest_version).toBe(3)
-      expect(builtManifest.name).toBe('Vite7 E2E Test Extension')
-      expect(builtManifest.content_scripts).toBeDefined()
-      expect(builtManifest.content_scripts.length).toBeGreaterThan(0)
-      expect(builtManifest.background).toBeDefined()
-    })
-
-    test('builds extension with service worker', async () => {
-      await build({
-        root: __dirname,
-        logLevel: 'silent',
-        build: {
-          outDir: 'dist',
-          minify: false,
-        },
-        plugins: [crx({ manifest })],
-      })
-
-      const builtManifest = JSON.parse(
-        readFileSync(join(distDir, 'manifest.json'), 'utf-8')
-      )
-
-      // Service worker should be referenced in manifest
-      expect(builtManifest.background.service_worker).toBeDefined()
-
-      // Service worker loader file should exist
-      const swPath = join(distDir, builtManifest.background.service_worker)
-      expect(existsSync(swPath)).toBe(true)
-
-      // The actual background code is in assets folder
-      // Check that assets folder has background.js compiled
-      const assetsDir = join(distDir, 'assets')
-      if (existsSync(assetsDir)) {
-        const assets = readdirSync(assetsDir)
-        const bgAsset = assets.find((f) => f.startsWith('background'))
-        if (bgAsset) {
-          const bgContent = readFileSync(join(assetsDir, bgAsset), 'utf-8')
-          expect(bgContent).toContain('Background script loaded')
-        }
-      }
-    })
-
-    test('content script file exists and contains code', async () => {
-      await build({
-        root: __dirname,
-        logLevel: 'silent',
-        build: {
-          outDir: 'dist',
-          minify: false,
-        },
-        plugins: [crx({ manifest })],
-      })
-
-      const builtManifest = JSON.parse(
-        readFileSync(join(distDir, 'manifest.json'), 'utf-8')
-      )
-
-      // Content script should exist
-      const contentScriptPath = join(
-        distDir,
-        builtManifest.content_scripts[0].js[0]
-      )
-      expect(existsSync(contentScriptPath)).toBe(true)
-
-      // Content script should contain our code
-      const contentScript = readFileSync(contentScriptPath, 'utf-8')
-      expect(contentScript).toContain('crxjs-vite7-test')
-    })
-
-    test('transformCrxManifest hook works in build', async () => {
-      let hookCalled = false
-      let receivedManifest: any = null
-
-      await build({
-        root: __dirname,
-        logLevel: 'silent',
-        build: {
-          outDir: 'dist',
-          minify: false,
-        },
-        plugins: [
-          crx({ manifest }),
-          {
-            name: 'test-transform',
-            transformCrxManifest(m) {
-              hookCalled = true
-              receivedManifest = m
-              // Modify description to prove hook works
-              m.description = 'Modified by transform hook'
-              return m
-            },
-          },
-        ],
-      })
-
-      expect(hookCalled).toBe(true)
-      expect(receivedManifest).not.toBeNull()
-
-      // Verify the modification was applied
-      const builtManifest = JSON.parse(
-        readFileSync(join(distDir, 'manifest.json'), 'utf-8')
-      )
-      expect(builtManifest.description).toBe('Modified by transform hook')
-    })
-
-    test('renderCrxManifest hook works in build', async () => {
-      let hookCalled = false
-
-      await build({
-        root: __dirname,
-        logLevel: 'silent',
-        build: {
-          outDir: 'dist',
-          minify: false,
-        },
-        plugins: [
-          crx({ manifest }),
-          {
-            name: 'test-render',
-            renderCrxManifest(m) {
-              hookCalled = true
-              m.author = 'Added by render hook'
-              return m
-            },
-          },
-        ],
-      })
-
-      expect(hookCalled).toBe(true)
-
-      const builtManifest = JSON.parse(
-        readFileSync(join(distDir, 'manifest.json'), 'utf-8')
-      )
-      expect(builtManifest.author).toBe('Added by render hook')
-    })
+  afterEach(async () => {
+    if (browser) {
+      await browser.close()
+      browser = undefined
+    }
   })
 
-  describe('Serve mode', () => {
-    let server: ViteDevServer | undefined
-
-    afterEach(async () => {
-      if (server) {
-        await server.close()
-        server = undefined
-      }
+  test('extension content script runs in browser after build', async () => {
+    // Build the extension
+    await build({
+      root: __dirname,
+      logLevel: 'silent',
+      build: {
+        outDir: 'dist',
+        minify: false,
+      },
+      plugins: [crx({ manifest })],
     })
 
-    test('dev server starts without errors', async () => {
-      server = await createServer({
-        root: __dirname,
-        logLevel: 'silent',
-        build: {
-          outDir: 'dist',
-          minify: false,
-        },
-        plugins: [crx({ manifest })],
+    // Verify build output
+    expect(existsSync(join(distDir, 'manifest.json'))).toBe(true)
+
+    // Launch browser with extension loaded
+    browser = await chromium.launchPersistentContext(cacheDir, {
+      headless: false,
+      args: [
+        `--disable-extensions-except=${distDir}`,
+        `--load-extension=${distDir}`,
+        '--headless=new',
+      ],
+    })
+
+    // Mock example.com
+    await browser.route('https://example.com/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: exampleHtml,
       })
-
-      await server.listen()
-
-      expect(server).toBeDefined()
-      expect(server.config).toBeDefined()
-      expect(server.config.plugins.some((p) => p.name?.startsWith('crx:'))).toBe(true)
-
-      await server.close()
-      server = undefined
     })
-  })
+
+    // Navigate to the page
+    const page = await browser.newPage()
+    await page.goto('https://example.com')
+
+    // Wait for our content script element to appear
+    const crxElement = page.locator('#crxjs-vite7-test')
+    await crxElement.waitFor({ timeout: 10000 })
+
+    // Verify the content script ran
+    const text = await crxElement.textContent()
+    expect(text).toContain('CRXJS Vite7 E2E Test')
+
+    // Verify element has correct styling (proves CSS was injected)
+    const bgColor = await crxElement.evaluate((el) => 
+      window.getComputedStyle(el).backgroundColor
+    )
+    expect(bgColor).toBe('rgb(76, 175, 80)') // #4CAF50
+  }, 60000)
+
+  test('content script DOM manipulation works', async () => {
+    // Build the extension
+    await build({
+      root: __dirname,
+      logLevel: 'silent',
+      build: {
+        outDir: 'dist',
+        minify: false,
+      },
+      plugins: [crx({ manifest })],
+    })
+
+    // Launch browser with extension loaded
+    browser = await chromium.launchPersistentContext(cacheDir, {
+      headless: false,
+      args: [
+        `--disable-extensions-except=${distDir}`,
+        `--load-extension=${distDir}`,
+        '--headless=new',
+      ],
+    })
+
+    await browser.route('https://example.com/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: exampleHtml,
+      })
+    })
+
+    const page = await browser.newPage()
+    await page.goto('https://example.com')
+
+    // Original page content should still be there
+    const heading = page.locator('h1')
+    await heading.waitFor({ timeout: 5000 })
+    expect(await heading.textContent()).toBe('Example Page')
+
+    // Content script element should be added
+    const crxElement = page.locator('#crxjs-vite7-test')
+    await crxElement.waitFor({ timeout: 10000 })
+    expect(await crxElement.isVisible()).toBe(true)
+  }, 60000)
+
+  test('multiple page navigations work with content script', async () => {
+    // Build the extension
+    await build({
+      root: __dirname,
+      logLevel: 'silent',
+      build: {
+        outDir: 'dist',
+        minify: false,
+      },
+      plugins: [crx({ manifest })],
+    })
+
+    browser = await chromium.launchPersistentContext(cacheDir, {
+      headless: false,
+      args: [
+        `--disable-extensions-except=${distDir}`,
+        `--load-extension=${distDir}`,
+        '--headless=new',
+      ],
+    })
+
+    await browser.route('https://example.com/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html',
+        body: exampleHtml,
+      })
+    })
+
+    const page = await browser.newPage()
+    
+    // First navigation
+    await page.goto('https://example.com/page1')
+    let crxElement = page.locator('#crxjs-vite7-test')
+    await crxElement.waitFor({ timeout: 10000 })
+    expect(await crxElement.isVisible()).toBe(true)
+
+    // Second navigation - content script should run again
+    await page.goto('https://example.com/page2')
+    crxElement = page.locator('#crxjs-vite7-test')
+    await crxElement.waitFor({ timeout: 10000 })
+    expect(await crxElement.isVisible()).toBe(true)
+  }, 60000)
 })

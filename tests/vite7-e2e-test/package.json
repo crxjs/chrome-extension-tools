@@ -3,7 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
-  "description": "E2E tests for CRXJS with Vite 7 (rolldown)",
+  "description": "E2E browser tests for CRXJS with Vite 7 (rolldown)",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest"
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.13.14",
+    "playwright-chromium": "^1.52.0",
     "typescript": "~5.7.2",
     "vitest": "^3.0.0"
   }

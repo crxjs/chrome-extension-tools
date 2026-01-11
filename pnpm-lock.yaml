@@ -640,6 +640,9 @@ importers:
       '@types/node':
         specifier: ^22.13.14
         version: 22.19.5
+      playwright-chromium:
+        specifier: ^1.52.0
+        version: 1.52.0
       typescript:
         specifier: ~5.7.2
         version: 5.7.3
