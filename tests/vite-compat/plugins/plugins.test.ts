@@ -2,7 +2,7 @@ import { existsSync, rmSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
-import { crx } from '@crxjs/vite-plugin'
+import { crx, type CrxPlugin } from '@crxjs/vite-plugin'
 import { describe, test, expect, beforeEach } from 'vitest'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
@@ -20,16 +20,17 @@ const manifest = {
   ],
 }
 
-describe('Vite 3 plugins initialization (backward compatibility)', () => {
+describe('Plugins initialization', () => {
   beforeEach(() => {
     if (existsSync(distDir)) {
       rmSync(distDir, { recursive: true, force: true })
     }
   })
 
-  test('build succeeds with Vite 3 (uses buildStart for plugins)', async () => {
-    // This test verifies backward compatibility with Vite 3
-    // where buildStart provides options.plugins
+  test('build succeeds without "plugins is not iterable" error', async () => {
+    // This test verifies that the configResolved hook properly initializes
+    // the plugins array in Vite 7 (rolldown-vite) where buildStart doesn't
+    // receive options.plugins
     await build({
       root: __dirname,
       logLevel: 'silent',
@@ -45,7 +46,7 @@ describe('Vite 3 plugins initialization (backward compatibility)', () => {
 
     // Content script should be built
     const manifestJson = JSON.parse(
-      readFileSync(join(distDir, 'manifest.json'), 'utf-8')
+      readFileSync(join(distDir, 'manifest.json'), 'utf-8'),
     )
     expect(manifestJson.content_scripts).toBeDefined()
     expect(manifestJson.content_scripts[0].js).toBeDefined()
@@ -66,15 +67,16 @@ describe('Vite 3 plugins initialization (backward compatibility)', () => {
         crx({ manifest }),
         {
           name: 'test-transform-hook',
-          transformCrxManifest(manifest) {
+          transformCrxManifest(manifest: unknown) {
             transformCalled = true
             return manifest
           },
-        },
+        } as CrxPlugin,
       ],
     })
 
     // The transformCrxManifest hook should have been called
+    // This proves that plugins array was properly initialized and iterated
     expect(transformCalled).toBe(true)
   })
 
@@ -92,15 +94,16 @@ describe('Vite 3 plugins initialization (backward compatibility)', () => {
         crx({ manifest }),
         {
           name: 'test-render-hook',
-          renderCrxManifest(manifest) {
+          renderCrxManifest(manifest: unknown) {
             renderCalled = true
             return manifest
           },
-        },
+        } as CrxPlugin,
       ],
     })
 
     // The renderCrxManifest hook should have been called
+    // This proves that plugins array was properly initialized and iterated
     expect(renderCalled).toBe(true)
   })
 })

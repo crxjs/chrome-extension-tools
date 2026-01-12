@@ -1,4 +1,4 @@
-import { existsSync, rmSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
@@ -12,7 +12,7 @@ const cacheDir = join(__dirname, '.chromium')
 
 const manifest = {
   manifest_version: 3 as const,
-  name: 'Vite7 E2E Test Extension',
+  name: 'E2E Test Extension',
   version: '1.0.0',
   content_scripts: [
     {
@@ -34,7 +34,7 @@ const exampleHtml = `
 </html>
 `
 
-describe('Vite 7 E2E Browser Tests', () => {
+describe('E2E Browser Tests', () => {
   let browser: BrowserContext | undefined
 
   beforeEach(async () => {
@@ -93,16 +93,16 @@ describe('Vite 7 E2E Browser Tests', () => {
     await page.goto('https://example.com')
 
     // Wait for our content script element to appear
-    const crxElement = page.locator('#crxjs-vite7-test')
+    const crxElement = page.locator('#crxjs-e2e-test')
     await crxElement.waitFor({ timeout: 10000 })
 
     // Verify the content script ran
     const text = await crxElement.textContent()
-    expect(text).toContain('CRXJS Vite7 E2E Test')
+    expect(text).toContain('CRXJS E2E Test')
 
     // Verify element has correct styling (proves CSS was injected)
-    const bgColor = await crxElement.evaluate((el) => 
-      window.getComputedStyle(el).backgroundColor
+    const bgColor = await crxElement.evaluate(
+      (el) => window.getComputedStyle(el).backgroundColor,
     )
     expect(bgColor).toBe('rgb(76, 175, 80)') // #4CAF50
   }, 60000)
@@ -146,7 +146,7 @@ describe('Vite 7 E2E Browser Tests', () => {
     expect(await heading.textContent()).toBe('Example Page')
 
     // Content script element should be added
-    const crxElement = page.locator('#crxjs-vite7-test')
+    const crxElement = page.locator('#crxjs-e2e-test')
     await crxElement.waitFor({ timeout: 10000 })
     expect(await crxElement.isVisible()).toBe(true)
   }, 60000)
@@ -181,16 +181,16 @@ describe('Vite 7 E2E Browser Tests', () => {
     })
 
     const page = await browser.newPage()
-    
+
     // First navigation
     await page.goto('https://example.com/page1')
-    let crxElement = page.locator('#crxjs-vite7-test')
+    let crxElement = page.locator('#crxjs-e2e-test')
     await crxElement.waitFor({ timeout: 10000 })
     expect(await crxElement.isVisible()).toBe(true)
 
     // Second navigation - content script should run again
     await page.goto('https://example.com/page2')
-    crxElement = page.locator('#crxjs-vite7-test')
+    crxElement = page.locator('#crxjs-e2e-test')
     await crxElement.waitFor({ timeout: 10000 })
     expect(await crxElement.isVisible()).toBe(true)
   }, 60000)
