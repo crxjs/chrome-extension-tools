@@ -276,6 +276,9 @@ jobs:
         id: build-playground
         shell: pwsh
         run: |
+          # Prevent errors from terminating the script
+          $ErrorActionPreference = "Continue"
+          
           Write-Host "=== Building vanilla playground ==="
           
           # Re-apply locale settings (may reset between steps)
@@ -288,24 +291,29 @@ jobs:
           Write-Host "Culture: $([System.Threading.Thread]::CurrentThread.CurrentCulture.Name)"
           Write-Host ""
           
-          # Run build and capture result (don't fail on error)
-          $buildOutput = pnpm build 2>&1
-          $buildExitCode = $LASTEXITCODE
-          
-          # Show build output
-          $buildOutput | ForEach-Object { Write-Host $_ }
+          # Run build - the stderr output may cause issues, so redirect it
+          try {
+            pnpm build 2>&1 | ForEach-Object { Write-Host $_ }
+            $buildExitCode = $LASTEXITCODE
+          } catch {
+            Write-Host "Build threw exception: $_"
+            $buildExitCode = 1
+          }
           
           # Check if build succeeded
           if ($buildExitCode -eq 0 -and (Test-Path "dist/manifest.json")) {
             Write-Host ""
             Write-Host "Playground build succeeded" -ForegroundColor Green
             echo "success=true" >> $env:GITHUB_OUTPUT
+            exit 0
           } else {
             Write-Host ""
             Write-Host "Playground build failed (exit code: $buildExitCode)" -ForegroundColor Yellow
             Write-Host "This is expected - the monorepo requires specific setup to build the playground."
             Write-Host "See the 'Test Chrome Extension Samples' job for UTF-8 validation results."
             echo "success=false" >> $env:GITHUB_OUTPUT
+            # Exit with 0 so the workflow continues
+            exit 0
           }
         working-directory: playgrounds/vanilla
 
