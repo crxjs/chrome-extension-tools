@@ -256,8 +256,14 @@ jobs:
         shell: pwsh
         run: |
           # Check if the build produced the expected output
-          if (Test-Path "packages/vite-plugin/dist/index.mjs") {
-            Write-Host "vite-plugin build succeeded" -ForegroundColor Green
+          $mjs = Test-Path "packages/vite-plugin/dist/index.mjs"
+          $cjs = Test-Path "packages/vite-plugin/dist/index.cjs"
+          
+          if ($mjs -and $cjs) {
+            Write-Host "vite-plugin build succeeded (both ESM and CJS)" -ForegroundColor Green
+            echo "success=true" >> $env:GITHUB_OUTPUT
+          } elseif ($mjs) {
+            Write-Host "vite-plugin build partial - ESM only, CJS missing" -ForegroundColor Yellow
             echo "success=true" >> $env:GITHUB_OUTPUT
           } else {
             Write-Host "vite-plugin build failed - dist/index.mjs not found" -ForegroundColor Yellow
@@ -269,7 +275,6 @@ jobs:
         if: steps.verify-build.outputs.success == 'true'
         id: build-playground
         shell: pwsh
-        continue-on-error: true
         run: |
           Write-Host "=== Building vanilla playground ==="
           
@@ -284,10 +289,19 @@ jobs:
           Write-Host ""
           
           pnpm build
+          
+          # Check if build succeeded
+          if (Test-Path "dist/manifest.json") {
+            Write-Host "Playground build succeeded" -ForegroundColor Green
+            echo "success=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "Playground build failed - no dist/manifest.json" -ForegroundColor Red
+            echo "success=false" >> $env:GITHUB_OUTPUT
+          }
         working-directory: playgrounds/vanilla
 
       - name: Run dev server briefly to test HMR output
-        if: steps.verify-build.outputs.success == 'true'
+        if: steps.build-playground.outputs.success == 'true'
         shell: pwsh
         timeout-minutes: 2
         run: |
@@ -320,7 +334,7 @@ jobs:
         continue-on-error: true
 
       - name: Check output files for encoding issues
-        if: steps.verify-build.outputs.success == 'true'
+        if: steps.build-playground.outputs.success == 'true'
         shell: pwsh
         run: |
           Write-Host "=== Checking output files for encoding ==="
@@ -483,7 +497,7 @@ jobs:
           }
 
       - name: Check manifest.json encoding
-        if: steps.verify-build.outputs.success == 'true'
+        if: steps.build-playground.outputs.success == 'true'
         shell: pwsh
         run: |
           Write-Host "=== Checking manifest.json ==="
@@ -509,14 +523,14 @@ jobs:
           }
 
       - name: Install Chrome for Testing
-        if: steps.verify-build.outputs.success == 'true'
+        if: steps.build-playground.outputs.success == 'true'
         shell: pwsh
         run: |
           Write-Host "=== Installing Chrome for Testing ==="
           npx @puppeteer/browsers install chrome@stable
 
       - name: Attempt to load extension in Chrome
-        if: steps.verify-build.outputs.success == 'true'
+        if: steps.build-playground.outputs.success == 'true'
         shell: pwsh
         run: |
           Write-Host "=== Attempting to load extension in Chrome ==="
@@ -572,7 +586,7 @@ jobs:
 
       - name: Upload dist artifacts for inspection
         uses: actions/upload-artifact@v4
-        if: always() && steps.verify-build.outputs.success == 'true'
+        if: always() && steps.build-playground.outputs.success == 'true'
         with:
           name: vanilla-dist-chinese-locale
           path: playgrounds/vanilla/dist/
@@ -586,26 +600,34 @@ jobs:
           Write-Host "=========================================="
           Write-Host ""
           
-          if ("${{ steps.verify-build.outputs.success }}" -eq "true") {
+          $vitePluginSuccess = "${{ steps.verify-build.outputs.success }}" -eq "true"
+          $playgroundSuccess = "${{ steps.build-playground.outputs.success }}" -eq "true"
+          
+          if ($vitePluginSuccess) {
             Write-Host "vite-plugin build: SUCCESS" -ForegroundColor Green
-            Write-Host "Playground tests were executed."
           } else {
-            Write-Host "vite-plugin build: SKIPPED/FAILED" -ForegroundColor Yellow
-            Write-Host ""
-            Write-Host "This is expected behavior. The vite-plugin build requires"
-            Write-Host "the full monorepo to be set up correctly."
-            Write-Host ""
-            Write-Host "IMPORTANT: This workflow's PRIMARY purpose is to:"
-            Write-Host "1. Validate the UTF-8 validator tool works"
-            Write-Host "2. Test Chrome extension samples for encoding issues"
-            Write-Host "3. Demonstrate locale configuration on Windows CI"
-            Write-Host ""
-            Write-Host "The actual issue #1083 can only be reproduced on a real"
-            Write-Host "Windows machine with Chinese system locale enabled."
-            Write-Host ""
-            Write-Host "See the 'Test Chrome Extension Samples' job for UTF-8 validation results."
+            Write-Host "vite-plugin build: FAILED" -ForegroundColor Yellow
           }
           
+          if ($playgroundSuccess) {
+            Write-Host "Playground build: SUCCESS" -ForegroundColor Green
+            Write-Host "UTF-8 validation tests were executed."
+          } else {
+            Write-Host "Playground build: SKIPPED/FAILED" -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "This may be expected if the monorepo isn't fully set up."
+          }
+          
+          Write-Host ""
+          Write-Host "IMPORTANT: This workflow's PRIMARY purpose is to:"
+          Write-Host "1. Validate the UTF-8 validator tool works"
+          Write-Host "2. Test Chrome extension samples for encoding issues"
+          Write-Host "3. Demonstrate locale configuration on Windows CI"
+          Write-Host ""
+          Write-Host "The actual issue #1083 can only be reproduced on a real"
+          Write-Host "Windows machine with Chinese system locale enabled."
+          Write-Host ""
+          Write-Host "See the 'Test Chrome Extension Samples' job for UTF-8 validation results."
           Write-Host ""
           Write-Host "For affected users, run:"
           Write-Host "  node tests/utf8-validation/validate-utf8.js ./dist --system-info"
