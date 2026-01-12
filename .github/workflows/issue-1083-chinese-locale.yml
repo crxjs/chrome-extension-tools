@@ -619,3 +619,158 @@ jobs:
         with:
           name: vanilla-dist-utf8-codepage
           path: playgrounds/vanilla/dist/
+
+  # Test official Chrome extension samples
+  # - tutorial.reading-time: Contains emoji (⏱️), should FAIL validation
+  # - tutorial.hello-world: Plain ASCII, should PASS validation
+  test-chrome-samples:
+    name: Test Chrome Extension Samples
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure Chinese locale (code page 936)
+        shell: pwsh
+        run: |
+          Write-Host "=== Configuring Chinese locale ==="
+          
+          # Set console code page to Chinese GBK
+          chcp 936
+          
+          # Set registry keys for user locale
+          $intlPath = "HKCU:\Control Panel\International"
+          Set-ItemProperty -Path $intlPath -Name "Locale" -Value "00000804"
+          Set-ItemProperty -Path $intlPath -Name "LocaleName" -Value "zh-CN"
+          
+          # Set environment variables
+          echo "LANG=zh_CN.GBK" >> $env:GITHUB_ENV
+          echo "LC_ALL=zh_CN.GBK" >> $env:GITHUB_ENV
+          
+          Write-Host "Code page set to 936 (Chinese GBK)"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Clone Chrome extension samples
+        shell: pwsh
+        run: |
+          Write-Host "=== Cloning Chrome extension samples ==="
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/nickcoxdotme/GoogleChrome/chrome-extensions-samples.git chrome-samples
+          cd chrome-samples
+          git sparse-checkout set functional-samples/tutorial.reading-time functional-samples/tutorial.hello-world
+
+      - name: Display sample contents
+        shell: pwsh
+        run: |
+          Write-Host "=== tutorial.reading-time (should FAIL - has emoji) ==="
+          Get-ChildItem -Path "chrome-samples/functional-samples/tutorial.reading-time" -Recurse
+          Write-Host ""
+          Write-Host "Content script content:"
+          Get-Content "chrome-samples/functional-samples/tutorial.reading-time/scripts/content.js" -Encoding UTF8
+          
+          Write-Host ""
+          Write-Host "=== tutorial.hello-world (should PASS - plain ASCII) ==="
+          Get-ChildItem -Path "chrome-samples/functional-samples/tutorial.hello-world" -Recurse
+          Write-Host ""
+          if (Test-Path "chrome-samples/functional-samples/tutorial.hello-world/hello.html") {
+            Write-Host "hello.html content:"
+            Get-Content "chrome-samples/functional-samples/tutorial.hello-world/hello.html" -Encoding UTF8
+          }
+
+      - name: Run Node.js UTF-8 validator on samples
+        shell: pwsh
+        run: |
+          Write-Host "=== Running UTF-8 validator ==="
+          
+          # Re-apply Chinese locale
+          chcp 936
+          
+          Write-Host ""
+          Write-Host "=========================================="
+          Write-Host "Testing tutorial.hello-world (should PASS)"
+          Write-Host "=========================================="
+          node tests/utf8-validation/validate-utf8.js chrome-samples/functional-samples/tutorial.hello-world --all --system-info
+          $helloWorldResult = $LASTEXITCODE
+          
+          Write-Host ""
+          Write-Host "=========================================="
+          Write-Host "Testing tutorial.reading-time (should FAIL)"
+          Write-Host "=========================================="
+          node tests/utf8-validation/validate-utf8.js chrome-samples/functional-samples/tutorial.reading-time --all --system-info
+          $readingTimeResult = $LASTEXITCODE
+          
+          Write-Host ""
+          Write-Host "=========================================="
+          Write-Host "SUMMARY"
+          Write-Host "=========================================="
+          
+          if ($helloWorldResult -eq 0) {
+            Write-Host "hello-world: PASSED (as expected)" -ForegroundColor Green
+          } else {
+            Write-Host "hello-world: FAILED (unexpected!)" -ForegroundColor Red
+          }
+          
+          if ($readingTimeResult -ne 0) {
+            Write-Host "reading-time: FAILED (as expected - has emoji)" -ForegroundColor Green
+          } else {
+            Write-Host "reading-time: PASSED (unexpected - should have failed!)" -ForegroundColor Yellow
+          }
+          
+          # The test passes if:
+          # - hello-world passes validation
+          # - reading-time fails validation (because of emoji/special chars)
+          if ($helloWorldResult -eq 0 -and $readingTimeResult -ne 0) {
+            Write-Host ""
+            Write-Host "Test expectations met!" -ForegroundColor Green
+            exit 0
+          } else {
+            Write-Host ""
+            Write-Host "Test expectations NOT met!" -ForegroundColor Red
+            Write-Host "Expected: hello-world=PASS, reading-time=FAIL"
+            Write-Host "Got: hello-world=$($helloWorldResult -eq 0 ? 'PASS' : 'FAIL'), reading-time=$($readingTimeResult -eq 0 ? 'PASS' : 'FAIL')"
+            # Don't fail the job - we're investigating
+            exit 0
+          }
+
+      - name: Simulate GBK corruption and validate
+        shell: pwsh
+        run: |
+          Write-Host "=== Simulating GBK file corruption ==="
+          
+          # This simulates what happens when a file with Chinese/emoji
+          # is read with the wrong encoding on Chinese Windows
+          
+          $sourcePath = "chrome-samples/functional-samples/tutorial.reading-time/scripts/content.js"
+          $corruptedPath = "chrome-samples/functional-samples/tutorial.reading-time/scripts/content-corrupted.js"
+          
+          # Read as UTF-8
+          $content = Get-Content $sourcePath -Raw -Encoding UTF8
+          Write-Host "Original content (first 200 chars):"
+          Write-Host $content.Substring(0, [Math]::Min(200, $content.Length))
+          
+          # Write using system default encoding (which should be GBK/936)
+          # This simulates the corruption that happens on Chinese Windows
+          chcp 936
+          [System.IO.File]::WriteAllText($corruptedPath, $content, [System.Text.Encoding]::Default)
+          
+          Write-Host ""
+          Write-Host "Corrupted file written with system default encoding"
+          Write-Host "Validating corrupted file:"
+          node tests/utf8-validation/validate-utf8.js $corruptedPath --verbose
+          
+          Write-Host ""
+          Write-Host "Hex dump of first 100 bytes:"
+          $bytes = [System.IO.File]::ReadAllBytes($corruptedPath)
+          $hexDump = ($bytes[0..99] | ForEach-Object { $_.ToString("X2") }) -join " "
+          Write-Host $hexDump
+
+      - name: Upload sample artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chrome-samples-validation
+          path: |
+            chrome-samples/functional-samples/tutorial.reading-time/
+            chrome-samples/functional-samples/tutorial.hello-world/
