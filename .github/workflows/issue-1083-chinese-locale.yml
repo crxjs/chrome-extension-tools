@@ -1,0 +1,621 @@
+name: Issue 1083 - Chinese Locale Reproduction
+
+# This workflow attempts to reproduce issue #1083
+# https://github.com/crxjs/chrome-extension-tools/issues/1083
+# The issue is about "Failed to load extension" on Windows with Chinese locale
+# Related: https://github.com/wxt-dev/wxt/issues/353
+
+on:
+  push:
+    branches: [fix/issue-1083-chinese-locale]
+  pull_request:
+    branches: [main]
+    paths:
+      - ".github/workflows/issue-1083-chinese-locale.yml"
+  workflow_dispatch:
+
+jobs:
+  test-chinese-locale:
+    name: Windows + Chinese Locale Test
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Display initial system locale info
+        shell: pwsh
+        run: |
+          Write-Host "=== Initial System Locale Info ==="
+          Write-Host "Current Code Page:"
+          chcp
+          Write-Host ""
+          Write-Host "System Culture:"
+          Get-Culture
+          Write-Host ""
+          Write-Host "UI Culture:"
+          Get-UICulture
+          Write-Host ""
+          Write-Host "System Locale:"
+          Get-WinSystemLocale
+          Write-Host ""
+          Write-Host "Current User Locale (via registry):"
+          Get-ItemProperty -Path "HKCU:\Control Panel\International" | Select-Object Locale, LocaleName, sLanguage
+          Write-Host ""
+          Write-Host "System Default Locale (via registry):"
+          Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Nls\Language" -ErrorAction SilentlyContinue
+
+      - name: Configure Chinese locale via registry and system settings
+        shell: pwsh
+        run: |
+          Write-Host "=== Configuring Chinese locale (zh-CN) ==="
+          
+          # ============================================================
+          # Method 1: Set User Locale via Registry (affects current user)
+          # ============================================================
+          Write-Host "Setting user locale registry keys..."
+          
+          $intlPath = "HKCU:\Control Panel\International"
+          
+          # Chinese (Simplified, China) locale settings
+          Set-ItemProperty -Path $intlPath -Name "Locale" -Value "00000804"
+          Set-ItemProperty -Path $intlPath -Name "LocaleName" -Value "zh-CN"
+          Set-ItemProperty -Path $intlPath -Name "sLanguage" -Value "CHS"
+          Set-ItemProperty -Path $intlPath -Name "sCountry" -Value "China"
+          Set-ItemProperty -Path $intlPath -Name "iCountry" -Value "86"
+          Set-ItemProperty -Path $intlPath -Name "sDecimal" -Value "."
+          Set-ItemProperty -Path $intlPath -Name "sThousand" -Value ","
+          Set-ItemProperty -Path $intlPath -Name "sList" -Value ","
+          Set-ItemProperty -Path $intlPath -Name "iNegNumber" -Value "1"
+          Set-ItemProperty -Path $intlPath -Name "sNativeDigits" -Value "0123456789"
+          Set-ItemProperty -Path $intlPath -Name "iDigits" -Value "2"
+          
+          # ============================================================
+          # Method 2: Set System Locale via Registry (requires elevation)
+          # ============================================================
+          Write-Host "Setting system locale registry keys..."
+          
+          # Set ACP (ANSI Code Page) to 936 (Chinese Simplified GBK)
+          $nlsPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage"
+          try {
+            Set-ItemProperty -Path $nlsPath -Name "ACP" -Value "936" -ErrorAction Stop
+            Set-ItemProperty -Path $nlsPath -Name "OEMCP" -Value "936" -ErrorAction Stop
+            Set-ItemProperty -Path $nlsPath -Name "MACCP" -Value "10008" -ErrorAction Stop
+            Write-Host "System code page registry set to 936 (GBK)"
+          } catch {
+            Write-Host "Warning: Could not set system code page (may need elevation): $_"
+          }
+          
+          # Set default system locale
+          $languagePath = "HKLM:\SYSTEM\CurrentControlSet\Control\Nls\Language"
+          try {
+            Set-ItemProperty -Path $languagePath -Name "Default" -Value "0804" -ErrorAction Stop
+            Set-ItemProperty -Path $languagePath -Name "InstallLanguage" -Value "0804" -ErrorAction Stop
+            Write-Host "System language registry set to Chinese (0804)"
+          } catch {
+            Write-Host "Warning: Could not set system language (may need elevation): $_"
+          }
+          
+          # ============================================================
+          # Method 3: Set console code page to Chinese GBK
+          # ============================================================
+          Write-Host "Setting console code page..."
+          chcp 936
+          
+          # ============================================================
+          # Method 4: Set environment variables
+          # ============================================================
+          Write-Host "Setting environment variables..."
+          
+          # For Node.js and other tools
+          echo "LANG=zh_CN.GBK" >> $env:GITHUB_ENV
+          echo "LC_ALL=zh_CN.GBK" >> $env:GITHUB_ENV
+          echo "LC_CTYPE=zh_CN.GBK" >> $env:GITHUB_ENV
+          
+          # Windows-specific locale environment
+          echo "LANGUAGE=zh_CN" >> $env:GITHUB_ENV
+          
+          # Force Node.js to use specific encoding
+          echo "NODE_OPTIONS=--input-type=commonjs" >> $env:GITHUB_ENV
+          
+          # ============================================================
+          # Method 5: Use PowerShell culture settings
+          # ============================================================
+          Write-Host "Setting PowerShell culture..."
+          
+          # This affects the current PowerShell session
+          [System.Threading.Thread]::CurrentThread.CurrentCulture = [System.Globalization.CultureInfo]::GetCultureInfo("zh-CN")
+          [System.Threading.Thread]::CurrentThread.CurrentUICulture = [System.Globalization.CultureInfo]::GetCultureInfo("zh-CN")
+          
+          # ============================================================
+          # Method 6: Disable UTF-8 worldwide language support (Beta)
+          # This is the opposite of what users enable to fix the issue
+          # ============================================================
+          Write-Host "Configuring UTF-8 beta setting..."
+          
+          $nlsPath2 = "HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage"
+          try {
+            # Ensure UTF-8 beta is NOT enabled (this is the problematic state)
+            # When ACP=65001, UTF-8 is enabled system-wide
+            # When ACP=936, system uses Chinese GBK encoding (problematic for Chrome extensions)
+            $currentACP = (Get-ItemProperty -Path $nlsPath2 -Name "ACP" -ErrorAction SilentlyContinue).ACP
+            Write-Host "Current ACP: $currentACP"
+          } catch {
+            Write-Host "Could not read ACP: $_"
+          }
+          
+          Write-Host ""
+          Write-Host "=== Locale configuration complete ==="
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - name: Verify locale settings
+        shell: pwsh
+        run: |
+          Write-Host "=== Verifying Locale Settings ==="
+          
+          Write-Host "Console Code Page:"
+          chcp
+          
+          Write-Host ""
+          Write-Host "PowerShell Culture:"
+          [System.Threading.Thread]::CurrentThread.CurrentCulture
+          
+          Write-Host ""
+          Write-Host "Environment Variables:"
+          Write-Host "LANG: $env:LANG"
+          Write-Host "LC_ALL: $env:LC_ALL"
+          Write-Host "LANGUAGE: $env:LANGUAGE"
+          
+          Write-Host ""
+          Write-Host "Registry - User Locale:"
+          Get-ItemProperty -Path "HKCU:\Control Panel\International" | Select-Object Locale, LocaleName, sLanguage
+          
+          Write-Host ""
+          Write-Host "Registry - System Code Page:"
+          Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Nls\CodePage" -ErrorAction SilentlyContinue | Select-Object ACP, OEMCP
+          
+          Write-Host ""
+          Write-Host "Node.js locale test:"
+          node -e "console.log('Locale:', process.env.LANG); console.log('Platform:', process.platform); console.log('Encoding test: 中文测试 emoji: ⏱️')"
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install all dependencies
+        run: pnpm install
+
+      - name: Add test file with emoji and Chinese characters
+        shell: pwsh
+        run: |
+          Write-Host "=== Adding test file with special characters ==="
+          
+          # Create a test file with emoji and Chinese characters
+          # This mimics what might be in real extensions (like the stopwatch emoji mentioned in the issue)
+          $testContent = "// Test file with special characters`n"
+          $testContent += "// 中文注释 - Chinese comment`n"
+          $testContent += "// Emoji: ⏱️ 🚀 ✅ ❌`n"
+          $testContent += "`n"
+          $testContent += "const chineseText = `"你好世界`";`n"
+          $testContent += "const emojiText = `"⏱️ Timer`";`n"
+          $testContent += "const mixedText = `"Hello 世界 ⏱️`";`n"
+          $testContent += "`n"
+          $testContent += "console.log(chineseText, emojiText, mixedText);`n"
+          $testContent += "`n"
+          $testContent += "export { chineseText, emojiText, mixedText };`n"
+          
+          # Write with UTF-8 encoding (no BOM)
+          $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+          [System.IO.File]::WriteAllText("playgrounds/vanilla/src/unicode-test.ts", $testContent, $utf8NoBom)
+          
+          Write-Host "Created unicode-test.ts"
+          Write-Host "File contents (hex check):"
+          $bytes = [System.IO.File]::ReadAllBytes("playgrounds/vanilla/src/unicode-test.ts")
+          Write-Host "First 50 bytes: $($bytes[0..49] -join ' ')"
+          Write-Host ""
+          Get-Content "playgrounds/vanilla/src/unicode-test.ts" -Encoding UTF8
+
+      - name: Import test file in content script
+        shell: pwsh
+        run: |
+          Write-Host "=== Modifying content script to import unicode test ==="
+          
+          $contentPath = "playgrounds/vanilla/src/content/main.ts"
+          $content = Get-Content $contentPath -Raw -Encoding UTF8
+          
+          # Add import at the top
+          $newContent = "import { chineseText, emojiText } from '../unicode-test';`n" + $content
+          $newContent += "`nconsole.log('Unicode test:', chineseText, emojiText);"
+          
+          $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+          [System.IO.File]::WriteAllText($contentPath, $newContent, $utf8NoBom)
+          
+          Write-Host "Modified content script:"
+          Get-Content $contentPath -Encoding UTF8
+
+      - name: Build vite-plugin
+        run: pnpm build
+        working-directory: packages/vite-plugin
+
+      - name: Build vanilla playground extension
+        shell: pwsh
+        run: |
+          Write-Host "=== Building vanilla playground ==="
+          
+          # Re-apply locale settings (may reset between steps)
+          chcp 936
+          [System.Threading.Thread]::CurrentThread.CurrentCulture = [System.Globalization.CultureInfo]::GetCultureInfo("zh-CN")
+          [System.Threading.Thread]::CurrentThread.CurrentUICulture = [System.Globalization.CultureInfo]::GetCultureInfo("zh-CN")
+          
+          Write-Host "Current Code Page:"
+          chcp
+          Write-Host "Culture: $([System.Threading.Thread]::CurrentThread.CurrentCulture.Name)"
+          Write-Host ""
+          
+          pnpm build
+        working-directory: playgrounds/vanilla
+
+      - name: Run dev server briefly to test HMR output
+        shell: pwsh
+        timeout-minutes: 2
+        run: |
+          Write-Host "=== Starting dev server to test HMR ==="
+          
+          # Re-apply locale
+          chcp 936
+          
+          # Start dev server in background and capture output
+          $job = Start-Job -ScriptBlock {
+            Set-Location $using:PWD
+            chcp 936
+            pnpm dev 2>&1
+          }
+          
+          # Wait for server to start
+          Start-Sleep -Seconds 30
+          
+          # Get output
+          $output = Receive-Job -Job $job
+          Write-Host "Dev server output:"
+          $output | ForEach-Object { Write-Host $_ }
+          
+          # Stop the job
+          Stop-Job -Job $job
+          Remove-Job -Job $job
+          
+          Write-Host "Dev server test complete"
+        working-directory: playgrounds/vanilla
+        continue-on-error: true
+
+      - name: Check output files for encoding issues
+        shell: pwsh
+        run: |
+          Write-Host "=== Checking output files for encoding ==="
+          
+          $distPath = "playgrounds/vanilla/dist"
+          
+          # List all JS files
+          Write-Host "JavaScript files in dist:"
+          Get-ChildItem -Path $distPath -Recurse -Filter "*.js" | ForEach-Object {
+            Write-Host "  $($_.FullName)"
+          }
+          
+          Write-Host ""
+          Write-Host "=== Validating UTF-8 encoding (matching Chrome's base::IsStringUTF8) ==="
+          
+          # This function validates UTF-8 similar to Chrome's base::IsStringUTF8
+          # It checks for:
+          # 1. Valid UTF-8 byte sequences
+          # 2. No overlong encodings
+          # 3. No surrogate pairs (U+D800-U+DFFF)
+          # 4. No non-character code points (U+FFFE, U+FFFF, U+nFFFE, U+nFFFF)
+          function Test-ValidUTF8 {
+            param([byte[]]$bytes)
+            
+            $i = 0
+            $errors = @()
+            
+            while ($i -lt $bytes.Length) {
+              $b = $bytes[$i]
+              
+              # ASCII (0x00-0x7F)
+              if ($b -le 0x7F) {
+                $i++
+                continue
+              }
+              
+              # Determine expected sequence length
+              $seqLen = 0
+              $minCodepoint = 0
+              $codepoint = 0
+              
+              if (($b -band 0xE0) -eq 0xC0) {
+                # 2-byte sequence (110xxxxx)
+                $seqLen = 2
+                $codepoint = $b -band 0x1F
+                $minCodepoint = 0x80
+              }
+              elseif (($b -band 0xF0) -eq 0xE0) {
+                # 3-byte sequence (1110xxxx)
+                $seqLen = 3
+                $codepoint = $b -band 0x0F
+                $minCodepoint = 0x800
+              }
+              elseif (($b -band 0xF8) -eq 0xF0) {
+                # 4-byte sequence (11110xxx)
+                $seqLen = 4
+                $codepoint = $b -band 0x07
+                $minCodepoint = 0x10000
+              }
+              else {
+                # Invalid leading byte (10xxxxxx or 11111xxx)
+                $errors += "Invalid leading byte 0x$($b.ToString('X2')) at position $i"
+                $i++
+                continue
+              }
+              
+              # Check if we have enough bytes
+              if ($i + $seqLen -gt $bytes.Length) {
+                $errors += "Truncated sequence at position $i"
+                break
+              }
+              
+              # Validate continuation bytes and build codepoint
+              $valid = $true
+              for ($j = 1; $j -lt $seqLen; $j++) {
+                $cont = $bytes[$i + $j]
+                if (($cont -band 0xC0) -ne 0x80) {
+                  $errors += "Invalid continuation byte 0x$($cont.ToString('X2')) at position $($i + $j)"
+                  $valid = $false
+                  break
+                }
+                $codepoint = ($codepoint -shl 6) -bor ($cont -band 0x3F)
+              }
+              
+              if (-not $valid) {
+                $i++
+                continue
+              }
+              
+              # Check for overlong encoding
+              if ($codepoint -lt $minCodepoint) {
+                $errors += "Overlong encoding for U+$($codepoint.ToString('X4')) at position $i"
+              }
+              
+              # Check for surrogate pairs (U+D800-U+DFFF) - invalid in UTF-8
+              if ($codepoint -ge 0xD800 -and $codepoint -le 0xDFFF) {
+                $errors += "Surrogate pair U+$($codepoint.ToString('X4')) at position $i"
+              }
+              
+              # Check for non-character code points (Chrome's IsStringUTF8 rejects these)
+              # U+FFFE, U+FFFF, and U+nFFFE, U+nFFFF for each plane
+              if (($codepoint -band 0xFFFE) -eq 0xFFFE) {
+                $errors += "Non-character code point U+$($codepoint.ToString('X4')) at position $i"
+              }
+              
+              # Check for code points > U+10FFFF
+              if ($codepoint -gt 0x10FFFF) {
+                $errors += "Code point U+$($codepoint.ToString('X4')) exceeds maximum at position $i"
+              }
+              
+              $i += $seqLen
+            }
+            
+            return $errors
+          }
+          
+          # Check each JS file
+          $hasErrors = $false
+          Get-ChildItem -Path $distPath -Recurse -Filter "*.js" | ForEach-Object {
+            $file = $_
+            Write-Host ""
+            Write-Host "Checking: $($file.Name)"
+            
+            $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+            Write-Host "  File size: $($bytes.Length) bytes"
+            
+            # Check for UTF-8 BOM
+            if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+              Write-Host "  Has UTF-8 BOM"
+            }
+            
+            # Validate UTF-8
+            $errors = Test-ValidUTF8 -bytes $bytes
+            
+            if ($errors.Count -gt 0) {
+              Write-Host "  ERROR: Invalid UTF-8 detected!" -ForegroundColor Red
+              $errors | ForEach-Object { Write-Host "    $_" -ForegroundColor Red }
+              $hasErrors = $true
+              
+              # Show hex dump around first error
+              Write-Host "  First 100 bytes (hex):"
+              $hexDump = ($bytes[0..99] | ForEach-Object { $_.ToString("X2") }) -join " "
+              Write-Host "    $hexDump"
+            }
+            else {
+              Write-Host "  Valid UTF-8" -ForegroundColor Green
+            }
+          }
+          
+          if ($hasErrors) {
+            Write-Host ""
+            Write-Host "=== UTF-8 VALIDATION FAILED ===" -ForegroundColor Red
+            Write-Host "This matches Chrome's base::IsStringUTF8() behavior"
+            Write-Host "The extension would fail to load with 'Failed to load extension' error"
+            exit 1
+          }
+          else {
+            Write-Host ""
+            Write-Host "=== All files passed UTF-8 validation ===" -ForegroundColor Green
+          }
+
+      - name: Check manifest.json encoding
+        shell: pwsh
+        run: |
+          Write-Host "=== Checking manifest.json ==="
+          $manifestPath = "playgrounds/vanilla/dist/manifest.json"
+          
+          if (Test-Path $manifestPath) {
+            Write-Host "Manifest content:"
+            Get-Content $manifestPath -Raw
+            
+            # Validate JSON
+            try {
+              $json = Get-Content $manifestPath -Raw | ConvertFrom-Json
+              Write-Host ""
+              Write-Host "Manifest JSON is valid"
+            } catch {
+              Write-Host "ERROR: Invalid JSON in manifest"
+              Write-Host $_.Exception.Message
+              exit 1
+            }
+          } else {
+            Write-Host "ERROR: manifest.json not found"
+            exit 1
+          }
+
+      - name: Install Chrome for Testing
+        shell: pwsh
+        run: |
+          Write-Host "=== Installing Chrome for Testing ==="
+          npx @puppeteer/browsers install chrome@stable
+
+      - name: Attempt to load extension in Chrome
+        shell: pwsh
+        run: |
+          Write-Host "=== Attempting to load extension in Chrome ==="
+          
+          $extensionPath = (Resolve-Path "playgrounds/vanilla/dist").Path
+          Write-Host "Extension path: $extensionPath"
+          
+          # Find Chrome for Testing
+          $chromePath = Get-ChildItem -Path "chrome" -Recurse -Filter "chrome.exe" | Select-Object -First 1
+          
+          if ($chromePath) {
+            Write-Host "Chrome found at: $($chromePath.FullName)"
+            
+            # Create a temporary user data directory
+            $userDataDir = Join-Path $env:TEMP "chrome-test-profile-$(Get-Random)"
+            New-Item -ItemType Directory -Path $userDataDir -Force | Out-Null
+            
+            # Launch Chrome with extension and capture any errors
+            # Using --no-sandbox for CI environment
+            $process = Start-Process -FilePath $chromePath.FullName -ArgumentList @(
+              "--headless=new",
+              "--disable-gpu",
+              "--no-sandbox",
+              "--disable-dev-shm-usage",
+              "--user-data-dir=$userDataDir",
+              "--load-extension=$extensionPath",
+              "--enable-logging",
+              "--v=1",
+              "chrome://extensions"
+            ) -PassThru -Wait -NoNewWindow -RedirectStandardError "chrome-stderr.txt" -RedirectStandardOutput "chrome-stdout.txt"
+            
+            Write-Host "Chrome exit code: $($process.ExitCode)"
+            
+            if (Test-Path "chrome-stderr.txt") {
+              Write-Host "=== Chrome stderr ==="
+              Get-Content "chrome-stderr.txt"
+            }
+            
+            if (Test-Path "chrome-stdout.txt") {
+              Write-Host "=== Chrome stdout ==="
+              Get-Content "chrome-stdout.txt"
+            }
+            
+            # Check Chrome logs for extension loading errors
+            $logPath = Join-Path $userDataDir "chrome_debug.log"
+            if (Test-Path $logPath) {
+              Write-Host "=== Chrome debug log ==="
+              Get-Content $logPath | Select-String -Pattern "extension|UTF|encoding|Failed" -CaseSensitive:$false
+            }
+          } else {
+            Write-Host "Chrome not found, skipping extension load test"
+          }
+
+      - name: Upload dist artifacts for inspection
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vanilla-dist-chinese-locale
+          path: playgrounds/vanilla/dist/
+
+  # Also test with UTF-8 code page for comparison
+  test-utf8-codepage:
+    name: Windows + UTF-8 Code Page Test
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set UTF-8 code page
+        shell: pwsh
+        run: |
+          Write-Host "=== Setting UTF-8 code page ==="
+          chcp 65001
+          echo "LANG=en_US.UTF-8" >> $env:GITHUB_ENV
+          echo "LC_ALL=en_US.UTF-8" >> $env:GITHUB_ENV
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install all dependencies
+        run: pnpm install
+
+      - name: Build vite-plugin
+        run: pnpm build
+        working-directory: packages/vite-plugin
+
+      - name: Build vanilla playground extension
+        shell: pwsh
+        run: |
+          chcp 65001
+          pnpm build
+        working-directory: playgrounds/vanilla
+
+      - name: Check output files for encoding issues
+        shell: pwsh
+        run: |
+          $distPath = "playgrounds/vanilla/dist"
+          Get-ChildItem -Path $distPath -Recurse -Filter "*.js" | ForEach-Object {
+            $file = $_
+            Write-Host "File: $($file.Name)"
+            $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+            $highByteCount = ($bytes | Where-Object { $_ -gt 127 }).Count
+            Write-Host "  High bytes: $highByteCount"
+          }
+
+      - name: Upload dist artifacts for inspection
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vanilla-dist-utf8-codepage
+          path: playgrounds/vanilla/dist/
