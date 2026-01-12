@@ -1,0 +1,26 @@
+{
+  "name": "@crxjs/vite7-e2e-test",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "E2E browser tests for CRXJS with Vite 7 (rolldown)",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "vite": "^7.0.0"
+  },
+  "dependenciesMeta": {
+    "@crxjs/vite-plugin": {
+      "injected": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "playwright-chromium": "^1.52.0",
+    "typescript": "~5.7.2",
+    "vitest": "^3.0.0"
+  }
+}
