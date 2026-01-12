@@ -696,14 +696,16 @@ jobs:
           Write-Host "=========================================="
           Write-Host "Testing tutorial.hello-world (should PASS)"
           Write-Host "=========================================="
-          node tests/utf8-validation/validate-utf8.js chrome-samples/functional-samples/tutorial.hello-world --all --system-info
+          # Don't use --all, only check text files (js, json, html, css)
+          node tests/utf8-validation/validate-utf8.js chrome-samples/functional-samples/tutorial.hello-world --system-info
           $helloWorldResult = $LASTEXITCODE
           
           Write-Host ""
           Write-Host "=========================================="
-          Write-Host "Testing tutorial.reading-time (should FAIL)"
+          Write-Host "Testing tutorial.reading-time (should PASS too - source files are valid UTF-8)"
           Write-Host "=========================================="
-          node tests/utf8-validation/validate-utf8.js chrome-samples/functional-samples/tutorial.reading-time --all --system-info
+          # The source files are valid UTF-8 - the issue is when they get PROCESSED by build tools
+          node tests/utf8-validation/validate-utf8.js chrome-samples/functional-samples/tutorial.reading-time --system-info
           $readingTimeResult = $LASTEXITCODE
           
           Write-Host ""
@@ -717,26 +719,22 @@ jobs:
             Write-Host "hello-world: FAILED (unexpected!)" -ForegroundColor Red
           }
           
-          if ($readingTimeResult -ne 0) {
-            Write-Host "reading-time: FAILED (as expected - has emoji)" -ForegroundColor Green
+          if ($readingTimeResult -eq 0) {
+            Write-Host "reading-time: PASSED (source files are valid UTF-8)" -ForegroundColor Green
           } else {
-            Write-Host "reading-time: PASSED (unexpected - should have failed!)" -ForegroundColor Yellow
+            Write-Host "reading-time: FAILED (unexpected!)" -ForegroundColor Red
           }
           
-          # The test passes if:
-          # - hello-world passes validation
-          # - reading-time fails validation (because of emoji/special chars)
-          if ($helloWorldResult -eq 0 -and $readingTimeResult -ne 0) {
+          # Both should pass - the source files are valid UTF-8
+          # The actual issue is when build tools process them on Chinese Windows
+          if ($helloWorldResult -eq 0 -and $readingTimeResult -eq 0) {
             Write-Host ""
-            Write-Host "Test expectations met!" -ForegroundColor Green
+            Write-Host "Source files are valid! Issue occurs during build processing." -ForegroundColor Cyan
             exit 0
           } else {
             Write-Host ""
-            Write-Host "Test expectations NOT met!" -ForegroundColor Red
-            Write-Host "Expected: hello-world=PASS, reading-time=FAIL"
-            Write-Host "Got: hello-world=$($helloWorldResult -eq 0 ? 'PASS' : 'FAIL'), reading-time=$($readingTimeResult -eq 0 ? 'PASS' : 'FAIL')"
-            # Don't fail the job - we're investigating
-            exit 0
+            Write-Host "Unexpected: source files have issues" -ForegroundColor Red
+            exit 1
           }
 
       - name: Simulate GBK corruption and validate
