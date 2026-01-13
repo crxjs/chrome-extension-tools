@@ -88,16 +88,33 @@ export const pluginHMR: CrxPluginFn = () => {
 
         const relFiles = new Set<string>()
         const fsFiles = new Set<string>()
+        const virtualModules = new Set<string>()
+
         for (const m of modules) {
           if (m.id?.startsWith(root)) {
             relFiles.add(m.id.slice(server.config.root.length))
           } else if (m.url?.startsWith('/@fs')) {
             fsFiles.add(m.url)
+          } else if (
+            m.id?.startsWith('\0') ||
+            m.url?.startsWith('/@id/__x00__')
+          ) {
+            // Virtual modules (like UnoCSS's __uno.css) have IDs starting with \0
+            // or URLs starting with /@id/__x00__
+            // These need to be handled separately for HMR to work correctly
+            const virtualId = m.url ?? m.id
+            if (virtualId) {
+              virtualModules.add(virtualId)
+              debug('virtual module detected:', virtualId)
+            }
           }
         }
 
         // update local vendor build if change detected from monorepo packages
         fsFiles.forEach((file) => update(file))
+
+        // update virtual modules (like UnoCSS, TailwindCSS virtual CSS)
+        virtualModules.forEach((file) => update(file))
 
         // check if changed file is a background dependency
         if (inputManifestFiles.background.length) {
@@ -119,6 +136,8 @@ export const pluginHMR: CrxPluginFn = () => {
               modules.some(isImporter(join(server.config.root, script.id)))
             ) {
               relFiles.forEach((relFile) => update(relFile))
+              // Also update virtual modules if content script dependencies change
+              virtualModules.forEach((file) => update(file))
             }
           }
       },
