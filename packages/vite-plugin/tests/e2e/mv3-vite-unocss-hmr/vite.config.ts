@@ -1,3 +1,4 @@
+// @ts-nocheck - UnoCSS types are not available in this test environment
 import UnoCSS from 'unocss/vite'
 import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig } from 'vite'
