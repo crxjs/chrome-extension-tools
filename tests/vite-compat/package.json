@@ -1,0 +1,25 @@
+{
+  "name": "@crxjs/vite-compat-test",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Compatibility tests for CRXJS with multiple Vite versions",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "vite": "^3.0.0"
+  },
+  "dependenciesMeta": {
+    "@crxjs/vite-plugin": {
+      "injected": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "playwright-chromium": "^1.52.0",
+    "typescript": "~5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

@@ -3,5 +3,12 @@ packages:
   - 'packages/**'
   # all playground apps
   - 'playgrounds/**'
+  # integration tests
+  - 'tests/**'
   # exclude packages that are inside test directories
   - '!**/test/**'
+
+# Inject workspace packages instead of symlinking them.
+# This ensures proper peer dependency resolution for tests that
+# need different versions (e.g., vite7-manifest-test needs vite@7).
+injectWorkspacePackages: true

@@ -4,13 +4,60 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      test_discord:
+        description: 'Test Discord notification (will be marked as [TEST])'
+        required: false
+        type: boolean
+        default: false
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # Test Discord notification (no production environment required)
+  test-discord:
+    name: Test Discord Notification
+    if: inputs.test_discord == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send test Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          # Check if webhook URL is configured
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "::error::DISCORD_WEBHOOK_URL secret is not configured."
+            exit 1
+          fi
+          
+          # Create the Discord webhook payload
+          PAYLOAD=$(jq -n \
+            '{
+              "username": "CRXJS Release Bot",
+              "avatar_url": "https://crxjs.dev/logo.svg",
+              "embeds": [{
+                "title": "[TEST] Test Discord Notification",
+                "description": "• This is a test notification to verify Discord webhook integration",
+                "color": 2105893,
+                "footer": {
+                  "text": "[TEST] CRXJS Chrome Extension Tools"
+                },
+                "timestamp": (now | strftime("%Y-%m-%dT%H:%M:%SZ"))
+              }]
+            }')
+          
+          # Send to Discord
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+          
+          echo "Discord test notification sent successfully!"
+
   release:
     name: Release
+    if: inputs.test_discord != true
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -55,12 +102,41 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # - if: steps.changesets.outputs.published == 'true'
-      #   name: Github Releases To Discord
-      #   uses: sillyangel/releases-to-discord@v1
-      #   with:
-      #     webhook_url: ${{ secrets.WEBHOOK_URL }}
-      #     color: "2105893"
-      #     username: "Release Changelog"
-      #     avatar_url: "https://cdn.discordapp.com/avatars/487431320314576937/bd64361e4ba6313d561d54e78c9e7171.png"
-      # FIXME: https://github.com/crxjs/chrome-extension-tools/actions/runs/13581366932/job/37967884502
+      - if: steps.changesets.outputs.published == 'true'
+        name: Notify Discord about new release
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          # Check if webhook URL is configured
+          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
+            echo "::warning::DISCORD_WEBHOOK_URL secret is not configured. Skipping Discord notification."
+            exit 0
+          fi
+          
+          # Parse the published packages and create a Discord message
+          PACKAGES=$(echo "$PUBLISHED_PACKAGES" | jq -r '.[] | "• \(.name)@\(.version)"' 2>/dev/null || echo "• New packages published")
+          
+          # Create the Discord webhook payload
+          PAYLOAD=$(jq -n \
+            --arg description "$PACKAGES" \
+            '{
+              "username": "CRXJS Release Bot",
+              "avatar_url": "https://crxjs.dev/logo.svg",
+              "embeds": [{
+                "title": "New packages have been published to npm",
+                "description": $description,
+                "color": 2105893,
+                "footer": {
+                  "text": "CRXJS Chrome Extension Tools"
+                },
+                "timestamp": (now | strftime("%Y-%m-%dT%H:%M:%SZ"))
+              }]
+            }')
+          
+          # Send to Discord
+          curl -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+          
+          echo "Discord notification sent successfully!"
