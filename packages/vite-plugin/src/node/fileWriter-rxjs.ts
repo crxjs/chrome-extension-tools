@@ -1,6 +1,14 @@
 import * as lexer from 'es-module-lexer'
+import fsx from 'fs-extra'
 import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
+import {
+  OutputAsset,
+  OutputChunk,
+  OutputOptions,
+  rollup,
+  RollupOptions,
+} from 'rollup'
 import {
   BehaviorSubject,
   filter,
@@ -17,12 +25,120 @@ import {
   takeUntil,
   toArray,
 } from 'rxjs'
-import { ErrorPayload, ViteDevServer } from 'vite'
+import {
+  ErrorPayload,
+  resolveConfig,
+  ResolvedConfig,
+  ViteDevServer,
+} from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 import convertSourceMap from 'convert-source-map'
+
+const { outputFile } = fsx
+
+const buildConfigCache = new Map<string, ResolvedConfig>()
+
+const getBuildConfigCacheKey = (server: ViteDevServer) => {
+  return `${server.config.root}:${server.config.mode}:${
+    server.config.configFile ?? 'inline'
+  }`
+}
+
+async function resolveBuildConfig(
+  server: ViteDevServer,
+): Promise<ResolvedConfig> {
+  const cacheKey = getBuildConfigCacheKey(server)
+  const cached = buildConfigCache.get(cacheKey)
+  if (cached) return cached
+  const configFile = server.config.configFile ?? false
+  const resolved = await resolveConfig(
+    {
+      root: server.config.root,
+      mode: server.config.mode,
+      logLevel: 'silent',
+      configFile,
+    },
+    'build',
+    server.config.mode,
+  )
+  buildConfigCache.set(cacheKey, resolved)
+  return resolved
+}
+
+const getIifeGlobalName = (fileName: string) => {
+  const base = fileName.split('/').pop() ?? fileName
+  const sanitized = base.replace(/\W+/g, '_').replace(/^_+/, '')
+  return `crx_${sanitized || 'content_script'}`
+}
+
+const resolveScriptInput = (server: ViteDevServer, id: string) => {
+  if (id.startsWith('/@fs/')) return id.slice('/@fs/'.length)
+  if (id.startsWith('/')) return join(server.config.root, id.slice(1))
+  return id
+}
+
+const isOutputChunk = (item: OutputChunk | OutputAsset): item is OutputChunk =>
+  item.type === 'chunk'
+
+const isOutputAsset = (item: OutputChunk | OutputAsset): item is OutputAsset =>
+  item.type === 'asset'
+
+async function bundleIife(
+  server: ViteDevServer,
+  script: CrxDevScriptId,
+  fileName: string,
+) {
+  const buildConfig = await resolveBuildConfig(server)
+  const input = resolveScriptInput(server, script.id)
+  const rollupOptions: RollupOptions = {
+    input,
+    plugins: buildConfig.plugins.filter(
+      (plugin) => !plugin.name?.startsWith('crx:'),
+    ),
+    external: buildConfig.build.rollupOptions?.external,
+    onwarn: buildConfig.build.rollupOptions?.onwarn,
+    treeshake: buildConfig.build.rollupOptions?.treeshake,
+  }
+  const rollupOutput = [buildConfig.build.rollupOptions?.output].flat()[0]
+  const { dir, file, manualChunks, ...baseOutputOptions } = (rollupOutput ??
+    {}) as OutputOptions
+  const sourcemap = buildConfig.build.sourcemap === 'inline' ? 'inline' : false
+  const outputOptions: OutputOptions = {
+    ...baseOutputOptions,
+    format: 'iife',
+    inlineDynamicImports: true,
+    entryFileNames: fileName,
+    assetFileNames:
+      baseOutputOptions.assetFileNames ?? 'assets/[name][extname]',
+    name: getIifeGlobalName(fileName),
+    sourcemap,
+  }
+
+  const bundle = await rollup(rollupOptions)
+  const { output } = await bundle.generate(outputOptions)
+  await bundle.close()
+
+  const entryChunk = output.find(
+    (item): item is OutputChunk => isOutputChunk(item) && item.isEntry,
+  )
+  if (!entryChunk) {
+    throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
+  }
+
+  const assets = output.filter(isOutputAsset)
+  const extraChunks = output.filter(
+    (item): item is OutputChunk => isOutputChunk(item) && !item.isEntry,
+  )
+
+  return {
+    code: entryChunk.code,
+    assets,
+    extraChunks,
+  }
+}
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -138,6 +254,7 @@ function prepScript(
   fileName: string,
   script: CrxDevScriptId,
 ): OperatorFileData {
+  if (script.type === 'iife') return prepIifeScript(fileName, script)
   return ($) =>
     $.pipe(
       // get script contents from dev server
@@ -198,6 +315,52 @@ function prepScript(
           }
         return { target, source: magic.toString(), deps: [...depSet] }
       }),
+    )
+}
+
+function prepIifeScript(
+  fileName: string,
+  script: CrxDevScriptId,
+): OperatorFileData {
+  return ($) =>
+    $.pipe(
+      mergeMap(async ({ server }) => {
+        const target = getOutputPath(server, fileName)
+        const { code, assets, extraChunks } = await bundleIife(
+          server,
+          script,
+          fileName,
+        )
+        return { target, source: code, deps: [], server, assets, extraChunks }
+      }),
+      mergeMap(
+        async ({ target, source, deps, server, assets, extraChunks }) => {
+          const extras = [
+            ...assets.map((asset) => ({
+              fileName: asset.fileName,
+              source: asset.source,
+            })),
+            ...extraChunks.map((chunk) => ({
+              fileName: chunk.fileName,
+              source: chunk.code,
+            })),
+          ].filter((item) => item.fileName !== fileName)
+
+          await Promise.all(
+            extras.map(async (item) => {
+              const outputPath = getOutputPath(server, item.fileName)
+              if (typeof item.source === 'undefined' || item.source === null)
+                return
+              if (item.source instanceof Uint8Array)
+                await outputFile(outputPath, item.source)
+              else
+                await outputFile(outputPath, item.source, { encoding: 'utf8' })
+            }),
+          )
+
+          return { target, source, deps }
+        },
+      ),
     )
 }
 
