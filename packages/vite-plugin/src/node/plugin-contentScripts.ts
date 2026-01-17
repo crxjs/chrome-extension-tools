@@ -1,13 +1,13 @@
 import contentHmrPort from 'client/es/hmr-content-port.ts'
 import { filter, Subscription } from 'rxjs'
+import { OutputAsset, OutputChunk } from 'rollup'
 import {
-  OutputAsset,
-  OutputChunk,
-  OutputOptions,
-  rollup,
-  RollupOptions,
-} from 'rollup'
-import { ConfigEnv, ResolvedConfig, UserConfig, ViteDevServer } from 'vite'
+  build as viteBuild,
+  ConfigEnv,
+  ResolvedConfig,
+  UserConfig,
+  ViteDevServer,
+} from 'vite'
 import {
   contentScripts,
   createDevLoader,
@@ -57,29 +57,49 @@ const emitAssetToBundle = (
 
 const bundleIifeScript = async (config: ResolvedConfig, scriptId: string) => {
   const input = resolveScriptInput(config, scriptId)
-  const rollupOptions: RollupOptions = {
-    input,
-    plugins: config.plugins.filter(
-      (plugin) => !plugin.name?.startsWith('crx:'),
-    ),
-    external: config.build.rollupOptions?.external,
-    onwarn: config.build.rollupOptions?.onwarn,
-    treeshake: config.build.rollupOptions?.treeshake,
-  }
-  const rollupOutput = [config.build.rollupOptions?.output].flat()[0]
-  const { dir, file, manualChunks, ...baseOutputOptions } = (rollupOutput ??
-    {}) as OutputOptions
-  const outputOptions: OutputOptions = {
-    ...baseOutputOptions,
-    format: 'iife',
-    inlineDynamicImports: true,
-    name: getIifeGlobalName(scriptId),
-    sourcemap: config.build.sourcemap,
+
+  // Use Vite's build API instead of raw Rollup to avoid plugin compatibility issues
+  // (Vite 6+ plugins are tracked in WeakMaps and can't be reused in separate Rollup builds)
+  const result = await viteBuild({
+    root: config.root,
+    mode: config.mode,
+    configFile: false, // Don't load user's config - use minimal IIFE-specific settings
+    logLevel: 'silent',
+    resolve: {
+      // Copy resolve settings from the config for consistency
+      alias: config.resolve.alias,
+      extensions: config.resolve.extensions,
+      conditions: config.resolve.conditions,
+    },
+    build: {
+      write: false, // Don't write to disk
+      manifest: false, // Don't generate Vite manifest
+      rollupOptions: {
+        input,
+        external: config.build.rollupOptions?.external,
+        onwarn: config.build.rollupOptions?.onwarn,
+        treeshake: config.build.rollupOptions?.treeshake,
+        output: {
+          format: 'iife',
+          inlineDynamicImports: true, // Required for IIFE format
+          name: getIifeGlobalName(scriptId),
+          sourcemap: config.build.sourcemap,
+        },
+      },
+      minify: false,
+      copyPublicDir: false,
+    },
+  })
+
+  // viteBuild with write: false returns RollupOutput or RollupOutput[]
+  const outputs = Array.isArray(result) ? result : [result]
+  const firstOutput = outputs[0]
+  const output = 'output' in firstOutput ? firstOutput.output : undefined
+
+  if (!output) {
+    throw new Error(`Unable to generate IIFE bundle for "${scriptId}"`)
   }
 
-  const bundle = await rollup(rollupOptions)
-  const { output } = await bundle.generate(outputOptions)
-  await bundle.close()
   return output
 }
 

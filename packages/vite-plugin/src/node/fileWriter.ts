@@ -1,6 +1,11 @@
 import fsx from 'fs-extra'
 import { performance } from 'perf_hooks'
-import { OutputOptions, rollup, RollupOptions } from 'rollup'
+import {
+  OutputOptions,
+  rollup,
+  RollupOptions,
+  Plugin as RollupPlugin,
+} from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
@@ -27,6 +32,17 @@ const { outputFile } = fsx
 
 const debug = _debug('file-writer')
 
+/** Type guard for CrxPlugin that works across Vite versions */
+function isCrxPlugin(p: unknown): p is CrxPlugin {
+  return (
+    typeof p === 'object' &&
+    p !== null &&
+    'name' in p &&
+    typeof (p as { name: unknown }).name === 'string' &&
+    (p as { name: string }).name.startsWith('crx:')
+  )
+}
+
 /**
  * Starts the file writer.
  *
@@ -43,14 +59,12 @@ export async function start({
 }): Promise<void> {
   serverEvent$.next({ type: 'start', server })
 
-  const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
-    p.name?.startsWith('crx:'),
-  )
+  const plugins = server.config.plugins.filter(isCrxPlugin)
   const { rollupOptions, outDir } = server.config.build
   const inputOptions: RollupOptions = {
     input: 'index.html',
     ...rollupOptions,
-    plugins,
+    plugins: plugins as RollupPlugin[],
   }
   // handle the various output option types
   const rollupOutputOptions = [rollupOptions.output].flat()[0]

@@ -52,6 +52,11 @@ export type CrxDevScriptId = {
 
 export interface CrxPlugin extends VitePlugin {
   /**
+   * The name of the plugin, required for CrxPlugin. This ensures compatibility
+   * with Vite 7+ where Plugin.name may be optional.
+   */
+  name: string
+  /**
    * Runs during the transform hook for the manifest. Filenames use input
    * filenames.
    */
@@ -126,6 +131,12 @@ export type CrxHMRPayload =
       data: HMRPayload
     }
 
-export interface ResolvedConfigWithHMRToken extends ResolvedConfig {
+/**
+ * Extension of ResolvedConfig that adds webSocketToken support. webSocketToken
+ * was added in Vite 7 and doesn't exist in earlier versions. We use
+ * intersection type instead of extends to avoid TypeScript errors when the base
+ * type changes across Vite versions.
+ */
+export type ResolvedConfigWithHMRToken = ResolvedConfig & {
   webSocketToken?: string
 }

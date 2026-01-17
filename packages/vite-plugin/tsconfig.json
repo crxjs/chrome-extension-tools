@@ -9,6 +9,7 @@
     "moduleResolution": "node",
     "paths": {
       "client/*": ["src/client/*"],
+      "src": ["src/node/index.ts"],
       "src/*": ["src/node/*"],
       "tests/*": ["tests/*"]
     },

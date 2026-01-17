@@ -89,14 +89,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
 
-      - name: Install Vite ${{ matrix.vite-version }}
-        run: pnpm add -D vite@${{ matrix.vite-version }}
-
-      - name: Rebuild plugin
+      - name: Build plugin (with default Vite 3)
         run: pnpm build
 
-      - name: Run unit and output tests
+      - name: Install Vite ${{ matrix.vite-version }} for testing
+        if: matrix.vite-version != '3'
+        run: pnpm add -D vite@${{ matrix.vite-version }}
+
+      - name: Run unit and output tests (Vite 3 only - includes snapshots)
+        if: matrix.vite-version == '3'
         run: pnpm test:run:out
+
+      - name: Run compat tests (Vite 6/7/8 - no snapshots)
+        if: matrix.vite-version != '3'
+        run: pnpm test:run:compat
 
   e2e:
     name: E2E Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
@@ -134,11 +140,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
 
-      - name: Install Vite ${{ matrix.vite-version }}
-        run: pnpm add -D vite@${{ matrix.vite-version }}
-
-      - name: Rebuild plugin
+      - name: Build plugin (with default Vite 3)
         run: pnpm build
+
+      - name: Install Vite ${{ matrix.vite-version }} for testing
+        if: matrix.vite-version != '3'
+        run: pnpm add -D vite@${{ matrix.vite-version }}
 
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
