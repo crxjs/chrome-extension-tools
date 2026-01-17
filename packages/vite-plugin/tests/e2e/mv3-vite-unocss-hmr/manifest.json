@@ -1,0 +1,12 @@
+{
+  "description": "UnoCSS HMR test extension",
+  "manifest_version": 3,
+  "name": "UnoCSS HMR test",
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/content.ts"]
+    }
+  ],
+  "version": "1.0.0"
+}

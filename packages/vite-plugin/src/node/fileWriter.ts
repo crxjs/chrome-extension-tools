@@ -80,6 +80,12 @@ export async function close(): Promise<void> {
  */
 export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
   const fileName = getFileName(script)
+  debug(
+    'add: script.id=%s script.type=%s fileName=%s',
+    script.id,
+    script.type,
+    fileName,
+  )
   let file = outputFiles.get(fileName)
   if (typeof file === 'undefined') {
     file = formatFileData({
@@ -88,6 +94,20 @@ export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
       file: write(script),
     })
     outputFiles.set(file.fileName, file)
+    debug('add: stored new file %s', file.fileName)
+  } else {
+    // For virtual modules, always re-write since their content may have changed
+    // Virtual modules don't have a file on disk, so we can't rely on file watchers
+    const isVirtualModule =
+      script.id.startsWith('/@id/') || script.id.startsWith('/__')
+    if (isVirtualModule) {
+      debug(
+        'add: virtual module already exists, triggering re-write for %s',
+        fileName,
+      )
+      file.file = write(script)
+      outputFiles.set(fileName, file)
+    }
   }
   return file
 }
@@ -102,16 +122,20 @@ export function update(_id: string): OutputFile[] {
   const id = prefix('/', _id)
   const types = ['iife', 'module'] as const
   const updatedFiles: OutputFile[] = []
+  debug('update called: _id=%s id=%s', _id, id)
   for (const type of types) {
     const fileName = getFileName({ id, type })
+    debug('update: looking for fileName=%s', fileName)
     const scriptFile = outputFiles.get(fileName)
     if (scriptFile) {
+      debug('update: found file, calling write()')
       scriptFile.file = write({ id, type })
       updatedFiles.push(scriptFile)
       // trigger scriptFiles change, scriptFile is already formatted
       outputFiles.set(fileName, scriptFile)
     }
   }
+  debug('update: returning %d files', updatedFiles.length)
   return updatedFiles
 }
 
