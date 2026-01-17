@@ -61,9 +61,16 @@ export async function start({
 
   const plugins = server.config.plugins.filter(isCrxPlugin)
   const { rollupOptions, outDir } = server.config.build
+  // Only pass valid Rollup input options, not Vite-specific options like 'platform'
   const inputOptions: RollupOptions = {
     input: 'index.html',
-    ...rollupOptions,
+    // Pick only valid Rollup input options from rollupOptions
+    external: rollupOptions.external,
+    onwarn: rollupOptions.onwarn,
+    treeshake: rollupOptions.treeshake,
+    context: rollupOptions.context,
+    moduleContext: rollupOptions.moduleContext,
+    preserveEntrySignatures: rollupOptions.preserveEntrySignatures,
     plugins: plugins as RollupPlugin[],
   }
   // handle the various output option types
