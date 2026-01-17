@@ -1,6 +1,13 @@
 import contentHmrPort from 'client/es/hmr-content-port.ts'
 import { filter, Subscription } from 'rxjs'
-import { ConfigEnv, UserConfig, ViteDevServer } from 'vite'
+import {
+  OutputAsset,
+  OutputChunk,
+  OutputOptions,
+  rollup,
+  RollupOptions,
+} from 'rollup'
+import { ConfigEnv, ResolvedConfig, UserConfig, ViteDevServer } from 'vite'
 import {
   contentScripts,
   createDevLoader,
@@ -11,11 +18,70 @@ import {
 import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { getOptions } from './plugin-optionsProvider'
-import { basename } from './path'
+import { basename, join } from './path'
 import { RxMap } from './RxMap'
 import { CrxPluginFn } from './types'
 import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
-import colors from 'picocolors';
+import colors from 'picocolors'
+
+const getIifeGlobalName = (fileName: string) => {
+  const base = fileName.split('/').pop() ?? fileName
+  const sanitized = base.replace(/\W+/g, '_').replace(/^_+/, '')
+  return `crx_${sanitized || 'content_script'}`
+}
+
+const resolveScriptInput = (config: ResolvedConfig, id: string) => {
+  if (id.startsWith('/@fs/')) return id.slice('/@fs/'.length)
+  if (id.startsWith('/')) return join(config.root, id.slice(1))
+  return id
+}
+
+const isOutputChunk = (item: OutputChunk | OutputAsset): item is OutputChunk =>
+  item.type === 'chunk'
+
+const isOutputAsset = (item: OutputChunk | OutputAsset): item is OutputAsset =>
+  item.type === 'asset'
+
+const emitAssetToBundle = (
+  bundle: Record<string, OutputChunk | OutputAsset>,
+  fileName: string,
+  source: string | Uint8Array,
+) => {
+  bundle[fileName] = {
+    type: 'asset',
+    fileName,
+    name: fileName,
+    source,
+  } as OutputAsset
+}
+
+const bundleIifeScript = async (config: ResolvedConfig, scriptId: string) => {
+  const input = resolveScriptInput(config, scriptId)
+  const rollupOptions: RollupOptions = {
+    input,
+    plugins: config.plugins.filter(
+      (plugin) => !plugin.name?.startsWith('crx:'),
+    ),
+    external: config.build.rollupOptions?.external,
+    onwarn: config.build.rollupOptions?.onwarn,
+    treeshake: config.build.rollupOptions?.treeshake,
+  }
+  const rollupOutput = [config.build.rollupOptions?.output].flat()[0]
+  const { dir, file, manualChunks, ...baseOutputOptions } = (rollupOutput ??
+    {}) as OutputOptions
+  const outputOptions: OutputOptions = {
+    ...baseOutputOptions,
+    format: 'iife',
+    inlineDynamicImports: true,
+    name: getIifeGlobalName(scriptId),
+    sourcemap: config.build.sourcemap,
+  }
+
+  const bundle = await rollup(rollupOptions)
+  const { output } = await bundle.generate(outputOptions)
+  await bundle.close()
+  return output
+}
 
 /**
  * Emits content scripts and loaders.
@@ -30,23 +96,24 @@ import colors from 'picocolors';
  * - This plugin emits content scripts and loaders
  */
 export const pluginContentScripts: CrxPluginFn = () => {
-  const pluginName = 'crx:content-scripts';
+  const pluginName = 'crx:content-scripts'
 
   let server: ViteDevServer
+  let resolvedConfig: ResolvedConfig
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
   let sub = new Subscription()
 
-  const worldMainIds = new Set<string>();
+  const worldMainIds = new Set<string>()
 
   const findWorldMainIds = async (config: UserConfig, env: ConfigEnv) => {
     const { manifest: _manifest } = await getOptions(config)
 
     const manifest = await (typeof _manifest === 'function'
       ? _manifest(env)
-      : _manifest);
+      : _manifest)
 
-    (manifest.content_scripts || []).forEach(({ world, js }) => {
+    ;(manifest.content_scripts || []).forEach(({ world, js }) => {
       if (world === 'MAIN' && js) {
         js.forEach((path) => worldMainIds.add(prefix('/', path)))
       }
@@ -69,7 +136,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
       name: pluginName,
       apply: 'serve',
       async config(config, env) {
-        await findWorldMainIds(config, env);
+        await findWorldMainIds(config, env)
         const { contentScripts = {} } = await getOptions(config)
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
@@ -112,17 +179,18 @@ export const pluginContentScripts: CrxPluginFn = () => {
                   id: getFileName({ type: 'loader', id }),
                   source: worldMainIds.has(file.id)
                     ? createDevMainLoader({
-                      fileName: `./${file.fileName.split('/').at(-1)}`
-                    })
+                        fileName: `./${file.fileName.split('/').at(-1)}`,
+                      })
                     : createDevLoader({
-                      preamble: preamble.fileName,
-                      client: client.fileName,
-                      fileName: file.fileName,
-                    }),
+                        preamble: preamble.fileName,
+                        client: client.fileName,
+                        fileName: file.fileName,
+                      }),
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
-                throw new Error('IIFE content scripts are not implemented')
+                const file = add({ type: 'iife', id })
+                script.fileName = file.fileName
               } else {
                 const file = add({ type: 'module', id })
                 script.fileName = file.fileName
@@ -158,7 +226,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'build',
       enforce: 'pre',
       async config(config, env) {
-        await findWorldMainIds(config, env);
+        await findWorldMainIds(config, env)
 
         return {
           ...config,
@@ -174,7 +242,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
           },
         }
       },
-      generateBundle(_options, bundle) {
+      configResolved(_config) {
+        resolvedConfig = _config
+      },
+      async generateBundle(_options, bundle) {
         // emit content script loaders
         for (const [key, script] of contentScripts)
           if (key === script.refId) {
@@ -203,7 +274,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
                     id: basename(script.id),
                   }),
                   source: worldMainIds.has(script.id)
-                    ? createProMainLoader({ fileName: `./${fileName.split('/').at(-1)}` })
+                    ? createProMainLoader({
+                        fileName: `./${fileName.split('/').at(-1)}`,
+                      })
                     : createProLoader({ fileName }),
                 })
 
@@ -219,7 +292,55 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()\n`
               }
             } else if (script.type === 'iife') {
-              throw new Error('IIFE content scripts are not implemented')
+              if (!resolvedConfig)
+                throw new Error(
+                  'Resolved config not available for IIFE scripts',
+                )
+              const output = await bundleIifeScript(resolvedConfig, script.id)
+              const entryChunk = output.find(
+                (item): item is OutputChunk =>
+                  isOutputChunk(item) && item.isEntry,
+              )
+              if (!entryChunk) {
+                throw new Error(
+                  `Unable to generate IIFE content script for "${script.id}"`,
+                )
+              }
+
+              const esModuleFile = this.getFileName(script.refId)
+              if (bundle[esModuleFile]) delete bundle[esModuleFile]
+
+              script.fileName = entryChunk.fileName
+              let entryCode = entryChunk.code
+              const shouldEmitMap =
+                resolvedConfig.build.sourcemap &&
+                resolvedConfig.build.sourcemap !== 'inline'
+              const shouldAppendMap = resolvedConfig.build.sourcemap === true
+              if (entryChunk.map && shouldEmitMap) {
+                const mapFileName = `${entryChunk.fileName}.map`
+                emitAssetToBundle(
+                  bundle,
+                  mapFileName,
+                  JSON.stringify(entryChunk.map),
+                )
+                if (shouldAppendMap)
+                  entryCode += `\n//# sourceMappingURL=${mapFileName}`
+              }
+
+              emitAssetToBundle(bundle, entryChunk.fileName, entryCode)
+
+              for (const item of output) {
+                if (isOutputAsset(item)) {
+                  if (
+                    typeof item.source === 'undefined' ||
+                    item.source === null
+                  )
+                    continue
+                  emitAssetToBundle(bundle, item.fileName, item.source)
+                } else if (isOutputChunk(item) && !item.isEntry) {
+                  emitAssetToBundle(bundle, item.fileName, item.code)
+                }
+              }
             }
             // trigger update for other key values
             contentScripts.set(script.refId, formatFileData(script))
