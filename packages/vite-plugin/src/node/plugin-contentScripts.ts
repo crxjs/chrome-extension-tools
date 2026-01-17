@@ -47,12 +47,21 @@ const emitAssetToBundle = (
   fileName: string,
   source: string | Uint8Array,
 ) => {
-  bundle[fileName] = {
-    type: 'asset',
+  // Create an asset object that's compatible with both Vite 3/4/5 (using 'name')
+  // and Vite 6+ (which also requires 'names' array for the manifest plugin)
+  // Use 'unknown' cast because Rollup's OutputAsset type varies between versions
+  const asset = {
+    type: 'asset' as const,
     fileName,
     name: fileName,
     source,
-  } as OutputAsset
+    // Vite 6+ specific properties that the manifest plugin expects
+    // These are safe to add as they're ignored by older Vite versions
+    names: [fileName],
+    originalFileNames: [] as string[],
+    needsCodeReference: false,
+  } as unknown as OutputAsset
+  bundle[fileName] = asset
 }
 
 const bundleIifeScript = async (config: ResolvedConfig, scriptId: string) => {
@@ -74,6 +83,7 @@ const bundleIifeScript = async (config: ResolvedConfig, scriptId: string) => {
     build: {
       write: false, // Don't write to disk
       manifest: false, // Don't generate Vite manifest
+      ssrManifest: false, // Also disable SSR manifest
       rollupOptions: {
         input,
         external: config.build.rollupOptions?.external,
