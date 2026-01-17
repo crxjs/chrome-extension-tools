@@ -96,6 +96,9 @@ jobs:
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }}
 
+      - name: Verify Vite version
+        run: echo "Testing with Vite $(pnpm exec vite --version)"
+
       - name: Run unit and output tests (Vite 3 only - includes snapshots)
         if: matrix.vite-version == '3'
         run: pnpm test:run:out
@@ -146,6 +149,9 @@ jobs:
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }}
+
+      - name: Verify Vite version
+        run: echo "Testing with Vite $(pnpm exec vite --version)"
 
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
