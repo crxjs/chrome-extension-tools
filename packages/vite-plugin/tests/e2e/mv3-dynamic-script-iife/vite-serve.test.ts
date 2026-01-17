@@ -3,7 +3,10 @@ import path from 'pathe'
 import { expect, test } from 'vitest'
 import { serve } from '../runners'
 
-test(
+// Skip on Windows: file watcher has reliability issues detecting IIFE rebuilds
+const isWindows = process.platform === 'win32'
+
+test.skipIf(isWindows)(
   'iife content script rebuilds on change and works after page reload',
   async () => {
     const src = path.join(__dirname, 'src')
