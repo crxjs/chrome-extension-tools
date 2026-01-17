@@ -1,5 +1,8 @@
 import { configureToMatchImageSnapshot } from 'jest-image-snapshot'
 import { expect } from 'vitest'
+import { version as viteVersion } from 'vite'
+
+console.log(`\n🔧 Running tests with Vite ${viteVersion}\n`)
 
 expect.extend({
   toMatchImageSnapshot: configureToMatchImageSnapshot({
