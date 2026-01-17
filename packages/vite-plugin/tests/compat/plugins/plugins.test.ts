@@ -2,7 +2,7 @@ import { existsSync, rmSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
-import { crx, type CrxPlugin } from '@crxjs/vite-plugin'
+import { crx, type CrxPlugin } from 'src'
 import { describe, test, expect, beforeEach } from 'vitest'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
