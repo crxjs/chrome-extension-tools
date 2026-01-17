@@ -1,13 +1,11 @@
 // This script runs in the MAIN world via registerContentScripts
 console.log('main-world.ts running in MAIN world')
 
-function createOkElement() {
+document.addEventListener('DOMContentLoaded', () => {
   const p = document.createElement('p')
   p.className = 'ok'
-  p.innerText = 'ok'
+  p.innerText = 'src1'
   document.body.appendChild(p)
-}
-
-document.addEventListener('DOMContentLoaded', createOkElement)
+})
 
 export {}
