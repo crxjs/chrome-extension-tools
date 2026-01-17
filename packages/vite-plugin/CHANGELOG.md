@@ -1,5 +1,40 @@
 # @crxjs/vite-plugin
 
+## 2.4.0
+
+### Minor Changes
+
+- c359ae4: Fix "TypeError: plugins is not iterable" error when using
+  rolldown-vite (Vite 7).
+
+  In rolldown-vite, the buildStart hook doesn't receive options.plugins. This
+  fix uses the configResolved hook to get plugins from the resolved config, with
+  buildStart kept as a fallback for older Vite versions.
+
+- c1dde11: feat: add Vite 8 beta support
+
+### Patch Changes
+
+- 11d030a: Replace cheerio with node-html-parser to fix npm deprecation warning
+  for whatwg-encoding.
+
+  Also adds explicit vite peerDependency declaration (^3.0.0 through ^7.0.0) to
+  enable proper version resolution when used with different vite versions.
+
+- 0ce086d: fix: respect user's build.manifest setting in Vite 4+
+
+  When users set `build.manifest: false` in their Vite config, the Vite manifest
+  file (`.vite/manifest.json` in Vite 5+, or `manifest.json` in older versions)
+  is now properly removed from the output bundle.
+
+  CRXJS internally requires the Vite manifest to derive content script resources
+  during build, so it forces `build.manifest: true`. Previously, this meant the
+  Vite manifest was always included in the output even if the user explicitly
+  disabled it. Now, CRXJS removes the manifest from the bundle after processing
+  if the user didn't want it.
+
+  Closes #1077
+
 ## 2.3.0
 
 ### Minor Changes
