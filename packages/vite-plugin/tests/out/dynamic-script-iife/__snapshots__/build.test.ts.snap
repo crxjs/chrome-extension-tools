@@ -72,7 +72,7 @@ chrome.action.onClicked.addListener((tab) => {
 `;
 
 exports[`build fs output > assets/declared-script.ts.hash0.js 1`] = `
-"(function(){const fileName = \\"/assets/main-world.hash1.js\\";
+"(function(){const fileName = \\"assets/main-world.hash1.js\\";
 console.log(\\"declared script\\");
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(fileName);

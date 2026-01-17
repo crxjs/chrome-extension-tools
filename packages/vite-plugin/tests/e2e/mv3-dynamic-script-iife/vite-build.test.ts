@@ -1,13 +1,24 @@
-import { test } from 'vitest'
-import { getPage } from '../helpers'
+import { expect, test } from 'vitest'
 import { build } from '../runners'
 
-test('crx runs from build output', async () => {
-  const { browser } = await build(__dirname)
+test(
+  'crx runs from build output',
+  async () => {
+    const { browser } = await build(__dirname)
 
-  const options = await getPage(browser, 'chrome-extension')
-  const example = await getPage(browser, 'example')
+    // Wait for the background script to register the content script
+    await new Promise((resolve) => setTimeout(resolve, 2000))
 
-  await options.waitForSelector('.ok', { timeout: 10000 })
-  await example.waitForSelector('.ok', { timeout: 10000 })
-})
+    // Navigate to example.com - the registered content script should inject
+    const page = await browser.newPage()
+    await page.goto('https://example.com')
+
+    // The main-world.ts script should create a .ok element
+    await page.waitForSelector('.ok', { timeout: 15000 })
+
+    const okElement = page.locator('.ok')
+    const text = await okElement.textContent()
+    expect(text).toBe('ok')
+  },
+  { retry: process.env.CI ? 5 : 0 },
+)

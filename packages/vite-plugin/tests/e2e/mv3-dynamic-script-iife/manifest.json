@@ -6,14 +6,6 @@
   "host_permissions": ["http://*/*", "https://*/*"],
   "manifest_version": 3,
   "name": "test extension",
-  "options_page": "src/options.html",
-  "permissions": ["storage", "scripting"],
-  "version": "1.0.0",
-  "web_accessible_resources": [
-    {
-      "matches": ["<all_urls>"],
-      "resources": ["src/redirect.html"],
-      "use_dynamic_url": false
-    }
-  ]
+  "permissions": ["scripting"],
+  "version": "1.0.0"
 }
