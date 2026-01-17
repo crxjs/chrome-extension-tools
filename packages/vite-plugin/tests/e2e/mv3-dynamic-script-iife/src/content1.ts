@@ -1,4 +1,4 @@
-import fileName from './main-world?script&iife'
+import fileName from './main-world?iife'
 
 const url = chrome.runtime.getURL(fileName)
 

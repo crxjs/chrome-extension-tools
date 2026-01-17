@@ -74,9 +74,12 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         }
       },
       async resolveId(_source: string, importer?: string) {
-        if (importer && _source.includes('?script')) {
+        if (
+          importer &&
+          (_source.includes('?script') || _source.includes('?iife'))
+        ) {
           const url = new URL(_source, 'stub://stub')
-          if (url.searchParams.has('script')) {
+          if (url.searchParams.has('script') || url.searchParams.has('iife')) {
             const [source] = _source.split('?')
             const resolved = await this.resolve(source, importer, {
               skipSelf: true,
