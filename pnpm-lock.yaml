@@ -455,6 +455,27 @@ importers:
         specifier: ^4.6.4
         version: 4.9.5
 
+  playgrounds/iife-demo:
+    dependenciesMeta:
+      '@crxjs/vite-plugin':
+        injected: true
+    devDependencies:
+      '@crxjs/vite-plugin':
+        specifier: workspace:*
+        version: file:packages/vite-plugin(vite@6.4.1(@types/node@22.19.5)(jiti@1.21.7)(terser@5.44.1))
+      '@types/chrome':
+        specifier: ^0.0.313
+        version: 0.0.313
+      '@types/node':
+        specifier: ^22.13.14
+        version: 22.19.5
+      typescript:
+        specifier: ~5.7.2
+        version: 5.7.3
+      vite:
+        specifier: ^6.2.0
+        version: 6.4.1(@types/node@22.19.5)(jiti@1.21.7)(terser@5.44.1)
+
   playgrounds/react:
     dependencies:
       react:
@@ -1514,7 +1535,7 @@ packages:
   '@crxjs/vite-plugin@file:packages/vite-plugin':
     resolution: {directory: packages/vite-plugin, type: directory}
     peerDependencies:
-      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
+      vite: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-beta.0
 
   '@discoveryjs/json-ext@0.5.7':
     resolution: {integrity: sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==}
@@ -16794,7 +16815,11 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
+      - bufferutil
+      - canvas
       - supports-color
+      - ts-node
+      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:

@@ -1,0 +1,11 @@
+{
+  "background": {
+    "service_worker": "src/background.ts"
+  },
+  "description": "test extension",
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "manifest_version": 3,
+  "name": "test extension",
+  "permissions": ["scripting"],
+  "version": "1.0.0"
+}

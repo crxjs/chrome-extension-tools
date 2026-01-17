@@ -74,9 +74,12 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         }
       },
       async resolveId(_source: string, importer?: string) {
-        if (importer && _source.includes('?script')) {
+        if (
+          importer &&
+          (_source.includes('?script') || _source.includes('?iife'))
+        ) {
           const url = new URL(_source, 'stub://stub')
-          if (url.searchParams.has('script')) {
+          if (url.searchParams.has('script') || url.searchParams.has('iife')) {
             const [source] = _source.split('?')
             const resolved = await this.resolve(source, importer, {
               skipSelf: true,
@@ -179,9 +182,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                       `Content script fileName is undefined: "${script.id}"`,
                     )
 
-                  return `${JSON.stringify(
-                    `/${script.loaderName ?? script.fileName}`,
-                  )}${match.split(scriptKey)[1]}`
+                  const fileName = script.loaderName ?? script.fileName
+                  // IIFE scripts are used with registerContentScripts which requires
+                  // paths without leading slash. Other scripts work with executeScript
+                  // which accepts paths with leading slash.
+                  const path =
+                    script.type === 'iife' ? fileName : `/${fileName}`
+                  return `${JSON.stringify(path)}${match.split(scriptKey)[1]}`
                 },
               )
               // TODO: remove unused import_meta value?

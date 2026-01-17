@@ -2,7 +2,7 @@ import { existsSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'vite'
-import { crx } from '@crxjs/vite-plugin'
+import { crx } from 'src'
 import { chromium, type BrowserContext } from 'playwright-chromium'
 import { describe, test, expect, beforeEach, afterEach } from 'vitest'
 

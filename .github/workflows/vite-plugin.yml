@@ -5,14 +5,12 @@ on:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
-      - "tests/vite-compat/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
-      - "tests/vite-compat/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   workflow_dispatch:
@@ -56,11 +54,13 @@ jobs:
         run: pnpm lint
 
   unit-output:
-    name: Unit & Output Tests (${{ matrix.os }})
+    name: Unit & Output Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        vite-version: ["3", "6", "7", "8.0.0-beta.7"]
     defaults:
       run:
         working-directory: packages/vite-plugin
@@ -89,15 +89,32 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
 
-      - name: Run unit and output tests
+      - name: Build plugin (with default Vite 3)
+        run: pnpm build
+
+      - name: Install Vite ${{ matrix.vite-version }} for testing
+        if: matrix.vite-version != '3'
+        run: pnpm add -D vite@${{ matrix.vite-version }}
+
+      - name: Verify Vite version
+        run: echo "Testing with Vite $(pnpm exec vite --version)"
+
+      - name: Run unit and output tests (Vite 3 only - includes snapshots)
+        if: matrix.vite-version == '3'
         run: pnpm test:run:out
 
+      - name: Run compat tests (Vite 6/7/8 - no snapshots)
+        if: matrix.vite-version != '3'
+        run: pnpm test:run:compat
+
   e2e:
-    name: E2E Tests (${{ matrix.os }})
+    name: E2E Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        vite-version: ["3", "6", "7", "8.0.0-beta.7"]
     defaults:
       run:
         working-directory: packages/vite-plugin
@@ -125,6 +142,16 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
+
+      - name: Build plugin (with default Vite 3)
+        run: pnpm build
+
+      - name: Install Vite ${{ matrix.vite-version }} for testing
+        if: matrix.vite-version != '3'
+        run: pnpm add -D vite@${{ matrix.vite-version }}
+
+      - name: Verify Vite version
+        run: echo "Testing with Vite $(pnpm exec vite --version)"
 
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
@@ -135,59 +162,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: image-diff-${{ matrix.os }}
+          name: image-diff-${{ matrix.os }}-vite-${{ matrix.vite-version }}
           path: ${{ github.workspace }}/packages/vite-plugin/tests/**/__image_snapshots__/__diff_output__/*.png
-
-  compat:
-    name: Compat Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        vite-version: ["3", "6", "7", "8.0.0-beta.7"]
-    defaults:
-      run:
-        working-directory: tests/vite-compat
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "22"
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.11.1
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-pnpm-modules
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
-          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
-
-      - name: Install dependencies
-        run: pnpm install
-        working-directory: .
-
-      - name: Build vite-plugin
-        run: pnpm build
-        working-directory: packages/vite-plugin
-
-      - name: Install Vite ${{ matrix.vite-version }}
-        run: pnpm add vite@${{ matrix.vite-version }}
-
-      - name: Re-install to link dependencies
-        run: pnpm install
-        working-directory: .
-
-      - name: Run compat tests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: pnpm test
-          working-directory: tests/vite-compat

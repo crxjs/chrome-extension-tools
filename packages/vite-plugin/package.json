@@ -61,6 +61,7 @@
     "test:run": "run-s test:run:*",
     "test:run:out": "vitest --run --mode out",
     "test:run:e2e": "vitest --run --mode e2e",
+    "test:run:compat": "vitest --run tests/compat/",
     "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
   },
   "dependencies": {
