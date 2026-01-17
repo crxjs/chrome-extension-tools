@@ -84,6 +84,22 @@ const bundleIifeScript = async (config: ResolvedConfig, scriptId: string) => {
           inlineDynamicImports: true, // Required for IIFE format
           name: getIifeGlobalName(scriptId),
           sourcemap: config.build.sourcemap,
+          // Preserve user's naming patterns for consistent output
+          entryFileNames: config.build.rollupOptions?.output
+            ? Array.isArray(config.build.rollupOptions.output)
+              ? config.build.rollupOptions.output[0]?.entryFileNames
+              : config.build.rollupOptions.output.entryFileNames
+            : undefined,
+          chunkFileNames: config.build.rollupOptions?.output
+            ? Array.isArray(config.build.rollupOptions.output)
+              ? config.build.rollupOptions.output[0]?.chunkFileNames
+              : config.build.rollupOptions.output.chunkFileNames
+            : undefined,
+          assetFileNames: config.build.rollupOptions?.output
+            ? Array.isArray(config.build.rollupOptions.output)
+              ? config.build.rollupOptions.output[0]?.assetFileNames
+              : config.build.rollupOptions.output.assetFileNames
+            : undefined,
         },
       },
       minify: false,
