@@ -2,13 +2,7 @@ import * as lexer from 'es-module-lexer'
 import fsx from 'fs-extra'
 import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
-import {
-  OutputAsset,
-  OutputChunk,
-  OutputOptions,
-  rollup,
-  RollupOptions,
-} from 'rollup'
+import { OutputAsset, OutputChunk } from 'rollup'
 import {
   BehaviorSubject,
   filter,
@@ -25,12 +19,7 @@ import {
   takeUntil,
   toArray,
 } from 'rxjs'
-import {
-  ErrorPayload,
-  resolveConfig,
-  ResolvedConfig,
-  ViteDevServer,
-} from 'vite'
+import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
@@ -38,35 +27,6 @@ import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 import convertSourceMap from 'convert-source-map'
 
 const { outputFile } = fsx
-
-const buildConfigCache = new Map<string, ResolvedConfig>()
-
-const getBuildConfigCacheKey = (server: ViteDevServer) => {
-  return `${server.config.root}:${server.config.mode}:${
-    server.config.configFile ?? 'inline'
-  }`
-}
-
-async function resolveBuildConfig(
-  server: ViteDevServer,
-): Promise<ResolvedConfig> {
-  const cacheKey = getBuildConfigCacheKey(server)
-  const cached = buildConfigCache.get(cacheKey)
-  if (cached) return cached
-  const configFile = server.config.configFile ?? false
-  const resolved = await resolveConfig(
-    {
-      root: server.config.root,
-      mode: server.config.mode,
-      logLevel: 'silent',
-      configFile,
-    },
-    'build',
-    server.config.mode,
-  )
-  buildConfigCache.set(cacheKey, resolved)
-  return resolved
-}
 
 const getIifeGlobalName = (fileName: string) => {
   const base = fileName.split('/').pop() ?? fileName
@@ -91,35 +51,50 @@ async function bundleIife(
   script: CrxDevScriptId,
   fileName: string,
 ) {
-  const buildConfig = await resolveBuildConfig(server)
   const input = resolveScriptInput(server, script.id)
-  const rollupOptions: RollupOptions = {
-    input,
-    plugins: buildConfig.plugins.filter(
-      (plugin) => !plugin.name?.startsWith('crx:'),
-    ),
-    external: buildConfig.build.rollupOptions?.external,
-    onwarn: buildConfig.build.rollupOptions?.onwarn,
-    treeshake: buildConfig.build.rollupOptions?.treeshake,
-  }
-  const rollupOutput = [buildConfig.build.rollupOptions?.output].flat()[0]
-  const { dir, file, manualChunks, ...baseOutputOptions } = (rollupOutput ??
-    {}) as OutputOptions
-  const sourcemap = buildConfig.build.sourcemap === 'inline' ? 'inline' : false
-  const outputOptions: OutputOptions = {
-    ...baseOutputOptions,
-    format: 'iife',
-    inlineDynamicImports: true,
-    entryFileNames: fileName,
-    assetFileNames:
-      baseOutputOptions.assetFileNames ?? 'assets/[name][extname]',
-    name: getIifeGlobalName(fileName),
-    sourcemap,
-  }
+  const sourcemap =
+    server.config.build.sourcemap === 'inline' ? 'inline' : false
 
-  const bundle = await rollup(rollupOptions)
-  const { output } = await bundle.generate(outputOptions)
-  await bundle.close()
+  // Use Vite's build API instead of raw Rollup to avoid plugin compatibility issues
+  // (Vite 6+ plugins are tracked in WeakMaps and can't be reused in separate Rollup builds)
+  // We use configFile: false to avoid loading user's config which may have incompatible settings
+  const result = await viteBuild({
+    root: server.config.root,
+    mode: server.config.mode,
+    configFile: false, // Don't load user's config - use minimal IIFE-specific settings
+    logLevel: 'silent',
+    resolve: {
+      // Copy resolve settings from the dev server for consistency
+      alias: server.config.resolve.alias,
+      extensions: server.config.resolve.extensions,
+      conditions: server.config.resolve.conditions,
+    },
+    build: {
+      write: false, // Don't write to disk, we'll handle that
+      manifest: false, // Don't generate Vite manifest
+      rollupOptions: {
+        input,
+        output: {
+          format: 'iife',
+          name: getIifeGlobalName(fileName),
+          entryFileNames: fileName,
+          inlineDynamicImports: true, // Required for IIFE format
+          sourcemap,
+        },
+      },
+      minify: false,
+      copyPublicDir: false,
+    },
+  })
+
+  // viteBuild with write: false returns RollupOutput or RollupOutput[]
+  const outputs = Array.isArray(result) ? result : [result]
+  const firstOutput = outputs[0]
+  const output = 'output' in firstOutput ? firstOutput.output : undefined
+
+  if (!output) {
+    throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
+  }
 
   const entryChunk = output.find(
     (item): item is OutputChunk => isOutputChunk(item) && item.isEntry,
@@ -128,7 +103,12 @@ async function bundleIife(
     throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
   }
 
-  const assets = output.filter(isOutputAsset)
+  const assets = output.filter(isOutputAsset).filter(
+    // Filter out manifest.json to avoid overwriting extension manifest
+    (asset) =>
+      asset.fileName !== 'manifest.json' &&
+      !asset.fileName.startsWith('.vite/'),
+  )
   const extraChunks = output.filter(
     (item): item is OutputChunk => isOutputChunk(item) && !item.isEntry,
   )
