@@ -27,9 +27,14 @@
   "type": "module",
   "exports": {
     ".": {
-      "require": "./index.cjs",
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.ts"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./index.d.cts",
+        "default": "./index.cjs"
+      }
     },
     "./*": "./*",
     "./client": {
@@ -44,6 +49,7 @@
     "types",
     "manifest.schema.json",
     "index.cjs",
+    "index.d.cts",
     "client.d.ts"
   ],
   "scripts": {
