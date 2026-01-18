@@ -1,0 +1,22 @@
+{
+  "name": "play-iife-demo",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "@types/chrome": "^0.0.313",
+    "@types/node": "^22.13.14",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  },
+  "dependenciesMeta": {
+    "@crxjs/vite-plugin": {
+      "injected": true
+    }
+  }
+}

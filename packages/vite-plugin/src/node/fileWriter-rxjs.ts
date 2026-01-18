@@ -1,6 +1,8 @@
 import * as lexer from 'es-module-lexer'
+import fsx from 'fs-extra'
 import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
+import { OutputAsset, OutputChunk } from 'rollup'
 import {
   BehaviorSubject,
   filter,
@@ -17,12 +19,106 @@ import {
   takeUntil,
   toArray,
 } from 'rxjs'
-import { ErrorPayload, ViteDevServer } from 'vite'
+import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 import convertSourceMap from 'convert-source-map'
+
+const { outputFile } = fsx
+
+const getIifeGlobalName = (fileName: string) => {
+  const base = fileName.split('/').pop() ?? fileName
+  const sanitized = base.replace(/\W+/g, '_').replace(/^_+/, '')
+  return `crx_${sanitized || 'content_script'}`
+}
+
+const resolveScriptInput = (server: ViteDevServer, id: string) => {
+  if (id.startsWith('/@fs/')) return id.slice('/@fs/'.length)
+  if (id.startsWith('/')) return join(server.config.root, id.slice(1))
+  return id
+}
+
+const isOutputChunk = (item: OutputChunk | OutputAsset): item is OutputChunk =>
+  item.type === 'chunk'
+
+const isOutputAsset = (item: OutputChunk | OutputAsset): item is OutputAsset =>
+  item.type === 'asset'
+
+async function bundleIife(
+  server: ViteDevServer,
+  script: CrxDevScriptId,
+  fileName: string,
+) {
+  const input = resolveScriptInput(server, script.id)
+  const sourcemap =
+    server.config.build.sourcemap === 'inline' ? 'inline' : false
+
+  // Use Vite's build API instead of raw Rollup to avoid plugin compatibility issues
+  // (Vite 6+ plugins are tracked in WeakMaps and can't be reused in separate Rollup builds)
+  // We use configFile: false to avoid loading user's config which may have incompatible settings
+  const result = await viteBuild({
+    root: server.config.root,
+    mode: server.config.mode,
+    configFile: false, // Don't load user's config - use minimal IIFE-specific settings
+    logLevel: 'silent',
+    resolve: {
+      // Copy resolve settings from the dev server for consistency
+      alias: server.config.resolve.alias,
+      extensions: server.config.resolve.extensions,
+      conditions: server.config.resolve.conditions,
+    },
+    build: {
+      write: false, // Don't write to disk, we'll handle that
+      manifest: false, // Don't generate Vite manifest
+      rollupOptions: {
+        input,
+        output: {
+          format: 'iife',
+          name: getIifeGlobalName(fileName),
+          entryFileNames: fileName,
+          inlineDynamicImports: true, // Required for IIFE format
+          sourcemap,
+        },
+      },
+      minify: false,
+      copyPublicDir: false,
+    },
+  })
+
+  // viteBuild with write: false returns RollupOutput or RollupOutput[]
+  const outputs = Array.isArray(result) ? result : [result]
+  const firstOutput = outputs[0]
+  const output = 'output' in firstOutput ? firstOutput.output : undefined
+
+  if (!output) {
+    throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
+  }
+
+  const entryChunk = output.find(
+    (item): item is OutputChunk => isOutputChunk(item) && item.isEntry,
+  )
+  if (!entryChunk) {
+    throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
+  }
+
+  const assets = output.filter(isOutputAsset).filter(
+    // Filter out manifest.json to avoid overwriting extension manifest
+    (asset) =>
+      asset.fileName !== 'manifest.json' &&
+      !asset.fileName.startsWith('.vite/'),
+  )
+  const extraChunks = output.filter(
+    (item): item is OutputChunk => isOutputChunk(item) && !item.isEntry,
+  )
+
+  return {
+    code: entryChunk.code,
+    assets,
+    extraChunks,
+  }
+}
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -138,6 +234,7 @@ function prepScript(
   fileName: string,
   script: CrxDevScriptId,
 ): OperatorFileData {
+  if (script.type === 'iife') return prepIifeScript(fileName, script)
   return ($) =>
     $.pipe(
       // get script contents from dev server
@@ -198,6 +295,52 @@ function prepScript(
           }
         return { target, source: magic.toString(), deps: [...depSet] }
       }),
+    )
+}
+
+function prepIifeScript(
+  fileName: string,
+  script: CrxDevScriptId,
+): OperatorFileData {
+  return ($) =>
+    $.pipe(
+      mergeMap(async ({ server }) => {
+        const target = getOutputPath(server, fileName)
+        const { code, assets, extraChunks } = await bundleIife(
+          server,
+          script,
+          fileName,
+        )
+        return { target, source: code, deps: [], server, assets, extraChunks }
+      }),
+      mergeMap(
+        async ({ target, source, deps, server, assets, extraChunks }) => {
+          const extras = [
+            ...assets.map((asset) => ({
+              fileName: asset.fileName,
+              source: asset.source,
+            })),
+            ...extraChunks.map((chunk) => ({
+              fileName: chunk.fileName,
+              source: chunk.code,
+            })),
+          ].filter((item) => item.fileName !== fileName)
+
+          await Promise.all(
+            extras.map(async (item) => {
+              const outputPath = getOutputPath(server, item.fileName)
+              if (typeof item.source === 'undefined' || item.source === null)
+                return
+              if (item.source instanceof Uint8Array)
+                await outputFile(outputPath, item.source)
+              else
+                await outputFile(outputPath, item.source, { encoding: 'utf8' })
+            }),
+          )
+
+          return { target, source, deps }
+        },
+      ),
     )
 }
 

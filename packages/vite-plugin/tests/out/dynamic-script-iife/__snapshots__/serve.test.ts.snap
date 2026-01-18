@@ -1,0 +1,148 @@
+// Vitest Snapshot v1
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "src/declared-script.ts-loader.js",
+      ],
+      "matches": Array [
+        "https://a.com/*",
+        "http://b.com/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/declared-script.ts-loader.js",
+  "src/declared-script.ts.js",
+  "src/dynamic-script.ts-loader.js",
+  "src/dynamic-script.ts.js",
+  "src/main-world.ts.iife.js",
+  "src/main-world.ts__scriptId--0.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/declared-script.ts",
+  "src/background.ts",
+}
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/src/background.ts';
+"
+`;
+
+exports[`serve fs output > src/declared-script.ts.js 1`] = `
+"import fileName from \\"/src/main-world.ts__scriptId--0.js\\";
+console.log(\\"declared script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+script.defer = true;
+document.head.prepend(script);
+"
+`;
+
+exports[`serve fs output > src/declared-script.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/declared-script.ts.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/dynamic-script.ts.js 1`] = `
+"console.log(\\"dynamic script\\");
+export {};
+"
+`;
+
+exports[`serve fs output > src/dynamic-script.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/dynamic-script.ts.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/main-world.ts.iife.js 1`] = `
+"(function() {
+  \\"use strict\\";
+  console.log(\\"main world script\\");
+})();
+"
+`;
+
+exports[`serve fs output > src/main-world.ts__scriptId--0.js 1`] = `
+"export default \\"src/main-world.ts.iife.js\\";
+"
+`;
