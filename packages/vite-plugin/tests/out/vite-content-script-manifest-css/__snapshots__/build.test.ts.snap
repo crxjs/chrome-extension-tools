@@ -1,0 +1,56 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "src/styles.css",
+      ],
+      "js": Array [
+        "assets/content.ts.hash0.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/content.ts.hash0.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/content.ts.hash0.js",
+  "manifest.json",
+  "src/styles.css",
+]
+`;
+
+exports[`build fs output > assets/content.ts.hash0.js 1`] = `
+"(function(){console.log(\\"content.ts\\");
+})()
+"
+`;
+
+exports[`build fs output > src/styles.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
