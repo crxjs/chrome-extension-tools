@@ -12,6 +12,7 @@ Object {
         "src/styles.css",
       ],
       "js": Array [
+        "vendor/crx-content-css-0-loader.js",
         "src/content.ts-loader.js",
       ],
       "matches": Array [
@@ -47,6 +48,8 @@ Array [
   "src/styles.css",
   "src/styles.css.js",
   "vendor/crx-client-port.js",
+  "vendor/crx-content-css-0-loader.js",
+  "vendor/crx-content-css-0.js",
   "vendor/vite-client.js",
   "vendor/vite-dist-client-env.mjs.js",
   "vendor/webcomponents-custom-elements.js",
@@ -66,8 +69,7 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content.ts.js 1`] = `
-"import '/src/styles.css.js';
-console.log(\\"content.ts\\");
+"console.log(\\"content.ts\\");
 export {};
 "
 `;
