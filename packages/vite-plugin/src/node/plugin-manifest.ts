@@ -350,6 +350,7 @@ export const pluginManifest: CrxPluginFn = () => {
         /* ---------- COPY MISSING MANIFEST ASSETS --------- */
 
         const assetTypes: (keyof ManifestFiles)[] = [
+          'contentStyles',
           'icons',
           'locales',
           'rulesets',
