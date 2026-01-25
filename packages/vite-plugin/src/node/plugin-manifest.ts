@@ -404,10 +404,9 @@ Public dir: "${config.publicDir}"`,
           const refId = this.emitFile({
             type: 'asset',
             name: 'loading-page.js',
-            source: loadingPageScript.replace(
-              '%PORT%',
-              `${config.server.port ?? 0}`,
-            ),
+            source: loadingPageScript
+              .replace('%PROTO%', config.server.https ? 'https' : 'http')
+              .replace('%PORT%', `${config.server.port ?? 0}`),
           })
           const loadingPageScriptName = this.getFileName(refId)
           files.html.map((f) =>
