@@ -1,7 +1,5 @@
-import { ResolvedConfig } from 'vite'
 import { CrxPluginFn } from './types'
 import {
-  contentCssPrefix,
   getContentCssId,
   getContentCssIndex,
   isContentCssId,
@@ -90,14 +88,9 @@ export function registerContentCssEntry(
  * ```
  */
 export const pluginDeclaredContentScripts: CrxPluginFn = () => {
-  let config: ResolvedConfig
-
   return {
     name: 'crx:content-scripts-declared-css',
     apply: 'serve',
-    configResolved(_config) {
-      config = _config
-    },
     resolveId(source) {
       // Handle synthetic CSS content script virtual modules
       if (isContentCssId(source)) {
