@@ -1,43 +1,35 @@
 name: Vite Plugin CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
   push:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - "tests/vite-compat/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
   pull_request:
     branches: [main]
     paths:
       - "packages/vite-plugin/**"
+      - "tests/vite-compat/**"
       - ".github/workflows/vite-plugin.yml"
       - "!**.md"
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: "packages/vite-plugin"
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # Runs linter and unit tests
-  checks:
-    name: Lint
-
-    # The type of runner that the job will run on
+  lint:
+    name: Lint (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: packages/vite-plugin
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
@@ -45,19 +37,9 @@ jobs:
           node-version: "22"
 
       - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
         uses: pnpm/action-setup@v4
         with:
-          # Version of PNPM to install
           version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
-
-      - name: Check CWD
-        run: node -e "console.log('cwd', process.cwd())"
 
       - name: Cache pnpm modules
         uses: actions/cache@v3
@@ -74,19 +56,18 @@ jobs:
       - name: Lint files
         run: pnpm lint
 
-  # Runs e2e tests in Playwright
-  e2e:
-    name: E2E Tests
-
-    # The type of runner that the job will run on
+  unit-output:
+    name: Unit & Output Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: packages/vite-plugin
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
@@ -94,19 +75,47 @@ jobs:
           node-version: "22"
 
       - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
         uses: pnpm/action-setup@v4
         with:
-          # Version of PNPM to install
           version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
 
-      - name: Check CWD
-        run: node -e "console.log('cwd', process.cwd())"
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: pnpm install --filter "vite-plugin"
+
+      - name: Run unit and output tests
+        run: pnpm test:run:out
+
+  e2e:
+    name: E2E Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: packages/vite-plugin
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
 
       - name: Cache pnpm modules
         uses: actions/cache@v3
@@ -124,27 +133,28 @@ jobs:
         uses: coactions/setup-xvfb@v1
         with:
           run: pnpm test:run:e2e
-          working-directory: "packages/vite-plugin"
+          working-directory: packages/vite-plugin
 
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: image-diff-${{ matrix.type }}
+          name: image-diff-${{ matrix.os }}
           path: ${{ github.workspace }}/packages/vite-plugin/tests/**/__image_snapshots__/__diff_output__/*.png
 
-  # Runs unit and output tests
-  unit:
-    name: Unit and Output Tests
-
-    # The type of runner that the job will run on
+  compat:
+    name: Compat Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        vite-version: ["3", "6", "7", "8.0.0-beta.7"]
+    defaults:
+      run:
+        working-directory: tests/vite-compat
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
@@ -152,19 +162,9 @@ jobs:
           node-version: "22"
 
       - name: Setup PNPM
-        # You may pin to the exact commit or the version.
-        # uses: pnpm/action-setup@646cdf48217256a3d0b80361c5a50727664284f2
         uses: pnpm/action-setup@v4
         with:
-          # Version of PNPM to install
           version: 10.11.1
-          # Where to store PNPM files
-          # dest: # optional, default is ~/setup-pnpm
-          # If specified, run `pnpm install`
-          # run_install: true
-
-      - name: Check CWD
-        run: node -e "console.log('cwd', process.cwd())"
 
       - name: Cache pnpm modules
         uses: actions/cache@v3
@@ -176,28 +176,22 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install --filter "vite-plugin"
+        run: pnpm install
+        working-directory: .
 
-      - name: Run unit and output tests
-        run: pnpm test:run:out
+      - name: Build vite-plugin
+        run: pnpm build
+        working-directory: packages/vite-plugin
 
-      # Disabling diff check for now, don't think it's doing anything
-      #
-      # - name: Check for diff
-      #   id: diff
-      #   run: echo "::set-output name=diff::$(git --no-pager diff --name-only)"
+      - name: Install Vite ${{ matrix.vite-version }}
+        run: pnpm add vite@${{ matrix.vite-version }}
 
-      # - name: Fail if diff
-      #   if: ${{ steps.diff.outputs.diff }}
-      #   run: exit 1
+      - name: Re-install to link dependencies
+        run: pnpm install
+        working-directory: .
 
-      # - name: Git diff
-      #   if: failure()
-      #   run: git diff > diff.txt
-
-      # - uses: actions/upload-artifact@v4
-      #   if: failure()
-      #   with:
-      #     name: output-diff-${{ matrix.type }}
-      #     path: diff.txt
-      #     if-no-files-found: ignore
+      - name: Run compat tests
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: pnpm test
+          working-directory: tests/vite-compat

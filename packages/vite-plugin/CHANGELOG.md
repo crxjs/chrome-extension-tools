@@ -1,5 +1,21 @@
 # @crxjs/vite-plugin
 
+## 2.3.0
+
+### Minor Changes
+
+- ee17090: \* adds support for main world content scripts declared from manifest
+  - shows warning during development for detected main world scripts so that the
+    dev is not surprised the hmr does not work for it
+  - does not touch `chrome.scripting.registerContentScripts` scripts, as they
+    already work
+
+## 2.2.1
+
+### Patch Changes
+
+- 5ff5465: feat(vite-plugin): limit path string checking to literals
+
 ## 2.2.0
 
 ### Minor Changes

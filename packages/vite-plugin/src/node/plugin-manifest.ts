@@ -25,7 +25,10 @@ declare const structuredClone: <T>(value: T) => T
  */
 export const pluginManifest: CrxPluginFn = () => {
   let manifest: ManifestV3
-  let plugins: CrxPlugin[]
+  // Initialize plugins as empty array to prevent "plugins is not iterable" error
+  // This is important for rolldown-vite (Vite 7) compatibility where buildStart
+  // doesn't receive options.plugins
+  let plugins: CrxPlugin[] = []
   let refId: string
   let config: ResolvedConfig
 
@@ -80,7 +83,16 @@ export const pluginManifest: CrxPluginFn = () => {
           }
         }
       },
+      // Use configResolved to get plugins for rolldown-vite (Vite 7) compatibility
+      // In rolldown-vite, buildStart doesn't receive options.plugins, so we grab
+      // them from the resolved config instead
+      configResolved(resolvedConfig) {
+        if (resolvedConfig.plugins) {
+          plugins = resolvedConfig.plugins as CrxPlugin[]
+        }
+      },
       buildStart(options) {
+        // Keep this as fallback for older Vite versions where buildStart provides plugins
         if (options.plugins) plugins = options.plugins as CrxPlugin[]
       },
     },
@@ -338,6 +350,7 @@ export const pluginManifest: CrxPluginFn = () => {
         /* ---------- COPY MISSING MANIFEST ASSETS --------- */
 
         const assetTypes: (keyof ManifestFiles)[] = [
+          'contentStyles',
           'icons',
           'locales',
           'rulesets',

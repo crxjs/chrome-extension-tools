@@ -1,0 +1,13 @@
+{
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://example.com/*"],
+      "world": "MAIN"
+    }
+  ],
+  "description": "test content script with world MAIN",
+  "manifest_version": 3,
+  "name": "Test Content Script World Main",
+  "version": "1.0.0"
+}

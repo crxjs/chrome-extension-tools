@@ -107,6 +107,8 @@ export interface ManifestV3 {
         match_about_blank?: boolean | undefined
         include_globs?: string[] | undefined
         exclude_globs?: string[] | undefined
+        // Accept string to support JSON imports where type inference gives string instead of literal types
+        world?: chrome.scripting.ExecutionWorld | string | undefined
       }[]
     | undefined
   content_security_policy?: {
@@ -277,4 +279,29 @@ export interface ManifestV3 {
   web_accessible_resources?:
     | (WebAccessibleResourceById | WebAccessibleResourceByMatch)[]
     | undefined
+  browser_specific_settings?:
+    | {
+        gecko: {
+            id: string;
+            strict_min_version?: string | undefined
+            strict_max_version?: string | undefined
+            update_url?: string | undefined
+            data_collection_permissions: {
+              /**
+               * available value: "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "none".
+               * see also: https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/
+              */
+              required: GeckoPermissionsRequired[]
+              /**
+               * available value: "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "technicalAndInteraction".
+               * see also: https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/
+              */
+              optional?: GeckoPermissionsOptional[] | undefined
+            }
+        }
+      }
+    | undefined
 }
+type GeckoPermissionsRequired = "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "none"
+type GeckoPermissionsOptional = "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "technicalAndInteraction"
+
