@@ -1,0 +1,4 @@
+/* CSS declared directly in manifest content_scripts.css - updated state */
+body {
+  background-color: rgb(0, 0, 255) !important;
+}

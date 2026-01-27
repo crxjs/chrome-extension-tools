@@ -38,7 +38,6 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let sub = new Subscription()
 
   const worldMainIds = new Set<string>()
-  const manifestCssFiles = new Set<string>()
 
   const findWorldMainIds = async (config: UserConfig, env: ConfigEnv) => {
     const { manifest: _manifest } = await getOptions(config)
@@ -47,12 +46,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
       ? _manifest(env)
       : _manifest)
 
-    ;(manifest.content_scripts || []).forEach(({ world, js, css }) => {
+    ;(manifest.content_scripts || []).forEach(({ world, js }) => {
       if (world === 'MAIN' && js) {
         js.forEach((path) => worldMainIds.add(prefix('/', path)))
-      }
-      if (css) {
-        css.forEach((path) => manifestCssFiles.add(path))
       }
     })
 
@@ -66,18 +62,6 @@ export const pluginContentScripts: CrxPluginFn = () => {
       )
       console.log(message)
     }
-
-    if (manifestCssFiles.size) {
-      const name = `[${pluginName}]`
-      const message = colors.yellow(
-        [
-          `${name} CSS files declared in manifest don't support HMR. To enable HMR, import CSS in your content script JS file instead:`,
-          ...[...manifestCssFiles].map((css) => `  ${css}`),
-        ].join('\r\n'),
-      )
-      console.log(message)
-    }
-
   }
 
   return [
