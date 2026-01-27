@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["src/content.ts"]
+    }
+  ],
+  "name": "test extension",
+  "version": "0.1.0"
+}

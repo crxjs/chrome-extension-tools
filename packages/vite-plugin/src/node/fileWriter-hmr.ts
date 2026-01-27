@@ -6,6 +6,7 @@ import {
   PrunePayload,
   UpdatePayload,
 } from 'vite'
+import { update } from './fileWriter'
 import { allFilesReady$ } from './fileWriter-rxjs'
 import { getFileName, getViteUrl, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
@@ -54,7 +55,28 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
       }
 
       case 'update': {
-        const update: UpdatePayload = {
+        // Update files on disk for virtual modules and other HMR updates
+        // This ensures the extension can fetch the updated content
+        debug('update payload with %d updates', p.updates.length)
+        for (const u of p.updates) {
+          debug(
+            'update item: path=%s acceptedPath=%s type=%s',
+            u.path,
+            u.acceptedPath,
+            u.type,
+          )
+          // Update virtual modules - regular files are handled by handleHotUpdate
+          // Virtual modules can have different formats:
+          // - /@id/__x00__virtual:uno.css (Vite's standard virtual module format)
+          // - /__uno.css (UnoCSS's virtual module format)
+          const isVirtualModule =
+            u.path.startsWith('/@id/') || u.path.startsWith('/__')
+          if (isVirtualModule) {
+            debug('updating virtual module: %s', u.path)
+            update(u.path)
+          }
+        }
+        const update_: UpdatePayload = {
           type: 'update',
           updates: p.updates.map(({ acceptedPath: ap, path: p, ...rest }) => ({
             ...rest,
@@ -62,7 +84,7 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
             path: prefix('/', getFileName({ id: p, type: 'module' })),
           })),
         }
-        return update
+        return update_
       }
 
       default:
