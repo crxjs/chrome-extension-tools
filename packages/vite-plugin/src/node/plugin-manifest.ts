@@ -12,6 +12,11 @@ import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
+import {
+  clearContentCssEntries,
+  getContentCssEntries,
+  registerContentCssEntry,
+} from './plugin-contentScripts_declared'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
 
@@ -196,11 +201,43 @@ export const pluginManifest: CrxPluginFn = () => {
         /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
 
         if (config.command === 'serve') {
+          // Clear and register CSS entries for synthetic content scripts
+          clearContentCssEntries()
+
           // vite serve file writer only emits content scripts
           // - html files come directly from vite dev server
           // - service worker comes from vite dev server via loader file
           if (manifest.content_scripts)
-            for (const { js = [], matches = [] } of manifest.content_scripts)
+            for (let i = 0; i < manifest.content_scripts.length; i++) {
+              const {
+                js = [],
+                css = [],
+                matches = [],
+              } = manifest.content_scripts[i]
+
+              // Register synthetic CSS entry if there are CSS files
+              if (css.length > 0) {
+                const cssEntry = registerContentCssEntry(i, css)
+                // Add the synthetic CSS entry as a content script with a loader
+                contentScripts.set(
+                  cssEntry.virtualId,
+                  formatFileData({
+                    type: 'loader',
+                    id: cssEntry.virtualId,
+                    matches,
+                    refId: hashScriptId({
+                      type: 'loader',
+                      id: cssEntry.virtualId,
+                    }),
+                    fileName: getFileName({
+                      type: 'loader',
+                      id: cssEntry.virtualId,
+                    }),
+                  }),
+                )
+              }
+
+              // Register regular JS content scripts
               for (const id of js) {
                 contentScripts.set(
                   prefix('/', id),
@@ -213,6 +250,7 @@ export const pluginManifest: CrxPluginFn = () => {
                   }),
                 )
               }
+            }
         } else {
           // vite build emits content scripts, html files and service worker
           if (manifest.content_scripts)
@@ -280,12 +318,32 @@ export const pluginManifest: CrxPluginFn = () => {
         if (config.command === 'serve') {
           // plugin-background emits service worker loader in renderCrxManifest
           // vite dev server sends html files through local host
-          if (manifest.content_scripts)
-            for (const script of manifest.content_scripts) {
-              script.js = script.js?.map((id) =>
+          if (manifest.content_scripts) {
+            // Get all registered CSS entries
+            const cssEntries = getContentCssEntries()
+            const cssEntryMap = new Map(cssEntries.map((e) => [e.index, e]))
+
+            for (let i = 0; i < manifest.content_scripts.length; i++) {
+              const script = manifest.content_scripts[i]
+              const cssEntry = cssEntryMap.get(i)
+
+              // Transform JS paths to loader file names
+              const jsLoaders = (script.js || []).map((id) =>
                 getFileName({ id, type: 'loader' }),
               )
+
+              // Prepend synthetic CSS entry loader if CSS exists for this entry
+              if (cssEntry) {
+                const cssLoader = getFileName({
+                  id: cssEntry.virtualId,
+                  type: 'loader',
+                })
+                script.js = [cssLoader, ...jsLoaders]
+              } else {
+                script.js = jsLoaders
+              }
             }
+          }
         } else {
           // transform hook emits files and replaces in manifest with ref ids
           // update background service worker filename from ref
