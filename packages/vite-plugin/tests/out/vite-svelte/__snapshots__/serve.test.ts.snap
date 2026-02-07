@@ -77,39 +77,238 @@ Set {
 
 exports[`serve fs output > assets/loading-page.hash.js 1`] = `
 "const VITE_URL = \\"http://localhost:3000\\";
-document.body.innerHTML = \`
-<div
-      id=\\"app\\"
-      style=\\"
-        border: 1px solid #ddd;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      \\"
-    >
-      <h1 style=\\"color: #333\\">Vite Dev Mode</h1>
-      <p style=\\"color: #666\\">
-        Cannot connect to the Vite Dev Server on <a href=\\"\${VITE_URL}\\">\${VITE_URL}</a>
-      </p>
-      <p style=\\"color: #666\\">
-        Double-check that Vite is working and reload the extension.
-      </p>
-      <p style=\\"color: #666\\">
-        This page will close when the extension reloads.
-      </p>
-      <button
-        style=\\"
-          padding: 10px 20px;
-          border: none;
-          background-color: #007bff;
-          color: #fff;
-          border-radius: 5px;
-          cursor: pointer;
-        \\"
-      >
-        Reload Extension
-      </button>
-    </div>\`;
+document.body.innerHTML = /* html */
+\`
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #111827;
+    --muted: #5f6b7a;
+    --muted-subtle: rgba(95, 107, 122, 0.7);
+    --muted-hint: rgba(95, 107, 122, 0.6);
+    --card: #ffffff;
+    --badge-bg: rgba(17, 24, 39, 0.04);
+    --accent: #ff6b2c;
+    --accent-2: #2563eb;
+    --link-underline: rgba(37, 99, 235, 0.45);
+    --glow-1: rgba(37, 99, 235, 0.12);
+    --glow-2: rgba(255, 107, 44, 0.1);
+    --button-grad-1: #ff7a43;
+    --button-grad-2: #ff9a73;
+    --button-shadow: rgba(255, 107, 44, 0.18);
+    --button-shadow-hover: rgba(255, 107, 44, 0.22);
+    --pulse: rgba(255, 107, 44, 0.6);
+    --pulse-ring: rgba(255, 107, 44, 0.5);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --ink: #e5e7eb;
+      --muted: #a3aab5;
+      --muted-subtle: rgba(163, 170, 181, 0.78);
+      --muted-hint: rgba(163, 170, 181, 0.6);
+      --card: #0f172a;
+      --badge-bg: rgba(148, 163, 184, 0.16);
+      --accent: #ff8a5a;
+      --accent-2: #7aa2ff;
+      --link-underline: rgba(122, 162, 255, 0.45);
+      --glow-1: rgba(96, 165, 250, 0.14);
+      --glow-2: rgba(251, 146, 60, 0.16);
+      --button-grad-1: #f07b4d;
+      --button-grad-2: #f39a76;
+      --button-shadow: rgba(240, 123, 77, 0.16);
+      --button-shadow-hover: rgba(240, 123, 77, 0.2);
+      --pulse: rgba(255, 138, 90, 0.65);
+      --pulse-ring: rgba(255, 138, 90, 0.5);
+    }
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: \\"IBM Plex Sans\\", \\"Inter\\", -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background: transparent;
+    width: 420px;
+    height: 250px;
+    margin: 0;
+    padding: 0 !important;
+  }
+
+  #app {
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 24px 24px 20px;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  #app::before {
+    content: \\"\\";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(240px 140px at 100% 0%, var(--glow-1), transparent 70%),
+      radial-gradient(220px 140px at 0% 100%, var(--glow-2), transparent 70%);
+    pointer-events: none;
+  }
+
+  .header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    padding-right: 96px;
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--badge-bg);
+    border-radius: 999px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 var(--pulse);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  h1 {
+    font-size: clamp(18px, 4vw, 22px);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .subtle {
+    color: var(--muted-subtle);
+    font-size: 12px;
+  }
+
+  a {
+    color: var(--accent-2);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--link-underline);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  button {
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--button-grad-1), var(--button-grad-2));
+    color: white;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 16px var(--button-shadow);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px var(--button-shadow-hover);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 2px;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--muted-hint);
+    text-align: center;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 var(--pulse-ring); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 107, 44, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 44, 0); }
+  }
+</style>
+
+<div id=\\"app\\">
+  <div class=\\"header\\">
+    <span class=\\"badge\\"><span class=\\"pulse\\"></span>dev server</span>
+    <div class=\\"header-text\\">
+      <h1>CRXJS DEV MODE</h1>
+      <p class=\\"subtle\\">Connecting to the Vite dev server\\\\u2026</p>
+    </div>
+  </div>
+
+  <div class=\\"content\\">
+    <p>
+      Cannot connect to <a href=\\"\${VITE_URL}\\">\${VITE_URL}</a>.
+      Make sure Vite is running, then reload the extension.
+    </p>
+    <p>This page will close automatically after the extension reloads.</p>
+  </div>
+
+  <div class=\\"footer\\">
+    <div class=\\"actions\\">
+      <button>Reload Extension</button>
+    </div>
+    <div class=\\"hint\\">Tip: if the URL is wrong, restart Vite so it picks the right port.</div>
+  </div>
+</div>
+\`;
 document.body.querySelector(\\"button\\")?.addEventListener(\\"click\\", () => {
   chrome.runtime.reload();
 });
@@ -503,13 +702,11 @@ exports[`serve fs output > src/popup.html 1`] = `
 "<!DOCTYPE html>
 <html lang=\\"en\\">
   <head>
-    <title>Vite Dev Mode</title>
+    <title>CRXJS DEV MODE</title>
     <script src=\\"/assets/loading-page.hash.js\\" type=\\"module\\"></script>
   </head>
-  <body
-    style=\\"font-family: Arial, sans-serif; padding: 20px; text-align: center\\"
-  >
-    <h1>Vite Dev Mode</h1>
+  <body>
+    <p>An unknown error occurred. Failed to load the script.</p>
   </body>
 </html>
 "
