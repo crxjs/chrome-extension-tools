@@ -9,7 +9,9 @@ import { getFileName, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
+import { getContentCssEntries } from './plugin-contentScripts_declared'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
+import { isContentCssId } from './virtualFileIds'
 
 const debug = _debug('hmr')
 
@@ -130,14 +132,39 @@ export const pluginHMR: CrxPluginFn = () => {
 
         for (const [key, script] of contentScripts)
           if (key === script.id) {
-            // check if changed file is a content script dependency
-            if (
-              relFiles.has(script.id) ||
-              modules.some(isImporter(join(server.config.root, script.id)))
-            ) {
-              relFiles.forEach((relFile) => update(relFile))
-              // Also update virtual modules if content script dependencies change
-              virtualModules.forEach((file) => update(file))
+            // Handle synthetic CSS content script entries (virtual modules)
+            if (isContentCssId(script.id)) {
+              // Check if any of the CSS files associated with this synthetic entry changed
+              const cssEntries = getContentCssEntries()
+              const entry = cssEntries.find((e) => e.virtualId === script.id)
+              if (entry) {
+                // Check if any changed file is a CSS file that this entry imports
+                const changedCssFiles = [...relFiles].filter((relFile) =>
+                  entry.cssFiles.some(
+                    (cssFile) =>
+                      relFile === prefix('/', cssFile) ||
+                      relFile.endsWith(cssFile),
+                  ),
+                )
+                if (changedCssFiles.length > 0) {
+                  // Update the CSS module files
+                  changedCssFiles.forEach((relFile) => update(relFile))
+                  // Also update the synthetic entry to ensure the import chain is refreshed
+                  update(script.id)
+                  // Also update virtual modules if content script CSS dependencies change
+                  virtualModules.forEach((file) => update(file))
+                }
+              }
+            } else {
+              // Regular content script - check if changed file is a dependency
+              if (
+                relFiles.has(script.id) ||
+                modules.some(isImporter(join(server.config.root, script.id)))
+              ) {
+                relFiles.forEach((relFile) => update(relFile))
+                // Also update virtual modules if content script dependencies change
+                virtualModules.forEach((file) => update(file))
+              }
             }
           }
       },

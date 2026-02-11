@@ -1,0 +1,27 @@
+import { expect, test } from 'vitest'
+import { build } from '../runners'
+
+test(
+  'CSS declared in manifest content_scripts is applied',
+  async () => {
+    const { browser } = await build(__dirname)
+    const page = await browser.newPage()
+
+    await page.goto('https://example.com')
+
+    // Wait for content script marker element
+    const marker = page.locator('#crx-content-script-loaded')
+    await marker.waitFor({ state: 'attached' })
+
+    // Verify the CSS from manifest is applied - body should have red background
+    const bgColor = await page.evaluate(() => {
+      return window.getComputedStyle(document.body).backgroundColor
+    })
+
+    expect(bgColor).toBe('rgb(255, 0, 0)')
+    console.log(
+      '✓ CSS declared in manifest content_scripts is applied correctly',
+    )
+  },
+  { retry: 2 },
+)

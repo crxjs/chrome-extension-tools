@@ -2,7 +2,10 @@ import { ResolvedConfigWithHMRToken } from './types'
 import { isObject } from './helpers'
 import { join, normalize } from './path'
 
-export function defineClientValues(code: string, config: ResolvedConfigWithHMRToken) {
+export function defineClientValues(
+  code: string,
+  config: ResolvedConfigWithHMRToken,
+) {
   let options = config.server.hmr
   options = options && typeof options !== 'boolean' ? options : {}
   const host = options.host || null
@@ -26,18 +29,27 @@ export function defineClientValues(code: string, config: ResolvedConfigWithHMRTo
     hmrPort = normalize(`${hmrPort}${hmrBase}`)
   }
 
-  return code
-    .replace(`__MODE__`, JSON.stringify(config.mode))
-    .replace(`__BASE__`, JSON.stringify(config.base))
-    .replace(`__DEFINES__`, serializeDefine(config.define || {}))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .replace(`__HMR_TOKEN__`, JSON.stringify(config.webSocketToken || ""))
-    .replace(`__HMR_PROTOCOL__`, JSON.stringify(protocol))
-    .replace(`__HMR_HOSTNAME__`, JSON.stringify(host))
-    .replace(`__HMR_PORT__`, JSON.stringify(hmrPort))
-    .replace(`__HMR_TIMEOUT__`, JSON.stringify(timeout))
-    .replace(`__HMR_ENABLE_OVERLAY__`, JSON.stringify(overlay))
-    .replace(`__SERVER_PORT__`, JSON.stringify(config.server.port?.toString()))
+  return (
+    code
+      .replace(`__MODE__`, JSON.stringify(config.mode))
+      .replace(`__BASE__`, JSON.stringify(config.base))
+      .replace(`__DEFINES__`, serializeDefine(config.define || {}))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .replace(`__HMR_TOKEN__`, JSON.stringify(config.webSocketToken || ''))
+      .replace(`__HMR_PROTOCOL__`, JSON.stringify(protocol))
+      .replace(`__HMR_HOSTNAME__`, JSON.stringify(host))
+      .replace(`__HMR_PORT__`, JSON.stringify(hmrPort))
+      .replace(`__HMR_TIMEOUT__`, JSON.stringify(timeout))
+      .replace(`__HMR_ENABLE_OVERLAY__`, JSON.stringify(overlay))
+      .replace(
+        `__SERVER_PROTO__`,
+        JSON.stringify(config.server.https ? 'https' : 'http'),
+      )
+      .replace(
+        `__SERVER_PORT__`,
+        JSON.stringify(config.server.port?.toString()),
+      )
+  )
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function serializeDefine(define: Record<string, any>): string {

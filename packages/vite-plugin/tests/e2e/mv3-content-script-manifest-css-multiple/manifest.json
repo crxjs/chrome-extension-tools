@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "css": ["src/styles1.css", "src/styles2.css"],
+      "js": ["src/content1.ts", "src/content2.ts", "src/content3.ts"]
+    }
+  ],
+  "name": "test extension - multiple content scripts css",
+  "version": "0.1.0"
+}

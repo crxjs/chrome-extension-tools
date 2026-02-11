@@ -21,6 +21,7 @@ jobs:
   lint:
     name: Lint (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -58,6 +59,7 @@ jobs:
   unit-output:
     name: Unit & Output Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -95,6 +97,7 @@ jobs:
   e2e:
     name: E2E Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -141,6 +144,7 @@ jobs:
   compat:
     name: Compat Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
