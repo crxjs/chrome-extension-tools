@@ -70,14 +70,6 @@ test.skipIf(process.env.CI)('virtual css module updates on hmr', async () => {
 
   // Read the file again to check if it was updated
   const updatedCssContentFromFile = await fs.readFile(virtualCssFile!, 'utf-8')
-  console.log(
-    'Updated CSS file content:',
-    updatedCssContentFromFile.substring(0, 500),
-  )
-
-  // Check if the file was actually updated
-  const fileWasUpdated = updatedCssContentFromFile.includes('text-green')
-  console.log('File was updated:', fileWasUpdated)
 
   // The virtual CSS should now contain the new classes - THIS IS THE KEY ASSERTION
   expect(updatedCssContentFromFile).toContain('text-green')

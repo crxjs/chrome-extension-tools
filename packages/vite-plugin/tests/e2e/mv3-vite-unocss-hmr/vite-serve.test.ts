@@ -76,8 +76,6 @@ test(
       if (updatedCss.includes('bg-green')) break
     }
 
-    console.log('Updated CSS:', updatedCss.substring(0, 500))
-
     // The CSS should now contain the new green background class
     // This is the key assertion - verifies HMR updated the virtual CSS file
     expect(updatedCss).toContain('bg-green')
