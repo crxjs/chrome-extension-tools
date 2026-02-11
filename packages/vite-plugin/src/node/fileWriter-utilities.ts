@@ -1,10 +1,33 @@
 import { ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
 import { _debug } from './helpers'
-import { isAbsolute, join } from './path'
+import { basename, dirname, isAbsolute, join } from './path'
 import { CrxDevAssetId, CrxDevScriptId } from './types'
 
 const debug = _debug('file-writer').extend('utilities')
+
+/**
+ * Sanitizes a filename by removing leading underscores from the basename.
+ * Chrome Extensions don't allow files starting with '_' (folders are ok). This
+ * handles cases like UnoCSS's `__uno.css` which becomes `uno.css`. Note:
+ * `_locales` folder is special and handled separately (not affected).
+ */
+function sanitizeUnderscorePrefix(fileName: string): string {
+  const dir = dirname(fileName)
+  let base = basename(fileName)
+
+  // Remove leading underscores from filename
+  while (base.startsWith('_')) {
+    base = base.slice(1)
+  }
+
+  // Handle edge case of file being only underscores (unlikely but safe)
+  if (!base) {
+    base = 'file'
+  }
+
+  return dir === '.' ? base : join(dir, base)
+}
 
 export type FileWriterId = {
   type: CrxDevAssetId['type'] | CrxDevScriptId['type'] | 'loader'
@@ -43,6 +66,7 @@ export function formatFileData<
  *
  * - Filenames never start with a slash
  * - URL queries are converted to underscores and dashes
+ * - Filenames starting with '_' are sanitized (Chrome Extensions reserve them)
  */
 export function getFileName({ type, id }: FileWriterId): string {
   let fileName = id
@@ -62,6 +86,9 @@ export function getFileName({ type, id }: FileWriterId): string {
   } else if (fileName.startsWith('.vite/deps/')) {
     fileName = `vendor/${fileName.slice('.vite/deps/'.length)}`
   }
+
+  // Sanitize underscore prefix before adding extension
+  fileName = sanitizeUnderscorePrefix(fileName)
 
   switch (type) {
     case 'iife':

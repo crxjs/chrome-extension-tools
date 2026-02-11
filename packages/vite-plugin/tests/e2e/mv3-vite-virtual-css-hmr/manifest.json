@@ -1,0 +1,13 @@
+{
+  "description": "test extension for virtual css hmr",
+  "manifest_version": 3,
+  "name": "test extension",
+  "background": { "service_worker": "src/background.ts" },
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/content.ts"]
+    }
+  ],
+  "version": "1.0.0"
+}

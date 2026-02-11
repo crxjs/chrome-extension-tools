@@ -1,0 +1,58 @@
+// Vitest Snapshot v1
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/content.hash1.css",
+      ],
+      "js": Array [
+        "assets/content.ts.hash0.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/content.ts.hash0.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/content.hash1.css",
+  "assets/content.ts.hash0.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output > assets/content.hash1.css 1`] = `
+"/* Simulating UnoCSS virtual __uno.css file */
+body {
+  color: blue;
+}
+"
+`;
+
+exports[`build fs output > assets/content.ts.hash0.js 1`] = `
+"(function(){const __uno = \\"\\";
+console.log(\\"content.ts with underscore css\\");
+})()
+"
+`;
