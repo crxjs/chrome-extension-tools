@@ -84,7 +84,7 @@
     "pathe": "^2.0.1",
     "picocolors": "^1.1.1",
     "react-refresh": "^0.13.0",
-    "rollup": "2.79.2",
+    "rollup": "2.80.0",
     "rxjs": "7.5.7"
   },
   "devDependencies": {
