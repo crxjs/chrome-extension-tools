@@ -54,6 +54,7 @@
   ],
   "scripts": {
     "release": "bumpp",
+    "prepublishOnly": "pnpm run build",
     "format": "prettier -w -c ../../.prettierrc.yaml",
     "build": "run-s build:clean build:js",
     "build:clean": "rimraf dist",
