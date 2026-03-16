@@ -22,7 +22,8 @@
     "play:svelte": "pnpm -C playgrounds/svelte run dev",
     "play:vanilla": "pnpm -C playgrounds/vanilla run dev",
     "play:vue": "pnpm -C playgrounds/vue run dev",
-    "release": "pnpm --filter \"*plugin*\" build && changeset publish"
+    "release": "pnpm --filter \"*plugin*\" build && changeset publish",
+    "release:vite-plugin": "cd ./packages/vite-plugin && pnpm release"
   },
   "dependencies": {
     "@changesets/cli": "^2.30.0",
@@ -40,6 +41,7 @@
     "node": ">=14"
   },
   "devDependencies": {
+    "bumpp": "^11.0.1",
     "vitest": "0.24.3"
   },
   "pnpm": {
