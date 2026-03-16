@@ -1,5 +1,13 @@
 # @crxjs/vite-plugin
 
+## 2.4.1
+
+### Patch Changes
+
+- c38910c: ci: migrate release workflow to npm trusted publishers
+- 150625d: ci: run compat tests against stable Vite 8, make the vite8 available
+  as a peer dependency
+
 ## 2.4.0
 
 ### Minor Changes
