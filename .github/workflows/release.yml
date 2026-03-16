@@ -59,7 +59,6 @@ jobs:
     name: Release
     if: inputs.test_discord != true
     runs-on: ubuntu-latest
-    environment: production
     permissions:
       contents: write
       pull-requests: write

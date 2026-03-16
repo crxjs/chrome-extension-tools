@@ -25,7 +25,7 @@
     "release": "pnpm --filter \"*plugin*\" build && changeset publish"
   },
   "dependencies": {
-    "@changesets/cli": "^2.22.0",
+    "@changesets/cli": "^2.30.0",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
     "eslint": "8.43.0",
