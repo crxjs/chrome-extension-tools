@@ -1,55 +1,5 @@
 # @crxjs/vite-plugin
 
-## 2.4.0
-
-### Minor Changes
-
-- 1f01417: feat: add HMR support for CSS declared in manifest content_scripts
-- 1f01417: add: browser_specific_settings.gecko properties
-- 1f01417: Fix "TypeError: plugins is not iterable" error when using
-  rolldown-vite (Vite 7).
-
-  In rolldown-vite, the buildStart hook doesn't receive options.plugins. This
-  fix uses the configResolved hook to get plugins from the resolved config, with
-  buildStart kept as a fallback for older Vite versions.
-
-- 1f01417: Fixed
-  [#852](https://github.com/crxjs/chrome-extension-tools/issues/852), the plugin
-  now emits a correct URL in `service-worker-loader.js` when the Vite option
-  `server.https` is enabled.
-- 1f01417: fix: resolve TypeScript types correctly for ESM and CJS consumers
-- 1f01417: feat: add Vite 8 beta support
-
-### Patch Changes
-
-- c38910c: ci: migrate release workflow to npm trusted publishers
-- 1f01417: fix: copy CSS files declared in manifest content_scripts to output
-- 1f01417: Replace cheerio with node-html-parser to fix npm deprecation warning
-  for whatwg-encoding.
-
-  Also adds explicit vite peerDependency declaration (^3.0.0 through ^7.0.0) to
-  enable proper version resolution when used with different vite versions.
-
-- 150625d: ci: run compat tests against stable Vite 8, make the vite8 available
-  as a peer dependency
-- 1f01417: fix: UnoCSS/TailwindCSS HMR issues with virtual CSS modules
-- 1f01417: fix: respect user's build.manifest setting in Vite 4+
-
-  When users set `build.manifest: false` in their Vite config, the Vite manifest
-  file (`.vite/manifest.json` in Vite 5+, or `manifest.json` in older versions)
-  is now properly removed from the output bundle.
-
-  CRXJS internally requires the Vite manifest to derive content script resources
-  during build, so it forces `build.manifest: true`. Previously, this meant the
-  Vite manifest was always included in the output even if the user explicitly
-  disabled it. Now, CRXJS removes the manifest from the bundle after processing
-  if the user didn't want it.
-
-  Closes #1077
-
-- 1f01417: feat(client): Update the style and content of the development mode
-  loading page
-
 ## 2.3.0
 
 ### Minor Changes
