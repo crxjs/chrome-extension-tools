@@ -1,4 +1,4 @@
-import { glob, GlobOptions } from 'tinyglobby'
+import { glob, GlobOptions, isDynamicPattern } from 'tinyglobby'
 import { ManifestV3 } from './manifest'
 import { ManifestFiles } from './types'
 import { isString } from './helpers'
@@ -46,7 +46,7 @@ export async function manifestFiles(
         .map(async (r) => {
           // don't copy node_modules, etc
           if (['*', '**/*'].includes(r)) return undefined
-          if (fg.isDynamicPattern(r)) return fg(r, options)
+          if (isDynamicPattern(r)) return glob(r, options)
           return r
         }),
     )
@@ -66,7 +66,7 @@ export async function manifestFiles(
 }
 
 export async function dirFiles(dir: string): Promise<string[]> {
-  const files = await fg(join(dir,'**','*'));
+  const files = await glob(join(dir,'**','*'));
   return files
 }
 
