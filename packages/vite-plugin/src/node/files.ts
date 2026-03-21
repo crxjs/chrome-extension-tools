@@ -1,4 +1,4 @@
-import fg from 'fast-glob'
+import { glob, GlobOptions } from 'tinyglobby'
 import { ManifestV3 } from './manifest'
 import { ManifestFiles } from './types'
 import { isString } from './helpers'
@@ -6,12 +6,12 @@ import { join } from 'pathe';
 
 export async function manifestFiles(
   manifest: ManifestV3,
-  options: fg.Options = {},
+  options: GlobOptions = {},
 ): Promise<ManifestFiles> {
   // JSON
   let locales: string[] = []
   if (manifest.default_locale)
-    locales = await fg('_locales/**/messages.json', options)
+    locales = await glob('_locales/**/messages.json', options)
 
   const rulesets =
     manifest.declarative_net_request?.rule_resources.flatMap(

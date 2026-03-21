@@ -1,5 +1,5 @@
 import type { Node as AcornNode } from 'acorn'
-import type { Options as FastGlobOptions } from 'fast-glob'
+import type { GlobOptions } from 'tinyglobby'
 import type { OutputBundle, PluginContext } from 'rollup'
 import type { HMRPayload, ResolvedConfig, Plugin as VitePlugin } from 'vite'
 import { ManifestV3 } from './manifest'
@@ -85,7 +85,7 @@ export interface CrxOptions {
     hmrTimeout?: number
     injectCss?: boolean
   }
-  fastGlobOptions?: FastGlobOptions
+  globOptions?: GlobOptions
   /**
    * The browser that this extension is targeting, can be "firefox" or "chrome".
    * Default is "chrome".

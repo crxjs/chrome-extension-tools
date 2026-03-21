@@ -78,7 +78,7 @@
     "convert-source-map": "^1.7.0",
     "debug": "^4.3.3",
     "es-module-lexer": "^0.10.0",
-    "fast-glob": "^3.2.11",
+    "tinyglobby": "^0.2.15",
     "fs-extra": "^10.0.1",
     "jsesc": "^3.0.2",
     "magic-string": "^0.30.12",
@@ -86,7 +86,7 @@
     "pathe": "^2.0.1",
     "picocolors": "^1.1.1",
     "react-refresh": "^0.13.0",
-    "rollup": "2.79.2",
+    "rollup": "2.80.0",
     "rxjs": "7.5.7"
   },
   "devDependencies": {
