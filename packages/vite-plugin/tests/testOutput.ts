@@ -1,4 +1,4 @@
-import fg from 'fast-glob'
+import { glob } from 'tinyglobby'
 import fs from 'fs-extra'
 import jsesc from 'jsesc'
 import { join } from 'pathe'
@@ -73,7 +73,7 @@ export async function testOutput(
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '_00 manifest.json')
 
-  const files = await fg(`**/*`, { cwd: outDir })
+  const files = await glob(`**/*`, { cwd: outDir })
 
   const scrubbedFiles = files.map(scrubHashes).sort()
   expect(scrubbedFiles).toMatchSnapshot('_01 output files')

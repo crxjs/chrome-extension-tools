@@ -254,9 +254,6 @@ importers:
       es-module-lexer:
         specifier: ^0.10.0
         version: 0.10.5
-      fast-glob:
-        specifier: ^3.2.11
-        version: 3.3.3
       fs-extra:
         specifier: ^10.0.1
         version: 10.1.0
@@ -279,11 +276,14 @@ importers:
         specifier: ^0.13.0
         version: 0.13.0
       rollup:
-        specifier: 2.79.2
-        version: 2.79.2
+        specifier: 2.80.0
+        version: 2.80.0
       rxjs:
         specifier: 7.5.7
         version: 7.5.7
+      tinyglobby:
+        specifier: ^0.2.15
+        version: 0.2.15
     devDependencies:
       '@extend-chrome/messages':
         specifier: 1.2.2
@@ -293,16 +293,16 @@ importers:
         version: 1.5.0
       '@rollup/plugin-alias':
         specifier: 4.0.4
-        version: 4.0.4(rollup@2.79.2)
+        version: 4.0.4(rollup@2.80.0)
       '@rollup/plugin-commonjs':
         specifier: 21.1.0
-        version: 21.1.0(rollup@2.79.2)
+        version: 21.1.0(rollup@2.80.0)
       '@rollup/plugin-json':
         specifier: ^5.0.0
-        version: 5.0.2(rollup@2.79.2)
+        version: 5.0.2(rollup@2.80.0)
       '@rollup/plugin-node-resolve':
         specifier: 13.2.0
-        version: 13.2.0(rollup@2.79.2)
+        version: 13.2.0(rollup@2.80.0)
       '@sveltejs/vite-plugin-svelte':
         specifier: 1.4.0
         version: 1.4.0(svelte@3.59.2)(vite@3.2.11(@types/node@17.0.18)(terser@5.44.1))
@@ -383,10 +383,10 @@ importers:
         version: 3.0.2
       rollup-plugin-dts:
         specifier: ^4.2.0
-        version: 4.2.3(rollup@2.79.2)(typescript@4.9.5)
+        version: 4.2.3(rollup@2.80.0)(typescript@4.9.5)
       rollup-plugin-esbuild:
         specifier: 4.10.3
-        version: 4.10.3(esbuild@0.17.14)(rollup@2.79.2)
+        version: 4.10.3(esbuild@0.17.14)(rollup@2.80.0)
       svelte:
         specifier: ^3.48.0
         version: 3.59.2
@@ -404,7 +404,7 @@ importers:
         version: 3.2.11(@types/node@17.0.18)(terser@5.44.1)
       vite-plugin-inspect:
         specifier: 0.7.25
-        version: 0.7.25(rollup@2.79.2)(vite@3.2.11(@types/node@17.0.18)(terser@5.44.1))
+        version: 0.7.25(rollup@2.80.0)(vite@3.2.11(@types/node@17.0.18)(terser@5.44.1))
       vitest:
         specifier: 0.28.5
         version: 0.28.5(jsdom@16.7.0)(terser@5.44.1)
@@ -7932,6 +7932,11 @@ packages:
     engines: {node: '>=10.0.0'}
     hasBin: true
 
+  rollup@2.80.0:
+    resolution: {integrity: sha512-cIFJOD1DESzpjOBl763Kp1AH7UE/0fcdHe6rZXUdQ9c50uvgigvW97u3IcSeBwOkgqL/PXPBktBCh0KEu5L8XQ==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+
   rollup@4.55.1:
     resolution: {integrity: sha512-wDv/Ht1BNHB4upNbK74s9usvl7hObDnvVzknxqY/E/O3X6rW1U1rV1aENEfJ54eFZDTNo7zv1f5N4edCluH7+A==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -10773,7 +10778,6 @@ snapshots:
       convert-source-map: 1.9.0
       debug: 4.4.3
       es-module-lexer: 0.10.5
-      fast-glob: 3.3.3
       fs-extra: 10.1.0
       jsesc: 3.1.0
       magic-string: 0.30.21
@@ -10781,8 +10785,9 @@ snapshots:
       pathe: 2.0.3
       picocolors: 1.1.1
       react-refresh: 0.13.0
-      rollup: 2.79.2
+      rollup: 2.80.0
       rxjs: 7.5.7
+      tinyglobby: 0.2.15
       vite: 3.2.11(@types/node@22.19.5)(terser@5.44.1)
     transitivePeerDependencies:
       - supports-color
@@ -10795,7 +10800,6 @@ snapshots:
       convert-source-map: 1.9.0
       debug: 4.4.3
       es-module-lexer: 0.10.5
-      fast-glob: 3.3.3
       fs-extra: 10.1.0
       jsesc: 3.1.0
       magic-string: 0.30.21
@@ -10803,8 +10807,9 @@ snapshots:
       pathe: 2.0.3
       picocolors: 1.1.1
       react-refresh: 0.13.0
-      rollup: 2.79.2
+      rollup: 2.80.0
       rxjs: 7.5.7
+      tinyglobby: 0.2.15
       vite: 6.4.1(@types/node@22.19.5)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
@@ -12612,11 +12617,11 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
-  '@rollup/plugin-alias@4.0.4(rollup@2.79.2)':
+  '@rollup/plugin-alias@4.0.4(rollup@2.80.0)':
     dependencies:
       slash: 4.0.0
     optionalDependencies:
-      rollup: 2.79.2
+      rollup: 2.80.0
 
   '@rollup/plugin-babel@6.1.0(@babel/core@7.28.5)(@types/babel__core@7.20.5)(rollup@2.79.2)':
     dependencies:
@@ -12640,21 +12645,38 @@ snapshots:
       resolve: 1.22.11
       rollup: 2.79.2
 
+  '@rollup/plugin-commonjs@21.1.0(rollup@2.80.0)':
+    dependencies:
+      '@rollup/pluginutils': 3.1.0(rollup@2.80.0)
+      commondir: 1.0.1
+      estree-walker: 2.0.2
+      glob: 7.2.3
+      is-reference: 1.2.1
+      magic-string: 0.25.9
+      resolve: 1.22.11
+      rollup: 2.80.0
+
   '@rollup/plugin-json@5.0.2(rollup@2.79.2)':
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@2.79.2)
     optionalDependencies:
       rollup: 2.79.2
 
-  '@rollup/plugin-node-resolve@13.2.0(rollup@2.79.2)':
+  '@rollup/plugin-json@5.0.2(rollup@2.80.0)':
     dependencies:
-      '@rollup/pluginutils': 3.1.0(rollup@2.79.2)
+      '@rollup/pluginutils': 5.3.0(rollup@2.80.0)
+    optionalDependencies:
+      rollup: 2.80.0
+
+  '@rollup/plugin-node-resolve@13.2.0(rollup@2.80.0)':
+    dependencies:
+      '@rollup/pluginutils': 3.1.0(rollup@2.80.0)
       '@types/resolve': 1.17.1
       builtin-modules: 3.3.0
       deepmerge: 4.3.1
       is-module: 1.0.0
       resolve: 1.22.11
-      rollup: 2.79.2
+      rollup: 2.80.0
 
   '@rollup/plugin-node-resolve@13.3.0(rollup@2.79.2)':
     dependencies:
@@ -12689,6 +12711,13 @@ snapshots:
       picomatch: 2.3.1
       rollup: 2.79.2
 
+  '@rollup/pluginutils@3.1.0(rollup@2.80.0)':
+    dependencies:
+      '@types/estree': 0.0.39
+      estree-walker: 1.0.1
+      picomatch: 2.3.1
+      rollup: 2.80.0
+
   '@rollup/pluginutils@4.2.1':
     dependencies:
       estree-walker: 2.0.2
@@ -12701,6 +12730,14 @@ snapshots:
       picomatch: 4.0.3
     optionalDependencies:
       rollup: 2.79.2
+
+  '@rollup/pluginutils@5.3.0(rollup@2.80.0)':
+    dependencies:
+      '@types/estree': 1.0.8
+      estree-walker: 2.0.2
+      picomatch: 4.0.3
+    optionalDependencies:
+      rollup: 2.80.0
 
   '@rollup/rollup-android-arm-eabi@4.55.1':
     optional: true
@@ -17232,11 +17269,7 @@ snapshots:
       pretty-format: 26.6.2
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-jasmine2@27.5.1:
     dependencies:
@@ -19389,15 +19422,15 @@ snapshots:
       rollup: 2.79.2
       rollup-pluginutils: 2.8.2
 
-  rollup-plugin-dts@4.2.3(rollup@2.79.2)(typescript@4.9.5):
+  rollup-plugin-dts@4.2.3(rollup@2.80.0)(typescript@4.9.5):
     dependencies:
       magic-string: 0.26.7
-      rollup: 2.79.2
+      rollup: 2.80.0
       typescript: 4.9.5
     optionalDependencies:
       '@babel/code-frame': 7.27.1
 
-  rollup-plugin-esbuild@4.10.3(esbuild@0.17.14)(rollup@2.79.2):
+  rollup-plugin-esbuild@4.10.3(esbuild@0.17.14)(rollup@2.80.0):
     dependencies:
       '@rollup/pluginutils': 4.2.1
       debug: 4.4.3
@@ -19405,7 +19438,7 @@ snapshots:
       esbuild: 0.17.14
       joycon: 3.1.1
       jsonc-parser: 3.3.1
-      rollup: 2.79.2
+      rollup: 2.80.0
     transitivePeerDependencies:
       - supports-color
 
@@ -19414,6 +19447,10 @@ snapshots:
       estree-walker: 0.6.1
 
   rollup@2.79.2:
+    optionalDependencies:
+      fsevents: 2.3.3
+
+  rollup@2.80.0:
     optionalDependencies:
       fsevents: 2.3.3
 
@@ -20675,10 +20712,10 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-inspect@0.7.25(rollup@2.79.2)(vite@3.2.11(@types/node@17.0.18)(terser@5.44.1)):
+  vite-plugin-inspect@0.7.25(rollup@2.80.0)(vite@3.2.11(@types/node@17.0.18)(terser@5.44.1)):
     dependencies:
       '@antfu/utils': 0.7.10
-      '@rollup/pluginutils': 5.3.0(rollup@2.79.2)
+      '@rollup/pluginutils': 5.3.0(rollup@2.80.0)
       debug: 4.4.3
       fs-extra: 11.3.3
       picocolors: 1.1.1
@@ -20713,7 +20750,7 @@ snapshots:
       esbuild: 0.15.18
       postcss: 8.5.6
       resolve: 1.22.11
-      rollup: 2.79.2
+      rollup: 2.80.0
     optionalDependencies:
       '@types/node': 17.0.18
       fsevents: 2.3.3
@@ -20724,7 +20761,7 @@ snapshots:
       esbuild: 0.15.18
       postcss: 8.5.6
       resolve: 1.22.11
-      rollup: 2.79.2
+      rollup: 2.80.0
     optionalDependencies:
       '@types/node': 22.19.5
       fsevents: 2.3.3
