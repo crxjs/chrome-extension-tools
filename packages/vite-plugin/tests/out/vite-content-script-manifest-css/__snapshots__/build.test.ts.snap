@@ -19,18 +19,6 @@ Object {
   "manifest_version": 3,
   "name": "test extension",
   "version": "0.1.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "assets/content.ts.hash0.js",
-      ],
-      "use_dynamic_url": false,
-    },
-  ],
 }
 `;
 
