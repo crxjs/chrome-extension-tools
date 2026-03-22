@@ -8,7 +8,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "svelte": "^5.28.1"
+    "svelte": "^5.53.5"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "workspace:*",
