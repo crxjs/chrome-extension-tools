@@ -5,8 +5,11 @@ import {
   contentScripts,
   createDevLoader,
   createDevMainLoader,
+  createDevShadowLoader,
   createProLoader,
   createProMainLoader,
+  createProShadowLoader,
+  hashScriptId,
 } from './contentScripts'
 import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
@@ -110,18 +113,31 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 const client = add({ type: 'module', id: viteClientId })
 
                 const file = add({ type: 'module', id })
+
+                let loaderSource: string
+                if (worldMainIds.has(file.id)) {
+                  loaderSource = createDevMainLoader({
+                    fileName: `./${file.fileName.split('/').at(-1)}`,
+                  })
+                } else if (script.shadowDom) {
+                  loaderSource = createDevShadowLoader({
+                    preamble: preamble.fileName,
+                    client: client.fileName,
+                    fileName: file.fileName,
+                    shadowMode: script.shadowMode || 'open',
+                  })
+                } else {
+                  loaderSource = createDevLoader({
+                    preamble: preamble.fileName,
+                    client: client.fileName,
+                    fileName: file.fileName,
+                  })
+                }
+
                 const loader = add({
                   type: 'asset',
                   id: getFileName({ type: 'loader', id }),
-                  source: worldMainIds.has(file.id)
-                    ? createDevMainLoader({
-                        fileName: `./${file.fileName.split('/').at(-1)}`,
-                      })
-                    : createDevLoader({
-                        preamble: preamble.fileName,
-                        client: client.fileName,
-                        fileName: file.fileName,
-                      }),
+                  source: loaderSource,
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
@@ -198,17 +214,27 @@ export const pluginContentScripts: CrxPluginFn = () => {
               )
 
               if (shouldUseLoader) {
+                let loaderSource: string
+                if (worldMainIds.has(script.id)) {
+                  loaderSource = createProMainLoader({
+                    fileName: `./${fileName.split('/').at(-1)}`,
+                  })
+                } else if (script.shadowDom) {
+                  loaderSource = createProShadowLoader({
+                    fileName,
+                    shadowMode: script.shadowMode || 'open',
+                  })
+                } else {
+                  loaderSource = createProLoader({ fileName })
+                }
+
                 const refId = this.emitFile({
                   type: 'asset',
                   name: getFileName({
                     type: 'loader',
                     id: basename(script.id),
                   }),
-                  source: worldMainIds.has(script.id)
-                    ? createProMainLoader({
-                        fileName: `./${fileName.split('/').at(-1)}`,
-                      })
-                    : createProLoader({ fileName }),
+                  source: loaderSource,
                 })
 
                 script.loaderName = this.getFileName(refId)

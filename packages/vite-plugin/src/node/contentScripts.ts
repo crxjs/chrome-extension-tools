@@ -1,6 +1,8 @@
 import contentDevLoader from 'client/iife/content-dev-loader.ts'
+import contentDevShadowLoader from 'client/iife/content-dev-loader-shadow.ts'
 import contentDevMainLoader from 'client/iife/content-dev-main-loader.ts'
 import contentProLoader from 'client/iife/content-pro-loader.ts'
+import contentProShadowLoader from 'client/iife/content-pro-loader-shadow.ts'
 import contentProMainLoader from 'client/iife/content-pro-main-loader.ts'
 import { filter } from 'rxjs'
 import { hash } from './helpers'
@@ -26,6 +28,10 @@ export interface ContentScript {
   matches: string[]
   /** CSS files imported by manifest */
   css?: string[]
+  /** Whether this content script uses shadow DOM isolation */
+  shadowDom?: boolean
+  /** Shadow DOM mode ('open' or 'closed'), defaults to 'open' */
+  shadowMode?: 'open' | 'closed'
 }
 
 /**
@@ -100,6 +106,49 @@ export function createDevMainLoader({
     .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
 }
 
-export function createProMainLoader({ fileName }: { fileName: string }): string {
+export function createProMainLoader({
+  fileName,
+}: {
+  fileName: string
+}): string {
   return contentProMainLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
+}
+
+export function createDevShadowLoader({
+  preamble,
+  client,
+  fileName,
+  shadowMode = 'open',
+}: {
+  preamble: string
+  client: string
+  fileName: string
+  shadowMode?: string
+}): string {
+  return contentDevShadowLoader
+    .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
+    .replace(/__CLIENT__/g, JSON.stringify(client))
+    .replace(/__SCRIPT__/g, JSON.stringify(fileName))
+    .replace(/__SHADOW_MODE__/g, JSON.stringify(shadowMode))
+    .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
+}
+
+/**
+ * Sentinel value used as a placeholder for CSS URLs in shadow loaders. Replaced
+ * with actual CSS URLs during renderCrxManifest after CSS filenames are
+ * resolved.
+ */
+export const SHADOW_CSS_PLACEHOLDER = '__CRX_SHADOW_CSS_URLS__'
+
+export function createProShadowLoader({
+  fileName,
+  shadowMode = 'open',
+}: {
+  fileName: string
+  shadowMode?: string
+}): string {
+  return contentProShadowLoader
+    .replace(/__SCRIPT__/g, JSON.stringify(fileName))
+    .replace(/__SHADOW_MODE__/g, JSON.stringify(shadowMode))
+    .replace(/__CSS_URLS__/g, `[${JSON.stringify(SHADOW_CSS_PLACEHOLDER)}]`)
 }

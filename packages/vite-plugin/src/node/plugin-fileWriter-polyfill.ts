@@ -54,6 +54,37 @@ export const pluginFileWriterPolyfill: CrxPluginFn = () => {
         const ws = 'new WebSocket'
         const index = code.indexOf(ws)
         magic.overwrite(index, index + ws.length, 'new HMRPort')
+
+        // Patch CSS injection to target shadow root when available
+        // This wraps the head element's appendChild/removeChild to redirect
+        // style elements with data-vite-dev-id to the shadow root
+        magic.append(`
+;(function() {
+  var _origHeadAppend = HTMLHeadElement.prototype.appendChild;
+  HTMLHeadElement.prototype.appendChild = function(node) {
+    if (node instanceof HTMLStyleElement && node.hasAttribute('data-vite-dev-id') && globalThis.__CRX_SHADOW_ROOT__) {
+      return globalThis.__CRX_SHADOW_ROOT__.appendChild(node);
+    }
+    return _origHeadAppend.call(this, node);
+  };
+  var _origHeadRemove = HTMLHeadElement.prototype.removeChild;
+  HTMLHeadElement.prototype.removeChild = function(node) {
+    if (node instanceof HTMLStyleElement && node.hasAttribute('data-vite-dev-id') && globalThis.__CRX_SHADOW_ROOT__) {
+      try { return globalThis.__CRX_SHADOW_ROOT__.removeChild(node); } catch(e) { return node; }
+    }
+    return _origHeadRemove.call(this, node);
+  };
+  // Also patch querySelector for style lookups (Vite uses this to find existing styles)
+  var _origQS = Document.prototype.querySelector;
+  Document.prototype.querySelector = function(selector) {
+    if (typeof selector === 'string' && selector.includes('data-vite-dev-id') && globalThis.__CRX_SHADOW_ROOT__) {
+      return globalThis.__CRX_SHADOW_ROOT__.querySelector(selector) || _origQS.call(this, selector);
+    }
+    return _origQS.call(this, selector);
+  };
+})();
+`)
+
         return magic.toString()
       }
     },
