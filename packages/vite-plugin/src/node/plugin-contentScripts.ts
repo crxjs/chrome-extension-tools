@@ -9,7 +9,6 @@ import {
   createProLoader,
   createProMainLoader,
   createProShadowLoader,
-  hashScriptId,
 } from './contentScripts'
 import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
