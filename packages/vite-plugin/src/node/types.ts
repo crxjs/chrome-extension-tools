@@ -91,6 +91,20 @@ export interface CrxOptions {
    * Default is "chrome".
    */
   browser?: Browser
+  /**
+   * Enable automatic extension reload and HMR during development. When false:
+   *
+   * - The extension will not call `chrome.runtime.reload()` on background changes
+   *   or dev server reconnection.
+   * - Content scripts will not receive HMR updates or reload their host pages.
+   * - Files are still rebuilt and written to the output directory on change.
+   *
+   * Use this when content scripts have side effects on injection and you want
+   * to manually reload the extension in the browser.
+   *
+   * Default is `true`.
+   */
+  liveReload?: boolean
 }
 
 export type Browser = 'firefox' | 'chrome'
