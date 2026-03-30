@@ -4,6 +4,7 @@ import type { CrxHMRPayload } from 'src/types'
 import type { HMRPayload } from 'vite'
 
 declare const __CRX_HMR_TIMEOUT__: number
+declare const __CRX_LIVE_RELOAD__: boolean
 
 function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
   return x.type === 'custom' && x.event.startsWith('crx:')
@@ -63,9 +64,13 @@ export class HMRPort {
     const payload: HMRPayload | CrxHMRPayload = JSON.parse(message.data)
     if (isCrxHMRPayload(payload)) {
       if (payload.event === 'crx:runtime-reload') {
-        // delayed page reload; let background finish restart
-        console.log('[crx] runtime reload')
-        setTimeout(() => location.reload(), 500)
+        if (__CRX_LIVE_RELOAD__) {
+          // delayed page reload; let background finish restart
+          console.log('[crx] runtime reload')
+          setTimeout(() => location.reload(), 500)
+        } else {
+          console.log('[crx] runtime reload suppressed (liveReload disabled)')
+        }
       } else {
         // unpack hmr payloads; forward to vite client
         // console.log('[crx] content payload', payload)

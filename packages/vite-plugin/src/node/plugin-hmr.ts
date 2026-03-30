@@ -10,6 +10,7 @@ import { _debug } from './helpers'
 import { isImporter } from './isImporter'
 import { isAbsolute, join } from './path'
 import { getContentCssEntries } from './plugin-contentScripts_declared'
+import { getOptions } from './plugin-optionsProvider'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 import { isContentCssId } from './virtualFileIds'
 
@@ -25,6 +26,7 @@ export const pluginHMR: CrxPluginFn = () => {
   let decoratedSend: ((payload: HMRPayload) => void) | undefined
   let config: ResolvedConfig
   let subs: Subscription
+  let liveReload = true
 
   return [
     {
@@ -33,6 +35,8 @@ export const pluginHMR: CrxPluginFn = () => {
       enforce: 'pre',
       // server hmr host should be localhost
       async config({ server = {}, ...config }) {
+        const opts = await getOptions({ ...config, server })
+        liveReload = opts.liveReload !== false
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
         server.hmr = server.hmr ?? {}
@@ -76,7 +80,11 @@ export const pluginHMR: CrxPluginFn = () => {
           subs.add(fileWriterError$.subscribe(send))
           subs.add(
             crxHMRPayload$.subscribe((payload) => {
-              send(payload) // send crx hmr and error events
+              // keep subscription alive for file writer side effects,
+              // but skip sending HMR payloads when liveReload is disabled
+              if (liveReload) {
+                send(payload) // send crx hmr and error events
+              }
             }),
           )
         }
@@ -125,8 +133,12 @@ export const pluginHMR: CrxPluginFn = () => {
             relFiles.has(background) ||
             modules.some(isImporter(join(server.config.root, background)))
           ) {
-            debug('sending runtime reload')
-            server.ws.send(crxRuntimeReload)
+            if (liveReload) {
+              debug('sending runtime reload')
+              server.ws.send(crxRuntimeReload)
+            } else {
+              debug('skipping runtime reload (liveReload disabled)')
+            }
           }
         }
 
