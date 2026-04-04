@@ -204,7 +204,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
                   }),
                   source: worldMainIds.has(script.id)
                     ? createProMainLoader({
-                        fileName: `./${fileName.split('/').at(-1)}`,
+                        fileName: `../${fileName}`,
                       })
                     : createProLoader({ fileName }),
                 })
