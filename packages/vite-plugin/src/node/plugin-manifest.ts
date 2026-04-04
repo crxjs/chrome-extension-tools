@@ -260,7 +260,7 @@ export const pluginManifest: CrxPluginFn = () => {
                 const refId = this.emitFile({
                   type: 'chunk',
                   id,
-                  name: basename(file),
+                  name: file.replace(/[\\/]/g, '-'),
                 })
                 contentScripts.set(
                   file,
