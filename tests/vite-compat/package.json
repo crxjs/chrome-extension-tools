@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@crxjs/vite-plugin": "workspace:*",
-    "vite": "^3.0.0"
+    "vite": "^6.4.2"
   },
   "dependenciesMeta": {
     "@crxjs/vite-plugin": {
