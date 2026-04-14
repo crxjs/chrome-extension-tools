@@ -76,6 +76,7 @@ export function getFileName({ type, id }: FileWriterId): string {
     .replace(/\?/g, '__') // convert url queries
     .replace(/&/g, '_')
     .replace(/=/g, '--')
+    .replace(/:/g, '-') // colons are illegal on Windows
   if (fileName.includes('node_modules/')) {
     fileName = `vendor/${fileName
       .split('node_modules/')
