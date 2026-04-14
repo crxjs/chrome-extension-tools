@@ -35,6 +35,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let server: ViteDevServer
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
+  let liveReload = true
   let sub = new Subscription()
 
   const worldMainIds = new Set<string>()
@@ -70,9 +71,11 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'serve',
       async config(config, env) {
         await findWorldMainIds(config, env)
-        const { contentScripts = {} } = await getOptions(config)
+        const opts = await getOptions(config)
+        const { contentScripts = {} } = opts
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
+        liveReload = opts.liveReload !== false
       },
       async configureServer(_server) {
         server = _server
@@ -141,10 +144,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
         }
 
         if (id === contentHmrPortId) {
-          const defined = contentHmrPort.replace(
-            '__CRX_HMR_TIMEOUT__',
-            JSON.stringify(hmrTimeout),
-          )
+          const defined = contentHmrPort
+            .replace('__CRX_HMR_TIMEOUT__', JSON.stringify(hmrTimeout))
+            .replace('__CRX_LIVE_RELOAD__', JSON.stringify(liveReload))
           return defined
         }
       },

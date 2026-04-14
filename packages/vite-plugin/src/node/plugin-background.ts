@@ -24,6 +24,7 @@ import { workerClientId } from './virtualFileIds'
 export const pluginBackground: CrxPluginFn = () => {
   let config: ResolvedConfig
   let browser: Browser
+  let liveReload = true
 
   return [
     {
@@ -34,9 +35,13 @@ export const pluginBackground: CrxPluginFn = () => {
       },
       load(id) {
         if (id === workerClientId) {
-          const base = `${config.server.https ? 'https' : 'http'}://localhost:${config.server.port}/`
+          const base = `${config.server.https ? 'https' : 'http'}://localhost:${
+            config.server.port
+          }/`
           return defineClientValues(
-            workerHmrClient.replace('__BASE__', JSON.stringify(base)),
+            workerHmrClient
+              .replace('__BASE__', JSON.stringify(base))
+              .replace('__LIVE_RELOAD__', JSON.stringify(liveReload)),
             config,
           )
         }
@@ -49,6 +54,7 @@ export const pluginBackground: CrxPluginFn = () => {
       async config(config) {
         const opts = await getOptions(config)
         browser = opts.browser || 'chrome'
+        liveReload = opts.liveReload !== false
       },
       configResolved(_config) {
         config = _config
@@ -61,7 +67,7 @@ export const pluginBackground: CrxPluginFn = () => {
 
         let loader: string
         if (config.command === 'serve') {
-          const proto = config.server.https ? 'https' : 'http';
+          const proto = config.server.https ? 'https' : 'http'
           const port = config.server.port?.toString()
           if (typeof port === 'undefined')
             throw new Error('server port is undefined in watch mode')
