@@ -84,6 +84,11 @@ export interface CrxOptions {
     preambleCode?: string | false
     hmrTimeout?: number
     injectCss?: boolean
+    /**
+     * Enable shadow DOM isolation for content scripts. When true, uses 'open'
+     * mode.
+     */
+    shadowDom?: boolean | { mode?: 'open' | 'closed' }
   }
   globOptions?: GlobOptions
   /**

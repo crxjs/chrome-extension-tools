@@ -64,6 +64,11 @@ declare namespace ContentScriptAPI {
       injectTime: number
       loadTime: number
     }
+    /**
+     * The shadow root container, present when shadow DOM isolation is enabled
+     * for this content script
+     */
+    shadowRoot?: ShadowRoot
   }
   export interface ExecuteFn {
     (options: ExecuteFnOptions): void

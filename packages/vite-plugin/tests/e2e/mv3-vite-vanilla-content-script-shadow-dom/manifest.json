@@ -1,0 +1,18 @@
+{
+  "description": "test shadow dom extension",
+  "manifest_version": 3,
+  "name": "test shadow dom extension",
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/content.ts"]
+    },
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/inject-host-styles.ts"],
+      "world": "MAIN",
+      "run_at": "document_start"
+    }
+  ],
+  "version": "1.0.0"
+}
