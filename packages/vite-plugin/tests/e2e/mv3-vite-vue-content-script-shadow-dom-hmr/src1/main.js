@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 
-export function onExecute({ shadowRoot }: ContentScriptAPI.ExecuteFnOptions) {
+export function onExecute({ shadowRoot }) {
   if (!shadowRoot) {
     console.error('shadowRoot is not available')
     return
