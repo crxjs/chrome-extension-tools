@@ -5,37 +5,21 @@ import { createUpdate } from '../helpers'
 import { serve } from '../runners'
 
 /**
- * SKIPPED: documents an upstream Vite/plugin-vue HMR issue that is
- * out of scope for the PR #1144 sheetsMap-reuse fix.
+ * Three back-to-back `<style scoped>` edits to the same Vue SFC
+ * in a shadow-DOM content script. Verifies the fix in
+ * plugin-fileWriter-polyfill.ts (route writes past Vite's sheetsMap
+ * reuse) holds past the 2-edit boundary.
  *
- * Symptom
- * -------
- * With three back-to-back edits to the same Vue SFC `<style scoped>`
- * block, the third HMR update is silently dropped: no matter the
- * delay between edits (tested up to 1000ms), Vite's client never
- * calls `__vite__updateStyle` for the third write. The polyfill's
- * MutationObserver records exactly 4 style writes for what should
- * be 5 (initial HelloWorld + initial App + 3 HMR edits). The
- * rendered button sticks on the 2nd edit's color.
- *
- * Evidence that the drop is upstream, not in this plugin
- * -------------------------------------------------------
- * - Instrumented the polyfill's `textContent` setter: only 4 sets
- *   are ever observed.
- * - Setting `window.__vite__updateStyle` from the test page shows
- *   `updateStyle` fires for edits 1 and 2 but not edit 3.
- * - Increasing inter-edit delay from 200ms to 1000ms did not
- *   change the failure rate (~50% fail either way).
- * - The non-shadow-DOM Vue control fixture exhibits the same
- *   failure pattern, so this is not shadow-DOM specific.
- *
- * Filed as: <add-issue-url-when-posted>
- *
- * When upstream is fixed, flip this back to `test(...)` and add a
- * `src4` fixture (orange) for the third distinct color.
+ * Fixture hygiene: src2/, src3/, src4/ must contain ONLY files whose
+ * content actually differs from src1/. An identical-content same-name
+ * file (e.g. a stray src4/App.vue copied from src1/) gets rewritten by
+ * `createUpdate`'s `fs.copy`, bumps its mtime, and provokes a chokidar
+ * event for a file Vite sees as unchanged. The resulting
+ * handleHotUpdate for the unchanged module races with the real one and
+ * Vite's HMR coalescing silently drops the real update. See helpers.ts.
  */
-test.skip(
-  'UPSTREAM BUG: 3rd sequential Vue SFC HMR update is dropped',
+test(
+  'CRX 3rd sequential Vue SFC HMR edit updates shadow-DOM style',
   async () => {
     const src = path.join(__dirname, 'src')
     const src1 = path.join(__dirname, 'src1') // red    rgb(255, 0, 0)
@@ -83,8 +67,6 @@ test.skip(
     await new Promise((r) => setTimeout(r, 200))
     await waitForShadowButtonBg('rgb(0, 0, 255)')
 
-    // Edit 3 (blue -> orange) is silently dropped by Vite upstream;
-    // this assertion fails ~50% of the time.
     await createUpdate({ target: src, src: src4 })('vue')
     await new Promise((r) => setTimeout(r, 200))
     await waitForShadowButtonBg('rgb(255, 165, 0)')
