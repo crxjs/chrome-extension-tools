@@ -6,6 +6,15 @@ import { getOptions } from './plugin-optionsProvider'
 import { CrxPluginFn } from './types'
 import colors from 'picocolors'
 
+
+/**
+ * Check if a content script file should be built as IIFE based on its filename.
+ * Files ending with .iife.ts, .iife.js, etc. are built as IIFE bundles.
+ */
+export function isIifeContentScript(file: string): boolean {
+  return /\.iife\.(ts|tsx|js|jsx|mjs|cjs)$/.test(file)
+}
+
 /**
  * Builds content scripts as IIFE bundles using Vite's library mode.
  *
@@ -22,14 +31,6 @@ import colors from 'picocolors'
  * - No code sharing between content scripts (larger total bundle size)
  * - Separate build step for each content script
  */
-/**
- * Check if a content script file should be built as IIFE based on its filename.
- * Files ending with .iife.ts, .iife.js, etc. are built as IIFE bundles.
- */
-export function isIifeContentScript(file: string): boolean {
-  return /\.iife\.(ts|tsx|js|jsx|mjs|cjs)$/.test(file)
-}
-
 export const pluginContentScriptsIife: CrxPluginFn = () => {
   const pluginName = 'crx:content-scripts-iife'
 
@@ -78,7 +79,7 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
         }
 
         // From dynamic scripts (contentScripts map)
-        for (const [key, script] of contentScripts.entries()) {
+        for (const [, script] of contentScripts.entries()) {
           if (script.type === 'iife' && script.isDynamicScript) {
             const id = join(config.root, script.id)
             // Avoid duplicates
