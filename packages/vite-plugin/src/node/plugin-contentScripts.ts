@@ -125,7 +125,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
-                throw new Error('IIFE content scripts are not implemented')
+                // IIFE scripts are handled by plugin-contentScripts_iife
+                // Skip processing here - the IIFE plugin will build and emit them
               } else {
                 const file = add({ type: 'module', id })
                 script.fileName = file.fileName
@@ -223,7 +224,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()\n`
               }
             } else if (script.type === 'iife') {
-              throw new Error('IIFE content scripts are not implemented')
+              // IIFE scripts are handled by plugin-contentScripts_iife
+              // Skip processing here - the IIFE plugin builds and emits them
+              continue
             }
             // trigger update for other key values
             contentScripts.set(script.refId, formatFileData(script))

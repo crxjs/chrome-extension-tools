@@ -17,6 +17,7 @@ import {
   getContentCssEntries,
   registerContentCssEntry,
 } from './plugin-contentScripts_declared'
+import { isIifeContentScript } from './plugin-contentScripts_iife'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
 
@@ -253,9 +254,13 @@ export const pluginManifest: CrxPluginFn = () => {
             }
         } else {
           // vite build emits content scripts, html files and service worker
+          // Skip .iife.ts content scripts - they will be built separately by the IIFE plugin
           if (manifest.content_scripts)
             for (const { js = [], matches = [] } of manifest.content_scripts)
               for (const file of js) {
+                // Skip IIFE content scripts - they're built separately
+                if (isIifeContentScript(file)) continue
+                
                 const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
