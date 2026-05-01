@@ -43,6 +43,47 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       configResolved(_config) {
         config = _config
       },
+      buildStart() {
+        // In watch mode, Rollup caches resolveId/load results between rebuilds,
+        // so the contentScripts map may not be repopulated. We must re-emit
+        // dynamic content script files here to ensure their refIds are valid in
+        // the new build context. Without this, getFileName() throws errors.
+        if (config.command === 'build') {
+          // Snapshot unique dynamic scripts (the map has multiple keys per script)
+          const dynamicScripts: ContentScript[] = []
+          for (const [key, script] of contentScripts) {
+            if (script.isDynamicScript && key === script.scriptId) {
+              dynamicScripts.push(script)
+            }
+          }
+
+          // Clear stale entries (old refIds, fileNames are invalid in new build)
+          contentScripts.clear()
+
+          // Re-emit each dynamic script with a fresh refId for this build context
+          for (const script of dynamicScripts) {
+            const absoluteId = script.id.startsWith('/')
+              ? `${config.root}${script.id}`
+              : `${config.root}/${script.id}`
+            const refId = this.emitFile({
+              type: 'chunk',
+              id: absoluteId,
+              name: basename(script.id),
+            })
+            contentScripts.set(
+              script.id,
+              formatFileData({
+                type: script.type,
+                id: script.id,
+                isDynamicScript: true,
+                refId,
+                scriptId: script.scriptId,
+                matches: script.matches,
+              }),
+            )
+          }
+        }
+      },
       configureServer(server) {
         return () => {
           server.middlewares.use(async (req, res, next) => {
@@ -140,9 +181,37 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         const index = id.indexOf('?scriptId=')
         if (index > -1) {
           const scriptId = id.slice(index + '?scriptId='.length)
-          const script = contentScripts.get(scriptId)!
+          let script = contentScripts.get(scriptId)
+
+          // In watch mode, Rollup may cache resolveId() but not load(),
+          // so the map may be empty when load runs. Recreate the entry.
+          if (!script && config.command === 'build') {
+            const fileId = id.slice(0, index)
+            const refId = this.emitFile({
+              type: 'chunk',
+              id: fileId,
+              name: basename(fileId),
+            })
+            script = formatFileData({
+              type: 'loader',
+              id: relative(config.root, fileId),
+              isDynamicScript: true,
+              refId,
+              scriptId,
+              matches: [],
+            })
+            contentScripts.set(script.id, script)
+          }
+
+          if (!script) {
+            throw new Error(`Content script not found for scriptId: "${scriptId}"`)
+          }
+
           if (config.command === 'build') {
-            return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.refId};`
+            // Use scriptId (deterministic hash) instead of refId for the placeholder.
+            // refIds change between watch mode rebuilds, but scriptId is stable.
+            // This ensures load() cache is valid across rebuilds.
+            return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.scriptId};`
           } else if (typeof script.fileName === 'string') {
             return `export default ${JSON.stringify(script.fileName)};`
           } else {

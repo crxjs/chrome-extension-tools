@@ -180,11 +180,11 @@ export const pluginContentScripts: CrxPluginFn = () => {
         // emit content script loaders
         for (const [key, script] of contentScripts)
           if (key === script.refId) {
+            const fileName = this.getFileName(script.refId)
+
             if (script.type === 'module') {
-              const fileName = this.getFileName(script.refId)
               script.fileName = fileName
             } else if (script.type === 'loader') {
-              const fileName = this.getFileName(script.refId)
               script.fileName = fileName
 
               const bundleFileInfo = bundle[fileName]
