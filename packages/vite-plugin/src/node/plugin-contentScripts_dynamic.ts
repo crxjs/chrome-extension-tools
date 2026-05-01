@@ -3,6 +3,7 @@ import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
 import { allFilesReady } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
+import { isIifeContentScript } from './plugin-contentScripts_iife'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
@@ -87,8 +88,15 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
               )
             const { id } = resolved
 
+            // Determine script type:
+            // - .iife.ts files are always IIFE (auto-detected from filename)
+            // - ?module query param forces module type
+            // - ?iife query param forces iife type
+            // - default is loader (module with loader wrapper)
             let type: ContentScript['type'] = 'loader'
-            if (url.searchParams.has('module')) {
+            if (isIifeContentScript(id)) {
+              type = 'iife'
+            } else if (url.searchParams.has('module')) {
               type = 'module'
             } else if (url.searchParams.has('iife')) {
               type = 'iife'
@@ -162,6 +170,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
        * Can't use `renderChunk` b/c pre plugin crx:content-scripts uses
        * `generateBundle` to emit loaders. Must come after "enforce: pre".
        */
+      enforce: 'post',
       generateBundle(options, bundle) {
         for (const chunk of Object.values(bundle))
           if (chunk.type === 'chunk') {
