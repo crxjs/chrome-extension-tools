@@ -6,6 +6,8 @@
 .vscode
 **/chromium-data-dir-*
 **/tests/e2e/mv3-*/src
+**/tests/e2e/mv3-vite-vue-seq-hmr-control-plain/.vite-cache
+**/tests/e2e/mv3-vite-vue-seq-hmr-control-plain/.chromium-plain
 **/__diff_output__
 TODO
 pnpm-global

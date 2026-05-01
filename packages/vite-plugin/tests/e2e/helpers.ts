@@ -94,6 +94,19 @@ export const createUpdate =
     src: string
     plugins?: (() => Promise<void>)[]
   }) =>
+  /**
+   * Copies files from `src` into `target` whose basename ends with
+   * `includes`.
+   *
+   * Fixture hygiene rule: each "edit" source directory (src2, src3, …)
+   * should contain ONLY files whose content differs from the previous
+   * step. Do NOT drop identical-content copies of unchanged files in
+   * there — `fs.copy(..., { overwrite: true })` will still rewrite them,
+   * bumping mtime and triggering a chokidar event. Near-simultaneous
+   * spurious HMR updates can race with the real update and Vite's HMR
+   * coalescing may drop the real ws.send. Keeping the delta set minimal
+   * avoids that class of flake entirely.
+   */
   async (includes: string, srcDir = src) => {
     const updatedFiles: string[] = []
     await Promise.all([

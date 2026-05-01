@@ -1,0 +1,11 @@
+h1 {
+  color: rgb(128, 0, 128);
+  font-size: 24px;
+}
+
+#crx-app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  text-align: center;
+  margin-top: 60px;
+  background-color: rgb(0, 255, 255);
+}
