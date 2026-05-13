@@ -72,7 +72,6 @@
     "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
   },
   "dependencies": {
-    "@rollup/pluginutils": "^4.1.2",
     "@webcomponents/custom-elements": "^1.5.0",
     "acorn-walk": "^8.2.0",
     "convert-source-map": "^1.7.0",
@@ -92,6 +91,7 @@
   "devDependencies": {
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
+    "@rollup/pluginutils": "^4.1.2",
     "@rollup/plugin-alias": "4.0.4",
     "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-json": "^5.0.0",
