@@ -4,6 +4,12 @@ export {}
 
 import filePath from './main-world?iife'
 
+// Also exercise the `.iife.ts` filename convention in the same test that uses the bare `?iife` query.
+import conventionFilePath from './main-world-convention.iife.ts?script'
+
+console.log('IIFE via bare ?iife:', filePath)
+console.log('IIFE via .iife.ts?script convention:', conventionFilePath)
+
 const script: chrome.scripting.RegisteredContentScript = {
   id: 'main-world-script',
   matches: ['<all_urls>'],
