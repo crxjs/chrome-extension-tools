@@ -85,20 +85,24 @@ export interface CrxOptions {
     hmrTimeout?: number
     injectCss?: boolean
     /**
-     * List of content script entry files (relative to project root) that should
-     * be built as standalone IIFE bundles. This allows marking normal-named
-     * files (without `.iife.*` suffix) as IIFE, e.g. for `world: 'MAIN'`
-     * scripts or to avoid loader overhead.
+     * List of content script files (relative to project root) that should be
+     * built as standalone IIFE bundles (self-contained, no loader, all imports
+     * inlined). This allows using normal filenames (without the `.iife.*`
+     * convention) for IIFE content scripts, e.g. for `world: 'MAIN'` or to
+     * avoid loader overhead.
+     *
+     * The files must still be listed in `manifest.content_scripts` (or used
+     * via `?script` / `?iife`).
      *
      * Example:
      *   crx({
      *     manifest,
      *     contentScripts: {
-     *       standalone: ['src/injected.ts', 'src/another.js']
+     *       standaloneFiles: ['src/injected.ts', 'src/another.js']
      *     }
      *   })
      */
-    standalone?: string[]
+    standaloneFiles?: string[]
   }
   globOptions?: GlobOptions
   /**

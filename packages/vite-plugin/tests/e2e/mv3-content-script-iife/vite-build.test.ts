@@ -37,7 +37,7 @@ test('IIFE content scripts are bundled correctly', async () => {
   expect(dynamicIifeContent).toMatch(/^\(function\(\)/)
   expect(dynamicIifeContent).toContain('shared-util')
 
-  // Verify standalone IIFE (normal .ts filename, declared via defineManifest + contentScripts.standalone)
+  // Verify standalone IIFE (normal .ts filename, declared via defineManifest + contentScripts.standaloneFiles)
   const standaloneIifeFile = path.join(outDir, 'src/content-standalone.js')
   expect(await fs.pathExists(standaloneIifeFile)).toBe(true)
   

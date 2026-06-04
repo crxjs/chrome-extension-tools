@@ -10,7 +10,7 @@ import colors from 'picocolors'
 /**
  * Check if a content script file should be built as IIFE based on its filename.
  * Files ending with .iife.ts, .iife.js, etc. are built as IIFE bundles.
- * Files can also be marked as IIFE via the `contentScripts.standalone` option
+ * Files can also be marked as IIFE via `contentScripts.standaloneFiles`
  * in the CRX plugin config (allows normal filenames without .iife suffix).
  */
 export function isIifeContentScript(file: string): boolean {
@@ -22,7 +22,7 @@ export function isIifeContentScript(file: string): boolean {
  *
  * Content scripts are built as IIFE if:
  * - their filename matches the .iife.* convention, or
- * - they are listed in `contentScripts.standalone` in the CRX plugin options
+ * - they are listed in `contentScripts.standaloneFiles` in the CRX plugin options
  *   (allows using normal .ts/.js filenames for standalone/IIFE bundles).
  *
  * Benefits:
@@ -60,7 +60,7 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
             ? await _manifest({ command: 'build', mode: config.mode })
             : await Promise.resolve(_manifest)
 
-        const standaloneFiles = (opts.contentScripts?.standalone || []).map((f: string) =>
+        const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
           f.replace(/^\//, '')
         )
         const isStandaloneFile = (file: string) => {
@@ -69,7 +69,7 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
         }
 
         // Collect IIFE content scripts from two sources:
-        // 1. Manifest content_scripts with .iife.ts files or listed in standalone
+        // 1. Manifest content_scripts with .iife.ts files or listed in standaloneFiles
         // 2. Dynamic scripts (via ?script import) with .iife.ts files or ?iife
         const iifeEntries: Array<{
           file: string

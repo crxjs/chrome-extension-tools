@@ -6,5 +6,5 @@ export default defineConfig({
   build: { minify: false },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest, contentScripts: { standalone: ['src/content-standalone.ts'] } })],
+  plugins: [crx({ manifest, contentScripts: { standaloneFiles: ['src/content-standalone.ts'] } })],
 })

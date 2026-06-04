@@ -46,11 +46,11 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       enforce: 'pre',
       configResolved(_config) {
         config = _config
-        // Load standalone files for auto-IIFE detection on ?script imports
+        // Load standaloneFiles for auto-IIFE detection on ?script imports
         // (in addition to .iife.* filename convention)
         getOptions({ plugins: _config.plugins } as UserConfig)
           .then((opts) => {
-            standaloneFiles = (opts.contentScripts?.standalone || []).map((f: string) =>
+            standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
               f.replace(/^\//, '')
             )
           })
@@ -101,7 +101,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
             const { id } = resolved
 
             // Determine script type:
-            // - .iife.ts files or files listed in contentScripts.standalone are IIFE (auto-detected)
+            // - .iife.ts files or files listed in contentScripts.standaloneFiles are IIFE (auto-detected)
             // - ?module query param forces module type
             // - ?iife query param forces iife type
             // - default is loader (module with loader wrapper)

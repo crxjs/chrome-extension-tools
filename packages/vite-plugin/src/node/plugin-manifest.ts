@@ -256,7 +256,7 @@ export const pluginManifest: CrxPluginFn = () => {
           // vite build emits content scripts, html files and service worker
           // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
           const opts = await getOptions({ plugins: config.plugins } as any)
-          const standaloneFiles = (opts.contentScripts?.standalone || []).map((f: string) =>
+          const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
             f.replace(/^\//, '')
           )
           const isStandaloneFile = (file: string) => {
