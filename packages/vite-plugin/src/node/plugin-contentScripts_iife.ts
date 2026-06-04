@@ -10,6 +10,8 @@ import colors from 'picocolors'
 /**
  * Check if a content script file should be built as IIFE based on its filename.
  * Files ending with .iife.ts, .iife.js, etc. are built as IIFE bundles.
+ * Files can also be marked as IIFE via the `contentScripts.standalone` option
+ * in the CRX plugin config (allows normal filenames without .iife suffix).
  */
 export function isIifeContentScript(file: string): boolean {
   return /\.iife\.(ts|tsx|js|jsx|mjs|cjs)$/.test(file)
@@ -18,8 +20,10 @@ export function isIifeContentScript(file: string): boolean {
 /**
  * Builds content scripts as IIFE bundles using Vite's library mode.
  *
- * When `contentScripts.iife` is enabled, content scripts are built separately
- * as self-contained IIFE bundles with all dependencies inlined.
+ * Content scripts are built as IIFE if:
+ * - their filename matches the .iife.* convention, or
+ * - they are listed in `contentScripts.standalone` in the CRX plugin options
+ *   (allows using normal .ts/.js filenames for standalone/IIFE bundles).
  *
  * Benefits:
  * - Single file output per content script (no code-splitting)
@@ -56,9 +60,17 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
             ? await _manifest({ command: 'build', mode: config.mode })
             : await Promise.resolve(_manifest)
 
+        const standaloneFiles = (opts.contentScripts?.standalone || []).map((f: string) =>
+          f.replace(/^\//, '')
+        )
+        const isStandaloneFile = (file: string) => {
+          const normalized = file.replace(/^\//, '')
+          return standaloneFiles.includes(normalized)
+        }
+
         // Collect IIFE content scripts from two sources:
-        // 1. Manifest content_scripts with .iife.ts files
-        // 2. Dynamic scripts (via ?script import) with .iife.ts files
+        // 1. Manifest content_scripts with .iife.ts files or listed in standalone
+        // 2. Dynamic scripts (via ?script import) with .iife.ts files or ?iife
         const iifeEntries: Array<{
           file: string
           id: string
@@ -70,7 +82,7 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
         if (manifest.content_scripts) {
           for (const { js = [], matches = [] } of manifest.content_scripts) {
             for (const file of js) {
-              if (isIifeContentScript(file)) {
+              if (isIifeContentScript(file) || isStandaloneFile(file)) {
                 const id = join(config.root, file)
                 iifeEntries.push({ file, id, matches })
               }

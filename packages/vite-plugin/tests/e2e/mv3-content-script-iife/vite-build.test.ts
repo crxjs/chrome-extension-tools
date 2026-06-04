@@ -37,13 +37,22 @@ test('IIFE content scripts are bundled correctly', async () => {
   expect(dynamicIifeContent).toMatch(/^\(function\(\)/)
   expect(dynamicIifeContent).toContain('shared-util')
 
+  // Verify standalone IIFE (normal .ts filename, declared via defineManifest + contentScripts.standalone)
+  const standaloneIifeFile = path.join(outDir, 'src/content-standalone.js')
+  expect(await fs.pathExists(standaloneIifeFile)).toBe(true)
+  
+  const standaloneIifeContent = await fs.readFile(standaloneIifeFile, 'utf-8')
+  expect(standaloneIifeContent).toMatch(/^\(function\(\)/)
+  expect(standaloneIifeContent).toContain('shared-util')
+
   // Test that content scripts work in browser
   const page = await browser.newPage()
   await page.goto('https://example.com')
   
-  // All 4 content scripts should create their markers
+  // All 5 content scripts should create their markers
   await page.waitForSelector('#regular-content-script', { timeout: 10000 })
   await page.waitForSelector('#iife-content-script', { timeout: 10000 })
+  await page.waitForSelector('#standalone-iife-script', { timeout: 10000 })
   await page.waitForSelector('#dynamic-regular-script', { timeout: 10000 })
   await page.waitForSelector('#dynamic-iife-script', { timeout: 10000 })
 
@@ -59,4 +68,7 @@ test('IIFE content scripts are bundled correctly', async () => {
 
   const dynamicIifeText = await page.locator('#dynamic-iife-script').textContent()
   expect(dynamicIifeText).toBe('dynamic-iife: shared-util')
+
+  const standaloneText = await page.locator('#standalone-iife-script').textContent()
+  expect(standaloneText).toBe('standalone: shared-util')
 })

@@ -16,6 +16,10 @@ export default defineManifest({
     {
       matches: ['https://example.com/*'],
       js: ['src/content-iife.iife.ts']
+    },
+    {
+      matches: ['https://example.com/*'],
+      js: ['src/content-standalone.ts']
     }
   ],
   host_permissions: ['https://example.com/*'],

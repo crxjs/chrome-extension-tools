@@ -4,6 +4,8 @@ import { allFilesReady } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
 import { isIifeContentScript } from './plugin-contentScripts_iife'
+import { getOptions } from './plugin-optionsProvider'
+import type { UserConfig } from 'vite'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
@@ -36,6 +38,7 @@ const dynamicScriptRegEx = () => {
  */
 export const pluginDynamicContentScripts: CrxPluginFn = () => {
   let config: ResolvedConfig
+  let standaloneFiles: string[] = []
 
   return [
     {
@@ -43,6 +46,15 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       enforce: 'pre',
       configResolved(_config) {
         config = _config
+        // Load standalone files for auto-IIFE detection on ?script imports
+        // (in addition to .iife.* filename convention)
+        getOptions({ plugins: _config.plugins } as UserConfig)
+          .then((opts) => {
+            standaloneFiles = (opts.contentScripts?.standalone || []).map((f: string) =>
+              f.replace(/^\//, '')
+            )
+          })
+          .catch(() => {})
       },
       configureServer(server) {
         return () => {
@@ -89,12 +101,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
             const { id } = resolved
 
             // Determine script type:
-            // - .iife.ts files are always IIFE (auto-detected from filename)
+            // - .iife.ts files or files listed in contentScripts.standalone are IIFE (auto-detected)
             // - ?module query param forces module type
             // - ?iife query param forces iife type
             // - default is loader (module with loader wrapper)
+            const relId = relative(config.root, id).replace(/^\//, '')
             let type: ContentScript['type'] = 'loader'
-            if (isIifeContentScript(id)) {
+            if (isIifeContentScript(relId) || standaloneFiles.includes(relId)) {
               type = 'iife'
             } else if (url.searchParams.has('module')) {
               type = 'module'
