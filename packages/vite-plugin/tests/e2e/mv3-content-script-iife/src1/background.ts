@@ -1,20 +1,21 @@
-// @ts-ignore - dynamic script import
 import dynamicRegularSrc from './content-dynamic.ts?script'
-// @ts-ignore - dynamic script import  
 import dynamicIifeSrc from './content-dynamic-iife.iife.ts?script'
 
-// Also exercise the bare `?iife` query alias on a normal-named file,
-// alongside the `.iife.ts` filename convention in the same project.
-import dynamicIifeBareSrc from './content-dynamic.ts?iife'
+// Exercise the bare `?iife` query alias on a normal-named file
+// (distinct file to avoid type conflict with ?script on the same module).
+// This is the "via query string" edge case for forcing IIFE on a normal filename
+// for a dynamically registered content script.
+import bareIifeAliasSrc from './normal-iife-alias.ts?iife'
 
 console.log('Background loaded')
 console.log('Dynamic regular script path:', dynamicRegularSrc)
 console.log('Dynamic IIFE script path:', dynamicIifeSrc)
-console.log('Dynamic IIFE (bare ?iife alias) script path:', dynamicIifeBareSrc)
+console.log('Dynamic bare ?iife alias script path:', bareIifeAliasSrc)
 
-chrome.runtime.onInstalled.addListener(async () => {
-  // Register dynamic content scripts
-  await chrome.scripting.registerContentScripts([
+// Register immediately at top level (onInstalled does not reliably fire
+// for test-loaded extensions in persistent context; see other dynamic tests).
+chrome.scripting
+  .registerContentScripts([
     {
       id: 'dynamic-regular',
       matches: ['https://example.com/*'],
@@ -25,6 +26,11 @@ chrome.runtime.onInstalled.addListener(async () => {
       matches: ['https://example.com/*'],
       js: [dynamicIifeSrc],
     },
+    {
+      id: 'dynamic-bare-iife-alias',
+      matches: ['https://example.com/*'],
+      js: [bareIifeAliasSrc],
+    },
   ])
-  console.log('Dynamic content scripts registered')
-})
+  .then(() => console.log('Dynamic content scripts registered'))
+  .catch(console.error)

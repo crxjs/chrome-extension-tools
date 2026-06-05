@@ -54,7 +54,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
               f.replace(/^\//, '')
             )
           })
-          .catch(() => {})
+          .catch(() => undefined)
       },
       configureServer(server) {
         return () => {
@@ -202,10 +202,11 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                     )
 
                   const fileName = script.loaderName ?? script.fileName
-                  // IIFE scripts are used with registerContentScripts which requires
-                  // paths without leading slash. Other scripts work with executeScript
-                  // which accepts paths with leading slash.
-                  const path = script.type === 'iife' ? fileName : `/${fileName}`
+                  // Return clean relative path (no leading slash). Used with
+                  // registerContentScripts, executeScript, and getURL. Paths must not
+                  // start with / for registerContentScripts; executeScript tolerates both
+                  // but we keep consistent with manifest-declared scripts and IIFE outputs.
+                  const path = fileName
                   return `${JSON.stringify(path)}${match.split(scriptKey)[1]}`
                 },
               )

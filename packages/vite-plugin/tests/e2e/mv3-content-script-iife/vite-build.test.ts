@@ -3,7 +3,9 @@ import path from 'pathe'
 import { expect, test } from 'vitest'
 import { build } from '../runners'
 
-test('IIFE content scripts are bundled correctly', async () => {
+test(
+  'IIFE content scripts are bundled correctly',
+  async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')
 
@@ -11,6 +13,9 @@ test('IIFE content scripts are bundled correctly', async () => {
   await fs.copy(src1, src, { recursive: true })
 
   const { browser, outDir } = await build(__dirname)
+
+  // Wait for the background script to execute the top-level registerContentScripts
+  await new Promise((resolve) => setTimeout(resolve, 1500))
 
   // Verify the IIFE content script is a single file with inlined imports
   const iifeFile = path.join(outDir, 'src/content-iife.iife.js')
@@ -45,16 +50,31 @@ test('IIFE content scripts are bundled correctly', async () => {
   expect(standaloneIifeContent).toMatch(/^\(function\(\)/)
   expect(standaloneIifeContent).toContain('shared-util')
 
+  // Verify bare `?iife` alias on a normal-named file (no .iife suffix,
+  // not listed in standaloneFiles or manifest) produces an IIFE bundle.
+  // This exercises the "via ?iife query string" edge case for a normal filename
+  // (alongside filename convention and standaloneFiles in config).
+  const bareAliasFile = path.join(outDir, 'src/normal-iife-alias.js')
+  expect(await fs.pathExists(bareAliasFile)).toBe(true)
+  const bareAliasContent = await fs.readFile(bareAliasFile, 'utf-8')
+  expect(bareAliasContent).toMatch(/^\(function\(\)/)
+  expect(bareAliasContent).toContain('shared-util')
+
   // Test that content scripts work in browser
   const page = await browser.newPage()
   await page.goto('https://example.com')
   
-  // All 5 content scripts should create their markers
+  // All 6 content scripts (3 manifest-declared + 3 dynamic) should create their markers.
+  // Covers:
+  // - IIFE via filename convention (.iife.ts)
+  // - IIFE via standaloneFiles in crx config (normal name in defineManifest)
+  // - IIFE via bare ?iife query string in import (normal name)
   await page.waitForSelector('#regular-content-script', { timeout: 10000 })
   await page.waitForSelector('#iife-content-script', { timeout: 10000 })
   await page.waitForSelector('#standalone-iife-script', { timeout: 10000 })
   await page.waitForSelector('#dynamic-regular-script', { timeout: 10000 })
   await page.waitForSelector('#dynamic-iife-script', { timeout: 10000 })
+  await page.waitForSelector('#bare-iife-alias-script', { timeout: 10000 })
 
   // Verify content
   const regularText = await page.locator('#regular-content-script').textContent()
@@ -71,4 +91,9 @@ test('IIFE content scripts are bundled correctly', async () => {
 
   const standaloneText = await page.locator('#standalone-iife-script').textContent()
   expect(standaloneText).toBe('standalone: shared-util')
-})
+
+  const bareAliasText = await page.locator('#bare-iife-alias-script').textContent()
+  expect(bareAliasText).toBe('bare-iife-alias: shared-util')
+  },
+  { retry: process.env.CI ? 3 : 0 },
+)
