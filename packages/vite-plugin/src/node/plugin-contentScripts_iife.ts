@@ -112,23 +112,15 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
           colors.cyan(`\n[${pluginName}] Building ${iifeEntries.length} content script(s) as IIFE...`),
         )
 
-        // Remove the module-based content script chunks from the bundle
-        // They will be replaced by IIFE builds
-        for (const entry of iifeEntries) {
-          const script = contentScripts.get(entry.file)
-          if (script?.fileName && bundle[script.fileName]) {
-            // Also remove any chunks that were only used by this content script
-            const chunk = bundle[script.fileName]
-            if (chunk.type === 'chunk') {
-              // Remove the main chunk
-              delete bundle[script.fileName]
-              // Remove associated loader if present
-              if (script.loaderName && bundle[script.loaderName]) {
-                delete bundle[script.loaderName]
-              }
-            }
-          }
-        }
+        // We intentionally do *not* remove the ESM chunks that were emitted for IIFE-registered
+        // scripts (via the emitFile in the dynamic scripts plugin). 
+        //
+        // The IIFE build below produces the self-contained artifact (src/*.js or per getIifeOutputPath)
+        // and updates the contentScripts map so dynamic registration uses the IIFE path at runtime.
+        // For pure IIFE cases this leaves an "unused" ESM chunk in assets/ — we accept that
+        // for code simplicity (no reference scanning, no conditional logic, no risk for mixed use
+        // where the same file is also imported normally by a regular content script).
+        // Manifest-declared IIFEs are already skipped from normal emit in plugin-manifest.ts.
 
         // Build each content script as IIFE
         for (const entry of iifeEntries) {
