@@ -1,7 +1,9 @@
 import fs from 'fs-extra'
 import path from 'pathe'
 import { expect, test } from 'vitest'
+import { waitForRegisteredContentScripts } from '../helpers'
 import { build } from '../runners'
+import { dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId } from './src1/dynamic-script-ids'
 
 test(
   'IIFE content scripts are bundled correctly',
@@ -16,8 +18,11 @@ test(
 
   const { browser, outDir } = await build(__dirname)
 
-  // Wait for the background script to execute the top-level registerContentScripts
-  await new Promise((resolve) => setTimeout(resolve, 1500))
+  await waitForRegisteredContentScripts(browser, [
+    dynamicRegularId,
+    dynamicIifeId,
+    dynamicBareIifeAliasId,
+  ])
 
   // Verify the IIFE content script is a single file with inlined imports
   const iifeFile = path.join(outDir, 'src/content-iife.iife.js')
