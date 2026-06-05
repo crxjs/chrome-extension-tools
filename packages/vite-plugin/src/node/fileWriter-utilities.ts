@@ -136,7 +136,7 @@ export function getViteUrl({ type, id }: FileWriterId) {
     // TODO: verify if assets need special handling
     throw new Error(`File type "${type}" not implemented.`)
   } else if (type === 'iife') {
-    // IIFE scripts are bundled separately (see prepIifeScript + bundleIife in fileWriter-rxjs)
+    // IIFE scripts are bundled separately (see plugin-contentScripts_iife + fileWriter-rxjs)
     // and do not go through Vite's transform pipeline for dev.
     throw new Error(`File type "iife" is handled via dedicated IIFE bundler, not Vite transform.`)
   } else if (type === 'loader') {
