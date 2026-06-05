@@ -11,8 +11,9 @@ test(
     const src2 = path.join(__dirname, 'src2')
 
     // Start with the initial version
-    await fs.remove(src)
-    await fs.copy(src1, src, { recursive: true })
+    // emptyDir + overwrite to avoid rmdir/mkdir races with leftover watchers from prior tests.
+    await fs.emptyDir(src)
+    await fs.copy(src1, src, { overwrite: true, recursive: true })
 
     const { browser } = await serve(__dirname)
 

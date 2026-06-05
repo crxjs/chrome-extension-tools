@@ -9,8 +9,10 @@ test(
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')
 
-  await fs.remove(src)
-  await fs.copy(src1, src, { recursive: true })
+  // emptyDir + overwrite: more reliable than remove+copy when tests run back-to-back
+  // (Vite watchers / polling from previous serve() can cause ENOTEMPTY/EEXIST).
+  await fs.emptyDir(src)
+  await fs.copy(src1, src, { overwrite: true, recursive: true })
 
   const { browser, outDir } = await build(__dirname)
 
