@@ -160,7 +160,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   await allFilesReady()
   debug('bundle end')
 
-  const outDirSettle$ = fromEvent(watch(outDir), 'all').pipe(
+  const outDirSettle$ = fromEvent(watch(outDir) as unknown as NodeJS.EventEmitter, 'all').pipe(
     startWith(null),
     map((x, i) => i),
     // debounce relies on the Date object
