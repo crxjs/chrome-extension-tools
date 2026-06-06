@@ -2,6 +2,8 @@ import fs from 'fs-extra'
 import path from 'pathe'
 import { expect, test } from 'vitest'
 import { serve } from '../runners'
+import { iifeContentId, regularContentId } from './src1/script-ids'
+import { standaloneIifeScriptId } from './src/script-ids'
 
 test('IIFE content scripts work in dev mode', async () => {
   const src = path.join(__dirname, 'src')
@@ -21,18 +23,18 @@ test('IIFE content scripts work in dev mode', async () => {
   // But they should still work and create their markers
   
   // Manifest content scripts (regular, .iife.ts convention, and standalone via config)
-  await page.waitForSelector('#regular-content-script', { timeout: 10000 })
-  await page.waitForSelector('#iife-content-script', { timeout: 10000 })
-  await page.waitForSelector('#standalone-iife-script', { timeout: 10000 })
+  await page.waitForSelector(`#${regularContentId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${iifeContentId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${standaloneIifeScriptId}`, { timeout: 10000 })
 
   // Verify content
-  const regularText = await page.locator('#regular-content-script').textContent()
+  const regularText = await page.locator(`#${regularContentId}`).textContent()
   expect(regularText).toBe('regular: shared-util')
 
-  const iifeText = await page.locator('#iife-content-script').textContent()
+  const iifeText = await page.locator(`#${iifeContentId}`).textContent()
   expect(iifeText).toBe('iife: shared-util')
 
-  const standaloneText = await page.locator('#standalone-iife-script').textContent()
+  const standaloneText = await page.locator(`#${standaloneIifeScriptId}`).textContent()
   expect(standaloneText).toBe('standalone: shared-util')
   
   // Note: Dynamic content scripts are tested in the build test

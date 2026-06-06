@@ -6,7 +6,7 @@ import dynamicIifeSrc from './content-dynamic-iife.iife.ts?script'
 // This is the "via query string" edge case for forcing IIFE on a normal filename
 // for a dynamically registered content script.
 import bareIifeAliasSrc from './normal-iife-alias.ts?iife'
-import { dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId } from './dynamic-script-ids'
+import { dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId } from './script-ids'
 
 console.log('Background loaded')
 console.log('Dynamic regular script path:', dynamicRegularSrc)

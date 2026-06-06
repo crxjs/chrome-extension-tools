@@ -1,3 +1,4 @@
+import { standaloneIifeScriptId } from './script-ids'
 import { createMarker, getMessage } from './utils'
 
-createMarker('standalone-iife-script', `standalone: ${getMessage()}`)
+createMarker(standaloneIifeScriptId, `standalone: ${getMessage()}`)

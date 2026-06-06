@@ -1,3 +1,4 @@
+import { dynamicRegularId } from './script-ids'
 import { createMarker, getMessage } from './utils'
 
-createMarker('dynamic-regular-script', `dynamic-regular: ${getMessage()}`)
+createMarker(dynamicRegularId, `dynamic-regular: ${getMessage()}`)

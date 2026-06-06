@@ -3,7 +3,7 @@ import path from 'pathe'
 import { expect, test } from 'vitest'
 import { waitForRegisteredContentScripts } from '../helpers'
 import { build } from '../runners'
-import { dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId } from './src1/dynamic-script-ids'
+import { bareIifeAliasScriptId, dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId, iifeContentId, regularContentId, standaloneIifeScriptId } from './src1/script-ids'
 
 test(
   'IIFE content scripts are bundled correctly',
@@ -76,30 +76,30 @@ test(
   // - IIFE via filename convention (.iife.ts)
   // - IIFE via standaloneFiles in crx config (normal name in defineManifest)
   // - IIFE via bare ?iife query string in import (normal name)
-  await page.waitForSelector('#regular-content-script', { timeout: 10000 })
-  await page.waitForSelector('#iife-content-script', { timeout: 10000 })
-  await page.waitForSelector('#standalone-iife-script', { timeout: 10000 })
-  await page.waitForSelector('#dynamic-regular-script', { timeout: 10000 })
-  await page.waitForSelector('#dynamic-iife-script', { timeout: 10000 })
-  await page.waitForSelector('#bare-iife-alias-script', { timeout: 10000 })
+  await page.waitForSelector(`#${regularContentId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${iifeContentId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${standaloneIifeScriptId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${dynamicRegularId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${dynamicIifeId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${bareIifeAliasScriptId}`, { timeout: 10000 })
 
   // Verify content
-  const regularText = await page.locator('#regular-content-script').textContent()
+  const regularText = await page.locator(`#${regularContentId}`).textContent()
   expect(regularText).toBe('regular: shared-util')
 
-  const iifeText = await page.locator('#iife-content-script').textContent()
+  const iifeText = await page.locator(`#${iifeContentId}`).textContent()
   expect(iifeText).toBe('iife: shared-util')
 
-  const dynamicRegularText = await page.locator('#dynamic-regular-script').textContent()
+  const dynamicRegularText = await page.locator(`#${dynamicRegularId}`).textContent()
   expect(dynamicRegularText).toBe('dynamic-regular: shared-util')
 
-  const dynamicIifeText = await page.locator('#dynamic-iife-script').textContent()
+  const dynamicIifeText = await page.locator(`#${dynamicIifeId}`).textContent()
   expect(dynamicIifeText).toBe('dynamic-iife: shared-util')
 
-  const standaloneText = await page.locator('#standalone-iife-script').textContent()
+  const standaloneText = await page.locator(`#${standaloneIifeScriptId}`).textContent()
   expect(standaloneText).toBe('standalone: shared-util')
 
-  const bareAliasText = await page.locator('#bare-iife-alias-script').textContent()
+  const bareAliasText = await page.locator(`#${bareIifeAliasScriptId}`).textContent()
   expect(bareAliasText).toBe('bare-iife-alias: shared-util')
   },
   { retry: process.env.CI ? 3 : 0 },

@@ -1,3 +1,4 @@
+import { iifeContentId } from './script-ids'
 import { createMarker, getMessage } from './utils'
 
-createMarker('iife-content-script', `iife: ${getMessage()}`)
+createMarker(iifeContentId, `iife: ${getMessage()}`)

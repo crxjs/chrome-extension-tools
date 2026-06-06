@@ -1,3 +1,4 @@
+import { dynamicIifeId } from './script-ids'
 import { createMarker, getMessage } from './utils'
 
-createMarker('dynamic-iife-script', `dynamic-iife: ${getMessage()}`)
+createMarker(dynamicIifeId, `dynamic-iife: ${getMessage()}`)
