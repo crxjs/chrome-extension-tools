@@ -125,8 +125,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
-                // IIFE scripts are handled by plugin-contentScripts_iife
-                // Skip processing here - the IIFE plugin will build and emit them
+                const file = add({ type: 'iife', id })
+                script.fileName = file.fileName
               } else {
                 const file = add({ type: 'module', id })
                 script.fileName = file.fileName

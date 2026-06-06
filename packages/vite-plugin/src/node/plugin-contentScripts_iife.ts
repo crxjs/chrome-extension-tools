@@ -18,18 +18,40 @@ export function isIifeContentScript(file: string): boolean {
 /**
  * Builds content scripts as IIFE bundles using Vite's library mode.
  *
- * When `contentScripts.iife` is enabled, content scripts are built separately
- * as self-contained IIFE bundles with all dependencies inlined.
+ * There are three ways to opt a content script into IIFE mode (self-contained
+ * bundle with dependencies inlined, no ESM loader):
  *
- * Benefits:
- * - Single file output per content script (no code-splitting)
- * - All imports inlined with #region comments showing module origins
- * - No dynamic imports or external dependencies
- * - Faster content script execution (no loader overhead)
+ * 1. Filename convention: `foo.iife.ts` (or .iife.js etc.) — works for both
+ *    manifest-declared content_scripts and dynamic `?script` imports.
+ * 2. Query string: `import x from './foo?iife'` (or `?script&iife`, or just `?script`
+ *    on a file that already matches (1) or (3)).
+ * 3. Declarative config: list the file (relative to root) in
+ *    `contentScripts: { standaloneFiles: ['src/foo.ts', ...] }` inside the crx()
+ *    options in your Vite defineConfig (or via defineManifest style). Useful for
+ *    MAIN world scripts without `.iife` in the filename.
+ *
+ * The IIFE plugin collects candidates from the manifest (after the manifest plugin
+ * has skipped the normal emit for them) and from the contentScripts map (populated
+ * by the dynamic scripts plugin for ?script cases). It then runs a secondary
+ * Vite lib build (format: 'iife') for each and emits the result.
+ *
+ * We intentionally do *not* attempt to delete the intermediate ESM chunks that
+ * the dynamic plugin emits for IIFE dynamic scripts. The final registration
+ * always points at the IIFE artifact; the extra chunk is unreferenced and small.
+ * This avoids fragile fileName/refId lookups, facadeModuleId scanning, and
+ * complications when the same module is used both as IIFE and as a normal import
+ * elsewhere. Manifest-declared IIFEs never produce an intermediate chunk because
+ * plugin-manifest already skips them.
+ *
+ * Benefits of IIFE output:
+ * - Single file (no code-splitting)
+ * - All imports inlined (#region markers for origin)
+ * - Works with chrome.scripting.executeScript({files}) and strict CSP
+ * - No loader overhead at runtime
  *
  * Trade-offs:
- * - No code sharing between content scripts (larger total bundle size)
- * - Separate build step for each content script
+ * - No sharing between scripts (larger total size)
+ * - Extra build step per IIFE script
  */
 export const pluginContentScriptsIife: CrxPluginFn = () => {
   const pluginName = 'crx:content-scripts-iife'
@@ -56,9 +78,14 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
             ? await _manifest({ command: 'build', mode: config.mode })
             : await Promise.resolve(_manifest)
 
-        // Collect IIFE content scripts from two sources:
-        // 1. Manifest content_scripts with .iife.ts files
-        // 2. Dynamic scripts (via ?script import) with .iife.ts files
+        const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
+          f.replace(/^\//, '')
+        )
+        const isStandaloneFile = (file: string) => {
+          const normalized = file.replace(/^\//, '')
+          return standaloneFiles.includes(normalized)
+        }
+
         const iifeEntries: Array<{
           file: string
           id: string
@@ -66,11 +93,10 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
           isDynamic?: boolean
         }> = []
 
-        // From manifest
         if (manifest.content_scripts) {
           for (const { js = [], matches = [] } of manifest.content_scripts) {
             for (const file of js) {
-              if (isIifeContentScript(file)) {
+              if (isIifeContentScript(file) || isStandaloneFile(file)) {
                 const id = join(config.root, file)
                 iifeEntries.push({ file, id, matches })
               }
@@ -78,12 +104,10 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
           }
         }
 
-        // From dynamic scripts (contentScripts map)
         for (const [, script] of contentScripts.entries()) {
           if (script.type === 'iife' && script.isDynamicScript) {
             const id = join(config.root, script.id)
-            // Avoid duplicates
-            if (!iifeEntries.some(e => e.id === id)) {
+            if (!iifeEntries.some((e) => e.id === id)) {
               iifeEntries.push({
                 file: script.id,
                 id,
@@ -100,25 +124,8 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
           colors.cyan(`\n[${pluginName}] Building ${iifeEntries.length} content script(s) as IIFE...`),
         )
 
-        // Remove the module-based content script chunks from the bundle
-        // They will be replaced by IIFE builds
-        for (const entry of iifeEntries) {
-          const script = contentScripts.get(entry.file)
-          if (script?.fileName && bundle[script.fileName]) {
-            // Also remove any chunks that were only used by this content script
-            const chunk = bundle[script.fileName]
-            if (chunk.type === 'chunk') {
-              // Remove the main chunk
-              delete bundle[script.fileName]
-              // Remove associated loader if present
-              if (script.loaderName && bundle[script.loaderName]) {
-                delete bundle[script.loaderName]
-              }
-            }
-          }
-        }
-
-        // Build each content script as IIFE
+        // Build each content script as IIFE (see JSDoc for the three declaration modes
+        // and the rationale for not removing intermediate ESM chunks for dynamic cases).
         for (const entry of iifeEntries) {
           const outputFileName = getIifeOutputPath(entry.file)
 

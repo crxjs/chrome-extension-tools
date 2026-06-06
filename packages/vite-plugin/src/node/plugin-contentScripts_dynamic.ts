@@ -4,6 +4,8 @@ import { allFilesReady } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
 import { isIifeContentScript } from './plugin-contentScripts_iife'
+import { getOptions } from './plugin-optionsProvider'
+import type { UserConfig } from 'vite'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
@@ -15,7 +17,7 @@ const dynamicScriptRegEx = () => {
 }
 
 /**
- * 1. Resolves `?script` import queries
+ * 1. Resolves `?script` (and `?iife` alias) import queries
  *
  * - Emits scripts to rollup or fileWriter
  * - Add scripts to contentScripts map
@@ -36,6 +38,7 @@ const dynamicScriptRegEx = () => {
  */
 export const pluginDynamicContentScripts: CrxPluginFn = () => {
   let config: ResolvedConfig
+  let standaloneFiles: string[] = []
 
   return [
     {
@@ -43,6 +46,15 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       enforce: 'pre',
       configResolved(_config) {
         config = _config
+        // Load standaloneFiles for auto-IIFE detection on ?script imports
+        // (in addition to .iife.* filename convention)
+        getOptions({ plugins: _config.plugins } as UserConfig)
+          .then((opts) => {
+            standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
+              f.replace(/^\//, '')
+            )
+          })
+          .catch(() => undefined)
       },
       configureServer(server) {
         return () => {
@@ -75,9 +87,9 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         }
       },
       async resolveId(_source: string, importer?: string) {
-        if (importer && _source.includes('?script')) {
+        if (importer && (_source.includes('?script') || _source.includes('?iife'))) {
           const url = new URL(_source, 'stub://stub')
-          if (url.searchParams.has('script')) {
+          if (url.searchParams.has('script') || url.searchParams.has('iife')) {
             const [source] = _source.split('?')
             const resolved = await this.resolve(source, importer, {
               skipSelf: true,
@@ -89,12 +101,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
             const { id } = resolved
 
             // Determine script type:
-            // - .iife.ts files are always IIFE (auto-detected from filename)
+            // - .iife.ts files or files listed in contentScripts.standaloneFiles are IIFE (auto-detected)
             // - ?module query param forces module type
             // - ?iife query param forces iife type
             // - default is loader (module with loader wrapper)
+            const relId = relative(config.root, id).replace(/^\//, '')
             let type: ContentScript['type'] = 'loader'
-            if (isIifeContentScript(id)) {
+            if (isIifeContentScript(relId) || standaloneFiles.includes(relId)) {
               type = 'iife'
             } else if (url.searchParams.has('module')) {
               type = 'module'
@@ -188,9 +201,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                       `Content script fileName is undefined: "${script.id}"`,
                     )
 
-                  return `${JSON.stringify(
-                    `/${script.loaderName ?? script.fileName}`,
-                  )}${match.split(scriptKey)[1]}`
+                  const fileName = script.loaderName ?? script.fileName
+                  // Return clean relative path (no leading slash). Used with
+                  // registerContentScripts, executeScript, and getURL. Paths must not
+                  // start with / for registerContentScripts; executeScript tolerates both
+                  // but we keep consistent with manifest-declared scripts and IIFE outputs.
+                  const path = fileName
+                  return `${JSON.stringify(path)}${match.split(scriptKey)[1]}`
                 },
               )
               // TODO: remove unused import_meta value?
