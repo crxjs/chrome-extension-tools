@@ -1,9 +1,9 @@
 import fs from 'fs-extra'
 import path from 'pathe'
 import { expect, test } from 'vitest'
+import { waitForRegisteredContentScripts } from '../helpers'
 import { serve } from '../runners'
-import { iifeContentId, regularContentId } from './src1/script-ids'
-import { standaloneIifeScriptId } from './src/script-ids'
+import { bareIifeAliasScriptId, dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId, iifeContentId, regularContentId, standaloneIifeScriptId } from './src1/script-ids'
 
 test('IIFE content scripts work in dev mode', async () => {
   const src = path.join(__dirname, 'src')
@@ -16,18 +16,24 @@ test('IIFE content scripts work in dev mode', async () => {
 
   const { browser } = await serve(__dirname)
 
+  await waitForRegisteredContentScripts(browser, [
+    dynamicRegularId,
+    dynamicIifeId,
+    dynamicBareIifeAliasId,
+  ])
+
   const page = await browser.newPage()
   await page.goto('https://example.com')
-  
+
   // In dev mode, .iife.ts files are served as ESM (IIFE bundling only happens in build)
-  // But they should still work and create their markers
-  
-  // Manifest content scripts (regular, .iife.ts convention, and standalone via config)
+  // but should still execute and create their markers.
   await page.waitForSelector(`#${regularContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${iifeContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${standaloneIifeScriptId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${dynamicRegularId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${dynamicIifeId}`, { timeout: 10000 })
+  await page.waitForSelector(`#${bareIifeAliasScriptId}`, { timeout: 10000 })
 
-  // Verify content
   const regularText = await page.locator(`#${regularContentId}`).textContent()
   expect(regularText).toBe('regular: shared-util')
 
@@ -36,7 +42,13 @@ test('IIFE content scripts work in dev mode', async () => {
 
   const standaloneText = await page.locator(`#${standaloneIifeScriptId}`).textContent()
   expect(standaloneText).toBe('standalone: shared-util')
-  
-  // Note: Dynamic content scripts are tested in the build test
-  // because chrome.runtime.onInstalled behavior differs in dev mode
+
+  const dynamicRegularText = await page.locator(`#${dynamicRegularId}`).textContent()
+  expect(dynamicRegularText).toBe('dynamic-regular: shared-util')
+
+  const dynamicIifeText = await page.locator(`#${dynamicIifeId}`).textContent()
+  expect(dynamicIifeText).toBe('dynamic-iife: shared-util')
+
+  const bareAliasText = await page.locator(`#${bareIifeAliasScriptId}`).textContent()
+  expect(bareAliasText).toBe('bare-iife-alias: shared-util')
 })
