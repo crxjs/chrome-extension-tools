@@ -93,8 +93,14 @@ export const pluginHMR: CrxPluginFn = () => {
         subs.unsubscribe()
       },
       // background changes require a full extension reload
-      handleHotUpdate({ modules, server }) {
+      handleHotUpdate({ file, modules, server }) {
         const { root } = server.config
+
+        const changedFilePath = file
+          ? file.startsWith(root)
+            ? prefix('/', file.slice(root.length))
+            : null
+          : null
 
         const relFiles = new Set<string>()
         const fsFiles = new Set<string>()
@@ -177,6 +183,22 @@ export const pluginHMR: CrxPluginFn = () => {
                 // Also update virtual modules if content script dependencies change
                 virtualModules.forEach((file) => update(file))
               }
+            }
+
+            // For IIFE scripts, also check the raw file path since they're not in the module graph.
+            // IIFE scripts need a runtime reload after rebuild because Chrome caches
+            // the content script files registered via registerContentScripts / executeScript.
+            const scriptPath = prefix('/', script.id)
+            if (script.type === 'iife' && changedFilePath === scriptPath) {
+              debug('IIFE script changed, triggering rebuild: %s', script.id)
+              const updatedFiles = update(scriptPath)
+              // Wait for the IIFE rebuild (which inlines everything) to complete, then reload.
+              Promise.all(updatedFiles.map((f) => f.file)).then(() => {
+                if (liveReload) {
+                  debug('IIFE rebuild complete, sending runtime reload')
+                  server.ws.send(crxRuntimeReload)
+                }
+              })
             }
           }
       },

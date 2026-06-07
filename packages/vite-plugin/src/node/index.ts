@@ -6,6 +6,7 @@ import { pluginContentScripts } from './plugin-contentScripts'
 import { pluginContentScriptsCss } from './plugin-contentScripts_css'
 import { pluginDeclaredContentScripts } from './plugin-contentScripts_declared'
 import { pluginDynamicContentScripts } from './plugin-contentScripts_dynamic'
+import { pluginContentScriptsIife } from './plugin-contentScripts_iife'
 import { pluginFileWriter } from './plugin-fileWriter'
 import { pluginFileWriterPolyfill } from './plugin-fileWriter-polyfill'
 import { pluginFileWriterPublic } from './plugin-fileWriter_public'
@@ -25,6 +26,7 @@ export const crx = (
   contentScripts.clear()
   return [
     pluginOptionsProvider(options),
+    pluginContentScriptsIife(), // Must come early so isIifeModeEnabled is set before manifest plugin
     pluginBackground(),
     pluginContentScripts(),
     pluginDeclaredContentScripts(),

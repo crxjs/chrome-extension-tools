@@ -1,5 +1,5 @@
 import jsesc from 'jsesc'
-import { BrowserContext, Locator, Page } from 'playwright-chromium'
+import { BrowserContext, Locator, Page, Worker } from 'playwright-chromium'
 import { basename, join, resolve } from 'src/path'
 import { TestContext } from 'vitest'
 import fs from 'fs-extra'
@@ -117,3 +117,54 @@ export const createUpdate =
       await ensureViteHMRWillPickupChangedFiled(updatedFiles)
     }
   }
+
+
+/**
+ * Returns the extension's MV3 background service worker. If one is already
+ * attached to the context it is returned immediately; otherwise this waits
+ * for one to spawn (up to `timeout` ms) and returns `undefined` on timeout.
+ */
+export async function getServiceWorker(
+  browser: BrowserContext,
+  { timeout = 500 }: { timeout?: number } = {},
+): Promise<Worker | undefined> {
+  const existing = browser.serviceWorkers()[0]
+  if (existing) return existing
+  try {
+    return await browser.waitForEvent('serviceworker', { timeout })
+  } catch {
+    return undefined
+  }
+}
+
+/**
+ * Wait until the MV3 background service worker has registered the given
+ * dynamic content script IDs via `chrome.scripting.registerContentScripts`.
+ *
+ * Polls from the outside so it tolerates: SW not spawned yet, SW JS global
+ * present before `chrome.*` bindings land, and SW restarts mid-evaluate.
+ */
+export async function waitForRegisteredContentScripts(
+  browser: BrowserContext,
+  expectedIds: string[],
+  { timeout = 15000, interval = 100 }: { timeout?: number; interval?: number } = {},
+): Promise<void> {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const sw = await getServiceWorker(browser)
+    if (sw) {
+      try {
+        const ids: string[] = await sw.evaluate(async () => {
+          if (typeof chrome === 'undefined' || !chrome.scripting) return []
+          const r = await chrome.scripting.getRegisteredContentScripts()
+          return r.map((s) => s.id)
+        })
+        if (expectedIds.every((id) => ids.includes(id))) return
+      } catch { /* SW restarted mid-evaluate — loop and retry */ }
+    }
+    await new Promise((r) => setTimeout(r, interval))
+  }
+  throw new Error(
+    `Timed out after ${timeout}ms waiting for content scripts to register: ${expectedIds.join(', ')}`,
+  )
+}
