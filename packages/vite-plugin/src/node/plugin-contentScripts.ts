@@ -185,6 +185,13 @@ export const pluginContentScripts: CrxPluginFn = () => {
   ]
 }
 
+/**
+ * Resolve build-time content script filenames and emit production loaders.
+ *
+ * This is intentionally idempotent. It can run from both `crx:content-scripts`
+ * and `crx:manifest` because dynamic script placeholders and manifest filename
+ * replacement happen in different post-build hooks across Vite versions.
+ */
 export function finalizeBuildContentScripts(
   context: Pick<PluginContext, 'emitFile' | 'getFileName'>,
   bundle: OutputBundle,
