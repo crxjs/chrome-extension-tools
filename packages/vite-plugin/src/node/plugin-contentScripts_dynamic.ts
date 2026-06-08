@@ -168,6 +168,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                   type: 'chunk',
                   id,
                   name: basename(id),
+                  preserveSignature: 'exports-only',
                 })
               } else {
                 refId = scriptId

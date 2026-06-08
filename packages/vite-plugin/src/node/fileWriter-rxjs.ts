@@ -20,7 +20,7 @@ import {
   toArray,
 } from 'rxjs'
 import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
-import { outputFiles } from './fileWriter-filesMap'
+import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
@@ -95,8 +95,20 @@ export const buildStart$ = fileWriterEvent$.pipe(
 export const allFilesReady$ = buildEnd$.pipe(
   switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
   map(() => [...outputFiles.values()]),
-  switchMap((files) => Promise.allSettled(files.map(({ file }) => file))),
+  switchMap((files) =>
+    Promise.allSettled(files.map((file) => waitForOutputFile(file))),
+  ),
 )
+
+async function waitForOutputFile(
+  file: OutputFile,
+  seen = new Set<OutputFile>(),
+): Promise<void> {
+  if (seen.has(file)) return
+  seen.add(file)
+  const { deps } = await file.file
+  await Promise.all(deps.map((dep) => waitForOutputFile(dep, seen)))
+}
 
 const timestamp$ = new BehaviorSubject(Date.now())
 allFilesReady$.subscribe(() => {
@@ -166,7 +178,13 @@ function prepScript(
       // get script contents from dev server
       mergeMap(async ({ server }) => {
         const target = getOutputPath(server, fileName)
-        const viteUrl = getViteUrl(script)
+        const originalViteUrl = getViteUrl(script)
+        const isVueSfcQuery = script.id.includes('?vue')
+        const viteUrl = getViteUrl(script, { timestamp: isVueSfcQuery })
+        if (isVueSfcQuery) {
+          const module = await server.moduleGraph.getModuleByUrl(originalViteUrl)
+          if (module) server.moduleGraph.invalidateModule(module)
+        }
         const transformResult = await server.transformRequest(viteUrl)
         if (!transformResult)
           throw new TypeError(`Unable to load "${script.id}" from server.`)

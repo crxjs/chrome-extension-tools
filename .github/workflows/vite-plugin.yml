@@ -152,7 +152,7 @@ jobs:
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: pnpm test:run:e2e
+          run: pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
           working-directory: packages/vite-plugin
 
       - uses: actions/upload-artifact@v4

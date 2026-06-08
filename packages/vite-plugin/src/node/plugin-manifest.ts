@@ -17,6 +17,7 @@ import {
   getContentCssEntries,
   registerContentCssEntry,
 } from './plugin-contentScripts_declared'
+import { finalizeBuildContentScripts } from './plugin-contentScripts'
 import { isIifeContentScript } from './plugin-contentScripts_iife'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
@@ -274,6 +275,7 @@ export const pluginManifest: CrxPluginFn = () => {
                   type: 'chunk',
                   id,
                   name: basename(file),
+                  preserveSignature: 'exports-only',
                 })
                 contentScripts.set(
                   file,
@@ -358,6 +360,8 @@ export const pluginManifest: CrxPluginFn = () => {
             }
           }
         } else {
+          finalizeBuildContentScripts(this, bundle)
+
           // transform hook emits files and replaces in manifest with ref ids
           // update background service worker filename from ref
           // service worker not emitted during development, so don't update file name
@@ -379,7 +383,8 @@ export const pluginManifest: CrxPluginFn = () => {
             ({ js = [], ...rest }) => {
               return {
                 js: js.map((id) => {
-                  const script = contentScripts.get(id)
+                  const script =
+                    contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
                   const fileName = script?.loaderName ?? script?.fileName
                   if (typeof fileName === 'undefined')
                     throw new Error(

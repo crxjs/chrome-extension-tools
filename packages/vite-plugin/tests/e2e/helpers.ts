@@ -66,7 +66,9 @@ export async function waitForInnerHtml(
   throw new Error('could not find element')
 }
 
-const ensureViteHMRWillPickupChangedFiled = async (filesToModify: string[]) => {
+export const ensureViteHMRWillPickupChangedFiled = async (
+  filesToModify: string[],
+) => {
   const now = new Date()
   for (const f of filesToModify) {
     // Add a newline to trigger change detection
@@ -83,6 +85,9 @@ const ensureViteHMRWillPickupChangedFiled = async (filesToModify: string[]) => {
     }
   }
 }
+
+export const ensureViteHmrSeesChangedFiles =
+  ensureViteHMRWillPickupChangedFiled
 
 export const createUpdate =
   ({

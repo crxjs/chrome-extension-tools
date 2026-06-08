@@ -3,6 +3,7 @@ import path from 'pathe'
 import { expect, test } from 'vitest'
 import { serve } from '../runners'
 import {
+  ensureViteHmrSeesChangedFiles,
   waitForContentScriptContent,
   waitForRegisteredContentScripts,
 } from '../helpers'
@@ -35,10 +36,11 @@ test(
 
     // Now update ONLY the main-world.ts file (not background.ts)
     // This directly copies the file to avoid any race conditions
-    await fs.copyFile(
-      path.join(src2, 'main-world.ts'),
-      path.join(src, 'main-world.ts'),
-    )
+    const mainWorldScript = path.join(src, 'main-world.ts')
+    await fs.copyFile(path.join(src2, 'main-world.ts'), mainWorldScript)
+    if (process.platform === 'win32') {
+      await ensureViteHmrSeesChangedFiles([mainWorldScript])
+    }
 
     // Wait for the IIFE rebuild to finish by polling the on-disk bundle for
     // the updated content (more reliable than a fixed timeout).

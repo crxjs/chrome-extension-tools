@@ -1,4 +1,12 @@
-import { buffer, filter, map, mergeMap, Observable, Subject } from 'rxjs'
+import {
+  buffer,
+  filter,
+  firstValueFrom,
+  map,
+  mergeMap,
+  Observable,
+  Subject,
+} from 'rxjs'
 import {
   CustomPayload,
   FullReloadPayload,
@@ -21,14 +29,27 @@ const isCustomPayload = (p: HMRPayload): p is CustomPayload => {
 }
 export const hmrPayload$ = new Subject<HMRPayload>()
 
-export function getUpdatePayloadFileIds(p: UpdatePayload) {
+function withTimestamp(id: string, timestamp: number) {
+  if (id.includes('?t=') || id.includes('&t=')) return id
+
+  const t = `t=${timestamp}` + (id.includes('?') ? '&' : '')
+  const parts = id.split('?')
+  parts[1] = typeof parts[1] === 'undefined' ? t : t + parts[1]
+  return parts.join('?')
+}
+
+export function getUpdatePayloadFileIds(
+  p: UpdatePayload,
+  { timestamp = false }: { timestamp?: boolean } = {},
+) {
   const ids = new Set<string>()
 
   for (const u of p.updates) {
     for (const id of [u.path, u.acceptedPath]) {
       const isVirtualModule = id.startsWith('/@id/') || id.startsWith('/__')
       const isQueryModule = id.includes('?')
-      if (isVirtualModule || isQueryModule) ids.add(id)
+      if (isVirtualModule || isQueryModule)
+        ids.add(timestamp ? withTimestamp(id, u.timestamp) : id)
     }
   }
 
@@ -54,8 +75,6 @@ export function mapVitePayloadForCrx(p: HMRPayload): HMRPayload {
     }
 
     case 'update': {
-      // Update files on disk for payload-only module ids. Regular files are
-      // handled by handleHotUpdate; query modules like Vue SFC styles are not.
       debug('update payload with %d updates', p.updates.length)
       for (const u of p.updates) {
         debug(
@@ -64,10 +83,6 @@ export function mapVitePayloadForCrx(p: HMRPayload): HMRPayload {
           u.acceptedPath,
           u.type,
         )
-      }
-      for (const id of getUpdatePayloadFileIds(p)) {
-        debug('updating payload module: %s', id)
-        update(id)
       }
       const update_: UpdatePayload = {
         type: 'update',
@@ -83,6 +98,25 @@ export function mapVitePayloadForCrx(p: HMRPayload): HMRPayload {
     default:
       return p // connected, custom, error
   }
+}
+
+export async function prepareVitePayloadForCrx(
+  p: HMRPayload,
+): Promise<HMRPayload> {
+  if (p.type === 'update') {
+    // Update files on disk for payload-only module ids. Regular files are
+    // handled by handleHotUpdate; query modules like Vue SFC styles are not.
+    const pendingFiles = getUpdatePayloadFileIds(p, {
+      timestamp: true,
+    }).flatMap((id) => {
+      debug('updating payload module: %s', id)
+      return update(id).map((file) => file.file)
+    })
+    await Promise.all(pendingFiles)
+    await firstValueFrom(allFilesReady$)
+  }
+
+  return mapVitePayloadForCrx(p)
 }
 
 export function shouldForwardCrxPayload(p: HMRPayload) {
@@ -112,7 +146,7 @@ export const crxHMRPayload$: Observable<CrxHMRPayload> = hmrPayload$.pipe(
     if (fullReload) payloads.push(fullReload)
     return payloads
   }),
-  map(mapVitePayloadForCrx),
+  mergeMap(prepareVitePayloadForCrx),
   filter(shouldForwardCrxPayload),
   map((data): CrxHMRPayload => {
     debug(`hmr payload`, data)

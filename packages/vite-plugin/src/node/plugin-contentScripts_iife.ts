@@ -70,7 +70,7 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
       name: pluginName,
       apply: 'build',
       enforce: 'post',
-      async generateBundle(options, bundle) {
+      async generateBundle() {
         const opts = await getOptions({ plugins: config.plugins } as UserConfig)
         const _manifest = opts.manifest
         const manifest =
@@ -144,40 +144,64 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
               ? result.flatMap(r => 'output' in r ? r.output : [])
               : result.output
             
-            // Add the IIFE output to the bundle
-            for (const chunk of outputs) {
-              if (chunk.type === 'chunk' && chunk.isEntry) {
-                bundle[outputFileName] = {
-                  ...chunk,
-                  fileName: outputFileName,
-                }
+            const entryChunk = outputs.find(
+              (chunk) => chunk.type === 'chunk' && chunk.isEntry,
+            )
+            if (!entryChunk || entryChunk.type !== 'chunk') {
+              throw new Error(`Unable to generate IIFE bundle for "${entry.file}"`)
+            }
 
-                // Update contentScripts map with new filename
-                // For dynamic scripts, we need to update the existing entry
-                const existingScript = contentScripts.get(entry.file)
-                if (existingScript) {
-                  // Update existing script entry with the IIFE filename
-                  existingScript.fileName = outputFileName
-                  contentScripts.set(entry.file, formatFileData(existingScript))
-                } else {
-                  // Create new entry for manifest-declared scripts
-                  contentScripts.set(
-                    entry.file,
-                    formatFileData({
-                      type: 'iife',
-                      id: entry.file,
-                      refId: entry.file,
-                      matches: entry.matches,
-                      fileName: outputFileName,
-                    }),
-                  )
-                }
-                
-                console.log(
-                  colors.green(`  ✓ ${basename(entry.file)} → ${outputFileName}`),
-                )
+            this.emitFile({
+              type: 'asset',
+              fileName: outputFileName,
+              source: entryChunk.code,
+            })
+
+            for (const output of outputs) {
+              if (
+                output.type === 'asset' &&
+                output.fileName !== outputFileName &&
+                output.fileName !== 'manifest.json' &&
+                !output.fileName.startsWith('.vite/')
+              ) {
+                this.emitFile({
+                  type: 'asset',
+                  fileName: output.fileName,
+                  source: output.source,
+                })
+              } else if (output.type === 'chunk' && !output.isEntry) {
+                this.emitFile({
+                  type: 'asset',
+                  fileName: output.fileName,
+                  source: output.code,
+                })
               }
             }
+
+            // Update contentScripts map with new filename
+            // For dynamic scripts, we need to update the existing entry
+            const existingScript = contentScripts.get(entry.file)
+            if (existingScript) {
+              // Update existing script entry with the IIFE filename
+              existingScript.fileName = outputFileName
+              contentScripts.set(entry.file, formatFileData(existingScript))
+            } else {
+              // Create new entry for manifest-declared scripts
+              contentScripts.set(
+                entry.file,
+                formatFileData({
+                  type: 'iife',
+                  id: entry.file,
+                  refId: entry.file,
+                  matches: entry.matches,
+                  fileName: outputFileName,
+                }),
+              )
+            }
+
+            console.log(
+              colors.green(`  ✓ ${basename(entry.file)} → ${outputFileName}`),
+            )
           } catch (error) {
             console.error(
               colors.red(`  ✗ Failed to build ${entry.file}:`),
