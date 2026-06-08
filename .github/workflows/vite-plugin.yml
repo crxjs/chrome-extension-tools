@@ -54,13 +54,11 @@ jobs:
         run: pnpm lint
 
   unit-output:
-    name: Unit & Output Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
+    name: Unit & Output Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        vite-version: ["3", "6", "7", "8"]
     defaults:
       run:
         working-directory: packages/vite-plugin
@@ -89,18 +87,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
 
-      - name: Build plugin (always on Vite 3)
-        run: pnpm build
-
-      - name: Install Vite ${{ matrix.vite-version }} for testing
-        if: matrix.vite-version != '3'
-        run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
-
-      - name: Verify Vite version
-        run: echo "Testing with Vite $(pnpm exec vite --version)"
-
-      - name: Run unit and output tests (Vite 3 only - includes snapshots)
-        if: matrix.vite-version == '3'
+      - name: Run unit and output tests
         run: pnpm test:run:out
 
   e2e:
