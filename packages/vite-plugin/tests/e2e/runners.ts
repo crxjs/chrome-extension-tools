@@ -25,7 +25,7 @@ afterEach(async () => {
 })
 
 export async function build(dirname: string) {
-  const { outDir, config } = await _build(dirname)
+  const { outDir, config, output } = await _build(dirname)
 
   const dataDir = path.join(config.cacheDir!, '.chromium')
   await fs.remove(dataDir);
@@ -41,7 +41,7 @@ export async function build(dirname: string) {
     })
   })
 
-  return { browser, outDir, dataDir }
+  return { browser, outDir, dataDir, output }
 }
 
 export async function serve(dirname: string) {
