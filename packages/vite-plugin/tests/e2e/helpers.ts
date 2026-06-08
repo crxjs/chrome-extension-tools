@@ -123,6 +123,20 @@ export const createUpdate =
     }
   }
 
+export async function waitForFileContent(
+  file: string,
+  predicate: (content: string) => boolean,
+  { timeout = 5000, interval = 100 }: { timeout?: number; interval?: number } = {},
+): Promise<string> {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const content = await fs.readFile(file, 'utf-8')
+    if (predicate(content)) return content
+    await new Promise((r) => setTimeout(r, interval))
+  }
+
+  throw new Error(`Timed out after ${timeout}ms waiting for "${file}" to update`)
+}
 
 /**
  * Returns the extension's MV3 background service worker. If one is already
