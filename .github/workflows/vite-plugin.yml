@@ -87,6 +87,55 @@ jobs:
       - name: Run unit and output tests
         run: pnpm test:run:out
 
+  compat:
+    name: Compat Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        vite-version: ["3", "6", "7", "8"]
+    defaults:
+      run:
+        working-directory: packages/vite-plugin
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pnpm-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
+
+      - name: Install dependencies
+        run: pnpm install --filter "vite-plugin"
+
+      - name: Build plugin (always on Vite 3)
+        run: pnpm build
+
+      - name: Install Vite ${{ matrix.vite-version }} for testing
+        if: matrix.vite-version != '3'
+        run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
+
+      - name: Verify Vite version
+        run: echo "Testing with Vite $(pnpm exec vite --version)"
+
+      - name: Run compat tests
+        run: pnpm exec vitest --run --mode compat ${{ matrix.vite-version == '8' && '--threads false' || '' }}
+
   e2e:
     name: E2E Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
     runs-on: ${{ matrix.os }}

@@ -67,6 +67,7 @@
     "test": "vitest --mode unit",
     "test:e2e": "vitest --mode e2e",
     "test:run": "run-s test:run:*",
+    "test:run:compat": "vitest --run --mode compat",
     "test:run:out": "vitest --run --mode out",
     "test:run:e2e": "vitest --run --mode e2e",
     "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
