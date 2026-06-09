@@ -275,6 +275,8 @@ export const pluginManifest: CrxPluginFn = () => {
                   type: 'chunk',
                   id,
                   name: basename(file),
+                  // Preserve content script entry exports so the build finalizer
+                  // can decide whether the script needs a loader wrapper.
                   preserveSignature: 'exports-only',
                 })
                 contentScripts.set(

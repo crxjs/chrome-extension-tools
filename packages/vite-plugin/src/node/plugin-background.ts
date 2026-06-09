@@ -96,6 +96,10 @@ export const pluginBackground: CrxPluginFn = () => {
         const opts = await getOptions(config)
         browser = opts.browser || 'chrome'
         liveReload = opts.liveReload !== false
+        // Vite's dev-server CORS default was tightened in patched releases
+        // (4.5.6, 5.4.12, 6.0.9+). Those versions no longer allow arbitrary
+        // origins, so extension pages need explicit access to fetch dev files.
+        // This is separate from Vite's WebSocket HMR token/origin checks.
         config.server = {
           ...config.server,
           cors: addExtensionCors(config.server?.cors),
