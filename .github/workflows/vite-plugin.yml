@@ -136,17 +136,11 @@ jobs:
       - name: Verify Vite version
         run: echo "Testing with Vite $(pnpm exec vite --version)"
 
-      - name: Setup Xvfb
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y xvfb x11-xserver-utils
-
       - name: Run e2e tests
-        if: runner.os == 'Linux'
-        run: xvfb-run --auto-servernum pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
-
-      - name: Run e2e tests
-        if: runner.os != 'Linux'
-        run: pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
+          working-directory: packages/vite-plugin
 
       - uses: actions/upload-artifact@v4
         if: failure()
