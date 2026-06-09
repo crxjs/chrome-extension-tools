@@ -1,11 +1,27 @@
+import type {
+  OutputAsset,
+  OutputChunk,
+  PluginContext,
+  RollupOutput,
+  RollupWatcher,
+} from 'rollup'
 import { build, mergeConfig, InlineConfig, ResolvedConfig, UserConfig } from 'vite'
-import { contentScripts } from './contentScripts'
+import { contentScripts, type ContentScript } from './contentScripts'
 import { formatFileData } from './fileWriter-utilities'
+import type { ManifestV3 } from './manifest'
 import { basename, dirname, join } from './path'
 import { getOptions } from './plugin-optionsProvider'
 import { CrxPluginFn } from './types'
 import colors from 'picocolors'
 
+type IifeEntry = {
+  file: string
+  id: string
+  matches: string[]
+}
+
+type IifeBuildResult = RollupOutput | RollupOutput[] | RollupWatcher
+type IifeBuildOutput = OutputAsset | OutputChunk
 
 /**
  * Check if a content script file should be built as IIFE based on its filename.
@@ -78,45 +94,14 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
             ? await _manifest({ command: 'build', mode: config.mode })
             : await Promise.resolve(_manifest)
 
-        const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
-          f.replace(/^\//, '')
+        const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map(
+          normalizeContentScriptPath,
         )
-        const isStandaloneFile = (file: string) => {
-          const normalized = file.replace(/^\//, '')
-          return standaloneFiles.includes(normalized)
-        }
-
-        const iifeEntries: Array<{
-          file: string
-          id: string
-          matches: string[]
-          isDynamic?: boolean
-        }> = []
-
-        if (manifest.content_scripts) {
-          for (const { js = [], matches = [] } of manifest.content_scripts) {
-            for (const file of js) {
-              if (isIifeContentScript(file) || isStandaloneFile(file)) {
-                const id = join(config.root, file)
-                iifeEntries.push({ file, id, matches })
-              }
-            }
-          }
-        }
-
-        for (const [, script] of contentScripts.entries()) {
-          if (script.type === 'iife' && script.isDynamicScript) {
-            const id = join(config.root, script.id)
-            if (!iifeEntries.some((e) => e.id === id)) {
-              iifeEntries.push({
-                file: script.id,
-                id,
-                matches: script.matches ?? [],
-                isDynamic: true,
-              })
-            }
-          }
-        }
+        const iifeEntries = collectIifeEntries(
+          manifest,
+          standaloneFiles,
+          config.root,
+        )
 
         if (iifeEntries.length === 0) return
 
@@ -132,72 +117,9 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
           try {
             const iifeConfig = createIifeConfig(config, entry.id, outputFileName)
             const result = await build(iifeConfig)
-
-            // Handle both single and array results from Vite build
-            // Skip if result is a watcher (shouldn't happen with write: false)
-            if ('on' in result) {
-              console.error(colors.red(`  Unexpected watcher result for ${entry.file}`))
-              continue
-            }
-            
-            const outputs = Array.isArray(result) 
-              ? result.flatMap(r => 'output' in r ? r.output : [])
-              : result.output
-            
-            const entryChunk = outputs.find(
-              (chunk) => chunk.type === 'chunk' && chunk.isEntry,
-            )
-            if (!entryChunk || entryChunk.type !== 'chunk') {
-              throw new Error(`Unable to generate IIFE bundle for "${entry.file}"`)
-            }
-
-            this.emitFile({
-              type: 'asset',
-              fileName: outputFileName,
-              source: entryChunk.code,
-            })
-
-            for (const output of outputs) {
-              if (
-                output.type === 'asset' &&
-                output.fileName !== outputFileName &&
-                output.fileName !== 'manifest.json' &&
-                !output.fileName.startsWith('.vite/')
-              ) {
-                this.emitFile({
-                  type: 'asset',
-                  fileName: output.fileName,
-                  source: output.source,
-                })
-              } else if (output.type === 'chunk' && !output.isEntry) {
-                this.emitFile({
-                  type: 'asset',
-                  fileName: output.fileName,
-                  source: output.code,
-                })
-              }
-            }
-
-            // Update contentScripts map with new filename
-            // For dynamic scripts, we need to update the existing entry
-            const existingScript = contentScripts.get(entry.file)
-            if (existingScript) {
-              // Update existing script entry with the IIFE filename
-              existingScript.fileName = outputFileName
-              contentScripts.set(entry.file, formatFileData(existingScript))
-            } else {
-              // Create new entry for manifest-declared scripts
-              contentScripts.set(
-                entry.file,
-                formatFileData({
-                  type: 'iife',
-                  id: entry.file,
-                  refId: entry.file,
-                  matches: entry.matches,
-                  fileName: outputFileName,
-                }),
-              )
-            }
+            const outputs = getBuildOutputs(result, entry.file)
+            emitIifeOutputs(this, outputs, entry.file, outputFileName)
+            registerIifeContentScript(entry, outputFileName)
 
             console.log(
               colors.green(`  ✓ ${basename(entry.file)} → ${outputFileName}`),
@@ -215,6 +137,122 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
       },
     },
   ]
+}
+
+function normalizeContentScriptPath(file: string): string {
+  return file.replace(/^\//, '')
+}
+
+function isStandaloneFile(file: string, standaloneFiles: string[]) {
+  return standaloneFiles.includes(normalizeContentScriptPath(file))
+}
+
+function collectIifeEntries(
+  manifest: ManifestV3,
+  standaloneFiles: string[],
+  root: string,
+): IifeEntry[] {
+  const entries: IifeEntry[] = []
+  const entryIds = new Set<string>()
+
+  const addEntry = (entry: IifeEntry) => {
+    if (entryIds.has(entry.id)) return
+    entryIds.add(entry.id)
+    entries.push(entry)
+  }
+
+  for (const { js = [], matches = [] } of manifest.content_scripts ?? []) {
+    for (const file of js) {
+      if (isIifeContentScript(file) || isStandaloneFile(file, standaloneFiles)) {
+        addEntry({ file, id: join(root, file), matches })
+      }
+    }
+  }
+
+  for (const [, script] of contentScripts.entries()) {
+    if (script.type !== 'iife' || !script.isDynamicScript) continue
+    addEntry({
+      file: script.id,
+      id: join(root, script.id),
+      matches: script.matches ?? [],
+    })
+  }
+
+  return entries
+}
+
+function getBuildOutputs(
+  result: IifeBuildResult,
+  entryFile: string,
+): IifeBuildOutput[] {
+  if ('on' in result) {
+    throw new Error(`Unexpected watcher result for "${entryFile}"`)
+  }
+
+  return Array.isArray(result)
+    ? result.flatMap((r) => r.output)
+    : result.output
+}
+
+function emitIifeOutputs(
+  context: Pick<PluginContext, 'emitFile'>,
+  outputs: IifeBuildOutput[],
+  entryFile: string,
+  outputFileName: string,
+): void {
+  const entryChunk = outputs.find(
+    (output): output is OutputChunk =>
+      output.type === 'chunk' && output.isEntry,
+  )
+  if (!entryChunk) {
+    throw new Error(`Unable to generate IIFE bundle for "${entryFile}"`)
+  }
+
+  context.emitFile({
+    type: 'asset',
+    fileName: outputFileName,
+    source: entryChunk.code,
+  })
+
+  for (const output of outputs) {
+    if (output.type === 'asset') {
+      if (
+        output.fileName !== outputFileName &&
+        output.fileName !== 'manifest.json' &&
+        !output.fileName.startsWith('.vite/')
+      ) {
+        context.emitFile({
+          type: 'asset',
+          fileName: output.fileName,
+          source: output.source,
+        })
+      }
+    } else if (!output.isEntry) {
+      context.emitFile({
+        type: 'asset',
+        fileName: output.fileName,
+        source: output.code,
+      })
+    }
+  }
+}
+
+function registerIifeContentScript(
+  entry: IifeEntry,
+  outputFileName: string,
+): void {
+  const existingScript = contentScripts.get(entry.file)
+  const script: ContentScript = existingScript
+    ? { ...existingScript, fileName: outputFileName }
+    : {
+        type: 'iife',
+        id: entry.file,
+        refId: entry.file,
+        matches: entry.matches,
+        fileName: outputFileName,
+      }
+
+  contentScripts.set(entry.file, formatFileData(script))
 }
 
 /**
