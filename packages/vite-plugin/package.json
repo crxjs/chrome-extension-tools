@@ -1,6 +1,6 @@
 {
   "name": "@crxjs/vite-plugin",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Build Chrome Extensions with this Vite plugin.",
   "keywords": [
     "rollup-plugin",
@@ -28,7 +28,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       },
       "require": {
@@ -62,13 +62,19 @@
     "dev:js": "npm run build:js -- -w",
     "dev:lint": "tsc --noEmit --watch",
     "lint": "run-s lint:eslint lint:types",
+    "lint:attw": "run-s build lint:attw:check",
+    "lint:attw:check": "attw --pack --entrypoints . .",
     "lint:eslint": "eslint \"{src,test}/**/*.ts\"",
     "lint:types": "tsc --noEmit",
     "test": "vitest --mode unit",
     "test:e2e": "vitest --mode e2e",
     "test:run": "run-s test:run:*",
+    "test:run:compat": "vitest --run --mode compat",
     "test:run:out": "vitest --run --mode out",
     "test:run:e2e": "vitest --run --mode e2e",
+    "test:vite-matrix": "node scripts/run-vite-matrix.mjs",
+    "test:vite-matrix:compat": "node scripts/run-vite-matrix.mjs --mode compat",
+    "test:vite-matrix:e2e": "node scripts/run-vite-matrix.mjs --mode e2e",
     "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
   },
   "dependencies": {
@@ -90,6 +96,7 @@
     "rxjs": "7.5.7"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.3",
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
     "@rollup/plugin-alias": "4.0.4",
@@ -111,7 +118,7 @@
     "@typescript-eslint/parser": "5.41.0",
     "@vitejs/plugin-react": "^2.2.0",
     "@vitejs/plugin-vue": "3.2.0",
-    "chokidar": "^3.5.3",
+    "chokidar": "^5.0.0",
     "esbuild": "0.17.14",
     "esbuild-runner": "2.2.2",
     "eslint": "8.43.0",
@@ -130,7 +137,7 @@
     "unocss": "^66.5.12",
     "vite": "^3.2.11",
     "vite-plugin-inspect": "0.7.25",
-    "vitest": "0.28.5",
+    "vitest": "0.34.6",
     "vue": "3.2.47"
   },
   "peerDependencies": {
