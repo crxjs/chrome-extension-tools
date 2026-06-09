@@ -142,9 +142,6 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
     server: {
       port: 5200,
       hmr: true,
-      cors: {
-        origin: [/chrome-extension:\/\//, /moz-extension:\/\//],
-      },
       watch: {
         // cache dir should not trigger update in these tests
         ignored: [cacheDir],
