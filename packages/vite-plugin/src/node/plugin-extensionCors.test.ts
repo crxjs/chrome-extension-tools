@@ -1,6 +1,6 @@
 import type { CorsOptions } from 'vite'
 import { expect, test } from 'vitest'
-import { addExtensionCors, pluginExtensionCors } from './extensionCors'
+import { addExtensionCors, pluginExtensionCors } from './plugin-extensionCors'
 
 type OriginFunction = Exclude<CorsOptions['origin'], string | RegExp | boolean | unknown[]>
 
