@@ -5,6 +5,7 @@ import MagicString from 'magic-string'
 import { OutputAsset, OutputChunk } from 'rollup'
 import {
   BehaviorSubject,
+  debounceTime,
   filter,
   first,
   firstValueFrom,
@@ -94,6 +95,7 @@ export const buildStart$ = fileWriterEvent$.pipe(
 /** Emit when all script files are written */
 export const allFilesReady$ = buildEnd$.pipe(
   switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
+  debounceTime(25),
   map(() => [...outputFiles.values()]),
   switchMap((files) =>
     Promise.allSettled(files.map((file) => waitForOutputFile(file))),
