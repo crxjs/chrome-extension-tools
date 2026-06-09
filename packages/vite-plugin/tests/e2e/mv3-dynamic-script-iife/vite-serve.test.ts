@@ -2,7 +2,11 @@ import fs from 'fs-extra'
 import path from 'pathe'
 import { expect, test } from 'vitest'
 import { serve } from '../runners'
-import { waitForRegisteredContentScripts } from '../helpers'
+import {
+  ensureViteHmrSeesChangedFiles,
+  waitForContentScriptContent,
+  waitForRegisteredContentScripts,
+} from '../helpers'
 
 test(
   'iife content script rebuilds on change and works after page reload',
@@ -16,7 +20,7 @@ test(
     await fs.emptyDir(src)
     await fs.copy(src1, src, { overwrite: true, recursive: true })
 
-    const { browser } = await serve(__dirname)
+    const { browser, outDir } = await serve(__dirname)
 
     // Wait for the background script to register the content script
     await waitForRegisteredContentScripts(browser, ['main-world-script'])
@@ -32,14 +36,20 @@ test(
 
     // Now update ONLY the main-world.ts file (not background.ts)
     // This directly copies the file to avoid any race conditions
-    await fs.copyFile(
-      path.join(src2, 'main-world.ts'),
-      path.join(src, 'main-world.ts'),
-    )
+    const mainWorldScript = path.join(src, 'main-world.ts')
+    await fs.copyFile(path.join(src2, 'main-world.ts'), mainWorldScript)
+    if (process.platform === 'win32') {
+      await ensureViteHmrSeesChangedFiles([mainWorldScript])
+    }
 
-    // Wait for the file watcher to pick up changes and rebuild the IIFE
-    // Note: IIFE scripts don't have HMR, but they should rebuild on file change
-    await new Promise((resolve) => setTimeout(resolve, 5000))
+    // Wait for the IIFE rebuild to finish by polling the on-disk bundle for
+    // the updated content (more reliable than a fixed timeout).
+    await waitForContentScriptContent(
+      browser,
+      outDir,
+      'main-world-script',
+      'src2',
+    )
 
     // Reload the page - the updated script should now inject
     // Navigate to a different page first to clear any cache

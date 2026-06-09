@@ -66,7 +66,9 @@ export async function waitForInnerHtml(
   throw new Error('could not find element')
 }
 
-const ensureViteHMRWillPickupChangedFiled = async (filesToModify: string[]) => {
+export const ensureViteHMRWillPickupChangedFiled = async (
+  filesToModify: string[],
+) => {
   const now = new Date()
   for (const f of filesToModify) {
     // Add a newline to trigger change detection
@@ -83,6 +85,9 @@ const ensureViteHMRWillPickupChangedFiled = async (filesToModify: string[]) => {
     }
   }
 }
+
+export const ensureViteHmrSeesChangedFiles =
+  ensureViteHMRWillPickupChangedFiled
 
 export const createUpdate =
   ({
@@ -118,6 +123,20 @@ export const createUpdate =
     }
   }
 
+export async function waitForFileContent(
+  file: string,
+  predicate: (content: string) => boolean,
+  { timeout = 5000, interval = 100 }: { timeout?: number; interval?: number } = {},
+): Promise<string> {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const content = await fs.readFile(file, 'utf-8')
+    if (predicate(content)) return content
+    await new Promise((r) => setTimeout(r, interval))
+  }
+
+  throw new Error(`Timed out after ${timeout}ms waiting for "${file}" to update`)
+}
 
 /**
  * Returns the extension's MV3 background service worker. If one is already
@@ -166,5 +185,48 @@ export async function waitForRegisteredContentScripts(
   }
   throw new Error(
     `Timed out after ${timeout}ms waiting for content scripts to register: ${expectedIds.join(', ')}`,
+  )
+}
+
+/**
+ * Wait until the IIFE bundle for a registered content script has been rebuilt
+ * to contain `needle`. Discovers the on-disk filename by asking the SW which
+ * `js` paths are currently registered for `scriptId`, then polls those files
+ * under `outDir` until one matches.
+ *
+ * Use this instead of a fixed sleep after editing a source file: the HMR plugin
+ * only signals runtime-reload once the IIFE rebuild promise resolves, so the
+ * output file's content is the most direct "rebuild finished" signal.
+ */
+export async function waitForContentScriptContent(
+  browser: BrowserContext,
+  outDir: string,
+  scriptId: string,
+  needle: string,
+  { timeout = 15000, interval = 100 }: { timeout?: number; interval?: number } = {},
+): Promise<void> {
+  const deadline = Date.now() + timeout
+  while (Date.now() < deadline) {
+    const sw = await getServiceWorker(browser)
+    if (sw) {
+      try {
+        const jsPaths: string[] = await sw.evaluate(async (id) => {
+          if (typeof chrome === 'undefined' || !chrome.scripting) return []
+          const r = await chrome.scripting.getRegisteredContentScripts({ ids: [id] })
+          return r.flatMap((s) => s.js ?? [])
+        }, scriptId)
+        for (const p of jsPaths) {
+          const file = join(outDir, p.replace(/^\//, ''))
+          try {
+            const content = await fs.readFile(file, 'utf8')
+            if (content.includes(needle)) return
+          } catch { /* file may not exist mid-rebuild */ }
+        }
+      } catch { /* SW restarted mid-evaluate — loop and retry */ }
+    }
+    await new Promise((r) => setTimeout(r, interval))
+  }
+  throw new Error(
+    `Timed out after ${timeout}ms waiting for "${needle}" in content script bundle for "${scriptId}"`,
   )
 }

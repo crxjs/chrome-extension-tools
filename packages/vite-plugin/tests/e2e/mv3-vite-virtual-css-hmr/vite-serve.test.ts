@@ -1,7 +1,8 @@
 import fs from 'fs-extra'
 import path from 'pathe'
+import { allFilesReady } from 'src/fileWriter-rxjs'
 import { expect, test } from 'vitest'
-import { createUpdate, waitForInnerHtml } from '../helpers'
+import { createUpdate, waitForFileContent, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
 
 /**
@@ -65,11 +66,11 @@ test.skipIf(process.env.CI)('virtual css module updates on hmr', async () => {
 
   console.log('content.ts updated, waiting for file to be updated in dist...')
 
-  // Wait a bit for the file to be written
-  await new Promise((r) => setTimeout(r, 2000))
-
-  // Read the file again to check if it was updated
-  const updatedCssContentFromFile = await fs.readFile(virtualCssFile!, 'utf-8')
+  await allFilesReady()
+  const updatedCssContentFromFile = await waitForFileContent(
+    virtualCssFile!,
+    (content) => content.includes('text-green') && content.includes('mt-4'),
+  )
 
   // The virtual CSS should now contain the new classes - THIS IS THE KEY ASSERTION
   expect(updatedCssContentFromFile).toContain('text-green')

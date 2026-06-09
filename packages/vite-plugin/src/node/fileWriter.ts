@@ -27,6 +27,17 @@ const { outputFile } = fsx
 
 const debug = _debug('file-writer')
 
+function queueWrite(
+  script: CrxDevAssetId | CrxDevScriptId,
+  previous?: OutputFile,
+) {
+  if (!previous) return write(script)
+
+  return previous.file
+    .catch(() => undefined)
+    .then(() => write(script))
+}
+
 /**
  * Starts the file writer.
  *
@@ -91,7 +102,7 @@ export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
     file = formatFileData({
       ...script,
       fileName,
-      file: write(script),
+      file: queueWrite(script),
     })
     outputFiles.set(file.fileName, file)
     debug('add: stored new file %s', file.fileName)
@@ -100,12 +111,19 @@ export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
     // Virtual modules don't have a file on disk, so we can't rely on file watchers
     const isVirtualModule =
       script.id.startsWith('/@id/') || script.id.startsWith('/__')
-    if (isVirtualModule) {
+    const isTimestampedModule =
+      script.type === 'module' && /[?&]t=\d+/.test(script.id)
+    if (isVirtualModule || isTimestampedModule) {
       debug(
-        'add: virtual module already exists, triggering re-write for %s',
+        'add: module already exists, triggering re-write for %s',
         fileName,
       )
-      file.file = write(script)
+      file = formatFileData({
+        ...file,
+        ...script,
+        fileName,
+        file: queueWrite(script, file),
+      })
       outputFiles.set(fileName, file)
     }
   }
@@ -129,7 +147,7 @@ export function update(_id: string): OutputFile[] {
     const scriptFile = outputFiles.get(fileName)
     if (scriptFile) {
       debug('update: found file, calling write()')
-      scriptFile.file = write({ id, type })
+      scriptFile.file = queueWrite({ id, type }, scriptFile)
       updatedFiles.push(scriptFile)
       // trigger scriptFiles change, scriptFile is already formatted
       outputFiles.set(fileName, scriptFile)

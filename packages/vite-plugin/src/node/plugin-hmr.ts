@@ -8,7 +8,7 @@ import { fileWriterError$ } from './fileWriter-rxjs'
 import { getFileName, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
 import { isImporter } from './isImporter'
-import { isAbsolute, join } from './path'
+import { isAbsolute, join, normalize, relative } from './path'
 import { getContentCssEntries } from './plugin-contentScripts_declared'
 import { getOptions } from './plugin-optionsProvider'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
@@ -19,6 +19,30 @@ const debug = _debug('hmr')
 export const crxRuntimeReload: CrxHMRPayload = {
   type: 'custom',
   event: 'crx:runtime-reload',
+}
+
+export function getChangedFilePath(root: string, file?: string | null): string | null {
+  if (!file) return null
+
+  const normalizedRoot = normalize(root)
+  const normalizedFile = normalize(file)
+  const relativeFile = relative(normalizedRoot, normalizedFile)
+  if (!relativeFile || relativeFile.startsWith('..') || isAbsolute(relativeFile)) {
+    return null
+  }
+
+  return prefix('/', relativeFile)
+}
+
+function stripTimestamp(id: string) {
+  return id
+    .replace(/([?&])t=\d+&/, '$1')
+    .replace(/[?&]t=\d+$/, '')
+    .replace(/\?$/, '')
+}
+
+function escapeRegExp(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 export const pluginHMR: CrxPluginFn = () => {
@@ -96,19 +120,16 @@ export const pluginHMR: CrxPluginFn = () => {
       handleHotUpdate({ file, modules, server }) {
         const { root } = server.config
 
-        const changedFilePath = file
-          ? file.startsWith(root)
-            ? prefix('/', file.slice(root.length))
-            : null
-          : null
+        const changedFilePath = getChangedFilePath(root, file)
 
         const relFiles = new Set<string>()
         const fsFiles = new Set<string>()
         const virtualModules = new Set<string>()
 
         for (const m of modules) {
-          if (m.id?.startsWith(root)) {
-            relFiles.add(m.id.slice(server.config.root.length))
+          const relFile = getChangedFilePath(root, m.id)
+          if (relFile) {
+            relFiles.add(relFile)
           } else if (m.url?.startsWith('/@fs')) {
             fsFiles.add(m.url)
           } else if (
@@ -218,14 +239,14 @@ export const pluginHMR: CrxPluginFn = () => {
           _id !== '/@vite/client' &&
           code.includes('createHotContext')
         ) {
-          const id = _id.replace(/t=\d+&/, '')
-          const escaped = id.replace(/([?&.])/g, '\\$1')
-          // using lookahead and lookbehind
+          const id = stripTimestamp(_id)
+          const escaped = escapeRegExp(id)
           const regexp = new RegExp(
-            `(?<=createHotContext\\(")${escaped}(?="\\))`,
+            `(createHotContext\\(")${escaped}("\\))`,
+            'g',
           )
           const fileUrl = prefix('/', getFileName({ id, type }))
-          const replaced = code.replace(regexp, fileUrl)
+          const replaced = code.replace(regexp, `$1${fileUrl}$2`)
           return replaced
         } else {
           return code

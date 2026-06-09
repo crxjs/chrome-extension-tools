@@ -123,14 +123,16 @@ export function getOutputPath(server: ViteDevServer, fileName: string) {
 }
 
 /** Converts a script to the correct Vite URL */
-export function getViteUrl({ type, id }: FileWriterId) {
-  // { timestamp = false }: { timestamp?: boolean } = {},
-  // if (timestamp && !id.startsWith('/@') && !id.includes('?v=')) {
-  //   const t = `t=${Date.now()}` + (id.includes('?') ? '&' : '')
-  //   const parts = id.split('?')
-  //   parts[1] = typeof parts[1] === 'undefined' ? t : t + parts[1]
-  //   id = parts.join('?')
-  // }
+export function getViteUrl(
+  { type, id }: FileWriterId,
+  { timestamp = false }: { timestamp?: boolean } = {},
+) {
+  if (timestamp && !id.startsWith('/@') && !id.includes('?v=')) {
+    const t = `t=${Date.now()}` + (id.includes('?') ? '&' : '')
+    const parts = id.split('?')
+    parts[1] = typeof parts[1] === 'undefined' ? t : t + parts[1]
+    id = parts.join('?')
+  }
 
   if (type === 'asset') {
     // TODO: verify if assets need special handling
