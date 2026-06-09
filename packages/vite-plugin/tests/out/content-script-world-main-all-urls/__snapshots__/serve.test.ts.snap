@@ -12,19 +12,14 @@ Object {
         "src/content.js-loader.js",
       ],
       "matches": Array [
-        "https://example.com/*",
+        "<all_urls>",
       ],
       "world": "MAIN",
     },
   ],
-  "description": "test content script with world MAIN",
-  "externally_connectable": Object {
-    "matches": Array [
-      "https://example.com/*",
-    ],
-  },
+  "description": "test content script with world MAIN and all urls",
   "manifest_version": 3,
-  "name": "Test Content Script World Main",
+  "name": "Test Content Script World Main All URLs",
   "version": "1.0.0",
   "web_accessible_resources": Array [
     Object {
@@ -67,7 +62,7 @@ import 'http://localhost:3000/@crx/client-worker';
 `;
 
 exports[`serve fs output > src/content.js.js 1`] = `
-"console.log('content script running in MAIN world')
+"console.log('content script running in MAIN world on all urls')
 "
 `;
 

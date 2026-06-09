@@ -17,6 +17,9 @@ declare const __HMR_TIMEOUT__: number
 declare const __SERVER_PROTO__: string
 declare const __SERVER_PORT__: string
 declare const __LIVE_RELOAD__: boolean
+declare const __CRX_HMR_TOKEN__: string
+
+const crxClientPortName = `@crx/client:${__CRX_HMR_TOKEN__}`
 
 /* -------- REDIRECT FETCH TO THE DEV SERVER ------- */
 
@@ -71,8 +74,15 @@ async function sendToServer(req: Request): Promise<Response> {
 
 const ports = new Set<chrome.runtime.Port>()
 
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name === '@crx/client') {
+function isExternalSenderAllowed(port: chrome.runtime.Port) {
+  return !port.sender?.id || port.sender.id === chrome.runtime.id
+}
+
+function handlePort(port: chrome.runtime.Port, { external = false } = {}) {
+  if (
+    port.name === crxClientPortName &&
+    (!external || isExternalSenderAllowed(port))
+  ) {
     ports.add(port)
     port.onDisconnect.addListener((port) => {
       if (chrome.runtime.lastError) {
@@ -87,7 +97,12 @@ chrome.runtime.onConnect.addListener((port) => {
     })
     port.postMessage({ data: JSON.stringify({ type: 'connected' }) })
   }
-})
+}
+
+chrome.runtime.onConnect.addListener(handlePort)
+chrome.runtime.onConnectExternal.addListener((port) =>
+  handlePort(port, { external: true }),
+)
 
 function notifyContentScripts(payload: HMRPayload) {
   const data = JSON.stringify(payload)

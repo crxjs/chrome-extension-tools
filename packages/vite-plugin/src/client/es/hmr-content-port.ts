@@ -5,9 +5,31 @@ import type { HMRPayload } from 'vite'
 
 declare const __CRX_HMR_TIMEOUT__: number
 declare const __CRX_LIVE_RELOAD__: boolean
+declare const __CRX_HMR_TOKEN__: string
+
+const crxClientPortName = `@crx/client:${__CRX_HMR_TOKEN__}`
 
 function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
   return x.type === 'custom' && x.event.startsWith('crx:')
+}
+
+function getRuntime() {
+  return typeof chrome === 'undefined' ? undefined : chrome.runtime
+}
+
+function getExtensionId() {
+  return new URL(import.meta.url).host
+}
+
+function hasOwnExtensionRuntime(
+  runtime: typeof chrome.runtime,
+  extensionId: string,
+) {
+  try {
+    return new URL(runtime.getURL('')).host === extensionId
+  } catch {
+    return false
+  }
 }
 
 export class HMRPort {
@@ -39,8 +61,16 @@ export class HMRPort {
   }
 
   initPort = () => {
+    const runtime = getRuntime()
+    if (!runtime) throw new Error('[crx] chrome.runtime is not available')
+
+    const extensionId = getExtensionId()
+    const connectInfo = { name: crxClientPortName }
+
     this.port?.disconnect()
-    this.port = chrome.runtime.connect({ name: '@crx/client' })
+    this.port = hasOwnExtensionRuntime(runtime, extensionId)
+      ? runtime.connect(connectInfo)
+      : runtime.connect(extensionId, connectInfo)
     this.port.onDisconnect.addListener(this.handleDisconnect.bind(this))
     this.port.onMessage.addListener(this.handleMessage.bind(this))
     this.port.postMessage({ type: 'connected' })
