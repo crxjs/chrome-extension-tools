@@ -1,8 +1,11 @@
-import type { CorsOptions } from 'vite'
+import type { CorsOptions, UserConfig } from 'vite'
 import { expect, test } from 'vitest'
 import { addExtensionCors, pluginExtensionCors } from './plugin-extensionCors'
 
-type OriginFunction = Exclude<CorsOptions['origin'], string | RegExp | boolean | unknown[]>
+type OriginFunction = (
+  origin: string,
+  cb: (err: Error | null, origin?: boolean) => void,
+) => void
 
 function originAllows(origin: CorsOptions['origin'], value: string): boolean {
   if (origin === true) return true
@@ -16,10 +19,11 @@ function originAllows(origin: CorsOptions['origin'], value: string): boolean {
 
 function getOrigin(cors: CorsOptions | boolean): CorsOptions['origin'] {
   if (cors === true) return true
+  if (cors === false) return undefined
   return cors.origin
 }
 
-function checkOrigin(origin: OriginFunction, value?: string) {
+function checkOrigin(origin: OriginFunction, value: string) {
   return new Promise<boolean | undefined>((resolve, reject) => {
     origin(value, (err, allowed) => {
       if (err) reject(err)
@@ -28,7 +32,7 @@ function checkOrigin(origin: OriginFunction, value?: string) {
   })
 }
 
-async function runExtensionCorsConfig(config: { server?: { cors?: CorsOptions | boolean } }) {
+async function runExtensionCorsConfig(config: UserConfig) {
   const hook = pluginExtensionCors().config
 
   if (typeof hook !== 'function') {
@@ -82,7 +86,7 @@ test('preserves user cors origin functions', async () => {
 })
 
 test('plugin applies extension cors to dev server config', async () => {
-  const config = {}
+  const config: UserConfig = {}
 
   await runExtensionCorsConfig(config)
 
