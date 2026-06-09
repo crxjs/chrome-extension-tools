@@ -172,7 +172,11 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                       : false,
                   }
 
-                  if (isDynamicScript || !injectCss) {
+                  if (
+                    isDynamicScript ||
+                    !injectCss ||
+                    contentScripts.get(key)!.shadowDom
+                  ) {
                     resource.resources.push(...css)
                   }
 

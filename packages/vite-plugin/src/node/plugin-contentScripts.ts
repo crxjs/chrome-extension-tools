@@ -6,8 +6,10 @@ import {
   contentScripts,
   createDevLoader,
   createDevMainLoader,
+  createDevShadowLoader,
   createProLoader,
   createProMainLoader,
+  createProShadowLoader,
 } from './contentScripts'
 import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
@@ -111,18 +113,31 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 const client = add({ type: 'module', id: viteClientId })
 
                 const file = add({ type: 'module', id })
+
+                let loaderSource: string
+                if (worldMainIds.has(file.id)) {
+                  loaderSource = createDevMainLoader({
+                    fileName: `./${file.fileName.split('/').at(-1)}`,
+                  })
+                } else if (script.shadowDom) {
+                  loaderSource = createDevShadowLoader({
+                    preamble: preamble.fileName,
+                    client: client.fileName,
+                    fileName: file.fileName,
+                    shadowMode: script.shadowMode || 'open',
+                  })
+                } else {
+                  loaderSource = createDevLoader({
+                    preamble: preamble.fileName,
+                    client: client.fileName,
+                    fileName: file.fileName,
+                  })
+                }
+
                 const loader = add({
                   type: 'asset',
                   id: getFileName({ type: 'loader', id }),
-                  source: worldMainIds.has(file.id)
-                    ? createDevMainLoader({
-                        fileName: `./${file.fileName.split('/').at(-1)}`,
-                      })
-                    : createDevLoader({
-                        preamble: preamble.fileName,
-                        client: client.fileName,
-                        fileName: file.fileName,
-                      }),
+                  source: loaderSource,
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
@@ -213,27 +228,36 @@ export function finalizeBuildContentScripts(
       const bundleFileInfo = bundle[fileName]
       if (bundleFileInfo?.type !== 'chunk') continue
 
-      // the loader loads scripts asynchronously which in this case needlessly
-      // delays content script execution which may not be desired
-      const shouldUseLoader = !(
-        bundleFileInfo.imports.length === 0 &&
-        bundleFileInfo.dynamicImports.length === 0 &&
-        bundleFileInfo.exports.length === 0
-      )
+      // Keep shadow DOM scripts behind their loader so it can create the root
+      // and adopt CSS even when the content module has no exports.
+      const shouldUseLoader =
+        script.shadowDom ||
+        !(
+          bundleFileInfo.imports.length === 0 &&
+          bundleFileInfo.dynamicImports.length === 0 &&
+          bundleFileInfo.exports.length === 0
+        )
 
       if (shouldUseLoader) {
         if (typeof script.loaderName === 'undefined') {
+          const source = worldMainIds.has(script.id)
+            ? createProMainLoader({
+                fileName: `./${fileName.split('/').at(-1)}`,
+              })
+            : script.shadowDom
+            ? createProShadowLoader({
+                fileName,
+                shadowMode: script.shadowMode || 'open',
+              })
+            : createProLoader({ fileName })
+
           const refId = context.emitFile({
             type: 'asset',
             name: getFileName({
               type: 'loader',
               id: basename(script.id),
             }),
-            source: worldMainIds.has(script.id)
-              ? createProMainLoader({
-                  fileName: `./${fileName.split('/').at(-1)}`,
-                })
-              : createProLoader({ fileName }),
+            source,
           })
 
           script.loaderName = context.getFileName(refId)

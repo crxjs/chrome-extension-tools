@@ -2,7 +2,7 @@ import contentScript from './content?script'
 
 // This fixes `self`'s type.
 declare const self: ServiceWorkerGlobalScope
-export { }
+export {}
 
 chrome.runtime.onInstalled.addListener(async ({ reason }) => {
   if (reason === 'install') {
@@ -16,10 +16,12 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
       .catch(console.error)
       .then(() => {
         console.log('Content script registered successfully.')
-        
-        chrome.tabs.create({
-          url: 'https://example.com'
-        }).catch(console.error);
+
+        chrome.tabs
+          .create({
+            url: 'https://example.com',
+          })
+          .catch(console.error)
       })
   }
 })

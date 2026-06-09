@@ -206,6 +206,10 @@ export const pluginManifest: CrxPluginFn = () => {
           // Clear and register CSS entries for synthetic content scripts
           clearContentCssEntries()
 
+          // Get global shadow DOM options
+          const options = await getOptions(config as any)
+          const globalShadowDom = options?.contentScripts?.shadowDom
+
           // vite serve file writer only emits content scripts
           // - html files come directly from vite dev server
           // - service worker comes from vite dev server via loader file
@@ -217,6 +221,16 @@ export const pluginManifest: CrxPluginFn = () => {
                 matches = [],
               } = manifest.content_scripts[i]
 
+              // Resolve shadow DOM settings for this content script
+              const perScriptShadowDom = (manifest.content_scripts[i] as any)
+                .__crx_shadowDom
+              const shadowDomSetting = perScriptShadowDom ?? globalShadowDom
+              const shadowDom = !!shadowDomSetting
+              const shadowMode =
+                (typeof shadowDomSetting === 'object' &&
+                  shadowDomSetting?.mode) ||
+                'open'
+
               // Register synthetic CSS entry if there are CSS files
               if (css.length > 0) {
                 const cssEntry = registerContentCssEntry(i, css)
@@ -227,6 +241,8 @@ export const pluginManifest: CrxPluginFn = () => {
                     type: 'loader',
                     id: cssEntry.virtualId,
                     matches,
+                    shadowDom,
+                    shadowMode,
                     refId: hashScriptId({
                       type: 'loader',
                       id: cssEntry.virtualId,
@@ -247,6 +263,8 @@ export const pluginManifest: CrxPluginFn = () => {
                     type: 'loader',
                     id,
                     matches,
+                    shadowDom,
+                    shadowMode,
                     refId: hashScriptId({ type: 'loader', id }),
                     fileName: getFileName({ type: 'loader', id }),
                   }),
@@ -257,19 +275,31 @@ export const pluginManifest: CrxPluginFn = () => {
           // vite build emits content scripts, html files and service worker
           // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
           const opts = await getOptions({ plugins: config.plugins } as any)
-          const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
-            f.replace(/^\//, '')
-          )
-          const isStandaloneFile = (file: string) => {
-            const normalized = file.replace(/^\//, '')
-            return standaloneFiles.includes(normalized)
-          }
+          const buildGlobalShadowDom = opts.contentScripts?.shadowDom
+          const standaloneFiles = (
+            opts.contentScripts?.standaloneFiles || []
+          ).map((f: string) => f.replace(/^\//, ''))
+          const isStandaloneFile = (file: string) =>
+            standaloneFiles.includes(file.replace(/^\//, ''))
           if (manifest.content_scripts)
-            for (const { js = [], matches = [] } of manifest.content_scripts)
+            for (const script of manifest.content_scripts) {
+              const { js = [], css = [], matches = [] } = script
+
+              // Resolve shadow DOM settings for this content script
+              const perScriptShadowDom = (script as any).__crx_shadowDom
+              const shadowDomSetting =
+                perScriptShadowDom ?? buildGlobalShadowDom
+              const shadowDom = !!shadowDomSetting
+              const shadowMode =
+                (typeof shadowDomSetting === 'object' &&
+                  shadowDomSetting?.mode) ||
+                'open'
+
               for (const file of js) {
                 // Skip IIFE/standalone content scripts - they're built separately
-                if (isIifeContentScript(file) || isStandaloneFile(file)) continue
-                
+                if (isIifeContentScript(file) || isStandaloneFile(file))
+                  continue
+
                 const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
@@ -286,9 +316,13 @@ export const pluginManifest: CrxPluginFn = () => {
                     id: file,
                     refId,
                     matches,
+                    css,
+                    shadowDom,
+                    shadowMode,
                   }),
                 )
               }
+            }
 
           if (manifest.background && 'service_worker' in manifest.background) {
             const file = manifest.background.service_worker
@@ -386,7 +420,8 @@ export const pluginManifest: CrxPluginFn = () => {
               return {
                 js: js.map((id) => {
                   const script =
-                    contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                    contentScripts.get(id) ??
+                    contentScripts.get(prefix('/', id))
                   const fileName = script?.loaderName ?? script?.fileName
                   if (typeof fileName === 'undefined')
                     throw new Error(
@@ -500,6 +535,13 @@ Public dir: "${config.publicDir}"`,
         }
 
         /* -------------- OUTPUT MANIFEST FILE ------------- */
+
+        // Strip internal __crx_shadowDom fields from manifest output
+        if (manifest.content_scripts) {
+          for (const script of manifest.content_scripts) {
+            delete (script as any).__crx_shadowDom
+          }
+        }
 
         // overwrite vite manifest.json after render hooks
         const manifestJson = bundle['manifest.json'] as OutputAsset

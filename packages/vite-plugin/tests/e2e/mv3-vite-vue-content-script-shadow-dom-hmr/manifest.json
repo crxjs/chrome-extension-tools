@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Vite Vue Shadow DOM HMR",
+  "version": "0.0.1",
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/main.js"]
+    }
+  ]
+}

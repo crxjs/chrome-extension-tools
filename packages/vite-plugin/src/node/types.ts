@@ -85,22 +85,22 @@ export interface CrxOptions {
     hmrTimeout?: number
     injectCss?: boolean
     /**
+     * Enable shadow DOM isolation for content scripts. When true, uses 'open'
+     * mode.
+     */
+    shadowDom?: boolean | { mode?: 'open' | 'closed' }
+    /**
      * List of content script files (relative to project root) that should be
      * built as standalone IIFE bundles (self-contained, no loader, all imports
      * inlined). This allows using normal filenames (without the `.iife.*`
      * convention) for IIFE content scripts, e.g. for `world: 'MAIN'` or to
      * avoid loader overhead.
      *
-     * The files must still be listed in `manifest.content_scripts` (or used
-     * via `?script` / `?iife`).
+     * The files must still be listed in `manifest.content_scripts` (or used via
+     * `?script` / `?iife`).
      *
-     * Example:
-     *   crx({
-     *     manifest,
-     *     contentScripts: {
-     *       standaloneFiles: ['src/injected.ts', 'src/another.js']
-     *     }
-     *   })
+     * Example: crx({ manifest, contentScripts: { standaloneFiles:
+     * ['src/injected.ts', 'src/another.js'] } })
      */
     standaloneFiles?: string[]
   }
