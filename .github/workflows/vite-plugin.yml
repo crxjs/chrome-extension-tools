@@ -50,6 +50,9 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      - name: Check package type exports
+        run: pnpm lint:attw
+
   unit-output:
     name: Unit & Output Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

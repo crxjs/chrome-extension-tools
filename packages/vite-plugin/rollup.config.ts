@@ -119,6 +119,11 @@ const config = defineConfig([
     output: { file: 'dist/index.d.ts', format: 'es' },
     plugins: [dts()],
   },
+  {
+    input: 'src/node/index.ts',
+    output: { file: 'dist/index.d.mts', format: 'es' },
+    plugins: [dts()],
+  },
 ])
 
 export default config
