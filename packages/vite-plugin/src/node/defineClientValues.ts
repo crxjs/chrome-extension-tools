@@ -34,7 +34,6 @@ export function defineClientValues(
       .replace(`__MODE__`, JSON.stringify(config.mode))
       .replace(`__BASE__`, JSON.stringify(config.base))
       .replace(`__DEFINES__`, serializeDefine(config.define || {}))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .replace(`__HMR_TOKEN__`, JSON.stringify(config.webSocketToken || ''))
       .replace(`__HMR_PROTOCOL__`, JSON.stringify(protocol))
       .replace(`__HMR_HOSTNAME__`, JSON.stringify(host))

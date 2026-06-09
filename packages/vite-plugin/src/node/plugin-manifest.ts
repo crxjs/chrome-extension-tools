@@ -3,7 +3,7 @@ import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ResolvedConfig, version as ViteVersion } from 'vite'
+import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
@@ -256,7 +256,7 @@ export const pluginManifest: CrxPluginFn = () => {
         } else {
           // vite build emits content scripts, html files and service worker
           // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
-          const opts = await getOptions({ plugins: config.plugins } as any)
+          const opts = await getOptions({ plugins: config.plugins } as UserConfig)
           const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
             f.replace(/^\//, '')
           )
