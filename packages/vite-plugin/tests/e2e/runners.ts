@@ -86,7 +86,9 @@ export async function build(dirname: string) {
 }
 
 export async function serve(dirname: string) {
-  const { outDir, server, config } = await _serve(dirname)
+  const { outDir, server, config } = await _serve(dirname, {
+    waitForOutDir: false,
+  })
 
   await allFilesSuccess()
 

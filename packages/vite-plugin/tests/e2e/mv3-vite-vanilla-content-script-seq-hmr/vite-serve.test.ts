@@ -31,12 +31,13 @@ test('crx page update on hmr', async () => {
   const root = page.locator('#root')
   const h1 = root.locator('h1')
   const h2 = root.locator('h2')
+  const waitForRoot = () => root.waitFor({ timeout: 5_000 })
 
   {
     // load page for the first time
     await page.goto('https://example.com')
     await waitForText('first')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
 
     const text = await root.textContent()
     expect(text).toMatch('first')
@@ -48,7 +49,7 @@ test('crx page update on hmr', async () => {
     // update c1.ts -> simple update
     await update('c1.ts')
     await waitForText('c1-1')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
     await h1.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()
@@ -61,7 +62,7 @@ test('crx page update on hmr', async () => {
     // update root file -> update w/ timestamp
     await update('root.ts')
     await waitForText('c1-1')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
     await h1.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()
@@ -74,7 +75,7 @@ test('crx page update on hmr', async () => {
     // update a.ts -> simple update
     await update('a.ts')
     await waitForText('c1-1')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
     await h2.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()
@@ -87,7 +88,7 @@ test('crx page update on hmr', async () => {
     // revert root file -> update w/ timestamp
     await update('root.ts', src1)
     await waitForText('c1-1')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
     await h2.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()
@@ -100,7 +101,7 @@ test('crx page update on hmr', async () => {
     // revert a.ts file -> simple update
     await update('a.ts', src1)
     await waitForText('c1-1')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
     await h1.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()
@@ -113,7 +114,7 @@ test('crx page update on hmr', async () => {
     // update c2.ts file -> simple update
     await update('c2.ts')
     await waitForText('c2-1')
-    await root.waitFor({ timeout: 100 })
+    await waitForRoot()
     await h1.waitFor({ timeout: 15_000 })
 
     const text = await root.textContent()

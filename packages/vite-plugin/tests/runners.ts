@@ -1,6 +1,16 @@
+import { watch } from 'chokidar'
 import fs from 'fs-extra'
 import { join } from 'pathe'
 import { RollupOutput, RollupWatcher } from 'rollup'
+import {
+  delay,
+  firstValueFrom,
+  fromEvent,
+  map,
+  of,
+  startWith,
+  switchMap,
+} from 'rxjs'
 import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
 import type { CrxPlugin } from 'src/types'
@@ -27,6 +37,10 @@ export interface ServeTestResult {
   server: ViteDevServer
   outDir: string
   rootDir: string
+}
+
+interface ServeTestOptions {
+  waitForOutDir?: boolean
 }
 
 let server: ViteDevServer | undefined
@@ -104,7 +118,30 @@ export async function build(
   return { command: 'build', outDir, output, config: config!, rootDir: dirname }
 }
 
-export async function serve(dirname: string): Promise<ServeTestResult> {
+async function waitForOutDir(outDir: string) {
+  const watcher = watch(outDir)
+  const outDirSettle$ = fromEvent(
+    watcher as unknown as NodeJS.EventEmitter,
+    'all',
+  ).pipe(
+    startWith(null),
+    map((x, i) => i),
+    // debounce relies on the Date object
+    switchMap((i) => of(i).pipe(delay(500))),
+  )
+
+  try {
+    // watch for activity on outDir to settle, Vite may be pre-bundling
+    await firstValueFrom(outDirSettle$)
+  } finally {
+    await watcher.close()
+  }
+}
+
+export async function serve(
+  dirname: string,
+  { waitForOutDir: shouldWaitForOutDir = true }: ServeTestOptions = {},
+): Promise<ServeTestResult> {
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 
@@ -154,6 +191,8 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   debug('listen')
   await allFilesReady()
   debug('bundle end')
+
+  if (shouldWaitForOutDir) await waitForOutDir(outDir)
 
   return {
     command: 'serve',
