@@ -1,36 +1,41 @@
 # @crxjs/vite-plugin
 
-## 2.4.0
+## 2.5.0
 
 ### Minor Changes
 
-- 315fce9: feat: add HMR support for CSS declared in manifest content_scripts
-- 88a9825: add: browser_specific_settings.gecko properties
-- c359ae4: Fix "TypeError: plugins is not iterable" error when using
+- 4756baf: feat: add HMR support for CSS declared in manifest content_scripts
+- 4756baf: add: browser_specific_settings.gecko properties
+- 4756baf: Fix "TypeError: plugins is not iterable" error when using
   rolldown-vite (Vite 7).
 
   In rolldown-vite, the buildStart hook doesn't receive options.plugins. This
   fix uses the configResolved hook to get plugins from the resolved config, with
   buildStart kept as a fallback for older Vite versions.
 
-- 98d53a4: Fixed
+- 4756baf: Fixed
   [#852](https://github.com/crxjs/chrome-extension-tools/issues/852), the plugin
   now emits a correct URL in `service-worker-loader.js` when the Vite option
   `server.https` is enabled.
-- a37a88f: fix: resolve TypeScript types correctly for ESM and CJS consumers
-- c1dde11: feat: add Vite 8 beta support
+- 4756baf: fix: resolve TypeScript types correctly for ESM and CJS consumers
+- 4756baf: feat: add Vite 8 beta support
 
 ### Patch Changes
 
-- edad84b: fix: copy CSS files declared in manifest content_scripts to output
-- 11d030a: Replace cheerio with node-html-parser to fix npm deprecation warning
+- 4756baf: ci: migrate release workflow to npm trusted publishers
+- 570312a: fix: sanitize colons from output filenames on Windows
+- 4756baf: fix: copy CSS files declared in manifest content_scripts to output
+- 4756baf: Replace cheerio with node-html-parser to fix npm deprecation warning
   for whatwg-encoding.
 
   Also adds explicit vite peerDependency declaration (^3.0.0 through ^7.0.0) to
   enable proper version resolution when used with different vite versions.
 
-- 5fa8e0e: fix: UnoCSS/TailwindCSS HMR issues with virtual CSS modules
-- 0ce086d: fix: respect user's build.manifest setting in Vite 4+
+- 4756baf: ci: run compat tests against stable Vite 8, make the vite8 available
+  as a peer dependency
+- 4756baf: fix: UnoCSS/TailwindCSS HMR issues with virtual CSS modules
+- 8a99b4f: made data_collection_permissions optional
+- 4756baf: fix: respect user's build.manifest setting in Vite 4+
 
   When users set `build.manifest: false` in their Vite config, the Vite manifest
   file (`.vite/manifest.json` in Vite 5+, or `manifest.json` in older versions)
@@ -44,7 +49,8 @@
 
   Closes #1077
 
-- 759c0df: feat(client): Update the style and content of the development mode
+- d364bd8: chore: upgrade chokidar to 5.0.0
+- 4756baf: feat(client): Update the style and content of the development mode
   loading page
 
 ## 2.3.0

@@ -22,10 +22,11 @@
     "play:svelte": "pnpm -C playgrounds/svelte run dev",
     "play:vanilla": "pnpm -C playgrounds/vanilla run dev",
     "play:vue": "pnpm -C playgrounds/vue run dev",
-    "release": "pnpm --filter \"*plugin*\" build && changeset publish"
+    "release": "pnpm --filter \"*plugin*\" build && changeset publish",
+    "release:vite-plugin": "cd ./packages/vite-plugin && pnpm release"
   },
   "dependencies": {
-    "@changesets/cli": "^2.22.0",
+    "@changesets/cli": "^2.30.0",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
     "eslint": "9.26.0",
@@ -40,7 +41,8 @@
     "node": ">=14"
   },
   "devDependencies": {
-    "vitest": "0.24.3"
+    "bumpp": "^11.0.1",
+    "vitest": "0.34.6"
   },
   "pnpm": {
     "peerDependencyRules": {

@@ -286,7 +286,7 @@ export interface ManifestV3 {
             strict_min_version?: string | undefined
             strict_max_version?: string | undefined
             update_url?: string | undefined
-            data_collection_permissions: {
+            data_collection_permissions?: {
               /**
                * available value: "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "none".
                * see also: https://extensionworkshop.com/documentation/develop/firefox-builtin-data-consent/

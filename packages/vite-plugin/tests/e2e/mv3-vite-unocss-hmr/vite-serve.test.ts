@@ -1,9 +1,9 @@
 import fs from 'fs-extra'
 import path from 'pathe'
-import { expect, test } from 'vitest'
-import { createUpdate } from '../helpers'
-import { serve } from '../runners'
 import { allFilesReady } from 'src/fileWriter-rxjs'
+import { expect, test } from 'vitest'
+import { createUpdate, waitForFileContent } from '../helpers'
+import { serve } from '../runners'
 
 /**
  * This test verifies that UnoCSS virtual CSS modules are properly updated
@@ -67,14 +67,10 @@ test(
     // Wait for all files to be written after HMR update
     await allFilesReady()
 
-    // Wait for the file to be updated - need to wait for async write to complete
-    // Poll the file until it contains the updated CSS or timeout
-    let updatedCss = ''
-    for (let i = 0; i < 50; i++) {
-      await new Promise((r) => setTimeout(r, 100))
-      updatedCss = await fs.readFile(unoCssFile!, 'utf-8')
-      if (updatedCss.includes('bg-green')) break
-    }
+    const updatedCss = await waitForFileContent(
+      unoCssFile!,
+      (content) => content.includes('bg-green'),
+    )
 
     // The CSS should now contain the new green background class
     // This is the key assertion - verifies HMR updated the virtual CSS file
