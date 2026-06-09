@@ -1,16 +1,6 @@
-import { watch } from 'chokidar'
 import fs from 'fs-extra'
 import { join } from 'pathe'
 import { RollupOutput, RollupWatcher } from 'rollup'
-import {
-  delay,
-  firstValueFrom,
-  fromEvent,
-  map,
-  of,
-  startWith,
-  switchMap,
-} from 'rxjs'
 import { allFilesReady, crx } from 'src/.'
 import { _debug } from 'src/helpers'
 import type { CrxPlugin } from 'src/types'
@@ -65,23 +55,24 @@ export async function build(
   await fs.remove(outDir)
 
   const plugins: CrxPlugin[] = [
-      // @ts-expect-error we're going to override this from the vite config
-      crx(null),
-      {
-        name: 'test:get-config',
-        configResolved(_config) {
-          config = _config;
-        },
+    // @ts-expect-error we're going to override this from the vite config
+    crx(null),
+    {
+      name: 'test:get-config',
+      configResolved(_config) {
+        config = _config
       },
-  ];
+    },
+  ]
 
   if (process.env.DEBUG) {
-    plugins.push(inspect({
-      build: true,
-      outputDir: '.vite-inspect'
-    }));
+    plugins.push(
+      inspect({
+        build: true,
+        outputDir: '.vite-inspect',
+      }),
+    )
   }
-
 
   let config: ResolvedConfig
   const inlineConfig: InlineConfig = {
@@ -163,16 +154,6 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   debug('listen')
   await allFilesReady()
   debug('bundle end')
-
-  const outDirSettle$ = fromEvent(watch(outDir) as unknown as NodeJS.EventEmitter, 'all').pipe(
-    startWith(null),
-    map((x, i) => i),
-    // debounce relies on the Date object
-    switchMap((i) => of(i).pipe(delay(500))),
-  )
-
-  // watch for activity on outDir to settle, Vite may be pre-bundling
-  await firstValueFrom(outDirSettle$)
 
   return {
     command: 'serve',
