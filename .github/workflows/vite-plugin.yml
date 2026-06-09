@@ -136,11 +136,29 @@ jobs:
       - name: Verify Vite version
         run: echo "Testing with Vite $(pnpm exec vite --version)"
 
+      - name: Setup Xvfb
+        if: runner.os == 'Linux'
+        run: |
+          if ! command -v Xvfb >/dev/null || ! command -v xdpyinfo >/dev/null; then
+            sudo apt-get install -y xvfb x11-xserver-utils
+          fi
+
+          display=:99
+          nohup Xvfb "$display" -screen 0 1280x720x24 > "$RUNNER_TEMP/xvfb.log" 2>&1 &
+
+          for _ in {1..20}; do
+            if xdpyinfo -display "$display" >/dev/null 2>&1; then
+              echo "DISPLAY=$display" >> "$GITHUB_ENV"
+              exit 0
+            fi
+            sleep 0.5
+          done
+
+          cat "$RUNNER_TEMP/xvfb.log"
+          exit 1
+
       - name: Run e2e tests
-        uses: coactions/setup-xvfb@v1
-        with:
-          run: pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
-          working-directory: packages/vite-plugin
+        run: pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
 
       - uses: actions/upload-artifact@v4
         if: failure()
