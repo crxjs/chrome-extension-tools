@@ -137,7 +137,7 @@
     "unocss": "^66.5.12",
     "vite": "^3.2.11",
     "vite-plugin-inspect": "0.7.25",
-    "vitest": "0.34.6",
+    "vitest": "3.2.6",
     "vue": "3.2.47"
   },
   "peerDependencies": {
