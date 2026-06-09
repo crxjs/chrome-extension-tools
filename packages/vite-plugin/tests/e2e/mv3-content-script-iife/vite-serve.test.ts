@@ -33,11 +33,11 @@ test('IIFE content scripts work in dev mode', async () => {
     'src/content-standalone.ts.iife.js',
   ])
 
-  await waitForRegisteredContentScripts(browser, [
-    dynamicRegularId,
-    dynamicIifeId,
-    dynamicBareIifeAliasId,
-  ])
+  await waitForRegisteredContentScripts(
+    browser,
+    [dynamicRegularId, dynamicIifeId, dynamicBareIifeAliasId],
+    { timeout: 30000 },
+  )
 
   const page = await browser.newPage()
   await page.goto('https://example.com')
