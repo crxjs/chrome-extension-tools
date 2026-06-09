@@ -39,6 +39,10 @@ export interface ServeTestResult {
   rootDir: string
 }
 
+interface ServeTestOptions {
+  waitForOutDir?: boolean
+}
+
 let server: ViteDevServer | undefined
 
 afterEach(async () => {
@@ -65,23 +69,24 @@ export async function build(
   await fs.remove(outDir)
 
   const plugins: CrxPlugin[] = [
-      // @ts-expect-error we're going to override this from the vite config
-      crx(null),
-      {
-        name: 'test:get-config',
-        configResolved(_config) {
-          config = _config;
-        },
+    // @ts-expect-error we're going to override this from the vite config
+    crx(null),
+    {
+      name: 'test:get-config',
+      configResolved(_config) {
+        config = _config
       },
-  ];
+    },
+  ]
 
   if (process.env.DEBUG) {
-    plugins.push(inspect({
-      build: true,
-      outputDir: '.vite-inspect'
-    }));
+    plugins.push(
+      inspect({
+        build: true,
+        outputDir: '.vite-inspect',
+      }),
+    )
   }
-
 
   let config: ResolvedConfig
   const inlineConfig: InlineConfig = {
@@ -113,7 +118,30 @@ export async function build(
   return { command: 'build', outDir, output, config: config!, rootDir: dirname }
 }
 
-export async function serve(dirname: string): Promise<ServeTestResult> {
+async function waitForOutDir(outDir: string) {
+  const watcher = watch(outDir)
+  const outDirSettle$ = fromEvent(
+    watcher as unknown as NodeJS.EventEmitter,
+    'all',
+  ).pipe(
+    startWith(null),
+    map((x, i) => i),
+    // debounce relies on the Date object
+    switchMap((i) => of(i).pipe(delay(500))),
+  )
+
+  try {
+    // watch for activity on outDir to settle, Vite may be pre-bundling
+    await firstValueFrom(outDirSettle$)
+  } finally {
+    await watcher.close()
+  }
+}
+
+export async function serve(
+  dirname: string,
+  { waitForOutDir: shouldWaitForOutDir = true }: ServeTestOptions = {},
+): Promise<ServeTestResult> {
   const debug = _debug('test:serve')
   debug('start %s', dirname)
 
@@ -161,15 +189,7 @@ export async function serve(dirname: string): Promise<ServeTestResult> {
   await allFilesReady()
   debug('bundle end')
 
-  const outDirSettle$ = fromEvent(watch(outDir) as unknown as NodeJS.EventEmitter, 'all').pipe(
-    startWith(null),
-    map((x, i) => i),
-    // debounce relies on the Date object
-    switchMap((i) => of(i).pipe(delay(500))),
-  )
-
-  // watch for activity on outDir to settle, Vite may be pre-bundling
-  await firstValueFrom(outDirSettle$)
+  if (shouldWaitForOutDir) await waitForOutDir(outDir)
 
   return {
     command: 'serve',
