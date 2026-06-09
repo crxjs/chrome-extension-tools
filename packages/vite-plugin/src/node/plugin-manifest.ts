@@ -17,6 +17,8 @@ import {
   getContentCssEntries,
   registerContentCssEntry,
 } from './plugin-contentScripts_declared'
+import { finalizeBuildContentScripts } from './plugin-contentScripts'
+import { isIifeContentScript } from './plugin-contentScripts_iife'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
 
@@ -253,14 +255,29 @@ export const pluginManifest: CrxPluginFn = () => {
             }
         } else {
           // vite build emits content scripts, html files and service worker
+          // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
+          const opts = await getOptions({ plugins: config.plugins } as any)
+          const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
+            f.replace(/^\//, '')
+          )
+          const isStandaloneFile = (file: string) => {
+            const normalized = file.replace(/^\//, '')
+            return standaloneFiles.includes(normalized)
+          }
           if (manifest.content_scripts)
             for (const { js = [], matches = [] } of manifest.content_scripts)
               for (const file of js) {
+                // Skip IIFE/standalone content scripts - they're built separately
+                if (isIifeContentScript(file) || isStandaloneFile(file)) continue
+                
                 const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
                   id,
                   name: basename(file),
+                  // Preserve content script entry exports so the build finalizer
+                  // can decide whether the script needs a loader wrapper.
+                  preserveSignature: 'exports-only',
                 })
                 contentScripts.set(
                   file,
@@ -345,6 +362,8 @@ export const pluginManifest: CrxPluginFn = () => {
             }
           }
         } else {
+          finalizeBuildContentScripts(this, bundle)
+
           // transform hook emits files and replaces in manifest with ref ids
           // update background service worker filename from ref
           // service worker not emitted during development, so don't update file name
@@ -366,7 +385,8 @@ export const pluginManifest: CrxPluginFn = () => {
             ({ js = [], ...rest }) => {
               return {
                 js: js.map((id) => {
-                  const script = contentScripts.get(id)
+                  const script =
+                    contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
                   const fileName = script?.loaderName ?? script?.fileName
                   if (typeof fileName === 'undefined')
                     throw new Error(

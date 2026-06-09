@@ -1,5 +1,6 @@
 import contentHmrPort from 'client/es/hmr-content-port.ts'
 import { filter, Subscription } from 'rxjs'
+import type { OutputBundle, PluginContext } from 'rollup'
 import { ConfigEnv, UserConfig, ViteDevServer } from 'vite'
 import {
   contentScripts,
@@ -35,6 +36,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let server: ViteDevServer
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
+  let liveReload = true
   let sub = new Subscription()
 
   const worldMainIds = new Set<string>()
@@ -70,9 +72,11 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'serve',
       async config(config, env) {
         await findWorldMainIds(config, env)
-        const { contentScripts = {} } = await getOptions(config)
+        const opts = await getOptions(config)
+        const { contentScripts = {} } = opts
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
+        liveReload = opts.liveReload !== false
       },
       async configureServer(_server) {
         server = _server
@@ -122,7 +126,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 })
                 script.fileName = loader.fileName
               } else if (type === 'iife') {
-                throw new Error('IIFE content scripts are not implemented')
+                const file = add({ type: 'iife', id })
+                script.fileName = file.fileName
               } else {
                 const file = add({ type: 'module', id })
                 script.fileName = file.fileName
@@ -141,10 +146,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
         }
 
         if (id === contentHmrPortId) {
-          const defined = contentHmrPort.replace(
-            '__CRX_HMR_TIMEOUT__',
-            JSON.stringify(hmrTimeout),
-          )
+          const defined = contentHmrPort
+            .replace('__CRX_HMR_TIMEOUT__', JSON.stringify(hmrTimeout))
+            .replace('__CRX_LIVE_RELOAD__', JSON.stringify(liveReload))
           return defined
         }
       },
@@ -175,58 +179,85 @@ export const pluginContentScripts: CrxPluginFn = () => {
         }
       },
       generateBundle(_options, bundle) {
-        // emit content script loaders
-        for (const [key, script] of contentScripts)
-          if (key === script.refId) {
-            if (script.type === 'module') {
-              const fileName = this.getFileName(script.refId)
-              script.fileName = fileName
-            } else if (script.type === 'loader') {
-              const fileName = this.getFileName(script.refId)
-              script.fileName = fileName
-
-              const bundleFileInfo = bundle[fileName]
-              // the loader loads scripts asynchronously which in this case needlessly
-              // delays content script execution which may not be desired
-              const shouldUseLoader = !(
-                bundleFileInfo.type === 'chunk' &&
-                bundleFileInfo.imports.length === 0 &&
-                bundleFileInfo.dynamicImports.length === 0 &&
-                bundleFileInfo.exports.length === 0
-              )
-
-              if (shouldUseLoader) {
-                const refId = this.emitFile({
-                  type: 'asset',
-                  name: getFileName({
-                    type: 'loader',
-                    id: basename(script.id),
-                  }),
-                  source: worldMainIds.has(script.id)
-                    ? createProMainLoader({
-                        fileName: `./${fileName.split('/').at(-1)}`,
-                      })
-                    : createProLoader({ fileName }),
-                })
-
-                script.loaderName = this.getFileName(refId)
-              } else {
-                // make sure the code is wrapped in a function invocation
-                // to have the same scope isolation as the loader provides
-                //
-                // note that loaders may also call an `onExecute` function
-                // if exported by the content script, but given we
-                // require content scripts in this branch to have no exports
-                // there is obviously no need to handle onExecute() here
-                bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()\n`
-              }
-            } else if (script.type === 'iife') {
-              throw new Error('IIFE content scripts are not implemented')
-            }
-            // trigger update for other key values
-            contentScripts.set(script.refId, formatFileData(script))
-          }
+        finalizeBuildContentScripts(this, bundle, worldMainIds)
       },
     },
   ]
+}
+
+/**
+ * Resolve build-time content script filenames and emit production loaders.
+ *
+ * This is intentionally idempotent. It can run from both `crx:content-scripts`
+ * and `crx:manifest` because dynamic script placeholders and manifest filename
+ * replacement happen in different post-build hooks across Vite versions.
+ */
+export function finalizeBuildContentScripts(
+  context: Pick<PluginContext, 'emitFile' | 'getFileName'>,
+  bundle: OutputBundle,
+  worldMainIds = new Set<string>(),
+) {
+  const processed = new Set<object>()
+
+  // emit content script loaders
+  for (const [key, script] of contentScripts) {
+    if (key !== script.refId || processed.has(script)) continue
+    processed.add(script)
+
+    if (script.type === 'module') {
+      script.fileName = script.fileName ?? context.getFileName(script.refId)
+    } else if (script.type === 'loader') {
+      const fileName = script.fileName ?? context.getFileName(script.refId)
+      script.fileName = fileName
+
+      const bundleFileInfo = bundle[fileName]
+      if (bundleFileInfo?.type !== 'chunk') continue
+
+      // the loader loads scripts asynchronously which in this case needlessly
+      // delays content script execution which may not be desired
+      const shouldUseLoader = !(
+        bundleFileInfo.imports.length === 0 &&
+        bundleFileInfo.dynamicImports.length === 0 &&
+        bundleFileInfo.exports.length === 0
+      )
+
+      if (shouldUseLoader) {
+        if (typeof script.loaderName === 'undefined') {
+          const refId = context.emitFile({
+            type: 'asset',
+            name: getFileName({
+              type: 'loader',
+              id: basename(script.id),
+            }),
+            source: worldMainIds.has(script.id)
+              ? createProMainLoader({
+                  fileName: `./${fileName.split('/').at(-1)}`,
+                })
+              : createProLoader({ fileName }),
+          })
+
+          script.loaderName = context.getFileName(refId)
+        }
+      } else if (
+        typeof script.loaderName === 'undefined' &&
+        !bundleFileInfo.code.startsWith('(function(){')
+      ) {
+        // make sure the code is wrapped in a function invocation
+        // to have the same scope isolation as the loader provides
+        //
+        // note that loaders may also call an `onExecute` function
+        // if exported by the content script, but given we
+        // require content scripts in this branch to have no exports
+        // there is obviously no need to handle onExecute() here
+        bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()\n`
+      }
+    } else if (script.type === 'iife') {
+      // IIFE scripts are handled by plugin-contentScripts_iife
+      // Skip processing here - the IIFE plugin builds and emits them
+      continue
+    }
+
+    // trigger update for other key values
+    contentScripts.set(script.refId, formatFileData(script))
+  }
 }
