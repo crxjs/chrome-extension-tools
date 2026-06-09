@@ -1,6 +1,6 @@
 import type { CorsOptions } from 'vite'
 import { expect, test } from 'vitest'
-import { addExtensionCors } from './extensionCors'
+import { addExtensionCors, pluginExtensionCors } from './extensionCors'
 
 type OriginFunction = Exclude<CorsOptions['origin'], string | RegExp | boolean | unknown[]>
 
@@ -25,6 +25,19 @@ function checkOrigin(origin: OriginFunction, value?: string) {
       if (err) reject(err)
       else resolve(allowed)
     })
+  })
+}
+
+async function runExtensionCorsConfig(config: { server?: { cors?: CorsOptions | boolean } }) {
+  const hook = pluginExtensionCors().config
+
+  if (typeof hook !== 'function') {
+    throw new Error('Unable to find extension CORS config hook')
+  }
+
+  await hook(config, {
+    command: 'serve',
+    mode: 'development',
   })
 }
 
@@ -66,4 +79,13 @@ test('preserves user cors origin functions', async () => {
   await expect(checkOrigin(origin, 'https://blocked.example')).resolves.toBe(
     false,
   )
+})
+
+test('plugin applies extension cors to dev server config', async () => {
+  const config = {}
+
+  await runExtensionCorsConfig(config)
+
+  const origin = getOrigin(config.server!.cors!)
+  expect(originAllows(origin, 'chrome-extension://extension-id')).toBe(true)
 })

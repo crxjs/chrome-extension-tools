@@ -2,6 +2,7 @@ import type { PluginOption } from 'vite'
 import type { ManifestV3Export } from './defineManifest'
 import { pluginOptionsProvider } from './plugin-optionsProvider'
 import { pluginBackground } from './plugin-background'
+import { pluginExtensionCors } from './extensionCors'
 import { pluginContentScripts } from './plugin-contentScripts'
 import { pluginContentScriptsCss } from './plugin-contentScripts_css'
 import { pluginDeclaredContentScripts } from './plugin-contentScripts_declared'
@@ -26,6 +27,7 @@ export const crx = (
   contentScripts.clear()
   return [
     pluginOptionsProvider(options),
+    pluginExtensionCors(),
     pluginContentScriptsIife(), // Must come early so isIifeModeEnabled is set before manifest plugin
     pluginBackground(),
     pluginContentScripts(),

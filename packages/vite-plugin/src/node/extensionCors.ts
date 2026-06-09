@@ -1,4 +1,4 @@
-import type { CorsOptions } from 'vite'
+import type { CorsOptions, Plugin } from 'vite'
 
 const extensionOrigins = [/^chrome-extension:\/\//, /^moz-extension:\/\//]
 
@@ -41,4 +41,20 @@ export function addExtensionCors(
   }
 
   return { origin: extensionOrigins }
+}
+
+export function pluginExtensionCors(): Plugin {
+  return {
+    name: 'crx:extension-cors',
+    apply: 'serve',
+    config(config) {
+      // Vite's dev-server CORS default was tightened in patched releases
+      // (4.5.6, 5.4.12, 6.0.9+). Extension pages still need access to
+      // dev-server files; WebSocket HMR tokens do not cover fetch CORS.
+      config.server = {
+        ...config.server,
+        cors: addExtensionCors(config.server?.cors),
+      }
+    },
+  }
 }
