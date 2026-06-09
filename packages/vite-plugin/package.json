@@ -28,7 +28,7 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
+        "types": "./dist/index.d.mts",
         "default": "./dist/index.mjs"
       },
       "require": {
@@ -62,6 +62,8 @@
     "dev:js": "npm run build:js -- -w",
     "dev:lint": "tsc --noEmit --watch",
     "lint": "run-s lint:eslint lint:types",
+    "lint:attw": "run-s build lint:attw:check",
+    "lint:attw:check": "attw --pack --entrypoints . .",
     "lint:eslint": "eslint \"{src,test}/**/*.ts\"",
     "lint:types": "tsc --noEmit",
     "test": "vitest --mode unit",
@@ -91,6 +93,7 @@
     "rxjs": "7.5.7"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.3",
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
     "@rollup/plugin-alias": "4.0.4",
