@@ -76,7 +76,6 @@ export async function expectRegisteredDynamicScript(
     matches: ['https://example.com/*'],
     runAt: 'document_start',
     world: 'MAIN',
-    persistAcrossSessions: false,
   })
 
   const [scriptPath] = script.js ?? []

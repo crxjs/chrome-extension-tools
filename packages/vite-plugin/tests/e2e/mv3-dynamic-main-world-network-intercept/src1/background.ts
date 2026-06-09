@@ -7,7 +7,6 @@ const script: chrome.scripting.RegisteredContentScript = {
   js: [interceptorSrc],
   runAt: 'document_start',
   world: 'MAIN',
-  persistAcrossSessions: false,
 }
 
 async function registerScript() {
