@@ -72,6 +72,9 @@
     "test:run:compat": "vitest --run --mode compat",
     "test:run:out": "vitest --run --mode out",
     "test:run:e2e": "vitest --run --mode e2e",
+    "test:vite-matrix": "node scripts/run-vite-matrix.mjs",
+    "test:vite-matrix:compat": "node scripts/run-vite-matrix.mjs --mode compat",
+    "test:vite-matrix:e2e": "node scripts/run-vite-matrix.mjs --mode e2e",
     "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
   },
   "dependencies": {
