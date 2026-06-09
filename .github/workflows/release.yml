@@ -59,7 +59,10 @@ jobs:
     name: Release
     if: inputs.test_discord != true
     runs-on: ubuntu-latest
-    environment: production
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
@@ -67,6 +70,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Setup PNPM
         # You may pin to the exact commit or the version.
@@ -94,13 +98,12 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v1.7.0
         with:
           # This expects you to have a script called release which does a build for your packages and calls changeset publish
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - if: steps.changesets.outputs.published == 'true'
         name: Notify Discord about new release
