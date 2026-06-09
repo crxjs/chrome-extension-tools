@@ -60,10 +60,11 @@ contentScripts.change$
       'scriptId',
     ] as const
     // set many to one value for lookup by multiple keys (script.id, script.fileName, etc)
-    for (const keyName of keyNames) {
-      const key = value[keyName]
+    const keys = keyNames.map((keyName) => value[keyName])
+    keys.push(value.id.replace(/^\//, ''))
+    for (const key of keys) {
       // avoid runaway recursion
-      if (typeof key === 'undefined' || map.has(key)) {
+      if (typeof key === 'undefined' || map.get(key) === value) {
         continue
       } else {
         map.set(key, value)

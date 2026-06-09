@@ -123,21 +123,24 @@ export function getOutputPath(server: ViteDevServer, fileName: string) {
 }
 
 /** Converts a script to the correct Vite URL */
-export function getViteUrl({ type, id }: FileWriterId) {
-  // { timestamp = false }: { timestamp?: boolean } = {},
-  // if (timestamp && !id.startsWith('/@') && !id.includes('?v=')) {
-  //   const t = `t=${Date.now()}` + (id.includes('?') ? '&' : '')
-  //   const parts = id.split('?')
-  //   parts[1] = typeof parts[1] === 'undefined' ? t : t + parts[1]
-  //   id = parts.join('?')
-  // }
+export function getViteUrl(
+  { type, id }: FileWriterId,
+  { timestamp = false }: { timestamp?: boolean } = {},
+) {
+  if (timestamp && !id.startsWith('/@') && !id.includes('?v=')) {
+    const t = `t=${Date.now()}` + (id.includes('?') ? '&' : '')
+    const parts = id.split('?')
+    parts[1] = typeof parts[1] === 'undefined' ? t : t + parts[1]
+    id = parts.join('?')
+  }
 
   if (type === 'asset') {
     // TODO: verify if assets need special handling
     throw new Error(`File type "${type}" not implemented.`)
   } else if (type === 'iife') {
-    // TODO: get worker script URL for IIFE
-    throw new Error(`File type "${type}" not implemented.`)
+    // IIFE scripts are bundled separately (see plugin-contentScripts_iife + fileWriter-rxjs)
+    // and do not go through Vite's transform pipeline for dev.
+    throw new Error(`File type "iife" is handled via dedicated IIFE bundler, not Vite transform.`)
   } else if (type === 'loader') {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {

@@ -1,0 +1,28 @@
+import { defineManifest } from '../../plugin-testOptionsProvider'
+
+export default defineManifest({
+  manifest_version: 3,
+  name: 'IIFE Content Script Test',
+  version: '1.0.0',
+  description: 'Test extension for IIFE content scripts',
+  background: {
+    service_worker: 'src/background.ts'
+  },
+  content_scripts: [
+    {
+      matches: ['https://example.com/*'],
+      js: ['src/content-regular.ts']
+    },
+    {
+      matches: ['https://example.com/*'],
+      js: ['src/content-iife.iife.ts']
+    },
+    {
+      matches: ['https://example.com/*'],
+      js: ['src/content-standalone.ts']
+    }
+  ],
+  host_permissions: ['https://example.com/*'],
+  permissions: ['scripting'],
+  options_page: 'src/options.html'
+})
