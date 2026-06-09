@@ -3,7 +3,7 @@ import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ResolvedConfig, version as ViteVersion } from 'vite'
+import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
@@ -200,6 +200,15 @@ export const pluginManifest: CrxPluginFn = () => {
           }
         }
 
+        const opts = await getOptions({ plugins: config.plugins } as UserConfig)
+        const standaloneFiles = (
+          opts.contentScripts?.standaloneFiles || []
+        ).map((f: string) => f.replace(/^\//, ''))
+        const isStandaloneFile = (file: string) => {
+          const normalized = file.replace(/^\//, '')
+          return standaloneFiles.includes(normalized)
+        }
+
         /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
 
         if (config.command === 'serve') {
@@ -239,16 +248,20 @@ export const pluginManifest: CrxPluginFn = () => {
                 )
               }
 
-              // Register regular JS content scripts
+              // Register JS content scripts
               for (const id of js) {
+                const type =
+                  isIifeContentScript(id) || isStandaloneFile(id)
+                    ? 'iife'
+                    : 'loader'
                 contentScripts.set(
                   prefix('/', id),
                   formatFileData({
-                    type: 'loader',
+                    type,
                     id,
                     matches,
-                    refId: hashScriptId({ type: 'loader', id }),
-                    fileName: getFileName({ type: 'loader', id }),
+                    refId: hashScriptId({ type, id }),
+                    fileName: getFileName({ type, id }),
                   }),
                 )
               }
@@ -256,20 +269,13 @@ export const pluginManifest: CrxPluginFn = () => {
         } else {
           // vite build emits content scripts, html files and service worker
           // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
-          const opts = await getOptions({ plugins: config.plugins } as any)
-          const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
-            f.replace(/^\//, '')
-          )
-          const isStandaloneFile = (file: string) => {
-            const normalized = file.replace(/^\//, '')
-            return standaloneFiles.includes(normalized)
-          }
           if (manifest.content_scripts)
             for (const { js = [], matches = [] } of manifest.content_scripts)
               for (const file of js) {
                 // Skip IIFE/standalone content scripts - they're built separately
-                if (isIifeContentScript(file) || isStandaloneFile(file)) continue
-                
+                if (isIifeContentScript(file) || isStandaloneFile(file))
+                  continue
+
                 const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
@@ -344,10 +350,15 @@ export const pluginManifest: CrxPluginFn = () => {
               const script = manifest.content_scripts[i]
               const cssEntry = cssEntryMap.get(i)
 
-              // Transform JS paths to loader file names
-              const jsLoaders = (script.js || []).map((id) =>
-                getFileName({ id, type: 'loader' }),
-              )
+              // Transform JS paths to emitted file names. IIFE scripts are
+              // emitted directly and do not need a loader.
+              const jsLoaders = (script.js || []).map((id) => {
+                const contentScript =
+                  contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                return (
+                  contentScript?.fileName ?? getFileName({ id, type: 'loader' })
+                )
+              })
 
               // Prepend synthetic CSS entry loader if CSS exists for this entry
               if (cssEntry) {
@@ -386,7 +397,8 @@ export const pluginManifest: CrxPluginFn = () => {
               return {
                 js: js.map((id) => {
                   const script =
-                    contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                    contentScripts.get(id) ??
+                    contentScripts.get(prefix('/', id))
                   const fileName = script?.loaderName ?? script?.fileName
                   if (typeof fileName === 'undefined')
                     throw new Error(
