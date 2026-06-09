@@ -17,11 +17,8 @@ on:
 
 jobs:
   lint:
-    name: Lint (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    name: Lint
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: packages/vite-plugin
