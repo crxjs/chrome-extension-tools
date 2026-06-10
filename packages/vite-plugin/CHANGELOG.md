@@ -1,5 +1,31 @@
 # @crxjs/vite-plugin
 
+## 2.6.0
+
+### Minor Changes
+
+- 4f5d2ec: feat: add IIFE content script bundling
+
+  Content scripts named with `.iife.ts` extension are automatically bundled as
+  self-contained IIFE files with all dependencies inlined. This is useful for
+  MAIN world content scripts used with `chrome.scripting.executeScript` or
+  `chrome.scripting.registerContentScripts`.
+
+### Patch Changes
+
+- 5316e9c: Allow `chrome-extension://` and `moz-extension://` origins in Vite
+  dev-server CORS automatically. This keeps extension pages able to fetch
+  dev-server files on Vite releases with the stricter localhost-only CORS
+  default, including Vite `4.5.6`, `5.4.12`, and `6.0.9+`, without requiring
+  projects to configure `server.cors.origin` manually.
+- 1aee9ad: fix: dynamic content scripts failing in build --watch mode
+- 2f8bab5: Fix the dev-mode loading page so it waits for the requested extension
+  HTML file, preserves the page URL query string, allows extension-origin
+  readiness polling, and throttles automatic reloads to avoid rapid flicker.
+- 1681511: Expand vite-plugin CI to run e2e tests against supported Vite
+  versions and fix compatibility issues exposed by the matrix.
+- 0593d58: fix: publish ESM declarations for the Vite plugin entrypoint
+
 ## 2.5.0
 
 ### Minor Changes
