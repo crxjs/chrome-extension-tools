@@ -83,6 +83,11 @@ export interface CrxOptions {
   contentScripts?: {
     preambleCode?: string | false
     hmrTimeout?: number
+    /**
+     * How often content-script HMR ports are recreated during development.
+     * Defaults to 5 minutes.
+     */
+    hmrReconnectInterval?: number
     injectCss?: boolean
     /**
      * List of content script files (relative to project root) that should be

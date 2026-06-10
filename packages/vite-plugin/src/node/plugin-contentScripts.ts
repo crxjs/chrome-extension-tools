@@ -36,6 +36,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let server: ViteDevServer
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
+  let hmrReconnectInterval: number | undefined
   let liveReload = true
   let sub = new Subscription()
 
@@ -75,6 +76,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
         const opts = await getOptions(config)
         const { contentScripts = {} } = opts
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
+        hmrReconnectInterval =
+          contentScripts.hmrReconnectInterval ?? 5 * 60 * 1000
         preambleCode = preambleCode ?? contentScripts.preambleCode
         liveReload = opts.liveReload !== false
       },
@@ -148,6 +151,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
         if (id === contentHmrPortId) {
           const defined = contentHmrPort
             .replace('__CRX_HMR_TIMEOUT__', JSON.stringify(hmrTimeout))
+            .replace(
+              '__CRX_HMR_RECONNECT_INTERVAL__',
+              JSON.stringify(hmrReconnectInterval),
+            )
             .replace('__CRX_LIVE_RELOAD__', JSON.stringify(liveReload))
           return defined
         }
