@@ -83,6 +83,16 @@ export interface CrxOptions {
   contentScripts?: {
     preambleCode?: string | false
     hmrTimeout?: number
+    /**
+     * Development HMR transport for module content scripts.
+     *
+     * - "file" keeps the historical CRXJS file-writer bridge.
+     * - "native" is experimental and loads Vite modules and Vite's HMR client
+     *   directly from the dev server.
+     *
+     * Default is "file".
+     */
+    hmr?: 'file' | 'native'
     injectCss?: boolean
     /**
      * List of content script files (relative to project root) that should be

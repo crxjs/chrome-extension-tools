@@ -6,6 +6,7 @@ import {
   contentScripts,
   createDevLoader,
   createDevMainLoader,
+  createDevNativeLoader,
   createProLoader,
   createProMainLoader,
 } from './contentScripts'
@@ -74,6 +75,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
   let liveReload = true
+  let nativeHmr = false
   let sub = new Subscription()
 
   const worldMainIds = new Set<string>()
@@ -121,6 +123,18 @@ export const pluginContentScripts: CrxPluginFn = () => {
     console.warn(message)
   }
 
+  const getViteOrigin = () => {
+    const resolvedLocal = server.resolvedUrls?.local[0]
+    if (resolvedLocal) return new URL(resolvedLocal).origin
+
+    const proto = server.config.server.https ? 'https' : 'http'
+    const port = server.config.server.port?.toString()
+    if (typeof port === 'undefined')
+      throw new Error('server port is undefined in watch mode')
+
+    return `${proto}://localhost:${port}`
+  }
+
   return [
     {
       name: pluginName,
@@ -133,6 +147,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
         preambleCode = preambleCode ?? contentScripts.preambleCode
         liveReload = opts.liveReload !== false
+        nativeHmr = contentScripts.hmr === 'native'
       },
       async configureServer(_server) {
         server = _server
@@ -161,34 +176,61 @@ export const pluginContentScripts: CrxPluginFn = () => {
             .subscribe(({ value: script }) => {
               const { type, id } = script
               if (type === 'loader') {
+                const fileId = prefix('/', id)
                 let preamble = { fileName: '' } // no preamble by default
-                if (preambleCode)
+                if (preambleCode && !nativeHmr)
                   preamble = add({ type: 'module', id: preambleId })
-                const client = add({ type: 'module', id: viteClientId })
 
-                const file = add({ type: 'module', id })
+                if (!nativeHmr) {
+                  const client = add({ type: 'module', id: viteClientId })
+                  const file = add({ type: 'module', id })
+                  const loaderFileName = getFileName({ type: 'loader', id })
+                  const loader = add({
+                    type: 'asset',
+                    id: loaderFileName,
+                    source: worldMainIds.has(file.id)
+                      ? createDevMainLoader({
+                          preamble: preamble.fileName
+                            ? asRelativeImport(
+                                loaderFileName,
+                                preamble.fileName,
+                              )
+                            : '',
+                          client: asRelativeImport(
+                            loaderFileName,
+                            client.fileName,
+                          ),
+                          fileName: asRelativeImport(
+                            loaderFileName,
+                            file.fileName,
+                          ),
+                        })
+                      : createDevLoader({
+                          preamble: preamble.fileName,
+                          client: client.fileName,
+                          fileName: file.fileName,
+                        }),
+                  })
+                  script.fileName = loader.fileName
+                  return
+                }
+
+                const viteOrigin = getViteOrigin()
+                const fromVite = (id: string) => new URL(id, viteOrigin).href
                 const loaderFileName = getFileName({ type: 'loader', id })
                 const loader = add({
                   type: 'asset',
                   id: loaderFileName,
-                  source: worldMainIds.has(file.id)
+                  source: worldMainIds.has(fileId)
                     ? createDevMainLoader({
-                        preamble: preamble.fileName
-                          ? asRelativeImport(loaderFileName, preamble.fileName)
-                          : '',
-                        client: asRelativeImport(
-                          loaderFileName,
-                          client.fileName,
-                        ),
-                        fileName: asRelativeImport(
-                          loaderFileName,
-                          file.fileName,
-                        ),
+                        preamble: preambleCode ? fromVite(preambleId) : '',
+                        client: fromVite('/@vite/client'),
+                        fileName: fromVite(fileId),
                       })
-                    : createDevLoader({
-                        preamble: preamble.fileName,
-                        client: client.fileName,
-                        fileName: file.fileName,
+                    : createDevNativeLoader({
+                        preamble: preambleCode ? preambleId : '',
+                        fileName: fileId,
+                        viteOrigin,
                       }),
                 })
                 script.fileName = loader.fileName
