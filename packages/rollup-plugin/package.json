@@ -45,7 +45,7 @@
   },
   "dependencies": {
     "@types/lodash": "^4.14.172",
-    "ajv": "^8.6.2",
+    "ajv": "^8.18.0",
     "array-flat-polyfill": "^1.0.1",
     "cheerio": "1.0.0-rc.11",
     "convert-source-map": "^1.7.0",
