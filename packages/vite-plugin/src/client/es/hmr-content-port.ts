@@ -9,18 +9,6 @@ declare const __CRX_HMR_TOKEN__: string
 
 const crxClientPortName = `@crx/client:${__CRX_HMR_TOKEN__}`
 
-function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
-  return x.type === 'custom' && x.event.startsWith('crx:')
-}
-
-function getRuntime() {
-  return typeof chrome === 'undefined' ? undefined : chrome.runtime
-}
-
-function getExtensionId() {
-  return new URL(import.meta.url).host
-}
-
 function hasOwnExtensionRuntime(
   runtime: typeof chrome.runtime,
   extensionId: string,
@@ -30,6 +18,16 @@ function hasOwnExtensionRuntime(
   } catch {
     return false
   }
+}
+
+const runtime = typeof chrome === 'undefined' ? undefined : chrome.runtime
+const extensionId = new URL(import.meta.url).host
+const connectsToOwnRuntime = runtime
+  ? hasOwnExtensionRuntime(runtime, extensionId)
+  : false
+
+function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
+  return x.type === 'custom' && x.event.startsWith('crx:')
 }
 
 export class HMRPort {
@@ -61,14 +59,12 @@ export class HMRPort {
   }
 
   initPort = () => {
-    const runtime = getRuntime()
     if (!runtime) throw new Error('[crx] chrome.runtime is not available')
 
-    const extensionId = getExtensionId()
     const connectInfo = { name: crxClientPortName }
 
     this.port?.disconnect()
-    this.port = hasOwnExtensionRuntime(runtime, extensionId)
+    this.port = connectsToOwnRuntime
       ? runtime.connect(connectInfo)
       : runtime.connect(extensionId, connectInfo)
     this.port.onDisconnect.addListener(this.handleDisconnect.bind(this))

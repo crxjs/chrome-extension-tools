@@ -1,6 +1,10 @@
+// @ts-expect-error virtual module provided by CRX during dev serve
+import { HMRPort } from '/@crx/client-port'
+
 declare global {
   interface Window {
     crxMainWorldHmrMessage?: string
+    crxMainWorldReconnectAfterChromeMutation?: () => boolean
   }
 }
 
@@ -19,6 +23,17 @@ function render(value: string) {
 }
 
 render(message)
+
+window.crxMainWorldReconnectAfterChromeMutation = () => {
+  const hmrPort = new HMRPort()
+  try {
+    hmrPort.initPort()
+    hmrPort.send(JSON.stringify({ type: 'connected' }))
+    return true
+  } finally {
+    ;(hmrPort as unknown as { port?: chrome.runtime.Port }).port?.disconnect()
+  }
+}
 
 if (import.meta.hot) {
   import.meta.hot.accept((mod) => {
