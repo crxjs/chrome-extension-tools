@@ -93,7 +93,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
             const react = await import('@vitejs/plugin-react')
             // auto config for react users
             preambleCode = react.default.preambleCode
-          } catch (error) {
+          } catch {
             preambleCode = false
           }
         }

@@ -18,8 +18,7 @@ export interface WebAccessibleResourceById {
 
 export interface ChromeManifestBackground {
   service_worker: string
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  type?: 'module' | (string & {}) // If the service worker uses ES modules
+  type?: 'module' | (string & Record<never, never>) // If the service worker uses ES modules
 }
 
 export interface FirefoxManifestBackground {
@@ -304,4 +303,3 @@ export interface ManifestV3 {
 }
 type GeckoPermissionsRequired = "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "none"
 type GeckoPermissionsOptional = "personallyIdentifyingInfo" | "healthInfo" | "financialAndPaymentInfo" | "authenticationInfo" | "personalCommunications" | "locationInfo" | "browsingActivity" | "websiteContent" | "websiteActivity" | "searchTerms" | "bookmarksInfo" | "technicalAndInteraction"
-

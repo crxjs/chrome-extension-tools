@@ -19,10 +19,11 @@ test(
     const page = await getPage(browser, 'chrome-extension')
     const update = createUpdate({ target: src, src: src2 })
     const styles = page.locator('head style')
-    const button = page.locator('button')
+    const button = page.locator('button', { hasText: /count is:/ })
     const buttonText = new Set<string>()
 
     await page.waitForLoadState()
+    await button.waitFor()
     await button.click()
     buttonText.add(await button.innerText())
 
