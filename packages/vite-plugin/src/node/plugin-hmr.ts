@@ -89,6 +89,7 @@ export const pluginHMR: CrxPluginFn = () => {
   let config: ResolvedConfig
   let subs: Subscription
   let liveReload = true
+  let nativeHmr = false
 
   return [
     {
@@ -102,7 +103,15 @@ export const pluginHMR: CrxPluginFn = () => {
       ) {
         const opts = await getOptions({ ...config, server })
         liveReload = opts.liveReload !== false
+        nativeHmr = opts.contentScripts?.hmr === 'native'
         const hmrConfig = getHmrHostConfig(server, this?.meta?.viteVersion)
+        if (nativeHmr && hmrConfig) {
+          const transport = hmrConfig.ws ?? hmrConfig.hmr
+          if (transport && typeof transport === 'object') {
+            transport.protocol =
+              transport.protocol ?? (server.https ? 'wss' : 'ws')
+          }
+        }
 
         return hmrConfig && { server: hmrConfig }
       },
@@ -124,14 +133,16 @@ export const pluginHMR: CrxPluginFn = () => {
           // decorate server websocket send method
           const { send } = server.ws
           decoratedSend = (payload: HMRPayload) => {
-            if (payload.type === 'error') {
-              send({
-                type: 'custom',
-                event: 'crx:content-script-payload',
-                data: payload,
-              })
-            } else {
-              hmrPayload$.next(payload) // sniff hmr events
+            if (!nativeHmr) {
+              if (payload.type === 'error') {
+                send({
+                  type: 'custom',
+                  event: 'crx:content-script-payload',
+                  data: payload,
+                })
+              } else {
+                hmrPayload$.next(payload) // sniff hmr events
+              }
             }
 
             send(payload) // don't interfere with normal hmr
@@ -140,15 +151,17 @@ export const pluginHMR: CrxPluginFn = () => {
 
           subs = new Subscription(() => (subs = new Subscription()))
           subs.add(fileWriterError$.subscribe(send))
-          subs.add(
-            crxHMRPayload$.subscribe((payload) => {
-              // keep subscription alive for file writer side effects,
-              // but skip sending HMR payloads when liveReload is disabled
-              if (liveReload) {
-                send(payload) // send crx hmr and error events
-              }
-            }),
-          )
+          if (!nativeHmr) {
+            subs.add(
+              crxHMRPayload$.subscribe((payload) => {
+                // keep subscription alive for file writer side effects,
+                // but skip sending HMR payloads when liveReload is disabled
+                if (liveReload) {
+                  send(payload) // send crx hmr and error events
+                }
+              }),
+            )
+          }
         }
       },
       closeBundle() {
@@ -209,6 +222,8 @@ export const pluginHMR: CrxPluginFn = () => {
 
         for (const [key, script] of contentScripts)
           if (key === script.id) {
+            if (nativeHmr && script.type !== 'iife') continue
+
             // Handle synthetic CSS content script entries (virtual modules)
             if (isContentCssId(script.id)) {
               // Check if any of the CSS files associated with this synthetic entry changed
