@@ -9,5 +9,8 @@ export default defineConfig({
   build: { minify: false },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest, contentScripts: { preambleCode } }), react()],
+  plugins: [
+    crx({ manifest, contentScripts: { preambleCode, hmr: 'native' } }),
+    react(),
+  ],
 })

@@ -6,5 +6,5 @@ export default defineConfig({
   build: { minify: false },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest })],
+  plugins: [crx({ manifest, contentScripts: { hmr: 'native' } })],
 })
