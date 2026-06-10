@@ -1,0 +1,12 @@
+{
+  "description": "test extension",
+  "manifest_version": 3,
+  "name": "Test Extension",
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://example.com/*"]
+    }
+  ],
+  "version": "1.0.0"
+}
