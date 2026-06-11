@@ -165,11 +165,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
         await findWorldMainIds(config, env)
 
         return {
-          ...config,
           build: {
-            ...config.build,
             rollupOptions: {
-              ...config.build?.rollupOptions,
               // keep exports for content script module api
               preserveEntrySignatures:
                 config.build?.rollupOptions?.preserveEntrySignatures ??

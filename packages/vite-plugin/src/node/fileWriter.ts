@@ -27,6 +27,33 @@ const { outputFile } = fsx
 
 const debug = _debug('file-writer')
 
+type RollupOptionsWithRolldownDefaults = RollupOptions & {
+  platform?: unknown
+  resolve?: unknown
+  transform?: unknown
+  moduleTypes?: unknown
+  optimization?: unknown
+  experimental?: unknown
+  cwd?: unknown
+}
+
+export function getRollupInputOptions(options: RollupOptions): RollupOptions {
+  // Vite 8 aliases build.rollupOptions to Rolldown options, but this writer
+  // still calls Rollup directly.
+  const {
+    platform: _platform,
+    resolve: _resolve,
+    transform: _transform,
+    moduleTypes: _moduleTypes,
+    optimization: _optimization,
+    experimental: _experimental,
+    cwd: _cwd,
+    ...rollupOptions
+  } = options as RollupOptionsWithRolldownDefaults
+
+  return rollupOptions
+}
+
 function queueWrite(
   script: CrxDevAssetId | CrxDevScriptId,
   previous?: OutputFile,
@@ -58,9 +85,10 @@ export async function start({
     p.name?.startsWith('crx:'),
   )
   const { rollupOptions, outDir } = server.config.build
+  const rollupInputOptions = getRollupInputOptions(rollupOptions)
   const inputOptions: RollupOptions = {
     input: 'index.html',
-    ...rollupOptions,
+    ...rollupInputOptions,
     plugins,
   }
   // handle the various output option types

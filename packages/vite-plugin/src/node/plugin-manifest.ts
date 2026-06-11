@@ -124,9 +124,7 @@ export const pluginManifest: CrxPluginFn = () => {
           for (const x of [js, sw, html].flat()) set.add(x)
 
           return {
-            ...config,
             optimizeDeps: {
-              ...config.optimizeDeps,
               entries: [...set],
             },
           }
