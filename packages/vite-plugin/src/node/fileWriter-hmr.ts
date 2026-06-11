@@ -1,7 +1,6 @@
 import {
   buffer,
   filter,
-  firstValueFrom,
   map,
   mergeMap,
   Observable,
@@ -14,7 +13,7 @@ import {
   PrunePayload,
   UpdatePayload,
 } from 'vite'
-import { update } from './fileWriter'
+import { allFilesReady, update } from './fileWriter'
 import { allFilesReady$ } from './fileWriter-rxjs'
 import { getFileName, getViteUrl, prefix } from './fileWriter-utilities'
 import { _debug } from './helpers'
@@ -113,7 +112,7 @@ export async function prepareVitePayloadForCrx(
       return update(id).map((file) => file.file)
     })
     await Promise.all(pendingFiles)
-    await firstValueFrom(allFilesReady$)
+    await allFilesReady()
   }
 
   return mapVitePayloadForCrx(p)
