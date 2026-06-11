@@ -5,6 +5,7 @@ import MagicString from 'magic-string'
 import { OutputAsset, OutputChunk } from 'rollup'
 import {
   BehaviorSubject,
+  debounceTime,
   filter,
   first,
   firstValueFrom,
@@ -14,9 +15,11 @@ import {
   of,
   ReplaySubject,
   retry,
+  share,
   startWith,
   switchMap,
   takeUntil,
+  tap,
   toArray,
 } from 'rxjs'
 import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
@@ -91,13 +94,42 @@ export const buildStart$ = fileWriterEvent$.pipe(
   switchMap((e) => of(e)),
 )
 
+const allFilesReadyDebounceMs = 100
+let currentAllFilesReadyGeneration = 0
+let completedAllFilesReadyGeneration = 0
+let lastAllFilesReadyResults: PromiseSettledResult<void>[] | undefined
+
 /** Emit when all script files are written */
-export const allFilesReady$ = buildEnd$.pipe(
-  switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
-  map(() => [...outputFiles.values()]),
-  switchMap((files) =>
-    Promise.allSettled(files.map((file) => waitForOutputFile(file))),
+const allFilesReadyState$ = buildEnd$.pipe(
+  switchMap(() =>
+    outputFiles.change$.pipe(
+      startWith({ type: 'start' }),
+      tap(() => {
+        currentAllFilesReadyGeneration += 1
+      }),
+      debounceTime(allFilesReadyDebounceMs),
+    ),
   ),
+  map(() => ({
+    generation: currentAllFilesReadyGeneration,
+    files: [...outputFiles.values()],
+  })),
+  switchMap(async ({ generation, files }) => {
+    const seen = new Set<OutputFile>()
+    const results = await Promise.allSettled(
+      files.map((file) => waitForOutputFile(file, seen)),
+    )
+    return { generation, results }
+  }),
+  tap(({ generation, results }) => {
+    completedAllFilesReadyGeneration = generation
+    lastAllFilesReadyResults = results
+  }),
+  share(),
+)
+
+export const allFilesReady$ = allFilesReadyState$.pipe(
+  map(({ results }) => results),
 )
 
 async function waitForOutputFile(
@@ -108,6 +140,25 @@ async function waitForOutputFile(
   seen.add(file)
   const { deps } = await file.file
   await Promise.all(deps.map((dep) => waitForOutputFile(dep, seen)))
+}
+
+async function waitForAllFilesReadyResults(): Promise<
+  PromiseSettledResult<void>[]
+> {
+  const targetGeneration = currentAllFilesReadyGeneration
+  if (
+    lastAllFilesReadyResults &&
+    completedAllFilesReadyGeneration >= targetGeneration
+  ) {
+    return lastAllFilesReadyResults
+  }
+
+  const { results } = await firstValueFrom(
+    allFilesReadyState$.pipe(
+      filter(({ generation }) => generation >= targetGeneration),
+    ),
+  )
+  return results
 }
 
 const timestamp$ = new BehaviorSubject(Date.now())
@@ -364,12 +415,12 @@ function prepIifeScript(
 
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesReady(): Promise<void> {
-  await firstValueFrom(allFilesReady$)
+  await waitForAllFilesReadyResults()
 }
 
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesSuccess(): Promise<void> {
-  const result = await firstValueFrom(allFilesReady$)
+  const result = await waitForAllFilesReadyResults()
   const reason = result.find(isRejected)?.reason
   if (typeof reason === 'undefined') return
   if (reason instanceof Error) throw reason
