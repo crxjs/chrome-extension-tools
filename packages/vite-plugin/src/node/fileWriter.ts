@@ -26,6 +26,45 @@ export { allFilesReady, fileReady }
 const { outputFile } = fsx
 
 const debug = _debug('file-writer')
+const defaultMaxParallelWrites = 8
+const configuredMaxParallelWrites = Number.parseInt(
+  process.env.CRXJS_FILE_WRITER_CONCURRENCY ?? '',
+  10,
+)
+const maxParallelWrites =
+  Number.isFinite(configuredMaxParallelWrites) && configuredMaxParallelWrites > 0
+    ? configuredMaxParallelWrites
+    : defaultMaxParallelWrites
+let activeWrites = 0
+const pendingWrites: Array<() => void> = []
+
+async function acquireWriteSlot(): Promise<void> {
+  if (activeWrites < maxParallelWrites) {
+    activeWrites += 1
+    return
+  }
+
+  await new Promise<void>((resolve) => pendingWrites.push(resolve))
+}
+
+function releaseWriteSlot(): void {
+  const pendingWrite = pendingWrites.shift()
+  if (pendingWrite) {
+    pendingWrite()
+    return
+  }
+
+  activeWrites -= 1
+}
+
+async function withWriteSlot<T>(fn: () => Promise<T>): Promise<T> {
+  await acquireWriteSlot()
+  try {
+    return await fn()
+  } finally {
+    releaseWriteSlot()
+  }
+}
 
 function queueWrite(
   script: CrxDevAssetId | CrxDevScriptId,
@@ -58,9 +97,11 @@ export async function start({
     p.name?.startsWith('crx:'),
   )
   const { rollupOptions, outDir } = server.config.build
+  const { platform: _platform, ...rollupInputOptions } =
+    rollupOptions as RollupOptions & { platform?: unknown }
   const inputOptions: RollupOptions = {
     input: 'index.html',
-    ...rollupOptions,
+    ...rollupInputOptions,
     plugins,
   }
   // handle the various output option types
@@ -168,30 +209,32 @@ export async function write(
   fileId: CrxDevAssetId | CrxDevScriptId,
 ): Promise<{ start: number; close: number; deps: OutputFile[] }> {
   const start = performance.now()
-  const deps = await firstValueFrom(
-    // wait for start event
-    start$.pipe(
-      // prepare either asset or script contents
-      prepFileData(fileId),
-      // output file and add dependencies to file writer
-      mergeMap(async ({ target, source, deps }) => {
-        const files = deps
-          .map((id: string) => {
-            const r = [add({ id, type: 'module' })]
-            if (id.includes('?import')) {
-              const [imported] = id.split('?import')
-              r.push(add({ id: imported, type: 'asset' }))
-            }
-            return r
-          })
-          .flat()
-        if (source instanceof Uint8Array) await outputFile(target, source)
-        else await outputFile(target, source, { encoding: 'utf8' })
-        return files
-      }),
-      // abort write operation on close event
-      takeUntil(close$),
-      concatWith(of([])),
+  const deps = await withWriteSlot(() =>
+    firstValueFrom(
+      // wait for start event
+      start$.pipe(
+        // prepare either asset or script contents
+        prepFileData(fileId),
+        // output file and add dependencies to file writer
+        mergeMap(async ({ target, source, deps }) => {
+          const files = deps
+            .map((id: string) => {
+              const r = [add({ id, type: 'module' })]
+              if (id.includes('?import')) {
+                const [imported] = id.split('?import')
+                r.push(add({ id: imported, type: 'asset' }))
+              }
+              return r
+            })
+            .flat()
+          if (source instanceof Uint8Array) await outputFile(target, source)
+          else await outputFile(target, source, { encoding: 'utf8' })
+          return files
+        }),
+        // abort write operation on close event
+        takeUntil(close$),
+        concatWith(of([])),
+      ),
     ),
   )
   const close = performance.now()
