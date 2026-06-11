@@ -89,15 +89,18 @@ export function createDevLoader({
 }
 
 export function createDevNativeLoader({
+  liveReload,
   preamble,
   fileName,
   viteOrigin,
 }: {
+  liveReload: boolean
   preamble: string
   fileName: string
   viteOrigin: string
 }): string {
   return contentDevNativeLoader
+    .replace(/__CRX_LIVE_RELOAD__/g, JSON.stringify(liveReload))
     .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
     .replace(/__VITE_ORIGIN__/g, JSON.stringify(viteOrigin))

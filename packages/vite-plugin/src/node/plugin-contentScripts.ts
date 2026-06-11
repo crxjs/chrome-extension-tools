@@ -155,6 +155,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
                     : createDevNativeLoader({
                         preamble: preambleCode ? preambleId : '',
                         fileName: fileId,
+                        liveReload,
                         viteOrigin: getViteOrigin(),
                       }),
                 })
