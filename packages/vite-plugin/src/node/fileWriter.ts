@@ -150,7 +150,7 @@ function logProgress(startTime: number, phase: string) {
       : 0
 
   progressDebug(
-    'phase=%s files=%d/%d discovered pct=%s active=%d queued=%d bytes=%s viteDeps=%d chunks=%d rate=%s/s eta=%s elapsed=%s',
+    'writes phase=%s files=%d/%d discovered pct=%s active=%d queued=%d bytes=%s viteDeps=%d chunks=%d rate=%s/s eta=%s elapsed=%s',
     phase,
     completedWrites,
     discoveredFiles,
@@ -169,7 +169,7 @@ function logProgress(startTime: number, phase: string) {
 function startProgressTimer(startTime: number, getPhase: () => string) {
   if (!progressDebug.enabled) return
   progressDebug(
-    'begin: interval=%dms note=%s',
+    'writes begin: interval=%dms note=%s',
     progressIntervalMs,
     'total is discovered files and may grow during graph discovery',
   )

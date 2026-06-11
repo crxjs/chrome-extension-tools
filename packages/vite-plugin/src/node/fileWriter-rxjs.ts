@@ -33,6 +33,7 @@ import convertSourceMap from 'convert-source-map'
 
 const { outputFile } = fsx
 const perfDebug = _debug('file-writer').extend('perf')
+const progressDebug = _debug('file-writer').extend('progress')
 
 function readIntegerEnv(name: string, fallback: number) {
   const value = process.env[name]
@@ -49,9 +50,95 @@ const readyDebounceMs = Math.max(
   0,
   readIntegerEnv('CRX_FILE_WRITER_READY_DEBOUNCE_MS', 100),
 )
+const progressIntervalMs = Math.max(
+  250,
+  readIntegerEnv('CRX_FILE_WRITER_PROGRESS_INTERVAL_MS', 1000),
+)
 
 function shouldLogPerf(ms: number) {
   return perfThresholdMs === 0 || ms >= perfThresholdMs
+}
+
+function formatDurationSeconds(seconds: number) {
+  if (!Number.isFinite(seconds)) return 'unknown'
+  if (seconds < 10) return `${seconds.toFixed(1)}s`
+  return `${Math.round(seconds)}s`
+}
+
+interface ReadyProgressStats {
+  generation: number
+  startTime: number
+  initialFiles: number
+  totalFiles: number
+  seenFiles: number
+  completedFiles: number
+  activeFiles: number
+  rejectedFiles: number
+}
+
+function updateReadyTotal(stats: ReadyProgressStats, seen: Set<OutputFile>) {
+  stats.seenFiles = seen.size
+  stats.totalFiles = Math.max(stats.totalFiles, outputFiles.size, seen.size)
+}
+
+function logReadyProgress(stats: ReadyProgressStats, phase: string) {
+  const elapsedSeconds = Math.max(
+    (performance.now() - stats.startTime) / 1000,
+    0.001,
+  )
+  const totalFiles = Math.max(
+    stats.totalFiles,
+    stats.initialFiles,
+    outputFiles.size,
+  )
+  const percent =
+    totalFiles > 0
+      ? Math.min(100, (stats.completedFiles / totalFiles) * 100)
+      : 0
+  const filesPerSecond = stats.completedFiles / elapsedSeconds
+  const remainingFiles = Math.max(totalFiles - stats.completedFiles, 0)
+  const etaSeconds =
+    filesPerSecond > 0 && remainingFiles > 0
+      ? remainingFiles / filesPerSecond
+      : 0
+
+  progressDebug(
+    'ready phase=%s generation=%d files=%d/%d discovered pct=%s seen=%d active=%d rejected=%d rate=%s/s eta=%s elapsed=%s',
+    phase,
+    stats.generation,
+    stats.completedFiles,
+    totalFiles,
+    `${percent.toFixed(1)}%`,
+    stats.seenFiles,
+    stats.activeFiles,
+    stats.rejectedFiles,
+    filesPerSecond.toFixed(1),
+    formatDurationSeconds(etaSeconds),
+    formatDurationSeconds(elapsedSeconds),
+  )
+}
+
+function startReadyProgressTimer(stats: ReadyProgressStats) {
+  if (!progressDebug.enabled) return
+  let logged = false
+  let stopped = false
+  const timer = setInterval(() => {
+    if (stats.generation !== currentAllFilesReadyGeneration) {
+      stopped = true
+      clearInterval(timer)
+      return
+    }
+    logged = true
+    logReadyProgress(stats, 'waiting')
+  }, progressIntervalMs)
+  timer.unref?.()
+  return (phase: string) => {
+    if (stopped) return
+    stopped = true
+    clearInterval(timer)
+    if (stats.generation === currentAllFilesReadyGeneration && logged)
+      logReadyProgress(stats, phase)
+  }
 }
 
 const getIifeGlobalName = (fileName: string) => {
@@ -136,9 +223,23 @@ const allFilesReadyState$ = buildEnd$.pipe(
   switchMap(async ({ generation, files }) => {
     const start = performance.now()
     const seen = new Set<OutputFile>()
+    const stats = progressDebug.enabled
+      ? {
+          generation,
+          startTime: start,
+          initialFiles: files.length,
+          totalFiles: files.length,
+          seenFiles: 0,
+          completedFiles: 0,
+          activeFiles: 0,
+          rejectedFiles: 0,
+        }
+      : undefined
+    const stopProgress = stats && startReadyProgressTimer(stats)
     const results = await Promise.allSettled(
-      files.map((file) => waitForOutputFile(file, seen)),
+      files.map((file) => waitForOutputFile(file, seen, stats)),
     )
+    if (stats) stats.rejectedFiles = results.filter(isRejected).length
     const totalMs = performance.now() - start
     if (shouldLogPerf(totalMs)) {
       perfDebug(
@@ -149,6 +250,7 @@ const allFilesReadyState$ = buildEnd$.pipe(
         results.filter(isRejected).length,
       )
     }
+    stopProgress?.('ready')
     return { generation, results }
   }),
   tap(({ generation, results }) => {
@@ -165,11 +267,25 @@ export const allFilesReady$ = allFilesReadyState$.pipe(
 async function waitForOutputFile(
   file: OutputFile,
   seen = new Set<OutputFile>(),
+  stats?: ReadyProgressStats,
 ): Promise<void> {
   if (seen.has(file)) return
   seen.add(file)
-  const { deps } = await file.file
-  await Promise.all(deps.map((dep) => waitForOutputFile(dep, seen)))
+  if (stats) {
+    stats.activeFiles += 1
+    updateReadyTotal(stats, seen)
+  }
+  try {
+    const { deps } = await file.file
+    if (stats) updateReadyTotal(stats, seen)
+    await Promise.all(deps.map((dep) => waitForOutputFile(dep, seen, stats)))
+  } finally {
+    if (stats) {
+      stats.activeFiles -= 1
+      stats.completedFiles += 1
+      updateReadyTotal(stats, seen)
+    }
+  }
 }
 
 const timestamp$ = new BehaviorSubject(Date.now())
