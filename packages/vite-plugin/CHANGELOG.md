@@ -1,5 +1,14 @@
 # @crxjs/vite-plugin
 
+## 2.6.1
+
+### Patch Changes
+
+- 2b88621: Coalesce file writer readiness waits so large dev-server graph
+  updates do not repeatedly recompute the same dependency traversal. This also
+  fixes late HMR readiness waits that could miss the shared ready event and
+  delay content script updates.
+
 ## 2.6.0
 
 ### Minor Changes
