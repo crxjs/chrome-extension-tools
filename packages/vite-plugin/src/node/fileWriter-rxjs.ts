@@ -1,10 +1,12 @@
 import * as lexer from 'es-module-lexer'
 import fsx from 'fs-extra'
 import { readFile } from 'fs/promises'
+import { performance } from 'perf_hooks'
 import MagicString from 'magic-string'
 import { OutputAsset, OutputChunk } from 'rollup'
 import {
   BehaviorSubject,
+  debounceTime,
   filter,
   first,
   firstValueFrom,
@@ -14,19 +16,130 @@ import {
   of,
   ReplaySubject,
   retry,
+  share,
   startWith,
   switchMap,
   takeUntil,
+  tap,
   toArray,
 } from 'rxjs'
 import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
+import { _debug } from './helpers'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 import convertSourceMap from 'convert-source-map'
 
 const { outputFile } = fsx
+const perfDebug = _debug('file-writer').extend('perf')
+const progressDebug = _debug('file-writer').extend('progress')
+
+function readIntegerEnv(name: string, fallback: number) {
+  const value = process.env[name]
+  if (!value) return fallback
+  const parsed = Number.parseInt(value, 10)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+const perfThresholdMs = Math.max(
+  0,
+  readIntegerEnv('CRX_FILE_WRITER_PERF_THRESHOLD_MS', 250),
+)
+const readyDebounceMs = Math.max(
+  0,
+  readIntegerEnv('CRX_FILE_WRITER_READY_DEBOUNCE_MS', 100),
+)
+const progressIntervalMs = Math.max(
+  250,
+  readIntegerEnv('CRX_FILE_WRITER_PROGRESS_INTERVAL_MS', 1000),
+)
+
+function shouldLogPerf(ms: number) {
+  return perfThresholdMs === 0 || ms >= perfThresholdMs
+}
+
+function formatDurationSeconds(seconds: number) {
+  if (!Number.isFinite(seconds)) return 'unknown'
+  if (seconds < 10) return `${seconds.toFixed(1)}s`
+  return `${Math.round(seconds)}s`
+}
+
+interface ReadyProgressStats {
+  generation: number
+  startTime: number
+  initialFiles: number
+  totalFiles: number
+  seenFiles: number
+  completedFiles: number
+  activeFiles: number
+  rejectedFiles: number
+}
+
+function updateReadyTotal(stats: ReadyProgressStats, seen: Set<OutputFile>) {
+  stats.seenFiles = seen.size
+  stats.totalFiles = Math.max(stats.totalFiles, outputFiles.size, seen.size)
+}
+
+function logReadyProgress(stats: ReadyProgressStats, phase: string) {
+  const elapsedSeconds = Math.max(
+    (performance.now() - stats.startTime) / 1000,
+    0.001,
+  )
+  const totalFiles = Math.max(
+    stats.totalFiles,
+    stats.initialFiles,
+    outputFiles.size,
+  )
+  const percent =
+    totalFiles > 0
+      ? Math.min(100, (stats.completedFiles / totalFiles) * 100)
+      : 0
+  const filesPerSecond = stats.completedFiles / elapsedSeconds
+  const remainingFiles = Math.max(totalFiles - stats.completedFiles, 0)
+  const etaSeconds =
+    filesPerSecond > 0 && remainingFiles > 0
+      ? remainingFiles / filesPerSecond
+      : 0
+
+  progressDebug(
+    'ready phase=%s generation=%d files=%d/%d discovered pct=%s seen=%d active=%d rejected=%d rate=%s/s eta=%s elapsed=%s',
+    phase,
+    stats.generation,
+    stats.completedFiles,
+    totalFiles,
+    `${percent.toFixed(1)}%`,
+    stats.seenFiles,
+    stats.activeFiles,
+    stats.rejectedFiles,
+    filesPerSecond.toFixed(1),
+    formatDurationSeconds(etaSeconds),
+    formatDurationSeconds(elapsedSeconds),
+  )
+}
+
+function startReadyProgressTimer(stats: ReadyProgressStats) {
+  if (!progressDebug.enabled) return
+  let logged = false
+  let stopped = false
+  const timer = setInterval(() => {
+    if (stats.generation !== currentAllFilesReadyGeneration) {
+      stopped = true
+      clearInterval(timer)
+      return
+    }
+    logged = true
+    logReadyProgress(stats, 'waiting')
+  }, progressIntervalMs)
+  timer.unref?.()
+  return (phase: string) => {
+    if (stopped) return
+    stopped = true
+    clearInterval(timer)
+    if (stats.generation === currentAllFilesReadyGeneration && logged)
+      logReadyProgress(stats, phase)
+  }
+}
 
 const getIifeGlobalName = (fileName: string) => {
   const base = fileName.split('/').pop() ?? fileName
@@ -91,23 +204,88 @@ export const buildStart$ = fileWriterEvent$.pipe(
   switchMap((e) => of(e)),
 )
 
+let currentAllFilesReadyGeneration = 0
+let completedAllFilesReadyGeneration = 0
+let lastAllFilesReadyResults: PromiseSettledResult<void>[] | undefined
+
 /** Emit when all script files are written */
-export const allFilesReady$ = buildEnd$.pipe(
-  switchMap(() => outputFiles.change$.pipe(startWith({ type: 'start' }))),
-  map(() => [...outputFiles.values()]),
-  switchMap((files) =>
-    Promise.allSettled(files.map((file) => waitForOutputFile(file))),
+const allFilesReadyState$ = buildEnd$.pipe(
+  switchMap(() =>
+    outputFiles.change$.pipe(
+      startWith({ type: 'start' }),
+      debounceTime(readyDebounceMs),
+    ),
   ),
+  map(() => ({
+    generation: ++currentAllFilesReadyGeneration,
+    files: [...outputFiles.values()],
+  })),
+  switchMap(async ({ generation, files }) => {
+    const start = performance.now()
+    const seen = new Set<OutputFile>()
+    const stats = progressDebug.enabled
+      ? {
+          generation,
+          startTime: start,
+          initialFiles: files.length,
+          totalFiles: files.length,
+          seenFiles: 0,
+          completedFiles: 0,
+          activeFiles: 0,
+          rejectedFiles: 0,
+        }
+      : undefined
+    const stopProgress = stats && startReadyProgressTimer(stats)
+    const results = await Promise.allSettled(
+      files.map((file) => waitForOutputFile(file, seen, stats)),
+    )
+    if (stats) stats.rejectedFiles = results.filter(isRejected).length
+    const totalMs = performance.now() - start
+    if (shouldLogPerf(totalMs)) {
+      perfDebug(
+        'ready generation: generation=%d files=%d ms=%d rejected=%d',
+        generation,
+        files.length,
+        Math.round(totalMs),
+        results.filter(isRejected).length,
+      )
+    }
+    stopProgress?.('ready')
+    return { generation, results }
+  }),
+  tap(({ generation, results }) => {
+    completedAllFilesReadyGeneration = generation
+    lastAllFilesReadyResults = results
+  }),
+  share(),
+)
+
+export const allFilesReady$ = allFilesReadyState$.pipe(
+  map(({ results }) => results),
 )
 
 async function waitForOutputFile(
   file: OutputFile,
   seen = new Set<OutputFile>(),
+  stats?: ReadyProgressStats,
 ): Promise<void> {
   if (seen.has(file)) return
   seen.add(file)
-  const { deps } = await file.file
-  await Promise.all(deps.map((dep) => waitForOutputFile(dep, seen)))
+  if (stats) {
+    stats.activeFiles += 1
+    updateReadyTotal(stats, seen)
+  }
+  try {
+    const { deps } = await file.file
+    if (stats) updateReadyTotal(stats, seen)
+    await Promise.all(deps.map((dep) => waitForOutputFile(dep, seen, stats)))
+  } finally {
+    if (stats) {
+      stats.activeFiles -= 1
+      stats.completedFiles += 1
+      updateReadyTotal(stats, seen)
+    }
+  }
 }
 
 const timestamp$ = new BehaviorSubject(Date.now())
@@ -185,10 +363,35 @@ function prepScript(
           const module = await server.moduleGraph.getModuleByUrl(originalViteUrl)
           if (module) server.moduleGraph.invalidateModule(module)
         }
-        const transformResult = await server.transformRequest(viteUrl)
+        const transformStart = performance.now()
+        let transformResult: Awaited<
+          ReturnType<typeof server.transformRequest>
+        >
+        try {
+          transformResult = await server.transformRequest(viteUrl)
+        } catch (error) {
+          perfDebug(
+            'transform failed: id=%s url=%s ms=%d',
+            script.id,
+            viteUrl,
+            Math.round(performance.now() - transformStart),
+          )
+          throw error
+        }
         if (!transformResult)
           throw new TypeError(`Unable to load "${script.id}" from server.`)
         const { deps = [], dynamicDeps = [], map } = transformResult
+        const transformMs = performance.now() - transformStart
+        if (shouldLogPerf(transformMs)) {
+          perfDebug(
+            'transform: id=%s url=%s ms=%d deps=%d dynamicDeps=%d',
+            script.id,
+            viteUrl,
+            Math.round(transformMs),
+            deps.length,
+            dynamicDeps.length,
+          )
+        }
         let { code } = transformResult
         try {
           if (map && server.config.build.sourcemap === 'inline') {
@@ -254,6 +457,7 @@ async function bundleIife(
   // Use Vite's build API instead of raw Rollup to avoid plugin compatibility issues
   // (Vite 6+ plugins are tracked in WeakMaps and can't be reused in separate Rollup builds)
   // We use configFile: false to avoid loading user's config which may have incompatible settings
+  const buildStart = performance.now()
   const result = await viteBuild({
     root: server.config.root,
     mode: server.config.mode,
@@ -282,6 +486,16 @@ async function bundleIife(
       copyPublicDir: false,
     },
   })
+  const buildMs = performance.now() - buildStart
+  if (shouldLogPerf(buildMs)) {
+    perfDebug(
+      'iife build: id=%s input=%s fileName=%s ms=%d',
+      script.id,
+      input,
+      fileName,
+      Math.round(buildMs),
+    )
+  }
 
   // viteBuild with write: false returns RollupOutput or RollupOutput[]
   const outputs = Array.isArray(result) ? result : [result]
@@ -363,13 +577,32 @@ function prepIifeScript(
 }
 
 /** Resolves when all existing files in scriptFiles are written. */
+async function waitForAllFilesReadyResults(): Promise<
+  PromiseSettledResult<void>[]
+> {
+  const targetGeneration = currentAllFilesReadyGeneration
+  if (
+    lastAllFilesReadyResults &&
+    completedAllFilesReadyGeneration >= targetGeneration
+  ) {
+    return lastAllFilesReadyResults
+  }
+
+  const { results } = await firstValueFrom(
+    allFilesReadyState$.pipe(
+      filter(({ generation }) => generation >= targetGeneration),
+    ),
+  )
+  return results
+}
+
 export async function allFilesReady(): Promise<void> {
-  await firstValueFrom(allFilesReady$)
+  await waitForAllFilesReadyResults()
 }
 
 /** Resolves when all existing files in scriptFiles are written. */
 export async function allFilesSuccess(): Promise<void> {
-  const result = await firstValueFrom(allFilesReady$)
+  const result = await waitForAllFilesReadyResults()
   const reason = result.find(isRejected)?.reason
   if (typeof reason === 'undefined') return
   if (reason instanceof Error) throw reason
