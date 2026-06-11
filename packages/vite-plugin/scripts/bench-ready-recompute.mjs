@@ -15,20 +15,89 @@ import {
   tap,
 } from 'rxjs'
 
+const presets = {
+  quick: {
+    files: 220,
+    subscribers: 4,
+    fileDelayMs: 10,
+    emitIntervalMs: 0,
+    debounceMs: 100,
+    depsPerFile: 3,
+  },
+  'startup-lag': {
+    files: 375,
+    subscribers: 4,
+    fileDelayMs: 10,
+    emitIntervalMs: 0,
+    debounceMs: 100,
+    depsPerFile: 3,
+  },
+}
+
+function printHelp() {
+  console.log(`Usage:
+  node scripts/bench-ready-recompute.mjs --mode=<old|old-recursive|fixed> [options]
+
+Presets:
+  --preset=quick        Multi-second recursive readiness storm.
+  --preset=startup-lag  30s-class recursive readiness storm.
+
+Options:
+  --files=<n>
+  --subscribers=<n>
+  --file-delay-ms=<n>
+  --emit-interval-ms=<n>
+  --debounce-ms=<n>
+  --deps-per-file=<n>
+
+Hyperfine startup-lag comparison:
+  hyperfine --runs 3 \\
+    'node scripts/bench-ready-recompute.mjs --preset=startup-lag --mode=old-recursive' \\
+    'node scripts/bench-ready-recompute.mjs --preset=startup-lag --mode=fixed'
+`)
+}
+
 function parseArgs() {
   const args = new Map()
   for (const arg of process.argv.slice(2)) {
     const [key, value = 'true'] = arg.replace(/^--/, '').split('=')
     args.set(key, value)
   }
+
+  if (args.has('help') || args.has('h')) {
+    printHelp()
+    process.exit(0)
+  }
+
+  const preset = args.get('preset')
+  const presetOptions = typeof preset === 'undefined' ? {} : presets[preset]
+  if (typeof preset !== 'undefined' && typeof presetOptions === 'undefined') {
+    throw new Error(
+      `Unknown preset: ${preset}. Expected one of: ${Object.keys(presets).join(
+        ', ',
+      )}`,
+    )
+  }
+
   return {
+    preset: preset ?? 'custom',
     mode: args.get('mode') ?? 'old',
-    files: Number(args.get('files') ?? 803),
-    subscribers: Number(args.get('subscribers') ?? 4),
-    fileDelayMs: Number(args.get('file-delay-ms') ?? 20),
-    emitIntervalMs: Number(args.get('emit-interval-ms') ?? 0),
-    debounceMs: Number(args.get('debounce-ms') ?? 100),
-    depsPerFile: Number(args.get('deps-per-file') ?? 0),
+    files: Number(args.get('files') ?? presetOptions.files ?? 803),
+    subscribers: Number(
+      args.get('subscribers') ?? presetOptions.subscribers ?? 4,
+    ),
+    fileDelayMs: Number(
+      args.get('file-delay-ms') ?? presetOptions.fileDelayMs ?? 20,
+    ),
+    emitIntervalMs: Number(
+      args.get('emit-interval-ms') ?? presetOptions.emitIntervalMs ?? 0,
+    ),
+    debounceMs: Number(
+      args.get('debounce-ms') ?? presetOptions.debounceMs ?? 100,
+    ),
+    depsPerFile: Number(
+      args.get('deps-per-file') ?? presetOptions.depsPerFile ?? 0,
+    ),
   }
 }
 
@@ -85,7 +154,9 @@ function createOldRecursiveReadyStream({ buildEnd$, outputFiles, metrics }) {
     switchMap(async (files) => {
       metrics.generations += 1
       metrics.fileChecks += files.length
-      return Promise.allSettled(files.map((file) => waitForOutputFile(file, metrics)))
+      return Promise.allSettled(
+        files.map((file) => waitForOutputFile(file, metrics)),
+      )
     }),
   )
 }
@@ -163,15 +234,21 @@ async function run() {
 
   const ready =
     options.mode === 'old'
-      ? { allFilesReady$: createOldReadyStream({ buildEnd$, outputFiles, metrics }) }
+      ? {
+          allFilesReady$: createOldReadyStream({
+            buildEnd$,
+            outputFiles,
+            metrics,
+          }),
+        }
       : options.mode === 'old-recursive'
-        ? {
-            allFilesReady$: createOldRecursiveReadyStream({
-              buildEnd$,
-              outputFiles,
-              metrics,
-            }),
-          }
+      ? {
+          allFilesReady$: createOldRecursiveReadyStream({
+            buildEnd$,
+            outputFiles,
+            metrics,
+          }),
+        }
       : createFixedReadyStream({ buildEnd$, outputFiles, metrics, options })
 
   const start = performance.now()
@@ -184,7 +261,9 @@ async function run() {
 
   // Match the plugin's long-lived timestamp/error subscribers.
   subscriptions.push(
-    ready.allFilesReady$.pipe(mergeMap((results) => of(results.length))).subscribe(),
+    ready.allFilesReady$
+      .pipe(mergeMap((results) => of(results.length)))
+      .subscribe(),
   )
 
   buildEnd$.next({ type: 'build_end' })
@@ -203,6 +282,7 @@ async function run() {
 
   const result = {
     ...metrics,
+    preset: options.preset,
     elapsedMs: Math.round(elapsedMs),
     files: options.files,
     depsPerFile: options.depsPerFile,
