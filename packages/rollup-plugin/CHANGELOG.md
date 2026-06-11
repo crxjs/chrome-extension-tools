@@ -1,5 +1,11 @@
 # rollup-plugin-chrome-extension
 
+## 3.6.16
+
+### Patch Changes
+
+- 4b41de7: chore(deps): bump rollup from 2.79.2 to 2.80.0
+
 ## 3.6.15
 
 ### Patch Changes
