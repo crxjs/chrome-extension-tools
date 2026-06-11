@@ -104,6 +104,9 @@ export const pluginHMR: CrxPluginFn = () => {
         const opts = await getOptions({ ...config, server })
         liveReload = opts.liveReload !== false
         nativeHmr = opts.contentScripts?.hmr === 'native'
+        if (nativeHmr && !liveReload) {
+          return { server: { hmr: false } }
+        }
         const hmrConfig = getHmrHostConfig(server, this?.meta?.viteVersion)
         if (nativeHmr && hmrConfig) {
           const transport = hmrConfig.ws ?? hmrConfig.hmr
