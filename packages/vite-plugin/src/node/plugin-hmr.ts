@@ -63,6 +63,10 @@ export const pluginHMR: CrxPluginFn = () => {
         const opts = await getOptions({ ...config, server })
         liveReload = opts.liveReload !== false
         nativeHmr = opts.contentScripts?.hmr === 'native'
+        if (nativeHmr && !liveReload) {
+          server.hmr = false
+          return { server, ...config }
+        }
         if (server.hmr === false) return
         if (server.hmr === true) server.hmr = {}
         server.hmr = server.hmr ?? {}

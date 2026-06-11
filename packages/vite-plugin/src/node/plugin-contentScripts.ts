@@ -224,12 +224,13 @@ export const pluginContentScripts: CrxPluginFn = () => {
                   source: worldMainIds.has(fileId)
                     ? createDevMainLoader({
                         preamble: preambleCode ? fromVite(preambleId) : '',
-                        client: fromVite('/@vite/client'),
+                        client: liveReload ? fromVite('/@vite/client') : '',
                         fileName: fromVite(fileId),
                       })
                     : createDevNativeLoader({
                         preamble: preambleCode ? preambleId : '',
                         fileName: fileId,
+                        liveReload,
                         viteOrigin,
                       }),
                 })

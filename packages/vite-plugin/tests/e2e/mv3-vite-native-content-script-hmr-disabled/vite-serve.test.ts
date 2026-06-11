@@ -1,10 +1,10 @@
 import fs from 'fs-extra'
 import path from 'pathe'
 import { expect, test } from 'vitest'
-import { createUpdate, waitForInnerHtml } from '../helpers'
+import { createUpdate } from '../helpers'
 import { serve } from '../runners'
 
-test('content script uses native Vite HMR over WebSocket', async () => {
+test('liveReload false disables native content script HMR accept', async () => {
   const src = path.join(__dirname, 'src')
   const src1 = path.join(__dirname, 'src1')
   const src2 = path.join(__dirname, 'src2')
@@ -34,14 +34,7 @@ test('content script uses native Vite HMR over WebSocket', async () => {
   expect(await app.textContent()).toBe('one')
 
   await update('content.js')
+  await new Promise((resolve) => setTimeout(resolve, 2000))
 
-  try {
-    await waitForInnerHtml(app, (html) => html.includes('two'))
-  } catch (error) {
-    throw new Error(
-      `${error}\n\nCurrent text: ${await app.textContent()}\n\nBrowser messages:\n${messages.join(
-        '\n',
-      )}`,
-    )
-  }
+  expect(await app.textContent()).toBe('one')
 })

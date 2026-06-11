@@ -1,4 +1,5 @@
 declare const __PREAMBLE__: string
+declare const __CRX_LIVE_RELOAD__: boolean
 declare const __SCRIPT__: string
 declare const __VITE_ORIGIN__: string
 
@@ -10,7 +11,9 @@ const fromVite = (id: string) => new URL(id, __VITE_ORIGIN__).href
     await import(/* @vite-ignore */ fromVite(__PREAMBLE__))
   }
 
-  await import(/* @vite-ignore */ fromVite('/@vite/client'))
+  if (__CRX_LIVE_RELOAD__) {
+    await import(/* @vite-ignore */ fromVite('/@vite/client'))
+  }
 
   const { onExecute } = (await import(
     /* @vite-ignore */ fromVite(__SCRIPT__)
