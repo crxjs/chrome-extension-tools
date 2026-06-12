@@ -43,3 +43,15 @@ test('rewrites query-string modules from update payloads', () => {
     }),
   ).toEqual(['/src/components/HelloWorld.vue?vue&type=style&lang.css'])
 })
+
+test('forwards Vite wildcard full reloads to content scripts', () => {
+  const payload = mapVitePayloadForCrx({
+    type: 'full-reload',
+    path: '*',
+  })
+
+  expect(payload).toMatchObject({
+    type: 'full-reload',
+  })
+  expect(shouldForwardCrxPayload(payload)).toBe(true)
+})
