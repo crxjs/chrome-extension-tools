@@ -2,9 +2,10 @@ import workerHmrClient from 'client/es/hmr-client-worker.ts'
 import type { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import { getFileName } from './fileWriter-utilities'
+import { getCrxHmrToken } from './hmrToken'
 import { ChromeManifestBackground, FirefoxManifestBackground } from './manifest'
 import { getOptions } from './plugin-optionsProvider'
-import type { Browser, CrxPluginFn } from './types'
+import type { Browser, CrxPluginFn, ResolvedConfigWithHMRToken } from './types'
 import { workerClientId } from './virtualFileIds'
 
 /**
@@ -41,7 +42,13 @@ export const pluginBackground: CrxPluginFn = () => {
           return defineClientValues(
             workerHmrClient
               .replace('__BASE__', JSON.stringify(base))
-              .replace('__LIVE_RELOAD__', JSON.stringify(liveReload)),
+              .replace('__LIVE_RELOAD__', JSON.stringify(liveReload))
+              .replace(
+                '__CRX_HMR_TOKEN__',
+                JSON.stringify(
+                  getCrxHmrToken(config as ResolvedConfigWithHMRToken),
+                ),
+              ),
             config,
           )
         }

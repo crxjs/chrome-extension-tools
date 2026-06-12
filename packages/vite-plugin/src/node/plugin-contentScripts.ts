@@ -11,12 +11,49 @@ import {
 } from './contentScripts'
 import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
+import { getCrxHmrToken } from './hmrToken'
 import { getOptions } from './plugin-optionsProvider'
-import { basename } from './path'
+import { basename, dirname, relative } from './path'
 import { RxMap } from './RxMap'
-import { CrxPluginFn } from './types'
+import { CrxPluginFn, ResolvedConfigWithHMRToken } from './types'
 import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
 import colors from 'picocolors'
+
+function asRelativeImport(fromFileName: string, toFileName: string) {
+  const path = relative(dirname(fromFileName), toFileName)
+  return path.startsWith('.') ? path : `./${path}`
+}
+
+function getExternallyConnectableMatch(match: string) {
+  if (match === '<all_urls>') return null
+
+  const parsed = /^(\*|https?):\/\/([^/]+)\/.*$/.exec(match)
+  if (!parsed) return null
+
+  const [, , host] = parsed
+  if (host === '*') return null
+
+  return match
+}
+
+function getExternallyConnectableMatches(matches: string[]) {
+  const result = new Set<string>()
+  const unsupported = new Set<string>()
+
+  for (const match of matches) {
+    const externallyConnectableMatch = getExternallyConnectableMatch(match)
+    if (externallyConnectableMatch) {
+      result.add(externallyConnectableMatch)
+    } else {
+      unsupported.add(match)
+    }
+  }
+
+  return {
+    matches: [...result],
+    unsupported: [...unsupported],
+  }
+}
 
 /**
  * Emits content scripts and loaders.
@@ -40,6 +77,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let sub = new Subscription()
 
   const worldMainIds = new Set<string>()
+  const worldMainExternallyConnectableMatches = new Set<string>()
+  const unsupportedWorldMainExternallyConnectableMatches = new Set<string>()
 
   const findWorldMainIds = async (config: UserConfig, env: ConfigEnv) => {
     const { manifest: _manifest } = await getOptions(config)
@@ -53,17 +92,33 @@ export const pluginContentScripts: CrxPluginFn = () => {
         js.forEach((path) => worldMainIds.add(prefix('/', path)))
       }
     })
+    ;(manifest.content_scripts || []).forEach(({ world, matches = [] }) => {
+      if (world === 'MAIN') {
+        const externallyConnectable = getExternallyConnectableMatches(matches)
+        externallyConnectable.matches.forEach((match) =>
+          worldMainExternallyConnectableMatches.add(match),
+        )
+        externallyConnectable.unsupported.forEach((match) =>
+          unsupportedWorldMainExternallyConnectableMatches.add(match),
+        )
+      }
+    })
+  }
 
-    if (worldMainIds.size) {
-      const name = `[${pluginName}]`
-      const message = colors.yellow(
-        [
-          `${name} Some content-scripts don't support HMR because the world is MAIN:`,
-          ...[...worldMainIds].map((id) => `  ${id}`),
-        ].join('\r\n'),
-      )
-      console.log(message)
-    }
+  const warnUnsupportedWorldMainExternallyConnectableMatches = () => {
+    if (unsupportedWorldMainExternallyConnectableMatches.size === 0) return
+
+    const name = `[${pluginName}]`
+    const message = colors.yellow(
+      [
+        `${name} MAIN world HMR requires externally_connectable.matches. CRX cannot auto-add these Chrome-rejected content-script match patterns:`,
+        ...[...unsupportedWorldMainExternallyConnectableMatches].map(
+          (match) => `  ${match}`,
+        ),
+        'Add explicit http(s) host addresses to your content script matches during development if you want MAIN world HMR for those pages.',
+      ].join('\r\n'),
+    )
+    console.warn(message)
   }
 
   return [
@@ -72,6 +127,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'serve',
       async config(config, env) {
         await findWorldMainIds(config, env)
+        warnUnsupportedWorldMainExternallyConnectableMatches()
         const opts = await getOptions(config)
         const { contentScripts = {} } = opts
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
@@ -111,12 +167,23 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 const client = add({ type: 'module', id: viteClientId })
 
                 const file = add({ type: 'module', id })
+                const loaderFileName = getFileName({ type: 'loader', id })
                 const loader = add({
                   type: 'asset',
-                  id: getFileName({ type: 'loader', id }),
+                  id: loaderFileName,
                   source: worldMainIds.has(file.id)
                     ? createDevMainLoader({
-                        fileName: `./${file.fileName.split('/').at(-1)}`,
+                        preamble: preamble.fileName
+                          ? asRelativeImport(loaderFileName, preamble.fileName)
+                          : '',
+                        client: asRelativeImport(
+                          loaderFileName,
+                          client.fileName,
+                        ),
+                        fileName: asRelativeImport(
+                          loaderFileName,
+                          file.fileName,
+                        ),
                       })
                     : createDevLoader({
                         preamble: preamble.fileName,
@@ -149,12 +216,31 @@ export const pluginContentScripts: CrxPluginFn = () => {
           const defined = contentHmrPort
             .replace('__CRX_HMR_TIMEOUT__', JSON.stringify(hmrTimeout))
             .replace('__CRX_LIVE_RELOAD__', JSON.stringify(liveReload))
+            .replace(
+              '__CRX_HMR_TOKEN__',
+              JSON.stringify(
+                getCrxHmrToken(server.config as ResolvedConfigWithHMRToken),
+              ),
+            )
           return defined
         }
       },
       closeBundle() {
         sub.unsubscribe()
         sub = new Subscription() // can't reuse subscriptions
+      },
+      transformCrxManifest(manifest) {
+        if (worldMainExternallyConnectableMatches.size === 0) return null
+
+        manifest.externally_connectable = manifest.externally_connectable ?? {}
+        manifest.externally_connectable.matches = [
+          ...new Set([
+            ...(manifest.externally_connectable.matches ?? []),
+            ...worldMainExternallyConnectableMatches,
+          ]),
+        ]
+
+        return manifest
       },
     },
     {
