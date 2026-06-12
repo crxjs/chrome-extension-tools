@@ -2,14 +2,13 @@ import fs from 'fs'
 import path from 'pathe'
 import { OutputOptions, rollup } from 'rollup'
 import configs from '../rollup.config'
-import { normalizePath } from '@rollup/pluginutils'
 import _debug from 'debug'
 
 const debug = _debug('test:global-setup')
 
 const srcDir = path.resolve(__dirname, '..', 'src')
 const clientDir = path.join(srcDir, 'client')
-const outDir = normalizePath(path.join(__dirname, 'artifacts'))
+const outDir = path.join(__dirname, 'artifacts')
 
 function getClientFiles() {
   const files = fs
@@ -32,7 +31,7 @@ const clientFiles = getClientFiles()
 debug('client files %o', clientFiles)
 
 const [config] = configs
-config.input = clientFiles.map((f) => normalizePath(f))
+config.input = clientFiles
 config.output = { dir: outDir, format: 'esm', sourcemap: true, plugins: [] }
 config.plugins?.push(
   {

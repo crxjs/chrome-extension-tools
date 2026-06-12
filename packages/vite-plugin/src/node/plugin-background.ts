@@ -1,5 +1,5 @@
 import workerHmrClient from 'client/es/hmr-client-worker.ts'
-import { ResolvedConfig } from 'vite'
+import type { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import { getFileName } from './fileWriter-utilities'
 import { ChromeManifestBackground, FirefoxManifestBackground } from './manifest'

@@ -1,5 +1,93 @@
 # @crxjs/vite-plugin
 
+## 2.6.1
+
+### Patch Changes
+
+- 2b88621: Coalesce file writer readiness waits so large dev-server graph
+  updates do not repeatedly recompute the same dependency traversal. This also
+  fixes late HMR readiness waits that could miss the shared ready event and
+  delay content script updates.
+
+## 2.6.0
+
+### Minor Changes
+
+- 4f5d2ec: feat: add IIFE content script bundling
+
+  Content scripts named with `.iife.ts` extension are automatically bundled as
+  self-contained IIFE files with all dependencies inlined. This is useful for
+  MAIN world content scripts used with `chrome.scripting.executeScript` or
+  `chrome.scripting.registerContentScripts`.
+
+### Patch Changes
+
+- 5316e9c: Allow `chrome-extension://` and `moz-extension://` origins in Vite
+  dev-server CORS automatically. This keeps extension pages able to fetch
+  dev-server files on Vite releases with the stricter localhost-only CORS
+  default, including Vite `4.5.6`, `5.4.12`, and `6.0.9+`, without requiring
+  projects to configure `server.cors.origin` manually.
+- 1aee9ad: fix: dynamic content scripts failing in build --watch mode
+- 2f8bab5: Fix the dev-mode loading page so it waits for the requested extension
+  HTML file, preserves the page URL query string, allows extension-origin
+  readiness polling, and throttles automatic reloads to avoid rapid flicker.
+- 1681511: Expand vite-plugin CI to run e2e tests against supported Vite
+  versions and fix compatibility issues exposed by the matrix.
+- 0593d58: fix: publish ESM declarations for the Vite plugin entrypoint
+
+## 2.5.0
+
+### Minor Changes
+
+- 4756baf: feat: add HMR support for CSS declared in manifest content_scripts
+- 4756baf: add: browser_specific_settings.gecko properties
+- 4756baf: Fix "TypeError: plugins is not iterable" error when using
+  rolldown-vite (Vite 7).
+
+  In rolldown-vite, the buildStart hook doesn't receive options.plugins. This
+  fix uses the configResolved hook to get plugins from the resolved config, with
+  buildStart kept as a fallback for older Vite versions.
+
+- 4756baf: Fixed
+  [#852](https://github.com/crxjs/chrome-extension-tools/issues/852), the plugin
+  now emits a correct URL in `service-worker-loader.js` when the Vite option
+  `server.https` is enabled.
+- 4756baf: fix: resolve TypeScript types correctly for ESM and CJS consumers
+- 4756baf: feat: add Vite 8 beta support
+
+### Patch Changes
+
+- 4756baf: ci: migrate release workflow to npm trusted publishers
+- 570312a: fix: sanitize colons from output filenames on Windows
+- 4756baf: fix: copy CSS files declared in manifest content_scripts to output
+- 4756baf: Replace cheerio with node-html-parser to fix npm deprecation warning
+  for whatwg-encoding.
+
+  Also adds explicit vite peerDependency declaration (^3.0.0 through ^7.0.0) to
+  enable proper version resolution when used with different vite versions.
+
+- 4756baf: ci: run compat tests against stable Vite 8, make the vite8 available
+  as a peer dependency
+- 4756baf: fix: UnoCSS/TailwindCSS HMR issues with virtual CSS modules
+- 8a99b4f: made data_collection_permissions optional
+- 4756baf: fix: respect user's build.manifest setting in Vite 4+
+
+  When users set `build.manifest: false` in their Vite config, the Vite manifest
+  file (`.vite/manifest.json` in Vite 5+, or `manifest.json` in older versions)
+  is now properly removed from the output bundle.
+
+  CRXJS internally requires the Vite manifest to derive content script resources
+  during build, so it forces `build.manifest: true`. Previously, this meant the
+  Vite manifest was always included in the output even if the user explicitly
+  disabled it. Now, CRXJS removes the manifest from the bundle after processing
+  if the user didn't want it.
+
+  Closes #1077
+
+- d364bd8: chore: upgrade chokidar to 5.0.0
+- 4756baf: feat(client): Update the style and content of the development mode
+  loading page
+
 ## 2.3.0
 
 ### Minor Changes
