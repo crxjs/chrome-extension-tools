@@ -2,7 +2,6 @@ import loadingPageScript from 'client/es/loading-page-script.ts'
 import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
-import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
@@ -11,7 +10,13 @@ import { decodeManifest, encodeManifest, isString } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, normalize, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
-import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
+import {
+  CrxOutputAsset,
+  CrxOutputChunk,
+  CrxPlugin,
+  CrxPluginFn,
+  ManifestFiles,
+} from './types'
 import {
   clearContentCssEntries,
   getContentCssEntries,
@@ -395,7 +400,7 @@ export const pluginManifest: CrxPluginFn = () => {
       },
       async generateBundle(options, bundle) {
         const manifestName = this.getFileName(refId)
-        const manifestJs = bundle[manifestName] as OutputChunk
+        const manifestJs = bundle[manifestName] as CrxOutputChunk
         let manifest = decodeManifest.call(this, manifestJs.code)
 
         /* ----------- UPDATE EMITTED FILE NAMES ----------- */
@@ -576,7 +581,7 @@ Public dir: "${config.publicDir}"`,
         /* -------------- OUTPUT MANIFEST FILE ------------- */
 
         // overwrite vite manifest.json after render hooks
-        const manifestJson = bundle['manifest.json'] as OutputAsset
+        const manifestJson = bundle['manifest.json'] as CrxOutputAsset
         if (typeof manifestJson === 'undefined') {
           this.emitFile({
             type: 'asset',

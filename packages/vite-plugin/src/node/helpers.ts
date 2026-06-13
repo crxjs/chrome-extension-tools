@@ -1,7 +1,7 @@
 import { simple } from 'acorn-walk'
 import { createHash as _hash } from 'crypto'
 import debug from 'debug'
-import { AcornNode, OutputBundle, PluginContext } from 'rollup'
+import type { Node as AcornNode } from 'acorn'
 import type {
   ManifestV3,
   WebAccessibleResourceById,
@@ -12,6 +12,8 @@ import type {
   AcornLiteral,
   AcornMemberExpression,
   AcornTemplateElement,
+  CrxOutputBundle,
+  CrxPluginContext,
 } from './types'
 
 export const _debug = (id: string) => debug('crx').extend(id)
@@ -55,7 +57,10 @@ export function isIdentifier(n: AcornNode): n is AcornIdentifier {
   return n.type === 'Identifier'
 }
 
-export function decodeManifest(this: PluginContext, code: string): ManifestV3 {
+export function decodeManifest(
+  this: Pick<CrxPluginContext, 'parse'>,
+  code: string,
+): ManifestV3 {
   const tree = this.parse(code)
 
   let literal: AcornLiteral | undefined
@@ -84,7 +89,7 @@ export function encodeManifest(manifest: ManifestV3): string {
   return `export default ${json}`
 }
 
-export function parseJsonAsset<T>(bundle: OutputBundle, key: string): T {
+export function parseJsonAsset<T>(bundle: CrxOutputBundle, key: string): T {
   const asset = bundle[key]
 
   if (typeof asset === 'undefined')

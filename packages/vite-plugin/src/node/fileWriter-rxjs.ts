@@ -2,7 +2,6 @@ import * as lexer from 'es-module-lexer'
 import fsx from 'fs-extra'
 import { readFile } from 'fs/promises'
 import MagicString from 'magic-string'
-import { OutputAsset, OutputChunk } from 'rollup'
 import {
   BehaviorSubject,
   debounceTime,
@@ -26,7 +25,13 @@ import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
-import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
+import {
+  CrxDevAssetId,
+  CrxDevScriptId,
+  CrxOutputAsset,
+  CrxOutputChunk,
+  CrxPlugin,
+} from './types'
 import convertSourceMap from 'convert-source-map'
 
 const { outputFile } = fsx
@@ -43,10 +48,14 @@ const resolveScriptInput = (server: ViteDevServer, id: string) => {
   return id
 }
 
-const isOutputChunk = (item: OutputChunk | OutputAsset): item is OutputChunk =>
+const isOutputChunk = (
+  item: CrxOutputChunk | CrxOutputAsset,
+): item is CrxOutputChunk =>
   item.type === 'chunk'
 
-const isOutputAsset = (item: OutputChunk | OutputAsset): item is OutputAsset =>
+const isOutputAsset = (
+  item: CrxOutputChunk | CrxOutputAsset,
+): item is CrxOutputAsset =>
   item.type === 'asset'
 
 /* ----------------- SERVER EVENTS ----------------- */
@@ -334,17 +343,20 @@ async function bundleIife(
     },
   })
 
-  // viteBuild with write: false returns RollupOutput or RollupOutput[]
+  // viteBuild with write: false returns bundler output objects. Cast to the
+  // local output shape so this package doesn't expose Rollup types.
   const outputs = Array.isArray(result) ? result : [result]
   const firstOutput = outputs[0]
-  const output = 'output' in firstOutput ? firstOutput.output : undefined
+  const output = (
+    'output' in firstOutput ? firstOutput.output : undefined
+  ) as (CrxOutputChunk | CrxOutputAsset)[] | undefined
 
   if (!output) {
     throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
   }
 
   const entryChunk = output.find(
-    (item): item is OutputChunk => isOutputChunk(item) && item.isEntry,
+    (item): item is CrxOutputChunk => isOutputChunk(item) && item.isEntry,
   )
   if (!entryChunk) {
     throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
@@ -357,7 +369,7 @@ async function bundleIife(
       !asset.fileName.startsWith('.vite/'),
   )
   const extraChunks = output.filter(
-    (item): item is OutputChunk => isOutputChunk(item) && !item.isEntry,
+    (item): item is CrxOutputChunk => isOutputChunk(item) && !item.isEntry,
   )
 
   return {
