@@ -125,6 +125,7 @@ export async function testOutput(
         (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
       )
 
+      source = source.replaceAll(/\r\n/g, '\n')
       source = source.replaceAll('\\r\\n', '\\n')
 
       const scrubbed = scrubHashes(file)
