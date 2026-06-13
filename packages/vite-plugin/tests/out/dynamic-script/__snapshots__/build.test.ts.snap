@@ -58,7 +58,7 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash3.js 1`] = `
-"//#region tests/out/dynamic-script/src/dynamic-script.ts?scriptId=vOFbm
+"//#region tests/out/dynamic-script/src/dynamic-script.ts?scriptId=scriptId0
 var dynamic_script_default = \\"assets/dynamic-script.ts.hash2.js\\";
 //#endregion
 //#region tests/out/dynamic-script/src/background.ts
@@ -74,7 +74,7 @@ chrome.action.onClicked.addListener((tab) => {
 `;
 
 exports[`build fs output > assets/declared-script.ts.hash0.js 1`] = `
-"(function(){//#region tests/out/dynamic-script/src/main-world.ts?scriptId=5JGz0
+"(function(){//#region tests/out/dynamic-script/src/main-world.ts?scriptId=scriptId1
 var main_world_default = \\"assets/main-world.ts.hash1.js\\";
 //#endregion
 //#region tests/out/dynamic-script/src/declared-script.ts

@@ -51,15 +51,22 @@ export async function testOutput(
 
   const hashMap = new Map<string, string>()
   const scriptIdMap = new Map<string, string>()
+  const scrubScriptId = (id: string) => {
+    const replaced =
+      scriptIdMap.get(id) ?? `scriptId${scriptIdMap.size.toString()}`
+    scriptIdMap.set(id, replaced)
+    return replaced
+  }
   const scrubHashes = (text: string) =>
     text
       .replace(
+        /(\?scriptId=)([A-Za-z0-9]+)/g,
+        (_found, prefix, id) => `${prefix}${scrubScriptId(id)}`,
+      )
+      .replace(
         /(\.[cm]?[jt]sx?)-([A-Za-z0-9]{5})(\.hash)/g,
         (_found, extension, id, hashMarker) => {
-          const replaced =
-            scriptIdMap.get(id) ?? `scriptId${scriptIdMap.size.toString()}`
-          scriptIdMap.set(id, replaced)
-          return `${extension}-${replaced}${hashMarker}`
+          return `${extension}-${scrubScriptId(id)}${hashMarker}`
         },
       )
       .replace(/(\.hash)([a-zA-Z0-9_-]+)\./g, (found, p1) => {
@@ -75,6 +82,8 @@ export async function testOutput(
         return replaced
       })
       .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
+      .replace(/(?:\.\.\/)+(vite\.svg)/g, '<workspace>/$1')
+      .replace(/(?:\.\.\/)+(@crx\/(?:manifest|stub))/g, '<virtual>/$1')
       .replaceAll(/\/\/#(.+?base64,)([^\s]+)/g, '// #$1<base64>')
 
   getTest('manifest.json', (source, name) => {

@@ -60,7 +60,7 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash2.js 1`] = `
-"//#region tests/out/dynamic-script-iife/src/dynamic-script.ts?scriptId=41VZY
+"//#region tests/out/dynamic-script-iife/src/dynamic-script.ts?scriptId=scriptId0
 var dynamic_script_default = \\"assets/dynamic-script.ts.hash1.js\\";
 //#endregion
 //#region tests/out/dynamic-script-iife/src/background.ts
@@ -76,7 +76,7 @@ chrome.action.onClicked.addListener((tab) => {
 `;
 
 exports[`build fs output > assets/declared-script.ts.hash0.js 1`] = `
-"(function(){//#region tests/out/dynamic-script-iife/src/main-world.ts?scriptId=kb8kD
+"(function(){//#region tests/out/dynamic-script-iife/src/main-world.ts?scriptId=scriptId1
 var main_world_default = \\"src/main-world.js\\";
 //#endregion
 //#region tests/out/dynamic-script-iife/src/declared-script.ts

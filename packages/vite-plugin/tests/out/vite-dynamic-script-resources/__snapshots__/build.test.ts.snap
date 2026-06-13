@@ -43,10 +43,10 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash5.js 1`] = `
-"//#region tests/out/vite-dynamic-script-resources/src/content1.ts?scriptId=mSs6b
+"//#region tests/out/vite-dynamic-script-resources/src/content1.ts?scriptId=scriptId0
 var content1_default = \\"assets/content1.ts.hash0.js\\";
 //#endregion
-//#region tests/out/vite-dynamic-script-resources/src/content2.ts?scriptId=oUdJ4
+//#region tests/out/vite-dynamic-script-resources/src/content2.ts?scriptId=scriptId1
 var content2_default = \\"assets/content2.ts.hash1.js\\";
 //#endregion
 //#region tests/out/vite-dynamic-script-resources/src/background.ts
@@ -59,7 +59,7 @@ chrome.scripting.executeScript({
 `;
 
 exports[`build fs output > assets/content1.ts.hash0.js 1`] = `
-"(function(){//#region tests/out/vite-dynamic-script-resources/src/script.ts?scriptId=XL87n
+"(function(){//#region tests/out/vite-dynamic-script-resources/src/script.ts?scriptId=scriptId2
 var script_default = \\"assets/script.ts.hash4.js\\";
 //#endregion
 //#region tests/out/vite-dynamic-script-resources/src/content1.ts
