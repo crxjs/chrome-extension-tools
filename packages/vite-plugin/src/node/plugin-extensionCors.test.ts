@@ -39,7 +39,7 @@ async function runExtensionCorsConfig(config: UserConfig) {
     throw new Error('Unable to find extension CORS config hook')
   }
 
-  await hook(config, {
+  await hook.call({} as ThisParameterType<typeof hook>, config, {
     command: 'serve',
     mode: 'development',
   })

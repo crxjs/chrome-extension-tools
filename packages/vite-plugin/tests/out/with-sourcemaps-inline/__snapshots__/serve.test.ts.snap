@@ -313,8 +313,7 @@ let ready = false;
 do {
   try {
     const response = await fetch(getReadyUrl());
-    if (!response.ok)
-      throw new Error(\`HTTP \${response.status}\`);
+    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
     ready = true;
   } catch {
     const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);

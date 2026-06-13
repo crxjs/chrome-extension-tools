@@ -50,8 +50,9 @@ exports[`build fs output > assets/content.hash1.css 1`] = `
 `;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){const styles = \\"\\";
+"(function(){//#region tests/out/vite-content-script-css-imports/src/content.ts
 console.log(\\"content.ts\\");
+//#endregion
 })()
 "
 `;

@@ -1,4 +1,3 @@
-import { OutputChunk } from 'rollup'
 import {
   Manifest as ViteManifest,
   ResolvedConfig,
@@ -18,7 +17,7 @@ import {
   WebAccessibleResourceByMatch,
 } from './manifest'
 import { getOptions } from './plugin-optionsProvider'
-import type { CrxPluginFn, Browser } from './types'
+import type { Browser, CrxOutputChunk, CrxPluginFn } from './types'
 
 const debug = _debug('web-acc-res')
 
@@ -127,7 +126,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
             viteFiles.set(file.file, file)
           if (viteFiles.size === 0) return null
 
-          const bundleChunks = new Map<string, OutputChunk>()
+          const bundleChunks = new Map<string, CrxOutputChunk>()
           for (const chunk of Object.values(bundle))
             if (chunk.type === 'chunk') bundleChunks.set(chunk.fileName, chunk)
 
@@ -235,7 +234,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           for (const res of war.resources) {
             resourcesWithMaps.push(res)
             if (bundle[res]?.type === 'chunk') {
-              const chunk = bundle[res] as OutputChunk & {
+              const chunk = bundle[res] as CrxOutputChunk & {
                 // OutputChunk.sourcemapFileName available in Vite >=5 (Rollup 3.29).
                 sourcemapFileName: string
               }

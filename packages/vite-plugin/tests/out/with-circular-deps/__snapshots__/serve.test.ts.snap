@@ -315,8 +315,7 @@ let ready = false;
 do {
   try {
     const response = await fetch(getReadyUrl());
-    if (!response.ok)
-      throw new Error(\`HTTP \${response.status}\`);
+    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
     ready = true;
   } catch {
     const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
@@ -397,7 +396,7 @@ sharedUtil();
 
 exports[`serve fs output > src/utils.ts.js 1`] = `
 "export const sharedUtil = () => {
-  console.log(\\"util\\");
+	console.log(\\"util\\");
 };
 
 // # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>

@@ -50,9 +50,19 @@ export async function testOutput(
   }
 
   const hashMap = new Map<string, string>()
+  const scriptIdMap = new Map<string, string>()
   const scrubHashes = (text: string) =>
     text
-      .replace(/(\.hash)([a-z0-9]+)\./g, (found, p1) => {
+      .replace(
+        /(\.[cm]?[jt]sx?)-([A-Za-z0-9]{5})(\.hash)/g,
+        (_found, extension, id, hashMarker) => {
+          const replaced =
+            scriptIdMap.get(id) ?? `scriptId${scriptIdMap.size.toString()}`
+          scriptIdMap.set(id, replaced)
+          return `${extension}-${replaced}${hashMarker}`
+        },
+      )
+      .replace(/(\.hash)([a-zA-Z0-9_-]+)\./g, (found, p1) => {
         const replaced =
           hashMap.get(found) ?? `${p1.toString()}${hashMap.size.toString()}.`
         hashMap.set(found, replaced)
@@ -80,6 +90,7 @@ export async function testOutput(
 
   for (const file of files) {
     if (file.includes('vendor')) continue
+    if (file.includes('rolldown-runtime')) continue
     if (file.includes('react-refresh')) continue
     if (file.includes('content-script-client')) continue
     if (file.includes('webcomponents-custom-elements')) continue
@@ -93,17 +104,17 @@ export async function testOutput(
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
-
-        source = source
-          .replaceAll(config.root, '<root>')
-          .replaceAll(jsesc(rootDir), '<root>')
-          .replaceAll('\\\\', '\\')
-
-        source = source.replace(
-            new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
-          (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
-        )
       }
+
+      source = source
+        .replaceAll(config.root, '<root>')
+        .replaceAll(jsesc(rootDir), '<root>')
+        .replaceAll('\\\\', '\\')
+
+      source = source.replace(
+        new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+        (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
+      )
 
       source = source.replaceAll('\\r\\n', '\\n')
 

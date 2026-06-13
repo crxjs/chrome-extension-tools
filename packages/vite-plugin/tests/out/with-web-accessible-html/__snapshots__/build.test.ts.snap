@@ -37,59 +37,53 @@ Array [
 `;
 
 exports[`build fs output > assets/modulepreload-polyfill.hash.js 1`] = `
-"(function polyfill() {
-  const relList = document.createElement(\\"link\\").relList;
-  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
-    return;
-  }
-  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-    processPreload(link);
-  }
-  new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type !== \\"childList\\") {
-        continue;
-      }
-      for (const node of mutation.addedNodes) {
-        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
-          processPreload(node);
-      }
-    }
-  }).observe(document, { childList: true, subtree: true });
-  function getFetchOpts(script) {
-    const fetchOpts = {};
-    if (script.integrity)
-      fetchOpts.integrity = script.integrity;
-    if (script.referrerpolicy)
-      fetchOpts.referrerPolicy = script.referrerpolicy;
-    if (script.crossorigin === \\"use-credentials\\")
-      fetchOpts.credentials = \\"include\\";
-    else if (script.crossorigin === \\"anonymous\\")
-      fetchOpts.credentials = \\"omit\\";
-    else
-      fetchOpts.credentials = \\"same-origin\\";
-    return fetchOpts;
-  }
-  function processPreload(link) {
-    if (link.ep)
-      return;
-    link.ep = true;
-    const fetchOpts = getFetchOpts(link);
-    fetch(link.href, fetchOpts);
-  }
+"//#region \\\\0vite/modulepreload-polyfill.js
+(function polyfill() {
+	const relList = document.createElement(\\"link\\").relList;
+	if (relList && relList.supports && relList.supports(\\"modulepreload\\")) return;
+	for (const link of document.querySelectorAll(\\"link[rel=\\\\\\"modulepreload\\\\\\"]\\")) processPreload(link);
+	new MutationObserver((mutations) => {
+		for (const mutation of mutations) {
+			if (mutation.type !== \\"childList\\") continue;
+			for (const node of mutation.addedNodes) if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\") processPreload(node);
+		}
+	}).observe(document, {
+		childList: true,
+		subtree: true
+	});
+	function getFetchOpts(link) {
+		const fetchOpts = {};
+		if (link.integrity) fetchOpts.integrity = link.integrity;
+		if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+		if (link.crossOrigin === \\"use-credentials\\") fetchOpts.credentials = \\"include\\";
+		else if (link.crossOrigin === \\"anonymous\\") fetchOpts.credentials = \\"omit\\";
+		else fetchOpts.credentials = \\"same-origin\\";
+		return fetchOpts;
+	}
+	function processPreload(link) {
+		if (link.ep) return;
+		link.ep = true;
+		const fetchOpts = getFetchOpts(link);
+		fetch(link.href, fetchOpts);
+	}
 })();
+//#endregion
 "
 `;
 
 exports[`build fs output > assets/sidebar.hash.js 1`] = `
 "import \\"./modulepreload-polyfill.hash.js\\";
+//#region tests/out/with-web-accessible-html/src/sidebar.js
 console.log(\\"content script sidebar\\");
+//#endregion
 "
 `;
 
 exports[`build fs output > assets/welcome.hash.js 1`] = `
 "import \\"./modulepreload-polyfill.hash.js\\";
+//#region tests/out/with-web-accessible-html/src/welcome.js
 console.log(\\"welcome page\\");
+//#endregion
 "
 `;
 
@@ -134,7 +128,6 @@ exports[`build fs output > src/sidebar.html 1`] = `
       This HTML page is a sidebar in a content script. It is web accessible and
       supports HMR and build optimizations.
     </p>
-    
   </body>
 </html>
 "
@@ -177,7 +170,6 @@ exports[`build fs output > src/welcome.html 1`] = `
       optimizations.
     </p>
     <div id=\\"root\\"></div>
-    
   </body>
 </html>
 "

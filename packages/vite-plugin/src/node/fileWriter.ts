@@ -55,16 +55,23 @@ export async function start({
   serverEvent$.next({ type: 'start', server })
 
   const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
-    p.name?.startsWith('crx:'),
+    (p as { name?: string }).name?.startsWith('crx:') === true,
   )
   const { rollupOptions, outDir } = server.config.build
-  const inputOptions: RollupOptions = {
+  const {
+    output: _viteOutput,
+    platform: _vitePlatform,
+    ...rollupInputOptions
+  } = rollupOptions as Record<string, unknown>
+  const inputOptions = {
     input: 'index.html',
-    ...rollupOptions,
-    plugins,
-  }
+    ...(rollupInputOptions as unknown as RollupOptions),
+    // Vite 8 types Rollup-facing options through Rolldown, but this legacy
+    // dev writer still executes the same CRX plugin hooks with Rollup 2.
+    plugins: plugins as unknown as RollupOptions['plugins'],
+  } as RollupOptions
   // handle the various output option types
-  const rollupOutputOptions = [rollupOptions.output].flat()[0]
+  const rollupOutputOptions = [rollupOptions.output].flat()[0] as OutputOptions
   const outputOptions: OutputOptions = {
     ...rollupOutputOptions,
     dir: outDir,

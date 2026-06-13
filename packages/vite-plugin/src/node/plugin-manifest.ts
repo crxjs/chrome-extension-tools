@@ -2,7 +2,6 @@ import loadingPageScript from 'client/es/loading-page-script.ts'
 import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
-import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
@@ -11,7 +10,15 @@ import { decodeManifest, encodeManifest, isString } from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, normalize, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
-import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
+import {
+  CrxOutputAsset,
+  CrxOutputBundle,
+  CrxOutputChunk,
+  CrxPlugin,
+  CrxPluginContext,
+  CrxPluginFn,
+  ManifestFiles,
+} from './types'
 import {
   clearContentCssEntries,
   getContentCssEntries,
@@ -62,6 +69,30 @@ function getLoadingPageReadyHtmlPath(requestUrl: string | undefined) {
   }
 
   return normalizeHtmlPath(pageUrl.pathname)
+}
+
+function duplicateBasenames(files: string[]) {
+  const counts = new Map<string, number>()
+  for (const file of files) {
+    const name = basename(file)
+    counts.set(name, (counts.get(name) ?? 0) + 1)
+  }
+
+  return new Set(
+    [...counts.entries()]
+      .filter(([, count]) => count > 1)
+      .map(([name]) => name),
+  )
+}
+
+function getContentScriptChunkName(
+  file: string,
+  duplicateNames: Set<string>,
+) {
+  const name = basename(file)
+  return duplicateNames.has(name)
+    ? `${name}-${hashScriptId({ type: 'loader', id: file })}`
+    : name
 }
 
 /**
@@ -332,6 +363,15 @@ export const pluginManifest: CrxPluginFn = () => {
             const normalized = file.replace(/^\//, '')
             return standaloneFiles.includes(normalized)
           }
+          const contentScriptFiles = (manifest.content_scripts ?? []).flatMap(
+            ({ js = [] }) =>
+              js.filter(
+                (file) =>
+                  !isIifeContentScript(file) && !isStandaloneFile(file),
+              ),
+          )
+          const duplicateContentScriptNames =
+            duplicateBasenames(contentScriptFiles)
           if (manifest.content_scripts)
             for (const { js = [], matches = [] } of manifest.content_scripts)
               for (const file of js) {
@@ -342,7 +382,10 @@ export const pluginManifest: CrxPluginFn = () => {
                 const refId = this.emitFile({
                   type: 'chunk',
                   id,
-                  name: basename(file),
+                  name: getContentScriptChunkName(
+                    file,
+                    duplicateContentScriptNames,
+                  ),
                   // Preserve content script entry exports so the build finalizer
                   // can decide whether the script needs a loader wrapper.
                   preserveSignature: 'exports-only',
@@ -395,7 +438,8 @@ export const pluginManifest: CrxPluginFn = () => {
       },
       async generateBundle(options, bundle) {
         const manifestName = this.getFileName(refId)
-        const manifestJs = bundle[manifestName] as OutputChunk
+        const crxBundle = bundle as CrxOutputBundle
+        const manifestJs = crxBundle[manifestName] as CrxOutputChunk
         let manifest = decodeManifest.call(this, manifestJs.code)
 
         /* ----------- UPDATE EMITTED FILE NAMES ----------- */
@@ -430,7 +474,13 @@ export const pluginManifest: CrxPluginFn = () => {
             }
           }
         } else {
-          finalizeBuildContentScripts(this, bundle)
+          finalizeBuildContentScripts(
+            this as unknown as Pick<
+              CrxPluginContext,
+              'emitFile' | 'getFileName'
+            >,
+            crxBundle,
+          )
 
           // transform hook emits files and replaces in manifest with ref ids
           // update background service worker filename from ref
@@ -474,7 +524,11 @@ export const pluginManifest: CrxPluginFn = () => {
         for (const plugin of plugins) {
           try {
             const m = structuredClone(manifest)
-            const result = await plugin.renderCrxManifest?.call(this, m, bundle)
+            const result = await plugin.renderCrxManifest?.call(
+              this as unknown as CrxPluginContext,
+              m,
+              crxBundle,
+            )
             manifest = result ?? manifest
           } catch (error) {
             const name = `[${plugin.name}]`
@@ -514,7 +568,7 @@ export const pluginManifest: CrxPluginFn = () => {
             .flat()
             .map(async (f) => {
               // copy an asset if it is missing from the bundle
-              if (typeof bundle[f] === 'undefined') {
+              if (typeof crxBundle[f] === 'undefined') {
                 // get assets from project root or from public dir
                 let filename = join(config.root, f)
                 if (!existsSync(filename)) filename = join(config.publicDir, f)
@@ -576,7 +630,7 @@ Public dir: "${config.publicDir}"`,
         /* -------------- OUTPUT MANIFEST FILE ------------- */
 
         // overwrite vite manifest.json after render hooks
-        const manifestJson = bundle['manifest.json'] as OutputAsset
+        const manifestJson = crxBundle['manifest.json'] as CrxOutputAsset
         if (typeof manifestJson === 'undefined') {
           this.emitFile({
             type: 'asset',

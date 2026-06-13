@@ -54,157 +54,243 @@ Array [
 `;
 
 exports[`build fs output > assets/App.hash.css 1`] = `
-"button.svelte-1c7643s{font-family:inherit;font-size:inherit;padding:1em 2em;color:#ff3e00;background-color:rgba(255, 62, 0, 0.1);border-radius:2em;border:2px solid rgba(255, 62, 0, 0);outline:none;width:200px;font-variant-numeric:tabular-nums;cursor:pointer}button.svelte-1c7643s:focus{border:2px solid #ff3e00}button.svelte-1c7643s:active{background-color:rgba(255, 62, 0, 0.2)}:root{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif}main.svelte-1fm71xa{text-align:center;padding:1em;margin:0 auto}img.svelte-1fm71xa{height:16rem;width:16rem}h1.svelte-1fm71xa{color:#ff3e00;text-transform:uppercase;font-size:4rem;font-weight:100;line-height:1.1;margin:2rem auto;max-width:14rem}p.svelte-1fm71xa{max-width:14rem;margin:1rem auto;line-height:1.35}@media(min-width: 480px){h1.svelte-1fm71xa{max-width:none}p.svelte-1fm71xa{max-width:none}}"
+"button.s-lXDMeZ-gXAhl{font-family:inherit;font-size:inherit;padding:1em 2em;color:#ff3e00;background-color:rgba(255, 62, 0, 0.1);border-radius:2em;border:2px solid rgba(255, 62, 0, 0);outline:none;width:200px;font-variant-numeric:tabular-nums;cursor:pointer}button.s-lXDMeZ-gXAhl:focus{border:2px solid #ff3e00}button.s-lXDMeZ-gXAhl:active{background-color:rgba(255, 62, 0, 0.2)}:root{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif}main.s-XsEmFtvddWTw{text-align:center;padding:1em;margin:0 auto}img.s-XsEmFtvddWTw{height:16rem;width:16rem}h1.s-XsEmFtvddWTw{color:#ff3e00;text-transform:uppercase;font-size:4rem;font-weight:100;line-height:1.1;margin:2rem auto;max-width:14rem}p.s-XsEmFtvddWTw{max-width:14rem;margin:1rem auto;line-height:1.35}@media(min-width: 480px){h1.s-XsEmFtvddWTw{max-width:none}p.s-XsEmFtvddWTw{max-width:none}}"
 `;
 
 exports[`build fs output > assets/App.hash.js 1`] = `
-"import { S as SvelteComponent, i as init, s as safe_not_equal, e as element, t as text, a as attr, b as insert, c as append, l as listen, d as set_data, n as noop, f as detach, g as space, h as create_component, j as src_url_equal, m as mount_component, k as transition_in, o as transition_out, p as destroy_component } from \\"./vendor.hash.js\\";
-const logo = \\"/assets/svelte.hash.png\\";
-const Counter_svelte_svelte_type_style_lang = \\"\\";
+"import { C as validate_slots, S as transition_out, _ as set_data_dev, a as create_component, b as text, c as dispatch_dev, d as init, f as insert_dev, g as safe_not_equal, h as noop, i as attr_dev, l as element, m as mount_component, n as add_location, o as destroy_component, p as listen_dev, r as append_dev, s as detach_dev, t as SvelteComponentDev, u as globals, v as space, x as transition_in, y as src_url_equal } from \\"./vendor.hash.js\\";
+//#region tests/out/vite-svelte/src/assets/svelte.png
+var svelte_default = \\"/assets/svelte.hash.png\\";
+//#endregion
+//#region tests/out/vite-svelte/src/lib/Counter.svelte
+var { Error: Error$$1, Object: Object$$1, console: console$$1 } = globals;
+var file$$1 = \\"src/lib/Counter.svelte\\";
 function create_fragment$1(ctx) {
-  let button$;
-  let t0$;
-  let t1$;
-  let mounted;
-  let dispose;
-  return {
-    c() {
-      button$ = element(\\"button\\");
-      t0$ = text(\\"Clicks: \\");
-      t1$ = text(ctx[0]);
-      attr(button$, \\"class\\", \\"svelte-1c7643s\\");
-    },
-    m(target, anchor) {
-      insert(target, button$, anchor);
-      append(button$, t0$);
-      append(button$, t1$);
-      if (!mounted) {
-        dispose = listen(button$, \\"click\\", ctx[1]);
-        mounted = true;
-      }
-    },
-    p(ctx2, [dirty]) {
-      if (dirty & 1)
-        set_data(t1$, ctx2[0]);
-    },
-    i: noop,
-    o: noop,
-    d(detaching) {
-      if (detaching)
-        detach(button$);
-      mounted = false;
-      dispose();
-    }
-  };
+	let button$;
+	let t0$;
+	let t1$;
+	let mounted;
+	let dispose;
+	const block$ = {
+		c: function create() {
+			button$ = element(\\"button\\");
+			t0$ = text(\\"Clicks: \\");
+			t1$ = text(ctx[0]);
+			attr_dev(button$, \\"class\\", \\"s-lXDMeZ-gXAhl\\");
+			add_location(button$, file$$1, 7, 0, 83);
+		},
+		l: function claim(nodes) {
+			throw new Error$$1(\\"options.hydrate only works if the component was compiled with the \`hydratable: true\` option\\");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, button$, anchor);
+			append_dev(button$, t0$);
+			append_dev(button$, t1$);
+			if (!mounted) {
+				dispose = listen_dev(button$, \\"click\\", ctx[1], false, false, false, false);
+				mounted = true;
+			}
+		},
+		p: function update(ctx, [dirty]) {
+			if (dirty & 1) set_data_dev(t1$, ctx[0]);
+		},
+		i: noop,
+		o: noop,
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(button$);
+			mounted = false;
+			dispose();
+		}
+	};
+	dispatch_dev(\\"SvelteRegisterBlock\\", {
+		block: block$,
+		id: create_fragment$1.name,
+		type: \\"component\\",
+		source: \\"\\",
+		ctx
+	});
+	return block$;
+}
+function instance$$1($$self, $$props, $$invalidate) {
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots(\\"Counter\\", slots, []);
+	let count = 0;
+	const increment = () => {
+		$$invalidate(0, count += 1);
+	};
+	const writable_props = [];
+	Object$$1.keys($$props).forEach((key) => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== \\"$$\\" && key !== \\"slot\\") console$$1.warn(\`<Counter> was created with unknown prop '\${key}'\`);
+	});
+	$$self.$capture_state = () => ({
+		count,
+		increment
+	});
+	$$self.$inject_state = ($$props) => {
+		if (\\"count\\" in $$props) $$invalidate(0, count = $$props.count);
+	};
+	if ($$props && \\"$$inject\\" in $$props) $$self.$inject_state($$props.$$inject);
+	return [count, increment];
+}
+var Counter$ = class extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, instance$$1, create_fragment$1, safe_not_equal, {});
+		dispatch_dev(\\"SvelteRegisterComponent\\", {
+			component: this,
+			tagName: \\"Counter$\\",
+			options,
+			id: create_fragment$1.name
+		});
+	}
+};
+//#endregion
+//#region tests/out/vite-svelte/src/App.svelte
+var { Error: Error$, Object: Object$, console: console$ } = globals;
+var file$ = \\"src/App.svelte\\";
+function create_fragment(ctx) {
+	let main$;
+	let img$;
+	let img$_src_value$;
+	let t0$;
+	let h1$;
+	let t2$;
+	let counter$;
+	let t3$;
+	let p0$;
+	let t4$;
+	let a0$;
+	let t6$;
+	let t7$;
+	let p1$;
+	let t8$;
+	let a1$;
+	let t10$;
+	let current;
+	counter$ = new Counter$({ $$inline: true });
+	const block$ = {
+		c: function create() {
+			main$ = element(\\"main\\");
+			img$ = element(\\"img\\");
+			t0$ = space();
+			h1$ = element(\\"h1\\");
+			h1$.textContent = \\"Hello world!\\";
+			t2$ = space();
+			create_component(counter$.$$.fragment);
+			t3$ = space();
+			p0$ = element(\\"p\\");
+			t4$ = text(\\"Visit \\");
+			a0$ = element(\\"a\\");
+			a0$.textContent = \\"svelte.dev\\";
+			t6$ = text(\\" to learn how to build Svelte\\\\n    apps.\\");
+			t7$ = space();
+			p1$ = element(\\"p\\");
+			t8$ = text(\\"Check out \\");
+			a1$ = element(\\"a\\");
+			a1$.textContent = \\"SvelteKit\\";
+			t10$ = text(\\" for\\\\n    the officially supported framework, also powered by Vite!\\");
+			if (!src_url_equal(img$.src, img$_src_value$ = \\"/assets/svelte.hash.png\\")) attr_dev(img$, \\"src\\", img$_src_value$);
+			attr_dev(img$, \\"alt\\", \\"Svelte Logo\\");
+			attr_dev(img$, \\"class\\", \\"s-XsEmFtvddWTw\\");
+			add_location(img$, file$, 6, 2, 115);
+			attr_dev(h1$, \\"class\\", \\"s-XsEmFtvddWTw\\");
+			add_location(h1$, file$, 7, 2, 154);
+			attr_dev(a0$, \\"href\\", \\"https://svelte.dev\\");
+			add_location(a0$, file$, 12, 10, 208);
+			attr_dev(p0$, \\"class\\", \\"s-XsEmFtvddWTw\\");
+			add_location(p0$, file$, 11, 2, 194);
+			attr_dev(a1$, \\"href\\", \\"https://github.com/sveltejs/kit#readme\\");
+			add_location(a1$, file$, 17, 14, 319);
+			attr_dev(p1$, \\"class\\", \\"s-XsEmFtvddWTw\\");
+			add_location(p1$, file$, 16, 2, 301);
+			attr_dev(main$, \\"class\\", \\"s-XsEmFtvddWTw\\");
+			add_location(main$, file$, 5, 0, 106);
+		},
+		l: function claim(nodes) {
+			throw new Error$(\\"options.hydrate only works if the component was compiled with the \`hydratable: true\` option\\");
+		},
+		m: function mount(target, anchor) {
+			insert_dev(target, main$, anchor);
+			append_dev(main$, img$);
+			append_dev(main$, t0$);
+			append_dev(main$, h1$);
+			append_dev(main$, t2$);
+			mount_component(counter$, main$, null);
+			append_dev(main$, t3$);
+			append_dev(main$, p0$);
+			append_dev(p0$, t4$);
+			append_dev(p0$, a0$);
+			append_dev(p0$, t6$);
+			append_dev(main$, t7$);
+			append_dev(main$, p1$);
+			append_dev(p1$, t8$);
+			append_dev(p1$, a1$);
+			append_dev(p1$, t10$);
+			current = true;
+		},
+		p: noop,
+		i: function intro(local) {
+			if (current) return;
+			transition_in(counter$.$$.fragment, local);
+			current = true;
+		},
+		o: function outro(local) {
+			transition_out(counter$.$$.fragment, local);
+			current = false;
+		},
+		d: function destroy(detaching) {
+			if (detaching) detach_dev(main$);
+			destroy_component(counter$);
+		}
+	};
+	dispatch_dev(\\"SvelteRegisterBlock\\", {
+		block: block$,
+		id: create_fragment.name,
+		type: \\"component\\",
+		source: \\"\\",
+		ctx
+	});
+	return block$;
 }
 function instance$($$self, $$props, $$invalidate) {
-  let count = 0;
-  const increment = () => {
-    $$invalidate(0, count += 1);
-  };
-  return [count, increment];
+	let { $$slots: slots = {}, $$scope } = $$props;
+	validate_slots(\\"App\\", slots, []);
+	const writable_props = [];
+	Object$.keys($$props).forEach((key) => {
+		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== \\"$$\\" && key !== \\"slot\\") console$.warn(\`<App> was created with unknown prop '\${key}'\`);
+	});
+	$$self.$capture_state = () => ({
+		logo: svelte_default,
+		Counter: Counter$
+	});
+	return [];
 }
-class Counter$ extends SvelteComponent {
-  constructor(options) {
-    super();
-    init(this, options, instance$, create_fragment$1, safe_not_equal, {});
-  }
-}
-const App_svelte_svelte_type_style_lang = \\"\\";
-function create_fragment(ctx) {
-  let main$;
-  let img$;
-  let img$_src_value$;
-  let t0$;
-  let h1$;
-  let t2$;
-  let counter$;
-  let t3$;
-  let p0$;
-  let t7$;
-  let p1$;
-  let current;
-  counter$ = new Counter$({});
-  return {
-    c() {
-      main$ = element(\\"main\\");
-      img$ = element(\\"img\\");
-      t0$ = space();
-      h1$ = element(\\"h1\\");
-      h1$.textContent = \\"Hello world!\\";
-      t2$ = space();
-      create_component(counter$.$$.fragment);
-      t3$ = space();
-      p0$ = element(\\"p\\");
-      p0$.innerHTML = \`Visit <a href=\\"https://svelte.dev\\">svelte.dev</a> to learn how to build Svelte
-    apps.\`;
-      t7$ = space();
-      p1$ = element(\\"p\\");
-      p1$.innerHTML = \`Check out <a href=\\"https://github.com/sveltejs/kit#readme\\">SvelteKit</a> for
-    the officially supported framework, also powered by Vite!\`;
-      if (!src_url_equal(img$.src, img$_src_value$ = logo))
-        attr(img$, \\"src\\", img$_src_value$);
-      attr(img$, \\"alt\\", \\"Svelte Logo\\");
-      attr(img$, \\"class\\", \\"svelte-1fm71xa\\");
-      attr(h1$, \\"class\\", \\"svelte-1fm71xa\\");
-      attr(p0$, \\"class\\", \\"svelte-1fm71xa\\");
-      attr(p1$, \\"class\\", \\"svelte-1fm71xa\\");
-      attr(main$, \\"class\\", \\"svelte-1fm71xa\\");
-    },
-    m(target, anchor) {
-      insert(target, main$, anchor);
-      append(main$, img$);
-      append(main$, t0$);
-      append(main$, h1$);
-      append(main$, t2$);
-      mount_component(counter$, main$, null);
-      append(main$, t3$);
-      append(main$, p0$);
-      append(main$, t7$);
-      append(main$, p1$);
-      current = true;
-    },
-    p: noop,
-    i(local) {
-      if (current)
-        return;
-      transition_in(counter$.$$.fragment, local);
-      current = true;
-    },
-    o(local) {
-      transition_out(counter$.$$.fragment, local);
-      current = false;
-    },
-    d(detaching) {
-      if (detaching)
-        detach(main$);
-      destroy_component(counter$);
-    }
-  };
-}
-class App$ extends SvelteComponent {
-  constructor(options) {
-    super();
-    init(this, options, null, create_fragment, safe_not_equal, {});
-  }
-}
-export {
-  App$ as A
+var App$ = class extends SvelteComponentDev {
+	constructor(options) {
+		super(options);
+		init(this, options, instance$, create_fragment, safe_not_equal, {});
+		dispatch_dev(\\"SvelteRegisterComponent\\", {
+			component: this,
+			tagName: \\"App$\\",
+			options,
+			id: create_fragment.name
+		});
+	}
 };
+//#endregion
+export { App$ as t };
 "
 `;
 
 exports[`build fs output > assets/content.js.hash.js 1`] = `
-"import { A as App$ } from \\"./App.hash.js\\";
-import \\"./vendor.hash.js\\";
-const html = \`<div id=\\"crx-app\\"></div>\`;
-const target = new DOMParser().parseFromString(html, \\"text/html\\").body.firstElementChild;
+"import { t as App$ } from \\"./App.hash.js\\";
+//#region tests/out/vite-svelte/src/content.js
+var target = new DOMParser().parseFromString(\`<div id=\\"crx-app\\"></div>\`, \\"text/html\\").body.firstElementChild;
 document.body.append(target);
-const app = new App$({ target });
-export {
-  app as default
-};
+var app = new App$({ target });
+//#endregion
+export { app as default };
 "
 `;
 
@@ -226,52 +312,39 @@ exports[`build fs output > assets/content.js-loader.hash.js 1`] = `
 `;
 
 exports[`build fs output > assets/popup.html.hash.js 1`] = `
-"import { A as App$ } from \\"./App.hash.js\\";
-import \\"./vendor.hash.js\\";
+"import { t as App$ } from \\"./App.hash.js\\";
+//#region \\\\0vite/modulepreload-polyfill.js
 (function polyfill() {
-  const relList = document.createElement(\\"link\\").relList;
-  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
-    return;
-  }
-  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-    processPreload(link);
-  }
-  new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type !== \\"childList\\") {
-        continue;
-      }
-      for (const node of mutation.addedNodes) {
-        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
-          processPreload(node);
-      }
-    }
-  }).observe(document, { childList: true, subtree: true });
-  function getFetchOpts(script) {
-    const fetchOpts = {};
-    if (script.integrity)
-      fetchOpts.integrity = script.integrity;
-    if (script.referrerpolicy)
-      fetchOpts.referrerPolicy = script.referrerpolicy;
-    if (script.crossorigin === \\"use-credentials\\")
-      fetchOpts.credentials = \\"include\\";
-    else if (script.crossorigin === \\"anonymous\\")
-      fetchOpts.credentials = \\"omit\\";
-    else
-      fetchOpts.credentials = \\"same-origin\\";
-    return fetchOpts;
-  }
-  function processPreload(link) {
-    if (link.ep)
-      return;
-    link.ep = true;
-    const fetchOpts = getFetchOpts(link);
-    fetch(link.href, fetchOpts);
-  }
+	const relList = document.createElement(\\"link\\").relList;
+	if (relList && relList.supports && relList.supports(\\"modulepreload\\")) return;
+	for (const link of document.querySelectorAll(\\"link[rel=\\\\\\"modulepreload\\\\\\"]\\")) processPreload(link);
+	new MutationObserver((mutations) => {
+		for (const mutation of mutations) {
+			if (mutation.type !== \\"childList\\") continue;
+			for (const node of mutation.addedNodes) if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\") processPreload(node);
+		}
+	}).observe(document, {
+		childList: true,
+		subtree: true
+	});
+	function getFetchOpts(link) {
+		const fetchOpts = {};
+		if (link.integrity) fetchOpts.integrity = link.integrity;
+		if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+		if (link.crossOrigin === \\"use-credentials\\") fetchOpts.credentials = \\"include\\";
+		else if (link.crossOrigin === \\"anonymous\\") fetchOpts.credentials = \\"omit\\";
+		else fetchOpts.credentials = \\"same-origin\\";
+		return fetchOpts;
+	}
+	function processPreload(link) {
+		if (link.ep) return;
+		link.ep = true;
+		const fetchOpts = getFetchOpts(link);
+		fetch(link.href, fetchOpts);
+	}
 })();
-new App$({
-  target: document.getElementById(\\"app\\")
-});
+new App$({ target: document.getElementById(\\"app\\") });
+//#endregion
 "
 `;
 
@@ -286,11 +359,10 @@ exports[`build fs output > src/popup.html 1`] = `
     <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash.js\\"></script>
     <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash.js\\">
     <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/App.hash.js\\">
-    <link rel=\\"stylesheet\\" href=\\"/assets/App.hash.css\\">
+    <link rel=\\"stylesheet\\" crossorigin href=\\"/assets/App.hash.css\\">
   </head>
   <body>
     <div id=\\"app\\"></div>
-    
   </body>
 </html>
 "

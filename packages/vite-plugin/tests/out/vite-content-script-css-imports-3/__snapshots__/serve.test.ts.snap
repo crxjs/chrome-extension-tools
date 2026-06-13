@@ -115,7 +115,6 @@ const __vite__id = \\"<root>/src/content1/styles.css\\"
 const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;
 
@@ -158,7 +157,6 @@ const __vite__id = \\"<root>/src/content2/styles.css\\"
 const __vite__css = \\"body {\\\\n  color: blue;\\\\n}\\\\n\\"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;
 
@@ -174,6 +172,5 @@ const __vite__id = \\"<root>/src/main/styles.css\\"
 const __vite__css = \\"h1 {\\\\n  color: green;\\\\n}\\\\n\\"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;

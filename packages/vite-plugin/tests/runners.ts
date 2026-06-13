@@ -1,7 +1,6 @@
 import { watch } from 'chokidar'
 import fs from 'fs-extra'
 import { join } from 'pathe'
-import { RollupOutput, RollupWatcher } from 'rollup'
 import {
   delay,
   firstValueFrom,
@@ -24,10 +23,12 @@ import {
 import inspect from 'vite-plugin-inspect'
 import { afterEach, expect } from 'vitest'
 
+type ViteBuildOutput = Awaited<ReturnType<typeof _build>>
+
 export interface BuildTestResult {
   command: 'build'
   config: ResolvedConfig
-  output: RollupOutput | RollupWatcher
+  output: ViteBuildOutput
   outDir: string
   rootDir: string
 }

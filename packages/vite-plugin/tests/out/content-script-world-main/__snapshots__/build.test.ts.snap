@@ -39,7 +39,9 @@ Array [
 `;
 
 exports[`build fs output > assets/content.js.hash0.js 1`] = `
-"(function(){console.log(\\"content script running in MAIN world\\");
+"(function(){//#region tests/out/content-script-world-main/src/content.js
+console.log(\\"content script running in MAIN world\\");
+//#endregion
 })()
 "
 `;
