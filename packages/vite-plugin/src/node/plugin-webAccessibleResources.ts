@@ -84,7 +84,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         userWantsViteManifest = build?.manifest
 
         // Only force manifest generation if we're building - we need it to derive content script resources
-        return { ...config, build: { ...build, manifest: command === 'build' } }
+        return { build: { manifest: command === 'build' } }
       },
       configResolved(_config) {
         config = _config
