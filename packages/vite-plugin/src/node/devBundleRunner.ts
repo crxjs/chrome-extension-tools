@@ -188,7 +188,7 @@ class DevBundleRunner {
           this.context,
           this.outputOptions,
           this.bundle,
-          false,
+          true,
         )
       }
     }
