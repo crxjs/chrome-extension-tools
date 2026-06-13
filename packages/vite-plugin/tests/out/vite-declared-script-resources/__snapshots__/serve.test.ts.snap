@@ -70,7 +70,10 @@ exports[`serve fs output > src/content.ts.js 1`] = `
 "import icon from \\"/src/image.png__import.js\\";
 import font from \\"/src/font.otf__import.js\\";
 import scriptUrl from \\"/src/script.ts__scriptId--0.js\\";
-console.log(\\"content.ts\\", { icon, font });
+console.log(\\"content.ts\\", {
+	icon,
+	font
+});
 const script = document.createElement(\\"script\\");
 script.src = chrome.runtime.getURL(scriptUrl);
 script.type = \\"module\\";

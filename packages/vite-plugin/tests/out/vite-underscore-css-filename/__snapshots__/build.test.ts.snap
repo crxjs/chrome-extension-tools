@@ -51,8 +51,9 @@ body {
 `;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){const __uno = \\"\\";
+"(function(){//#region tests/out/vite-underscore-css-filename/src/content.ts
 console.log(\\"content.ts with underscore css\\");
+//#endregion
 })()
 "
 `;

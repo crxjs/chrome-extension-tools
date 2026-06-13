@@ -2,12 +2,17 @@ import { ModuleNode } from 'vite'
 import { isImporter } from './isImporter'
 import { test, expect } from 'vitest'
 
-function createModuleNode(name: string) {
+type TestModuleNode = Omit<ModuleNode, 'importers' | 'importedModules'> & {
+  importers: Set<ModuleNode>
+  importedModules: Set<ModuleNode>
+}
+
+function createModuleNode(name: string): TestModuleNode {
   return {
     file: name,
     importers: new Set<ModuleNode>(),
     importedModules: new Set<ModuleNode>(),
-  } as ModuleNode
+  } as TestModuleNode
 }
 
 test('exact match', () => {

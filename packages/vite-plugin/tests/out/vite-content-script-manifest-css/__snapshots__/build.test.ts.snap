@@ -43,7 +43,9 @@ Array [
 `;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){console.log(\\"content.ts\\");
+"(function(){//#region tests/out/vite-content-script-manifest-css/src/content.ts
+console.log(\\"content.ts\\");
+//#endregion
 })()
 "
 `;

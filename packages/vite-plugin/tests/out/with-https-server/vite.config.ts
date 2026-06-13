@@ -18,6 +18,6 @@ export default defineConfig({
   logLevel: 'error',
   plugins: [crx({ manifest })],
   server: {
-    https: true,
+    https: {},
   },
 })

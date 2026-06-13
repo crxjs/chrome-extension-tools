@@ -45,19 +45,32 @@ Array [
 `;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){const icon = \\"/assets/image.hash2.png\\";
-const font = \\"/assets/font.hash1.otf\\";
-const scriptUrl = \\"assets/script.ts.hash3.js\\";
-console.log(\\"content.ts\\", { icon, font });
-const script = document.createElement(\\"script\\");
-script.src = chrome.runtime.getURL(scriptUrl);
+"(function(){//#region tests/out/vite-declared-script-resources/src/image.png
+var image_default = \\"/assets/image.hash2.png\\";
+//#endregion
+//#region tests/out/vite-declared-script-resources/src/font.otf
+var font_default = \\"/assets/font.hash1.otf\\";
+//#endregion
+//#region tests/out/vite-declared-script-resources/src/script.ts?scriptId=scriptId0
+var script_default = \\"assets/script.ts.hash3.js\\";
+//#endregion
+//#region tests/out/vite-declared-script-resources/src/content.ts
+console.log(\\"content.ts\\", {
+	icon: image_default,
+	font: font_default
+});
+var script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(script_default);
 script.type = \\"module\\";
 document.body.append(script);
+//#endregion
 })()
 "
 `;
 
 exports[`build fs output > assets/script.ts.hash3.js 1`] = `
-"console.log(\\"main world script\\");
+"//#region tests/out/vite-declared-script-resources/src/script.ts
+console.log(\\"main world script\\");
+//#endregion
 "
 `;

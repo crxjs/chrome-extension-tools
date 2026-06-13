@@ -52,7 +52,6 @@ Array [
   "src/lib/Counter.svelte.js",
   "src/lib/Counter.svelte__svelte_type--style_lang.css.js",
   "src/popup.html",
-  "vendor/chunk-ROZ23EM4.js__v--hash.js",
   "vendor/crx-client-port.js",
   "vendor/svelte-hmr-runtime-hot-api-esm.js__v--hash.js",
   "vendor/svelte-hmr-runtime-hot-api.js__v--hash.js",
@@ -326,8 +325,7 @@ let ready = false;
 do {
   try {
     const response = await fetch(getReadyUrl());
-    if (!response.ok)
-      throw new Error(\`HTTP \${response.status}\`);
+    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
     ready = true;
   } catch {
     const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
@@ -376,8 +374,8 @@ import {
 } from \\"/vendor/svelte_internal.js__v--hash.js\\";
 
 const { Error: Error$, Object: Object$, console: console$ } = globals$;
-import logo from '/src/assets/svelte.png__import.js';
-import Counter from '/src/lib/Counter.svelte.js';
+import logo from \\"/src/assets/svelte.png__import.js\\";
+import Counter from \\"/src/lib/Counter.svelte.js\\";
 const file$ = \\"src/App.svelte\\";
 
 function create_fragment(ctx) {
@@ -531,14 +529,13 @@ const __vite__id = \\"<root>/src/App.svelte?svelte&type=style&lang.css\\"
 const __vite__css = \\":root{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,\\\\n      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif}main.s-XsEmFtvddWTw{text-align:center;padding:1em;margin:0 auto}img.s-XsEmFtvddWTw{height:16rem;width:16rem}h1.s-XsEmFtvddWTw{color:#ff3e00;text-transform:uppercase;font-size:4rem;font-weight:100;line-height:1.1;margin:2rem auto;max-width:14rem}p.s-XsEmFtvddWTw{max-width:14rem;margin:1rem auto;line-height:1.35}@media(min-width: 480px){h1.s-XsEmFtvddWTw{max-width:none}p.s-XsEmFtvddWTw{max-width:none}}.s-XsEmFtvddWTw{}\\"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;
 
 exports[`serve fs output > src/assets/svelte.png__import.js 1`] = `"export default \\"/src/assets/svelte.png\\""`;
 
 exports[`serve fs output > src/content.js.js 1`] = `
-"import App from '/src/App.svelte.js'
+"import App from \\"/src/App.svelte.js\\"
 
 const html = \`<div id=\\"crx-app\\"></div>\`
 const target = new DOMParser().parseFromString(html, 'text/html').body
@@ -708,7 +705,6 @@ const __vite__id = \\"<root>/src/lib/Counter.svelte?svelte&type=style&lang.css\\
 const __vite__css = \\"button.s-lXDMeZ-gXAhl{font-family:inherit;font-size:inherit;padding:1em 2em;color:#ff3e00;background-color:rgba(255, 62, 0, 0.1);border-radius:2em;border:2px solid rgba(255, 62, 0, 0);outline:none;width:200px;font-variant-numeric:tabular-nums;cursor:pointer}button.s-lXDMeZ-gXAhl:focus{border:2px solid #ff3e00}button.s-lXDMeZ-gXAhl:active{background-color:rgba(255, 62, 0, 0.2)}.s-lXDMeZ-gXAhl{}\\"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;
 

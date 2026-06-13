@@ -43,32 +43,46 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash5.js 1`] = `
-"const content1 = \\"assets/content1.ts.hash0.js\\";
-const content2 = \\"assets/content2.ts.hash1.js\\";
+"//#region tests/out/vite-dynamic-script-resources/src/content1.ts?scriptId=scriptId0
+var content1_default = \\"assets/content1.ts.hash0.js\\";
+//#endregion
+//#region tests/out/vite-dynamic-script-resources/src/content2.ts?scriptId=scriptId1
+var content2_default = \\"assets/content2.ts.hash1.js\\";
+//#endregion
+//#region tests/out/vite-dynamic-script-resources/src/background.ts
 chrome.scripting.executeScript({
-  files: [content1, content2],
-  target: { tabId: 1 }
+	files: [content1_default, content2_default],
+	target: { tabId: 1 }
 });
+//#endregion
 "
 `;
 
 exports[`build fs output > assets/content1.ts.hash0.js 1`] = `
-"(function(){const script = \\"assets/script.ts.hash4.js\\";
-console.log(\\"content.ts\\", { script });
+"(function(){//#region tests/out/vite-dynamic-script-resources/src/script.ts?scriptId=scriptId2
+var script_default = \\"assets/script.ts.hash4.js\\";
+//#endregion
+//#region tests/out/vite-dynamic-script-resources/src/content1.ts
+console.log(\\"content.ts\\", { script: script_default });
+//#endregion
 })()
 "
 `;
 
 exports[`build fs output > assets/content2.ts.hash1.js 1`] = `
-"(function(){const font = \\"/assets/font.hash2.otf\\";
-console.log(\\"content2.ts\\", { font });
+"(function(){//#endregion
+//#region tests/out/vite-dynamic-script-resources/src/content2.ts
+console.log(\\"content2.ts\\", { font: \\"/assets/font.hash2.otf\\" });
+//#endregion
 })()
 "
 `;
 
 exports[`build fs output > assets/script.ts.hash4.js 1`] = `
-"const icon = \\"/assets/image.hash3.png\\";
-console.log(\\"main world script\\", { icon });
+"//#endregion
+//#region tests/out/vite-dynamic-script-resources/src/script.ts
+console.log(\\"main world script\\", { icon: \\"/assets/image.hash3.png\\" });
+//#endregion
 "
 `;
 

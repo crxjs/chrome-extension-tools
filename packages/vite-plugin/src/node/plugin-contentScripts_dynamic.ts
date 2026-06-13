@@ -69,9 +69,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
               dynamicScripts.push(script)
             }
           }
+          if (dynamicScripts.length === 0) return
 
-          // Clear stale entries (old refIds, fileNames are invalid in new build)
-          contentScripts.clear()
+          // Clear stale dynamic entries (old refIds, fileNames are invalid in
+          // new build), but keep manifest-declared content scripts intact.
+          for (const [key, script] of [...contentScripts]) {
+            if (script.isDynamicScript) contentScripts.delete(key)
+          }
 
           // Re-emit each dynamic script with a fresh refId for this build context
           for (const script of dynamicScripts) {

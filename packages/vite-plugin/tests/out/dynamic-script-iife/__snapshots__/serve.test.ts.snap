@@ -136,8 +136,9 @@ exports[`serve fs output > src/dynamic-script.ts-loader.js 1`] = `
 
 exports[`serve fs output > src/main-world.ts.iife.js 1`] = `
 "(function() {
-  \\"use strict\\";
-  console.log(\\"main world script\\");
+	//#region tests/out/dynamic-script-iife/src/main-world.ts
+	console.log(\\"main world script\\");
+	//#endregion
 })();
 "
 `;

@@ -44,13 +44,13 @@ Array [
 `;
 
 exports[`build fs output > assets/content.js.hash1.js 1`] = `
-"console.log(\\"content script\\");
+"//#region tests/out/content-script-module-api/src/content.js
+console.log(\\"content script\\");
 function onExecute() {
-  console.log(\\"onExecute\\");
+	console.log(\\"onExecute\\");
 }
-export {
-  onExecute
-};
+//#endregion
+export { onExecute };
 "
 `;
 

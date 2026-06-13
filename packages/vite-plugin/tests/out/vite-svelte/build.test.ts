@@ -5,10 +5,10 @@ import { test } from 'vitest'
 
 test('build fs output', async () => {
   const result = await build(__dirname)
-  // Use Svelte-aware test for .svelte.js files to handle cross-platform differences
+  // Use Svelte-aware test for compiled JS files to handle cross-platform differences
   const svelteTest = createSvelteAwareTest()
   const customTests = new Map([
-    [/\.svelte\.js$/, svelteTest],
+    [/\.js$/, svelteTest],
   ])
   await testOutput(result, customTests)
 })
