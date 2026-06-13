@@ -239,6 +239,9 @@ importers:
       '@webcomponents/custom-elements':
         specifier: ^1.5.0
         version: 1.6.0
+      acorn:
+        specifier: ^8.15.0
+        version: 8.15.0
       acorn-walk:
         specifier: ^8.3.5
         version: 8.3.5
@@ -269,9 +272,6 @@ importers:
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
-      rollup:
-        specifier: 2.80.0
-        version: 2.80.0
       rxjs:
         specifier: 7.5.7
         version: 7.5.7
@@ -384,6 +384,9 @@ importers:
       rimraf:
         specifier: 3.0.2
         version: 3.0.2
+      rollup:
+        specifier: 2.80.0
+        version: 2.80.0
       rollup-plugin-dts:
         specifier: ^4.2.0
         version: 4.2.3(rollup@2.80.0)(typescript@4.9.5)
@@ -10882,6 +10885,7 @@ snapshots:
   '@crxjs/vite-plugin@file:packages/vite-plugin(vite@6.4.1(@types/node@22.19.5)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.2))':
     dependencies:
       '@webcomponents/custom-elements': 1.6.0
+      acorn: 8.15.0
       acorn-walk: 8.3.5
       convert-source-map: 1.9.0
       debug: 4.4.3
@@ -10892,7 +10896,6 @@ snapshots:
       node-html-parser: 7.1.0
       pathe: 2.0.3
       picocolors: 1.1.1
-      rollup: 2.80.0
       rxjs: 7.5.7
       tinyglobby: 0.2.17
       vite: 6.4.1(@types/node@22.19.5)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.2)

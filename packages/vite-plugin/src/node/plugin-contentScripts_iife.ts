@@ -1,17 +1,15 @@
-import type {
-  OutputAsset,
-  OutputChunk,
-  PluginContext,
-  RollupOutput,
-  RollupWatcher,
-} from 'rollup'
 import { build, mergeConfig, InlineConfig, ResolvedConfig, UserConfig } from 'vite'
 import { contentScripts, type ContentScript } from './contentScripts'
 import { formatFileData } from './fileWriter-utilities'
 import type { ManifestV3 } from './manifest'
 import { basename, dirname, join } from './path'
 import { getOptions } from './plugin-optionsProvider'
-import { CrxPluginFn } from './types'
+import {
+  CrxOutputAsset,
+  CrxOutputChunk,
+  CrxPluginContext,
+  CrxPluginFn,
+} from './types'
 import colors from 'picocolors'
 
 type IifeEntry = {
@@ -20,8 +18,11 @@ type IifeEntry = {
   matches: string[]
 }
 
-type IifeBuildResult = RollupOutput | RollupOutput[] | RollupWatcher
-type IifeBuildOutput = OutputAsset | OutputChunk
+type IifeBuildResult =
+  | { output: IifeBuildOutput[] }
+  | { output: IifeBuildOutput[] }[]
+  | { on: (...args: unknown[]) => unknown }
+type IifeBuildOutput = CrxOutputAsset | CrxOutputChunk
 
 /**
  * Check if a content script file should be built as IIFE based on its filename.
@@ -117,7 +118,7 @@ export const pluginContentScriptsIife: CrxPluginFn = () => {
           try {
             const iifeConfig = createIifeConfig(config, entry.id, outputFileName)
             const result = await build(iifeConfig)
-            const outputs = getBuildOutputs(result, entry.file)
+            const outputs = getBuildOutputs(result as IifeBuildResult, entry.file)
             emitIifeOutputs(this, outputs, entry.file, outputFileName)
             registerIifeContentScript(entry, outputFileName)
 
@@ -195,13 +196,13 @@ function getBuildOutputs(
 }
 
 function emitIifeOutputs(
-  context: Pick<PluginContext, 'emitFile'>,
+  context: Pick<CrxPluginContext, 'emitFile'>,
   outputs: IifeBuildOutput[],
   entryFile: string,
   outputFileName: string,
 ): void {
   const entryChunk = outputs.find(
-    (output): output is OutputChunk =>
+    (output): output is CrxOutputChunk =>
       output.type === 'chunk' && output.isEntry,
   )
   if (!entryChunk) {

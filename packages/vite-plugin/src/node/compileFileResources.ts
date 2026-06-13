@@ -1,8 +1,8 @@
-import { OutputChunk } from 'rollup'
 import { ManifestChunk, ResolvedConfig } from 'vite'
 import { contentScripts } from './contentScripts'
 import { prefix } from './fileWriter-utilities'
 import { relative } from './path'
+import type { CrxOutputChunk } from './types'
 
 interface FileResources {
   assets: Set<string>
@@ -17,7 +17,7 @@ export function compileFileResources(
     files,
     config,
   }: {
-    chunks: Map<string, OutputChunk>
+    chunks: Map<string, CrxOutputChunk>
     files: Map<string, ManifestChunk>
     config: ResolvedConfig
   },
