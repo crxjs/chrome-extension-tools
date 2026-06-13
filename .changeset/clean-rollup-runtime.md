@@ -2,4 +2,4 @@
 "@crxjs/vite-plugin": minor
 ---
 
-Remove the direct Rollup runtime dependency from the Vite plugin package.
+Add an opt-in Vite-powered development bundle writer for the Vite plugin while keeping the Rollup writer as the default.

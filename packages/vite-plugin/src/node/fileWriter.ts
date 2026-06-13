@@ -1,5 +1,6 @@
 import fsx from 'fs-extra'
 import { performance } from 'perf_hooks'
+import { rollup, type OutputOptions, type RollupOptions } from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
 import { writeDevBundle } from './devBundleRunner'
@@ -19,6 +20,7 @@ import {
   prefix,
 } from './fileWriter-utilities'
 import { _debug } from './helpers'
+import { getOptions } from './plugin-optionsProvider'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
 export { allFilesReady, fileReady }
@@ -26,6 +28,30 @@ export { allFilesReady, fileReady }
 const { outputFile } = fsx
 
 const debug = _debug('file-writer')
+
+async function writeRollupDevBundle({
+  server,
+  plugins,
+}: {
+  server: ViteDevServer
+  plugins: CrxPlugin[]
+}) {
+  const { rollupOptions, outDir } = server.config.build
+  const inputOptions: RollupOptions = {
+    input: 'index.html',
+    ...rollupOptions,
+    plugins,
+  }
+  const rollupOutputOptions = [rollupOptions.output].flat()[0]
+  const outputOptions: OutputOptions = {
+    ...rollupOutputOptions,
+    dir: outDir,
+    format: 'es',
+  }
+
+  const build = await rollup(inputOptions)
+  await build.write(outputOptions)
+}
 
 function queueWrite(
   script: CrxDevAssetId | CrxDevScriptId,
@@ -57,8 +83,13 @@ export async function start({
   const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
     p.name?.startsWith('crx:'),
   )
+  const options = await getOptions({ plugins: [...server.config.plugins] })
   fileWriterEvent$.next({ type: 'build_start' })
-  await writeDevBundle({ server, plugins })
+  if (options.experimental?.viteDevBundle) {
+    await writeDevBundle({ server, plugins })
+  } else {
+    await writeRollupDevBundle({ server, plugins })
+  }
   fileWriterEvent$.next({ type: 'build_end' })
 
   await allFilesReady()

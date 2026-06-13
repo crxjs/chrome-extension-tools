@@ -25,6 +25,9 @@ export default defineConfig({
   logLevel: 'error',
   plugins: [
     crx({
+      experimental: {
+        viteDevBundle: true,
+      },
       manifest: {
         manifest_version: 3,
         version: '1.0.0',

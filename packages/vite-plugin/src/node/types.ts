@@ -134,6 +134,15 @@ export interface CrxPlugin extends VitePlugin {
 
 // change this to an interface when you want to add options
 export interface CrxOptions {
+  experimental?: {
+    /**
+     * Use the Vite plugin container instead of Rollup to write the development
+     * extension base files.
+     *
+     * This is opt-in while the Rollup-compatible path remains the default.
+     */
+    viteDevBundle?: boolean
+  }
   contentScripts?: {
     preambleCode?: string | false
     hmrTimeout?: number
