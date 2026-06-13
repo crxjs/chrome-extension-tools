@@ -121,7 +121,7 @@
     "@vitejs/plugin-react": "^2.2.0",
     "@vitejs/plugin-vue": "3.2.0",
     "chokidar": "^5.0.0",
-    "esbuild": "0.17.14",
+    "esbuild": "0.28.1",
     "esbuild-runner": "2.2.2",
     "eslint": "9.26.0",
     "eslint-plugin-react": "^7.29.4",
