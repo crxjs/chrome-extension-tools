@@ -1,6 +1,5 @@
 export const viteClientId = '/@vite/client'
 export const customElementsId = '/@webcomponents/custom-elements'
-export const reactRefreshId = '/@react-refresh'
 
 export const contentHmrPortId = '/@crx/client-port'
 export const manifestId = '/@crx/manifest'
