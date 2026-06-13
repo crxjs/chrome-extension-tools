@@ -82,6 +82,7 @@ export async function testOutput(
         return replaced
       })
       .replace(/(v--)([a-z0-9]+)\./g, '$1hash.')
+      .replace(/(\/\/#region )\/(vite\.svg)/g, '$1<workspace>/$2')
       .replace(/(?:\.\.\/)+(vite\.svg)/g, '<workspace>/$1')
       .replace(/(?:\.\.\/)+(@crx\/(?:manifest|stub))/g, '<virtual>/$1')
       .replaceAll(/\/\/#(.+?base64,)([^\s]+)/g, '// #$1<base64>')
