@@ -148,10 +148,12 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                     `Content script filename is undefined for "${id}"`,
                   )
                 } else {
-                  const { assets, css, imports } = compileFileResources(
-                    fileName,
-                    { chunks: bundleChunks, files: viteFiles, config },
-                  )
+                  const { assets, css, imports, runtimeCss } =
+                    compileFileResources(fileName, {
+                      chunks: bundleChunks,
+                      files: viteFiles,
+                      config,
+                    })
 
                   // update content script resources for use by css plugin
                   contentScripts.get(key)!.css = [...css]
@@ -172,9 +174,9 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                       : false,
                   }
 
-                  if (isDynamicScript || !injectCss) {
-                    resource.resources.push(...css)
-                  }
+                  const cssResources =
+                    isDynamicScript || !injectCss ? css : runtimeCss
+                  resource.resources.push(...cssResources)
 
                   if (resource.resources.length)
                     if (type === 'module') {
