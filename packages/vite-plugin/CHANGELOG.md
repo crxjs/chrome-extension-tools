@@ -1,5 +1,16 @@
 # @crxjs/vite-plugin
 
+## 2.7.0
+
+### Minor Changes
+
+- 9f00943: Add dev HMR support for manifest-declared MAIN world content scripts.
+
+### Patch Changes
+
+- a9cc89a: Remove unused vite-plugin dependencies and update selected dependency
+  versions.
+
 ## 2.6.1
 
 ### Patch Changes
