@@ -26,7 +26,8 @@ Object {
       "resources": Array [
         "assets/App.hash1.js",
         "assets/content.tsx.hash2.js",
-        "assets/vendor.hash3.js",
+        "assets/rolldown-runtime.hash3.js",
+        "assets/vendor.hash4.js",
       ],
       "use_dynamic_url": false,
     },
@@ -39,41 +40,57 @@ Array [
   "assets/App.hash1.js",
   "assets/content.tsx-loader.hash0.js",
   "assets/content.tsx.hash2.js",
-  "assets/popup.html.hash4.js",
-  "assets/vendor.hash3.js",
+  "assets/popup.html.hash5.js",
+  "assets/rolldown-runtime.hash3.js",
+  "assets/vendor.hash4.js",
   "manifest.json",
   "src/popup.html",
 ]
 `;
 
 exports[`build fs output > assets/App.hash1.js 1`] = `
-"import { j as jsxRuntime } from \\"./vendor.hash3.js\\";
-const jsx = jsxRuntime.exports.jsx;
-const jsxs = jsxRuntime.exports.jsxs;
-const App = () => {
-  return /* @__PURE__ */ jsxs(\\"div\\", {
-    children: [/* @__PURE__ */ jsx(\\"h1\\", {
-      children: \\"Popup Page\\"
-    }), /* @__PURE__ */ jsx(\\"p\\", {
-      children: \\"If you are seeing this, React is working!\\"
-    })]
-  });
+"import { n as __toESM } from \\"./rolldown-runtime.hash3.js\\";
+import { t as require_jsx_dev_runtime } from \\"./vendor.hash4.js\\";
+var jsxDEV = (/* @__PURE__ */ __toESM(require_jsx_dev_runtime())).jsxDEV;
+//#endregion
+//#region tests/out/vite-react-fast-refresh/src/App.tsx
+var _jsxFileName = \\"<root>/src/App.tsx\\";
+var App = () => {
+	return /*#__PURE__*/ jsxDEV(\\"div\\", { children: [/*#__PURE__*/ jsxDEV(\\"h1\\", { children: \\"Popup Page\\" }, void 0, false, {
+		fileName: _jsxFileName,
+		lineNumber: 6,
+		columnNumber: 7
+	}, void 0), /*#__PURE__*/ jsxDEV(\\"p\\", { children: \\"If you are seeing this, React is working!\\" }, void 0, false, {
+		fileName: _jsxFileName,
+		lineNumber: 7,
+		columnNumber: 7
+	}, void 0)] }, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 5,
+		columnNumber: 5
+	}, void 0);
 };
-export {
-  App as A,
-  jsx as j
-};
+//#endregion
+export { jsxDEV as n, App as t };
 "
 `;
 
 exports[`build fs output > assets/content.tsx.hash2.js 1`] = `
-"import { r as reactDom } from \\"./vendor.hash3.js\\";
-import { j as jsx, A as App } from \\"./App.hash1.js\\";
+"import { n as require_react_dom } from \\"./vendor.hash4.js\\";
+import { n as jsxDEV, t as App } from \\"./App.hash1.js\\";
+//#region tests/out/vite-react-fast-refresh/src/content.tsx
+var import_react_dom = require_react_dom();
+var _jsxFileName = \\"<root>/src/content.tsx\\";
 console.log(\\"content script\\");
-const root = document.createElement(\\"div\\");
+var root = document.createElement(\\"div\\");
 root.id = \\"root\\";
 document.body.append(root);
-reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
+(0, import_react_dom.render)(/*#__PURE__*/ jsxDEV(App, {}, void 0, false, {
+	fileName: _jsxFileName,
+	lineNumber: 10,
+	columnNumber: 8
+}, void 0), root);
+//#endregion
 "
 `;
 
@@ -94,53 +111,51 @@ exports[`build fs output > assets/content.tsx-loader.hash0.js 1`] = `
 "
 `;
 
-exports[`build fs output > assets/popup.html.hash4.js 1`] = `
-"import { r as reactDom } from \\"./vendor.hash3.js\\";
-import { j as jsx, A as App } from \\"./App.hash1.js\\";
+exports[`build fs output > assets/popup.html.hash5.js 1`] = `
+"import { n as require_react_dom } from \\"./vendor.hash4.js\\";
+import { n as jsxDEV, t as App } from \\"./App.hash1.js\\";
+//#region \\\\0vite/modulepreload-polyfill.js
 (function polyfill() {
-  const relList = document.createElement(\\"link\\").relList;
-  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
-    return;
-  }
-  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-    processPreload(link);
-  }
-  new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type !== \\"childList\\") {
-        continue;
-      }
-      for (const node of mutation.addedNodes) {
-        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
-          processPreload(node);
-      }
-    }
-  }).observe(document, { childList: true, subtree: true });
-  function getFetchOpts(script) {
-    const fetchOpts = {};
-    if (script.integrity)
-      fetchOpts.integrity = script.integrity;
-    if (script.referrerpolicy)
-      fetchOpts.referrerPolicy = script.referrerpolicy;
-    if (script.crossorigin === \\"use-credentials\\")
-      fetchOpts.credentials = \\"include\\";
-    else if (script.crossorigin === \\"anonymous\\")
-      fetchOpts.credentials = \\"omit\\";
-    else
-      fetchOpts.credentials = \\"same-origin\\";
-    return fetchOpts;
-  }
-  function processPreload(link) {
-    if (link.ep)
-      return;
-    link.ep = true;
-    const fetchOpts = getFetchOpts(link);
-    fetch(link.href, fetchOpts);
-  }
+	const relList = document.createElement(\\"link\\").relList;
+	if (relList && relList.supports && relList.supports(\\"modulepreload\\")) return;
+	for (const link of document.querySelectorAll(\\"link[rel=\\\\\\"modulepreload\\\\\\"]\\")) processPreload(link);
+	new MutationObserver((mutations) => {
+		for (const mutation of mutations) {
+			if (mutation.type !== \\"childList\\") continue;
+			for (const node of mutation.addedNodes) if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\") processPreload(node);
+		}
+	}).observe(document, {
+		childList: true,
+		subtree: true
+	});
+	function getFetchOpts(link) {
+		const fetchOpts = {};
+		if (link.integrity) fetchOpts.integrity = link.integrity;
+		if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+		if (link.crossOrigin === \\"use-credentials\\") fetchOpts.credentials = \\"include\\";
+		else if (link.crossOrigin === \\"anonymous\\") fetchOpts.credentials = \\"omit\\";
+		else fetchOpts.credentials = \\"same-origin\\";
+		return fetchOpts;
+	}
+	function processPreload(link) {
+		if (link.ep) return;
+		link.ep = true;
+		const fetchOpts = getFetchOpts(link);
+		fetch(link.href, fetchOpts);
+	}
 })();
+//#endregion
+//#region tests/out/vite-react-fast-refresh/src/popup.tsx
+var import_react_dom = require_react_dom();
+var _jsxFileName = \\"<root>/src/popup.tsx\\";
 console.log(\\"popup script\\");
-const root = document.querySelector(\\"#root\\");
-reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
+var root = document.querySelector(\\"#root\\");
+(0, import_react_dom.render)(/*#__PURE__*/ jsxDEV(App, {}, void 0, false, {
+	fileName: _jsxFileName,
+	lineNumber: 8,
+	columnNumber: 8
+}, void 0), root);
+//#endregion
 "
 `;
 
@@ -151,13 +166,13 @@ exports[`build fs output > src/popup.html 1`] = `
     <meta charset=\\"UTF-8\\" />
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <title>Popup Page</title>
-    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash4.js\\"></script>
-    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash5.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/rolldown-runtime.hash3.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash4.js\\">
     <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/App.hash1.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>
-    
   </body>
 </html>
 "

@@ -1,8 +1,7 @@
 import type { Node as AcornNode } from 'acorn'
 import type { GlobOptions } from 'tinyglobby'
-import type { OutputBundle, PluginContext } from 'rollup'
 import type { HMRPayload, ResolvedConfig, Plugin as VitePlugin } from 'vite'
-import { ManifestV3 } from './manifest'
+import type { ManifestV3 } from './manifest'
 
 export interface AcornLiteral extends AcornNode {
   type: 'Literal'
@@ -50,13 +49,59 @@ export type CrxDevScriptId = {
   type: 'module' | 'iife'
 }
 
+export type CrxOutputAsset = {
+  type: 'asset'
+  fileName: string
+  source: string | Uint8Array
+  name?: string
+}
+
+export type CrxOutputChunk = {
+  type: 'chunk'
+  fileName: string
+  code: string
+  facadeModuleId: string | null
+  imports: string[]
+  dynamicImports: string[]
+  exports: string[]
+  modules: Record<string, unknown>
+  isEntry: boolean
+  map?: unknown
+  sourcemapFileName?: string
+}
+
+export type CrxOutputBundle = Record<string, CrxOutputAsset | CrxOutputChunk>
+
+export type CrxEmittedAsset = {
+  type: 'asset'
+  name?: string
+  fileName?: string
+  source?: string | Uint8Array
+}
+
+export type CrxEmittedChunk = {
+  type: 'chunk'
+  id: string
+  name?: string
+  fileName?: string
+  preserveSignature?: false | 'strict' | 'exports-only' | 'allow-extension'
+}
+
+export type CrxEmittedFile = CrxEmittedAsset | CrxEmittedChunk
+
+export interface CrxPluginContext {
+  emitFile(file: CrxEmittedFile): string
+  getFileName(refId: string): string
+  parse(code: string): AcornNode
+}
+
 export interface CrxPlugin extends VitePlugin {
   /**
    * Runs during the transform hook for the manifest. Filenames use input
    * filenames.
    */
   transformCrxManifest?: (
-    this: PluginContext,
+    this: Pick<CrxPluginContext, 'parse'>,
     manifest: ManifestV3,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
   /**
@@ -64,9 +109,9 @@ export interface CrxPlugin extends VitePlugin {
    * filenames.
    */
   renderCrxManifest?: (
-    this: PluginContext,
+    this: CrxPluginContext,
     manifest: ManifestV3,
-    bundle: OutputBundle,
+    bundle: CrxOutputBundle,
   ) => Promise<ManifestV3 | null | undefined> | ManifestV3 | null | undefined
   /**
    * Runs in the file writer on content scripts during development. `script.id`
@@ -159,6 +204,9 @@ export type CrxHMRPayload =
       data: HMRPayload
     }
 
-export interface ResolvedConfigWithHMRToken extends ResolvedConfig {
+export type ResolvedConfigWithHMRToken = Omit<
+  ResolvedConfig,
+  'webSocketToken'
+> & {
   webSocketToken?: string
 }

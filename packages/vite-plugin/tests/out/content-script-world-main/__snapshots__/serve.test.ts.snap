@@ -78,11 +78,10 @@ exports[`serve fs output > src/content.js-loader.js 1`] = `
   const injectTime = performance.now();
   (async () => {
     try {
-      if (\\"\\")
-        await import(
-          /* @vite-ignore */
-          \\"\\"
-        );
+      if (\\"\\") await import(
+        /* @vite-ignore */
+        \\"\\"
+      );
       await import(
         /* @vite-ignore */
         \\"../vendor/vite-client.js\\"

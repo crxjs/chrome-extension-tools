@@ -5,7 +5,6 @@ import { createUpdate } from '../helpers'
 import { header as initialHeader } from './src1/header'
 import { header as updatedHeader } from './src2/header'
 import { build } from '../runners'
-import { RollupWatcher } from 'rollup'
 
 async function waitForContentAsset(
   outDir: string,
@@ -57,7 +56,7 @@ test(
     } finally {
       // Clean up the watcher
       if ('close' in output) {
-        ;(output as RollupWatcher).close()
+        output.close()
       }
     }
   },

@@ -99,6 +99,5 @@ const __vite__id = \\"<root>/src/__uno.css\\"
 const __vite__css = \\"/* Simulating UnoCSS virtual __uno.css file */\\\\nbody {\\\\n  color: blue;\\\\n}\\\\n\\"
 __vite__updateStyle(__vite__id, __vite__css)
 import.meta.hot.accept()
-export default __vite__css
 import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
 `;

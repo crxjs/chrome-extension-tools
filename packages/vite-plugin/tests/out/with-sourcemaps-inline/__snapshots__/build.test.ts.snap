@@ -44,7 +44,8 @@ Array [
   "assets/background.ts.hash1.js",
   "assets/content.ts.hash0.js",
   "assets/popup.html.hash2.js",
-  "assets/vendor.hash3.js",
+  "assets/rolldown-runtime.hash3.js",
+  "assets/vendor.hash4.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/popup.html",
@@ -52,70 +53,89 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash1.js 1`] = `
-"console.log(\\"service_worker.ts\\");
-// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
-"
+"//#region tests/out/with-sourcemaps-inline/src/background.ts
+console.log(\\"service_worker.ts\\");
+//#endregion
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>"
 `;
 
 exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){const message = \\"content script\\";
-console.log(message);
-})()
+"(function(){//#region tests/out/with-sourcemaps-inline/src/content.ts
+console.log(\\"content script\\");
+//#endregion
+
 // # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
 
 exports[`build fs output > assets/popup.html.hash2.js 1`] = `
-"import { R as React, r as reactDom } from \\"./vendor.hash3.js\\";
+"import \\"./rolldown-runtime.hash3.js\\";
+import { n as require_react_dom, r as require_react, t as require_jsx_dev_runtime } from \\"./vendor.hash4.js\\";
+//#region \\\\0vite/modulepreload-polyfill.js
 (function polyfill() {
-  const relList = document.createElement(\\"link\\").relList;
-  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
-    return;
-  }
-  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
-    processPreload(link);
-  }
-  new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type !== \\"childList\\") {
-        continue;
-      }
-      for (const node of mutation.addedNodes) {
-        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
-          processPreload(node);
-      }
-    }
-  }).observe(document, { childList: true, subtree: true });
-  function getFetchOpts(script) {
-    const fetchOpts = {};
-    if (script.integrity)
-      fetchOpts.integrity = script.integrity;
-    if (script.referrerpolicy)
-      fetchOpts.referrerPolicy = script.referrerpolicy;
-    if (script.crossorigin === \\"use-credentials\\")
-      fetchOpts.credentials = \\"include\\";
-    else if (script.crossorigin === \\"anonymous\\")
-      fetchOpts.credentials = \\"omit\\";
-    else
-      fetchOpts.credentials = \\"same-origin\\";
-    return fetchOpts;
-  }
-  function processPreload(link) {
-    if (link.ep)
-      return;
-    link.ep = true;
-    const fetchOpts = getFetchOpts(link);
-    fetch(link.href, fetchOpts);
-  }
+	const relList = document.createElement(\\"link\\").relList;
+	if (relList && relList.supports && relList.supports(\\"modulepreload\\")) return;
+	for (const link of document.querySelectorAll(\\"link[rel=\\\\\\"modulepreload\\\\\\"]\\")) processPreload(link);
+	new MutationObserver((mutations) => {
+		for (const mutation of mutations) {
+			if (mutation.type !== \\"childList\\") continue;
+			for (const node of mutation.addedNodes) if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\") processPreload(node);
+		}
+	}).observe(document, {
+		childList: true,
+		subtree: true
+	});
+	function getFetchOpts(link) {
+		const fetchOpts = {};
+		if (link.integrity) fetchOpts.integrity = link.integrity;
+		if (link.referrerPolicy) fetchOpts.referrerPolicy = link.referrerPolicy;
+		if (link.crossOrigin === \\"use-credentials\\") fetchOpts.credentials = \\"include\\";
+		else if (link.crossOrigin === \\"anonymous\\") fetchOpts.credentials = \\"omit\\";
+		else fetchOpts.credentials = \\"same-origin\\";
+		return fetchOpts;
+	}
+	function processPreload(link) {
+		if (link.ep) return;
+		link.ep = true;
+		const fetchOpts = getFetchOpts(link);
+		fetch(link.href, fetchOpts);
+	}
 })();
-const App = () => {
-  return /* @__PURE__ */ React.createElement(\\"div\\", null, /* @__PURE__ */ React.createElement(\\"h1\\", null, \\"Popup Page\\"), /* @__PURE__ */ React.createElement(\\"p\\", null, \\"If you are seeing this, React is working!\\"));
+//#endregion
+//#region tests/out/with-sourcemaps-inline/src/App.tsx
+var import_react_dom = require_react_dom();
+require_react();
+var import_jsx_dev_runtime = require_jsx_dev_runtime();
+var _jsxFileName$1 = \\"<root>/src/App.tsx\\";
+var App = () => {
+	return /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(\\"div\\", { children: [/* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(\\"h1\\", { children: \\"Popup Page\\" }, void 0, false, {
+		fileName: _jsxFileName$1,
+		lineNumber: 6,
+		columnNumber: 7
+	}, void 0), /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(\\"p\\", { children: \\"If you are seeing this, React is working!\\" }, void 0, false, {
+		fileName: _jsxFileName$1,
+		lineNumber: 7,
+		columnNumber: 7
+	}, void 0)] }, void 0, true, {
+		fileName: _jsxFileName$1,
+		lineNumber: 5,
+		columnNumber: 5
+	}, void 0);
 };
+//#endregion
+//#region tests/out/with-sourcemaps-inline/src/popup.tsx
+var _jsxFileName = \\"<root>/src/popup.tsx\\";
 console.log(\\"popup script\\");
-const root = document.querySelector(\\"#root\\");
-reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
-// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
-"
+var root = document.querySelector(\\"#root\\");
+(0, import_react_dom.render)(/* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(App, {}, void 0, false, {
+	fileName: _jsxFileName,
+	lineNumber: 9,
+	columnNumber: 8
+}, void 0), root);
+//#endregion
+
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>"
 `;
 
 exports[`build fs output > service-worker-loader.js 1`] = `
@@ -131,11 +151,11 @@ exports[`build fs output > src/popup.html 1`] = `
     <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
     <title>Popup Page</title>
     <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash2.js\\"></script>
-    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/rolldown-runtime.hash3.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash4.js\\">
   </head>
   <body>
     <div id=\\"root\\"></div>
-    
   </body>
 </html>
 "

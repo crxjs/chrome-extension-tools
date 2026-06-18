@@ -41,8 +41,8 @@ Object {
       ],
       "resources": Array [
         "assets/import.hash5.js",
-        "assets/index.ts.hash6.js",
-        "assets/index.ts.hash7.js",
+        "assets/index.ts-scriptId0.hash6.js",
+        "assets/index.ts-scriptId1.hash7.js",
       ],
       "use_dynamic_url": false,
     },
@@ -58,8 +58,8 @@ Array [
   "assets/index.hash4.css",
   "assets/index.ts-loader.hash0.js",
   "assets/index.ts-loader.hash3.js",
-  "assets/index.ts.hash6.js",
-  "assets/index.ts.hash7.js",
+  "assets/index.ts-scriptId0.hash6.js",
+  "assets/index.ts-scriptId1.hash7.js",
   "manifest.json",
 ]
 `;
@@ -72,8 +72,9 @@ exports[`build fs output > assets/import.hash1.css 1`] = `
 `;
 
 exports[`build fs output > assets/import.hash5.js 1`] = `
-"const styles = \\"\\";
+"//#region tests/out/vite-content-script-css-imports-3/src/main/import.ts
 console.log(\\"imported file\\");
+//#endregion
 "
 `;
 
@@ -91,20 +92,6 @@ exports[`build fs output > assets/index.hash4.css 1`] = `
 "
 `;
 
-exports[`build fs output > assets/index.ts.hash6.js 1`] = `
-"import \\"./import.hash5.js\\";
-const styles = \\"\\";
-console.log(\\"content2\\");
-"
-`;
-
-exports[`build fs output > assets/index.ts.hash7.js 1`] = `
-"import \\"./import.hash5.js\\";
-const styles = \\"\\";
-console.log(\\"content1\\");
-"
-`;
-
 exports[`build fs output > assets/index.ts-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
@@ -113,7 +100,7 @@ exports[`build fs output > assets/index.ts-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.hash7.js\\")
+      chrome.runtime.getURL(\\"assets/index.ts-scriptId1.hash7.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -130,11 +117,27 @@ exports[`build fs output > assets/index.ts-loader.hash3.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.hash6.js\\")
+      chrome.runtime.getURL(\\"assets/index.ts-scriptId0.hash6.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
+"
+`;
+
+exports[`build fs output > assets/index.ts-scriptId0.hash6.js 1`] = `
+"import \\"./import.hash5.js\\";
+//#region tests/out/vite-content-script-css-imports-3/src/content2/index.ts
+console.log(\\"content2\\");
+//#endregion
+"
+`;
+
+exports[`build fs output > assets/index.ts-scriptId1.hash7.js 1`] = `
+"import \\"./import.hash5.js\\";
+//#region tests/out/vite-content-script-css-imports-3/src/content1/index.ts
+console.log(\\"content1\\");
+//#endregion
 "
 `;

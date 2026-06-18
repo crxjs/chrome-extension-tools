@@ -126,11 +126,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
 
-      - name: Build plugin (always on Vite 3)
+      - name: Build plugin
         run: pnpm build
 
       - name: Install Vite ${{ matrix.vite-version }} for testing
-        if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
 
       - name: Install React plugin for Vite 8
@@ -179,11 +178,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --filter "vite-plugin"
 
-      - name: Build plugin (always on Vite 3)
+      - name: Build plugin
         run: pnpm build
 
       - name: Install Vite ${{ matrix.vite-version }} for testing
-        if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
 
       - name: Install React plugin for Vite 8

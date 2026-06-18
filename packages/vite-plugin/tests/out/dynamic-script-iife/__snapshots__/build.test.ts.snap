@@ -60,37 +60,48 @@ Array [
 `;
 
 exports[`build fs output > assets/background.ts.hash2.js 1`] = `
-"const scriptFileName = \\"assets/dynamic-script.ts.hash1.js\\";
+"//#region tests/out/dynamic-script-iife/src/dynamic-script.ts?scriptId=scriptId0
+var dynamic_script_default = \\"assets/dynamic-script.ts.hash1.js\\";
+//#endregion
+//#region tests/out/dynamic-script-iife/src/background.ts
 console.log(\\"background.ts\\");
 chrome.action.onClicked.addListener((tab) => {
-  if (tab.id)
-    chrome.scripting.executeScript({
-      files: [scriptFileName],
-      target: { tabId: tab.id }
-    });
+	if (tab.id) chrome.scripting.executeScript({
+		files: [dynamic_script_default],
+		target: { tabId: tab.id }
+	});
 });
+//#endregion
 "
 `;
 
 exports[`build fs output > assets/declared-script.ts.hash0.js 1`] = `
-"(function(){const fileName = \\"src/main-world.js\\";
+"(function(){//#region tests/out/dynamic-script-iife/src/main-world.ts?scriptId=scriptId1
+var main_world_default = \\"src/main-world.js\\";
+//#endregion
+//#region tests/out/dynamic-script-iife/src/declared-script.ts
 console.log(\\"declared script\\");
-const script = document.createElement(\\"script\\");
-script.src = chrome.runtime.getURL(fileName);
+var script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(main_world_default);
 script.defer = true;
 document.head.prepend(script);
+//#endregion
 })()
 "
 `;
 
 exports[`build fs output > assets/dynamic-script.ts.hash1.js 1`] = `
-"(function(){console.log(\\"dynamic script\\");
+"(function(){//#region tests/out/dynamic-script-iife/src/dynamic-script.ts
+console.log(\\"dynamic script\\");
+//#endregion
 })()
 "
 `;
 
 exports[`build fs output > assets/main-world.ts.hash3.js 1`] = `
-"console.log(\\"main world script\\");
+"//#region tests/out/dynamic-script-iife/src/main-world.ts
+console.log(\\"main world script\\");
+//#endregion
 "
 `;
 
@@ -101,8 +112,9 @@ exports[`build fs output > service-worker-loader.js 1`] = `
 
 exports[`build fs output > src/main-world.js 1`] = `
 "(function() {
-  \\"use strict\\";
-  console.log(\\"main world script\\");
+	//#region tests/out/dynamic-script-iife/src/main-world.ts
+	console.log(\\"main world script\\");
+	//#endregion
 })();
 "
 `;

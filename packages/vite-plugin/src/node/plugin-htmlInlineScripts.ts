@@ -18,6 +18,11 @@ const prefix = '@crx/inline-script'
 const isInlineTag = (t: HtmlTagDescriptor): boolean =>
   t.tag === 'script' && !t.attrs?.src
 
+type TransformIndexHtmlObject = {
+  handler?: IndexHtmlTransformHook
+  transform?: IndexHtmlTransformHook
+}
+
 /**
  * Adds prefix and removes file extension so Vite doesn't resolve it as an html
  * file
@@ -49,17 +54,24 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
    * scripts
    */
   const auditTransformIndexHtml = (p: CrxPlugin): void => {
-    let transform: IndexHtmlTransformHook
+    let transform: IndexHtmlTransformHook | undefined
     if (typeof p.transformIndexHtml === 'function') {
       transform = p.transformIndexHtml
       p.transformIndexHtml = auditor
     } else if (typeof p.transformIndexHtml === 'object') {
-      transform = p.transformIndexHtml.transform
-      p.transformIndexHtml.transform = auditor
+      const hook = p.transformIndexHtml as TransformIndexHtmlObject
+      transform = hook.handler ?? hook.transform
+      if (hook.handler) hook.handler = auditor
+      else hook.transform = auditor
     }
 
-    async function auditor(_html: string, ctx: IndexHtmlTransformContext) {
-      const result = await transform(_html, ctx)
+    async function auditor(
+      this: ThisParameterType<IndexHtmlTransformHook>,
+      _html: string,
+      ctx: IndexHtmlTransformContext,
+    ) {
+      if (!transform) return
+      const result = await transform.call(this, _html, ctx)
       if (!result || typeof result === 'string') return result
 
       let html: string | undefined

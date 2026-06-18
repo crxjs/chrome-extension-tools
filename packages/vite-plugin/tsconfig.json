@@ -6,9 +6,12 @@
     "jsx": "react-jsx",
     "lib": ["esnext", "DOM", "WebWorker"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "paths": {
-      "client/*": ["src/client/*"],
+      "@rollup/plugin-node-resolve": [
+        "node_modules/@rollup/plugin-node-resolve/types/index.d.ts"
+      ],
+      "es-module-lexer": ["node_modules/es-module-lexer/types/lexer.d.ts"],
       "src/*": ["src/node/*"],
       "tests/*": ["tests/*"]
     },
@@ -18,5 +21,6 @@
     "strictNullChecks": true,
     "target": "esnext"
   },
+  "include": ["client.d.ts", "index.d.cts", "modules.d.ts", "src", "tests"],
   "exclude": ["node_modules", "tests/templates", "dist", "src/node/archive"]
 }

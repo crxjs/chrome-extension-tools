@@ -46,10 +46,10 @@ Array [
   "src/content.tsx-loader.js",
   "src/content.tsx.js",
   "src/popup.html",
-  "vendor/chunk-B65QLFCX.js__v--hash.js",
   "vendor/crx-client-port.js",
   "vendor/crx-client-preamble.js",
   "vendor/id-__x00__react-jsx-dev-runtime.js",
+  "vendor/react-DGOonrjK.js__v--hash.js",
   "vendor/react-dom.js__v--hash.js",
   "vendor/react-refresh.js",
   "vendor/react_jsx-dev-runtime.js__v--hash.js",
@@ -317,8 +317,7 @@ let ready = false;
 do {
   try {
     const response = await fetch(getReadyUrl());
-    if (!response.ok)
-      throw new Error(\`HTTP \${response.status}\`);
+    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);
     ready = true;
   } catch {
     const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
@@ -345,97 +344,92 @@ exports[`serve fs output > src/App.tsx.js 1`] = `
 let prevRefreshReg;
 let prevRefreshSig;
 if (import.meta.hot) {
-  if (!window.__vite_plugin_react_preamble_installed__) {
-    throw new Error(\\"@vitejs/plugin-react can't detect preamble. Something is wrong. See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201\\");
-  }
-  prevRefreshReg = window.$RefreshReg$;
-  prevRefreshSig = window.$RefreshSig$;
-  window.$RefreshReg$ = (type, id) => {
-    RefreshRuntime.register(type, \\"<root>/src/App.tsx \\" + id);
-  };
-  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+	if (!window.__vite_plugin_react_preamble_installed__) {
+		throw new Error(\\"@vitejs/plugin-react can't detect preamble. Something is wrong. \\" + \\"See https://github.com/vitejs/vite-plugin-react/pull/11#discussion_r430879201\\");
+	}
+	prevRefreshReg = window.$RefreshReg$;
+	prevRefreshSig = window.$RefreshSig$;
+	window.$RefreshReg$ = (type, id) => {
+		RefreshRuntime.register(type, \\"<root>/src/App.tsx\\" + \\" \\" + id);
+	};
+	window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
 }
 var _jsxFileName = \\"<root>/src/App.tsx\\";
 import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 const App = () => {
-  return /* @__PURE__ */ _jsxDEV(\\"div\\", {
-    children: [/* @__PURE__ */ _jsxDEV(\\"h1\\", {
-      children: \\"Popup Page\\"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 6,
-      columnNumber: 7
-    }, void 0), /* @__PURE__ */ _jsxDEV(\\"p\\", {
-      children: \\"If you are seeing this, React is working!\\"
-    }, void 0, false, {
-      fileName: _jsxFileName,
-      lineNumber: 7,
-      columnNumber: 7
-    }, void 0)]
-  }, void 0, true, {
-    fileName: _jsxFileName,
-    lineNumber: 5,
-    columnNumber: 5
-  }, void 0);
+	return /*#__PURE__*/ _jsxDEV(\\"div\\", { children: [/*#__PURE__*/ _jsxDEV(\\"h1\\", { children: \\"Popup Page\\" }, void 0, false, {
+		fileName: _jsxFileName,
+		lineNumber: 6,
+		columnNumber: 7
+	}, this), /*#__PURE__*/ _jsxDEV(\\"p\\", { children: \\"If you are seeing this, React is working!\\" }, void 0, false, {
+		fileName: _jsxFileName,
+		lineNumber: 7,
+		columnNumber: 7
+	}, this)] }, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 5,
+		columnNumber: 5
+	}, this);
 };
 _c = App;
 export default App;
 var _c;
 $RefreshReg$(_c, \\"App\\");
 if (import.meta.hot) {
-  let isReactRefreshBoundary = function(mod) {
-    if (mod == null || typeof mod !== \\"object\\") {
-      return false;
-    }
-    let hasExports = false;
-    let areAllExportsComponents = true;
-    for (const exportName in mod) {
-      hasExports = true;
-      if (exportName === \\"__esModule\\") {
-        continue;
-      }
-      const desc = Object.getOwnPropertyDescriptor(mod, exportName);
-      if (desc && desc.get) {
-        return false;
-      }
-      const exportValue = mod[exportName];
-      if (!RefreshRuntime.isLikelyComponentType(exportValue)) {
-        areAllExportsComponents = false;
-      }
-    }
-    return hasExports && areAllExportsComponents;
-  };
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-  import.meta.hot.accept((mod) => {
-    if (isReactRefreshBoundary(mod)) {
-      if (!window.__vite_plugin_react_timeout) {
-        window.__vite_plugin_react_timeout = setTimeout(() => {
-          window.__vite_plugin_react_timeout = 0;
-          RefreshRuntime.performReactRefresh();
-        }, 30);
-      }
-    } else {
-      import.meta.hot.invalidate();
-    }
-  });
+	window.$RefreshReg$ = prevRefreshReg;
+	window.$RefreshSig$ = prevRefreshSig;
+	function isReactRefreshBoundary(mod) {
+		if (mod == null || typeof mod !== \\"object\\") {
+			return false;
+		}
+		let hasExports = false;
+		let areAllExportsComponents = true;
+		for (const exportName in mod) {
+			hasExports = true;
+			if (exportName === \\"__esModule\\") {
+				continue;
+			}
+			const desc = Object.getOwnPropertyDescriptor(mod, exportName);
+			if (desc && desc.get) {
+				// Don't invoke getters as they may have side effects.
+				return false;
+			}
+			const exportValue = mod[exportName];
+			if (!RefreshRuntime.isLikelyComponentType(exportValue)) {
+				areAllExportsComponents = false;
+			}
+		}
+		return hasExports && areAllExportsComponents;
+	}
+	import.meta.hot.accept((mod) => {
+		if (isReactRefreshBoundary(mod)) {
+			if (!window.__vite_plugin_react_timeout) {
+				window.__vite_plugin_react_timeout = setTimeout(() => {
+					window.__vite_plugin_react_timeout = 0;
+					RefreshRuntime.performReactRefresh();
+				}, 30);
+			}
+		} else {
+			import.meta.hot.invalidate();
+		}
+	});
 }
 "
 `;
 
 exports[`serve fs output > src/content.tsx.js 1`] = `
-"var _jsxFileName = \\"<root>/src/content.tsx\\";
-import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--hash.js\\"; const render = __vite__cjsImport0_reactDom[\\"render\\"];
+"const render = __vite__cjsImport0_reactDom[\\"render\\"];var _jsxFileName = \\"<root>/src/content.tsx\\";
+import __vite__cjsImport0_reactDom from \\"/vendor/react-dom.js__v--hash.js\\";
 import App from \\"/src/App.tsx.js\\";
 import { jsxDEV as _jsxDEV } from \\"/vendor/id-__x00__react-jsx-dev-runtime.js\\";
 console.log(\\"content script\\");
 const root = document.createElement(\\"div\\");
 root.id = \\"root\\";
 document.body.append(root);
-render(/* @__PURE__ */ _jsxDEV(App, {}, void 0, false, {
-  fileName: _jsxFileName,
-  lineNumber: 10,
-  columnNumber: 8
+render(/*#__PURE__*/ _jsxDEV(App, {}, void 0, false, {
+	fileName: _jsxFileName,
+	lineNumber: 10,
+	columnNumber: 8
 }, this), root);
 "
 `;
