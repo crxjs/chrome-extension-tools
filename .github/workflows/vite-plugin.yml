@@ -133,6 +133,10 @@ jobs:
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
 
+      - name: Install React plugin for Vite 8
+        if: matrix.vite-version == '8'
+        run: pnpm add -D @vitejs/plugin-react@5.2.0 --ignore-scripts
+
       - name: Verify Vite version
         run: echo "Testing with Vite $(pnpm exec vite --version)"
 
@@ -181,6 +185,10 @@ jobs:
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
+
+      - name: Install React plugin for Vite 8
+        if: matrix.vite-version == '8'
+        run: pnpm add -D @vitejs/plugin-react@5.2.0 --ignore-scripts
 
       - name: Verify Vite version
         run: echo "Testing with Vite $(pnpm exec vite --version)"

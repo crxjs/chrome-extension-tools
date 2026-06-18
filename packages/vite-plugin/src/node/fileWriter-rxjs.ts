@@ -274,16 +274,20 @@ function prepScript(
       mergeMap(async ({ target, code, deps }) => {
         await lexer.init
         const [imports] = lexer.parse(code, fileName)
-        const depSet = new Set<string>(deps)
+        const isSelfDependency = (id: string) =>
+          getFileName({ type: 'module', id }) === fileName
+        // @vitejs/plugin-react >=5.0.4 can create React Refresh self-imports.
+        // Keep the import rewrite, but do not wait on this file as its own dependency.
+        const depSet = new Set<string>(deps.filter((id) => !isSelfDependency(id)))
         const magic = new MagicString(code)
         for (const i of imports)
           if (i.n) {
-            depSet.add(i.n)
-            const fileName = getFileName({ type: 'module', id: i.n })
+            const depFileName = getFileName({ type: 'module', id: i.n })
+            if (!isSelfDependency(i.n)) depSet.add(i.n)
 
             // NOTE: Temporary fix for this bug: https://github.com/guybedford/es-module-lexer/issues/144
             const fullImport = code.substring(i.s, i.e)
-            magic.overwrite(i.s, i.e, fullImport.replace(i.n, `/${fileName}`))
+            magic.overwrite(i.s, i.e, fullImport.replace(i.n, `/${depFileName}`))
 
             // NOTE: use this once the bug is fixed
             // magic.overwrite(i.s, i.e, `/${fileName}`)

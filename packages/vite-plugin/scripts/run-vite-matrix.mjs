@@ -299,6 +299,15 @@ async function main() {
         ])
       }
 
+      if (majorVersion === '8') {
+        await run(PNPM, [
+          'add',
+          '-D',
+          '@vitejs/plugin-react@5.2.0',
+          '--ignore-scripts',
+        ])
+      }
+
       const viteVersion = await capture(PNPM, ['exec', 'vite', '--version'])
       console.log(`[vite-matrix] Testing with ${viteVersion}`)
 
