@@ -10,10 +10,37 @@ import {
 
 const _require =
   typeof require === 'undefined' ? createRequire(import.meta.url) : require
-// customElementsId starts with a slash, remove it for require.
-const customElementsPath = _require.resolve(customElementsId.slice(1))
-const customElementsCode = readFileSync(customElementsPath, 'utf8')
-const customElementsMap = readFileSync(`${customElementsPath}.map`, 'utf8')
+
+const unsafeOwnerDocumentRegistryAccess = 'this.ownerDocument.__CE_registry'
+const safeOwnerDocumentRegistryAccess =
+  'this.ownerDocument&&this.ownerDocument.__CE_registry'
+
+interface CustomElementsPolyfill {
+  code: string
+  map: string
+}
+
+let customElementsPolyfill: CustomElementsPolyfill | undefined
+
+export function patchCustomElementsPolyfill(code: string): string {
+  return code
+    .split(unsafeOwnerDocumentRegistryAccess)
+    .join(safeOwnerDocumentRegistryAccess)
+}
+
+function loadCustomElementsPolyfill(): CustomElementsPolyfill {
+  if (customElementsPolyfill) return customElementsPolyfill
+
+  // customElementsId starts with a slash, remove it for require.
+  const customElementsPath = _require.resolve(customElementsId.slice(1))
+
+  customElementsPolyfill = {
+    code: patchCustomElementsPolyfill(readFileSync(customElementsPath, 'utf8')),
+    map: readFileSync(`${customElementsPath}.map`, 'utf8'),
+  }
+
+  return customElementsPolyfill
+}
 
 /**
  * Adds polyfills for content scripts:
@@ -43,7 +70,7 @@ export const pluginFileWriterPolyfill: CrxPluginFn = () => {
     },
     load(id) {
       if (id === customElementsId) {
-        return { code: customElementsCode, map: customElementsMap }
+        return loadCustomElementsPolyfill()
       }
     },
     renderCrxDevScript(code, { type, id }) {
