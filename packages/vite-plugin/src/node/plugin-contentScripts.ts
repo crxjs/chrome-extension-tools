@@ -1,6 +1,5 @@
 import contentHmrPort from 'client/es/hmr-content-port.ts'
 import { filter, Subscription } from 'rxjs'
-import type { OutputBundle, PluginContext } from 'rollup'
 import { ConfigEnv, UserConfig, ViteDevServer } from 'vite'
 import {
   contentScripts,
@@ -15,7 +14,12 @@ import { getCrxHmrToken } from './hmrToken'
 import { getOptions } from './plugin-optionsProvider'
 import { basename, dirname, relative } from './path'
 import { RxMap } from './RxMap'
-import { CrxPluginFn, ResolvedConfigWithHMRToken } from './types'
+import {
+  CrxOutputBundle,
+  CrxPluginContext,
+  CrxPluginFn,
+  ResolvedConfigWithHMRToken,
+} from './types'
 import { contentHmrPortId, preambleId, viteClientId } from './virtualFileIds'
 import colors from 'picocolors'
 
@@ -279,8 +283,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
  * replacement happen in different post-build hooks across Vite versions.
  */
 export function finalizeBuildContentScripts(
-  context: Pick<PluginContext, 'emitFile' | 'getFileName'>,
-  bundle: OutputBundle,
+  context: Pick<CrxPluginContext, 'emitFile' | 'getFileName'>,
+  bundle: CrxOutputBundle,
   worldMainIds = new Set<string>(),
 ) {
   const processed = new Set<object>()

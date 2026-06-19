@@ -1,8 +1,9 @@
 import fsx from 'fs-extra'
 import { performance } from 'perf_hooks'
-import { OutputOptions, rollup, RollupOptions } from 'rollup'
+import { rollup, type OutputOptions, type RollupOptions } from 'rollup'
 import { concatWith, firstValueFrom, mergeMap, of, takeUntil } from 'rxjs'
 import { ViteDevServer } from 'vite'
+import { writeDevBundle } from './devBundleRunner'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import {
   allFilesReady,
@@ -19,6 +20,7 @@ import {
   prefix,
 } from './fileWriter-utilities'
 import { _debug } from './helpers'
+import { getOptions } from './plugin-optionsProvider'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 
 export { allFilesReady, fileReady }
@@ -26,6 +28,30 @@ export { allFilesReady, fileReady }
 const { outputFile } = fsx
 
 const debug = _debug('file-writer')
+
+async function writeRollupDevBundle({
+  server,
+  plugins,
+}: {
+  server: ViteDevServer
+  plugins: CrxPlugin[]
+}) {
+  const { rollupOptions, outDir } = server.config.build
+  const inputOptions: RollupOptions = {
+    input: 'index.html',
+    ...rollupOptions,
+    plugins,
+  }
+  const rollupOutputOptions = [rollupOptions.output].flat()[0]
+  const outputOptions: OutputOptions = {
+    ...rollupOutputOptions,
+    dir: outDir,
+    format: 'es',
+  }
+
+  const build = await rollup(inputOptions)
+  await build.write(outputOptions)
+}
 
 function queueWrite(
   script: CrxDevAssetId | CrxDevScriptId,
@@ -42,10 +68,10 @@ function queueWrite(
  * Starts the file writer.
  *
  * - Signals write() to start by providing the Vite Dev Server.
- * - Runs Rollup with internal plugins to output the CRX base.
+ * - Runs CRX internal plugins to output the dev CRX base.
  * - CRX base includes: manifest, loader files, and public folder.
  * - Output is pure assets, no actual scripts.
- * - Resolves when Rollup completes.
+ * - Resolves when the dev bundle writer completes.
  */
 export async function start({
   server,
@@ -57,23 +83,13 @@ export async function start({
   const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
     p.name?.startsWith('crx:'),
   )
-  const { rollupOptions, outDir } = server.config.build
-  const inputOptions: RollupOptions = {
-    input: 'index.html',
-    ...rollupOptions,
-    plugins,
-  }
-  // handle the various output option types
-  const rollupOutputOptions = [rollupOptions.output].flat()[0]
-  const outputOptions: OutputOptions = {
-    ...rollupOutputOptions,
-    dir: outDir,
-    format: 'es',
-  }
-
+  const options = await getOptions({ plugins: [...server.config.plugins] })
   fileWriterEvent$.next({ type: 'build_start' })
-  const build = await rollup(inputOptions)
-  await build.write(outputOptions)
+  if (options.experimental?.viteDevBundle) {
+    await writeDevBundle({ server, plugins })
+  } else {
+    await writeRollupDevBundle({ server, plugins })
+  }
   fileWriterEvent$.next({ type: 'build_end' })
 
   await allFilesReady()
