@@ -24,6 +24,23 @@ const { readFile } = fs
 
 declare const structuredClone: <T>(value: T) => T
 
+export function getDocumentStartLoaderWarnings(
+  manifest: Pick<ManifestV3, 'content_scripts'>,
+  standaloneFiles: string[],
+): string[] {
+  const standalone = standaloneFiles.map((file) => file.replace(/^\//, ''))
+  const isStandaloneFile = (file: string) => {
+    const normalized = file.replace(/^\//, '')
+    return standalone.includes(normalized)
+  }
+
+  return (manifest.content_scripts ?? [])
+    .filter((script) => script.run_at === 'document_start')
+    .flatMap(({ js = [] }) =>
+      js.filter((id) => !isIifeContentScript(id) && !isStandaloneFile(id)),
+    )
+}
+
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
  *
@@ -207,6 +224,21 @@ export const pluginManifest: CrxPluginFn = () => {
         const isStandaloneFile = (file: string) => {
           const normalized = file.replace(/^\//, '')
           return standaloneFiles.includes(normalized)
+        }
+        const documentStartLoaderWarnings = getDocumentStartLoaderWarnings(
+          manifest,
+          standaloneFiles,
+        )
+        if (documentStartLoaderWarnings.length > 0) {
+          const name = '[crx:manifest]'
+          const message = colors.yellow(
+            [
+              `${name} Some document_start content scripts use the async loader.`,
+              'Use the .iife.ts/.iife.tsx/.iife.js naming convention or contentScripts.standaloneFiles for exact document_start timing:',
+              ...documentStartLoaderWarnings.map((id) => `  ${id}`),
+            ].join('\r\n'),
+          )
+          console.log(message)
         }
 
         /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
