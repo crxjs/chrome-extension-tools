@@ -89,13 +89,16 @@ export async function expectRegisteredDynamicScript(
   return scriptPath
 }
 
-export async function expectNetworkProbe(page: Page) {
+export async function expectNetworkProbe(
+  page: Page,
+  marker = 'crx-dynamic-main-world-iife',
+) {
   const probe = await page.evaluate(() => (window as any).__networkProbe)
   expect(probe).toEqual({
-    patchBeforePageScript: 'crx-dynamic-main-world-iife',
+    patchBeforePageScript: marker,
     fetchBeforeCall: null,
     xhrBeforeCall: null,
-    fetchAfterCall: 'crx-dynamic-main-world-iife',
-    xhrAfterCall: 'crx-dynamic-main-world-iife',
+    fetchAfterCall: marker,
+    xhrAfterCall: marker,
   })
 }
