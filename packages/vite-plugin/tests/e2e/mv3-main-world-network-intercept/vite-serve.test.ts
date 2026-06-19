@@ -95,7 +95,7 @@ test(
 )
 
 test(
-  'manifest-declared IIFE content script rebuilds on change and works after page reload',
+  'manifest-declared IIFE content script rebuilds on change and reloads the page',
   async () => {
     const src = path.join(__dirname, 'src')
     const src1 = path.join(__dirname, 'src1')
@@ -117,13 +117,14 @@ test(
     await expectNetworkProbe(page, 'crx-main-world-iife')
 
     const update = createUpdate({ target: src, src: src2 })
+    const pageReloaded = page.waitForEvent('load', { timeout: 30000 })
     await update('interceptor.iife.ts')
     await waitForFileContent(
       scriptFile,
       (content) => content.includes('crx-main-world-iife-updated'),
       { timeout: 30000 },
     )
-    await page.reload({ waitUntil: 'load' })
+    await pageReloaded
 
     await expectNetworkProbe(page, 'crx-main-world-iife-updated')
   },

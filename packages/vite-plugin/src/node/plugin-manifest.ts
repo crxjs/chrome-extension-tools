@@ -4,7 +4,12 @@ import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
-import { contentScripts, hashScriptId } from './contentScripts'
+import {
+  contentScripts,
+  createIifeReloadBridge,
+  hashScriptId,
+} from './contentScripts'
+import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
 import { decodeManifest, encodeManifest, isString } from './helpers'
@@ -19,7 +24,12 @@ import {
 } from './plugin-contentScripts_declared'
 import { finalizeBuildContentScripts } from './plugin-contentScripts'
 import { isIifeContentScript } from './plugin-contentScripts_iife'
-import { manifestId, stubId } from './virtualFileIds'
+import {
+  contentHmrPortId,
+  iifeReloadBridgeId,
+  manifestId,
+  stubId,
+} from './virtualFileIds'
 const { readFile } = fs
 
 declare const structuredClone: <T>(value: T) => T
@@ -96,6 +106,21 @@ export const pluginManifest: CrxPluginFn = () => {
   let devHtmlFiles = new Set<string>()
   let refId: string
   let config: ResolvedConfig
+  let iifeReloadBridgeFileName: string | undefined
+  let liveReload = true
+
+  function getIifeReloadBridgeFileName() {
+    if (iifeReloadBridgeFileName) return iifeReloadBridgeFileName
+
+    const client = add({ type: 'module', id: contentHmrPortId })
+    const bridge = add({
+      type: 'asset',
+      id: iifeReloadBridgeId,
+      source: createIifeReloadBridge({ client: client.fileName }),
+    })
+    iifeReloadBridgeFileName = bridge.fileName
+    return bridge.fileName
+  }
 
   return [
     {
@@ -284,6 +309,7 @@ export const pluginManifest: CrxPluginFn = () => {
         }
 
         const opts = await getOptions({ plugins: config.plugins } as UserConfig)
+        liveReload = opts.liveReload !== false
         const standaloneFiles = (
           opts.contentScripts?.standaloneFiles || []
         ).map((f: string) => f.replace(/^\//, ''))
@@ -440,18 +466,41 @@ export const pluginManifest: CrxPluginFn = () => {
         if (config.command === 'serve') {
           // plugin-background emits service worker loader in renderCrxManifest
           // vite dev server sends html files through local host
-          if (manifest.content_scripts) {
+          manifest.content_scripts = manifest.content_scripts ?? []
+          {
             // Get all registered CSS entries
             const cssEntries = getContentCssEntries()
             const cssEntryMap = new Map(cssEntries.map((e) => [e.index, e]))
+            const iifeReloadScripts: NonNullable<ManifestV3['content_scripts']> = []
+            const iifeReloadScriptKeys = new Set<string>()
+            const addIifeReloadScript = (
+              script: Omit<
+                NonNullable<ManifestV3['content_scripts']>[number],
+                'js'
+              >,
+            ) => {
+              const key = JSON.stringify(script)
+              if (iifeReloadScriptKeys.has(key)) return
+              iifeReloadScriptKeys.add(key)
+              iifeReloadScripts.push({
+                ...script,
+                js: [getIifeReloadBridgeFileName()],
+              })
+            }
 
             for (let i = 0; i < manifest.content_scripts.length; i++) {
               const script = manifest.content_scripts[i]
               const cssEntry = cssEntryMap.get(i)
+              const originalJs = script.js || []
+              const hasIifeScript = originalJs.some((id) => {
+                const contentScript =
+                  contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                return contentScript?.type === 'iife'
+              })
 
               // Transform JS paths to emitted file names. IIFE scripts are
               // emitted directly and do not need a loader.
-              const jsLoaders = (script.js || []).map((id) => {
+              const jsLoaders = originalJs.map((id) => {
                 const contentScript =
                   contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
                 return (
@@ -469,7 +518,30 @@ export const pluginManifest: CrxPluginFn = () => {
               } else {
                 script.js = jsLoaders
               }
+
+              if (liveReload && hasIifeScript) {
+                const {
+                  js: _js,
+                  css: _css,
+                  world: _world,
+                  run_at: _runAt,
+                  ...bridgeScript
+                } = script
+                addIifeReloadScript(bridgeScript)
+              }
             }
+
+            if (
+              liveReload &&
+              manifest.host_permissions &&
+              manifest.host_permissions.length > 0
+            ) {
+              addIifeReloadScript({
+                matches: manifest.host_permissions,
+              })
+            }
+
+            manifest.content_scripts.push(...iifeReloadScripts)
           }
         } else {
           finalizeBuildContentScripts(this, bundle)

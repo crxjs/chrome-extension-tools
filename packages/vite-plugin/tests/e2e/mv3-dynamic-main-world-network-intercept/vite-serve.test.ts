@@ -41,6 +41,7 @@ test(
     await expectNetworkProbe(page)
 
     const update = createUpdate({ target: src, src: src2 })
+    const pageReloaded = page.waitForEvent('load', { timeout: 30000 })
     await update('interceptor.iife.ts')
     await waitForContentScriptContent(
       browser,
@@ -54,7 +55,7 @@ test(
       [dynamicNetworkScriptId],
       { timeout: 30000 },
     )
-    await page.reload({ waitUntil: 'load' })
+    await pageReloaded
 
     await expectNetworkProbe(page, 'crx-dynamic-main-world-iife-updated')
   },
