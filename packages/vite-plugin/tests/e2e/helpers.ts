@@ -104,7 +104,6 @@ export const createUpdate =
     await Promise.all([
       ...plugins.map((p) => p()),
       fs.copy(srcDir, target, {
-        recursive: true,
         overwrite: true,
         filter: (f) => {
           if (fs.lstatSync(f).isDirectory()) return true

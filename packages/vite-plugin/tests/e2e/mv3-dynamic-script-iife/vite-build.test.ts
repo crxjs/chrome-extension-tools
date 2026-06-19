@@ -12,7 +12,7 @@ test(
 
     // Use the initial version for build test
     await fs.emptydir(src)
-    await fs.copy(src1, src, { recursive: true, overwrite: true })
+    await fs.copy(src1, src, { overwrite: true })
 
     const { browser } = await build(__dirname)
 

@@ -18,7 +18,7 @@ test(
     // Start with the initial version
     // emptyDir + overwrite to avoid rmdir/mkdir races with leftover watchers from prior tests.
     await fs.emptyDir(src)
-    await fs.copy(src1, src, { overwrite: true, recursive: true })
+    await fs.copy(src1, src, { overwrite: true })
 
     const { browser, outDir } = await serve(__dirname)
 
