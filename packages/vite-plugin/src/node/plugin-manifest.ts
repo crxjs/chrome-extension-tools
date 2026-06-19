@@ -9,7 +9,7 @@ import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
 import { decodeManifest, encodeManifest, isString } from './helpers'
 import { ManifestV3 } from './manifest'
-import { basename, isAbsolute, join, relative } from './path'
+import { basename, isAbsolute, join, normalize, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import {
@@ -41,6 +41,46 @@ export function getDocumentStartLoaderWarnings(
     )
 }
 
+const loadingPageReadyPath = '/@crx/dev-ready'
+
+function normalizeHtmlPath(pathname: string): string | null {
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(pathname)
+  } catch {
+    return null
+  }
+
+  const normalized = normalize(decoded.replace(/^\/+/, '') || 'index.html')
+  if (normalized.startsWith('..') || isAbsolute(normalized)) return null
+  return normalized
+}
+
+function getLoadingPageReadyHtmlPath(requestUrl: string | undefined) {
+  if (!requestUrl) return null
+
+  let url: URL
+  try {
+    url = new URL(requestUrl, 'http://crxjs.local')
+  } catch {
+    return null
+  }
+
+  if (url.pathname !== loadingPageReadyPath) return undefined
+
+  const path = url.searchParams.get('path')
+  if (!path) return null
+
+  let pageUrl: URL
+  try {
+    pageUrl = new URL(path, 'http://crxjs.local')
+  } catch {
+    return null
+  }
+
+  return normalizeHtmlPath(pageUrl.pathname)
+}
+
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
  *
@@ -53,6 +93,7 @@ export const pluginManifest: CrxPluginFn = () => {
   // This is important for rolldown-vite (Vite 7) compatibility where buildStart
   // doesn't receive options.plugins
   let plugins: CrxPlugin[] = []
+  let devHtmlFiles = new Set<string>()
   let refId: string
   let config: ResolvedConfig
 
@@ -81,6 +122,7 @@ export const pluginManifest: CrxPluginFn = () => {
             background: sw,
             html,
           } = await manifestFiles(manifest, { cwd: config.root })
+          devHtmlFiles = new Set(html.map(normalizeHtmlPath).filter(isString))
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
@@ -99,9 +141,7 @@ export const pluginManifest: CrxPluginFn = () => {
           for (const x of [js, sw, html].flat()) set.add(x)
 
           return {
-            ...config,
             optimizeDeps: {
-              ...config.optimizeDeps,
               entries: [...set],
             },
           }
@@ -114,6 +154,32 @@ export const pluginManifest: CrxPluginFn = () => {
         if (resolvedConfig.plugins) {
           plugins = resolvedConfig.plugins as CrxPlugin[]
         }
+      },
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const htmlPath = getLoadingPageReadyHtmlPath(req.url)
+          if (typeof htmlPath === 'undefined') {
+            next()
+            return
+          }
+
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Access-Control-Allow-Methods', 'GET')
+
+          if (!htmlPath) {
+            res.statusCode = 400
+            res.end()
+            return
+          }
+
+          const exists =
+            devHtmlFiles.has(htmlPath) &&
+            (existsSync(join(server.config.root, htmlPath)) ||
+              existsSync(join(server.config.publicDir, htmlPath)))
+
+          res.statusCode = exists ? 204 : 404
+          res.end()
+        })
       },
       buildStart(options) {
         // Keep this as fallback for older Vite versions where buildStart provides plugins
@@ -480,6 +546,11 @@ export const pluginManifest: CrxPluginFn = () => {
           'webAccessibleResources',
         ]
         const files = await manifestFiles(manifest, { cwd: config.root })
+        if (config.command === 'serve') {
+          devHtmlFiles = new Set(
+            files.html.map(normalizeHtmlPath).filter(isString),
+          )
+        }
         await Promise.all(
           assetTypes
             .map((k) => files[k])
@@ -529,7 +600,8 @@ Public dir: "${config.publicDir}"`,
             name: 'loading-page.js',
             source: loadingPageScript
               .replace('%PROTO%', config.server.https ? 'https' : 'http')
-              .replace('%PORT%', `${config.server.port ?? 0}`),
+              .replace('%PORT%', `${config.server.port ?? 0}`)
+              .replace('%READY_PATH%', loadingPageReadyPath),
           })
           const loadingPageScriptName = this.getFileName(refId)
           files.html.map((f) =>

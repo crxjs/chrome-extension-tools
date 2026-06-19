@@ -20,7 +20,7 @@ test.skipIf(process.env.CI)('virtual css module updates on hmr', async () => {
 
   // Start with src1
   await fs.remove(src)
-  await fs.copy(src1, src, { recursive: true })
+  await fs.copy(src1, src)
 
   const { browser, outDir, devServer } = await serve(__dirname)
 

@@ -92,15 +92,25 @@ export function createProLoader({ fileName }: { fileName: string }): string {
 }
 
 export function createDevMainLoader({
+  preamble,
+  client,
   fileName,
 }: {
+  preamble: string
+  client: string
   fileName: string
 }): string {
   return contentDevMainLoader
+    .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
+    .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
     .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
 }
 
-export function createProMainLoader({ fileName }: { fileName: string }): string {
+export function createProMainLoader({
+  fileName,
+}: {
+  fileName: string
+}): string {
   return contentProMainLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
 }

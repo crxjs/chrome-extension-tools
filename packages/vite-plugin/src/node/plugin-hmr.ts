@@ -66,7 +66,7 @@ export const pluginHMR: CrxPluginFn = () => {
         server.hmr = server.hmr ?? {}
         server.hmr.host = 'localhost'
 
-        return { server, ...config }
+        return { server }
       },
       // server should ignore outdir
       configResolved(_config) {

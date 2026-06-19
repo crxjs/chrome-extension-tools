@@ -11,7 +11,7 @@ test('liveReload default: background change triggers runtime reload', async () =
   const src2 = path.join(__dirname, 'src2')
 
   await fs.remove(src)
-  await fs.copy(src1, src, { recursive: true })
+  await fs.copy(src1, src)
 
   const { browser, routes } = await serve(__dirname)
 

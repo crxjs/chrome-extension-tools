@@ -62,7 +62,7 @@ test(
     const src = path.join(__dirname, 'src')
     const src1 = path.join(__dirname, 'src1')
     await fs.emptyDir(src)
-    await fs.copy(src1, src, { overwrite: true, recursive: true })
+    await fs.copy(src1, src, { overwrite: true })
 
     const { browser, outDir } = await build(__dirname)
     await routeHostPage(browser)

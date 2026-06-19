@@ -13,16 +13,17 @@ test(
     const src3 = path.join(__dirname, 'src3')
 
     await fs.remove(src)
-    await fs.copy(src1, src, { recursive: true })
+    await fs.copy(src1, src)
 
     const { browser } = await serve(__dirname)
     const page = await getPage(browser, 'chrome-extension')
     const update = createUpdate({ target: src, src: src2 })
     const styles = page.locator('head style')
-    const button = page.locator('button')
+    const button = page.locator('button', { hasText: /count is:/ })
     const buttonText = new Set<string>()
 
     await page.waitForLoadState()
+    await button.waitFor()
     await button.click()
     buttonText.add(await button.innerText())
 

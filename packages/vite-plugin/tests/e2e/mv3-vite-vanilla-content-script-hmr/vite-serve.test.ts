@@ -13,7 +13,7 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   const src2 = path.join(__dirname, 'src2')
 
   await fs.remove(src)
-  await fs.copy(src1, src, { recursive: true })
+  await fs.copy(src1, src)
 
   const { browser, routes } = await serve(__dirname)
 
