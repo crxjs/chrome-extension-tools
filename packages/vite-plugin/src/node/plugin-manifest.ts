@@ -236,6 +236,7 @@ export const pluginManifest: CrxPluginFn = () => {
               `${name} Some document_start content scripts use the async loader.`,
               'Use the .iife.ts/.iife.tsx/.iife.js naming convention or contentScripts.standaloneFiles for exact document_start timing:',
               ...documentStartLoaderWarnings.map((id) => `  ${id}`),
+              'Learn more: https://crxjs.dev/concepts/content#iife-content-scripts',
             ].join('\r\n'),
           )
           console.log(message)
