@@ -466,11 +466,11 @@ export const pluginManifest: CrxPluginFn = () => {
         if (config.command === 'serve') {
           // plugin-background emits service worker loader in renderCrxManifest
           // vite dev server sends html files through local host
-          manifest.content_scripts = manifest.content_scripts ?? []
           {
             // Get all registered CSS entries
             const cssEntries = getContentCssEntries()
             const cssEntryMap = new Map(cssEntries.map((e) => [e.index, e]))
+            const manifestContentScripts = manifest.content_scripts ?? []
             const iifeReloadScripts: NonNullable<ManifestV3['content_scripts']> = []
             const iifeReloadScriptKeys = new Set<string>()
             const addIifeReloadScript = (
@@ -488,8 +488,8 @@ export const pluginManifest: CrxPluginFn = () => {
               })
             }
 
-            for (let i = 0; i < manifest.content_scripts.length; i++) {
-              const script = manifest.content_scripts[i]
+            for (let i = 0; i < manifestContentScripts.length; i++) {
+              const script = manifestContentScripts[i]
               const cssEntry = cssEntryMap.get(i)
               const originalJs = script.js || []
               const hasIifeScript = originalJs.some((id) => {
@@ -531,8 +531,11 @@ export const pluginManifest: CrxPluginFn = () => {
               }
             }
 
+            const canRegisterDynamicScripts =
+              manifest.permissions?.includes('scripting') === true
             if (
               liveReload &&
+              canRegisterDynamicScripts &&
               manifest.host_permissions &&
               manifest.host_permissions.length > 0
             ) {
@@ -541,7 +544,10 @@ export const pluginManifest: CrxPluginFn = () => {
               })
             }
 
-            manifest.content_scripts.push(...iifeReloadScripts)
+            if (iifeReloadScripts.length > 0) {
+              manifest.content_scripts = manifestContentScripts
+              manifest.content_scripts.push(...iifeReloadScripts)
+            }
           }
         } else {
           finalizeBuildContentScripts(this, bundle)

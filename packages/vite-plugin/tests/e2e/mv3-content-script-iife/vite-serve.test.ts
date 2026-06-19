@@ -27,11 +27,17 @@ test('IIFE content scripts work in dev mode', async () => {
   const manifest = (await fs.readJson(path.join(outDir, 'manifest.json'))) as {
     content_scripts: Array<{ js: string[] }>
   }
-  expect(manifest.content_scripts.map(({ js }) => js[0])).toEqual([
+  const contentScriptFiles = manifest.content_scripts.map(({ js }) => js[0])
+  expect(
+    contentScriptFiles.filter(
+      (file) => file !== 'vendor/crx-iife-reload-bridge.js',
+    ),
+  ).toEqual([
     'src/content-regular.ts-loader.js',
     'src/content-iife.iife.ts.iife.js',
     'src/content-standalone.ts.iife.js',
   ])
+  expect(contentScriptFiles).toContain('vendor/crx-iife-reload-bridge.js')
 
   await waitForRegisteredContentScripts(
     browser,
