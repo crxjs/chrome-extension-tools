@@ -9,7 +9,7 @@ async function copyInitialFixture() {
   const src1 = path.join(__dirname, 'src1')
 
   await fs.remove(src)
-  await fs.copy(src1, src, { recursive: true })
+  await fs.copy(src1, src)
 
   return src
 }
