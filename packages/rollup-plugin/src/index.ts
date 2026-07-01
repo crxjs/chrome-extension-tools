@@ -21,7 +21,7 @@ export const chromeExtension = (
     const packageJsonPath = join(process.cwd(), 'package.json')
     options.pkg = options.pkg || readJSONSync(packageJsonPath)
     // eslint-disable-next-line no-empty
-  } catch (error) {}
+  } catch {}
 
   /* ----------------- SETUP PLUGINS ----------------- */
 

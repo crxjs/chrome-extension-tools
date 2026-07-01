@@ -5,7 +5,7 @@ import { buildCRX } from '../../../__fixtures__/build-crx'
 import { context } from '../../../__fixtures__/plugin-context'
 import { cloneObject } from '../../manifest-input/cloneObject'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const fsExtra = require('fs-extra')
 const mockOutputJson = jest.spyOn(fsExtra, 'outputJson')
 mockOutputJson.mockImplementation(() => Promise.resolve())

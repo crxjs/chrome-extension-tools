@@ -4,7 +4,7 @@ import { context } from '../../../__fixtures__/plugin-context'
 import { isChunk } from '../../helpers'
 import { validateNames } from '../index'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const bundle: OutputBundle = require('../../../__fixtures__/validate-names__sample-bundle.json')
 
 const helperKey = Object.keys(bundle).find((name) => name.includes('_'))!
