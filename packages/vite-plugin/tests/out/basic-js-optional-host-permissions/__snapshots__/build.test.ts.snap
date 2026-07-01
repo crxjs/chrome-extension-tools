@@ -35,19 +35,6 @@ Object {
     "tabs",
   ],
   "version": "1.0.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
-        "https://example.com/*",
-      ],
-      "resources": Array [
-        "assets/content.js.hash0.js",
-      ],
-      "use_dynamic_url": false,
-    },
-  ],
 }
 `;
 

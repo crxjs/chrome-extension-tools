@@ -17,17 +17,6 @@ Object {
   "manifest_version": 3,
   "name": "Test Content Script World Main",
   "version": "1.0.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "https://example.com/*",
-      ],
-      "resources": Array [
-        "assets/content.js.hash0.js",
-      ],
-      "use_dynamic_url": false,
-    },
-  ],
 }
 `;
 
