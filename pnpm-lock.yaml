@@ -95,7 +95,7 @@ importers:
         specifier: ^6.0.1
         version: 6.1.1
       playwright-chromium:
-        specifier: 1.61.1
+        specifier: ^1.61.1
         version: 1.61.1
       rollup:
         specifier: ^2.80.0
@@ -373,7 +373,7 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
       playwright-chromium:
-        specifier: 1.61.1
+        specifier: ^1.61.1
         version: 1.61.1
       react:
         specifier: 17.0.2
