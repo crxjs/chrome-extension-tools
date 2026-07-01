@@ -190,7 +190,9 @@ export const simpleReloader = (
     /* -------------- WRITE TIMESTAMP FILE ------------- */
     async writeBundle() {
       // Sometimes Chrome says the manifest isn't valid, so we need to wait a bit
-      reloadDelay > 0 && (await delay(reloadDelay))
+      if (reloadDelay > 0) {
+        await delay(reloadDelay)
+      }
 
       try {
         await outputJson(

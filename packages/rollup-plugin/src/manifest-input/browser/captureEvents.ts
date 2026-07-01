@@ -8,7 +8,7 @@ export function captureEvents(events: ChromeEvent[]) {
   function captureEvent(event: ChromeEvent) {
     let isCapturePhase = true
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     const callbacks = new Map<Function, any[]>()
     const eventArgs = new Set<any[]>()
 
