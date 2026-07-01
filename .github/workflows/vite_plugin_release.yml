@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    uses: crxjs/workflows/.github/workflows/release.yml@v1
+    uses: ./.github/workflows/release-new.yml
     with:
       publish: true
     permissions:

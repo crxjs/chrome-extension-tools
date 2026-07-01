@@ -1,0 +1,70 @@
+name: Release New
+
+on:
+  workflow_call:
+    inputs:
+      github-release:
+        required: false
+        type: boolean
+        default: true
+      publish:
+        required: false
+        type: boolean
+        default: false
+      build:
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: write
+      id-token: write
+
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Generate GitHub Changelog
+        run: pnpx changelogithub
+        continue-on-error: true
+        if: ${{ inputs.github-release }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Build
+        run: ${{ inputs.build }}
+        if: ${{ inputs.build && inputs.publish }}
+
+      - name: Publish to NPM
+        working-directory: packages/vite-plugin
+        run: npm publish --access public --provenance
+        if: ${{ inputs.publish }}
