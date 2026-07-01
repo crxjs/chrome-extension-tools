@@ -1,5 +1,14 @@
 # @crxjs/vite-plugin
 
+## 2.7.1
+
+### Patch Changes
+
+- efa9c63: Update direct dependency ranges for `convert-source-map`, `debug`,
+  and `fs-extra`.
+- 6efde9d: Filter Vite 8/Rolldown-only options before the dev file writer calls
+  Rollup, removing `Unknown input options: platform` warnings.
+
 ## 2.7.0
 
 ### Minor Changes
