@@ -39,16 +39,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "22"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
       - name: Setup PNPM
         uses: pnpm/action-setup@v4
         with:
           version: 10.11.1
-
-      - name: Update npm
-        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install
@@ -65,7 +62,6 @@ jobs:
         if: ${{ inputs.build && inputs.publish }}
 
       - name: Publish to NPM
-        run: pnpm -r publish --access public --no-git-checks
+        working-directory: packages/vite-plugin
+        run: npm publish --access public --provenance
         if: ${{ inputs.publish }}
-        env:
-          NPM_CONFIG_PROVENANCE: true
