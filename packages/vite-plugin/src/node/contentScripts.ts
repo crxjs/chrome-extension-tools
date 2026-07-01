@@ -1,5 +1,6 @@
 import contentDevLoader from 'client/iife/content-dev-loader.ts'
 import contentDevMainLoader from 'client/iife/content-dev-main-loader.ts'
+import contentDevNativeLoader from 'client/iife/content-dev-native-loader.ts'
 import contentProLoader from 'client/iife/content-pro-loader.ts'
 import contentProMainLoader from 'client/iife/content-pro-main-loader.ts'
 import { filter } from 'rxjs'
@@ -85,6 +86,24 @@ export function createDevLoader({
     .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
     .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
+}
+
+export function createDevNativeLoader({
+  liveReload,
+  preamble,
+  fileName,
+  viteOrigin,
+}: {
+  liveReload: boolean
+  preamble: string
+  fileName: string
+  viteOrigin: string
+}): string {
+  return contentDevNativeLoader
+    .replace(/__CRX_LIVE_RELOAD__/g, JSON.stringify(liveReload))
+    .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
+    .replace(/__SCRIPT__/g, JSON.stringify(fileName))
+    .replace(/__VITE_ORIGIN__/g, JSON.stringify(viteOrigin))
 }
 
 export function createProLoader({ fileName }: { fileName: string }): string {

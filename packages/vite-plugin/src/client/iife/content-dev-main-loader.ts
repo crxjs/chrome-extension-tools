@@ -5,7 +5,7 @@ const injectTime = performance.now()
 ;(async () => {
   try {
     if (__PREAMBLE__) await import(/* @vite-ignore */ __PREAMBLE__)
-    await import(/* @vite-ignore */ __CLIENT__)
+    if (__CLIENT__) await import(/* @vite-ignore */ __CLIENT__)
   } catch (error) {
     console.warn('[crx] MAIN world HMR client failed to load', error)
   }

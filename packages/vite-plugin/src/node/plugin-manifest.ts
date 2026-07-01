@@ -64,6 +64,17 @@ function getLoadingPageReadyHtmlPath(requestUrl: string | undefined) {
   return normalizeHtmlPath(pageUrl.pathname)
 }
 
+function addDevServerHostPermission(
+  manifest: ManifestV3,
+  config: ResolvedConfig,
+) {
+  const proto = config.server.https ? 'https' : 'http'
+  const permission = `${proto}://localhost/*`
+  manifest.host_permissions = [
+    ...new Set([...(manifest.host_permissions ?? []), permission]),
+  ]
+}
+
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
  *
@@ -79,13 +90,16 @@ export const pluginManifest: CrxPluginFn = () => {
   let devHtmlFiles = new Set<string>()
   let refId: string
   let config: ResolvedConfig
+  let nativeContentScriptHmr = false
 
   return [
     {
       name: 'crx:manifest-init',
       enforce: 'pre',
       async config(config, env) {
-        const { manifest: _manifest } = await getOptions(config)
+        const opts = await getOptions(config)
+        const { manifest: _manifest } = opts
+        nativeContentScriptHmr = opts.contentScripts?.hmr === 'native'
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
           : _manifest)
@@ -335,7 +349,7 @@ export const pluginManifest: CrxPluginFn = () => {
               for (const file of js) {
                 // Skip IIFE/standalone content scripts - they're built separately
                 if (isIifeContentScript(file) || isStandaloneFile(file)) continue
-                
+
                 const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
@@ -401,6 +415,10 @@ export const pluginManifest: CrxPluginFn = () => {
         if (config.command === 'serve') {
           // plugin-background emits service worker loader in renderCrxManifest
           // vite dev server sends html files through local host
+          if (nativeContentScriptHmr) {
+            addDevServerHostPermission(manifest, config)
+          }
+
           if (manifest.content_scripts) {
             // Get all registered CSS entries
             const cssEntries = getContentCssEntries()
