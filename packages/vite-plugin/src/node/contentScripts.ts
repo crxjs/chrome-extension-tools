@@ -114,3 +114,12 @@ export function createProMainLoader({
 }): string {
   return contentProMainLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
 }
+
+export function createIifeReloadBridge({ client }: { client: string }): string {
+  return [
+    `import(chrome.runtime.getURL(${JSON.stringify(client)}))`,
+    `  .then(({ HMRPort }) => new HMRPort())`,
+    `  .catch(console.error)`,
+    '',
+  ].join('\n')
+}

@@ -3,7 +3,15 @@ import path from 'pathe'
 import { expect, test } from 'vitest'
 import { waitForRegisteredContentScripts } from '../helpers'
 import { serve } from '../runners'
-import { bareIifeAliasScriptId, dynamicBareIifeAliasId, dynamicIifeId, dynamicRegularId, iifeContentId, regularContentId, standaloneIifeScriptId } from './src1/script-ids'
+import {
+  bareIifeAliasScriptId,
+  dynamicBareIifeAliasId,
+  dynamicIifeId,
+  dynamicRegularId,
+  iifeContentId,
+  regularContentId,
+  standaloneIifeScriptId,
+} from './src1/script-ids'
 
 test('IIFE content scripts work in dev mode', async () => {
   const src = path.join(__dirname, 'src')
@@ -14,19 +22,33 @@ test('IIFE content scripts work in dev mode', async () => {
   await fs.emptyDir(src)
   await fs.copy(src1, src, { overwrite: true })
 
-  const { browser } = await serve(__dirname)
+  const { browser, outDir } = await serve(__dirname)
 
-  await waitForRegisteredContentScripts(browser, [
-    dynamicRegularId,
-    dynamicIifeId,
-    dynamicBareIifeAliasId,
+  const manifest = (await fs.readJson(path.join(outDir, 'manifest.json'))) as {
+    content_scripts: Array<{ js: string[] }>
+  }
+  const contentScriptFiles = manifest.content_scripts.map(({ js }) => js[0])
+  expect(
+    contentScriptFiles.filter(
+      (file) => file !== 'vendor/crx-iife-reload-bridge.js',
+    ),
+  ).toEqual([
+    'src/content-regular.ts-loader.js',
+    'src/content-iife.iife.ts.iife.js',
+    'src/content-standalone.ts.iife.js',
   ])
+  expect(contentScriptFiles).toContain('vendor/crx-iife-reload-bridge.js')
+
+  await waitForRegisteredContentScripts(
+    browser,
+    [dynamicRegularId, dynamicIifeId, dynamicBareIifeAliasId],
+    { timeout: 30000 },
+  )
 
   const page = await browser.newPage()
   await page.goto('https://example.com')
 
-  // In dev mode, .iife.ts files are served as ESM (IIFE bundling only happens in build)
-  // but should still execute and create their markers.
+  // In dev mode, .iife.ts files should execute and create their markers.
   await page.waitForSelector(`#${regularContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${iifeContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${standaloneIifeScriptId}`, { timeout: 10000 })
@@ -40,15 +62,21 @@ test('IIFE content scripts work in dev mode', async () => {
   const iifeText = await page.locator(`#${iifeContentId}`).textContent()
   expect(iifeText).toBe('iife: shared-util')
 
-  const standaloneText = await page.locator(`#${standaloneIifeScriptId}`).textContent()
+  const standaloneText = await page
+    .locator(`#${standaloneIifeScriptId}`)
+    .textContent()
   expect(standaloneText).toBe('standalone: shared-util')
 
-  const dynamicRegularText = await page.locator(`#${dynamicRegularId}`).textContent()
+  const dynamicRegularText = await page
+    .locator(`#${dynamicRegularId}`)
+    .textContent()
   expect(dynamicRegularText).toBe('dynamic-regular: shared-util')
 
   const dynamicIifeText = await page.locator(`#${dynamicIifeId}`).textContent()
   expect(dynamicIifeText).toBe('dynamic-iife: shared-util')
 
-  const bareAliasText = await page.locator(`#${bareIifeAliasScriptId}`).textContent()
+  const bareAliasText = await page
+    .locator(`#${bareIifeAliasScriptId}`)
+    .textContent()
   expect(bareAliasText).toBe('bare-iife-alias: shared-util')
 })

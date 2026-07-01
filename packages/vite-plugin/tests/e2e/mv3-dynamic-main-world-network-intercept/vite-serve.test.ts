@@ -1,0 +1,63 @@
+import fs from 'fs-extra'
+import path from 'pathe'
+import { expect, test } from 'vitest'
+import {
+  createUpdate,
+  waitForContentScriptContent,
+  waitForRegisteredContentScripts,
+} from '../helpers'
+import { serve } from '../runners'
+import {
+  expectNetworkProbe,
+  expectRegisteredDynamicScript,
+  routeHostPage,
+} from './test-helpers'
+import { dynamicNetworkScriptId } from './src1/script-ids'
+
+test(
+  'dynamic IIFE MAIN world content script intercepts host network calls and rebuilds in dev mode',
+  async () => {
+    const src = path.join(__dirname, 'src')
+    const src1 = path.join(__dirname, 'src1')
+    const src2 = path.join(__dirname, 'src2')
+    await fs.emptyDir(src)
+    await fs.copy(src1, src, { overwrite: true })
+
+    const { browser, outDir } = await serve(__dirname)
+    await waitForRegisteredContentScripts(
+      browser,
+      [dynamicNetworkScriptId],
+      { timeout: 30000 },
+    )
+    const scriptPath = await expectRegisteredDynamicScript(browser)
+    expect(scriptPath).toBe('src/interceptor.iife.ts.iife.js')
+    expect(await fs.pathExists(path.join(outDir, scriptPath))).toBe(true)
+
+    await routeHostPage(browser)
+
+    const page = await browser.newPage()
+    await page.goto('https://example.com')
+
+    await expectNetworkProbe(page)
+
+    const update = createUpdate({ target: src, src: src2 })
+    const pageReloaded = page.waitForEvent('load', { timeout: 30000 })
+    await update('interceptor.iife.ts')
+    await waitForContentScriptContent(
+      browser,
+      outDir,
+      dynamicNetworkScriptId,
+      'crx-dynamic-main-world-iife-updated',
+      { timeout: 30000 },
+    )
+    await waitForRegisteredContentScripts(
+      browser,
+      [dynamicNetworkScriptId],
+      { timeout: 30000 },
+    )
+    await pageReloaded
+
+    await expectNetworkProbe(page, 'crx-dynamic-main-world-iife-updated')
+  },
+  { retry: process.env.CI ? 5 : 0 },
+)
