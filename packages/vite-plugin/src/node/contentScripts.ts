@@ -72,6 +72,12 @@ export function hashScriptId(script: Pick<ContentScript, 'type' | 'id'>) {
 }
 
 function makeDevClientOptional(source: string) {
+  // In normal dev mode CRXJS writes a transformed /@vite/client file into the
+  // extension output and the loader must import it. Vite 8.1 bundled dev mode
+  // does not expose /@vite/client through the old transformRequest path, so the
+  // bundled-dev loader gets an empty client filename and must skip that import.
+  // Keep the original template unchanged when a client filename is available so
+  // normal dev output stays byte-for-byte compatible with existing snapshots.
   return source
     .replace(
       `    await import(
