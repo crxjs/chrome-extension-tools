@@ -71,6 +71,32 @@ export function hashScriptId(script: Pick<ContentScript, 'type' | 'id'>) {
   return hash(`${script.type}&${script.id}`)
 }
 
+function makeDevClientOptional(source: string) {
+  return source
+    .replace(
+      `    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(__CLIENT__)
+    );`,
+      `    if (__CLIENT__)
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(__CLIENT__)
+      );`,
+    )
+    .replace(
+      `      await import(
+        /* @vite-ignore */
+        __CLIENT__
+      );`,
+      `      if (__CLIENT__)
+        await import(
+          /* @vite-ignore */
+          __CLIENT__
+        );`,
+    )
+}
+
 export function createDevLoader({
   preamble,
   client,
@@ -80,7 +106,11 @@ export function createDevLoader({
   client: string
   fileName: string
 }): string {
-  return contentDevLoader
+  const source = client
+    ? contentDevLoader
+    : makeDevClientOptional(contentDevLoader)
+
+  return source
     .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
     .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
@@ -100,7 +130,11 @@ export function createDevMainLoader({
   client: string
   fileName: string
 }): string {
-  return contentDevMainLoader
+  const source = client
+    ? contentDevMainLoader
+    : makeDevClientOptional(contentDevMainLoader)
+
+  return source
     .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
     .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
