@@ -1,6 +1,9 @@
+import react from '@vitejs/plugin-react'
 import { crx } from '../../plugin-testOptionsProvider'
 import { defineConfig, type UserConfig } from 'vite'
 import manifest from './manifest.json'
+
+const { preambleCode } = react
 
 type BundledDevConfig = UserConfig & {
   experimental: {
@@ -15,7 +18,7 @@ const config: BundledDevConfig = {
     bundledDev: true,
   },
   logLevel: 'error',
-  plugins: [crx({ manifest })],
+  plugins: [crx({ manifest, contentScripts: { preambleCode } }), react()],
 }
 
 export default defineConfig(config)

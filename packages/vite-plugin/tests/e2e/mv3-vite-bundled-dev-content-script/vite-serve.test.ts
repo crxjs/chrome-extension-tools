@@ -13,7 +13,7 @@ test(
     await marker.waitFor({ timeout: 10000 })
 
     expect(await marker.textContent()).toBe(
-      'Vite bundled dev content script loaded',
+      'Vite bundled dev React content script loaded',
     )
   },
   {

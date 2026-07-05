@@ -22,7 +22,11 @@ import {
   tap,
   toArray,
 } from 'rxjs'
-import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
+import {
+  build as viteBuild,
+  ErrorPayload,
+  ViteDevServer,
+} from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
 import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
 import { join } from './path'
@@ -48,6 +52,28 @@ const isOutputChunk = (item: OutputChunk | OutputAsset): item is OutputChunk =>
 
 const isOutputAsset = (item: OutputChunk | OutputAsset): item is OutputAsset =>
   item.type === 'asset'
+
+function isBundledDevServer(server: ViteDevServer) {
+  return Boolean(
+    (
+      server.config as ViteDevServer['config'] & {
+        experimental?: { bundledDev?: boolean }
+      }
+    ).experimental?.bundledDev,
+  )
+}
+
+function canBundleInBundledDev(script: CrxDevScriptId) {
+  // Only real manifest entries can go through Vite's build pipeline here.
+  // Virtual dev modules like @crx/client-preamble still need the transformRequest
+  // path so CRXJS can rewrite their imports to files emitted by the dev writer.
+  return (
+    script.type === 'module' &&
+    !script.id.startsWith('@') &&
+    !script.id.startsWith('/@') &&
+    !script.id.startsWith('\0')
+  )
+}
 
 /* ----------------- SERVER EVENTS ----------------- */
 
@@ -226,6 +252,24 @@ function prepScript(
   if (script.type === 'iife') return prepIifeScript(fileName, script)
   return ($) =>
     $.pipe(
+      mergeMap((event) =>
+        firstValueFrom(
+          of(event).pipe(
+            isBundledDevServer(event.server) && canBundleInBundledDev(script)
+              ? prepBundledDevModuleScript(fileName, script)
+              : prepDevModuleScript(fileName, script),
+          ),
+        ),
+      ),
+    )
+}
+
+function prepDevModuleScript(
+  fileName: string,
+  script: CrxDevScriptId,
+): OperatorFileData {
+  return ($) =>
+    $.pipe(
       // get script contents from dev server
       mergeMap(async ({ server }) => {
         const target = getOutputPath(server, fileName)
@@ -297,6 +341,131 @@ function prepScript(
     )
 }
 
+async function writeBundleExtraFiles(
+  server: ViteDevServer,
+  fileName: string,
+  assets: OutputAsset[],
+  extraChunks: OutputChunk[],
+) {
+  const extras = [
+    ...assets.map((asset) => ({
+      fileName: asset.fileName,
+      source: asset.source,
+    })),
+    ...extraChunks.map((chunk) => ({
+      fileName: chunk.fileName,
+      source: chunk.code,
+    })),
+  ].filter((item) => item.fileName !== fileName)
+
+  await Promise.all(
+    extras.map(async (item) => {
+      const outputPath = getOutputPath(server, item.fileName)
+      if (typeof item.source === 'undefined' || item.source === null) return
+      if (item.source instanceof Uint8Array)
+        await outputFile(outputPath, item.source)
+      else await outputFile(outputPath, item.source, { encoding: 'utf8' })
+    }),
+  )
+}
+
+function getViteBuildOutput(
+  result: Awaited<ReturnType<typeof viteBuild>>,
+  scriptId: string,
+) {
+  const outputs = Array.isArray(result) ? result : [result]
+  const firstOutput = outputs[0]
+  const output = 'output' in firstOutput ? firstOutput.output : undefined
+
+  if (!output) {
+    throw new Error(`Unable to generate bundle for "${scriptId}"`)
+  }
+
+  return output
+}
+
+async function bundleBundledDevModule(
+  server: ViteDevServer,
+  script: CrxDevScriptId,
+  fileName: string,
+) {
+  const input = resolveScriptInput(server, script.id)
+  const sourcemap =
+    server.config.build.sourcemap === 'inline' ? 'inline' : false
+
+  const result = await viteBuild({
+    root: server.config.root,
+    mode: server.config.mode,
+    configFile: false,
+    logLevel: 'silent',
+    define: server.config.define,
+    resolve: {
+      alias: server.config.resolve.alias,
+      extensions: server.config.resolve.extensions,
+      conditions: server.config.resolve.conditions,
+    },
+    build: {
+      write: false,
+      manifest: false,
+      rollupOptions: {
+        input,
+        output: {
+          format: 'es',
+          entryFileNames: fileName,
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]',
+          sourcemap,
+        },
+      },
+      minify: false,
+      copyPublicDir: false,
+      modulePreload: false,
+    },
+  })
+
+  const output = getViteBuildOutput(result, script.id)
+  const entryChunk = output.find(
+    (item): item is OutputChunk => isOutputChunk(item) && item.isEntry,
+  )
+  if (!entryChunk) {
+    throw new Error(`Unable to generate bundle for "${script.id}"`)
+  }
+
+  const assets = output.filter(isOutputAsset).filter(
+    (asset) =>
+      asset.fileName !== 'manifest.json' &&
+      !asset.fileName.startsWith('.vite/'),
+  )
+  const extraChunks = output.filter(
+    (item): item is OutputChunk => isOutputChunk(item) && !item.isEntry,
+  )
+
+  return {
+    code: entryChunk.code,
+    assets,
+    extraChunks,
+  }
+}
+
+function prepBundledDevModuleScript(
+  fileName: string,
+  script: CrxDevScriptId,
+): OperatorFileData {
+  return ($) =>
+    $.pipe(
+      mergeMap(async ({ server }) => {
+        const target = getOutputPath(server, fileName)
+        const { code, assets, extraChunks } = await bundleBundledDevModule(
+          server,
+          script,
+          fileName,
+        )
+        await writeBundleExtraFiles(server, fileName, assets, extraChunks)
+        return { target, source: code, deps: [] }
+      }),
+    )
+}
+
 async function bundleIife(
   server: ViteDevServer,
   script: CrxDevScriptId,
@@ -338,14 +507,7 @@ async function bundleIife(
     },
   })
 
-  // viteBuild with write: false returns RollupOutput or RollupOutput[]
-  const outputs = Array.isArray(result) ? result : [result]
-  const firstOutput = outputs[0]
-  const output = 'output' in firstOutput ? firstOutput.output : undefined
-
-  if (!output) {
-    throw new Error(`Unable to generate IIFE bundle for "${script.id}"`)
-  }
+  const output = getViteBuildOutput(result, script.id)
 
   const entryChunk = output.find(
     (item): item is OutputChunk => isOutputChunk(item) && item.isEntry,
@@ -388,29 +550,7 @@ function prepIifeScript(
       }),
       mergeMap(
         async ({ target, source, deps, server, assets, extraChunks }) => {
-          const extras = [
-            ...assets.map((asset) => ({
-              fileName: asset.fileName,
-              source: asset.source,
-            })),
-            ...extraChunks.map((chunk) => ({
-              fileName: chunk.fileName,
-              source: chunk.code,
-            })),
-          ].filter((item) => item.fileName !== fileName)
-
-          await Promise.all(
-            extras.map(async (item) => {
-              const outputPath = getOutputPath(server, item.fileName)
-              if (typeof item.source === 'undefined' || item.source === null)
-                return
-              if (item.source instanceof Uint8Array)
-                await outputFile(outputPath, item.source)
-              else
-                await outputFile(outputPath, item.source, { encoding: 'utf8' })
-            }),
-          )
-
+          await writeBundleExtraFiles(server, fileName, assets, extraChunks)
           return { target, source, deps }
         },
       ),
