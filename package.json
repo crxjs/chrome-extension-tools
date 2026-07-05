@@ -21,6 +21,7 @@
     "play:solid": "pnpm -C playgrounds/solid run dev",
     "play:svelte": "pnpm -C playgrounds/svelte run dev",
     "play:vanilla": "pnpm -C playgrounds/vanilla run dev",
+    "play:vite-plus": "pnpm -C playgrounds/vite-plus run dev",
     "play:vue": "pnpm -C playgrounds/vue run dev",
     "release": "pnpm --filter \"*plugin*\" build && changeset publish",
     "release:vite-plugin": "cd ./packages/vite-plugin && pnpm release"

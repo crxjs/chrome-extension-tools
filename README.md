@@ -44,7 +44,7 @@ npm create crxjs@latest
 - Install [pnpm](https://pnpm.io)
 - Install dependencies using `pnpm install`
 - Build the `vite-plugin` project using `pnpm build:vite-plugin`
-- Playgrounds project is located at `playgrounds/**`, using `pnpm play` can run the playgrounds
+- Playground projects are located at `playgrounds/**`; use `pnpm play` for the default playground or `pnpm play:vite-plus` for the Vite+ playground
 - Cd into the `vite-plugin` directory using `cd packages/vite-plugin`
 - Test using `pnpm run test`
 - Use [DeepWiki](https://deepwiki.com/crxjs/chrome-extension-tools) to learn more about CRXJS

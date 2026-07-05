@@ -1,0 +1,21 @@
+{
+  "name": "play-vite-plus",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "check": "vp check",
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "workspace:*",
+    "@types/chrome": "^0.0.313",
+    "@types/node": "^22.13.14",
+    "typescript": "~5.7.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.2",
+    "vite-plugin-zip-pack": "^1.2.4",
+    "vite-plus": "0.2.2"
+  }
+}
