@@ -1,11 +1,4 @@
-import {
-  buffer,
-  filter,
-  map,
-  mergeMap,
-  Observable,
-  Subject,
-} from 'rxjs'
+import { buffer, filter, map, mergeMap, Observable, Subject } from 'rxjs'
 import {
   CustomPayload,
   FullReloadPayload,
@@ -44,12 +37,17 @@ export function getUpdatePayloadFileIds(
   const ids = new Set<string>()
 
   for (const u of p.updates) {
-    for (const id of [u.path, u.acceptedPath]) {
-      const isVirtualModule = id.startsWith('/@id/') || id.startsWith('/__')
-      const isQueryModule = id.includes('?')
-      if (isVirtualModule || isQueryModule)
-        ids.add(timestamp ? withTimestamp(id, u.timestamp) : id)
-    }
+    // The browser imports acceptedPath with Vite's update timestamp. Rebuild it
+    // first so its rewritten imports also point at fresh dependency modules.
+    ids.add(
+      timestamp ? withTimestamp(u.acceptedPath, u.timestamp) : u.acceptedPath,
+    )
+
+    const isVirtualModule =
+      u.path.startsWith('/@id/') || u.path.startsWith('/__')
+    const isQueryModule = u.path.includes('?')
+    if (isVirtualModule || isQueryModule)
+      ids.add(timestamp ? withTimestamp(u.path, u.timestamp) : u.path)
   }
 
   return [...ids]
@@ -103,8 +101,10 @@ export async function prepareVitePayloadForCrx(
   p: HMRPayload,
 ): Promise<HMRPayload> {
   if (p.type === 'update') {
-    // Update files on disk for payload-only module ids. Regular files are
-    // handled by handleHotUpdate; query modules like Vue SFC styles are not.
+    // Update HMR boundaries and payload-only module ids before forwarding the
+    // payload. handleHotUpdate covers changed physical files, but accepted
+    // importers must be transformed with Vite's timestamp so their dependency
+    // imports do not keep pointing at cached extension modules.
     const pendingFiles = getUpdatePayloadFileIds(p, {
       timestamp: true,
     }).flatMap((id) => {

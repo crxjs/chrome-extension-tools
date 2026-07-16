@@ -24,7 +24,12 @@ import {
 } from 'rxjs'
 import { build as viteBuild, ErrorPayload, ViteDevServer } from 'vite'
 import { OutputFile, outputFiles } from './fileWriter-filesMap'
-import { getFileName, getOutputPath, getViteUrl } from './fileWriter-utilities'
+import {
+  getFileName,
+  getFileUrl,
+  getOutputPath,
+  getViteUrl,
+} from './fileWriter-utilities'
 import { join } from './path'
 import { CrxDevAssetId, CrxDevScriptId, CrxPlugin } from './types'
 import convertSourceMap from 'convert-source-map'
@@ -233,7 +238,9 @@ function prepScript(
         const isVueSfcQuery = script.id.includes('?vue')
         const viteUrl = getViteUrl(script, { timestamp: isVueSfcQuery })
         if (isVueSfcQuery) {
-          const module = await server.moduleGraph.getModuleByUrl(originalViteUrl)
+          const module = await server.moduleGraph.getModuleByUrl(
+            originalViteUrl,
+          )
           if (module) server.moduleGraph.invalidateModule(module)
         }
         const transformResult = await server.transformRequest(viteUrl)
@@ -278,16 +285,18 @@ function prepScript(
           getFileName({ type: 'module', id }) === fileName
         // @vitejs/plugin-react >=5.0.4 can create React Refresh self-imports.
         // Keep the import rewrite, but do not wait on this file as its own dependency.
-        const depSet = new Set<string>(deps.filter((id) => !isSelfDependency(id)))
+        const depSet = new Set<string>(
+          deps.filter((id) => !isSelfDependency(id)),
+        )
         const magic = new MagicString(code)
         for (const i of imports)
           if (i.n) {
-            const depFileName = getFileName({ type: 'module', id: i.n })
+            const depFileUrl = getFileUrl({ type: 'module', id: i.n })
             if (!isSelfDependency(i.n)) depSet.add(i.n)
 
             // NOTE: Temporary fix for this bug: https://github.com/guybedford/es-module-lexer/issues/144
             const fullImport = code.substring(i.s, i.e)
-            magic.overwrite(i.s, i.e, fullImport.replace(i.n, `/${depFileName}`))
+            magic.overwrite(i.s, i.e, fullImport.replace(i.n, depFileUrl))
 
             // NOTE: use this once the bug is fixed
             // magic.overwrite(i.s, i.e, `/${fileName}`)

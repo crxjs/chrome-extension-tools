@@ -110,6 +110,13 @@ export function getFileName({ type, id }: FileWriterId): string {
   }
 }
 
+/** Converts a Vite module id to its extension URL, preserving HMR timestamps. */
+export function getFileUrl(fileId: FileWriterId): string {
+  const fileName = getFileName(fileId)
+  const timestamp = fileId.id.match(/[?&](t=\d+)/)?.[1]
+  return prefix('/', fileName) + (timestamp ? `?${timestamp}` : '')
+}
+
 /** Converts a file name to an absolute filename */
 export function getOutputPath(server: ViteDevServer, fileName: string) {
   const {
@@ -140,7 +147,9 @@ export function getViteUrl(
   } else if (type === 'iife') {
     // IIFE scripts are bundled separately (see plugin-contentScripts_iife + fileWriter-rxjs)
     // and do not go through Vite's transform pipeline for dev.
-    throw new Error(`File type "iife" is handled via dedicated IIFE bundler, not Vite transform.`)
+    throw new Error(
+      `File type "iife" is handled via dedicated IIFE bundler, not Vite transform.`,
+    )
   } else if (type === 'loader') {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {

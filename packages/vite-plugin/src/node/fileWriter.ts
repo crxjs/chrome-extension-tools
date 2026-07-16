@@ -60,9 +60,7 @@ function queueWrite(
 ) {
   if (!previous) return write(script)
 
-  return previous.file
-    .catch(() => undefined)
-    .then(() => write(script))
+  return previous.file.catch(() => undefined).then(() => write(script))
 }
 
 /**
@@ -142,10 +140,7 @@ export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
     const isTimestampedModule =
       script.type === 'module' && /[?&]t=\d+/.test(script.id)
     if (isVirtualModule || isTimestampedModule) {
-      debug(
-        'add: module already exists, triggering re-write for %s',
-        fileName,
-      )
+      debug('add: module already exists, triggering re-write for %s', fileName)
       file = formatFileData({
         ...file,
         ...script,
@@ -168,6 +163,18 @@ export function update(_id: string): OutputFile[] {
   const id = prefix('/', _id)
   const types = ['iife', 'module'] as const
   const updatedFiles: OutputFile[] = []
+  const updatedFileNames = new Set<string>()
+  const updateFile = (scriptFile: OutputFile) => {
+    scriptFile.file = queueWrite(
+      { id: scriptFile.id, type: scriptFile.type },
+      scriptFile,
+    )
+    updatedFiles.push(scriptFile)
+    updatedFileNames.add(scriptFile.fileName)
+    // trigger scriptFiles change, scriptFile is already formatted
+    outputFiles.set(scriptFile.fileName, scriptFile)
+  }
+
   debug('update called: _id=%s id=%s', _id, id)
   for (const type of types) {
     const fileName = getFileName({ id, type })
@@ -175,12 +182,32 @@ export function update(_id: string): OutputFile[] {
     const scriptFile = outputFiles.get(fileName)
     if (scriptFile) {
       debug('update: found file, calling write()')
-      scriptFile.file = queueWrite({ id, type }, scriptFile)
-      updatedFiles.push(scriptFile)
-      // trigger scriptFiles change, scriptFile is already formatted
-      outputFiles.set(fileName, scriptFile)
+      updateFile(scriptFile)
     }
   }
+
+  // Vite represents transformed resources as query-string modules, for
+  // example an imported JSON file becomes `/locales/pl.json?import`. Its file
+  // watcher reports the physical path without the query, so update every
+  // existing module variant that belongs to the changed source file.
+  const sourceId = id.split('?')[0]
+  for (const scriptFile of outputFiles.values()) {
+    if (
+      scriptFile.type !== 'module' ||
+      updatedFileNames.has(scriptFile.fileName) ||
+      scriptFile.id.split('?')[0] !== sourceId
+    ) {
+      continue
+    }
+
+    debug(
+      'update: found query variant fileName=%s id=%s',
+      scriptFile.fileName,
+      scriptFile.id,
+    )
+    updateFile(scriptFile)
+  }
+
   debug('update: returning %d files', updatedFiles.length)
   return updatedFiles
 }
