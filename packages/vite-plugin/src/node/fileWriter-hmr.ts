@@ -37,6 +37,9 @@ export function getUpdatePayloadFileIds(
   const ids = new Set<string>()
 
   for (const u of p.updates) {
+    // For example, a JSON update can report:
+    //   path: /src/locales/pl.json
+    //   acceptedPath: /src/App.jsx
     // The browser imports acceptedPath with Vite's update timestamp. Rebuild it
     // first so its rewritten imports also point at fresh dependency modules.
     ids.add(
