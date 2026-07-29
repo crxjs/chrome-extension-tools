@@ -210,9 +210,12 @@ function prepAsset(
     $.pipe(
       mergeMap(async ({ server }) => {
         const target = getOutputPath(server, fileName)
+        const filePath = id.startsWith('/@fs/')
+          ? id.slice('/@fs/'.length - 1)
+          : join(server.config.root, id)
         return {
           target,
-          source: source ?? (await readFile(join(server.config.root, id))),
+          source: source ?? (await readFile(filePath)),
           deps: [],
         }
       }),
