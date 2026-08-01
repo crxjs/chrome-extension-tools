@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'url'
 import * as lexer from 'es-module-lexer'
 import fsx from 'fs-extra'
 import { readFile } from 'fs/promises'
@@ -211,7 +212,7 @@ function prepAsset(
       mergeMap(async ({ server }) => {
         const target = getOutputPath(server, fileName)
         const filePath = id.startsWith('/@fs/')
-          ? id.slice('/@fs/'.length - 1)
+          ? fileURLToPath('file://' + id.slice('/@fs'.length))
           : join(server.config.root, id)
         return {
           target,
