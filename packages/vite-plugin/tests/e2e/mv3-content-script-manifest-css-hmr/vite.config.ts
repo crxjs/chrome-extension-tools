@@ -16,5 +16,5 @@ export default defineConfig({
   },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest })],
+  plugins: [crx({ manifest, contentScripts: { hmr: 'native' } })],
 })

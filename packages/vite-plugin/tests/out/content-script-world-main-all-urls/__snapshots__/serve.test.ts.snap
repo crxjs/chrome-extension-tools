@@ -78,10 +78,11 @@ exports[`serve fs output > src/content.js-loader.js 1`] = `
           /* @vite-ignore */
           \\"\\"
         );
-      await import(
-        /* @vite-ignore */
-        \\"../vendor/vite-client.js\\"
-      );
+      if (\\"../vendor/vite-client.js\\")
+        await import(
+          /* @vite-ignore */
+          \\"../vendor/vite-client.js\\"
+        );
     } catch (error) {
       console.warn(\\"[crx] MAIN world HMR client failed to load\\", error);
     }
