@@ -23,7 +23,6 @@ Object {
         "https://google.com/*",
       ],
       "resources": Array [
-        "assets/content.ts.hash0.js",
         "assets/font.hash1.otf",
         "assets/image.hash2.png",
         "assets/script.ts.hash3.js",

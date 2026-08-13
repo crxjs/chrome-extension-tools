@@ -27,7 +27,6 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "assets/declared-script.ts.hash0.js",
         "assets/main-world.ts.hash1.js",
       ],
       "use_dynamic_url": false,
