@@ -4,7 +4,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const DEFAULT_VERSIONS = ['3', '6', '7', '8']
+const DEFAULT_VERSIONS = ['3', '6', '7', '8.1']
 const DEFAULT_MODES = ['compat', 'e2e']
 const BASE_VITE_VERSION = '3'
 const PNPM = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm'
@@ -137,9 +137,9 @@ function printHelp() {
 
 Usage:
   pnpm test:vite-matrix
-  pnpm test:vite-matrix -- --mode e2e --vite 8
+  pnpm test:vite-matrix -- --mode e2e --vite 8.1
   pnpm test:vite-matrix -- --mode compat,e2e --vite 6,7
-  pnpm test:vite-matrix -- 8
+  pnpm test:vite-matrix -- 8.1
 
 Options:
   --vite, --versions <list>  Vite versions to test. Default: ${DEFAULT_VERSIONS.join(

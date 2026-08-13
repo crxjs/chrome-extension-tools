@@ -97,7 +97,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        vite-version: ["3", "6", "7", "8"]
+        vite-version: ["3", "6", "7", "8.1"]
     defaults:
       run:
         working-directory: packages/vite-plugin
@@ -133,15 +133,15 @@ jobs:
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
 
-      - name: Install React plugin for Vite 8
-        if: matrix.vite-version == '8'
+      - name: Install React plugin for Vite 8.x
+        if: startsWith(matrix.vite-version, '8')
         run: pnpm add -D @vitejs/plugin-react@5.2.0 --ignore-scripts
 
       - name: Verify Vite version
         run: echo "Testing with Vite $(pnpm exec vite --version)"
 
       - name: Run compat tests
-        run: pnpm exec vitest --run --mode compat ${{ matrix.vite-version == '8' && '--threads false' || '' }}
+        run: pnpm exec vitest --run --mode compat ${{ startsWith(matrix.vite-version, '8') && '--threads false' || '' }}
 
   e2e:
     name: E2E Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
@@ -150,7 +150,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        vite-version: ["3", "6", "7", "8"]
+        vite-version: ["3", "6", "7", "8.1"]
     defaults:
       run:
         working-directory: packages/vite-plugin
@@ -186,8 +186,8 @@ jobs:
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
 
-      - name: Install React plugin for Vite 8
-        if: matrix.vite-version == '8'
+      - name: Install React plugin for Vite 8.x
+        if: startsWith(matrix.vite-version, '8')
         run: pnpm add -D @vitejs/plugin-react@5.2.0 --ignore-scripts
 
       - name: Verify Vite version
@@ -196,7 +196,7 @@ jobs:
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: pnpm exec vitest --run --mode e2e ${{ matrix.vite-version == '8' && '--threads false' || '' }}
+          run: pnpm exec vitest --run --mode e2e ${{ startsWith(matrix.vite-version, '8') && '--threads false' || '' }}
           working-directory: packages/vite-plugin
 
       - uses: actions/upload-artifact@v4
