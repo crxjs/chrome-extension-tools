@@ -9,12 +9,15 @@ test('serves assets imported by a workspace package outside the Vite root', asyn
 
   try {
     const files = await glob('**/*', { cwd: result.outDir })
-    const assetFile = files.find((file) => file.endsWith('badge.svg'))
+    const assetContents = await Promise.all(
+      files
+        .filter((file) => file.endsWith('.svg'))
+        .map((file) => fs.readFile(join(result.outDir, file), 'utf8')),
+    )
 
-    expect(assetFile).toBeDefined()
-    await expect(
-      fs.readFile(join(result.outDir, assetFile!), 'utf8'),
-    ).resolves.toContain('workspace asset')
+    expect(
+      assetContents.some((content) => content.includes('workspace asset')),
+    ).toBe(true)
   } finally {
     await result.server.close()
   }

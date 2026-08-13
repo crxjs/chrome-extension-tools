@@ -1,7 +1,7 @@
 import { ViteDevServer } from 'vite'
 import { outputFiles } from './fileWriter-filesMap'
-import { _debug } from './helpers'
-import { basename, dirname, isAbsolute, join } from './path'
+import { _debug, hash } from './helpers'
+import { basename, dirname, extname, isAbsolute, join } from './path'
 import { CrxDevAssetId, CrxDevScriptId } from './types'
 
 const debug = _debug('file-writer').extend('utilities')
@@ -65,6 +65,7 @@ export function formatFileData<
  * Converts ScriptId to filename:
  *
  * - Filenames never start with a slash
+ * - Outside-root IDs use bounded, deterministic filenames
  * - URL queries are converted to underscores and dashes
  * - Filenames starting with '_' are sanitized (Chrome Extensions reserve them)
  */
@@ -73,10 +74,18 @@ export function getFileName({ type, id }: FileWriterId): string {
     .replace(/t=\d+&/, '') // filenames do not contain timestamps
     .replace(/\?t=\d+$/, '') // filenames do not contain timestamps
     .replace(/^\//, '') // filenames do not start with a slash
-    .replace(/\?/g, '__') // convert url queries
-    .replace(/&/g, '_')
-    .replace(/=/g, '--')
-    .replace(/:/g, '-') // colons are illegal on Windows
+
+  if (fileName.startsWith('@fs/') && !fileName.includes('node_modules/')) {
+    const extension = type === 'asset' ? extname(fileName.split('?')[0]) : ''
+    fileName = `vendor/fs-${hash(fileName, 12)}${extension}`
+  } else {
+    fileName = fileName
+      .replace(/\?/g, '__') // convert url queries
+      .replace(/&/g, '_')
+      .replace(/=/g, '--')
+      .replace(/:/g, '-') // colons are illegal on Windows
+  }
+
   if (fileName.includes('node_modules/')) {
     fileName = `vendor/${fileName
       .split('node_modules/')
@@ -140,7 +149,9 @@ export function getViteUrl(
   } else if (type === 'iife') {
     // IIFE scripts are bundled separately (see plugin-contentScripts_iife + fileWriter-rxjs)
     // and do not go through Vite's transform pipeline for dev.
-    throw new Error(`File type "iife" is handled via dedicated IIFE bundler, not Vite transform.`)
+    throw new Error(
+      `File type "iife" is handled via dedicated IIFE bundler, not Vite transform.`,
+    )
   } else if (type === 'loader') {
     throw new Error('Vite does not transform loader files.')
   } else if (type === 'module') {
