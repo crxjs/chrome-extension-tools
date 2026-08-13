@@ -1,0 +1,11 @@
+{
+  "content_scripts": [
+    {
+      "js": ["src/content.ts"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "manifest_version": 3,
+  "name": "workspace assets test",
+  "version": "1.0.0"
+}
