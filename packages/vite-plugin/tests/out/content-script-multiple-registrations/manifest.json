@@ -12,6 +12,19 @@
       "match_about_blank": true,
       "run_at": "document_end",
       "world": "MAIN"
+    },
+    {
+      "js": ["src/content2.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_end",
+      "world": "MAIN"
+    },
+    {
+      "js": ["src/content2.js"],
+      "matches": ["https://outlook.office.com/*"],
+      "match_about_blank": true,
+      "run_at": "document_end",
+      "world": "MAIN"
     }
   ],
   "description": "test content script declared in multiple content_scripts entries",

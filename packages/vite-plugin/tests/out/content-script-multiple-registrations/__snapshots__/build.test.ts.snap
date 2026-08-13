@@ -24,6 +24,27 @@ Object {
       "run_at": "document_end",
       "world": "MAIN",
     },
+    Object {
+      "js": Array [
+        "assets/content2.js-loader.hash1.js",
+      ],
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "run_at": "document_end",
+      "world": "MAIN",
+    },
+    Object {
+      "js": Array [
+        "assets/content2.js-loader.hash1.js",
+      ],
+      "match_about_blank": true,
+      "matches": Array [
+        "https://outlook.office.com/*",
+      ],
+      "run_at": "document_end",
+      "world": "MAIN",
+    },
   ],
   "description": "test content script declared in multiple content_scripts entries",
   "manifest_version": 3,
@@ -36,8 +57,20 @@ Object {
         "https://outlook.office.com/*",
       ],
       "resources": Array [
-        "assets/content.js.hash1.js",
-        "assets/message.hash2.js",
+        "assets/content.js.hash2.js",
+        "assets/message.hash3.js",
+        "assets/preload-helper.hash4.js",
+      ],
+      "use_dynamic_url": false,
+    },
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "assets/content2.js.hash5.js",
+        "assets/message.hash3.js",
+        "assets/preload-helper.hash4.js",
       ],
       "use_dynamic_url": false,
     },
@@ -48,13 +81,78 @@ Object {
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/content.js-loader.hash0.js",
-  "assets/content.js.hash1.js",
-  "assets/message.hash2.js",
+  "assets/content.js.hash2.js",
+  "assets/content2.js-loader.hash1.js",
+  "assets/content2.js.hash5.js",
+  "assets/message.hash3.js",
+  "assets/preload-helper.hash4.js",
   "manifest.json",
 ]
 `;
 
-exports[`build fs output > assets/content.js.hash1.js 1`] = `
+exports[`build fs output > assets/content.js.hash2.js 1`] = `
+"import { _ as __vitePreload } from \\"./preload-helper.hash4.js\\";
+(async () => {
+  const { logMessage } = await __vitePreload(() => import(\\"./message.hash3.js\\"), true ? [] : void 0);
+  logMessage();
+})().catch(console.error);
+"
+`;
+
+exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      \\"./content.js.hash2.js\\"
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/content2.js.hash5.js 1`] = `
+"import { _ as __vitePreload } from \\"./preload-helper.hash4.js\\";
+(async () => {
+  const { logMessage } = await __vitePreload(() => import(\\"./message.hash3.js\\"), true ? [] : void 0);
+  logMessage();
+})().catch(console.error);
+"
+`;
+
+exports[`build fs output > assets/content2.js-loader.hash1.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      \\"./content2.js.hash5.js\\"
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/message.hash3.js 1`] = `
+"function logMessage() {
+  console.log(\\"content script running\\");
+}
+export {
+  logMessage
+};
+"
+`;
+
+exports[`build fs output > assets/preload-helper.hash4.js 1`] = `
 "const scriptRel = \\"modulepreload\\";
 const assetsURL = function(dep) {
   return \\"/\\" + dep;
@@ -99,36 +197,8 @@ const __vitePreload = function preload(baseModule, deps, importerUrl) {
     }
   })).then(() => baseModule());
 };
-(async () => {
-  const { logMessage } = await __vitePreload(() => import(\\"./message.hash2.js\\"), true ? [] : void 0);
-  logMessage();
-})().catch(console.error);
-"
-`;
-
-exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
-"(function () {
-  'use strict';
-
-  const injectTime = performance.now();
-  (async () => {
-    const { onExecute } = await import(
-      /* @vite-ignore */
-      \\"./content.js.hash1.js\\"
-    );
-    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`build fs output > assets/message.hash2.js 1`] = `
-"function logMessage() {
-  console.log(\\"content script running\\");
-}
 export {
-  logMessage
+  __vitePreload as _
 };
 "
 `;

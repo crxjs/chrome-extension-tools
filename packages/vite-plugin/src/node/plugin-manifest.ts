@@ -7,7 +7,12 @@ import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
-import { decodeManifest, encodeManifest, isString } from './helpers'
+import {
+  decodeManifest,
+  encodeManifest,
+  isString,
+  reduceMatchPatterns,
+} from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, normalize, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
@@ -323,7 +328,9 @@ export const pluginManifest: CrxPluginFn = () => {
                   formatFileData({
                     type: 'loader',
                     id,
-                    matches: [...(matchesByFile.get(id) ?? matches)],
+                    matches: reduceMatchPatterns([
+                      ...(matchesByFile.get(id) ?? matches),
+                    ]),
                     refId: hashScriptId({ type: 'loader', id }),
                     fileName: getFileName({ type: 'loader', id }),
                   }),
@@ -375,7 +382,7 @@ export const pluginManifest: CrxPluginFn = () => {
                   type: 'loader',
                   id: file,
                   refId,
-                  matches: [...matches],
+                  matches: reduceMatchPatterns([...matches]),
                 }),
               )
             }
