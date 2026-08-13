@@ -71,6 +71,38 @@ export function hashScriptId(script: Pick<ContentScript, 'type' | 'id'>) {
   return hash(`${script.type}&${script.id}`)
 }
 
+function makeDevClientOptional(source: string) {
+  // In normal dev mode CRXJS writes a transformed /@vite/client file into the
+  // extension output and the loader must import it. Vite 8.1 bundled dev mode
+  // does not expose /@vite/client through the old transformRequest path, so the
+  // bundled-dev loader gets an empty client filename and must skip that import.
+  // Keep the original template unchanged when a client filename is available so
+  // normal dev output stays byte-for-byte compatible with existing snapshots.
+  return source
+    .replace(
+      `    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(__CLIENT__)
+    );`,
+      `    if (__CLIENT__)
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(__CLIENT__)
+      );`,
+    )
+    .replace(
+      `      await import(
+        /* @vite-ignore */
+        __CLIENT__
+      );`,
+      `      if (__CLIENT__)
+        await import(
+          /* @vite-ignore */
+          __CLIENT__
+        );`,
+    )
+}
+
 export function createDevLoader({
   preamble,
   client,
@@ -80,7 +112,11 @@ export function createDevLoader({
   client: string
   fileName: string
 }): string {
-  return contentDevLoader
+  const source = client
+    ? contentDevLoader
+    : makeDevClientOptional(contentDevLoader)
+
+  return source
     .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
     .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
@@ -100,7 +136,11 @@ export function createDevMainLoader({
   client: string
   fileName: string
 }): string {
-  return contentDevMainLoader
+  const source = client
+    ? contentDevMainLoader
+    : makeDevClientOptional(contentDevMainLoader)
+
+  return source
     .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
     .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))

@@ -417,8 +417,23 @@ export const pluginManifest: CrxPluginFn = () => {
         return { code: encoded, map: null }
       },
       async generateBundle(options, bundle) {
-        const manifestName = this.getFileName(refId)
-        const manifestJs = bundle[manifestName] as OutputChunk
+        let manifestName: string
+        let manifestJs: OutputChunk | undefined
+        try {
+          manifestName = this.getFileName(refId)
+          manifestJs = bundle[manifestName] as OutputChunk
+        } catch (error) {
+          manifestJs = Object.values(bundle).find(
+            (chunk): chunk is OutputChunk =>
+              chunk.type === 'chunk' && chunk.facadeModuleId === manifestId,
+          )
+          if (!manifestJs) throw error
+          manifestName = manifestJs.fileName
+        }
+
+        if (manifestJs.type !== 'chunk')
+          throw new Error(`Unable to load CRX manifest chunk "${manifestName}"`)
+
         let manifest = decodeManifest.call(this, manifestJs.code)
 
         /* ----------- UPDATE EMITTED FILE NAMES ----------- */
