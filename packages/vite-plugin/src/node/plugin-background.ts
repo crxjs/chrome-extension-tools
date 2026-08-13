@@ -42,7 +42,7 @@ export const pluginBackground: CrxPluginFn = () => {
           return defineClientValues(
             workerHmrClient
               .replace('__BASE__', JSON.stringify(base))
-              .replace('__LIVE_RELOAD__', JSON.stringify(liveReload))
+              .replace(/__LIVE_RELOAD__/g, JSON.stringify(liveReload))
               .replace(
                 '__CRX_HMR_TOKEN__',
                 JSON.stringify(
