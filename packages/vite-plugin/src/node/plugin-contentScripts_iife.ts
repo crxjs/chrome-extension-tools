@@ -153,11 +153,17 @@ function collectIifeEntries(
   root: string,
 ): IifeEntry[] {
   const entries: IifeEntry[] = []
-  const entryIds = new Set<string>()
+  const entriesById = new Map<string, IifeEntry>()
 
   const addEntry = (entry: IifeEntry) => {
-    if (entryIds.has(entry.id)) return
-    entryIds.add(entry.id)
+    const existing = entriesById.get(entry.id)
+    if (existing) {
+      // the same script may be declared in multiple content_scripts entries
+      // with different matches; union the matches of all registrations
+      existing.matches = [...new Set([...existing.matches, ...entry.matches])]
+      return
+    }
+    entriesById.set(entry.id, entry)
     entries.push(entry)
   }
 

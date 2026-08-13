@@ -1,0 +1,21 @@
+{
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://example.com/*"],
+      "run_at": "document_end",
+      "world": "MAIN"
+    },
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://outlook.office.com/*"],
+      "match_about_blank": true,
+      "run_at": "document_end",
+      "world": "MAIN"
+    }
+  ],
+  "description": "test content script declared in multiple content_scripts entries",
+  "manifest_version": 3,
+  "name": "Test Content Script Multiple Registrations",
+  "version": "1.0.0"
+}
