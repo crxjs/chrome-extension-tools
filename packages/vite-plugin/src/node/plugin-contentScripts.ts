@@ -24,6 +24,16 @@ function asRelativeImport(fromFileName: string, toFileName: string) {
   return path.startsWith('.') ? path : `./${path}`
 }
 
+function isBundledDevServer(server: ViteDevServer) {
+  return Boolean(
+    (
+      server.config as ViteDevServer['config'] & {
+        experimental?: { bundledDev?: boolean }
+      }
+    ).experimental?.bundledDev,
+  )
+}
+
 function getExternallyConnectableMatch(match: string) {
   if (match === '<all_urls>') return null
 
@@ -164,7 +174,9 @@ export const pluginContentScripts: CrxPluginFn = () => {
                 let preamble = { fileName: '' } // no preamble by default
                 if (preambleCode)
                   preamble = add({ type: 'module', id: preambleId })
-                const client = add({ type: 'module', id: viteClientId })
+                const client = isBundledDevServer(server)
+                  ? { fileName: '' }
+                  : add({ type: 'module', id: viteClientId })
 
                 const file = add({ type: 'module', id })
                 const loaderFileName = getFileName({ type: 'loader', id })
