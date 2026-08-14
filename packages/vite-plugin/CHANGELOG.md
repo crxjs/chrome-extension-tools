@@ -1,5 +1,31 @@
 # @crxjs/vite-plugin
 
+## 2.8.0
+
+### Minor Changes
+
+- 74756c1: Add support for loading content scripts in Vite 8.1 experimental
+  bundled dev mode.
+
+### Patch Changes
+
+- acfda2e: Expose CSS imported by dynamic content script chunks as
+  web-accessible resources so Chrome can load those styles at runtime.
+- 3992a44: Replace every live reload placeholder in the background worker client
+  so it can reconnect after a dev server restart.
+- e8d7422: Avoid adding directly injected content script entries to
+  `web_accessible_resources` when no loader is emitted.
+- ba08d5a: Fix dev server crash when a monorepo workspace package imports assets
+  (images, SVGs, etc.) from its own source tree outside the Vite root.
+  `prepAsset` was reading the file with `join(server.config.root, id)`, but
+  `pathe.join` does not treat a `/@fs/…` Vite URL as an absolute path and
+  produces an incorrect path like `<root>/@fs/<abs-path>`. Strip the `/@fs`
+  prefix to recover the real absolute filesystem path before calling `readFile`.
+- 4b194b0: Refresh content scripts when imported JSON and other query-string
+  modules change during development.
+- 8db8ca0: Shorten dev-mode filenames for outside-root Vite modules to avoid
+  Windows path length failures.
+
 ## 2.7.1
 
 ### Patch Changes
