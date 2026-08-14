@@ -119,6 +119,13 @@ export function getFileName({ type, id }: FileWriterId): string {
   }
 }
 
+/** Converts a Vite module id to its extension URL, preserving HMR timestamps. */
+export function getFileUrl(fileId: FileWriterId): string {
+  const fileName = getFileName(fileId)
+  const timestamp = fileId.id.match(/[?&](t=\d+)/)?.[1]
+  return prefix('/', fileName) + (timestamp ? `?${timestamp}` : '')
+}
+
 /** Converts a file name to an absolute filename */
 export function getOutputPath(server: ViteDevServer, fileName: string) {
   const {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { getFileName } from './fileWriter-utilities'
+import { getFileName, getFileUrl } from './fileWriter-utilities'
 
 // Characters that are illegal in Windows filenames
 const WINDOWS_ILLEGAL_CHARS = /[<>:"|?*]/
@@ -130,5 +130,16 @@ describe('getFileName', () => {
   test('sanitizes leading underscores from basename', () => {
     const result = getFileName({ type: 'asset', id: '/__uno.css' })
     expect(result).toBe('uno.css')
+  })
+})
+
+describe('getFileUrl', () => {
+  test('preserves HMR timestamps outside the output filename', () => {
+    expect(
+      getFileUrl({
+        id: '/src/locales/pl.json?t=123&import',
+        type: 'module',
+      }),
+    ).toBe('/src/locales/pl.json__import.js?t=123')
   })
 })
