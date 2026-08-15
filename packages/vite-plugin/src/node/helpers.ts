@@ -120,3 +120,10 @@ export const getMatchPatternOrigin = (pattern: string): string => {
   }
   return root
 }
+
+/**
+ * `<all_urls>` matches every URL, so it subsumes every other pattern; collapse
+ * the set to avoid redundant patterns in `web_accessible_resources`.
+ */
+export const reduceMatchPatterns = (matches: string[]): string[] =>
+  matches.includes('<all_urls>') ? ['<all_urls>'] : matches

@@ -7,7 +7,12 @@ import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
-import { decodeManifest, encodeManifest, isString } from './helpers'
+import {
+  decodeManifest,
+  encodeManifest,
+  isString,
+  reduceMatchPatterns,
+} from './helpers'
 import { ManifestV3 } from './manifest'
 import { basename, isAbsolute, join, normalize, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
@@ -275,7 +280,18 @@ export const pluginManifest: CrxPluginFn = () => {
           // vite serve file writer only emits content scripts
           // - html files come directly from vite dev server
           // - service worker comes from vite dev server via loader file
-          if (manifest.content_scripts)
+          if (manifest.content_scripts) {
+            // the same file may be declared in multiple content_scripts entries
+            // with different matches; union the matches of all registrations
+            // (see the build branch below)
+            const matchesByFile = new Map<string, Set<string>>()
+            for (const { js = [], matches = [] } of manifest.content_scripts)
+              for (const id of js) {
+                const fileMatches = matchesByFile.get(id) ?? new Set()
+                for (const match of matches) fileMatches.add(match)
+                matchesByFile.set(id, fileMatches)
+              }
+
             for (let i = 0; i < manifest.content_scripts.length; i++) {
               const {
                 js = [],
@@ -312,13 +328,16 @@ export const pluginManifest: CrxPluginFn = () => {
                   formatFileData({
                     type: 'loader',
                     id,
-                    matches,
+                    matches: reduceMatchPatterns([
+                      ...(matchesByFile.get(id) ?? matches),
+                    ]),
                     refId: hashScriptId({ type: 'loader', id }),
                     fileName: getFileName({ type: 'loader', id }),
                   }),
                 )
               }
             }
+          }
         } else {
           // vite build emits content scripts, html files and service worker
           // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
@@ -330,31 +349,44 @@ export const pluginManifest: CrxPluginFn = () => {
             const normalized = file.replace(/^\//, '')
             return standaloneFiles.includes(normalized)
           }
-          if (manifest.content_scripts)
+          if (manifest.content_scripts) {
+            // the same file may be declared in multiple content_scripts entries
+            // with different matches (e.g. a broad entry plus a narrow
+            // match_about_blank entry); union the matches of all registrations
+            // so web_accessible_resources covers every entry
+            const matchesByFile = new Map<string, Set<string>>()
             for (const { js = [], matches = [] } of manifest.content_scripts)
               for (const file of js) {
                 // Skip IIFE/standalone content scripts - they're built separately
-                if (isIifeContentScript(file) || isStandaloneFile(file)) continue
-                
-                const id = join(config.root, file)
-                const refId = this.emitFile({
-                  type: 'chunk',
-                  id,
-                  name: basename(file),
-                  // Preserve content script entry exports so the build finalizer
-                  // can decide whether the script needs a loader wrapper.
-                  preserveSignature: 'exports-only',
-                })
-                contentScripts.set(
-                  file,
-                  formatFileData({
-                    type: 'loader',
-                    id: file,
-                    refId,
-                    matches,
-                  }),
-                )
+                if (isIifeContentScript(file) || isStandaloneFile(file))
+                  continue
+
+                const fileMatches = matchesByFile.get(file) ?? new Set()
+                for (const match of matches) fileMatches.add(match)
+                matchesByFile.set(file, fileMatches)
               }
+
+            for (const [file, matches] of matchesByFile) {
+              const id = join(config.root, file)
+              const refId = this.emitFile({
+                type: 'chunk',
+                id,
+                name: basename(file),
+                // Preserve content script entry exports so the build finalizer
+                // can decide whether the script needs a loader wrapper.
+                preserveSignature: 'exports-only',
+              })
+              contentScripts.set(
+                file,
+                formatFileData({
+                  type: 'loader',
+                  id: file,
+                  refId,
+                  matches: reduceMatchPatterns([...matches]),
+                }),
+              )
+            }
+          }
 
           if (manifest.background && 'service_worker' in manifest.background) {
             const file = manifest.background.service_worker
