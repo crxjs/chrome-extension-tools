@@ -1,6 +1,7 @@
 import { ResolvedConfigWithHMRToken } from './types'
 import { isObject } from './helpers'
 import { join, normalize } from './path'
+import { supportsWebSocketConfig } from './viteVersion'
 
 type HmrOptions = Exclude<
   ResolvedConfigWithHMRToken['server']['hmr'],
@@ -17,11 +18,15 @@ type ServerOptionsWithWebSocket = ResolvedConfigWithHMRToken['server'] & {
 export function defineClientValues(
   code: string,
   config: ResolvedConfigWithHMRToken,
+  viteVersion: string | undefined,
 ) {
   const server = config.server as ServerOptionsWithWebSocket
   const hmrOptions: HmrOptions = isObject(server.hmr) ? server.hmr : {}
+  const wsOptions = supportsWebSocketConfig(viteVersion)
+    ? server.ws
+    : hmrOptions
   const options: WebSocketOptions =
-    'ws' in server ? (isObject(server.ws) ? server.ws : {}) : hmrOptions
+    server.ws !== false && isObject(wsOptions) ? wsOptions : {}
   const host = options.host || null
   const protocol = options.protocol || null
   const timeout = options.timeout || 30000

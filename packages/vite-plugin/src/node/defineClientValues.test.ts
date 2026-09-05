@@ -35,6 +35,7 @@ describe('defineClientValues', () => {
       'timeout',
     ]) {
       Object.defineProperty(hmr, key, {
+        enumerable: true,
         get() {
           throw new Error(`deprecated HMR field ${key} was read`)
         },
@@ -52,6 +53,7 @@ describe('defineClientValues', () => {
           timeout: 1234,
         },
       }),
+      '8.2.0',
     )
 
     expect(result).toBe(
@@ -65,52 +67,61 @@ describe('defineClientValues', () => {
     )
   })
 
-  it('does not fall back to deprecated HMR fields when WebSockets are disabled', () => {
-    const hmr = { overlay: false }
-    Object.defineProperty(hmr, 'host', {
-      get() {
-        throw new Error('deprecated HMR host was read')
-      },
-    })
-
-    const result = defineClientValues(
-      clientTemplate,
-      createConfig({ hmr, ws: false }),
-    )
-
-    expect(result).toBe(
-      [
-        'protocol=null',
-        'host=null',
-        'port="5173"',
-        'timeout=30000',
-        'overlay=false',
-      ].join('\n'),
-    )
-  })
-
-  it('falls back to HMR settings before Vite 8', () => {
-    const result = defineClientValues(
-      clientTemplate,
-      createConfig({
-        hmr: {
-          clientPort: 24679,
-          host: 'legacy-host',
-          overlay: false,
-          protocol: 'ws',
-          timeout: 5000,
+  it.each([false, undefined])(
+    'does not read deprecated HMR fields when server.ws is %s',
+    (ws) => {
+      const hmr = { overlay: false }
+      Object.defineProperty(hmr, 'host', {
+        get() {
+          throw new Error('deprecated HMR host was read')
         },
-      }),
-    )
+      })
 
-    expect(result).toBe(
-      [
-        'protocol="ws"',
-        'host="legacy-host"',
-        'port="24679"',
-        'timeout=5000',
-        'overlay=false',
-      ].join('\n'),
-    )
-  })
+      const result = defineClientValues(
+        clientTemplate,
+        createConfig({ hmr, ...(ws === false ? { ws } : {}) }),
+        '8.2.0',
+      )
+
+      expect(result).toBe(
+        [
+          'protocol=null',
+          'host=null',
+          'port="5173"',
+          'timeout=30000',
+          'overlay=false',
+        ].join('\n'),
+      )
+    },
+  )
+
+  it.each([undefined, '3.2.11', '7.3.1', '8.0.0'])(
+    'reads legacy HMR settings on Vite %s',
+    (version) => {
+      const result = defineClientValues(
+        clientTemplate,
+        createConfig({
+          ws: undefined,
+          hmr: {
+            clientPort: 24679,
+            host: 'legacy-host',
+            overlay: false,
+            protocol: 'ws',
+            timeout: 5000,
+          },
+        }),
+        version,
+      )
+
+      expect(result).toBe(
+        [
+          'protocol="ws"',
+          'host="legacy-host"',
+          'port="24679"',
+          'timeout=5000',
+          'overlay=false',
+        ].join('\n'),
+      )
+    },
+  )
 })

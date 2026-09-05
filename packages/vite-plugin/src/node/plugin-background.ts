@@ -1,5 +1,6 @@
 import workerHmrClient from 'client/es/hmr-client-worker.ts'
 import fs from 'fs-extra'
+import type { PluginContext } from 'rollup'
 import type { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
 import { getFileName, getOutputPath } from './fileWriter-utilities'
@@ -50,7 +51,7 @@ export const pluginBackground: CrxPluginFn = () => {
       resolveId(source) {
         if (source === `/${workerClientId}`) return workerClientId
       },
-      load(id) {
+      load(this: PluginContext & { meta: { viteVersion?: string } }, id) {
         if (id === workerClientId) {
           const base = `${config.server.https ? 'https' : 'http'}://localhost:${
             config.server.port
@@ -66,6 +67,7 @@ export const pluginBackground: CrxPluginFn = () => {
                 ),
               ),
             config,
+            this.meta?.viteVersion,
           )
         }
       },

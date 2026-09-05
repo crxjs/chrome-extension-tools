@@ -13,6 +13,7 @@ import { getContentCssEntries } from './plugin-contentScripts_declared'
 import { getOptions } from './plugin-optionsProvider'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 import { isContentCssId } from './virtualFileIds'
+import { supportsWebSocketConfig } from './viteVersion'
 
 const debug = _debug('hmr')
 
@@ -35,10 +36,11 @@ export const crxRuntimeReload: CrxHMRPayload = {
 
 export function getHmrHostConfig(
   server: ServerOptionsWithWebSocket,
+  viteVersion: string | undefined,
 ): ServerOptionsWithWebSocket | undefined {
   if (server.hmr === false || server.ws === false) return undefined
 
-  if ('ws' in server) {
+  if (supportsWebSocketConfig(viteVersion)) {
     return {
       ws: { ...server.ws, host: 'localhost' },
     }
@@ -94,10 +96,13 @@ export const pluginHMR: CrxPluginFn = () => {
       apply: 'serve',
       enforce: 'pre',
       // server hmr host should be localhost
-      async config({ server = {}, ...config }) {
+      async config(
+        this: { meta?: { viteVersion?: string } } | void,
+        { server = {}, ...config },
+      ) {
         const opts = await getOptions({ ...config, server })
         liveReload = opts.liveReload !== false
-        const hmrConfig = getHmrHostConfig(server)
+        const hmrConfig = getHmrHostConfig(server, this?.meta?.viteVersion)
 
         return hmrConfig && { server: hmrConfig }
       },
