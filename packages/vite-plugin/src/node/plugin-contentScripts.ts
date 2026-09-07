@@ -287,6 +287,20 @@ export const pluginContentScripts: CrxPluginFn = () => {
  * and `crx:manifest` because dynamic script placeholders and manifest filename
  * replacement happen in different post-build hooks across Vite versions.
  */
+function wrapContentScriptCode(code: string): string {
+  const sourceMap = code.match(
+    /^(.*?)(\r?\n)(\/\/\s*[#@]\s*sourceMappingURL=[^\r\n]*)([ \t]*)(\r?\n)?$/s,
+  )
+
+  if (!sourceMap) return `(function(){${code}})()\n`
+
+  const [, body, lineEnding, comment, trailingWhitespace, finalLineEnding] =
+    sourceMap
+  return `(function(){${body}})()${lineEnding}${comment}${trailingWhitespace}${
+    finalLineEnding ?? ''
+  }`
+}
+
 export function finalizeBuildContentScripts(
   context: Pick<PluginContext, 'emitFile' | 'getFileName'>,
   bundle: OutputBundle,
@@ -344,7 +358,7 @@ export function finalizeBuildContentScripts(
         // if exported by the content script, but given we
         // require content scripts in this branch to have no exports
         // there is obviously no need to handle onExecute() here
-        bundleFileInfo.code = `(function(){${bundleFileInfo.code}})()\n`
+        bundleFileInfo.code = wrapContentScriptCode(bundleFileInfo.code)
       }
     } else if (script.type === 'iife') {
       // IIFE scripts are handled by plugin-contentScripts_iife
