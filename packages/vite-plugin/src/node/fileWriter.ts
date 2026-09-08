@@ -82,7 +82,13 @@ export async function start({
   const plugins = server.config.plugins.filter((p): p is CrxPlugin =>
     p.name?.startsWith('crx:'),
   )
-  const { rollupOptions, outDir } = server.config.build
+  const buildConfig = server.config.build as
+    | (typeof server.config.build & {
+        rolldownOptions?: typeof server.config.build.rollupOptions
+      })
+  const rollupOptions =
+    buildConfig.rolldownOptions ?? buildConfig.rollupOptions ?? {}
+  const outDir = buildConfig.outDir
   const rollupInputOptions = getRollupInputOptions(rollupOptions)
   const inputOptions: RollupOptions = {
     input: 'index.html',

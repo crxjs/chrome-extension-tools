@@ -109,7 +109,13 @@ export const pluginManifest: CrxPluginFn = () => {
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
-          let { input = [] } = config.build?.rollupOptions ?? {}
+          const build = config.build as
+            | (typeof config.build & {
+                rolldownOptions?: NonNullable<typeof config.build>['rollupOptions']
+              })
+            | undefined
+          let input =
+            build?.rolldownOptions?.input ?? build?.rollupOptions?.input ?? []
           if (typeof input === 'string') input = [input]
           else input = Object.values(input)
           input = input.map((f) => {
