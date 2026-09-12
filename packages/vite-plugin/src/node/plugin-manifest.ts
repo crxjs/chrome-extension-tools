@@ -272,6 +272,15 @@ export const pluginManifest: CrxPluginFn = () => {
           // Clear and register CSS entries for synthetic content scripts
           clearContentCssEntries()
 
+          const opts = await getOptions({
+            plugins: config.plugins,
+          } as UserConfig)
+          const standaloneFiles = (
+            opts.contentScripts?.standaloneFiles || []
+          ).map((f: string) => f.replace(/^\//, ''))
+          const isStandaloneFile = (file: string) =>
+            standaloneFiles.includes(file.replace(/^\//, ''))
+
           // vite serve file writer only emits content scripts
           // - html files come directly from vite dev server
           // - service worker comes from vite dev server via loader file
@@ -306,15 +315,22 @@ export const pluginManifest: CrxPluginFn = () => {
               }
 
               // Register regular JS content scripts
+              // IIFE scripts skip the dev loader so they execute
+              // synchronously, matching build output and dynamically
+              // registered IIFE scripts
               for (const id of js) {
+                const type =
+                  isIifeContentScript(id) || isStandaloneFile(id)
+                    ? ('iife' as const)
+                    : ('loader' as const)
                 contentScripts.set(
                   prefix('/', id),
                   formatFileData({
-                    type: 'loader',
+                    type,
                     id,
                     matches,
-                    refId: hashScriptId({ type: 'loader', id }),
-                    fileName: getFileName({ type: 'loader', id }),
+                    refId: hashScriptId({ type, id }),
+                    fileName: getFileName({ type, id }),
                   }),
                 )
               }
@@ -425,10 +441,13 @@ export const pluginManifest: CrxPluginFn = () => {
               const script = manifest.content_scripts[i]
               const cssEntry = cssEntryMap.get(i)
 
-              // Transform JS paths to loader file names
-              const jsLoaders = (script.js || []).map((id) =>
-                getFileName({ id, type: 'loader' }),
-              )
+              // Transform JS paths to emitted file names: dev loaders for
+              // module scripts, the bundled file itself for IIFE scripts
+              const jsLoaders = (script.js || []).map((id) => {
+                const registered =
+                  contentScripts.get(prefix('/', id)) ?? contentScripts.get(id)
+                return registered?.fileName ?? getFileName({ id, type: 'loader' })
+              })
 
               // Prepend synthetic CSS entry loader if CSS exists for this entry
               if (cssEntry) {

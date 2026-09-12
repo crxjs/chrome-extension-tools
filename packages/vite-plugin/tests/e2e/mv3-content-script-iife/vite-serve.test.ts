@@ -14,7 +14,7 @@ test('IIFE content scripts work in dev mode', async () => {
   await fs.emptyDir(src)
   await fs.copy(src1, src, { overwrite: true })
 
-  const { browser } = await serve(__dirname)
+  const { browser, outDir } = await serve(__dirname)
 
   await waitForRegisteredContentScripts(browser, [
     dynamicRegularId,
@@ -25,8 +25,21 @@ test('IIFE content scripts work in dev mode', async () => {
   const page = await browser.newPage()
   await page.goto('https://example.com')
 
-  // In dev mode, .iife.ts files are served as ESM (IIFE bundling only happens in build)
-  // but should still execute and create their markers.
+  // In dev mode, declared IIFE scripts skip the async dev loader and are
+  // referenced directly in the manifest so they execute synchronously,
+  // like build output and dynamically registered IIFE scripts (#1225).
+  const manifest = await fs.readJson(path.join(outDir, 'manifest.json'))
+  const declaredJs: string[] = manifest.content_scripts.flatMap(
+    (script: { js?: string[] }) => script.js ?? [],
+  )
+  expect(declaredJs).toContain('src/content-iife.iife.ts.iife.js')
+  expect(declaredJs).toContain('src/content-standalone.ts.iife.js')
+  expect(declaredJs).toContain('src/content-regular.ts-loader.js')
+  for (const fileName of declaredJs.filter((f) => f.endsWith('.iife.js'))) {
+    const code = await fs.readFile(path.join(outDir, fileName), 'utf8')
+    expect(code).toMatch(/^\(function\(\)/)
+  }
+
   await page.waitForSelector(`#${regularContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${iifeContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${standaloneIifeScriptId}`, { timeout: 10000 })
