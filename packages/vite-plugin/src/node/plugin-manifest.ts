@@ -24,6 +24,13 @@ const { readFile } = fs
 
 declare const structuredClone: <T>(value: T) => T
 
+type ViteBuildOptions = NonNullable<UserConfig['build']>
+interface UserConfigWithRolldownOptions extends UserConfig {
+  build?: ViteBuildOptions & {
+    rolldownOptions?: ViteBuildOptions['rollupOptions']
+  }
+}
+
 const loadingPageReadyPath = '/@crx/dev-ready'
 
 function normalizeHtmlPath(pathname: string): string | null {
@@ -84,7 +91,7 @@ export const pluginManifest: CrxPluginFn = () => {
     {
       name: 'crx:manifest-init',
       enforce: 'pre',
-      async config(config, env) {
+      async config(config: UserConfigWithRolldownOptions, env) {
         const { manifest: _manifest } = await getOptions(config)
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
@@ -109,13 +116,10 @@ export const pluginManifest: CrxPluginFn = () => {
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
-          const build = config.build as
-            | (typeof config.build & {
-                rolldownOptions?: NonNullable<typeof config.build>['rollupOptions']
-              })
-            | undefined
           let input =
-            build?.rolldownOptions?.input ?? build?.rollupOptions?.input ?? []
+            config.build?.rolldownOptions?.input ??
+            config.build?.rollupOptions?.input ??
+            []
           if (typeof input === 'string') input = [input]
           else input = Object.values(input)
           input = input.map((f) => {
