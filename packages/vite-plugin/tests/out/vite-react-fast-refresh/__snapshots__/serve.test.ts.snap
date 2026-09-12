@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
@@ -68,6 +68,15 @@ Set {
 
 exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
 "const VITE_URL = \\"http://localhost:3000\\";
+const READY_PATH = \\"/@crx/dev-ready\\";
+const VITE_PAGE_URL = new URL(location.pathname + location.search, VITE_URL).href;
+const RELOAD_DELAY = 100;
+function getReadyUrl() {
+  const url = new URL(READY_PATH, VITE_URL);
+  url.searchParams.set(\\"path\\", location.pathname + location.search);
+  url.searchParams.set(\\"t\\", Date.now().toString());
+  return url.href;
+}
 document.body.innerHTML = /* html */
 \`
 <style>
@@ -286,7 +295,7 @@ document.body.innerHTML = /* html */
 
   <div class=\\"content\\">
     <p>
-      Cannot connect to <a href=\\"\${VITE_URL}\\">\${VITE_URL}</a>.
+      Cannot connect to <a href=\\"\${VITE_PAGE_URL}\\">\${VITE_PAGE_URL}</a>.
       Make sure Vite is running, then reload the extension.
     </p>
     <p>This page will close automatically after the extension reloads.</p>
@@ -307,15 +316,20 @@ let tries = 0;
 let ready = false;
 do {
   try {
-    await fetch(VITE_URL);
+    const response = await fetch(getReadyUrl());
+    if (!response.ok)
+      throw new Error(\`HTTP \${response.status}\`);
     ready = true;
   } catch {
     const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
-    console.log(\`[CRXJS] Vite Dev Server is not available on \${VITE_URL}\`);
+    console.log(\`[CRXJS] Vite Dev Server is not available on \${VITE_PAGE_URL}\`);
     console.log(\`[CRXJS] Retrying in \${timeout}ms...\`);
     await new Promise((resolve) => setTimeout(resolve, timeout));
   }
 } while (!ready);
+console.log(\`[CRXJS] Vite Dev Server is ready on \${VITE_PAGE_URL}\`);
+console.log(\`[CRXJS] Reloading in \${RELOAD_DELAY}ms...\`);
+await new Promise((resolve) => setTimeout(resolve, RELOAD_DELAY));
 location.reload();
 "
 `;

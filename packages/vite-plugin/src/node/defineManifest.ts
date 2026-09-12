@@ -55,8 +55,7 @@ type FilePathFields<T extends string> = {
          * @example "src/background.js"
          */
         service_worker: ManifestFilePath<T>
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        type?: 'module' | (string & {}) // If the service worker uses ES modules
+        type?: 'module' | (string & Record<never, never>) // If the service worker uses ES modules
       }
     | FirefoxManifestBackground
 

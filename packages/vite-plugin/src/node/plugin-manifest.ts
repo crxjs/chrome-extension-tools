@@ -3,13 +3,13 @@ import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
-import { ResolvedConfig, version as ViteVersion } from 'vite'
+import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
 import { contentScripts, hashScriptId } from './contentScripts'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
 import { decodeManifest, encodeManifest, isString } from './helpers'
 import { ManifestV3 } from './manifest'
-import { basename, isAbsolute, join, relative } from './path'
+import { basename, isAbsolute, join, normalize, relative } from './path'
 import { getOptions } from './plugin-optionsProvider'
 import { CrxPlugin, CrxPluginFn, ManifestFiles } from './types'
 import {
@@ -17,10 +17,59 @@ import {
   getContentCssEntries,
   registerContentCssEntry,
 } from './plugin-contentScripts_declared'
+import { finalizeBuildContentScripts } from './plugin-contentScripts'
+import { isIifeContentScript } from './plugin-contentScripts_iife'
 import { manifestId, stubId } from './virtualFileIds'
 const { readFile } = fs
 
 declare const structuredClone: <T>(value: T) => T
+
+type ViteBuildOptions = NonNullable<UserConfig['build']>
+interface UserConfigWithRolldownOptions extends UserConfig {
+  build?: ViteBuildOptions & {
+    rolldownOptions?: ViteBuildOptions['rollupOptions']
+  }
+}
+
+const loadingPageReadyPath = '/@crx/dev-ready'
+
+function normalizeHtmlPath(pathname: string): string | null {
+  let decoded: string
+  try {
+    decoded = decodeURIComponent(pathname)
+  } catch {
+    return null
+  }
+
+  const normalized = normalize(decoded.replace(/^\/+/, '') || 'index.html')
+  if (normalized.startsWith('..') || isAbsolute(normalized)) return null
+  return normalized
+}
+
+function getLoadingPageReadyHtmlPath(requestUrl: string | undefined) {
+  if (!requestUrl) return null
+
+  let url: URL
+  try {
+    url = new URL(requestUrl, 'http://crxjs.local')
+  } catch {
+    return null
+  }
+
+  if (url.pathname !== loadingPageReadyPath) return undefined
+
+  const path = url.searchParams.get('path')
+  if (!path) return null
+
+  let pageUrl: URL
+  try {
+    pageUrl = new URL(path, 'http://crxjs.local')
+  } catch {
+    return null
+  }
+
+  return normalizeHtmlPath(pageUrl.pathname)
+}
 
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
@@ -34,6 +83,7 @@ export const pluginManifest: CrxPluginFn = () => {
   // This is important for rolldown-vite (Vite 7) compatibility where buildStart
   // doesn't receive options.plugins
   let plugins: CrxPlugin[] = []
+  let devHtmlFiles = new Set<string>()
   let refId: string
   let config: ResolvedConfig
 
@@ -41,7 +91,7 @@ export const pluginManifest: CrxPluginFn = () => {
     {
       name: 'crx:manifest-init',
       enforce: 'pre',
-      async config(config, env) {
+      async config(config: UserConfigWithRolldownOptions, env) {
         const { manifest: _manifest } = await getOptions(config)
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
@@ -62,10 +112,14 @@ export const pluginManifest: CrxPluginFn = () => {
             background: sw,
             html,
           } = await manifestFiles(manifest, { cwd: config.root })
+          devHtmlFiles = new Set(html.map(normalizeHtmlPath).filter(isString))
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
-          let { input = [] } = config.build?.rollupOptions ?? {}
+          let input =
+            config.build?.rolldownOptions?.input ??
+            config.build?.rollupOptions?.input ??
+            []
           if (typeof input === 'string') input = [input]
           else input = Object.values(input)
           input = input.map((f) => {
@@ -80,9 +134,7 @@ export const pluginManifest: CrxPluginFn = () => {
           for (const x of [js, sw, html].flat()) set.add(x)
 
           return {
-            ...config,
             optimizeDeps: {
-              ...config.optimizeDeps,
               entries: [...set],
             },
           }
@@ -95,6 +147,32 @@ export const pluginManifest: CrxPluginFn = () => {
         if (resolvedConfig.plugins) {
           plugins = resolvedConfig.plugins as CrxPlugin[]
         }
+      },
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const htmlPath = getLoadingPageReadyHtmlPath(req.url)
+          if (typeof htmlPath === 'undefined') {
+            next()
+            return
+          }
+
+          res.setHeader('Access-Control-Allow-Origin', '*')
+          res.setHeader('Access-Control-Allow-Methods', 'GET')
+
+          if (!htmlPath) {
+            res.statusCode = 400
+            res.end()
+            return
+          }
+
+          const exists =
+            devHtmlFiles.has(htmlPath) &&
+            (existsSync(join(server.config.root, htmlPath)) ||
+              existsSync(join(server.config.publicDir, htmlPath)))
+
+          res.statusCode = exists ? 204 : 404
+          res.end()
+        })
       },
       buildStart(options) {
         // Keep this as fallback for older Vite versions where buildStart provides plugins
@@ -204,6 +282,15 @@ export const pluginManifest: CrxPluginFn = () => {
           // Clear and register CSS entries for synthetic content scripts
           clearContentCssEntries()
 
+          const opts = await getOptions({
+            plugins: config.plugins,
+          } as UserConfig)
+          const standaloneFiles = (
+            opts.contentScripts?.standaloneFiles || []
+          ).map((f: string) => f.replace(/^\//, ''))
+          const isStandaloneFile = (file: string) =>
+            standaloneFiles.includes(file.replace(/^\//, ''))
+
           // vite serve file writer only emits content scripts
           // - html files come directly from vite dev server
           // - service worker comes from vite dev server via loader file
@@ -238,29 +325,51 @@ export const pluginManifest: CrxPluginFn = () => {
               }
 
               // Register regular JS content scripts
+              // IIFE scripts skip the dev loader so they execute
+              // synchronously, matching build output and dynamically
+              // registered IIFE scripts
               for (const id of js) {
+                const type =
+                  isIifeContentScript(id) || isStandaloneFile(id)
+                    ? ('iife' as const)
+                    : ('loader' as const)
                 contentScripts.set(
                   prefix('/', id),
                   formatFileData({
-                    type: 'loader',
+                    type,
                     id,
                     matches,
-                    refId: hashScriptId({ type: 'loader', id }),
-                    fileName: getFileName({ type: 'loader', id }),
+                    refId: hashScriptId({ type, id }),
+                    fileName: getFileName({ type, id }),
                   }),
                 )
               }
             }
         } else {
           // vite build emits content scripts, html files and service worker
+          // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
+          const opts = await getOptions({ plugins: config.plugins } as UserConfig)
+          const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
+            f.replace(/^\//, '')
+          )
+          const isStandaloneFile = (file: string) => {
+            const normalized = file.replace(/^\//, '')
+            return standaloneFiles.includes(normalized)
+          }
           if (manifest.content_scripts)
             for (const { js = [], matches = [] } of manifest.content_scripts)
               for (const file of js) {
+                // Skip IIFE/standalone content scripts - they're built separately
+                if (isIifeContentScript(file) || isStandaloneFile(file)) continue
+                
                 const id = join(config.root, file)
                 const refId = this.emitFile({
                   type: 'chunk',
                   id,
                   name: file.replace(/[\\/]/g, '-'),
+                  // Preserve content script entry exports so the build finalizer
+                  // can decide whether the script needs a loader wrapper.
+                  preserveSignature: 'exports-only',
                 })
                 contentScripts.set(
                   file,
@@ -309,8 +418,23 @@ export const pluginManifest: CrxPluginFn = () => {
         return { code: encoded, map: null }
       },
       async generateBundle(options, bundle) {
-        const manifestName = this.getFileName(refId)
-        const manifestJs = bundle[manifestName] as OutputChunk
+        let manifestName: string
+        let manifestJs: OutputChunk | undefined
+        try {
+          manifestName = this.getFileName(refId)
+          manifestJs = bundle[manifestName] as OutputChunk
+        } catch (error) {
+          manifestJs = Object.values(bundle).find(
+            (chunk): chunk is OutputChunk =>
+              chunk.type === 'chunk' && chunk.facadeModuleId === manifestId,
+          )
+          if (!manifestJs) throw error
+          manifestName = manifestJs.fileName
+        }
+
+        if (manifestJs.type !== 'chunk')
+          throw new Error(`Unable to load CRX manifest chunk "${manifestName}"`)
+
         let manifest = decodeManifest.call(this, manifestJs.code)
 
         /* ----------- UPDATE EMITTED FILE NAMES ----------- */
@@ -327,10 +451,13 @@ export const pluginManifest: CrxPluginFn = () => {
               const script = manifest.content_scripts[i]
               const cssEntry = cssEntryMap.get(i)
 
-              // Transform JS paths to loader file names
-              const jsLoaders = (script.js || []).map((id) =>
-                getFileName({ id, type: 'loader' }),
-              )
+              // Transform JS paths to emitted file names: dev loaders for
+              // module scripts, the bundled file itself for IIFE scripts
+              const jsLoaders = (script.js || []).map((id) => {
+                const registered =
+                  contentScripts.get(prefix('/', id)) ?? contentScripts.get(id)
+                return registered?.fileName ?? getFileName({ id, type: 'loader' })
+              })
 
               // Prepend synthetic CSS entry loader if CSS exists for this entry
               if (cssEntry) {
@@ -345,6 +472,8 @@ export const pluginManifest: CrxPluginFn = () => {
             }
           }
         } else {
+          finalizeBuildContentScripts(this, bundle)
+
           // transform hook emits files and replaces in manifest with ref ids
           // update background service worker filename from ref
           // service worker not emitted during development, so don't update file name
@@ -366,7 +495,8 @@ export const pluginManifest: CrxPluginFn = () => {
             ({ js = [], ...rest }) => {
               return {
                 js: js.map((id) => {
-                  const script = contentScripts.get(id)
+                  const script =
+                    contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
                   const fileName = script?.loaderName ?? script?.fileName
                   if (typeof fileName === 'undefined')
                     throw new Error(
@@ -415,6 +545,11 @@ export const pluginManifest: CrxPluginFn = () => {
           'webAccessibleResources',
         ]
         const files = await manifestFiles(manifest, { cwd: config.root })
+        if (config.command === 'serve') {
+          devHtmlFiles = new Set(
+            files.html.map(normalizeHtmlPath).filter(isString),
+          )
+        }
         await Promise.all(
           assetTypes
             .map((k) => files[k])
@@ -464,7 +599,8 @@ Public dir: "${config.publicDir}"`,
             name: 'loading-page.js',
             source: loadingPageScript
               .replace('%PROTO%', config.server.https ? 'https' : 'http')
-              .replace('%PORT%', `${config.server.port ?? 0}`),
+              .replace('%PORT%', `${config.server.port ?? 0}`)
+              .replace('%READY_PATH%', loadingPageReadyPath),
           })
           const loadingPageScriptName = this.getFileName(refId)
           files.html.map((f) =>

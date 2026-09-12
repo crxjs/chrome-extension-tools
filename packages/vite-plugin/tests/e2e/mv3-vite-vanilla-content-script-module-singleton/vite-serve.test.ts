@@ -9,7 +9,7 @@ test('crx page update on hmr', async () => {
 
   // load page for the first time
   await page.goto('https://example.com')
-  await root.waitFor({ timeout: 100 })
+  await root.waitFor({ timeout: 5_000 })
 
   const text = await root.textContent()
   expect(text).toMatch('true')

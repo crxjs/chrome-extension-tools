@@ -1,0 +1,11 @@
+{
+  "content_scripts": [
+    {
+      "js": ["src/content.js"],
+      "matches": ["https://example.com/*"]
+    }
+  ],
+  "manifest_version": 3,
+  "name": "Build Manifest Test Extension",
+  "version": "1.0.0"
+}

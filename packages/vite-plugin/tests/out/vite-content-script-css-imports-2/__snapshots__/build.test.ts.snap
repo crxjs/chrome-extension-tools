@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -8,7 +8,7 @@ Object {
         "assets/index.hash1.css",
       ],
       "js": Array [
-        "assets/index.ts.hash0.js",
+        "assets/src-content1-index.ts.hash0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -20,7 +20,7 @@ Object {
         "assets/index.hash3.css",
       ],
       "js": Array [
-        "assets/index.ts.hash2.js",
+        "assets/src-content2-index.ts.hash2.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -31,19 +31,6 @@ Object {
   "manifest_version": 3,
   "name": "test extension",
   "version": "0.1.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://*/*",
-        "https://*/*",
-      ],
-      "resources": Array [
-        "assets/index.ts.hash2.js",
-        "assets/index.ts.hash0.js",
-      ],
-      "use_dynamic_url": false,
-    },
-  ],
 }
 `;
 
@@ -51,8 +38,8 @@ exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/index.hash1.css",
   "assets/index.hash3.css",
-  "assets/index.ts.hash0.js",
-  "assets/index.ts.hash2.js",
+  "assets/src-content1-index.ts.hash0.js",
+  "assets/src-content2-index.ts.hash2.js",
   "manifest.json",
 ]
 `;
@@ -71,14 +58,14 @@ exports[`build fs output > assets/index.hash3.css 1`] = `
 "
 `;
 
-exports[`build fs output > assets/index.ts.hash0.js 1`] = `
+exports[`build fs output > assets/src-content1-index.ts.hash0.js 1`] = `
 "(function(){const styles = \\"\\";
 console.log(\\"content1\\");
 })()
 "
 `;
 
-exports[`build fs output > assets/index.ts.hash2.js 1`] = `
+exports[`build fs output > assets/src-content2-index.ts.hash2.js 1`] = `
 "(function(){const styles = \\"\\";
 console.log(\\"content2\\");
 })()

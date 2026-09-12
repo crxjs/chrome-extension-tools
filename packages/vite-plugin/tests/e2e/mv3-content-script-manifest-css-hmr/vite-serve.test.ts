@@ -42,7 +42,7 @@ test.skipIf(process.env.CI)(
 
     // Start with initial source
     await fs.remove(src)
-    await fs.copy(src1, src, { recursive: true })
+    await fs.copy(src1, src)
 
     const { browser, routes } = await serve(__dirname)
     const page = await browser.newPage()

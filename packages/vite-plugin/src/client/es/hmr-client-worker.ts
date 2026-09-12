@@ -16,6 +16,10 @@ declare const __HMR_PORT__: string
 declare const __HMR_TIMEOUT__: number
 declare const __SERVER_PROTO__: string
 declare const __SERVER_PORT__: string
+declare const __LIVE_RELOAD__: boolean
+declare const __CRX_HMR_TOKEN__: string
+
+const crxClientPortName = `@crx/client:${__CRX_HMR_TOKEN__}`
 
 /* -------- REDIRECT FETCH TO THE DEV SERVER ------- */
 
@@ -70,8 +74,15 @@ async function sendToServer(req: Request): Promise<Response> {
 
 const ports = new Set<chrome.runtime.Port>()
 
-chrome.runtime.onConnect.addListener((port) => {
-  if (port.name === '@crx/client') {
+function isExternalSenderAllowed(port: chrome.runtime.Port) {
+  return !port.sender?.id || port.sender.id === chrome.runtime.id
+}
+
+function handlePort(port: chrome.runtime.Port, { external = false } = {}) {
+  if (
+    port.name === crxClientPortName &&
+    (!external || isExternalSenderAllowed(port))
+  ) {
     ports.add(port)
     port.onDisconnect.addListener((port) => {
       if (chrome.runtime.lastError) {
@@ -86,7 +97,12 @@ chrome.runtime.onConnect.addListener((port) => {
     })
     port.postMessage({ data: JSON.stringify({ type: 'connected' }) })
   }
-})
+}
+
+chrome.runtime.onConnect.addListener(handlePort)
+chrome.runtime.onConnectExternal.addListener((port) =>
+  handlePort(port, { external: true }),
+)
 
 function notifyContentScripts(payload: HMRPayload) {
   const data = JSON.stringify(payload)
@@ -130,6 +146,15 @@ function handleSocketMessage(payload: HMRPayload) {
 }
 
 function handleCrxHmrPayload(payload: CrxHMRPayload) {
+  if (!__LIVE_RELOAD__) {
+    // when liveReload is disabled, don't relay any CRX payloads to content
+    // scripts and don't reload the extension
+    if (payload.event === 'crx:runtime-reload') {
+      console.log('[crx] runtime reload suppressed (liveReload disabled)')
+    }
+    return
+  }
+
   // everything goes to the content scripts
   notifyContentScripts(payload)
 
@@ -146,7 +171,6 @@ function handleCrxHmrPayload(payload: CrxHMRPayload) {
 }
 
 async function waitForSuccessfulPing(ms = 1000) {
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     try {
       await fetch(`${base}__vite_ping`)
@@ -162,8 +186,14 @@ socket.addEventListener('close', async ({ wasClean }) => {
   if (wasClean) return
   console.log(`[vite] server connection lost. polling for restart...`)
   await waitForSuccessfulPing()
-  handleCrxHmrPayload({
-    type: 'custom',
-    event: 'crx:runtime-reload',
-  })
+  if (__LIVE_RELOAD__) {
+    handleCrxHmrPayload({
+      type: 'custom',
+      event: 'crx:runtime-reload',
+    })
+  } else {
+    console.log(
+      '[crx] server reconnected, skipping reload (liveReload disabled)',
+    )
+  }
 })

@@ -3,6 +3,9 @@ import { ContentScript, contentScripts, hashScriptId } from './contentScripts'
 import { allFilesReady } from './fileWriter'
 import { formatFileData, getFileName } from './fileWriter-utilities'
 import { basename, relative } from './path'
+import { isIifeContentScript } from './plugin-contentScripts_iife'
+import { getOptions } from './plugin-optionsProvider'
+import type { UserConfig } from 'vite'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
@@ -14,7 +17,7 @@ const dynamicScriptRegEx = () => {
 }
 
 /**
- * 1. Resolves `?script` import queries
+ * 1. Resolves `?script` (and `?iife` alias) import queries
  *
  * - Emits scripts to rollup or fileWriter
  * - Add scripts to contentScripts map
@@ -35,6 +38,7 @@ const dynamicScriptRegEx = () => {
  */
 export const pluginDynamicContentScripts: CrxPluginFn = () => {
   let config: ResolvedConfig
+  let standaloneFiles: string[] = []
 
   return [
     {
@@ -42,6 +46,56 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
       enforce: 'pre',
       configResolved(_config) {
         config = _config
+        // Load standaloneFiles for auto-IIFE detection on ?script imports
+        // (in addition to .iife.* filename convention)
+        getOptions({ plugins: _config.plugins } as UserConfig)
+          .then((opts) => {
+            standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
+              f.replace(/^\//, '')
+            )
+          })
+          .catch(() => undefined)
+      },
+      buildStart() {
+        // In watch mode, Rollup caches resolveId/load results between rebuilds,
+        // so the contentScripts map may not be repopulated. We must re-emit
+        // dynamic content script files here to ensure their refIds are valid in
+        // the new build context. Without this, getFileName() throws errors.
+        if (config.command === 'build') {
+          // Snapshot unique dynamic scripts (the map has multiple keys per script)
+          const dynamicScripts: ContentScript[] = []
+          for (const [key, script] of contentScripts) {
+            if (script.isDynamicScript && key === script.scriptId) {
+              dynamicScripts.push(script)
+            }
+          }
+
+          // Clear stale entries (old refIds, fileNames are invalid in new build)
+          contentScripts.clear()
+
+          // Re-emit each dynamic script with a fresh refId for this build context
+          for (const script of dynamicScripts) {
+            const absoluteId = script.id.startsWith('/')
+              ? `${config.root}${script.id}`
+              : `${config.root}/${script.id}`
+            const refId = this.emitFile({
+              type: 'chunk',
+              id: absoluteId,
+              name: basename(script.id),
+            })
+            contentScripts.set(
+              script.id,
+              formatFileData({
+                type: script.type,
+                id: script.id,
+                isDynamicScript: true,
+                refId,
+                scriptId: script.scriptId,
+                matches: script.matches,
+              }),
+            )
+          }
+        }
       },
       configureServer(server) {
         return () => {
@@ -74,9 +128,9 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         }
       },
       async resolveId(_source: string, importer?: string) {
-        if (importer && _source.includes('?script')) {
+        if (importer && (_source.includes('?script') || _source.includes('?iife'))) {
           const url = new URL(_source, 'stub://stub')
-          if (url.searchParams.has('script')) {
+          if (url.searchParams.has('script') || url.searchParams.has('iife')) {
             const [source] = _source.split('?')
             const resolved = await this.resolve(source, importer, {
               skipSelf: true,
@@ -87,8 +141,16 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
               )
             const { id } = resolved
 
+            // Determine script type:
+            // - .iife.ts files or files listed in contentScripts.standaloneFiles are IIFE (auto-detected)
+            // - ?module query param forces module type
+            // - ?iife query param forces iife type
+            // - default is loader (module with loader wrapper)
+            const relId = relative(config.root, id).replace(/^\//, '')
             let type: ContentScript['type'] = 'loader'
-            if (url.searchParams.has('module')) {
+            if (isIifeContentScript(relId) || standaloneFiles.includes(relId)) {
+              type = 'iife'
+            } else if (url.searchParams.has('module')) {
               type = 'module'
             } else if (url.searchParams.has('iife')) {
               type = 'iife'
@@ -106,6 +168,9 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                   type: 'chunk',
                   id,
                   name: basename(id),
+                  // Preserve content script entry exports so the build finalizer
+                  // can decide whether the script needs a loader wrapper.
+                  preserveSignature: 'exports-only',
                 })
               } else {
                 refId = scriptId
@@ -140,9 +205,37 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
         const index = id.indexOf('?scriptId=')
         if (index > -1) {
           const scriptId = id.slice(index + '?scriptId='.length)
-          const script = contentScripts.get(scriptId)!
+          let script = contentScripts.get(scriptId)
+
+          // In watch mode, Rollup may cache resolveId() but not load(),
+          // so the map may be empty when load runs. Recreate the entry.
+          if (!script && config.command === 'build') {
+            const fileId = id.slice(0, index)
+            const refId = this.emitFile({
+              type: 'chunk',
+              id: fileId,
+              name: basename(fileId),
+            })
+            script = formatFileData({
+              type: 'loader',
+              id: relative(config.root, fileId),
+              isDynamicScript: true,
+              refId,
+              scriptId,
+              matches: [],
+            })
+            contentScripts.set(script.id, script)
+          }
+
+          if (!script) {
+            throw new Error(`Content script not found for scriptId: "${scriptId}"`)
+          }
+
           if (config.command === 'build') {
-            return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.refId};`
+            // Use scriptId (deterministic hash) instead of refId for the placeholder.
+            // refIds change between watch mode rebuilds, but scriptId is stable.
+            // This ensures load() cache is valid across rebuilds.
+            return `export default import.meta.CRX_DYNAMIC_SCRIPT_${script.scriptId};`
           } else if (typeof script.fileName === 'string') {
             return `export default ${JSON.stringify(script.fileName)};`
           } else {
@@ -162,6 +255,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
        * Can't use `renderChunk` b/c pre plugin crx:content-scripts uses
        * `generateBundle` to emit loaders. Must come after "enforce: pre".
        */
+      enforce: 'post',
       generateBundle(options, bundle) {
         for (const chunk of Object.values(bundle))
           if (chunk.type === 'chunk') {
@@ -179,9 +273,13 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                       `Content script fileName is undefined: "${script.id}"`,
                     )
 
-                  return `${JSON.stringify(
-                    `/${script.loaderName ?? script.fileName}`,
-                  )}${match.split(scriptKey)[1]}`
+                  const fileName = script.loaderName ?? script.fileName
+                  // Return clean relative path (no leading slash). Used with
+                  // registerContentScripts, executeScript, and getURL. Paths must not
+                  // start with / for registerContentScripts; executeScript tolerates both
+                  // but we keep consistent with manifest-declared scripts and IIFE outputs.
+                  const path = fileName
+                  return `${JSON.stringify(path)}${match.split(scriptKey)[1]}`
                 },
               )
               // TODO: remove unused import_meta value?

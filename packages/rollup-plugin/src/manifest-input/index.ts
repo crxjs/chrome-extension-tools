@@ -30,8 +30,9 @@ export const explorer = cosmiconfigSync('manifest', {
   cache: false,
   loaders: {
     '.ts': (filePath: string) => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       require('esbuild-runner/register')
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const result = require(filePath)
 
       return result.default ?? result

@@ -9,9 +9,11 @@ console.log(__dirname)
 export default defineConfig(({ mode }) => {
   const exclude =
     mode === 'e2e'
-      ? ['**/src/**', '**/out/**'] // exclude non-e2e tests
+      ? ['**/src/**', '**/compat/**', '**/out/**'] // exclude non-e2e tests
       : mode === 'out'
-      ? ['**/e2e/**'] // exclude e2e tests
+      ? ['**/compat/**', '**/e2e/**'] // exclude non-output tests
+      : mode === 'compat'
+      ? ['**/e2e/**', '**/out/**', '**/src/**'] // exclude non-compat tests
       : [] // for running any individual test
 
   const testTimeout = process.env.TIMEOUT

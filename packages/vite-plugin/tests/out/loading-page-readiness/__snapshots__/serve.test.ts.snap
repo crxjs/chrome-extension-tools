@@ -1,0 +1,75 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serve loading page waits for the requested extension html > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html?page=default",
+  },
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "description": "loading page readiness test extension",
+  "manifest_version": 3,
+  "name": "Loading Page Readiness",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve loading page waits for the requested extension html > _01 output files 1`] = `
+Array [
+  "assets/loading-page.hash0.js",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/popup.html",
+]
+`;
+
+exports[`serve loading page waits for the requested extension html > _02 optimized deps 1`] = `
+Set {
+  "src/background.js",
+  "src/popup.html",
+}
+`;
+
+exports[`serve loading page waits for the requested extension html > assets/loading-page.hash0.js 1`] = `
+Object {
+  "rejectsHttpErrors": true,
+  "throttlesReloads": true,
+  "usesCurrentPage": true,
+  "usesReadyEndpoint": true,
+}
+`;
+
+exports[`serve loading page waits for the requested extension html > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/src/background.js';
+"
+`;
+
+exports[`serve loading page waits for the requested extension html > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <title>CRXJS DEV MODE</title>
+    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
+  </head>
+  <body>
+    <p>An unknown error occurred. Failed to load the script.</p>
+  </body>
+</html>
+"
+`;

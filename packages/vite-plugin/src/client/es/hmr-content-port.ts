@@ -4,6 +4,27 @@ import type { CrxHMRPayload } from 'src/types'
 import type { HMRPayload } from 'vite'
 
 declare const __CRX_HMR_TIMEOUT__: number
+declare const __CRX_LIVE_RELOAD__: boolean
+declare const __CRX_HMR_TOKEN__: string
+
+const crxClientPortName = `@crx/client:${__CRX_HMR_TOKEN__}`
+
+function hasOwnExtensionRuntime(
+  runtime: typeof chrome.runtime,
+  extensionId: string,
+) {
+  try {
+    return new URL(runtime.getURL('')).host === extensionId
+  } catch {
+    return false
+  }
+}
+
+const runtime = typeof chrome === 'undefined' ? undefined : chrome.runtime
+const extensionId = new URL(import.meta.url).host
+const connectsToOwnRuntime = runtime
+  ? hasOwnExtensionRuntime(runtime, extensionId)
+  : false
 
 function isCrxHMRPayload(x: HMRPayload): x is CrxHMRPayload {
   return x.type === 'custom' && x.event.startsWith('crx:')
@@ -38,8 +59,14 @@ export class HMRPort {
   }
 
   initPort = () => {
+    if (!runtime) throw new Error('[crx] chrome.runtime is not available')
+
+    const connectInfo = { name: crxClientPortName }
+
     this.port?.disconnect()
-    this.port = chrome.runtime.connect({ name: '@crx/client' })
+    this.port = connectsToOwnRuntime
+      ? runtime.connect(connectInfo)
+      : runtime.connect(extensionId, connectInfo)
     this.port.onDisconnect.addListener(this.handleDisconnect.bind(this))
     this.port.onMessage.addListener(this.handleMessage.bind(this))
     this.port.postMessage({ type: 'connected' })
@@ -63,9 +90,13 @@ export class HMRPort {
     const payload: HMRPayload | CrxHMRPayload = JSON.parse(message.data)
     if (isCrxHMRPayload(payload)) {
       if (payload.event === 'crx:runtime-reload') {
-        // delayed page reload; let background finish restart
-        console.log('[crx] runtime reload')
-        setTimeout(() => location.reload(), 500)
+        if (__CRX_LIVE_RELOAD__) {
+          // delayed page reload; let background finish restart
+          console.log('[crx] runtime reload')
+          setTimeout(() => location.reload(), 500)
+        } else {
+          console.log('[crx] runtime reload suppressed (liveReload disabled)')
+        }
       } else {
         // unpack hmr payloads; forward to vite client
         // console.log('[crx] content payload', payload)

@@ -38,6 +38,10 @@ npm create crxjs@latest
 > [!NOTE]  
 > Looking for MV2 support? See [`rollup-plugin`](packages/rollup-plugin/README.md)  
 
+## 💻 Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for local development workflows.
+
 ## 💝 Contributors
 
 This project exists thanks to all the people who contribute.

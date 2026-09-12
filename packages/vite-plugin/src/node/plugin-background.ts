@@ -1,11 +1,26 @@
 import workerHmrClient from 'client/es/hmr-client-worker.ts'
-import { ResolvedConfig } from 'vite'
+import fs from 'fs-extra'
+import type { PluginContext } from 'rollup'
+import type { ResolvedConfig } from 'vite'
 import { defineClientValues } from './defineClientValues'
-import { getFileName } from './fileWriter-utilities'
+import { getFileName, getOutputPath } from './fileWriter-utilities'
+import { getCrxHmrToken } from './hmrToken'
+import { isImporter } from './isImporter'
 import { ChromeManifestBackground, FirefoxManifestBackground } from './manifest'
+import { join, normalize } from './path'
 import { getOptions } from './plugin-optionsProvider'
-import type { Browser, CrxPluginFn } from './types'
+import type { Browser, CrxPluginFn, ResolvedConfigWithHMRToken } from './types'
 import { workerClientId } from './virtualFileIds'
+
+function addTimestamp(url: string, timestamp?: number): string {
+  if (!timestamp) return url
+  const [pathname, query] = url.replace(/[?&]t=\d+/, '').split('?')
+  return `${pathname}?t=${timestamp}${query ? `&${query}` : ''}`
+}
+
+function escapeRegExp(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
 /**
  * This plugin enables HMR during Vite serve mode by intercepting fetch requests
@@ -24,6 +39,10 @@ import { workerClientId } from './virtualFileIds'
 export const pluginBackground: CrxPluginFn = () => {
   let config: ResolvedConfig
   let browser: Browser
+  let liveReload = true
+  let devBackgroundLoader:
+    | { worker: string; fileName: string }
+    | undefined
 
   return [
     {
@@ -32,14 +51,57 @@ export const pluginBackground: CrxPluginFn = () => {
       resolveId(source) {
         if (source === `/${workerClientId}`) return workerClientId
       },
-      load(id) {
+      load(this: PluginContext & { meta: { viteVersion?: string } }, id) {
         if (id === workerClientId) {
-          const base = `${config.server.https ? 'https' : 'http'}://localhost:${config.server.port}/`
+          const base = `${config.server.https ? 'https' : 'http'}://localhost:${
+            config.server.port
+          }/`
           return defineClientValues(
-            workerHmrClient.replace('__BASE__', JSON.stringify(base)),
+            workerHmrClient
+              .replace('__BASE__', JSON.stringify(base))
+              .replace(/__LIVE_RELOAD__/g, JSON.stringify(liveReload))
+              .replace(
+                '__CRX_HMR_TOKEN__',
+                JSON.stringify(
+                  getCrxHmrToken(config as ResolvedConfigWithHMRToken),
+                ),
+              ),
             config,
+            this.meta?.viteVersion,
           )
         }
+      },
+    },
+    {
+      name: 'crx:background-loader-hmr',
+      apply: 'serve',
+      enforce: 'pre',
+      async handleHotUpdate({ file, modules, server, timestamp }) {
+        if (!devBackgroundLoader) return
+
+        const background = join(server.config.root, devBackgroundLoader.worker)
+        const isBackgroundUpdate =
+          normalize(file) === normalize(background) ||
+          modules.some(isImporter(background))
+
+        if (!isBackgroundUpdate) return
+
+        const proto = server.config.server.https ? 'https' : 'http'
+        const port = server.config.server.port?.toString()
+        if (typeof port === 'undefined') return
+
+        const loaderFile = getOutputPath(server, devBackgroundLoader.fileName)
+        const workerUrl = `${proto}://localhost:${port}/${devBackgroundLoader.worker}`
+        const timestampedWorkerUrl = addTimestamp(workerUrl, timestamp)
+        const loader = await fs.readFile(loaderFile, 'utf8')
+        await fs.outputFile(
+          loaderFile,
+          loader.replace(
+            new RegExp(`${escapeRegExp(workerUrl)}(?:[?&]t=\\d+)?`, 'g'),
+            timestampedWorkerUrl,
+          ),
+          'utf8',
+        )
       },
     },
     {
@@ -49,6 +111,7 @@ export const pluginBackground: CrxPluginFn = () => {
       async config(config) {
         const opts = await getOptions(config)
         browser = opts.browser || 'chrome'
+        liveReload = opts.liveReload !== false
       },
       configResolved(_config) {
         config = _config
@@ -61,7 +124,7 @@ export const pluginBackground: CrxPluginFn = () => {
 
         let loader: string
         if (config.command === 'serve') {
-          const proto = config.server.https ? 'https' : 'http';
+          const proto = config.server.https ? 'https' : 'http'
           const port = config.server.port?.toString()
           if (typeof port === 'undefined')
             throw new Error('server port is undefined in watch mode')
@@ -100,15 +163,20 @@ export const pluginBackground: CrxPluginFn = () => {
           fileName: getFileName({ type: 'loader', id: 'service-worker' }),
           source: loader,
         })
+        const loaderFileName = this.getFileName(refId)
+        devBackgroundLoader =
+          config.command === 'serve' && worker
+            ? { worker, fileName: loaderFileName }
+            : undefined
 
         if (browser !== 'firefox') {
           manifest.background = {
-            service_worker: this.getFileName(refId),
+            service_worker: loaderFileName,
             type: 'module',
           }
         } else {
           manifest.background = {
-            scripts: [this.getFileName(refId)],
+            scripts: [loaderFileName],
             type: 'module',
           }
         }

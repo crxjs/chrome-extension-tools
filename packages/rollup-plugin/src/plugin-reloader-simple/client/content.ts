@@ -32,7 +32,7 @@ async function connect(): Promise<void> {
     port = chrome.runtime.connect({
       name: 'simpleReloader',
     })
-  } catch (error) {
+  } catch {
     return // should reload, context invalid
   }
 

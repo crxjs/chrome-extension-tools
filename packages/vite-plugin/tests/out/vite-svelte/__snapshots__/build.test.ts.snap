@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -28,7 +28,7 @@ Object {
       ],
       "resources": Array [
         "assets/App.hash.js",
-        "assets/content.js.hash.js",
+        "assets/src-content.js.hash.js",
         "assets/svelte.hash.png",
         "assets/vendor.hash.js",
       ],
@@ -43,8 +43,8 @@ Array [
   "assets/App.hash.css",
   "assets/App.hash.js",
   "assets/content.js-loader.hash.js",
-  "assets/content.js.hash.js",
   "assets/popup.html.hash.js",
+  "assets/src-content.js.hash.js",
   "assets/svelte.hash.png",
   "assets/vendor.hash.js",
   "favicon.ico",
@@ -195,19 +195,6 @@ export {
 "
 `;
 
-exports[`build fs output > assets/content.js.hash.js 1`] = `
-"import { A as App$ } from \\"./App.hash.js\\";
-import \\"./vendor.hash.js\\";
-const html = \`<div id=\\"crx-app\\"></div>\`;
-const target = new DOMParser().parseFromString(html, \\"text/html\\").body.firstElementChild;
-document.body.append(target);
-const app = new App$({ target });
-export {
-  app as default
-};
-"
-`;
-
 exports[`build fs output > assets/content.js-loader.hash.js 1`] = `
 "(function () {
   'use strict';
@@ -216,7 +203,7 @@ exports[`build fs output > assets/content.js-loader.hash.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.hash.js\\")
+      chrome.runtime.getURL(\\"assets/src-content.js.hash.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -272,6 +259,19 @@ import \\"./vendor.hash.js\\";
 new App$({
   target: document.getElementById(\\"app\\")
 });
+"
+`;
+
+exports[`build fs output > assets/src-content.js.hash.js 1`] = `
+"import { A as App$ } from \\"./App.hash.js\\";
+import \\"./vendor.hash.js\\";
+const html = \`<div id=\\"crx-app\\"></div>\`;
+const target = new DOMParser().parseFromString(html, \\"text/html\\").body.firstElementChild;
+document.body.append(target);
+const app = new App$({ target });
+export {
+  app as default
+};
 "
 `;
 

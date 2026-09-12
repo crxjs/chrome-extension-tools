@@ -1,0 +1,13 @@
+{
+  "description": "test React MAIN world content script HMR",
+  "manifest_version": 3,
+  "name": "React MAIN World Content Script HMR Test",
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/main.jsx"],
+      "world": "MAIN"
+    }
+  ],
+  "version": "1.0.0"
+}

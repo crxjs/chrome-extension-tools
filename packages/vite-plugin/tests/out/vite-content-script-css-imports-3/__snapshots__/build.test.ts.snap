@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -41,8 +41,8 @@ Object {
       ],
       "resources": Array [
         "assets/import.hash5.js",
-        "assets/index.ts.hash6.js",
-        "assets/index.ts.hash7.js",
+        "assets/src-content1-index.ts.hash6.js",
+        "assets/src-content2-index.ts.hash7.js",
       ],
       "use_dynamic_url": false,
     },
@@ -58,8 +58,8 @@ Array [
   "assets/index.hash4.css",
   "assets/index.ts-loader.hash0.js",
   "assets/index.ts-loader.hash3.js",
-  "assets/index.ts.hash6.js",
-  "assets/index.ts.hash7.js",
+  "assets/src-content1-index.ts.hash6.js",
+  "assets/src-content2-index.ts.hash7.js",
   "manifest.json",
 ]
 `;
@@ -91,20 +91,6 @@ exports[`build fs output > assets/index.hash4.css 1`] = `
 "
 `;
 
-exports[`build fs output > assets/index.ts.hash6.js 1`] = `
-"import \\"./import.hash5.js\\";
-const styles = \\"\\";
-console.log(\\"content2\\");
-"
-`;
-
-exports[`build fs output > assets/index.ts.hash7.js 1`] = `
-"import \\"./import.hash5.js\\";
-const styles = \\"\\";
-console.log(\\"content1\\");
-"
-`;
-
 exports[`build fs output > assets/index.ts-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
@@ -113,7 +99,7 @@ exports[`build fs output > assets/index.ts-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.hash7.js\\")
+      chrome.runtime.getURL(\\"assets/src-content1-index.ts.hash6.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -130,11 +116,25 @@ exports[`build fs output > assets/index.ts-loader.hash3.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/index.ts.hash6.js\\")
+      chrome.runtime.getURL(\\"assets/src-content2-index.ts.hash7.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
+"
+`;
+
+exports[`build fs output > assets/src-content1-index.ts.hash6.js 1`] = `
+"import \\"./import.hash5.js\\";
+const styles = \\"\\";
+console.log(\\"content1\\");
+"
+`;
+
+exports[`build fs output > assets/src-content2-index.ts.hash7.js 1`] = `
+"import \\"./import.hash5.js\\";
+const styles = \\"\\";
+console.log(\\"content2\\");
 "
 `;

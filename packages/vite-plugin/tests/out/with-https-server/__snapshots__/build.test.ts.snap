@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`build fs output > _00 manifest.json 1`] = `
 Object {
@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content.js.hash0.js",
+        "assets/src-content.js.hash0.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -27,26 +27,14 @@ Object {
   "manifest_version": 3,
   "name": "Test Extension",
   "version": "1.0.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
-      ],
-      "resources": Array [
-        "assets/content.js.hash0.js",
-      ],
-      "use_dynamic_url": false,
-    },
-  ],
 }
 `;
 
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/background.js.hash1.js",
-  "assets/content.js.hash0.js",
   "assets/popup.html.hash2.js",
+  "assets/src-content.js.hash0.js",
   "assets/vendor.hash3.js",
   "manifest.json",
   "service-worker-loader.js",
@@ -56,12 +44,6 @@ Array [
 
 exports[`build fs output > assets/background.js.hash1.js 1`] = `
 "console.log(\\"service_worker.js\\");
-"
-`;
-
-exports[`build fs output > assets/content.js.hash0.js 1`] = `
-"(function(){console.log(\\"content script\\");
-})()
 "
 `;
 
@@ -114,6 +96,12 @@ const App = () => {
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
 ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`build fs output > assets/src-content.js.hash0.js 1`] = `
+"(function(){console.log(\\"content script\\");
+})()
 "
 `;
 

@@ -54,10 +54,11 @@ contentScripts.change$
       'scriptId',
     ] as const
     // set many to one value for lookup by multiple keys (script.id, script.fileName, etc)
-    for (const keyName of keyNames) {
-      const key = value[keyName]
+    const keys = keyNames.map((keyName) => value[keyName])
+    keys.push(value.id.replace(/^\//, ''))
+    for (const key of keys) {
       // avoid runaway recursion
-      if (typeof key === 'undefined' || map.has(key)) {
+      if (typeof key === 'undefined' || map.get(key) === value) {
         continue
       } else {
         map.set(key, value)
@@ -70,6 +71,38 @@ export function hashScriptId(script: Pick<ContentScript, 'type' | 'id'>) {
   return hash(`${script.type}&${script.id}`)
 }
 
+function makeDevClientOptional(source: string) {
+  // In normal dev mode CRXJS writes a transformed /@vite/client file into the
+  // extension output and the loader must import it. Vite 8.1 bundled dev mode
+  // does not expose /@vite/client through the old transformRequest path, so the
+  // bundled-dev loader gets an empty client filename and must skip that import.
+  // Keep the original template unchanged when a client filename is available so
+  // normal dev output stays byte-for-byte compatible with existing snapshots.
+  return source
+    .replace(
+      `    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(__CLIENT__)
+    );`,
+      `    if (__CLIENT__)
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(__CLIENT__)
+      );`,
+    )
+    .replace(
+      `      await import(
+        /* @vite-ignore */
+        __CLIENT__
+      );`,
+      `      if (__CLIENT__)
+        await import(
+          /* @vite-ignore */
+          __CLIENT__
+        );`,
+    )
+}
+
 export function createDevLoader({
   preamble,
   client,
@@ -79,7 +112,11 @@ export function createDevLoader({
   client: string
   fileName: string
 }): string {
-  return contentDevLoader
+  const source = client
+    ? contentDevLoader
+    : makeDevClientOptional(contentDevLoader)
+
+  return source
     .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
     .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
@@ -91,15 +128,29 @@ export function createProLoader({ fileName }: { fileName: string }): string {
 }
 
 export function createDevMainLoader({
+  preamble,
+  client,
   fileName,
 }: {
+  preamble: string
+  client: string
   fileName: string
 }): string {
-  return contentDevMainLoader
+  const source = client
+    ? contentDevMainLoader
+    : makeDevClientOptional(contentDevMainLoader)
+
+  return source
+    .replace(/__PREAMBLE__/g, JSON.stringify(preamble))
+    .replace(/__CLIENT__/g, JSON.stringify(client))
     .replace(/__SCRIPT__/g, JSON.stringify(fileName))
     .replace(/__TIMESTAMP__/g, JSON.stringify(Date.now()))
 }
 
-export function createProMainLoader({ fileName }: { fileName: string }): string {
+export function createProMainLoader({
+  fileName,
+}: {
+  fileName: string
+}): string {
   return contentProMainLoader.replace(/__SCRIPT__/g, JSON.stringify(fileName))
 }

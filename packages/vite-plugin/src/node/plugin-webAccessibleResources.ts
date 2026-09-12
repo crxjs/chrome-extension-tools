@@ -84,7 +84,7 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         userWantsViteManifest = build?.manifest
 
         // Only force manifest generation if we're building - we need it to derive content script resources
-        return { ...config, build: { ...build, manifest: command === 'build' } }
+        return { build: { manifest: command === 'build' } }
       },
       configResolved(_config) {
         config = _config
@@ -148,16 +148,26 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                     `Content script filename is undefined for "${id}"`,
                   )
                 } else {
-                  const { assets, css, imports } = compileFileResources(
-                    fileName,
-                    { chunks: bundleChunks, files: viteFiles, config },
-                  )
+                  const { assets, css, imports, runtimeCss } =
+                    compileFileResources(fileName, {
+                      chunks: bundleChunks,
+                      files: viteFiles,
+                      config,
+                    })
 
                   // update content script resources for use by css plugin
                   contentScripts.get(key)!.css = [...css]
 
-                  // loader files import the entry, so entry file must be web accessible
-                  if (type === 'loader' || isDynamicScript)
+                  // loader files import the entry via chrome.runtime.getURL(),
+                  // so the entry file must be web accessible.
+                  // When no loader is emitted (simple scripts with no imports/exports),
+                  // the entry is listed directly in content_scripts and injected by
+                  // Chrome itself — it does not need to be web accessible.
+                  // See: https://developer.chrome.com/docs/extensions/reference/manifest/web-accessible-resources
+                  // "Content scripts themselves do not need to be allowed."
+                  const script = contentScripts.get(key)!
+                  const hasLoader = !!script.loaderName
+                  if ((type === 'loader' && hasLoader) || isDynamicScript)
                     imports.add(fileName)
 
                   const resource:
@@ -172,9 +182,9 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
                       : false,
                   }
 
-                  if (isDynamicScript || !injectCss) {
-                    resource.resources.push(...css)
-                  }
+                  const cssResources =
+                    isDynamicScript || !injectCss ? css : runtimeCss
+                  resource.resources.push(...cssResources)
 
                   if (resource.resources.length)
                     if (type === 'module') {

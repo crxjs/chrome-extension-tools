@@ -1,14 +1,14 @@
 import { serve } from 'tests/runners'
 import { testOutput } from 'tests/testOutput'
 import { test, expect } from 'vitest'
-import fg from 'fast-glob'
+import { glob } from 'tinyglobby'
 import { basename } from 'path'
 
 test('no output files start with underscore (except _locales)', async () => {
   const result = await serve(__dirname)
   const { outDir } = result
 
-  const files = await fg(`**/*`, { cwd: outDir })
+  const files = await glob(`**/*`, { cwd: outDir })
 
   // Filter out _locales which is allowed to start with underscore
   const invalidFiles = files.filter((file) => {

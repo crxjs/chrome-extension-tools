@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-unsafe-function-type */
 export type ChromeEvent = chrome.events.Event<Function> & {
   __isCapturedEvent: boolean
 }

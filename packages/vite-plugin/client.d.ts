@@ -43,6 +43,21 @@ declare module '*?script&iife' {
   export default fileName
 }
 
+declare module '*?iife' {
+  /**
+   * Alias for `*?script&iife`.
+   *
+   * Script format is IIFE. Use for content scripts with opaque origins.
+   *
+   * Exports the file name of the output script file.
+   *
+   * If imported inside a content script, RPCE will include the file name in
+   * `web_accessible_resources`.
+   */
+  const fileName: string
+  export default fileName
+}
+
 declare module '*?script&module' {
   /**
    * Script format is ESM. No loader and no HMR. Does not support frameworks
