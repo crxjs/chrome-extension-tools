@@ -44,6 +44,25 @@ test('rewrites query-string modules from update payloads', () => {
   ).toEqual(['/src/components/HelloWorld.vue?vue&type=style&lang.css'])
 })
 
+test('rewrites accepted HMR boundaries with the update timestamp', () => {
+  expect(
+    getUpdatePayloadFileIds(
+      {
+        type: 'update',
+        updates: [
+          {
+            type: 'js-update',
+            path: '/src/locales/pl.json',
+            acceptedPath: '/src/App.jsx',
+            timestamp: 123,
+          },
+        ],
+      },
+      { timestamp: true },
+    ),
+  ).toEqual(['/src/App.jsx?t=123'])
+})
+
 test('forwards Vite wildcard full reloads to content scripts', () => {
   const payload = mapVitePayloadForCrx({
     type: 'full-reload',

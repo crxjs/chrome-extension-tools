@@ -51,6 +51,13 @@ export function getDocumentStartLoaderWarnings(
     )
 }
 
+type ViteBuildOptions = NonNullable<UserConfig['build']>
+interface UserConfigWithRolldownOptions extends UserConfig {
+  build?: ViteBuildOptions & {
+    rolldownOptions?: ViteBuildOptions['rollupOptions']
+  }
+}
+
 const loadingPageReadyPath = '/@crx/dev-ready'
 
 function normalizeHtmlPath(pathname: string): string | null {
@@ -126,7 +133,7 @@ export const pluginManifest: CrxPluginFn = () => {
     {
       name: 'crx:manifest-init',
       enforce: 'pre',
-      async config(config, env) {
+      async config(config: UserConfigWithRolldownOptions, env) {
         const { manifest: _manifest } = await getOptions(config)
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
@@ -151,7 +158,10 @@ export const pluginManifest: CrxPluginFn = () => {
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
-          let { input = [] } = config.build?.rollupOptions ?? {}
+          let input =
+            config.build?.rolldownOptions?.input ??
+            config.build?.rollupOptions?.input ??
+            []
           if (typeof input === 'string') input = [input]
           else input = Object.values(input)
           input = input.map((f) => {
@@ -373,12 +383,15 @@ export const pluginManifest: CrxPluginFn = () => {
                 )
               }
 
-              // Register JS content scripts
+              // Register regular JS content scripts
+              // IIFE scripts skip the dev loader so they execute
+              // synchronously, matching build output and dynamically
+              // registered IIFE scripts
               for (const id of js) {
                 const type =
                   isIifeContentScript(id) || isStandaloneFile(id)
-                    ? 'iife'
-                    : 'loader'
+                    ? ('iife' as const)
+                    : ('loader' as const)
                 contentScripts.set(
                   prefix('/', id),
                   formatFileData({
@@ -405,7 +418,7 @@ export const pluginManifest: CrxPluginFn = () => {
                 const refId = this.emitFile({
                   type: 'chunk',
                   id,
-                  name: basename(file),
+                  name: file.replace(/[\\/]/g, '-'),
                   // Preserve content script entry exports so the build finalizer
                   // can decide whether the script needs a loader wrapper.
                   preserveSignature: 'exports-only',
@@ -457,8 +470,23 @@ export const pluginManifest: CrxPluginFn = () => {
         return { code: encoded, map: null }
       },
       async generateBundle(options, bundle) {
-        const manifestName = this.getFileName(refId)
-        const manifestJs = bundle[manifestName] as OutputChunk
+        let manifestName: string
+        let manifestJs: OutputChunk | undefined
+        try {
+          manifestName = this.getFileName(refId)
+          manifestJs = bundle[manifestName] as OutputChunk
+        } catch (error) {
+          manifestJs = Object.values(bundle).find(
+            (chunk): chunk is OutputChunk =>
+              chunk.type === 'chunk' && chunk.facadeModuleId === manifestId,
+          )
+          if (!manifestJs) throw error
+          manifestName = manifestJs.fileName
+        }
+
+        if (manifestJs.type !== 'chunk')
+          throw new Error(`Unable to load CRX manifest chunk "${manifestName}"`)
+
         let manifest = decodeManifest.call(this, manifestJs.code)
 
         /* ----------- UPDATE EMITTED FILE NAMES ----------- */
@@ -471,7 +499,9 @@ export const pluginManifest: CrxPluginFn = () => {
             const cssEntries = getContentCssEntries()
             const cssEntryMap = new Map(cssEntries.map((e) => [e.index, e]))
             const manifestContentScripts = manifest.content_scripts ?? []
-            const iifeReloadScripts: NonNullable<ManifestV3['content_scripts']> = []
+            const iifeReloadScripts: NonNullable<
+              ManifestV3['content_scripts']
+            > = []
             const iifeReloadScriptKeys = new Set<string>()
             const addIifeReloadScript = (
               script: Omit<

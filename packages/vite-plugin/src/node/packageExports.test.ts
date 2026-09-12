@@ -8,29 +8,23 @@ const __dirname = path.dirname(__filename)
 const packageRoot = path.resolve(__dirname, '../..')
 
 describe('package exports', () => {
-  test('uses ESM declarations for the ESM entrypoint', async () => {
+  test('uses ESM-only exports for the entrypoint', async () => {
     const packageJson = await fs.readJson(path.join(packageRoot, 'package.json'))
 
     expect(packageJson.exports['.']).toEqual({
-      import: {
-        types: './dist/index.d.mts',
-        default: './dist/index.mjs',
-      },
-      require: {
-        types: './index.d.cts',
-        default: './index.cjs',
-      },
+      types: './dist/index.d.mts',
+      default: './dist/index.mjs',
     })
-    expect(packageJson.types).toBe('dist/index.d.ts')
+    expect(packageJson.main).toBe('./dist/index.mjs')
+    expect(packageJson.types).toBe('./dist/index.d.mts')
   })
 
-  test('builds both legacy and ESM declaration files', async () => {
-    const rollupConfig = await fs.readFile(
-      path.join(packageRoot, 'rollup.config.ts'),
+  test('builds ESM declaration files', async () => {
+    const tsdownConfig = await fs.readFile(
+      path.join(packageRoot, 'tsdown.config.ts'),
       'utf8',
     )
 
-    expect(rollupConfig).toContain("file: 'dist/index.d.ts'")
-    expect(rollupConfig).toContain("file: 'dist/index.d.mts'")
+    expect(tsdownConfig).toContain("dts: '.d.mts'")
   })
 })

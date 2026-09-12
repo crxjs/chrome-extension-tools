@@ -25,7 +25,7 @@ Object {
       ],
       "resources": Array [
         "assets/App.hash1.js",
-        "assets/content.tsx.hash2.js",
+        "assets/src-content.tsx.hash2.js",
         "assets/vendor.hash3.js",
       ],
       "use_dynamic_url": false,
@@ -38,8 +38,8 @@ exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/App.hash1.js",
   "assets/content.tsx-loader.hash0.js",
-  "assets/content.tsx.hash2.js",
   "assets/popup.html.hash4.js",
+  "assets/src-content.tsx.hash2.js",
   "assets/vendor.hash3.js",
   "manifest.json",
   "src/popup.html",
@@ -66,17 +66,6 @@ export {
 "
 `;
 
-exports[`build fs output > assets/content.tsx.hash2.js 1`] = `
-"import { r as reactDom } from \\"./vendor.hash3.js\\";
-import { j as jsx, A as App } from \\"./App.hash1.js\\";
-console.log(\\"content script\\");
-const root = document.createElement(\\"div\\");
-root.id = \\"root\\";
-document.body.append(root);
-reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
-"
-`;
-
 exports[`build fs output > assets/content.tsx-loader.hash0.js 1`] = `
 "(function () {
   'use strict';
@@ -85,7 +74,7 @@ exports[`build fs output > assets/content.tsx-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.tsx.hash2.js\\")
+      chrome.runtime.getURL(\\"assets/src-content.tsx.hash2.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
@@ -140,6 +129,17 @@ import { j as jsx, A as App } from \\"./App.hash1.js\\";
 })();
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
+reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
+"
+`;
+
+exports[`build fs output > assets/src-content.tsx.hash2.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash3.js\\";
+import { j as jsx, A as App } from \\"./App.hash1.js\\";
+console.log(\\"content script\\");
+const root = document.createElement(\\"div\\");
+root.id = \\"root\\";
+document.body.append(root);
 reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
 "
 `;

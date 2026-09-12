@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs'
-import { HMRPayload, ResolvedConfig } from 'vite'
+import { HMRPayload, ResolvedConfig, UserConfig } from 'vite'
 import { contentScripts } from './contentScripts'
 import { manifestFiles } from './files'
 import { update } from './fileWriter'
@@ -13,21 +13,59 @@ import { getContentCssEntries } from './plugin-contentScripts_declared'
 import { getOptions } from './plugin-optionsProvider'
 import type { CrxHMRPayload, CrxPluginFn, ManifestFiles } from './types'
 import { isContentCssId } from './virtualFileIds'
+import { supportsWebSocketConfig } from './viteVersion'
 
 const debug = _debug('hmr')
+
+type HmrOptions = Exclude<
+  NonNullable<UserConfig['server']>['hmr'],
+  boolean | undefined
+>
+type WebSocketOptions = Pick<
+  HmrOptions,
+  'clientPort' | 'host' | 'path' | 'port' | 'protocol' | 'server' | 'timeout'
+>
+type ServerOptionsWithWebSocket = NonNullable<UserConfig['server']> & {
+  ws?: false | WebSocketOptions
+}
 
 export const crxRuntimeReload: CrxHMRPayload = {
   type: 'custom',
   event: 'crx:runtime-reload',
 }
 
-export function getChangedFilePath(root: string, file?: string | null): string | null {
+export function getHmrHostConfig(
+  server: ServerOptionsWithWebSocket,
+  viteVersion: string | undefined,
+): ServerOptionsWithWebSocket | undefined {
+  if (server.hmr === false || server.ws === false) return undefined
+
+  if (supportsWebSocketConfig(viteVersion)) {
+    return {
+      ws: { ...server.ws, host: 'localhost' },
+    }
+  }
+
+  const hmr = typeof server.hmr === 'object' ? server.hmr : {}
+  return {
+    hmr: { ...hmr, host: 'localhost' },
+  }
+}
+
+export function getChangedFilePath(
+  root: string,
+  file?: string | null,
+): string | null {
   if (!file) return null
 
   const normalizedRoot = normalize(root)
   const normalizedFile = normalize(file)
   const relativeFile = relative(normalizedRoot, normalizedFile)
-  if (!relativeFile || relativeFile.startsWith('..') || isAbsolute(relativeFile)) {
+  if (
+    !relativeFile ||
+    relativeFile.startsWith('..') ||
+    isAbsolute(relativeFile)
+  ) {
     return null
   }
 
@@ -58,15 +96,15 @@ export const pluginHMR: CrxPluginFn = () => {
       apply: 'serve',
       enforce: 'pre',
       // server hmr host should be localhost
-      async config({ server = {}, ...config }) {
+      async config(
+        this: { meta?: { viteVersion?: string } } | void,
+        { server = {}, ...config },
+      ) {
         const opts = await getOptions({ ...config, server })
         liveReload = opts.liveReload !== false
-        if (server.hmr === false) return
-        if (server.hmr === true) server.hmr = {}
-        server.hmr = server.hmr ?? {}
-        server.hmr.host = 'localhost'
+        const hmrConfig = getHmrHostConfig(server, this?.meta?.viteVersion)
 
-        return { server }
+        return hmrConfig && { server: hmrConfig }
       },
       // server should ignore outdir
       configResolved(_config) {

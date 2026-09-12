@@ -8,7 +8,6 @@
     "module": "esnext",
     "moduleResolution": "node",
     "paths": {
-      "client/*": ["src/client/*"],
       "src/*": ["src/node/*"],
       "tests/*": ["tests/*"]
     },
@@ -18,5 +17,5 @@
     "strictNullChecks": true,
     "target": "esnext"
   },
-  "exclude": ["node_modules", "tests/templates", "dist", "src/node/archive"]
+  "exclude": ["node_modules", "tests/templates", "dist", "src/node/archive", "tsdown.config.ts"]
 }

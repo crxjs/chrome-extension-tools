@@ -1,0 +1,10 @@
+{
+  "description": "MV3 service worker recursive dynamic import regression",
+  "manifest_version": 3,
+  "name": "MV3 service worker recursive dynamic import regression",
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "version": "1.0.0"
+}

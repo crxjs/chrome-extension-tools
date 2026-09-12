@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content.js.hash0.js",
+        "assets/src-content.js.hash0.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -35,27 +35,14 @@ Object {
     "tabs",
   ],
   "version": "1.0.0",
-  "web_accessible_resources": Array [
-    Object {
-      "matches": Array [
-        "http://b.com/*",
-        "https://a.com/*",
-        "https://example.com/*",
-      ],
-      "resources": Array [
-        "assets/content.js.hash0.js",
-      ],
-      "use_dynamic_url": false,
-    },
-  ],
 }
 `;
 
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/background.js.hash1.js",
-  "assets/content.js.hash0.js",
   "assets/popup.html.hash2.js",
+  "assets/src-content.js.hash0.js",
   "assets/vendor.hash3.js",
   "manifest.json",
   "service-worker-loader.js",
@@ -65,31 +52,6 @@ Array [
 
 exports[`build fs output > assets/background.js.hash1.js 1`] = `
 "console.log(\\"service_worker.js\\");
-"
-`;
-
-exports[`build fs output > assets/content.js.hash0.js 1`] = `
-"(function(){console.log(\\"content script\\");
-const requesting = browser.permissions.request({
-  permissions: [\\"tabs\\"]
-});
-requesting.then(
-  function(result) {
-    if (result) {
-      console.log(\\"Permission granted. Opening a tab\\");
-      browser.tabs.open({
-        url: \\"https://example.com\\",
-        active: true
-      });
-    } else {
-      console.log(\\"Permission denied\\");
-    }
-  },
-  function() {
-    console.error(\\"Error requesting permissions\\");
-  }
-);
-})()
 "
 `;
 
@@ -166,6 +128,31 @@ const App = () => {
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
 ReactDOM.render(/* @__PURE__ */ React.createElement(App, null), root);
+"
+`;
+
+exports[`build fs output > assets/src-content.js.hash0.js 1`] = `
+"(function(){console.log(\\"content script\\");
+const requesting = browser.permissions.request({
+  permissions: [\\"tabs\\"]
+});
+requesting.then(
+  function(result) {
+    if (result) {
+      console.log(\\"Permission granted. Opening a tab\\");
+      browser.tabs.open({
+        url: \\"https://example.com\\",
+        active: true
+      });
+    } else {
+      console.log(\\"Permission denied\\");
+    }
+  },
+  function() {
+    console.error(\\"Error requesting permissions\\");
+  }
+);
+})()
 "
 `;
 

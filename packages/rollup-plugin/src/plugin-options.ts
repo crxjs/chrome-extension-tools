@@ -3,7 +3,7 @@ import { CheerioFile } from './html-inputs/cheerio'
 import { DynamicImportWrapperOptions } from './manifest-input/dynamicImportWrapper'
 import { ValidateNamesPlugin } from './validate-names/index'
 
-// eslint-disable-next-line @typescript-eslint/ban-types -- Just to extract whatever function is defined
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- Just to extract whatever function is defined
 type ExtractFunction<T> = Extract<T, Function>
 type RequiredPlugin = Required<Plugin>
 export type PluginWithFunctionHooks = {

@@ -229,7 +229,7 @@ test('Errors if cache.bgScriptPath is undefined', async () => {
       bundle,
       false,
     )
-  } catch (error) {
+  } catch {
     expect(context.error).toBeCalledWith('cache.bgScriptPath is undefined')
   }
 })
@@ -252,7 +252,7 @@ test('Errors if cache.ctScriptPath is undefined', async () => {
       bundle,
       false,
     )
-  } catch (error) {
+  } catch {
     expect(context.error).toBeCalledWith('cache.ctScriptPath is undefined')
   }
 })

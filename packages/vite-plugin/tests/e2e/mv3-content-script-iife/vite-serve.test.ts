@@ -38,6 +38,12 @@ test('IIFE content scripts work in dev mode', async () => {
     'src/content-standalone.ts.iife.js',
   ])
   expect(contentScriptFiles).toContain('vendor/crx-iife-reload-bridge.js')
+  for (const fileName of contentScriptFiles.filter((f) =>
+    f.endsWith('.iife.js'),
+  )) {
+    const code = await fs.readFile(path.join(outDir, fileName), 'utf8')
+    expect(code).toMatch(/^\(function\(\)/)
+  }
 
   await waitForRegisteredContentScripts(
     browser,
@@ -48,7 +54,9 @@ test('IIFE content scripts work in dev mode', async () => {
   const page = await browser.newPage()
   await page.goto('https://example.com')
 
-  // In dev mode, .iife.ts files should execute and create their markers.
+  // In dev mode, declared IIFE scripts skip the async dev loader and are
+  // referenced directly in the manifest so they execute synchronously,
+  // like build output and dynamically registered IIFE scripts (#1225).
   await page.waitForSelector(`#${regularContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${iifeContentId}`, { timeout: 10000 })
   await page.waitForSelector(`#${standaloneIifeScriptId}`, { timeout: 10000 })
