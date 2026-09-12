@@ -262,19 +262,12 @@ export const pluginContentScripts: CrxPluginFn = () => {
       async config(config, env) {
         await findWorldMainIds(config, env)
 
-        const build = config.build as
-          | (typeof config.build & {
-              rolldownOptions?: NonNullable<typeof config.build>['rollupOptions']
-            })
-          | undefined
-
         return {
           build: {
             rollupOptions: {
               // keep exports for content script module api
               preserveEntrySignatures:
-                build?.rolldownOptions?.preserveEntrySignatures ??
-                build?.rollupOptions?.preserveEntrySignatures ??
+                config.build?.rollupOptions?.preserveEntrySignatures ??
                 'exports-only',
             },
           },
