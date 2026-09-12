@@ -8,7 +8,7 @@ Object {
         "src/styles.css",
       ],
       "js": Array [
-        "assets/content.ts.hash0.js",
+        "assets/src-content.ts.hash0.js",
       ],
       "matches": Array [
         "http://*/*",
@@ -24,13 +24,13 @@ Object {
 
 exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/content.ts.hash0.js",
+  "assets/src-content.ts.hash0.js",
   "manifest.json",
   "src/styles.css",
 ]
 `;
 
-exports[`build fs output > assets/content.ts.hash0.js 1`] = `
+exports[`build fs output > assets/src-content.ts.hash0.js 1`] = `
 "(function(){console.log(\\"content.ts\\");
 })()
 "

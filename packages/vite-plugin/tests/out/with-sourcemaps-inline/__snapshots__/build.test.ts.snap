@@ -12,7 +12,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content.ts.hash0.js",
+        "assets/src-content.ts.hash0.js",
       ],
       "matches": Array [
         "https://*/*",
@@ -30,8 +30,8 @@ Object {
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/background.ts.hash1.js",
-  "assets/content.ts.hash0.js",
   "assets/popup.html.hash2.js",
+  "assets/src-content.ts.hash0.js",
   "assets/vendor.hash3.js",
   "manifest.json",
   "service-worker-loader.js",
@@ -41,14 +41,6 @@ Array [
 
 exports[`build fs output > assets/background.ts.hash1.js 1`] = `
 "console.log(\\"service_worker.ts\\");
-// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
-"
-`;
-
-exports[`build fs output > assets/content.ts.hash0.js 1`] = `
-"(function(){const message = \\"content script\\";
-console.log(message);
-})()
 // # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;
@@ -102,6 +94,14 @@ const App = () => {
 console.log(\\"popup script\\");
 const root = document.querySelector(\\"#root\\");
 reactDom.exports.render(/* @__PURE__ */ React.createElement(App, null), root);
+// # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
+"
+`;
+
+exports[`build fs output > assets/src-content.ts.hash0.js 1`] = `
+"(function(){const message = \\"content script\\";
+console.log(message);
+})()
 // # sourceMappingURL=data:application/json;charset=utf-8;base64,<base64>
 "
 `;

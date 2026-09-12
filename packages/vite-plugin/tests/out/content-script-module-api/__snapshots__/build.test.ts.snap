@@ -27,7 +27,7 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "assets/content.js.hash1.js",
+        "assets/src-content.js.hash1.js",
       ],
       "use_dynamic_url": false,
     },
@@ -38,20 +38,9 @@ Object {
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/content.js-loader.hash0.js",
-  "assets/content.js.hash1.js",
+  "assets/src-content.js.hash1.js",
   "manifest.json",
 ]
-`;
-
-exports[`build fs output > assets/content.js.hash1.js 1`] = `
-"console.log(\\"content script\\");
-function onExecute() {
-  console.log(\\"onExecute\\");
-}
-export {
-  onExecute
-};
-"
 `;
 
 exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
@@ -62,11 +51,22 @@ exports[`build fs output > assets/content.js-loader.hash0.js 1`] = `
   (async () => {
     const { onExecute } = await import(
       /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.js.hash1.js\\")
+      chrome.runtime.getURL(\\"assets/src-content.js.hash1.js\\")
     );
     onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
   })().catch(console.error);
 
 })();
+"
+`;
+
+exports[`build fs output > assets/src-content.js.hash1.js 1`] = `
+"console.log(\\"content script\\");
+function onExecute() {
+  console.log(\\"onExecute\\");
+}
+export {
+  onExecute
+};
 "
 `;

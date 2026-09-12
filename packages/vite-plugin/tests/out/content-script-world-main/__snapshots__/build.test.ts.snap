@@ -5,7 +5,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/content.js.hash0.js",
+        "assets/src-content.js.hash0.js",
       ],
       "matches": Array [
         "https://example.com/*",
@@ -22,12 +22,12 @@ Object {
 
 exports[`build fs output > _01 output files 1`] = `
 Array [
-  "assets/content.js.hash0.js",
+  "assets/src-content.js.hash0.js",
   "manifest.json",
 ]
 `;
 
-exports[`build fs output > assets/content.js.hash0.js 1`] = `
+exports[`build fs output > assets/src-content.js.hash0.js 1`] = `
 "(function(){console.log(\\"content script running in MAIN world\\");
 })()
 "
