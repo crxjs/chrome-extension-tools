@@ -2,6 +2,7 @@ export const viteClientId = '/@vite/client'
 export const customElementsId = '/@webcomponents/custom-elements'
 
 export const contentHmrPortId = '/@crx/client-port'
+export const iifeReloadBridgeId = '/@crx/iife-reload-bridge.js'
 export const manifestId = '/@crx/manifest'
 export const preambleId = '/@crx/client-preamble'
 export const stubId = '/@crx/stub'
