@@ -1,0 +1,12 @@
+{
+  "description": "Web Components polyfill content script regression",
+  "manifest_version": 3,
+  "name": "Web Components polyfill regression",
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["source/content.ts"]
+    }
+  ],
+  "version": "1.0.0"
+}
