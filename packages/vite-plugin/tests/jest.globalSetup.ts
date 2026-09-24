@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'pathe'
-import { OutputOptions, rollup } from 'rollup'
-import configs from '../rollup.config'
+import { OutputOptions, rollup, type RollupOptions } from 'rollup'
+import esbuild from 'rollup-plugin-esbuild'
+import { bundleClientCode } from '../client-bundle-plugin'
 import _debug from 'debug'
 
 const debug = _debug('test:global-setup')
@@ -30,56 +31,60 @@ function getClientFiles() {
 const clientFiles = getClientFiles()
 debug('client files %o', clientFiles)
 
-const [config] = configs
-config.input = clientFiles
-config.output = { dir: outDir, format: 'esm', sourcemap: true, plugins: [] }
-config.plugins?.push(
-  {
-    name: 'load virtual import files',
-    resolveId(source, importer) {
-      if (!importer) {
-        debug('entry file %s', source)
-        return source
-      }
-      return null
-    },
-    load(id) {
-      debug('load %s', id)
-      let importPath: string | undefined
-      if (clientFiles.includes(id)) {
-        importPath = path.posix.join('client', id)
-      }
+const config: RollupOptions = {
+  input: clientFiles,
+  output: { dir: outDir, format: 'esm', sourcemap: true, plugins: [] },
+  external: [],
+  plugins: [
+    bundleClientCode(),
+    esbuild({ legalComments: 'inline' }),
+    {
+      name: 'load virtual import files',
+      resolveId(source, importer) {
+        if (!importer) {
+          debug('entry file %s', source)
+          return source
+        }
+        return null
+      },
+      load(id) {
+        debug('load %s', id)
+        let importPath: string | undefined
+        if (clientFiles.includes(id)) {
+          importPath = path.posix.join('client', id)
+        }
 
-      if (importPath?.endsWith('.html')) {
-        const filename = path.join(srcDir, importPath)
-        return `
+        if (importPath?.endsWith('.html')) {
+          const filename = path.join(srcDir, importPath)
+          return `
 var clientCode = \`${fs.readFileSync(filename, 'utf-8')}\`;
 export default clientCode;
         `.trim()
-      } else if (importPath) {
-        return `
+        } else if (importPath) {
+          return `
 import clientCode from '${importPath}'
 export default clientCode`.trim()
-      }
-
-      return null
-    },
-  },
-  {
-    name: 'fix output filename',
-    generateBundle(options, bundle) {
-      for (const chunk of Object.values(bundle)) {
-        if (chunk.type === 'chunk') {
-          const format = path
-            .dirname(chunk.facadeModuleId!)
-            .split('/')
-            .pop() as 'es' | 'iife'
-          chunk.fileName = path.join(format, chunk.fileName)
         }
-      }
+
+        return null
+      },
     },
-  },
-)
+    {
+      name: 'fix output filename',
+      generateBundle(options, bundle) {
+        for (const chunk of Object.values(bundle)) {
+          if (chunk.type === 'chunk') {
+            const format = path
+              .dirname(chunk.facadeModuleId!)
+              .split('/')
+              .pop() as 'es' | 'iife'
+            chunk.fileName = path.join(format, chunk.fileName)
+          }
+        }
+      },
+    },
+  ],
+}
 
 debug('client build config %O', config)
 

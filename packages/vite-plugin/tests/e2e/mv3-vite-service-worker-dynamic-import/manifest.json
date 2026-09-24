@@ -1,0 +1,16 @@
+{
+  "description": "MV3 service worker dynamic import regression",
+  "manifest_version": 3,
+  "name": "MV3 service worker dynamic import regression",
+  "background": {
+    "service_worker": "src/background.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/content-script.ts"],
+      "matches": ["https://example.com/*"]
+    }
+  ],
+  "version": "1.0.0"
+}

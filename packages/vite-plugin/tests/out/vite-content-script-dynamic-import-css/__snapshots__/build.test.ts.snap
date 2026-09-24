@@ -27,9 +27,9 @@ Object {
         "https://*/*",
       ],
       "resources": Array [
-        "assets/content.ts.hash3.js",
-        "assets/entry.hash4.js",
+        "assets/entry.hash3.js",
         "assets/entry.hash1.css",
+        "assets/src-content.ts.hash4.js",
       ],
       "use_dynamic_url": false,
     },
@@ -41,9 +41,9 @@ exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/content.hash2.css",
   "assets/content.ts-loader.hash0.js",
-  "assets/content.ts.hash3.js",
   "assets/entry.hash1.css",
-  "assets/entry.hash4.js",
+  "assets/entry.hash3.js",
+  "assets/src-content.ts.hash4.js",
   "manifest.json",
 ]
 `;
@@ -55,7 +55,37 @@ exports[`build fs output > assets/content.hash2.css 1`] = `
 "
 `;
 
-exports[`build fs output > assets/content.ts.hash3.js 1`] = `
+exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/src-content.ts.hash4.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/entry.hash1.css 1`] = `
+".entry {
+  color: blue;
+}
+"
+`;
+
+exports[`build fs output > assets/entry.hash3.js 1`] = `
+"const entry = \\"\\";
+console.log(\\"entry.ts\\");
+"
+`;
+
+exports[`build fs output > assets/src-content.ts.hash4.js 1`] = `
 "const scriptRel = \\"modulepreload\\";
 const assetsURL = function(dep) {
   return \\"/\\" + dep;
@@ -102,36 +132,6 @@ const __vitePreload = function preload(baseModule, deps, importerUrl) {
 };
 const content = \\"\\";
 console.log(\\"content.ts\\");
-__vitePreload(() => import(\\"./entry.hash4.js\\"), true ? [\\"assets/entry.hash4.js\\",\\"assets/entry.hash1.css\\"] : void 0);
-"
-`;
-
-exports[`build fs output > assets/content.ts-loader.hash0.js 1`] = `
-"(function () {
-  'use strict';
-
-  const injectTime = performance.now();
-  (async () => {
-    const { onExecute } = await import(
-      /* @vite-ignore */
-      chrome.runtime.getURL(\\"assets/content.ts.hash3.js\\")
-    );
-    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
-  })().catch(console.error);
-
-})();
-"
-`;
-
-exports[`build fs output > assets/entry.hash1.css 1`] = `
-".entry {
-  color: blue;
-}
-"
-`;
-
-exports[`build fs output > assets/entry.hash4.js 1`] = `
-"const entry = \\"\\";
-console.log(\\"entry.ts\\");
+__vitePreload(() => import(\\"./entry.hash3.js\\"), true ? [\\"assets/entry.hash3.js\\",\\"assets/entry.hash1.css\\"] : void 0);
 "
 `;

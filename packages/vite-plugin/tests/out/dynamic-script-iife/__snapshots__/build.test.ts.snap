@@ -9,7 +9,7 @@ Object {
   "content_scripts": Array [
     Object {
       "js": Array [
-        "assets/declared-script.ts.hash0.js",
+        "assets/src-declared-script.ts.hash0.js",
       ],
       "matches": Array [
         "https://a.com/*",
@@ -27,7 +27,6 @@ Object {
         "https://a.com/*",
       ],
       "resources": Array [
-        "assets/declared-script.ts.hash0.js",
         "src/main-world.js",
       ],
       "use_dynamic_url": false,
@@ -50,9 +49,9 @@ Object {
 exports[`build fs output > _01 output files 1`] = `
 Array [
   "assets/background.ts.hash2.js",
-  "assets/declared-script.ts.hash0.js",
   "assets/dynamic-script.ts.hash1.js",
   "assets/main-world.ts.hash3.js",
+  "assets/src-declared-script.ts.hash0.js",
   "manifest.json",
   "service-worker-loader.js",
   "src/main-world.js",
@@ -72,17 +71,6 @@ chrome.action.onClicked.addListener((tab) => {
 "
 `;
 
-exports[`build fs output > assets/declared-script.ts.hash0.js 1`] = `
-"(function(){const fileName = \\"src/main-world.js\\";
-console.log(\\"declared script\\");
-const script = document.createElement(\\"script\\");
-script.src = chrome.runtime.getURL(fileName);
-script.defer = true;
-document.head.prepend(script);
-})()
-"
-`;
-
 exports[`build fs output > assets/dynamic-script.ts.hash1.js 1`] = `
 "(function(){console.log(\\"dynamic script\\");
 })()
@@ -91,6 +79,17 @@ exports[`build fs output > assets/dynamic-script.ts.hash1.js 1`] = `
 
 exports[`build fs output > assets/main-world.ts.hash3.js 1`] = `
 "console.log(\\"main world script\\");
+"
+`;
+
+exports[`build fs output > assets/src-declared-script.ts.hash0.js 1`] = `
+"(function(){const fileName = \\"src/main-world.js\\";
+console.log(\\"declared script\\");
+const script = document.createElement(\\"script\\");
+script.src = chrome.runtime.getURL(fileName);
+script.defer = true;
+document.head.prepend(script);
+})()
 "
 `;
 

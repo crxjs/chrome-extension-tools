@@ -4,7 +4,12 @@ import { existsSync, promises as fs } from 'fs'
 import colors from 'picocolors'
 import { OutputAsset, OutputChunk } from 'rollup'
 import { ResolvedConfig, UserConfig, version as ViteVersion } from 'vite'
-import { contentScripts, hashScriptId } from './contentScripts'
+import {
+  contentScripts,
+  createIifeReloadBridge,
+  hashScriptId,
+} from './contentScripts'
+import { add } from './fileWriter'
 import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
 import {
@@ -24,10 +29,39 @@ import {
 } from './plugin-contentScripts_declared'
 import { finalizeBuildContentScripts } from './plugin-contentScripts'
 import { isIifeContentScript } from './plugin-contentScripts_iife'
-import { manifestId, stubId } from './virtualFileIds'
+import {
+  contentHmrPortId,
+  iifeReloadBridgeId,
+  manifestId,
+  stubId,
+} from './virtualFileIds'
 const { readFile } = fs
 
 declare const structuredClone: <T>(value: T) => T
+
+export function getDocumentStartLoaderWarnings(
+  manifest: Pick<ManifestV3, 'content_scripts'>,
+  standaloneFiles: string[],
+): string[] {
+  const standalone = standaloneFiles.map((file) => file.replace(/^\//, ''))
+  const isStandaloneFile = (file: string) => {
+    const normalized = file.replace(/^\//, '')
+    return standalone.includes(normalized)
+  }
+
+  return (manifest.content_scripts ?? [])
+    .filter((script) => script.run_at === 'document_start')
+    .flatMap(({ js = [] }) =>
+      js.filter((id) => !isIifeContentScript(id) && !isStandaloneFile(id)),
+    )
+}
+
+type ViteBuildOptions = NonNullable<UserConfig['build']>
+interface UserConfigWithRolldownOptions extends UserConfig {
+  build?: ViteBuildOptions & {
+    rolldownOptions?: ViteBuildOptions['rollupOptions']
+  }
+}
 
 const loadingPageReadyPath = '/@crx/dev-ready'
 
@@ -84,12 +118,27 @@ export const pluginManifest: CrxPluginFn = () => {
   let devHtmlFiles = new Set<string>()
   let refId: string
   let config: ResolvedConfig
+  let iifeReloadBridgeFileName: string | undefined
+  let liveReload = true
+
+  function getIifeReloadBridgeFileName() {
+    if (iifeReloadBridgeFileName) return iifeReloadBridgeFileName
+
+    const client = add({ type: 'module', id: contentHmrPortId })
+    const bridge = add({
+      type: 'asset',
+      id: iifeReloadBridgeId,
+      source: createIifeReloadBridge({ client: client.fileName }),
+    })
+    iifeReloadBridgeFileName = bridge.fileName
+    return bridge.fileName
+  }
 
   return [
     {
       name: 'crx:manifest-init',
       enforce: 'pre',
-      async config(config, env) {
+      async config(config: UserConfigWithRolldownOptions, env) {
         const { manifest: _manifest } = await getOptions(config)
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
@@ -114,7 +163,10 @@ export const pluginManifest: CrxPluginFn = () => {
           const { entries = [] } = config.optimizeDeps ?? {}
           // Vite ignores build inputs if optimize deps has explicit entries,
           // so we need to merge both to include extra HTML files
-          let { input = [] } = config.build?.rollupOptions ?? {}
+          let input =
+            config.build?.rolldownOptions?.input ??
+            config.build?.rollupOptions?.input ??
+            []
           if (typeof input === 'string') input = [input]
           else input = Object.values(input)
           input = input.map((f) => {
@@ -271,6 +323,32 @@ export const pluginManifest: CrxPluginFn = () => {
           }
         }
 
+        const opts = await getOptions({ plugins: config.plugins } as UserConfig)
+        liveReload = opts.liveReload !== false
+        const standaloneFiles = (
+          opts.contentScripts?.standaloneFiles || []
+        ).map((f: string) => f.replace(/^\//, ''))
+        const isStandaloneFile = (file: string) => {
+          const normalized = file.replace(/^\//, '')
+          return standaloneFiles.includes(normalized)
+        }
+        const documentStartLoaderWarnings = getDocumentStartLoaderWarnings(
+          manifest,
+          standaloneFiles,
+        )
+        if (documentStartLoaderWarnings.length > 0) {
+          const name = '[crx:manifest]'
+          const message = colors.yellow(
+            [
+              `${name} Some document_start content scripts use the async loader.`,
+              'Use the .iife.ts/.iife.tsx/.iife.js naming convention or contentScripts.standaloneFiles for exact document_start timing:',
+              ...documentStartLoaderWarnings.map((id) => `  ${id}`),
+              'Learn more: https://crxjs.dev/concepts/content#iife-content-scripts',
+            ].join('\r\n'),
+          )
+          console.log(message)
+        }
+
         /* ----------- EMIT SCRIPTS DURING BUILD ----------- */
 
         if (config.command === 'serve') {
@@ -322,17 +400,24 @@ export const pluginManifest: CrxPluginFn = () => {
               }
 
               // Register regular JS content scripts
+              // IIFE scripts skip the dev loader so they execute
+              // synchronously, matching build output and dynamically
+              // registered IIFE scripts
               for (const id of js) {
+                const type =
+                  isIifeContentScript(id) || isStandaloneFile(id)
+                    ? ('iife' as const)
+                    : ('loader' as const)
                 contentScripts.set(
                   prefix('/', id),
                   formatFileData({
-                    type: 'loader',
+                    type,
                     id,
                     matches: reduceMatchPatterns([
                       ...(matchesByFile.get(id) ?? matches),
                     ]),
-                    refId: hashScriptId({ type: 'loader', id }),
-                    fileName: getFileName({ type: 'loader', id }),
+                    refId: hashScriptId({ type, id }),
+                    fileName: getFileName({ type, id }),
                   }),
                 )
               }
@@ -341,14 +426,6 @@ export const pluginManifest: CrxPluginFn = () => {
         } else {
           // vite build emits content scripts, html files and service worker
           // Skip IIFE/standalone content scripts - they will be built separately by the IIFE plugin
-          const opts = await getOptions({ plugins: config.plugins } as UserConfig)
-          const standaloneFiles = (opts.contentScripts?.standaloneFiles || []).map((f: string) =>
-            f.replace(/^\//, '')
-          )
-          const isStandaloneFile = (file: string) => {
-            const normalized = file.replace(/^\//, '')
-            return standaloneFiles.includes(normalized)
-          }
           if (manifest.content_scripts) {
             // the same file may be declared in multiple content_scripts entries
             // with different matches (e.g. a broad entry plus a narrow
@@ -371,7 +448,7 @@ export const pluginManifest: CrxPluginFn = () => {
               const refId = this.emitFile({
                 type: 'chunk',
                 id,
-                name: basename(file),
+                name: file.replace(/[\\/]/g, '-'),
                 // Preserve content script entry exports so the build finalizer
                 // can decide whether the script needs a loader wrapper.
                 preserveSignature: 'exports-only',
@@ -448,19 +525,49 @@ export const pluginManifest: CrxPluginFn = () => {
         if (config.command === 'serve') {
           // plugin-background emits service worker loader in renderCrxManifest
           // vite dev server sends html files through local host
-          if (manifest.content_scripts) {
+          {
             // Get all registered CSS entries
             const cssEntries = getContentCssEntries()
             const cssEntryMap = new Map(cssEntries.map((e) => [e.index, e]))
+            const manifestContentScripts = manifest.content_scripts ?? []
+            const iifeReloadScripts: NonNullable<
+              ManifestV3['content_scripts']
+            > = []
+            const iifeReloadScriptKeys = new Set<string>()
+            const addIifeReloadScript = (
+              script: Omit<
+                NonNullable<ManifestV3['content_scripts']>[number],
+                'js'
+              >,
+            ) => {
+              const key = JSON.stringify(script)
+              if (iifeReloadScriptKeys.has(key)) return
+              iifeReloadScriptKeys.add(key)
+              iifeReloadScripts.push({
+                ...script,
+                js: [getIifeReloadBridgeFileName()],
+              })
+            }
 
-            for (let i = 0; i < manifest.content_scripts.length; i++) {
-              const script = manifest.content_scripts[i]
+            for (let i = 0; i < manifestContentScripts.length; i++) {
+              const script = manifestContentScripts[i]
               const cssEntry = cssEntryMap.get(i)
+              const originalJs = script.js || []
+              const hasIifeScript = originalJs.some((id) => {
+                const contentScript =
+                  contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                return contentScript?.type === 'iife'
+              })
 
-              // Transform JS paths to loader file names
-              const jsLoaders = (script.js || []).map((id) =>
-                getFileName({ id, type: 'loader' }),
-              )
+              // Transform JS paths to emitted file names. IIFE scripts are
+              // emitted directly and do not need a loader.
+              const jsLoaders = originalJs.map((id) => {
+                const contentScript =
+                  contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                return (
+                  contentScript?.fileName ?? getFileName({ id, type: 'loader' })
+                )
+              })
 
               // Prepend synthetic CSS entry loader if CSS exists for this entry
               if (cssEntry) {
@@ -472,6 +579,35 @@ export const pluginManifest: CrxPluginFn = () => {
               } else {
                 script.js = jsLoaders
               }
+
+              if (liveReload && hasIifeScript) {
+                const {
+                  js: _js,
+                  css: _css,
+                  world: _world,
+                  run_at: _runAt,
+                  ...bridgeScript
+                } = script
+                addIifeReloadScript(bridgeScript)
+              }
+            }
+
+            const canRegisterDynamicScripts =
+              manifest.permissions?.includes('scripting') === true
+            if (
+              liveReload &&
+              canRegisterDynamicScripts &&
+              manifest.host_permissions &&
+              manifest.host_permissions.length > 0
+            ) {
+              addIifeReloadScript({
+                matches: manifest.host_permissions,
+              })
+            }
+
+            if (iifeReloadScripts.length > 0) {
+              manifest.content_scripts = manifestContentScripts
+              manifest.content_scripts.push(...iifeReloadScripts)
             }
           }
         } else {
@@ -499,7 +635,8 @@ export const pluginManifest: CrxPluginFn = () => {
               return {
                 js: js.map((id) => {
                   const script =
-                    contentScripts.get(id) ?? contentScripts.get(prefix('/', id))
+                    contentScripts.get(id) ??
+                    contentScripts.get(prefix('/', id))
                   const fileName = script?.loaderName ?? script?.fileName
                   if (typeof fileName === 'undefined')
                     throw new Error(

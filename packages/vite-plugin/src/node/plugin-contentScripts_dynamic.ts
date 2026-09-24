@@ -9,7 +9,8 @@ import type { UserConfig } from 'vite'
 import { CrxPluginFn } from './types'
 
 // Rollup may use `import_meta` instead of `import.meta`
-const _dynamicScriptRegEx = /\b(import.meta).CRX_DYNAMIC_SCRIPT_(.+?)[,;]/gm
+const _dynamicScriptRegEx =
+  /\b(import\.meta|import_meta)\.CRX_DYNAMIC_SCRIPT_([A-Za-z0-9]+)(?=[^A-Za-z0-9]|$)/gm
 const dynamicScriptRegEx = () => {
   // stupid stateful JS RegExp
   _dynamicScriptRegEx.lastIndex = 0
@@ -279,7 +280,7 @@ export const pluginDynamicContentScripts: CrxPluginFn = () => {
                   // start with / for registerContentScripts; executeScript tolerates both
                   // but we keep consistent with manifest-declared scripts and IIFE outputs.
                   const path = fileName
-                  return `${JSON.stringify(path)}${match.split(scriptKey)[1]}`
+                  return JSON.stringify(path)
                 },
               )
               // TODO: remove unused import_meta value?

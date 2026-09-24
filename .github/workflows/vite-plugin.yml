@@ -85,6 +85,8 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
         run: pnpm install --filter "vite-plugin"
 
       - name: Run unit and output tests
@@ -124,6 +126,8 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
         run: pnpm install --filter "vite-plugin"
 
       - name: Build plugin (always on Vite 3)
@@ -177,7 +181,13 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
         run: pnpm install --filter "vite-plugin"
+
+      - name: Install Chromium
+        timeout-minutes: 10
+        run: pnpm exec playwright install --no-shell chromium
 
       - name: Build plugin (always on Vite 3)
         run: pnpm build

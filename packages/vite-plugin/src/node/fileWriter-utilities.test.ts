@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { getFileName } from './fileWriter-utilities'
+import { getFileName, getFileUrl } from './fileWriter-utilities'
 
 // Characters that are illegal in Windows filenames
 const WINDOWS_ILLEGAL_CHARS = /[<>:"|?*]/
@@ -44,6 +44,58 @@ describe('getFileName', () => {
     expect(result).toMatch(/^vendor\//)
   })
 
+  test('bounds filenames for modules served from outside the Vite root', () => {
+    const result = getFileName({
+      type: 'module',
+      id: '/@fs/D:/Work11Space/Pro20260126/app-monorepo/packages/ui/tiptap-editor/src/components/primitives/toolbar/ToolbarButton.vue?vue&type=style&index=0&scoped=eb58e4f8&lang.scss',
+    })
+
+    expect(result).toMatch(/^vendor\/fs-[A-Za-z0-9]{12}\.js$/)
+    expect(result).not.toContain('Work11Space')
+  })
+
+  test('keeps existing vendor names for outside-root node_modules', () => {
+    const result = getFileName({
+      type: 'module',
+      id: '/@fs/D:/workspace/node_modules/vite/dist/client/env.mjs',
+    })
+
+    expect(result).toBe('vendor/vite-dist-client-env.mjs.js')
+  })
+
+  test('preserves extensions for assets served from outside the Vite root', () => {
+    const result = getFileName({
+      type: 'asset',
+      id: '/@fs/D:/workspace/packages/ui/src/assets/icon.png',
+    })
+
+    expect(result).toMatch(/^vendor\/fs-[A-Za-z0-9]{12}\.png$/)
+  })
+
+  test('includes the full Vite query when hashing outside-root modules', () => {
+    const vueFile =
+      '/@fs/D:/workspace/packages/ui/src/components/ToolbarButton.vue'
+    const style = getFileName({
+      type: 'module',
+      id: `${vueFile}?vue&type=style&index=0&scoped=eb58e4f8&lang.scss`,
+    })
+    const script = getFileName({
+      type: 'module',
+      id: `${vueFile}?vue&type=script&setup=true&lang.ts`,
+    })
+
+    expect(style).not.toBe(script)
+  })
+
+  test('ignores HMR timestamps when hashing outside-root modules', () => {
+    const id =
+      '/@fs/D:/workspace/packages/ui/src/components/ToolbarButton.vue?vue&type=style&index=0&scoped=eb58e4f8&lang.scss'
+
+    expect(
+      getFileName({ type: 'module', id: id.replace('?', '?t=123&') }),
+    ).toBe(getFileName({ type: 'module', id }))
+  })
+
   test('sanitizes colons for Windows compatibility', () => {
     const result = getFileName({
       type: 'module',
@@ -78,5 +130,16 @@ describe('getFileName', () => {
   test('sanitizes leading underscores from basename', () => {
     const result = getFileName({ type: 'asset', id: '/__uno.css' })
     expect(result).toBe('uno.css')
+  })
+})
+
+describe('getFileUrl', () => {
+  test('preserves HMR timestamps outside the output filename', () => {
+    expect(
+      getFileUrl({
+        id: '/src/locales/pl.json?t=123&import',
+        type: 'module',
+      }),
+    ).toBe('/src/locales/pl.json__import.js?t=123')
   })
 })
