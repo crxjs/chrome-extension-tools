@@ -17,5 +17,5 @@ export default defineConfig({
   },
   clearScreen: false,
   logLevel: 'error',
-  plugins: [crx({ manifest }), svelte()],
+  plugins: [crx({ manifest, contentScripts: { hmr: 'native' } }), svelte()],
 })

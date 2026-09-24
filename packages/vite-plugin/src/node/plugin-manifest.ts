@@ -103,6 +103,17 @@ function getLoadingPageReadyHtmlPath(requestUrl: string | undefined) {
   return normalizeHtmlPath(pageUrl.pathname)
 }
 
+function addDevServerHostPermission(
+  manifest: ManifestV3,
+  config: ResolvedConfig,
+) {
+  const proto = config.server.https ? 'https' : 'http'
+  const permission = `${proto}://localhost/*`
+  manifest.host_permissions = [
+    ...new Set([...(manifest.host_permissions ?? []), permission]),
+  ]
+}
+
 /**
  * This plugin emits, transforms, renders, and outputs the manifest.
  *
@@ -118,6 +129,7 @@ export const pluginManifest: CrxPluginFn = () => {
   let devHtmlFiles = new Set<string>()
   let refId: string
   let config: ResolvedConfig
+  let nativeContentScriptHmr = false
   let iifeReloadBridgeFileName: string | undefined
   let liveReload = true
 
@@ -139,7 +151,9 @@ export const pluginManifest: CrxPluginFn = () => {
       name: 'crx:manifest-init',
       enforce: 'pre',
       async config(config: UserConfigWithRolldownOptions, env) {
-        const { manifest: _manifest } = await getOptions(config)
+        const opts = await getOptions(config)
+        const { manifest: _manifest } = opts
+        nativeContentScriptHmr = opts.contentScripts?.hmr === 'native'
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
           : _manifest)
@@ -525,6 +539,10 @@ export const pluginManifest: CrxPluginFn = () => {
         if (config.command === 'serve') {
           // plugin-background emits service worker loader in renderCrxManifest
           // vite dev server sends html files through local host
+          if (nativeContentScriptHmr) {
+            addDevServerHostPermission(manifest, config)
+          }
+
           {
             // Get all registered CSS entries
             const cssEntries = getContentCssEntries()
