@@ -1,0 +1,21 @@
+{
+  "description": "Test content script declared in multiple content_scripts entries",
+  "manifest_version": 3,
+  "name": "Content Script Multiple Registrations Test",
+  "version": "1.0.0",
+  "content_scripts": [
+    {
+      "matches": ["https://example.com/*"],
+      "js": ["src/content.ts"],
+      "run_at": "document_end",
+      "world": "MAIN"
+    },
+    {
+      "matches": ["https://www.google.com/*"],
+      "js": ["src/content.ts"],
+      "match_about_blank": true,
+      "run_at": "document_end",
+      "world": "MAIN"
+    }
+  ]
+}
