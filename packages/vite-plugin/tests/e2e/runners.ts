@@ -3,6 +3,7 @@ import path from 'pathe'
 import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'
+import { getOptions } from 'src/plugin-optionsProvider'
 import { afterEach } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
@@ -99,6 +100,12 @@ export async function serve(dirname: string) {
     slowMo: process.env.DEBUG ? 100 : undefined,
     args: chromiumArgs(outDir),
   })) as ChromiumBrowserContext
+
+  const options = await getOptions({ plugins: [...config.plugins] })
+  if (options.contentScripts?.hmr === 'native') {
+    // Native modules load from localhost in the host page's network context.
+    await browser.grantPermissions(['local-network-access'])
+  }
 
   const routes = new Subject<Route>()
   await browser.route('https://example.com', async (route) => {
