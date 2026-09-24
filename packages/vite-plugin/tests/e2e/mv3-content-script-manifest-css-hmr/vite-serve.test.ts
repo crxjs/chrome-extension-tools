@@ -45,6 +45,10 @@ test.skipIf(process.env.CI)(
     await fs.copy(src1, src)
 
     const { browser, routes } = await serve(__dirname)
+    // Native modules load from localhost in the host page's network context.
+    await browser.grantPermissions(['local-network-access'], {
+      origin: 'https://example.com',
+    })
     const page = await browser.newPage()
     const update = createUpdate({ target: src, src: src2 })
 

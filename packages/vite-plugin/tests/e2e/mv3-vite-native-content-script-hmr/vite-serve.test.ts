@@ -13,6 +13,10 @@ test('content script uses native Vite HMR over WebSocket', async () => {
   await fs.copy(src1, src)
 
   const { browser } = await serve(__dirname)
+  // Native modules load from localhost in the host page's network context.
+  await browser.grantPermissions(['local-network-access'], {
+    origin: 'https://example.com',
+  })
   const page = await browser.newPage()
   const app = page.locator('#native-hmr-app')
   const update = createUpdate({ target: src, src: src2 })
