@@ -2,7 +2,7 @@ import { expect, test } from 'vitest'
 import { serve } from '../runners'
 
 test(
-  'favicon URLs work in content script and popup in serve mode',
+  'favicon URLs work in content scripts in serve mode',
   async () => {
     const { browser } = await serve(__dirname)
 

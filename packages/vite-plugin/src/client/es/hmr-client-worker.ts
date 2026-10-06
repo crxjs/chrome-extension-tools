@@ -26,7 +26,8 @@ const crxClientPortName = `@crx/client:${__CRX_HMR_TOKEN__}`
 const ownOrigin = `chrome-extension://${chrome.runtime.id}`
 self.addEventListener('fetch', (fetchEvent) => {
   const url = new URL(fetchEvent.request.url)
-  if (url.origin === ownOrigin) {
+  // Chrome handles the Favicon API directly; it is not a dev-server asset.
+  if (url.origin === ownOrigin && url.pathname !== '/_favicon/') {
     fetchEvent.respondWith(sendToServer(fetchEvent.request))
   }
 })
