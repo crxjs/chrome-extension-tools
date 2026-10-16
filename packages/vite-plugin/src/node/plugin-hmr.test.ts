@@ -49,6 +49,47 @@ describe('getHmrHostConfig', () => {
 
 describe('pluginHMR config hook', () => {
   it.each([
+    { version: '3.2.11', key: 'hmr' },
+    { version: '8.1.0', key: 'ws' },
+  ])('configures native HMR on Vite $version', async ({ version, key }) => {
+    const [plugin] = [pluginHMR()].flat()
+    const configHook = plugin.config
+    if (typeof configHook !== 'function') throw new Error('Missing config hook')
+
+    for (const liveReload of [true, false]) {
+      for (const protocol of [undefined, 'wss'] as const) {
+        const result = await Reflect.apply(
+          configHook,
+          { meta: { viteVersion: version } },
+          [
+            {
+              server: { [key]: { protocol } },
+              plugins: [
+                pluginOptionsProvider({
+                  manifest: {
+                    manifest_version: 3,
+                    name: 'test',
+                    version: '1.0.0',
+                  },
+                  contentScripts: { hmr: 'native' },
+                  liveReload,
+                }),
+              ],
+            },
+            { command: 'serve', mode: 'development' },
+          ],
+        )
+
+        expect(result).toEqual({
+          server: liveReload
+            ? { [key]: { host: 'localhost', protocol: protocol ?? 'ws' } }
+            : { hmr: false },
+        })
+      }
+    }
+  })
+
+  it.each([
     { context: undefined, key: 'hmr' },
     { context: { meta: {} }, key: 'hmr' },
     { context: { meta: { viteVersion: '8.0.0' } }, key: 'hmr' },

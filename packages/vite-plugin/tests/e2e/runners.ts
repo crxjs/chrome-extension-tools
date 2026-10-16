@@ -100,6 +100,9 @@ export async function serve(dirname: string) {
     args: chromiumArgs(outDir),
   })) as ChromiumBrowserContext
 
+  // Allow test pages to access the localhost dev server in modern Chromium.
+  await browser.grantPermissions(['local-network-access'])
+
   const routes = new Subject<Route>()
   await browser.route('https://example.com', async (route) => {
     await route.fulfill({

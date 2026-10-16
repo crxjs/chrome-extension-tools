@@ -1,5 +1,7 @@
 import type { CorsOptions, UserConfig } from 'vite'
 import { expect, test } from 'vitest'
+import type { CrxInputOptions } from './plugin-optionsProvider'
+import { pluginOptionsProvider } from './plugin-optionsProvider'
 import { addExtensionCors, pluginExtensionCors } from './plugin-extensionCors'
 
 type OriginFunction = (
@@ -32,12 +34,23 @@ function checkOrigin(origin: OriginFunction, value: string) {
   })
 }
 
-async function runExtensionCorsConfig(config: UserConfig) {
+const manifest: CrxInputOptions['manifest'] = {
+  manifest_version: 3,
+  name: 'Test Extension',
+  version: '1.0.0',
+}
+
+async function runExtensionCorsConfig(
+  config: UserConfig,
+  options: CrxInputOptions = { manifest },
+) {
   const hook = pluginExtensionCors().config
 
   if (typeof hook !== 'function') {
     throw new Error('Unable to find extension CORS config hook')
   }
+
+  config.plugins = [...(config.plugins ?? []), pluginOptionsProvider(options)]
 
   await hook(config, {
     command: 'serve',
@@ -76,9 +89,9 @@ test('preserves user cors origin functions', async () => {
     }),
   ) as OriginFunction
 
-  await expect(checkOrigin(origin, 'chrome-extension://extension-id')).resolves.toBe(
-    true,
-  )
+  await expect(
+    checkOrigin(origin, 'chrome-extension://extension-id'),
+  ).resolves.toBe(true)
   await expect(checkOrigin(origin, 'https://example.com')).resolves.toBe(true)
   await expect(checkOrigin(origin, 'https://blocked.example')).resolves.toBe(
     false,
@@ -92,4 +105,25 @@ test('plugin applies extension cors to dev server config', async () => {
 
   const origin = getOrigin(config.server!.cors!)
   expect(originAllows(origin, 'chrome-extension://extension-id')).toBe(true)
+})
+
+test('plugin allows content script match origins for native hmr', async () => {
+  const config: UserConfig = {}
+
+  await runExtensionCorsConfig(config, {
+    manifest: {
+      ...manifest,
+      content_scripts: [
+        {
+          matches: ['https://example.com/*'],
+          js: ['src/content.js'],
+        },
+      ],
+    },
+    contentScripts: { hmr: 'native' },
+  })
+
+  const origin = getOrigin(config.server!.cors!)
+  expect(originAllows(origin, 'https://example.com')).toBe(true)
+  expect(originAllows(origin, 'https://other.example')).toBe(false)
 })
