@@ -78,15 +78,19 @@ testVite8.each(['object', 'array'] as const)(
   },
 )
 
-testVite8('preserves explicit output.minify false', async () => {
-  const config = {
-    build: { minify: true, rolldownOptions: { output: { minify: false } } },
-  }
-  for (const code of await buildScripts(config)) {
-    expect(code).toContain('\n')
-    expect(execute(code)).toEqual({ result: 42, logs: [['started']] })
-  }
-})
+testVite8.each([false, true])(
+  'respects explicit output.minify %s over build.minify',
+  async (minify) => {
+    const config = {
+      build: { minify: !minify, rolldownOptions: { output: { minify } } },
+    }
+    const source = `debugger; globalThis.__result = 42;`
+    for (const code of await buildScripts(config, source)) {
+      expect(code.includes('debugger')).toBe(!minify)
+      expect(execute(code)).toEqual({ result: 42, logs: [] })
+    }
+  },
+)
 
 testVite8('inherits Oxc JSX transform options', async () => {
   const config = {
