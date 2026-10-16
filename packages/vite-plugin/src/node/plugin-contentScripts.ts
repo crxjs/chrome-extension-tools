@@ -226,6 +226,10 @@ export const pluginContentScripts: CrxPluginFn = () => {
 
         if (id === contentHmrPortId) {
           const defined = contentHmrPort
+            .replace(
+              '__CRX_DEV_SERVER_PORT__',
+              JSON.stringify(server.config.server.port),
+            )
             .replace('__CRX_HMR_TIMEOUT__', JSON.stringify(hmrTimeout))
             .replace('__CRX_LIVE_RELOAD__', JSON.stringify(liveReload))
             .replace(

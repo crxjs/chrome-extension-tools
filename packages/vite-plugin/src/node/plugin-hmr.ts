@@ -89,6 +89,7 @@ export const pluginHMR: CrxPluginFn = () => {
   let config: ResolvedConfig
   let subs: Subscription
   let liveReload = true
+  let hasSandboxPages = false
 
   return [
     {
@@ -185,6 +186,10 @@ export const pluginHMR: CrxPluginFn = () => {
           }
         }
 
+        // Sandbox modules are emitted locally because their requests bypass
+        // the extension service worker.
+        if (hasSandboxPages) relFiles.forEach((file) => update(file))
+
         // update local vendor build if change detected from monorepo packages
         fsFiles.forEach((file) => update(file))
 
@@ -268,6 +273,7 @@ export const pluginHMR: CrxPluginFn = () => {
       enforce: 'post',
       // get final output manifest for handleHotUpdate 👆
       async transformCrxManifest(manifest) {
+        hasSandboxPages = Boolean(manifest.sandbox?.pages?.length)
         inputManifestFiles = await manifestFiles(manifest, { cwd: config.root })
         return null
       },
