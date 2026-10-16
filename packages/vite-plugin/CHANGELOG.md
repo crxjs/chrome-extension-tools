@@ -1,5 +1,19 @@
 # @crxjs/vite-plugin
 
+## 3.0.1
+
+### Patch Changes
+
+- c8c4945: Let Chrome handle `/_favicon/` requests instead of proxying them to
+  the Vite dev server, so favicons load in extension pages during development.
+- b20fe3f: Preserve Vite 8 output minifier and Oxc transform options when
+  building standalone IIFE content scripts.
+- 604de13: Union match patterns across all content_scripts entries that declare
+  the same script file, so web_accessible_resources covers every registration
+  instead of only the last one (fixes #1233). When the union contains
+  `<all_urls>`, it collapses to just `<all_urls>` since it subsumes every other
+  pattern.
+
 ## 3.0.0
 
 ### Major Changes
