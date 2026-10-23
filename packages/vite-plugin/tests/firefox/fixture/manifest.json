@@ -20,6 +20,11 @@
     {
       "matches": ["http://127.0.0.1/*"],
       "js": ["src/content.js"]
+    },
+    {
+      "matches": ["http://127.0.0.1/*"],
+      "js": ["src/main.js"],
+      "world": "MAIN"
     }
   ]
 }

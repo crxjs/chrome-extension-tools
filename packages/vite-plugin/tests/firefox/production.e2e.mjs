@@ -118,6 +118,13 @@ test(
         15_000,
         'Content script did not run or communicate with the background',
       )
+      await driver.wait(
+        async () =>
+          (await driver.executeScript('return window.crxjsFirefoxMain')) ===
+          '42:main',
+        15_000,
+        'MAIN world module did not import its dependency and execute in the page',
+      )
     } catch (error) {
       await mkdir(artifacts, { recursive: true })
       await writeFile(

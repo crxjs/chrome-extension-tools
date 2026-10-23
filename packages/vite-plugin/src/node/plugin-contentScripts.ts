@@ -5,6 +5,7 @@ import { ConfigEnv, UserConfig, ViteDevServer } from 'vite'
 import {
   contentScripts,
   createDevLoader,
+  createFirefoxMainBridge,
   createDevMainLoader,
   createProLoader,
   createProMainLoader,
@@ -84,6 +85,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
   let preambleCode: string | false | undefined
   let hmrTimeout: number | undefined
   let liveReload = true
+  let firefox = false
   let sub = new Subscription()
 
   const worldMainIds = new Set<string>()
@@ -91,7 +93,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
   const unsupportedWorldMainExternallyConnectableMatches = new Set<string>()
 
   const findWorldMainIds = async (config: UserConfig, env: ConfigEnv) => {
-    const { manifest: _manifest } = await getOptions(config)
+    const { manifest: _manifest, browser } = await getOptions(config)
+    firefox = browser === 'firefox'
 
     const manifest = await (typeof _manifest === 'function'
       ? _manifest(env)
@@ -137,7 +140,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
       apply: 'serve',
       async config(config, env) {
         await findWorldMainIds(config, env)
-        warnUnsupportedWorldMainExternallyConnectableMatches()
+        if (!firefox) warnUnsupportedWorldMainExternallyConnectableMatches()
         const opts = await getOptions(config)
         const { contentScripts = {} } = opts
         hmrTimeout = contentScripts.hmrTimeout ?? 5000
@@ -180,30 +183,34 @@ export const pluginContentScripts: CrxPluginFn = () => {
 
                 const file = add({ type: 'module', id })
                 const loaderFileName = getFileName({ type: 'loader', id })
-                const loader = add({
+                const loaderSource = worldMainIds.has(file.id)
+                  ? createDevMainLoader({
+                      preamble: preamble.fileName
+                        ? asRelativeImport(loaderFileName, preamble.fileName)
+                        : '',
+                      client: asRelativeImport(loaderFileName, client.fileName),
+                      fileName: asRelativeImport(loaderFileName, file.fileName),
+                    })
+                  : createDevLoader({
+                      preamble: preamble.fileName,
+                      client: client.fileName,
+                      fileName: file.fileName,
+                    })
+                let source = loaderSource
+                if (firefox && worldMainIds.has(file.id)) {
+                  const mainModule = `${loaderFileName}.main.js`
+                  add({ type: 'asset', id: mainModule, source: loaderSource })
+                  script.firefoxMainModule = mainModule
+                  source = createFirefoxMainBridge(
+                    mainModule,
+                    getCrxHmrToken(server.config as ResolvedConfigWithHMRToken),
+                  )
+                }
+                script.fileName = add({
                   type: 'asset',
                   id: loaderFileName,
-                  source: worldMainIds.has(file.id)
-                    ? createDevMainLoader({
-                        preamble: preamble.fileName
-                          ? asRelativeImport(loaderFileName, preamble.fileName)
-                          : '',
-                        client: asRelativeImport(
-                          loaderFileName,
-                          client.fileName,
-                        ),
-                        fileName: asRelativeImport(
-                          loaderFileName,
-                          file.fileName,
-                        ),
-                      })
-                    : createDevLoader({
-                        preamble: preamble.fileName,
-                        client: client.fileName,
-                        fileName: file.fileName,
-                      }),
-                })
-                script.fileName = loader.fileName
+                  source,
+                }).fileName
               } else if (type === 'iife') {
                 const file = add({ type: 'iife', id })
                 script.fileName = file.fileName
@@ -229,7 +236,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
             .replace('__CRX_HMR_TIMEOUT__', JSON.stringify(hmrTimeout))
             .replace('__CRX_LIVE_RELOAD__', JSON.stringify(liveReload))
             .replace(
-              '__CRX_HMR_TOKEN__',
+              /__CRX_HMR_TOKEN__/g,
               JSON.stringify(
                 getCrxHmrToken(server.config as ResolvedConfigWithHMRToken),
               ),
@@ -242,6 +249,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
         sub = new Subscription() // can't reuse subscriptions
       },
       transformCrxManifest(manifest) {
+        if (firefox) return null
         if (worldMainExternallyConnectableMatches.size === 0) return null
 
         manifest.externally_connectable = manifest.externally_connectable ?? {}
@@ -274,7 +282,45 @@ export const pluginContentScripts: CrxPluginFn = () => {
         }
       },
       generateBundle(_options, bundle) {
-        finalizeBuildContentScripts(this, bundle, worldMainIds)
+        finalizeBuildContentScripts(this, bundle, worldMainIds, firefox)
+      },
+    },
+    {
+      name: 'crx:firefox-main-world',
+      renderCrxManifest(manifest) {
+        if (!firefox) return null
+        manifest.content_scripts = manifest.content_scripts?.flatMap(
+          (entry) => {
+            if (
+              entry.world !== 'MAIN' ||
+              !entry.js?.some((js) => contentScripts.get(js)?.firefoxMainModule)
+            )
+              return [entry]
+            return (entry.js ?? []).map((js, i) => {
+              const script = contentScripts.get(js)
+              if (!script?.firefoxMainModule)
+                return {
+                  ...entry,
+                  js: [js],
+                  css: i === 0 ? entry.css : undefined,
+                }
+              if (!server) {
+                manifest.web_accessible_resources ??= []
+                manifest.web_accessible_resources.push({
+                  matches: entry.matches ?? [],
+                  resources: [script.firefoxMainModule],
+                })
+              }
+              return {
+                ...entry,
+                js: [js],
+                css: i === 0 ? entry.css : undefined,
+                world: 'ISOLATED' as const,
+              }
+            })
+          },
+        )
+        return manifest
       },
     },
   ]
@@ -305,6 +351,7 @@ export function finalizeBuildContentScripts(
   context: Pick<PluginContext, 'emitFile' | 'getFileName'>,
   bundle: OutputBundle,
   worldMainIds = new Set<string>(),
+  firefox = false,
 ) {
   const processed = new Set<object>()
 
@@ -332,13 +379,27 @@ export function finalizeBuildContentScripts(
 
       if (shouldUseLoader) {
         if (typeof script.loaderName === 'undefined') {
+          let mainModule: string | undefined
+          if (firefox && worldMainIds.has(script.id)) {
+            const mainRef = context.emitFile({
+              type: 'asset',
+              fileName: `${fileName}.main.js`,
+              source: createProMainLoader({
+                fileName: `./${basename(fileName)}`,
+              }),
+            })
+            mainModule = context.getFileName(mainRef)
+            script.firefoxMainModule = mainModule
+          }
           const refId = context.emitFile({
             type: 'asset',
             name: getFileName({
               type: 'loader',
               id: basename(script.id),
             }),
-            source: worldMainIds.has(script.id)
+            source: mainModule
+              ? createFirefoxMainBridge(mainModule)
+              : worldMainIds.has(script.id)
               ? createProMainLoader({
                   fileName: `../${fileName}`,
                 })
