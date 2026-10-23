@@ -1,8 +1,10 @@
 import type { PluginContext } from 'rollup'
-import type { ResolvedConfig } from 'vite'
+import type { ResolvedConfig, UserConfig } from 'vite'
 import { expect, test } from 'vitest'
 import { pluginBackground } from './plugin-background'
 import type { CrxPlugin } from './types'
+import { pluginOptionsProvider } from './plugin-optionsProvider'
+import type { ManifestV3 } from './manifest'
 import { workerClientId } from './virtualFileIds'
 
 test.each([
@@ -59,5 +61,83 @@ test.each([
     expect(client).toBeTypeOf('string')
     expect(client).not.toContain('__LIVE_RELOAD__')
     expect(client).toContain(JSON.stringify(host))
+  },
+)
+
+// Exercise the manifest hook used by real builds, including its browser/mode gate.
+test.each([
+  { browser: 'firefox', command: 'serve', allowed: true, defaultCsp: false },
+  { browser: 'firefox', command: 'serve', allowed: true, defaultCsp: true },
+  { browser: 'firefox', command: 'build', allowed: false, defaultCsp: false },
+  { browser: 'firefox', command: 'build', allowed: false, defaultCsp: true },
+  { browser: 'chrome', command: 'serve', allowed: false, defaultCsp: false },
+] as const)(
+  'localhost CSP is limited to $browser $command (default CSP: $defaultCsp)',
+  async ({ browser, command, allowed, defaultCsp }) => {
+    const plugins = pluginBackground() as CrxPlugin[]
+    const plugin = plugins.find((p) => p.name === 'crx:background-loader-file')!
+    const manifest = {
+      manifest_version: 3,
+      name: 'CSP regression',
+      version: '1.0.0',
+      background:
+        browser === 'firefox'
+          ? { scripts: ['background.js'], type: 'module' }
+          : { service_worker: 'background.js', type: 'module' },
+      content_security_policy: {
+        extension_pages: "script-src 'self'; object-src 'none'",
+        sandbox: "sandbox allow-scripts; script-src 'self'",
+      },
+    } as ManifestV3
+    if (defaultCsp) delete manifest.content_security_policy
+    const config = {
+      command,
+      server: { port: 5173 },
+      plugins: [pluginOptionsProvider({ browser, manifest })],
+    } as unknown as ResolvedConfig
+    if (
+      typeof plugin.config !== 'function' ||
+      typeof plugin.configResolved !== 'function'
+    )
+      throw new Error('Missing configuration hooks')
+    await plugin.config.call({} as never, config as unknown as UserConfig, {
+      command,
+      mode: 'test',
+    })
+    await plugin.configResolved(config)
+    let source = ''
+    const context = {
+      emitFile(asset: { source: string }) {
+        source = asset.source
+        return 'loader'
+      },
+      getFileName() {
+        return 'service-worker-loader.js'
+      },
+    }
+    await plugin.renderCrxManifest!.call(
+      context as unknown as PluginContext,
+      manifest,
+      {},
+    )
+    expect(manifest.content_security_policy?.extension_pages).toBe(
+      allowed
+        ? `script-src 'self' http://localhost:5173; object-src '${
+            defaultCsp ? 'self' : 'none'
+          }'`
+        : defaultCsp
+        ? undefined
+        : "script-src 'self'; object-src 'none'",
+    )
+    expect(manifest.content_security_policy?.sandbox).toBe(
+      defaultCsp ? undefined : "sandbox allow-scripts; script-src 'self'",
+    )
+    if (allowed) {
+      expect(source).toBe(
+        "import 'http://localhost:5173/@vite/env';\n" +
+          `import 'http://localhost:5173${workerClientId}';\n` +
+          "import 'http://localhost:5173/background.js';\n",
+      )
+    }
   },
 )
