@@ -13,7 +13,9 @@ test(
     await app.locator('img').waitFor()
 
     expect(await app.screenshot()).toMatchImageSnapshot({
-      customSnapshotIdentifier: getCustomId(ctx),
+      customSnapshotIdentifier: `${getCustomId(ctx)}${
+        process.env.E2E_BROWSER === 'firefox' ? '-firefox' : ''
+      }`,
     })
   },
   { retry: process.env.CI ? 5 : 0 },

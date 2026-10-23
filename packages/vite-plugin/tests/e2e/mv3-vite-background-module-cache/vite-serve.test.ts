@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import path from 'pathe'
 import type { Page } from 'playwright-chromium'
-import { firstValueFrom } from 'rxjs'
+import { firstValueFrom, timeout } from 'rxjs'
 import { expect, test } from 'vitest'
 import { createUpdate } from '../helpers'
 import { serve } from '../runners'
@@ -35,8 +35,10 @@ test('background dependency update does not duplicate service worker modules', a
   await page.goto('https://example.com')
   await waitForProgressCount(page, 1)
 
-  await update('progress.ts')
-  await firstValueFrom(routes)
+  await Promise.all([
+    firstValueFrom(routes.pipe(timeout(15_000))),
+    update('progress.ts'),
+  ])
   await waitForProgressCount(page, 1)
 
   await new Promise((resolve) => setTimeout(resolve, 500))

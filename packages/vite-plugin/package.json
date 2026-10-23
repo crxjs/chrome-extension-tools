@@ -91,7 +91,6 @@
     "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.26.0",
     "@extend-chrome/messages": "1.2.2",
-    "@extend-chrome/storage": "1.5.0",
     "@playwright/test": "1.61.1",
     "@sveltejs/vite-plugin-svelte": "1.4.0",
     "@types/chrome": "0.0.237",

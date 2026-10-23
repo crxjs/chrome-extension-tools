@@ -291,9 +291,6 @@ importers:
       '@extend-chrome/messages':
         specifier: 1.2.2
         version: 1.2.2
-      '@extend-chrome/storage':
-        specifier: 1.5.0
-        version: 1.5.0
       '@playwright/test':
         specifier: 1.61.1
         version: 1.61.1

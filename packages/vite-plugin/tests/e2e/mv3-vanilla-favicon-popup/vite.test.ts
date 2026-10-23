@@ -2,7 +2,11 @@ import { expect, test } from 'vitest'
 import { getServiceWorker } from '../helpers'
 import { build, serve } from '../runners'
 
-test.each(['serve', 'build'] as const)(
+// Firefox has no Chrome /_favicon/ endpoint or favicon permission.
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1315616
+test
+  .skipIf(process.env.E2E_BROWSER === 'firefox')
+  .each(['serve', 'build'] as const)(
   'Chrome handles popup favicons in %s mode',
   async (mode) => {
     const result = await (mode === 'serve'

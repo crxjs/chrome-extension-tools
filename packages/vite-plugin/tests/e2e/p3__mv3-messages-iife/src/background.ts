@@ -2,7 +2,6 @@
 declare const self: ServiceWorkerGlobalScope
 
 import { bgCheckStream, sendBgOk } from './messages'
-import { tabIds } from './storage'
 
 console.log('service worker')
 
@@ -21,6 +20,12 @@ bgCheckStream.subscribe(async ([, { tab }, respond]) => {
   respond({ id })
   await sendBgOk(undefined, { tabId: id })
 
-  await tabIds.set({ id })
+  await new Promise<void>((resolve, reject) => {
+    chrome.storage.local.set({ tabIds: { id } }, () => {
+      if (chrome.runtime.lastError)
+        reject(new Error(chrome.runtime.lastError.message))
+      else resolve()
+    })
+  })
   await openOptionsPage()
 })
