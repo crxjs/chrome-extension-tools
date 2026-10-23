@@ -214,3 +214,80 @@ jobs:
         with:
           name: image-diff-${{ matrix.os }}-vite-${{ matrix.vite-version }}
           path: ${{ github.workspace }}/packages/vite-plugin/tests/**/__image_snapshots__/__diff_output__/*.png
+
+  firefox:
+    name: Firefox E2E (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
+    needs: [lint, unit-output, compat, e2e]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        vite-version: ["3", "6", "7", "8.1"]
+    defaults:
+      run:
+        working-directory: packages/vite-plugin
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - name: Install dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+        run: pnpm install --frozen-lockfile --filter @crxjs/vite-plugin --ignore-scripts
+
+      - name: Build plugin (always on Vite 3)
+        run: pnpm build
+
+      - name: Install Vite ${{ matrix.vite-version }} for testing
+        if: matrix.vite-version != '3'
+        run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
+
+      - name: Install Firefox
+        id: firefox
+        uses: browser-actions/setup-firefox@0bc507ddf224827e3b1af68e014d5e42ab93e795 # v1
+        with:
+          firefox-version: latest
+
+      - name: Run Firefox production extension tests
+        env:
+          FIREFOX_BINARY: ${{ steps.firefox.outputs.firefox-path }}
+        run: pnpm test:firefox
+
+      - name: Install Playwright Firefox
+        run: pnpm exec playwright install --with-deps firefox
+
+      - name: Install React plugin for Vite 8.x
+        if: startsWith(matrix.vite-version, '8')
+        run: pnpm add -D @vitejs/plugin-react@5.2.0 --ignore-scripts
+
+      # Exploratory coverage: preserve every assertion and publish failures.
+      # The next step fails the job if discovery/execution did not finish.
+      - name: Run all shared E2E scenarios in Firefox
+        id: firefox-suite
+        continue-on-error: true
+        run: pnpm test:firefox:e2e
+
+      - name: Verify complete execution and publish results
+        if: always() && steps.firefox-suite.outcome != 'skipped'
+        run: pnpm test:firefox:report
+
+      - name: Upload Firefox diagnostics and full results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: firefox-${{ matrix.os }}-vite-${{ matrix.vite-version }}
+          path: |
+            packages/vite-plugin/tests/firefox/artifacts/
+            packages/vite-plugin/tests/e2e/**/__image_snapshots__/__diff_output__/*.png
+          retention-days: 7
