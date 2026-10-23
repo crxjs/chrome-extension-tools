@@ -20,6 +20,19 @@ The OpenPolyfill migration removes the DuckDuckGo harness and its network helper
 
 The first full run after migration reported 69 passed / 2 failed / 7 skipped. Both failures were 15-second Firefox launch timeouts before scenario assertions; the React sandbox passed. A second run was stopped after further startup timeouts and the previously observed duplicate content-script element. The final adapter removes the inherited 15-second launch override and uses Playwright's default launch timeout. It does not add retries or weaken assertions; the duplicate-content-script intermittency is not claimed fixed.
 
+## CI installer follow-up
+
+CI for `1d4ab03f` exposed an installer collision: `pnpm exec playwright` resolved to
+`playwright-chromium` 1.61.1 and installed Firefox revision 1532, while OpenPolyfill
+required revision 1555 from `@playwright/test` 1.64.1. The suite stopped before
+executing tests because the expected `omni.ja` was absent.
+
+The Firefox job and reproduction instructions now invoke `@playwright/test/cli.js`
+explicitly. A fresh local browser-cache installation selected Firefox 157.0; the
+complete headless suite then passed **71 / 0 / 7** in 4m35s, with all 72 files
+reported and no setup/unhandled errors. No product code or assertions changed.
+Linux CI remains a separate verification of this installer correction.
+
 ## Fixes and fixture corrections
 
 - **CRXJS Firefox sandbox modules:** Firefox's opaque sandbox origin cannot load private extension modules. Build output now exposes only the sandbox entry and its transitive JS/CSS/assets through explicit web-accessible resource filenames. The regression checks React rendering, origin `null`, unavailable extension APIs, no wildcard or background exposure, and unchanged Chromium output.

@@ -11,11 +11,14 @@ Use Node.js 22 (matching CI). From the repository root:
 
 ```sh
 PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --frozen-lockfile --ignore-scripts
-pnpm -C packages/vite-plugin exec playwright install --with-deps firefox
+pnpm -C packages/vite-plugin exec node node_modules/@playwright/test/cli.js install --with-deps firefox
 pnpm -C packages/vite-plugin test:firefox:e2e
 # Run even when the test command exits nonzero:
 pnpm -C packages/vite-plugin test:firefox:report
 ```
+
+The installer explicitly uses `@playwright/test/cli.js`: the shared `playwright`
+command can resolve to the older Chromium dependency and download the wrong Firefox.
 
 `test:firefox:e2e` runs the same Vitest discovery, fixture sources and assertions
 as `test:run:e2e`, sequentially in the main Vitest process (`--threads false`)

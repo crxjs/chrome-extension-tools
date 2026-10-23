@@ -265,7 +265,9 @@ jobs:
         run: pnpm test:firefox
 
       - name: Install Playwright Firefox
-        run: pnpm exec playwright install --with-deps firefox
+        # Both playwright-chromium and @playwright/test provide a playwright bin.
+        # Use the Firefox runner's package explicitly to install its revision.
+        run: node node_modules/@playwright/test/cli.js install --with-deps firefox
 
       - name: Install React plugin for Vite 8.x
         if: startsWith(matrix.vite-version, '8')
