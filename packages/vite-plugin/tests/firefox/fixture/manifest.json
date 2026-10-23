@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "CRXJS Firefox production E2E",
+  "version": "1.0.0",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "production-e2e@crxjs.test"
+    }
+  },
+  "background": {
+    "scripts": ["src/background.js"],
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "content_scripts": [
+    {
+      "matches": ["http://127.0.0.1/*"],
+      "js": ["src/content.js"]
+    }
+  ]
+}

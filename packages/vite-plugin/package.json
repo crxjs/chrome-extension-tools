@@ -65,7 +65,10 @@
     "test:vite-matrix": "node scripts/run-vite-matrix.mjs",
     "test:vite-matrix:compat": "node scripts/run-vite-matrix.mjs --mode compat",
     "test:vite-matrix:e2e": "node scripts/run-vite-matrix.mjs --mode e2e",
-    "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
+    "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\"",
+    "test:firefox": "node --test tests/firefox/production.e2e.mjs",
+    "test:firefox:e2e": "node tests/firefox/run-suite.mjs",
+    "test:firefox:report": "node tests/firefox/report.mjs"
   },
   "dependencies": {
     "@webcomponents/custom-elements": "^1.5.0",
@@ -89,6 +92,7 @@
     "@eslint/js": "9.26.0",
     "@extend-chrome/messages": "1.2.2",
     "@extend-chrome/storage": "1.5.0",
+    "@playwright/test": "1.61.1",
     "@sveltejs/vite-plugin-svelte": "1.4.0",
     "@types/chrome": "0.0.237",
     "@types/convert-source-map": "^2.0.0",
@@ -108,6 +112,7 @@
     "esbuild": "0.17.14",
     "eslint": "9.26.0",
     "eslint-plugin-react": "^7.29.4",
+    "firefox-webext-playwright-harness": "https://codeload.github.com/duckduckgo/firefox-webext-playwright-harness/tar.gz/1df36079857205ba6ae995ff5936124ecdc32896",
     "i18next": "25.10.10",
     "jest-image-snapshot": "^5.2.0",
     "npm-run-all": "^4.1.5",
@@ -116,6 +121,7 @@
     "react-dom": "17.0.2",
     "react-i18next": "16.6.6",
     "rollup-plugin-esbuild": "4.10.3",
+    "selenium-webdriver": "4.51.0",
     "svelte": "^3.48.0",
     "tsdown": "^0.23.0",
     "type-fest": "^5.1.0",
