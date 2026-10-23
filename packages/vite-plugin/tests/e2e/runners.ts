@@ -1,7 +1,6 @@
 import fs from 'fs-extra'
 import path from 'pathe'
 import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
-import { launchFirefox } from '../firefox/runner'
 import { Subject } from 'rxjs'
 import type { RollupWatcher, RollupWatcherEvent } from 'rollup'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'
@@ -104,7 +103,7 @@ export async function build(dirname: string) {
   await prepareBrowserProfile(dataDir)
   browser =
     process.env.E2E_BROWSER === 'firefox'
-      ? await launchFirefox(outDir)
+      ? await (await import('../firefox/runner')).launchFirefox(outDir)
       : ((await chromium.launchPersistentContext(dataDir, {
           headless: false,
           slowMo: process.env.DEBUG ? 100 : undefined,
@@ -133,7 +132,7 @@ export async function serve(dirname: string) {
   await prepareBrowserProfile(dataDir)
   browser =
     process.env.E2E_BROWSER === 'firefox'
-      ? await launchFirefox(outDir)
+      ? await (await import('../firefox/runner')).launchFirefox(outDir)
       : ((await chromium.launchPersistentContext(dataDir, {
           headless: false,
           slowMo: process.env.DEBUG ? 100 : undefined,

@@ -5,6 +5,8 @@ settings:
   excludeLinksFromLockfile: false
   injectWorkspacePackages: true
 
+packageExtensionsChecksum: sha256-/rChMmZgnSWhy3iZZaBI3Gx5q9R95DmvhppHzSjcPQU=
+
 importers:
 
   .:
@@ -45,7 +47,7 @@ importers:
         version: 11.0.1
       vitest:
         specifier: 0.34.6
-        version: 0.34.6(jsdom@16.7.0)(playwright@1.61.1)(terser@5.44.1)
+        version: 0.34.6(jsdom@16.7.0)(playwright@1.64.1)(terser@5.44.1)
 
   packages/rollup-plugin:
     dependencies:
@@ -291,9 +293,12 @@ importers:
       '@extend-chrome/messages':
         specifier: 1.2.2
         version: 1.2.2
+      '@openpolyfill/firefox-addon-playwright-harness':
+        specifier: 0.3.0
+        version: 0.3.0(@playwright/test@1.64.1)
       '@playwright/test':
-        specifier: 1.61.1
-        version: 1.61.1
+        specifier: 1.64.1
+        version: 1.64.1
       '@sveltejs/vite-plugin-svelte':
         specifier: 1.4.0
         version: 1.4.0(svelte@3.59.2)(vite@3.2.11(@types/node@20.19.43)(terser@5.44.1))
@@ -351,9 +356,6 @@ importers:
       eslint-plugin-react:
         specifier: ^7.29.4
         version: 7.37.5(eslint@9.26.0(jiti@2.6.1))
-      firefox-webext-playwright-harness:
-        specifier: https://codeload.github.com/duckduckgo/firefox-webext-playwright-harness/tar.gz/1df36079857205ba6ae995ff5936124ecdc32896
-        version: https://codeload.github.com/duckduckgo/firefox-webext-playwright-harness/tar.gz/1df36079857205ba6ae995ff5936124ecdc32896(@playwright/test@1.61.1)
       i18next:
         specifier: 25.10.10
         version: 25.10.10(typescript@5.8.3)
@@ -404,7 +406,7 @@ importers:
         version: 0.7.25(rollup@2.80.0)(vite@3.2.11(@types/node@20.19.43)(terser@5.44.1))
       vitest:
         specifier: 0.34.6
-        version: 0.34.6(jsdom@16.7.0)(playwright@1.61.1)(terser@5.44.1)
+        version: 0.34.6(jsdom@16.7.0)(playwright@1.64.1)(terser@5.44.1)
       vue:
         specifier: 3.2.47
         version: 3.2.47
@@ -1865,12 +1867,22 @@ packages:
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
 
+  '@openpolyfill/firefox-addon-playwright-harness@0.3.0':
+    resolution: {integrity: sha512-KFKX3uVUq7RcaSeRUi4MAJ45xdZws+uQmvbOIxJyydkvLJEIf8RS1cUZeFG6DuXiZa1gwLhnz+KZ8BDyBxgDSQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@playwright/test': '>=1.40'
+
+  '@openpolyfill/firefox-rdp@0.1.0':
+    resolution: {integrity: sha512-kcWRyJrjt8DGa8J7JA9D5YylZ88F3jfWV2Iy8RksOFgEeOrtuMjo7l+pHDhe3DTVG3MXmBppZEuDDheSVHrE0A==}
+    engines: {node: '>=20'}
+
   '@oxc-project/types@0.148.0':
     resolution: {integrity: sha512-Nm4s/jB+4FpFsPhWGEC4h7rzksesmtnMXomo6rCMcg/b8zLQuOziRgkCS1fxDCXOlJB/6Q8oABOZ/OP6RIPj9A==}
 
-  '@playwright/test@1.61.1':
-    resolution: {integrity: sha512-8nKv6+0RJSL9FE4jYOEGXnPeM/Hg12qZpmqzZjRh3qM0Y7c3z1mrOTfFLids72RDQYVh9WpLEfR5WdpNX4fkig==}
-    engines: {node: '>=18'}
+  '@playwright/test@1.64.1':
+    resolution: {integrity: sha512-IaYGml/nSOiZWROfPtuIL7neuu9qDOZ3TNvNljUIrhDMxiGTgPjzj/g9p9RxpS2tSepPDRY+UwAaEeiKtUvIAg==}
+    engines: {node: '>=20'}
     hasBin: true
 
   '@polka/url@1.0.0-next.29':
@@ -3590,6 +3602,10 @@ packages:
     resolution: {integrity: sha512-uIFDxqpRZGZ6ThOk84hEfqWoHx2devRFvpTZcTHur85vImfaxUbTW9Ryh4CpCuDnToOP1CEtXKIgytHBPVff5A==}
     engines: {node: '>=0.3.1'}
 
+  diff@8.0.4:
+    resolution: {integrity: sha512-DPi0FmjiSU5EvQV0++GFDOJ9ASQUVFh5kD+OzOnYdi7n3Wpm9hWWGfB/O2blfHcMVTL5WkQXSnRiK9makhrcnw==}
+    engines: {node: '>=0.3.1'}
+
   dir-glob@3.0.1:
     resolution: {integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA==}
     engines: {node: '>=8'}
@@ -4089,12 +4105,6 @@ packages:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
 
-  firefox-webext-playwright-harness@https://codeload.github.com/duckduckgo/firefox-webext-playwright-harness/tar.gz/1df36079857205ba6ae995ff5936124ecdc32896:
-    resolution: {tarball: https://codeload.github.com/duckduckgo/firefox-webext-playwright-harness/tar.gz/1df36079857205ba6ae995ff5936124ecdc32896}
-    version: 0.3.0
-    peerDependencies:
-      '@playwright/test': '*'
-
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
@@ -4144,11 +4154,6 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
-
-  fsevents@2.3.2:
-    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -5674,9 +5679,14 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.61.1:
-    resolution: {integrity: sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==}
-    engines: {node: '>=18'}
+  playwright-core@1.64.1:
+    resolution: {integrity: sha512-BC4s8y6SEVA6Q1rSxZTto8hI1KUI3xXlHGZgvGqP4IqPdI/a6FX9H29IDNz7vKo9l21b6LfYosScPL6M3xxyDQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.1:
+    resolution: {integrity: sha512-HCrVhHr5QQuwYoswEUGTb7gGp522yflbv/ST8nF4sFWGuLjQCt17Q/EubpGGSNKYn1tsTCPZxqHhHCfVURu7UA==}
+    engines: {node: '>=20'}
     hasBin: true
 
   pngjs@3.4.0:
@@ -8790,11 +8800,21 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
+  '@openpolyfill/firefox-addon-playwright-harness@0.3.0(@playwright/test@1.64.1)':
+    dependencies:
+      '@openpolyfill/firefox-rdp': 0.1.0
+      '@playwright/test': 1.64.1
+      diff: 8.0.4
+      jszip: 3.10.2
+      playwright-core: 1.64.1
+
+  '@openpolyfill/firefox-rdp@0.1.0': {}
+
   '@oxc-project/types@0.148.0': {}
 
-  '@playwright/test@1.61.1':
+  '@playwright/test@1.64.1':
     dependencies:
-      playwright: 1.61.1
+      playwright: 1.64.1
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -10713,6 +10733,8 @@ snapshots:
 
   diff@5.2.0: {}
 
+  diff@8.0.4: {}
+
   dir-glob@3.0.1:
     dependencies:
       path-type: 4.0.0
@@ -11366,11 +11388,6 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  firefox-webext-playwright-harness@https://codeload.github.com/duckduckgo/firefox-webext-playwright-harness/tar.gz/1df36079857205ba6ae995ff5936124ecdc32896(@playwright/test@1.61.1):
-    dependencies:
-      '@playwright/test': 1.61.1
-      jszip: 3.10.2
-
   flat-cache@4.0.1:
     dependencies:
       flatted: 3.3.3
@@ -11426,9 +11443,6 @@ snapshots:
       universalify: 2.0.1
 
   fs.realpath@1.0.0: {}
-
-  fsevents@2.3.2:
-    optional: true
 
   fsevents@2.3.3:
     optional: true
@@ -13462,11 +13476,11 @@ snapshots:
 
   playwright-core@1.61.1: {}
 
-  playwright@1.61.1:
+  playwright-core@1.64.1: {}
+
+  playwright@1.64.1:
     dependencies:
-      playwright-core: 1.61.1
-    optionalDependencies:
-      fsevents: 2.3.2
+      playwright-core: 1.64.1
 
   pngjs@3.4.0: {}
 
@@ -14828,7 +14842,7 @@ snapshots:
     optionalDependencies:
       vite: 6.4.1(@types/node@26.0.0)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.2)
 
-  vitest@0.34.6(jsdom@16.7.0)(playwright@1.61.1)(terser@5.44.1):
+  vitest@0.34.6(jsdom@16.7.0)(playwright@1.64.1)(terser@5.44.1):
     dependencies:
       '@types/chai': 4.3.20
       '@types/chai-subset': 1.3.6(@types/chai@4.3.20)
@@ -14856,7 +14870,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       jsdom: 16.7.0
-      playwright: 1.61.1
+      playwright: 1.64.1
     transitivePeerDependencies:
       - less
       - sass

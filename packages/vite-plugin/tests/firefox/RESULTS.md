@@ -1,6 +1,6 @@
 # Local Firefox compatibility results
 
-Local full run on 2026-10-23, macOS arm64, Node 22.23.3, Vite 3.2.11, Playwright 1.61.1 / patched Firefox 151.0. See [README.md](./README.md) for reproduction and the experimental harness.
+Local full run on 2026-10-23, macOS arm64, Node 22.23.3, Vite 3.2.11, OpenPolyfill 0.3.0, Playwright 1.64.1 / patched Firefox 157.0. See [README.md](./README.md) for reproduction and the experimental harness.
 
 **72 files / 78 tests: 71 passed, 0 failed, 7 skipped.** Previous complete run: 61 passed / 12 failed / 4 skipped (77 tests). This run adds one regression test for exactly one MAIN-world page reload after a background restart.
 
@@ -10,17 +10,19 @@ This table records one complete awake run, not a combination of isolated retries
 
 ## Validation
 
-- Full Firefox suite: 2 minutes 46 seconds, exit 0. Completeness verification: all 72 files reported, no setup failures, no unhandled errors, no crash.
-- Full Chromium suite: 72 files / 78 tests, 74 passed / 0 failed / 4 existing skips, 1 minute 34 seconds. Includes the retained Chrome-only expected-failure regression assertions.
-- Prior product-change validation (not rerun for this fixture-only change): unit/output: 170 passed, 1 existing skip. Package build, TypeScript, targeted ESLint, report syntax and diff checks passed.
-- Prior product-change validation: unmodified Firefox 152.0.6 production smoke passed, including MAIN module import/onExecute and a page-global assertion, alongside background/popup and isolated content-script checks.
+- Full Firefox suite: 4 minutes 31 seconds, exit 0. Completeness verification: all 72 files reported, no setup failures, no unhandled errors, no crash.
+- Full Chromium suite: 72 files / 78 tests, 74 passed / 0 failed / 4 existing skips, 1 minute 55 seconds. Includes the retained Chrome-only expected-failure regression assertions.
+- Unit/output: 170 passed, 1 existing skip, 45 seconds. A separate built-package check also verified a static Firefox sandbox without module scripts exposes no unrelated assets. Package build, TypeScript, targeted ESLint, report syntax and diff checks passed.
+- Unmodified Firefox 152.0.6 production smoke passed, including MAIN module import/onExecute and a page-global assertion, alongside background/popup and isolated content-script checks.
 - The new Linux/Vite CI matrix result remains pending; this report is local evidence.
 
-The native-storage follow-up was validated with fresh full headless Firefox and Chromium runs, plus TypeScript and targeted ESLint. Rollup fixtures and dependencies are unchanged. The existing IIFE messaging cases remain skipped; the active ESM messaging cases passed in both browsers.
+The OpenPolyfill migration removes the DuckDuckGo harness and its network helper. Chromium keeps its existing Playwright dependency and runner. Rollup fixtures and dependencies are unchanged.
 
-Earlier local attempts were not clean: the first had two Firefox launch timeouts and exposed a missed ESM fixture dependency, which was then removed. The second had a duplicate `#app` in the background-module-cache scenario (70 passed / 1 failed / 7 skipped). The final full run passed without changing that test or its timeouts; the intermittent duplicate-content-script behavior is not claimed fixed by this storage change.
+The first full run after migration reported 69 passed / 2 failed / 7 skipped. Both failures were 15-second Firefox launch timeouts before scenario assertions; the React sandbox passed. A second run was stopped after further startup timeouts and the previously observed duplicate content-script element. The final adapter removes the inherited 15-second launch override and uses Playwright's default launch timeout. It does not add retries or weaken assertions; the duplicate-content-script intermittency is not claimed fixed.
 
 ## Fixes and fixture corrections
+
+- **CRXJS Firefox sandbox modules:** Firefox's opaque sandbox origin cannot load private extension modules. Build output now exposes only the sandbox entry and its transitive JS/CSS/assets through explicit web-accessible resource filenames. The regression checks React rendering, origin `null`, unavailable extension APIs, no wildcard or background exposure, and unchanged Chromium output.
 
 - **CRXJS MAIN modules:** Firefox resolved content-loader relative imports against the host page. An isolated bootstrap now inserts a module with an extension URL, giving imports the correct base while executing user code in MAIN. Production bootstrap resources retain the original registration match patterns. Native MAIN IIFE injection is unchanged.
 - **CRXJS MAIN HMR:** Firefox lacks Chrome webpage runtime messaging. A dev-only, one-way bridge forwards extension HMR notifications into MAIN. Page code can request a connected notification but cannot relay extension commands. Existing vanilla/React HMR and page-chrome-mutation assertions pass without replacing HMR with reloads. A new regression checks exactly one reload when the background changes.

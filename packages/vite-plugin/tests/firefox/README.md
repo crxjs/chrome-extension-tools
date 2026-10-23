@@ -37,21 +37,33 @@ accepts `moz-extension://`. A Firefox background page
 provides the `evaluate()` operations used by the shared service-worker helper;
 this does **not** establish Chromium service-worker lifecycle parity.
 
-The runner uses DuckDuckGo's experimental
-[firefox-webext-playwright-harness](https://github.com/duckduckgo/firefox-webext-playwright-harness),
-pinned to commit `1df36079857205ba6ae995ff5936124ecdc32896`, with Playwright 1.61.1.
-It installs real temporary extensions through Mozilla's RDP client from
-`web-ext`. Content-script-only production fixtures use that client directly,
-since the upstream harness requires a background page. Each test gets an isolated
-profile and debugger port; cleanup closes the browser, RDP connection, helper
-server and profile, including after assertion failures.
+The runner uses [OpenPolyfill](https://github.com/OpenPolyfill/FirefoxAddonPlaywrightHarness),
+pinned to `@openpolyfill/firefox-addon-playwright-harness` 0.3.0 and Playwright 1.64.1.
+It installs temporary extensions through Firefox RDP, including fixtures without a
+background. Each test gets an isolated profile and debugger port. The small adapter
+maps background evaluation to the shared worker helper and follows replacement
+background targets after runtime reloads; it never replays in-flight evaluations.
 
-**This is an experimental test environment.** The library patches the downloaded
-Playwright Firefox binary (`omni.ja` and `playwright.cfg`) to expose extension pages
-and enable its privileged network helper. It does not modify the system Firefox,
-but it does modify Playwright's cached Firefox installation. It does not disable
-the extension's CSP. These results are distinct from the stock-Firefox smoke test
-below. Updating Playwright or the pinned harness requires rerunning this suite.
+`run-suite.mjs` explicitly applies the harness patches through `setup.mjs`, so
+installation with `--ignore-scripts` works in CI. For direct Vitest diagnosis, run
+`node tests/firefox/setup.mjs` first. The root pnpm package extension supplies the
+harness's undeclared `playwright-core` dependency at the matching pinned version;
+otherwise pnpm may resolve an unrelated hoisted version. Chromium keeps using its
+existing `playwright-chromium` dependency and does not import the Firefox runner.
+
+**This is an experimental test environment.** OpenPolyfill patches Playwright's
+selector bundle and cached Firefox resources (`omni.ja` and `playwright.cfg`).
+It does not modify system Firefox or disable extension CSP. It has no DuckDuckGo
+network helper or local interception server. These results remain distinct from
+the unmodified-Firefox smoke below. Upgrading either pinned package requires
+rechecking patch compatibility and the complete suite.
+
+Firefox sandbox pages use an opaque origin. Production builds expose only their
+bundled dependency graphs as web-accessible resources, with `<all_urls>` matching
+because their opaque origin cannot match an extension origin. Unrelated background
+entries remain private. The sandbox test asserts rendered React content, origin
+`null`, unavailable extension APIs, and absence of wildcard/background resources.
+Chromium output is unchanged.
 
 Three Chrome Favicon API assertions are explicitly skipped in Firefox: Firefox
 has no `/_favicon/` endpoint or `favicon` permission ([Mozilla tracking issue](https://bugzilla.mozilla.org/show_bug.cgi?id=1315616)).
