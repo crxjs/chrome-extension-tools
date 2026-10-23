@@ -112,8 +112,10 @@ complete shared suite on Linux with Vite 3, 6, 7 and 8.1. The shared suite is
 **advisory while compatibility is being established**: failed assertions remain
 visible in the step output, job summary, JSON report and image-diff artifacts.
 They do not block the matrix job. The subsequent report step fails the job if any
-test file was not reported, a suite failed to collect, browser/extension setup failed, or Vitest reported
-runtime errors. Missing/invalid reports also fail. There is no failure allowlist.
+test file was not reported, a suite failed to collect, browser/extension setup still failed after the configured attempts, or Vitest reported
+runtime errors. Missing/invalid reports also fail. Earlier errors from tests that
+passed an existing retry remain visible in the report, but do not indicate missing
+execution. This runner adds no retries. There is no failure allowlist.
 
 The stock-Firefox smoke test remains required. Artifacts are uploaded for every
 run and retained for seven days. The job has a 90-minute upper bound because all

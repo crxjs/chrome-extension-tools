@@ -24,6 +24,14 @@ const results = report.testResults.flatMap((file) =>
     error: test.failureMessages.join('\n'),
   })),
 )
+// Vitest retains errors from earlier attempts even when an existing retry passes.
+const setupFailures = results.filter(
+  (test) =>
+    test.status !== 'passed' && test.error.includes('Firefox setup failed:'),
+)
+const recovered = results.filter(
+  (test) => test.status === 'passed' && test.error,
+)
 function testFiles(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(dir, entry.name)
@@ -72,12 +80,14 @@ const lines = [
     (t) => `| ${t.status} | ${escaped(t.file)} | ${escaped(t.name)} |`,
   ),
   '',
-  '## Failure details',
+  `Passed after an earlier failed attempt: ${recovered.length}.`,
+  '',
+  '## Failure and retry details',
   '',
   ...results
-    .filter((t) => t.status === 'failed')
+    .filter((t) => t.status === 'failed' || t.error)
     .flatMap((t) => [
-      `### ${t.file}: ${t.name}`,
+      `### ${t.file}: ${t.name} (${t.status})`,
       '',
       '```text',
       t.error
@@ -93,7 +103,7 @@ if (process.env.GITHUB_STEP_SUMMARY)
   appendFileSync(process.env.GITHUB_STEP_SUMMARY, markdown)
 console.log(lines.slice(0, 4).join('\n'))
 if (
-  results.some((test) => test.error.includes('Firefox setup failed:')) ||
+  setupFailures.length ||
   execution.fileCount !== expectedFiles.length ||
   execution.unhandledErrors.length ||
   ![0, 1].includes(run.status) ||
@@ -104,9 +114,7 @@ if (
   !results.length
 ) {
   console.error('Firefox execution verification failed', {
-    setupFailures: results
-      .filter((test) => test.error.includes('Firefox setup failed:'))
-      .map((test) => test.file),
+    setupFailures: setupFailures.map((test) => test.file),
     missing,
     empty: empty.map((f) => f.name),
     execution,

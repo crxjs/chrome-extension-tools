@@ -33,6 +33,37 @@ complete headless suite then passed **71 / 0 / 7** in 4m35s, with all 72 files
 reported and no setup/unhandled errors. No product code or assertions changed.
 Linux CI remains a separate verification of this installer correction.
 
+## Navigation and report follow-up
+
+CI for `c9da23f8` completed every suite. Firefox/Vite 3 and 6 reported 67 passed,
+1 failed, 10 existing skips; both failures were duplicate `#app` elements in the
+background-module-cache test. Vite 7 and 8.1 reported 68 passed / 0 failed / 10
+skipped. Vite 8.1's execution check incorrectly failed on errors retained from
+successful retries (`listAddons` setup errors in three tests).
+
+The background test now waits for page navigation to finish instead of just the
+HTTP route being fulfilled. A local probe confirmed the old route notification
+arrived before the new document finished loading. Strict single-element and
+single-response assertions remain unchanged. The reporter checks final setup
+status and retains earlier attempt errors in an explicit retry-details section.
+
+Validation after these corrections:
+
+- Full local headless Chromium: 74 passed / 0 failed / 4 skipped (2m03s).
+- Full local headless Firefox with `CI=true`, matching CI conditions: 68 passed /
+  0 failed / 10 skipped (3m15s), all 72 files reported, no retained attempt errors
+  or unhandled errors. The three extra skips are existing CI-only HMR exclusions.
+- Two preceding non-CI Firefox runs each had 68 passed / 3 timeouts / 7 skipped
+  in partially different scenarios. Focused checks passed afterwards. These
+  intermittent local failures are not claimed fixed by the navigation change.
+- Replayed the actual Vite 8.1 JSON artifact through the reporter: accepted the
+  final passed results and preserved all four tests' earlier error histories.
+  Separate corrupted inputs with a final setup failure, missing test file, or
+  unhandled error still failed the verification.
+
+No new retries, skips, assertion relaxations, product or harness changes were
+introduced in this follow-up. Remote validation of these corrections is pending.
+
 ## Fixes and fixture corrections
 
 - **CRXJS Firefox sandbox modules:** Firefox's opaque sandbox origin cannot load private extension modules. Build output now exposes only the sandbox entry and its transitive JS/CSS/assets through explicit web-accessible resource filenames. The regression checks React rendering, origin `null`, unavailable extension APIs, no wildcard or background exposure, and unchanged Chromium output.
