@@ -34,7 +34,25 @@ export class HMRPort {
   private port: chrome.runtime.Port | undefined
   private callbacks = new Map<string, Set<(event: any) => void>>()
 
+  private readonly mainBridge =
+    !connectsToOwnRuntime &&
+    location.protocol !== 'moz-extension:' &&
+    import.meta.url.startsWith('moz-extension:')
+
   constructor() {
+    if (this.mainBridge) {
+      window.addEventListener('message', (event) => {
+        if (
+          event.source === window &&
+          event.data?.channel === `@crx/main:${__CRX_HMR_TOKEN__}` &&
+          typeof event.data?.data === 'string'
+        )
+          this.handleMessage(event.data)
+      })
+      // Vite attaches message listeners after construction.
+      queueMicrotask(this.initPort)
+      return
+    }
     /**
      * To keep extension background alive:
      *
@@ -59,6 +77,13 @@ export class HMRPort {
   }
 
   initPort = () => {
+    if (this.mainBridge) {
+      window.postMessage(
+        { channel: `@crx/main:${__CRX_HMR_TOKEN__}`, ready: true },
+        '*',
+      )
+      return
+    }
     if (!runtime) throw new Error('[crx] chrome.runtime is not available')
 
     const connectInfo = { name: crxClientPortName }
@@ -116,6 +141,8 @@ export class HMRPort {
   }
 
   send = (data: string) => {
+    // Vite's keepalive/connected messages need no privileged forwarding.
+    if (this.mainBridge) return
     if (this.port) this.port.postMessage({ data })
     else throw new Error('HMRPort is not initialized')
   }

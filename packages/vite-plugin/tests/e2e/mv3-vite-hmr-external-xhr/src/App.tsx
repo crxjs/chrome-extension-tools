@@ -1,9 +1,11 @@
 import React from 'react'
 
+declare const __TEST_API_URL__: string
+
 const App: React.FC = () => {
   const [ok, setOk] = React.useState(false)
   React.useEffect(() => {
-    fetch('http://mock-api-route.test/')
+    fetch(__TEST_API_URL__)
       .then((res) => {
         return res.text()
       })

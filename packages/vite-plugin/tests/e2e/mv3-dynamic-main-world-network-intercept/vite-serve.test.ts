@@ -24,11 +24,9 @@ test(
     await fs.copy(src1, src, { overwrite: true })
 
     const { browser, outDir } = await serve(__dirname)
-    await waitForRegisteredContentScripts(
-      browser,
-      [dynamicNetworkScriptId],
-      { timeout: 30000 },
-    )
+    await waitForRegisteredContentScripts(browser, [dynamicNetworkScriptId], {
+      timeout: 30000,
+    })
     const scriptPath = await expectRegisteredDynamicScript(browser)
     expect(scriptPath).toBe('src/interceptor.iife.ts.iife.js')
     expect(await fs.pathExists(path.join(outDir, scriptPath))).toBe(true)
@@ -41,21 +39,24 @@ test(
     await expectNetworkProbe(page)
 
     const update = createUpdate({ target: src, src: src2 })
-    const pageReloaded = page.waitForEvent('load', { timeout: 30000 })
-    await update('interceptor.iife.ts')
-    await waitForContentScriptContent(
-      browser,
-      outDir,
-      dynamicNetworkScriptId,
-      'crx-dynamic-main-world-iife-updated',
-      { timeout: 30000 },
-    )
-    await waitForRegisteredContentScripts(
-      browser,
-      [dynamicNetworkScriptId],
-      { timeout: 30000 },
-    )
-    await pageReloaded
+    await Promise.all([
+      page.waitForEvent('load', { timeout: 30000 }),
+      (async () => {
+        await update('interceptor.iife.ts')
+        await waitForContentScriptContent(
+          browser,
+          outDir,
+          dynamicNetworkScriptId,
+          'crx-dynamic-main-world-iife-updated',
+          { timeout: 30000 },
+        )
+        await waitForRegisteredContentScripts(
+          browser,
+          [dynamicNetworkScriptId],
+          { timeout: 30000 },
+        )
+      })(),
+    ])
 
     await expectNetworkProbe(page, 'crx-dynamic-main-world-iife-updated')
   },

@@ -65,7 +65,10 @@
     "test:vite-matrix": "node scripts/run-vite-matrix.mjs",
     "test:vite-matrix:compat": "node scripts/run-vite-matrix.mjs --mode compat",
     "test:vite-matrix:e2e": "node scripts/run-vite-matrix.mjs --mode e2e",
-    "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\""
+    "test:update": "run-s \"test:run:out --update\" \"test:run:e2e --update\"",
+    "test:firefox": "node --test tests/firefox/production.e2e.mjs",
+    "test:firefox:e2e": "node tests/firefox/run-suite.mjs",
+    "test:firefox:report": "node tests/firefox/report.mjs"
   },
   "dependencies": {
     "@webcomponents/custom-elements": "^1.5.0",
@@ -88,7 +91,8 @@
     "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.26.0",
     "@extend-chrome/messages": "1.2.2",
-    "@extend-chrome/storage": "1.5.0",
+    "@openpolyfill/firefox-addon-playwright-harness": "0.3.0",
+    "@playwright/test": "1.64.1",
     "@sveltejs/vite-plugin-svelte": "1.4.0",
     "@types/chrome": "0.0.237",
     "@types/convert-source-map": "^2.0.0",
@@ -116,6 +120,7 @@
     "react-dom": "17.0.2",
     "react-i18next": "16.6.6",
     "rollup-plugin-esbuild": "4.10.3",
+    "selenium-webdriver": "4.51.0",
     "svelte": "^3.48.0",
     "tsdown": "^0.23.0",
     "type-fest": "^5.1.0",

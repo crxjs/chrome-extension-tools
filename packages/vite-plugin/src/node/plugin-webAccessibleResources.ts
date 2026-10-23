@@ -110,7 +110,10 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
         }
 
         // derive content script resources from vite file manifest
-        if (contentScripts.size > 0) {
+        if (
+          contentScripts.size > 0 ||
+          (browser === 'firefox' && manifest.sandbox?.pages?.length)
+        ) {
           // Vite 5 changed the manifest.json location to .vite/manifest.json.
           // In order to support both Vite <=4 and Vite 5, we need to check the Vite version and determine the path accordingly.
           const viteMajorVersion = parseInt(ViteVersion.split('.')[0])
@@ -130,6 +133,30 @@ export const pluginWebAccessibleResources: CrxPluginFn = () => {
           const bundleChunks = new Map<string, OutputChunk>()
           for (const chunk of Object.values(bundle))
             if (chunk.type === 'chunk') bundleChunks.set(chunk.fileName, chunk)
+
+          // Firefox sandbox pages have an opaque origin. Their module graph
+          // must be web accessible, while unrelated extension entries stay private.
+          if (browser === 'firefox') {
+            for (const page of manifest.sandbox?.pages ?? []) {
+              const entry = viteManifest[page]
+              // Static HTML without a module entry has no graph to expose.
+              if (!entry) continue
+              const { assets, css, imports } = compileFileResources(
+                entry.file,
+                {
+                  chunks: bundleChunks,
+                  files: viteFiles,
+                  config,
+                },
+              )
+              web_accessible_resources.push({
+                matches: ['<all_urls>'],
+                resources: [
+                  ...new Set([entry.file, ...assets, ...css, ...imports]),
+                ],
+              })
+            }
+          }
 
           const moduleScriptResources = new Map<
             string,

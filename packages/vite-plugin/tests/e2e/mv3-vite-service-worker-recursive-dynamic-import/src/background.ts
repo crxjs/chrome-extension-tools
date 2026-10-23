@@ -1,3 +1,5 @@
 import './seed-data'
 
-chrome.runtime.onMessage.addListener(() => undefined)
+const listener = () => undefined
+Object.assign(globalThis, { __messageListener: listener })
+chrome.runtime.onMessage.addListener(listener)

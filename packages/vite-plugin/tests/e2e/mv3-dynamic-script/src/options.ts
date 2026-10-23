@@ -4,30 +4,42 @@ import content2 from './content2?script'
 console.log('options.ts', content1, content2)
 
 let newTab: chrome.tabs.Tab | undefined
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (tabId === newTab?.id && changeInfo.status === 'loading') {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (
+    tab.url?.startsWith('https://example.com') &&
+    tabId === newTab?.id &&
+    changeInfo.status === 'loading'
+  ) {
     chrome.scripting.executeScript({
       target: { tabId: newTab.id! },
-      files: [content1],
+      // Firefox resolves relative files against this nested options page.
+      files: [`/${content1}`],
     })
   }
 })
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-  if (tabId === newTab?.id && changeInfo.status === 'complete') {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (
+    tab.url?.startsWith('https://example.com') &&
+    tabId === newTab?.id &&
+    changeInfo.status === 'complete'
+  ) {
     chrome.scripting.executeScript({
       target: { tabId: newTab.id! },
-      files: [content2],
+      files: [`/${content2}`],
     })
   }
 })
 
-// https://github.com/microsoft/playwright/issues/32865
-// Network mocking does not work for initial request when page opened via extension API chrome.tabs.create()
-// Network mocking _does_ work for the redirect request.
-const url = chrome.runtime.getURL('src/redirect.html')
-chrome.tabs.create({ url }).then((tab) => {
-  newTab = tab
-})
+// Start only after the test has installed network routes. Assign the tab ID
+// before navigation so neither browser can dispatch onUpdated too early.
+const start = document.createElement('button')
+start.id = 'start'
+start.textContent = 'Start injection test'
+start.onclick = async () => {
+  newTab = await chrome.tabs.create({ url: 'about:blank' })
+  await chrome.tabs.update(newTab.id!, { url: 'https://example.com' })
+}
+document.body.append(start)
 
 chrome.runtime.onMessage.addListener(({ type }) => {
   if (type === 'ok') {
