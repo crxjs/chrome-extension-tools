@@ -646,6 +646,9 @@ export const pluginManifest: CrxPluginFn = () => {
                   type: 'loader',
                 })
                 script.js = [cssLoader, ...jsLoaders]
+                // Firefox's manifest-injected CSS can override the updated
+                // style element. During development the HMR loader owns CSS.
+                if (firefox && script.world !== 'MAIN') delete script.css
               } else {
                 script.js = jsLoaders
               }

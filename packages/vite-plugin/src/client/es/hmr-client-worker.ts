@@ -146,6 +146,39 @@ function handleSocketMessage(payload: HMRPayload) {
   }
 }
 
+// Firefox destroys content-script timers when the extension restarts. Keep
+// pending tab reloads in the background document's origin storage, then replay
+// them after the replacement background (including user modules) has loaded.
+const reloadTabsKey = '@crx/reload-tabs'
+const hasBackgroundDocument = typeof document !== 'undefined'
+if (hasBackgroundDocument) {
+  const pending = localStorage.getItem(reloadTabsKey)
+  localStorage.removeItem(reloadTabsKey)
+  if (pending && __LIVE_RELOAD__) {
+    try {
+      const { tabs, timestamp } = JSON.parse(pending) as {
+        tabs: number[]
+        timestamp: number
+      }
+      if (
+        Array.isArray(tabs) &&
+        tabs.every(Number.isInteger) &&
+        Date.now() - timestamp >= 0 &&
+        Date.now() - timestamp < 30_000
+      ) {
+        const reloadTabs = () => {
+          for (const tabId of tabs)
+            chrome.tabs.reload(tabId).catch(console.error)
+        }
+        if (document.readyState === 'complete') reloadTabs()
+        else globalThis.addEventListener('load', reloadTabs, { once: true })
+      }
+    } catch (error) {
+      console.warn('[crx] could not restore pending tab reloads', error)
+    }
+  }
+}
+
 function handleCrxHmrPayload(payload: CrxHMRPayload) {
   if (!__LIVE_RELOAD__) {
     // when liveReload is disabled, don't relay any CRX payloads to content
@@ -163,6 +196,19 @@ function handleCrxHmrPayload(payload: CrxHMRPayload) {
     case 'crx:runtime-reload':
       // immediate runtime reload
       console.log('[crx] runtime reload')
+      if (hasBackgroundDocument) {
+        const tabs = [
+          ...new Set(
+            [...ports]
+              .map((port) => port.sender?.tab?.id)
+              .filter((id): id is number => typeof id === 'number'),
+          ),
+        ]
+        localStorage.setItem(
+          reloadTabsKey,
+          JSON.stringify({ tabs, timestamp: Date.now() }),
+        )
+      }
       chrome.runtime.reload()
       break
 

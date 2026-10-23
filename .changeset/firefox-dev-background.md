@@ -3,3 +3,5 @@
 ---
 
 Fix Firefox development startup, extension-page loading, runtime reloads and manifest CSS HMR. Permit the local Vite origin for temporary development extensions, use static background dependencies so installation listeners register in time, and emit transformed HTML with local-server asset URLs while preserving extension navigation.
+
+Restore connected tabs after background restarts and let the isolated-world HMR loader own development manifest CSS so stale styles cannot override updates.
