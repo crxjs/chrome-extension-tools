@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { extractScriptsAndRemove } from './html'
+import { extractScriptsAndRemove, rewriteDevHtmlAssets } from './html'
 
 describe('extractScriptsAndRemove', () => {
   const sampleHtml = `<!DOCTYPE html>
@@ -51,4 +51,16 @@ describe('extractScriptsAndRemove', () => {
     expect(scriptSrcs).toHaveLength(0)
     expect(html).toContain('<p>Hello</p>')
   })
+})
+
+test('Firefox dev HTML loads assets from Vite while retaining extension navigation', () => {
+  const html = rewriteDevHtmlAssets(
+    '<script src="/src/main.ts"></script><img src="./logo.svg"><a href="options.html">Options</a><iframe src="frame.html"></iframe><img src="data:image/png;base64,abc">',
+    'http://localhost:5200/src/popup.html',
+  )
+  expect(html).toContain('src="http://localhost:5200/src/main.ts"')
+  expect(html).toContain('src="http://localhost:5200/src/logo.svg"')
+  expect(html).toContain('href="options.html"')
+  expect(html).toContain('src="frame.html"')
+  expect(html).toContain('src="data:image/png;base64,abc"')
 })
