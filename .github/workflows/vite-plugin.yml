@@ -35,6 +35,9 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -79,6 +82,9 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -121,6 +127,9 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10.11.1
+
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
 
       - name: Cache pnpm modules
         uses: actions/cache@v3
@@ -178,6 +187,9 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10.11.1
+
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
 
       - name: Cache pnpm modules
         uses: actions/cache@v3
@@ -250,6 +262,9 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10.11.1
+
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
 
       - name: Install dependencies
         env:

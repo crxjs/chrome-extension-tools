@@ -44,9 +44,11 @@ inheriting CRXJS's `injectWorkspacePackages` setting. Tests retain the normal
 reproduction failed with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` before this change
 and successfully built/imported the package afterward. This workaround can be
 removed with the Git pin after publication. The library's plain-JavaScript
-build configuration is named `tsdown.config.mjs`, so Node 22 can load it when
-Git preparation runs inside pnpm's `node_modules`-based store; this was also
-reproduced locally before updating the Git pin. Once a release is separately approved,
+build configuration is named `tsdown.config.mjs`, avoiding Node 22's native TypeScript-config restriction inside dependency
+folders. CI explicitly configures the already cached `$HOME/.pnpm-store`,
+outside `node_modules`, because declaration generation filters dependency
+folders as well. Clean-store preparation and declaration generation are checked
+using that layout before updating CI. Once a release is separately approved,
 replace the Git pin with the published version and update the lockfile.
 A built tarball was used for the initial local integration checks, installed with
 `--ignore-scripts`; this does not require publication.
