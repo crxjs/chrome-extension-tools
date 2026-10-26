@@ -1,0 +1,397 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "main.js-loader.js",
+      ],
+      "matches": Array [
+        "https://example.com/*",
+      ],
+      "world": "MAIN",
+    },
+  ],
+  "externally_connectable": Object {
+    "matches": Array [
+      "https://example.com/*",
+    ],
+  },
+  "manifest_version": 3,
+  "name": "MAIN module and sandbox output",
+  "sandbox": Object {
+    "pages": Array [
+      "sandbox.html",
+    ],
+  },
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "assets/loading-page.hash0.js",
+  "main.js-loader.js",
+  "main.js.js",
+  "manifest.json",
+  "sandbox.html",
+  "service-worker-loader.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "main.js",
+  "background.js",
+  "sandbox.html",
+}
+`;
+
+exports[`serve fs output > assets/loading-page.hash0.js 1`] = `
+"const VITE_URL = \\"http://localhost:3000\\";
+const READY_PATH = \\"/@crx/dev-ready\\";
+const VITE_PAGE_URL = new URL(location.pathname + location.search, VITE_URL).href;
+const RELOAD_DELAY = 100;
+function getReadyUrl() {
+  const url = new URL(READY_PATH, VITE_URL);
+  url.searchParams.set(\\"path\\", location.pathname + location.search);
+  url.searchParams.set(\\"t\\", Date.now().toString());
+  return url.href;
+}
+document.body.innerHTML = /* html */
+\`
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #111827;
+    --muted: #5f6b7a;
+    --muted-subtle: rgba(95, 107, 122, 0.7);
+    --muted-hint: rgba(95, 107, 122, 0.6);
+    --card: #ffffff;
+    --badge-bg: rgba(17, 24, 39, 0.04);
+    --accent: #ff6b2c;
+    --accent-2: #2563eb;
+    --link-underline: rgba(37, 99, 235, 0.45);
+    --glow-1: rgba(37, 99, 235, 0.12);
+    --glow-2: rgba(255, 107, 44, 0.1);
+    --button-grad-1: #ff7a43;
+    --button-grad-2: #ff9a73;
+    --button-shadow: rgba(255, 107, 44, 0.18);
+    --button-shadow-hover: rgba(255, 107, 44, 0.22);
+    --pulse: rgba(255, 107, 44, 0.6);
+    --pulse-ring: rgba(255, 107, 44, 0.5);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --ink: #e5e7eb;
+      --muted: #a3aab5;
+      --muted-subtle: rgba(163, 170, 181, 0.78);
+      --muted-hint: rgba(163, 170, 181, 0.6);
+      --card: #0f172a;
+      --badge-bg: rgba(148, 163, 184, 0.16);
+      --accent: #ff8a5a;
+      --accent-2: #7aa2ff;
+      --link-underline: rgba(122, 162, 255, 0.45);
+      --glow-1: rgba(96, 165, 250, 0.14);
+      --glow-2: rgba(251, 146, 60, 0.16);
+      --button-grad-1: #f07b4d;
+      --button-grad-2: #f39a76;
+      --button-shadow: rgba(240, 123, 77, 0.16);
+      --button-shadow-hover: rgba(240, 123, 77, 0.2);
+      --pulse: rgba(255, 138, 90, 0.65);
+      --pulse-ring: rgba(255, 138, 90, 0.5);
+    }
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: \\"IBM Plex Sans\\", \\"Inter\\", -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background: transparent;
+    width: 420px;
+    height: 250px;
+    margin: 0;
+    padding: 0 !important;
+  }
+
+  #app {
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    padding: 24px 24px 20px;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  #app::before {
+    content: \\"\\";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(240px 140px at 100% 0%, var(--glow-1), transparent 70%),
+      radial-gradient(220px 140px at 0% 100%, var(--glow-2), transparent 70%);
+    pointer-events: none;
+  }
+
+  .header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    padding-right: 96px;
+  }
+
+  .header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--badge-bg);
+    border-radius: 999px;
+    padding: 6px 10px;
+    white-space: nowrap;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 var(--pulse);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  h1 {
+    font-size: clamp(18px, 4vw, 22px);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .subtle {
+    color: var(--muted-subtle);
+    font-size: 12px;
+  }
+
+  a {
+    color: var(--accent-2);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--link-underline);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+
+  button {
+    appearance: none;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--button-grad-1), var(--button-grad-2));
+    color: white;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 8px 16px var(--button-shadow);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px var(--button-shadow-hover);
+  }
+
+  button:focus-visible {
+    outline: 2px solid var(--accent-2);
+    outline-offset: 2px;
+  }
+
+  .hint {
+    font-size: 11px;
+    color: var(--muted-hint);
+    text-align: center;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 var(--pulse-ring); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 107, 44, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 44, 0); }
+  }
+</style>
+
+<div id=\\"app\\">
+  <div class=\\"header\\">
+    <span class=\\"badge\\"><span class=\\"pulse\\"></span>dev server</span>
+    <div class=\\"header-text\\">
+      <h1>CRXJS DEV MODE</h1>
+      <p class=\\"subtle\\">Connecting to the Vite dev server\\\\u2026</p>
+    </div>
+  </div>
+
+  <div class=\\"content\\">
+    <p>
+      Cannot connect to <a href=\\"\${VITE_PAGE_URL}\\">\${VITE_PAGE_URL}</a>.
+      Make sure Vite is running, then reload the extension.
+    </p>
+    <p>This page will close automatically after the extension reloads.</p>
+  </div>
+
+  <div class=\\"footer\\">
+    <div class=\\"actions\\">
+      <button>Reload Extension</button>
+    </div>
+    <div class=\\"hint\\">Tip: if the URL is wrong, restart Vite so it picks the right port.</div>
+  </div>
+</div>
+\`;
+document.body.querySelector(\\"button\\")?.addEventListener(\\"click\\", () => {
+  chrome.runtime.reload();
+});
+let tries = 0;
+let ready = false;
+do {
+  try {
+    const response = await fetch(getReadyUrl());
+    if (!response.ok)
+      throw new Error(\`HTTP \${response.status}\`);
+    ready = true;
+  } catch {
+    const timeout = Math.min(100 * Math.pow(2, ++tries), 5e3);
+    console.log(\`[CRXJS] Vite Dev Server is not available on \${VITE_PAGE_URL}\`);
+    console.log(\`[CRXJS] Retrying in \${timeout}ms...\`);
+    await new Promise((resolve) => setTimeout(resolve, timeout));
+  }
+} while (!ready);
+console.log(\`[CRXJS] Vite Dev Server is ready on \${VITE_PAGE_URL}\`);
+console.log(\`[CRXJS] Reloading in \${RELOAD_DELAY}ms...\`);
+await new Promise((resolve) => setTimeout(resolve, RELOAD_DELAY));
+location.reload();
+"
+`;
+
+exports[`serve fs output > main.js.js 1`] = `
+"export function onExecute() {
+  window.mainModuleLoaded = true
+}
+"
+`;
+
+exports[`serve fs output > main.js-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    try {
+      if (\\"\\")
+        await import(
+          /* @vite-ignore */
+          \\"\\"
+        );
+      await import(
+        /* @vite-ignore */
+        \\"./vendor/vite-client.js\\"
+      );
+    } catch (error) {
+      console.warn(\\"[crx] MAIN world HMR client failed to load\\", error);
+    }
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      \\"./main.js.js\\"
+    );
+    onExecute?.({
+      perf: { injectTime, loadTime: performance.now() - injectTime }
+    });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > sandbox.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <title>CRXJS DEV MODE</title>
+    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
+  </head>
+  <body>
+    <p>An unknown error occurred. Failed to load the script.</p>
+  </body>
+</html>
+"
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/background.js';
+"
+`;

@@ -1,0 +1,143 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "service_worker": "service-worker-loader.js",
+    "type": "module",
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/main.js-loader.hash0.js",
+      ],
+      "matches": Array [
+        "https://example.com/*",
+      ],
+      "world": "MAIN",
+    },
+  ],
+  "manifest_version": 3,
+  "name": "MAIN module and sandbox output",
+  "sandbox": Object {
+    "pages": Array [
+      "sandbox.html",
+    ],
+  },
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "https://example.com/*",
+      ],
+      "resources": Array [
+        "assets/main.js.hash1.js",
+      ],
+      "use_dynamic_url": false,
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/background.js.hash2.js",
+  "assets/main.js-loader.hash0.js",
+  "assets/main.js.hash1.js",
+  "assets/sandbox.html.hash3.js",
+  "manifest.json",
+  "sandbox.html",
+  "service-worker-loader.js",
+]
+`;
+
+exports[`build fs output > assets/background.js.hash2.js 1`] = `
+"chrome.runtime.onInstalled.addListener(() => console.log(\\"installed\\"));
+"
+`;
+
+exports[`build fs output > assets/main.js.hash1.js 1`] = `
+"function onExecute() {
+  window.mainModuleLoaded = true;
+}
+export {
+  onExecute
+};
+"
+`;
+
+exports[`build fs output > assets/main.js-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      \\"../assets/main.js.hash1.js\\"
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/sandbox.html.hash3.js 1`] = `
+"(function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+document.body.textContent = \\"Sandbox module\\";
+"
+`;
+
+exports[`build fs output > sandbox.html 1`] = `
+"<!doctype html>
+<html><script type=\\"module\\" crossorigin src=\\"/assets/sandbox.html.hash3.js\\"></script>
+
+<body></body></html>
+"
+`;
+
+exports[`build fs output > service-worker-loader.js 1`] = `
+"import './assets/background.js.hash2.js';
+"
+`;

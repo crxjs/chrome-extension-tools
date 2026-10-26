@@ -6,6 +6,7 @@ import { manifestFiles } from 'src/files'
 import { allFileWriterErrors } from 'src/fileWriter-rxjs'
 import { _debug } from 'src/helpers'
 import { ManifestV3 } from 'src/manifest'
+import { getCrxHmrToken } from 'src/hmrToken'
 import { expect } from 'vitest'
 import {
   BuildTestResult,
@@ -70,6 +71,17 @@ export async function testOutput(
   getTest('manifest.json', (source, name) => {
     const scrubbed = scrubHashes(source)
     const manifest: ManifestV3 = JSON.parse(scrubbed)
+    if (
+      config.command === 'serve' &&
+      manifest.content_security_policy?.extension_pages
+    ) {
+      // Hide the dynamic port chosen by parallel fixtures, preserving the allowed origin.
+      manifest.content_security_policy.extension_pages =
+        manifest.content_security_policy.extension_pages.replace(
+          /((?:https?):\/\/localhost:)\d+(?=[\s;]|$)/g,
+          (_, origin) => `${origin}<port>`,
+        )
+    }
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '_00 manifest.json')
 
@@ -91,6 +103,10 @@ export async function testOutput(
 
       if (config?.command === 'serve') {
         source = source
+          .replaceAll(getCrxHmrToken(config), '<hmr-token>')
+          // Inline-script URLs use a wall-clock cache buster.
+          .replace(/(@crx\/inline-script\/[^?\s"]*\?t=)\d+/g, '$1<timestamp>')
+        source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)
 
@@ -100,7 +116,7 @@ export async function testOutput(
           .replaceAll('\\\\', '\\')
 
         source = source.replace(
-            new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+          new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
           (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
         )
       }

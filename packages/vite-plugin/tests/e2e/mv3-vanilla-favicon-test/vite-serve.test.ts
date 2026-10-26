@@ -1,7 +1,9 @@
 import { expect, test } from 'vitest'
 import { serve } from '../runners'
 
-test(
+// Firefox has no Chrome /_favicon/ endpoint or favicon permission.
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1315616
+test.skipIf(process.env.E2E_BROWSER === 'firefox')(
   'favicon URLs work in content scripts in serve mode',
   async () => {
     const { browser } = await serve(__dirname)
@@ -17,9 +19,15 @@ test(
     await githubFavicon.waitFor({ timeout: 5000 })
 
     const githubSrc = await githubFavicon.getAttribute('src')
-    expect(githubSrc).toMatch(
-      /chrome-extension:\/\/.*\/_favicon\/\?pageUrl=https%3A%2F%2Fgithub\.com&size=32/,
+    const faviconUrl = new URL(githubSrc!)
+    expect(faviconUrl.protocol).toBe(
+      process.env.E2E_BROWSER === 'firefox'
+        ? 'moz-extension:'
+        : 'chrome-extension:',
     )
+    expect(faviconUrl.pathname).toBe('/_favicon/')
+    expect(faviconUrl.searchParams.get('pageUrl')).toBe('https://github.com')
+    expect(faviconUrl.searchParams.get('size')).toBe('32')
 
     // Test if the image really loaded without errors
     const imageLoadedSuccessfully = await githubFavicon.evaluate(

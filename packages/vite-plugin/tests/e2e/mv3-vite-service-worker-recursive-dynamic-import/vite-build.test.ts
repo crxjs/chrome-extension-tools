@@ -25,12 +25,15 @@ async function buildFixture() {
     await new Promise((resolve) => setTimeout(resolve, 250))
     state = await worker.evaluate(() => {
       const fixtureGlobal = globalThis as typeof globalThis & {
+        __messageListener: () => undefined
         __nestedValue?: string
         __voices?: string[]
       }
 
       return {
-        listeners: chrome.runtime.onMessage.hasListeners(),
+        listeners: chrome.runtime.onMessage.hasListener(
+          fixtureGlobal.__messageListener,
+        ),
         nestedValue: fixtureGlobal.__nestedValue,
         voices: fixtureGlobal.__voices,
       }
@@ -48,19 +51,23 @@ async function buildFixture() {
 
 // TODO(#1235): replace `test.fails` with `test` after recursively inlining
 // service worker dynamic imports and their preload dependencies.
-test.fails(
+// Report the actual result when surveying Firefox compatibility.
+const testRecursiveRegression =
+  process.env.E2E_BROWSER === 'firefox' ? test : test.fails
+
+testRecursiveRegression(
   'inlines recursive service worker dynamic imports with shared dependencies',
   async ({ expect }) => {
-    expect(await buildFixture()).toEqual({
-      output: {
-        dynamicImports: [],
-        hasRawImport: false,
-      },
-      state: {
-        listeners: true,
-        nestedValue: 'fixture-nested-import-ran',
-        voices: ['fixture-Alice', 'fixture-Bob'],
-      },
+    const result = await buildFixture()
+    // Firefox uses a background document, where native dynamic imports are valid.
+    // Keep checking execution; only Chrome service workers require inlining.
+    if (process.env.E2E_BROWSER !== 'firefox') {
+      expect(result.output).toEqual({ dynamicImports: [], hasRawImport: false })
+    }
+    expect(result.state).toEqual({
+      listeners: true,
+      nestedValue: 'fixture-nested-import-ran',
+      voices: ['fixture-Alice', 'fixture-Bob'],
     })
   },
 )

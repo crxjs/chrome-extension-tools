@@ -8,21 +8,27 @@ test(
     const { browser } = await serve(__dirname)
 
     const options1 = await getPage(browser, 'chrome-extension')
+    await options1.click('#start')
     const example1 = await getPage(browser, 'example')
 
     // P2: revisit this, we probably won't need it
-    const branch = await Promise.race([
-      // it might work the first time
-      options1.waitForSelector('.ok').then(() => 0),
-      // runtime reload b/c imported script has changed the manifest
-      options1.waitForEvent('close').then(() => 1),
-    ])
+    const branch =
+      process.env.E2E_BROWSER === 'firefox'
+        ? // Firefox does not close the options tab on runtime reload.
+          await options1.waitForSelector('.ok').then(() => 0)
+        : await Promise.race([
+            // it might work the first time
+            options1.waitForSelector('.ok').then(() => 0),
+            // runtime reload b/c imported script has changed the manifest
+            options1.waitForEvent('close').then(() => 1),
+          ])
 
     if (branch === 0) {
       await example1.waitForSelector('.ok')
     } else {
       // options page will open again when crx reloads
       const options2 = await getPage(browser, 'chrome-extension')
+      await options2.click('#start')
 
       // close the old example window
       await example1.close()

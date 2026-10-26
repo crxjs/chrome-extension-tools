@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'pathe'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { createUpdate } from '../helpers'
 import { serve } from '../runners'
 
@@ -12,7 +12,7 @@ test('crx page update on hmr', async () => {
   await fs.remove(src)
   await fs.copy(src1, src)
 
-  const { browser } = await serve(__dirname)
+  const { browser, devServer } = await serve(__dirname)
   const page = await browser.newPage()
   const update = createUpdate({
     target: src,
@@ -46,6 +46,13 @@ test('crx page update on hmr', async () => {
   }
 
   {
+    // Rendering can finish before the background's HMR socket connects.
+    await vi.waitFor(
+      () => expect(devServer.ws.clients.size).toBeGreaterThan(0),
+      {
+        timeout: 5_000,
+      },
+    )
     // update c1.ts -> simple update
     await update('c1.ts')
     await waitForText('c1-1')

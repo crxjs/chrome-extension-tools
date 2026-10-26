@@ -1,3 +1,4 @@
+import firefoxMainBridge from 'client/iife/content-firefox-main-bridge.ts'
 import contentDevLoader from 'client/iife/content-dev-loader.ts'
 import contentDevMainLoader from 'client/iife/content-dev-main-loader.ts'
 import contentProLoader from 'client/iife/content-pro-loader.ts'
@@ -22,6 +23,8 @@ export interface ContentScript {
   fileName?: string
   /** Content script from script import */
   isDynamicScript?: boolean
+  /** Isolated loader for Firefox MAIN-world modules. */
+  firefoxMainModule?: string
   /** Match patterns from manifest content scripts */
   matches: string[]
   /** CSS files imported by manifest */
@@ -162,4 +165,10 @@ export function createIifeReloadBridge({ client }: { client: string }): string {
     `  .catch(console.error)`,
     '',
   ].join('\n')
+}
+
+export function createFirefoxMainBridge(fileName: string, token = '') {
+  return firefoxMainBridge
+    .replace(/__MAIN_MODULE__/g, JSON.stringify(fileName))
+    .replace(/__CRX_HMR_TOKEN__/g, JSON.stringify(token))
 }

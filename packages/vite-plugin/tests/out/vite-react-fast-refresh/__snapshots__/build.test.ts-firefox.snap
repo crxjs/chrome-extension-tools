@@ -1,0 +1,168 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "browser_specific_settings": Object {
+    "gecko": Object {
+      "id": "e2e@crxjs.test",
+    },
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "assets/content.tsx-loader.hash0.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+      ],
+      "resources": Array [
+        "assets/App.hash1.js",
+        "assets/src-content.tsx.hash2.js",
+        "assets/vendor.hash3.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/App.hash1.js",
+  "assets/content.tsx-loader.hash0.js",
+  "assets/popup.html.hash4.js",
+  "assets/src-content.tsx.hash2.js",
+  "assets/vendor.hash3.js",
+  "manifest.json",
+  "src/popup.html",
+]
+`;
+
+exports[`build fs output > assets/App.hash1.js 1`] = `
+"import { j as jsxRuntime } from \\"./vendor.hash3.js\\";
+const jsx = jsxRuntime.exports.jsx;
+const jsxs = jsxRuntime.exports.jsxs;
+const App = () => {
+  return /* @__PURE__ */ jsxs(\\"div\\", {
+    children: [/* @__PURE__ */ jsx(\\"h1\\", {
+      children: \\"Popup Page\\"
+    }), /* @__PURE__ */ jsx(\\"p\\", {
+      children: \\"If you are seeing this, React is working!\\"
+    })]
+  });
+};
+export {
+  App as A,
+  jsx as j
+};
+"
+`;
+
+exports[`build fs output > assets/content.tsx-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/src-content.tsx.hash2.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/popup.html.hash4.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash3.js\\";
+import { j as jsx, A as App } from \\"./App.hash1.js\\";
+(function polyfill() {
+  const relList = document.createElement(\\"link\\").relList;
+  if (relList && relList.supports && relList.supports(\\"modulepreload\\")) {
+    return;
+  }
+  for (const link of document.querySelectorAll('link[rel=\\"modulepreload\\"]')) {
+    processPreload(link);
+  }
+  new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type !== \\"childList\\") {
+        continue;
+      }
+      for (const node of mutation.addedNodes) {
+        if (node.tagName === \\"LINK\\" && node.rel === \\"modulepreload\\")
+          processPreload(node);
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
+  function getFetchOpts(script) {
+    const fetchOpts = {};
+    if (script.integrity)
+      fetchOpts.integrity = script.integrity;
+    if (script.referrerpolicy)
+      fetchOpts.referrerPolicy = script.referrerpolicy;
+    if (script.crossorigin === \\"use-credentials\\")
+      fetchOpts.credentials = \\"include\\";
+    else if (script.crossorigin === \\"anonymous\\")
+      fetchOpts.credentials = \\"omit\\";
+    else
+      fetchOpts.credentials = \\"same-origin\\";
+    return fetchOpts;
+  }
+  function processPreload(link) {
+    if (link.ep)
+      return;
+    link.ep = true;
+    const fetchOpts = getFetchOpts(link);
+    fetch(link.href, fetchOpts);
+  }
+})();
+console.log(\\"popup script\\");
+const root = document.querySelector(\\"#root\\");
+reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
+"
+`;
+
+exports[`build fs output > assets/src-content.tsx.hash2.js 1`] = `
+"import { r as reactDom } from \\"./vendor.hash3.js\\";
+import { j as jsx, A as App } from \\"./App.hash1.js\\";
+console.log(\\"content script\\");
+const root = document.createElement(\\"div\\");
+root.id = \\"root\\";
+document.body.append(root);
+reactDom.exports.render(/* @__PURE__ */ jsx(App, {}), root);
+"
+`;
+
+exports[`build fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <meta charset=\\"UTF-8\\" />
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" />
+    <title>Popup Page</title>
+    <script type=\\"module\\" crossorigin src=\\"/assets/popup.html.hash4.js\\"></script>
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/vendor.hash3.js\\">
+    <link rel=\\"modulepreload\\" crossorigin href=\\"/assets/App.hash1.js\\">
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    
+  </body>
+</html>
+"
+`;
