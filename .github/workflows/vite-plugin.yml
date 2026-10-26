@@ -47,7 +47,9 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Lint
         run: pnpm lint
@@ -89,7 +91,9 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Run unit and output tests
         run: pnpm test:run:out
@@ -130,7 +134,9 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Build plugin (always on Vite 3)
         run: pnpm build
@@ -185,7 +191,9 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Install Chromium
         timeout-minutes: 10
@@ -246,6 +254,8 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
         run: pnpm install --frozen-lockfile --filter @crxjs/vite-plugin
 
       - name: Build plugin (always on Vite 3)

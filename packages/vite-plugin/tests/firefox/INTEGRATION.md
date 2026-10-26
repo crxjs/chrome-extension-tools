@@ -36,7 +36,14 @@ new runner without changing assertions or stored snapshots.
 Before publication the immutable Git dependency must build its own distribution.
 Use `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --frozen-lockfile`;
 `onlyBuiltDependencies` explicitly permits that package's build. The library's
-prepare script builds its distribution. Once a release is separately approved,
+prepare script builds its distribution. During dependency installation only,
+CI sets `CI=false` while retaining the outer `--frozen-lockfile`. This prevents
+pnpm's nested Git preparation from rejecting the library's own lockfile after
+inheriting CRXJS's `injectWorkspacePackages` setting. Tests retain the normal
+`CI=true` environment and all existing retry/skip conditions. A clean-store
+reproduction failed with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` before this change
+and successfully built/imported the package afterward. This workaround can be
+removed with the Git pin after publication. Once a release is separately approved,
 replace the Git pin with the published version and update the lockfile.
 A built tarball was used for the initial local integration checks, installed with
 `--ignore-scripts`; this does not require publication.
