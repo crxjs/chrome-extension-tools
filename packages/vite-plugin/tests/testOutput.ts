@@ -6,6 +6,7 @@ import { manifestFiles } from 'src/files'
 import { allFileWriterErrors } from 'src/fileWriter-rxjs'
 import { _debug } from 'src/helpers'
 import { ManifestV3 } from 'src/manifest'
+import { getCrxHmrToken } from 'src/hmrToken'
 import { expect } from 'vitest'
 import {
   BuildTestResult,
@@ -90,6 +91,10 @@ export async function testOutput(
       )
 
       if (config?.command === 'serve') {
+        source = source
+          .replaceAll(getCrxHmrToken(config), '<hmr-token>')
+          // Inline-script URLs use a wall-clock cache buster.
+          .replace(/(@crx\/inline-script\/[^?\s"]*\?t=)\d+/g, '$1<timestamp>')
         source = source
           .replace(/localhost:\d{4}/g, `localhost:3000`)
           .replace(/url\.port = "\d{4}"/, `url.port = "3000"`)

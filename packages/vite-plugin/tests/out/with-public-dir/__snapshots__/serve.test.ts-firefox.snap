@@ -1,0 +1,100 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_icon": Object {
+      "128": "icons/action-icon-128.png",
+      "16": "icons/action-icon-16.png",
+      "32": "icons/action-icon-32.png",
+      "48": "icons/action-icon-48.png",
+    },
+    "default_popup": "src/popup.html",
+  },
+  "background": Object {
+    "scripts": Array [
+      "service-worker-loader.js",
+    ],
+    "type": "module",
+  },
+  "browser_specific_settings": Object {
+    "gecko": Object {
+      "id": "e2e@crxjs.test",
+    },
+  },
+  "content_security_policy": Object {
+    "extension_pages": "script-src 'self' http://localhost:5200; object-src 'self'",
+  },
+  "description": "Chrome Extension with a public dir",
+  "icons": Object {
+    "128": "icons/manifest-icon-128.png",
+    "16": "icons/manifest-icon-16.png",
+    "32": "icons/manifest-icon-32.png",
+    "48": "icons/manifest-icon-48.png",
+  },
+  "manifest_version": 3,
+  "name": "public dir test extension",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "favicon.svg",
+  "icons/action-icon-128.png",
+  "icons/action-icon-16.png",
+  "icons/action-icon-32.png",
+  "icons/action-icon-48.png",
+  "icons/manifest-icon-128.png",
+  "icons/manifest-icon-16.png",
+  "icons/manifest-icon-32.png",
+  "icons/manifest-icon-48.png",
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/popup.html",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/popup.html",
+}
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+"
+`;
+
+exports[`serve fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
+
+    <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\" >
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" >
+    <link rel=\\"icon\\" type=\\"image/svg+xml\\" href=\\"http://localhost:3000/favicon.svg\\">
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"http://localhost:3000/src/popup.js\\" type=\\"module\\"></script>
+  </body>
+</html>
+"
+`;

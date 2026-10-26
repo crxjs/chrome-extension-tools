@@ -1,0 +1,131 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html",
+  },
+  "background": Object {
+    "scripts": Array [
+      "service-worker-loader.js",
+    ],
+    "type": "module",
+  },
+  "browser_specific_settings": Object {
+    "gecko": Object {
+      "id": "e2e@crxjs.test",
+    },
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "src/content.ts-loader.js",
+      ],
+      "matches": Array [
+        "https://*/*",
+        "http://*/*",
+      ],
+    },
+  ],
+  "content_security_policy": Object {
+    "extension_pages": "script-src 'self' http://localhost:5200; object-src 'self'",
+  },
+  "description": "test extension",
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/content.ts-loader.js",
+  "src/content.ts.js",
+  "src/popup.html",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/content.ts",
+  "src/background.ts",
+  "src/popup.html",
+}
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/src/background.ts';
+"
+`;
+
+exports[`serve fs output > src/content.ts.js 1`] = `
+"const message = \\"content script\\";
+console.log(message);
+export {};
+"
+`;
+
+exports[`serve fs output > src/content.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content.ts.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
+
+    <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\" >
+    <meta name=\\"viewport\\" content=\\"width=1000, initial-scale=1.0\\" >
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"http://localhost:3000/src/popup.tsx\\" type=\\"module\\"></script>
+  </body>
+</html>
+"
+`;

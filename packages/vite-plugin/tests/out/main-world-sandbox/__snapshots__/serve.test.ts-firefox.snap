@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > _00 manifest.json 1`] = `
+exports[`serve fs output > _00 manifest.json 1`] = `
 Object {
   "background": Object {
     "scripts": Array [
@@ -10,7 +10,7 @@ Object {
   },
   "browser_specific_settings": Object {
     "gecko": Object {
-      "id": "output@crxjs.test",
+      "id": "e2e@crxjs.test",
     },
   },
   "content_scripts": Array [
@@ -28,7 +28,7 @@ Object {
     "extension_pages": "script-src 'self' http://localhost:5200; object-src 'self'",
   },
   "manifest_version": 3,
-  "name": "Firefox output compatibility",
+  "name": "MAIN module and sandbox output",
   "sandbox": Object {
     "pages": Array [
       "sandbox.html",
@@ -49,7 +49,7 @@ Object {
 }
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > _01 output files 1`] = `
+exports[`serve fs output > _01 output files 1`] = `
 Array [
   "main.js-loader.js",
   "main.js-loader.js.main.js",
@@ -64,7 +64,7 @@ Array [
 ]
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > _02 optimized deps 1`] = `
+exports[`serve fs output > _02 optimized deps 1`] = `
 Set {
   "main.js",
   "background.js",
@@ -72,14 +72,14 @@ Set {
 }
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > main.js.js 1`] = `
+exports[`serve fs output > main.js.js 1`] = `
 "export function onExecute() {
-  window.firefoxMainLoaded = true
+  window.mainModuleLoaded = true
 }
 "
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > main.js-loader.js 1`] = `
+exports[`serve fs output > main.js-loader.js 1`] = `
 "(function () {
   'use strict';
 
@@ -126,7 +126,7 @@ exports[`Firefox development output: CSP, static background imports and local HT
 "
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > main.js-loader.js.main.js 1`] = `
+exports[`serve fs output > main.js-loader.js.main.js 1`] = `
 "(function () {
   'use strict';
 
@@ -158,7 +158,7 @@ exports[`Firefox development output: CSP, static background imports and local HT
 "
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > sandbox.html 1`] = `
+exports[`serve fs output > sandbox.html 1`] = `
 "<!doctype html>
 <html>
 <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
@@ -168,7 +168,7 @@ exports[`Firefox development output: CSP, static background imports and local HT
 "
 `;
 
-exports[`Firefox development output: CSP, static background imports and local HTML assets > service-worker-loader.js 1`] = `
+exports[`serve fs output > service-worker-loader.js 1`] = `
 "import 'http://localhost:3000/@vite/env';
 import 'http://localhost:3000/@crx/client-worker';
 import 'http://localhost:3000/background.js';

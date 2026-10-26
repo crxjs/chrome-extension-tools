@@ -121,16 +121,49 @@ harness. Inline comments identify the reason at each integration point.
 
 ### Output snapshots
 
-Existing `tests/out` fixtures use the default Chrome target, so Firefox-only
-branches do not change their snapshots. `E2E_BROWSER=firefox` is set by the
-Firefox E2E runner; the regular output suite does not run a browser matrix.
-The `tests/out/firefox` fixture explicitly selects `browser: 'firefox'` and
-records separate serve/build snapshots for the dev CSP/background/HTML paths,
-MAIN module bootstraps and production sandbox resources:
+Every shared `tests/out` fixture runs for both Chrome and Firefox. The existing
+snapshot names remain the Chrome baseline; Firefox adds a `-firefox` suffix in
+the same directory, for example:
+
+```text
+basic-js/__snapshots__/build.test.ts.snap
+basic-js/__snapshots__/build.test.ts-firefox.snap
+basic-js/__snapshots__/serve.test.ts.snap
+basic-js/__snapshots__/serve.test.ts-firefox.snap
+```
+
+The options provider adapts the browser target and background manifest format;
+the fixture sources and assertions are shared. The `main-world-sandbox` fixture
+also covers the production MAIN bootstrap and sandbox graph for both targets.
+No browser or OpenPolyfill installation is required to inspect generated output.
 
 ```sh
-pnpm -C packages/vite-plugin exec vitest --run --mode out tests/out/firefox
+# Standard local and CI command: unit/output baseline, then Firefox outputs.
+pnpm -C packages/vite-plugin test:run:out
+# Update both sets after reviewing the differences.
+pnpm -C packages/vite-plugin test:run:out --update
+# Select one fixture in both targets.
+pnpm -C packages/vite-plugin test:run:out tests/out/basic-js
+# Direct Firefox-only run (POSIX shell).
+OUTPUT_BROWSER=firefox pnpm -C packages/vite-plugin exec vitest --run --mode out
 ```
+
+The runner forwards Vitest arguments to both runs and fails if either run fails.
+Firefox runs only the output files; the unit tests run once with the baseline.
+HMR tokens are normalized in the output helper so bridge snapshots are stable.
+
+The first RED run compared Firefox output against copies of the Chrome
+expectations, without `--update` (`CI=true`). It exited 1: **61 tests failed,
+3 passed, 1 existing skip**. Failures included the real `service_worker` →
+`scripts` manifest difference. Firefox snapshots were updated only after this
+run. This checks the output differences of the existing implementation; it does
+not claim the product changes were originally implemented test-first.
+
+The subsequent GREEN run used `CI=true pnpm test:run:out --threads false`
+without `--update`: baseline **172 passed / 1 existing skip**, Firefox
+**64 passed / 1 existing skip**. All 61 snapshot files have both target variants.
+The first verification caught a changing React inline-script URL timestamp;
+that cache-buster value is normalized alongside the HMR token.
 
 The output helper omits the bundled HMR clients from source snapshots. Real
 browser E2E tests cover their runtime behaviour; unchanged output snapshots alone

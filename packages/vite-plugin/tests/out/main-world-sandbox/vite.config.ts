@@ -13,5 +13,5 @@ export default defineConfig({
       },
     },
   },
-  plugins: [crx({ browser: 'firefox', manifest })],
+  plugins: [crx({ manifest })],
 })

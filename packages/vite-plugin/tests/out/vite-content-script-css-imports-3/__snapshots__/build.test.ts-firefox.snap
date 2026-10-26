@@ -1,0 +1,144 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`build fs output > _00 manifest.json 1`] = `
+Object {
+  "browser_specific_settings": Object {
+    "gecko": Object {
+      "id": "e2e@crxjs.test",
+    },
+  },
+  "content_scripts": Array [
+    Object {
+      "css": Array [
+        "assets/import.hash1.css",
+        "assets/index.hash2.css",
+      ],
+      "js": Array [
+        "assets/index.ts-loader.hash0.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "css": Array [
+        "assets/import.hash1.css",
+        "assets/index.hash4.css",
+      ],
+      "js": Array [
+        "assets/index.ts-loader.hash3.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+      "resources": Array [
+        "assets/import.hash5.js",
+        "assets/src-content1-index.ts.hash6.js",
+        "assets/src-content2-index.ts.hash7.js",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`build fs output > _01 output files 1`] = `
+Array [
+  "assets/import.hash1.css",
+  "assets/import.hash5.js",
+  "assets/index.hash2.css",
+  "assets/index.hash4.css",
+  "assets/index.ts-loader.hash0.js",
+  "assets/index.ts-loader.hash3.js",
+  "assets/src-content1-index.ts.hash6.js",
+  "assets/src-content2-index.ts.hash7.js",
+  "manifest.json",
+]
+`;
+
+exports[`build fs output > assets/import.hash1.css 1`] = `
+"h1 {
+  color: green;
+}
+"
+`;
+
+exports[`build fs output > assets/import.hash5.js 1`] = `
+"const styles = \\"\\";
+console.log(\\"imported file\\");
+"
+`;
+
+exports[`build fs output > assets/index.hash2.css 1`] = `
+"body {
+  color: red;
+}
+"
+`;
+
+exports[`build fs output > assets/index.hash4.css 1`] = `
+"body {
+  color: blue;
+}
+"
+`;
+
+exports[`build fs output > assets/index.ts-loader.hash0.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/src-content1-index.ts.hash6.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/index.ts-loader.hash3.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"assets/src-content2-index.ts.hash7.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`build fs output > assets/src-content1-index.ts.hash6.js 1`] = `
+"import \\"./import.hash5.js\\";
+const styles = \\"\\";
+console.log(\\"content1\\");
+"
+`;
+
+exports[`build fs output > assets/src-content2-index.ts.hash7.js 1`] = `
+"import \\"./import.hash5.js\\";
+const styles = \\"\\";
+console.log(\\"content2\\");
+"
+`;

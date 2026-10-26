@@ -4,7 +4,7 @@ import {
 } from '../src/node/plugin-optionsProvider'
 
 export const crx = (options: CrxInputOptions) => {
-  if (process.env.E2E_BROWSER !== 'firefox')
+  if ((process.env.OUTPUT_BROWSER ?? process.env.E2E_BROWSER) !== 'firefox')
     return pluginOptionsProvider(options)
   // Keep the same fixtures, adapting only the browser-specific manifest format.
   const original = options.manifest
