@@ -50,7 +50,12 @@ outside `node_modules`, because declaration generation filters dependency
 folders as well. Clean-store preparation and declaration generation are checked
 using that layout before updating CI. Once a release is separately approved,
 replace the Git pin with the published version and update the lockfile.
-A built tarball was used for the initial local integration checks, installed with
+Before a Vite matrix changes dependencies, `scripts/use-packed-web-ext.mjs`
+packs the prepared dependency with `npm pack --ignore-scripts` and switches only
+the temporary checkout to that tarball. This keeps `dist` available even when
+subsequent Vite/React-plugin installs use `--ignore-scripts`. The local matrix
+runner performs the same step and restores the Git dependency afterward.
+A built tarball was also used for the initial local integration checks, installed with
 `--ignore-scripts`; this does not require publication.
 
 Install browsers through their owning packages rather than the shared binary:

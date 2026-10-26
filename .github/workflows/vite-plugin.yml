@@ -150,6 +150,9 @@ jobs:
       - name: Build plugin (always on Vite 3)
         run: pnpm build
 
+      - name: Use built environment for the Vite matrix
+        run: node scripts/use-packed-web-ext.mjs
+
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
@@ -214,6 +217,9 @@ jobs:
       - name: Build plugin (always on Vite 3)
         run: pnpm build
 
+      - name: Use built environment for the Vite matrix
+        run: node scripts/use-packed-web-ext.mjs
+
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
         run: pnpm add -D vite@${{ matrix.vite-version }} --ignore-scripts
@@ -275,6 +281,9 @@ jobs:
 
       - name: Build plugin (always on Vite 3)
         run: pnpm build
+
+      - name: Use built environment for the Vite matrix
+        run: node scripts/use-packed-web-ext.mjs
 
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
