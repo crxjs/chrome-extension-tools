@@ -314,10 +314,6 @@ async function main() {
       for (const mode of modes) {
         const vitestArgs = ['exec', 'vitest', '--run', '--mode', mode]
 
-        if (majorVersion === '8') {
-          vitestArgs.push('--threads', 'false')
-        }
-
         vitestArgs.push(...options.vitestArgs)
 
         await run(PNPM, vitestArgs)

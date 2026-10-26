@@ -5,8 +5,8 @@ import { TestContext } from 'vitest'
 import fs from 'fs-extra'
 
 let count = 0
-export function getCustomId({ meta }: TestContext): string {
-  const filename = meta.file?.name
+export function getCustomId({ task }: TestContext): string {
+  const filename = task.file?.name
   if (!filename) throw new TypeError('Test context filename is undefined')
   return `${basename(filename, '.test.ts')}-${count++}`
 }
@@ -20,9 +20,10 @@ export async function getPage(
       ? parseInt(process.env.TIMEOUT)
       : 5000
   if (process.env.E2E_BROWSER === 'firefox') {
+    const scheme = new URL(await globalThis.browser.getExtensionURL()).protocol.slice(0, -1)
     test = typeof test === 'string'
-      ? test.replace('chrome-extension', 'moz-extension')
-      : new RegExp(test.source.replace('chrome-extension', 'moz-extension'), test.flags)
+      ? test.replace('chrome-extension', scheme)
+      : new RegExp(test.source.replace('chrome-extension', scheme), test.flags)
   }
   const regex = test instanceof RegExp ? test : new RegExp(jsesc(test))
   const waitForUrl = async (p: Page): Promise<boolean> => {
@@ -143,18 +144,16 @@ export async function waitForFileContent(
 }
 
 /**
- * Returns the extension's MV3 background service worker. If one is already
- * attached to the context it is returned immediately; otherwise this waits
- * for one to spawn (up to `timeout` ms) and returns `undefined` on timeout.
+ * Returns the shared environment's background (a Chromium service worker or
+ * Firefox background document), preserving the existing fixture helper API.
+ * Returns `undefined` when no background is available within the timeout.
  */
 export async function getServiceWorker(
   browser: BrowserContext,
   { timeout = 500 }: { timeout?: number } = {},
-): Promise<Worker | undefined> {
-  const existing = browser.serviceWorkers()[0]
-  if (existing) return existing
+): Promise<Pick<Worker, 'evaluate' | 'url'> | undefined> {
   try {
-    return await browser.waitForEvent('serviceworker', { timeout })
+    return await globalThis.browser.getBackground(timeout) as Pick<Worker, 'evaluate' | 'url'> | undefined
   } catch {
     return undefined
   }

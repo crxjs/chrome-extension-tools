@@ -1,81 +1,39 @@
-import fs from 'fs-extra'
 import path from 'pathe'
-import { chromium, ChromiumBrowserContext, Route } from 'playwright-chromium'
+import type { ChromiumBrowserContext, Route } from 'playwright-chromium'
 import { Subject } from 'rxjs'
 import type { RollupWatcher, RollupWatcherEvent } from 'rollup'
 import { allFilesSuccess } from 'src/fileWriter-rxjs'
 import { afterEach } from 'vitest'
 import { build as _build, serve as _serve } from '../runners'
 
-const chromiumArgs = (outDir: string) => {
-  const args = [
-    `--disable-extensions-except=${outDir}`,
-    `--load-extension=${outDir}`,
-    '--disable-features=ExtensionDisableUnsupportedDeveloper',
-  ]
-  // run headless if not in debug mode
-  if (typeof process.env.DEBUG === 'undefined') args.unshift(`--headless=new`)
-  return args
-}
-
 let browser: ChromiumBrowserContext | undefined
 let buildWatcher: RollupWatcher | undefined
-const useProfileTemplate =
-  process.env.E2E_BROWSER !== 'firefox' &&
-  typeof process.env.DEBUG === 'undefined'
-// Copying a warmed empty profile keeps each test isolated without paying
-// Chromium's first-run profile initialization cost for every fixture.
-let browserProfileTemplateDir: string | undefined
-if (useProfileTemplate) {
-  createBrowserProfileTemplate()
-    .then((dir) => {
-      browserProfileTemplateDir = dir
-    })
-    .catch(() => undefined)
+
+async function launch(outDir: string): Promise<ChromiumBrowserContext> {
+  try {
+    await globalThis.browser.launch(outDir)
+    return globalThis.browser.context as unknown as ChromiumBrowserContext
+  } catch (error) {
+    if (process.env.E2E_BROWSER !== 'firefox') throw error
+    throw new Error(
+      `Firefox setup failed: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    )
+  }
 }
 
 afterEach(async () => {
   try {
-    await browser?.close()
+    await globalThis.browser.close()
   } finally {
     await buildWatcher?.close()
     buildWatcher = undefined
   }
 })
 
-async function createBrowserProfileTemplate(): Promise<string> {
-  const dataDir = path.join(__dirname, '.vite', 'chromium-profile-template')
-  if (await fs.pathExists(path.join(dataDir, 'Default'))) return dataDir
-
-  await fs.remove(dataDir)
-  await fs.ensureDir(dataDir)
-
-  const template = (await chromium.launchPersistentContext(dataDir, {
-    headless: false,
-    args: ['--headless=new'],
-  })) as ChromiumBrowserContext
-  await template.close()
-
-  return dataDir
-}
-
-async function prepareBrowserProfile(dataDir: string) {
-  await fs.remove(dataDir)
-  if (!browserProfileTemplateDir) {
-    await fs.ensureDir(dataDir)
-    return
-  }
-
-  await fs.copy(browserProfileTemplateDir, dataDir, {
-    filter: (src) => {
-      const name = path.basename(src)
-      return !name.startsWith('Singleton') && name !== 'DevToolsActivePort'
-    },
-  })
-}
-
 export async function build(dirname: string) {
-  const { outDir, config, output } = await _build(dirname)
+  const { outDir, output } = await _build(dirname)
   if ('on' in output) {
     buildWatcher = output
     // Vite returns a watcher before its first bundle exists. Firefox's RDP
@@ -99,16 +57,7 @@ export async function build(dirname: string) {
     })
   }
 
-  const dataDir = path.join(config.cacheDir!, '.chromium')
-  await prepareBrowserProfile(dataDir)
-  browser =
-    process.env.E2E_BROWSER === 'firefox'
-      ? await (await import('../firefox/runner')).launchFirefox(outDir)
-      : ((await chromium.launchPersistentContext(dataDir, {
-          headless: false,
-          slowMo: process.env.DEBUG ? 100 : undefined,
-          args: chromiumArgs(outDir),
-        })) as ChromiumBrowserContext)
+  browser = await launch(outDir)
 
   await browser.route('https://example.com', async (route) => {
     await route.fulfill({
@@ -116,11 +65,11 @@ export async function build(dirname: string) {
     })
   })
 
-  return { browser, outDir, dataDir, output }
+  return { browser, outDir, output }
 }
 
 export async function serve(dirname: string) {
-  const { outDir, server, config } = await _serve(dirname, {
+  const { outDir, server } = await _serve(dirname, {
     // A retry can observe the previous file-writer success notification.
     // Wait for this server's output to settle before Firefox installs it.
     waitForOutDir: process.env.E2E_BROWSER === 'firefox',
@@ -128,16 +77,7 @@ export async function serve(dirname: string) {
 
   await allFilesSuccess()
 
-  const dataDir = path.join(config.cacheDir!, '.chromium')
-  await prepareBrowserProfile(dataDir)
-  browser =
-    process.env.E2E_BROWSER === 'firefox'
-      ? await (await import('../firefox/runner')).launchFirefox(outDir)
-      : ((await chromium.launchPersistentContext(dataDir, {
-          headless: false,
-          slowMo: process.env.DEBUG ? 100 : undefined,
-          args: chromiumArgs(outDir),
-        })) as ChromiumBrowserContext)
+  browser = await launch(outDir)
 
   const routes = new Subject<Route>()
   await browser.route('https://example.com', async (route) => {
@@ -150,7 +90,6 @@ export async function serve(dirname: string) {
   return {
     browser,
     outDir,
-    dataDir,
     devServer: server,
     routes: routes.asObservable(),
   }

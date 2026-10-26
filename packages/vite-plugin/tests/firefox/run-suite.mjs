@@ -1,4 +1,9 @@
-import './setup.mjs'
+import {
+  getFirefoxInfo,
+  prepareFirefox,
+} from 'vitest-environment-web-ext/firefox'
+
+await prepareFirefox()
 import { spawnSync } from 'node:child_process'
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -13,18 +18,21 @@ for (const file of [
 ]) {
   rmSync(`tests/firefox/artifacts/${file}`, { force: true })
 }
-const { firefox } = require('@playwright/test')
-const version = spawnSync(firefox.executablePath(), ['--version'], {
+const firefox = getFirefoxInfo()
+const version = spawnSync(firefox.executablePath, ['--version'], {
   encoding: 'utf8',
 })
 if (version.error || version.status !== 0)
   throw version.error ?? new Error(version.stderr)
+const vitestRequire = createRequire(require.resolve('vitest/package.json'))
 const environment = {
   node: process.version,
   platform: process.platform,
   arch: process.arch,
   vite: require('vite/package.json').version,
-  playwright: require('@playwright/test/package.json').version,
+  vitest: require('vitest/package.json').version,
+  vitestVite: vitestRequire('vite/package.json').version,
+  playwright: firefox.playwright,
   firefox: version.stdout.trim(),
 }
 writeFileSync(
@@ -40,8 +48,6 @@ const child = spawnSync(
     'run',
     '--mode',
     'e2e',
-    '--threads',
-    'false',
     '--reporter=default',
     '--reporter=json',
     '--reporter=./tests/firefox/execution-reporter.mjs',

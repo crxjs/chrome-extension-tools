@@ -42,23 +42,17 @@
   },
   "devDependencies": {
     "bumpp": "^11.0.1",
-    "vitest": "0.34.6"
+    "vitest": "3.2.7"
   },
   "pnpm": {
-    "packageExtensions": {
-      "@openpolyfill/firefox-addon-playwright-harness@0.3.0": {
-        "dependencies": {
-          "playwright-core": "1.64.1"
-        }
-      }
-    },
     "peerDependencyRules": {
       "ignoreMissing": [
         "jest"
       ]
     },
     "onlyBuiltDependencies": [
-      "playwright-chromium"
+      "playwright-chromium",
+      "vitest-environment-web-ext"
     ]
   }
 }

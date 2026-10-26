@@ -1,5 +1,6 @@
-import { defineConfig, configDefaults } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 import path from 'pathe'
+import { chromium } from 'playwright-chromium'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
@@ -21,10 +22,28 @@ export default defineConfig(({ mode }) => {
     : 60000
 
   return {
-    expect: {
-      timeout: 15_000,
-    },
+    server: { watch: { ignored: ['**/tests/templates/**'] } },
     test: {
+      expect: { poll: { timeout: 15_000 } },
+      environment: mode === 'e2e' ? 'web-ext' : 'node',
+      environmentOptions: {
+        'web-ext': {
+          path: '.',
+          autoLaunch: false,
+          detectExtensionId: false,
+          playwright: {
+            browser:
+              process.env.E2E_BROWSER === 'firefox' ? 'firefox' : 'chromium',
+            headless: !process.env.DEBUG,
+            slowMo: process.env.DEBUG ? 100 : 0,
+            // Keep the existing Chromium revision independent of Firefox's driver.
+            executablePath:
+              process.env.E2E_BROWSER === 'firefox'
+                ? ''
+                : chromium.executablePath(),
+          },
+        },
+      },
       ...(process.env.OUTPUT_BROWSER === 'firefox'
         ? { include: ['tests/out/**/*.test.ts'] }
         : {}),
@@ -60,18 +79,14 @@ export default defineConfig(({ mode }) => {
         )
       },
       globalSetup: './tests/jest.globalSetup.ts',
-      maxThreads: mode === 'e2e' ? 1 : undefined,
-      minThreads: mode === 'e2e' ? 1 : undefined,
-      outputDiffLines: Infinity,
-      outputDiffMaxLines: Infinity,
-      outputDiffMaxSize: Infinity,
-      outputTruncateLength: Infinity,
+      pool: 'forks',
+      fileParallelism: mode !== 'e2e',
       setupFiles: './tests/jest.setup.ts',
       snapshotFormat: {
+        escapeString: true,
         printBasicPrototype: true,
       },
       testTimeout,
-      watchExclude: [...configDefaults.watchExclude, '**/tests/templates'],
       chaiConfig: { includeStack: false, showDiff: true, truncateThreshold: 0 },
     },
   }
