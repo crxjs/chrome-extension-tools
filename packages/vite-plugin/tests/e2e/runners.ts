@@ -73,8 +73,8 @@ export async function build(dirname: string) {
 export async function serve(dirname: string) {
   const { outDir, server } = await _serve(dirname, {
     // A retry can observe the previous file-writer success notification.
-    // Wait for this server's output to settle before Firefox installs it.
-    waitForOutDir: process.env.E2E_BROWSER === 'firefox',
+    // Wait for this server's output to settle before either browser loads it.
+    waitForOutDir: true,
   })
 
   await allFilesSuccess()

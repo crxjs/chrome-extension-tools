@@ -21,7 +21,8 @@ The custom environment uses `autoLaunch: false`: each CRXJS test builds or serve
 its fixture before calling the environment's public `browser.launch(outDir)`.
 After fixture routes are installed, runners explicitly await declared background
 startup through the public API. Extensions without a background return immediately.
-The MAIN-world background-reload test also waits for the Vite HMR connection
+Both browsers wait for the current server's output files to settle before loading the extension, preventing a replayed success notification from an earlier run from opening incomplete output.
+The MAIN-world background-reload and two-entrypoint tests wait for the Vite HMR connection
 before editing its background module; its existing 15-second reload deadline and
 exactly-one-reload assertion remain unchanged, as do its retry policy and skips.
 The existing helper delegates background access to `browser.getBackground()`;
