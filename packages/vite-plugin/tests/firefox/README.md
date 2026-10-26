@@ -152,18 +152,14 @@ The runner forwards Vitest arguments to both runs and fails if either run fails.
 Firefox runs only the output files; the unit tests run once with the baseline.
 HMR tokens are normalized in the output helper so bridge snapshots are stable.
 
-The first RED run compared Firefox output against copies of the Chrome
-expectations, without `--update` (`CI=true`). It exited 1: **61 tests failed,
-3 passed, 1 existing skip**. Failures included the real `service_worker` →
-`scripts` manifest difference. Firefox snapshots were updated only after this
-run. This checks the output differences of the existing implementation; it does
-not claim the product changes were originally implemented test-first.
+The product regression comparison now holds the browser target and tests fixed
+and swaps only the CRXJS source tree: PR base `a7228f49` → `3bd2d324`.
+Chrome retains all 61 snapshot files unchanged. Firefox requires updates to 33
+files (31 serve, 2 build). The earlier Chrome-versus-Firefox RED run did not prove
+this before/after comparison.
 
-The subsequent GREEN run used `CI=true pnpm test:run:out --threads false`
-without `--update`: baseline **172 passed / 1 existing skip**, Firefox
-**64 passed / 1 existing skip**. All 61 snapshot files have both target variants.
-The first verification caught a changing React inline-script URL timestamp;
-that cache-buster value is normalized alongside the HMR token.
+See [OUTPUT-DIFF.md](./OUTPUT-DIFF.md) for the controlled test results, changed
+fixtures, review observations and the [complete diff](./output-before-after.patch).
 
 The output helper omits the bundled HMR clients from source snapshots. Real
 browser E2E tests cover their runtime behaviour; unchanged output snapshots alone
