@@ -53,6 +53,13 @@
     "onlyBuiltDependencies": [
       "playwright-chromium",
       "vitest-environment-web-ext"
-    ]
+    ],
+    "packageExtensions": {
+      "@openpolyfill/firefox-addon-playwright-harness@0.3.0": {
+        "dependencies": {
+          "playwright-core": "1.64.1"
+        }
+      }
+    }
   }
 }

@@ -151,3 +151,7 @@ the test's existing retries; this migration adds no retry policy.
 
 CI and publication status are reported separately in the PR. No merge or package
 publication is part of this implementation.
+
+### OpenPolyfill dependency resolution
+
+OpenPolyfill 0.3.0 resolves `playwright-core` from its own package but does not declare it. The root `pnpm.packageExtensions` supplies its missing `playwright-core: 1.64.1` dependency. This keeps Firefox patching on the pinned driver when Chromium also installs 1.61.1; it does not override Chromium. A fresh minimal pnpm installation with both versions reproduced the incompatible-patch failure without this extension and passed the same patch command with it.

@@ -301,6 +301,7 @@ jobs:
         run: pnpm test:firefox
 
       - name: Install Playwright Firefox
+        # The root package extension binds OpenPolyfill to its matching core.
         # Resolve the Firefox driver through the environment's pinned installer.
         run: pnpm exec web-ext-firefox install --with-deps
 

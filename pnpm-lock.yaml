@@ -5,6 +5,8 @@ settings:
   excludeLinksFromLockfile: false
   injectWorkspacePackages: true
 
+packageExtensionsChecksum: sha256-/rChMmZgnSWhy3iZZaBI3Gx5q9R95DmvhppHzSjcPQU=
+
 importers:
 
   .:
@@ -8784,6 +8786,7 @@ snapshots:
       '@playwright/test': 1.64.1
       diff: 8.0.4
       jszip: 3.10.2
+      playwright-core: 1.64.1
 
   '@openpolyfill/firefox-rdp@0.1.0': {}
 
