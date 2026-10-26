@@ -75,11 +75,11 @@ export async function testOutput(
       config.command === 'serve' &&
       manifest.content_security_policy?.extension_pages
     ) {
-      // Parallel fixtures can move Vite off 5200; keep the permitted origin visible.
+      // Hide the dynamic port chosen by parallel fixtures, preserving the allowed origin.
       manifest.content_security_policy.extension_pages =
         manifest.content_security_policy.extension_pages.replace(
           /((?:https?):\/\/localhost:)\d+(?=[\s;]|$)/g,
-          (_, origin) => `${origin}5200`,
+          (_, origin) => `${origin}<port>`,
         )
     }
     expect(manifest).toMatchSnapshot(name)

@@ -22,7 +22,7 @@ Object {
     },
   },
   "content_security_policy": Object {
-    "extension_pages": "script-src 'self' http://localhost:5200; object-src 'self'",
+    "extension_pages": "script-src 'self' http://localhost:<port>; object-src 'self'",
   },
   "declarative_net_request": Object {
     "rule_resources": Array [

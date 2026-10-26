@@ -28,7 +28,7 @@ Object {
     },
   ],
   "content_security_policy": Object {
-    "extension_pages": "script-src 'self' https://localhost:5200; object-src 'self'",
+    "extension_pages": "script-src 'self' https://localhost:<port>; object-src 'self'",
   },
   "description": "test extension",
   "host_permissions": Array [
