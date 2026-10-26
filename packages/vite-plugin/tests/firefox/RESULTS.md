@@ -193,3 +193,41 @@ Historical baseline: Linux/Vite 3 at 65d9573b (42 passed / 28 failed / 7 CI-cond
 | passed | mv3-vite-vue-page-hmr/vite-serve.test.ts | crx page update on hmr |  |
 | passed | mv3-web-accessible-resources/vite-build.test.ts | crx runs from build output |  |
 | passed | mv3-web-accessible-resources/vite-serve.test.ts | crx runs from server output |  |
+
+## Parallel output ports and background HMR readiness (2026-10-26)
+
+[CI run 40310383728](https://github.com/crxjs/chrome-extension-tools/actions/runs/40310383728)
+at `0e9259a7` exposed two test synchronization/normalization defects:
+
+- Ubuntu's output job passed its Chrome run, then failed 19 Firefox snapshots
+  solely because the dev CSP contained `localhost:5201` or `5202` rather than
+  `5200`. The previous normalizer handled script/HTML contents but omitted the
+  manifest. Three local workers reproduced the failure (21 affected tests;
+  scheduling changes which fixtures receive a different port). The helper now
+  normalizes only localhost port numbers in development CSP expectations;
+  protocol, host, directives and allowed sources remain visible. No snapshots
+  or product CSP were changed.
+- Chromium/Vite 7 passed 70 tests with 7 existing skips but timed out waiting for
+  navigation in the background-module-cache test. Delaying the real WebSocket
+  upgrade by three seconds reproduced the same timeout: initial extension
+  runtime messaging worked, but the reload was broadcast to zero HMR clients.
+  Waiting for an HMR client before updating the dependency made that controlled
+  reproduction pass, with the broadcast reaching one client. The single-element
+  and single-response assertions remain unchanged; no retry/skip was added.
+- The Windows output job was canceled before completing its assertions. Firefox
+  E2E jobs were skipped because the prerequisite checks failed.
+
+Local validation with Node 22.23.2:
+
+- Unit/output on Vite 3 with three workers, no snapshot update: Chrome
+  **172 passed / 0 failed / 1 existing skip**; Firefox **64 / 0 / 1**.
+- Complete headless Chromium E2E on Vite 7: **71 / 0 / 7**, all 72 files reported.
+- TypeScript and targeted ESLint passed. Diagnostic upgrade delays and logs
+  were confined to the isolated reproduction and are absent from the PR.
+- Complete headless Firefox E2E on Vite 7 with `CI=true`: **68 / 0 / 10**;
+  the execution report accepted all 72 files. The required local Playwright
+  Firefox revision was installed after the initial setup-only ENOENT failure.
+
+These fixes change only tests/helpers. Product code, snapshot expectations,
+browser versions, retries and skips are unchanged. Remote CI after the push is
+separate validation of the Ubuntu and Windows environments.

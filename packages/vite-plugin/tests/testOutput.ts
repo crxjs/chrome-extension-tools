@@ -71,6 +71,17 @@ export async function testOutput(
   getTest('manifest.json', (source, name) => {
     const scrubbed = scrubHashes(source)
     const manifest: ManifestV3 = JSON.parse(scrubbed)
+    if (
+      config.command === 'serve' &&
+      manifest.content_security_policy?.extension_pages
+    ) {
+      // Parallel fixtures can move Vite off 5200; keep the permitted origin visible.
+      manifest.content_security_policy.extension_pages =
+        manifest.content_security_policy.extension_pages.replace(
+          /((?:https?):\/\/localhost:)\d+(?=[\s;]|$)/g,
+          (_, origin) => `${origin}5200`,
+        )
+    }
     expect(manifest).toMatchSnapshot(name)
   })(JSON.stringify(manifest), '_00 manifest.json')
 
@@ -105,7 +116,7 @@ export async function testOutput(
           .replaceAll('\\\\', '\\')
 
         source = source.replace(
-            new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
+          new RegExp('<root>' + '([/\\\\][^"\']+)', 'g'),
           (_, path) => `<root>${path.replaceAll(/\\/g, '/')}`,
         )
       }
