@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'pathe'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { createUpdate } from '../helpers'
 import { serve } from '../runners'
 
@@ -36,7 +36,7 @@ test(
     const src = await copyInitialFixture()
     const src2 = path.join(__dirname, 'src2')
 
-    const { browser, routes } = await serve(__dirname)
+    const { browser, routes, devServer } = await serve(__dirname)
     const page = await browser.newPage()
     const update = createUpdate({ target: src, src: src2 })
 
@@ -107,7 +107,7 @@ test(
 
 test('MAIN world reloads once when the background restarts', async () => {
   const src = await copyInitialFixture()
-  const { browser, routes } = await serve(__dirname)
+  const { browser, routes, devServer } = await serve(__dirname)
   const page = await browser.newPage()
   await page.goto('https://example.com')
   await waitForMainWorldMessage(page, 'MAIN world HMR before update')
@@ -119,6 +119,8 @@ test('MAIN world reloads once when the background restarts', async () => {
     target: src,
     src: path.join(__dirname, 'src2'),
   })
+  // A rendered content script does not prove the background HMR socket is ready.
+  await vi.waitFor(() => expect(devServer.ws.clients.size).toBeGreaterThan(0), { timeout: 5000 })
   await Promise.all([
     page.waitForEvent('load', { timeout: 15000 }),
     update('background.ts'),

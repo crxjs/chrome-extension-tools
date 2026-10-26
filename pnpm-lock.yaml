@@ -400,8 +400,8 @@ importers:
         specifier: 3.2.7
         version: 3.2.7(@types/debug@4.1.13)(@types/node@20.19.43)(jiti@2.6.1)(jsdom@16.7.0)(terser@5.44.1)(yaml@2.8.2)
       vitest-environment-web-ext:
-        specifier: github:crxjs/vitest-environment-web-ext#c7ed7218bb370dc46a84bf604640f8c28277ad0a
-        version: https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/c7ed7218bb370dc46a84bf604640f8c28277ad0a(playwright@1.64.1)(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.43)(jiti@2.6.1)(jsdom@16.7.0)(terser@5.44.1)(yaml@2.8.2))
+        specifier: github:crxjs/vitest-environment-web-ext#def232e64ed419deb1ebb10c997eee4599629859
+        version: https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/def232e64ed419deb1ebb10c997eee4599629859(playwright@1.64.1)(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.43)(jiti@2.6.1)(jsdom@16.7.0)(terser@5.44.1)(yaml@2.8.2))
       vue:
         specifier: 3.2.47
         version: 3.2.47
@@ -6896,8 +6896,8 @@ packages:
       vite:
         optional: true
 
-  vitest-environment-web-ext@https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/c7ed7218bb370dc46a84bf604640f8c28277ad0a:
-    resolution: {tarball: https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/c7ed7218bb370dc46a84bf604640f8c28277ad0a}
+  vitest-environment-web-ext@https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/def232e64ed419deb1ebb10c997eee4599629859:
+    resolution: {tarball: https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/def232e64ed419deb1ebb10c997eee4599629859}
     version: 0.0.4
     hasBin: true
     peerDependencies:
@@ -14830,7 +14830,7 @@ snapshots:
     optionalDependencies:
       vite: 6.4.1(@types/node@26.0.0)(jiti@2.6.1)(terser@5.44.1)(yaml@2.8.2)
 
-  vitest-environment-web-ext@https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/c7ed7218bb370dc46a84bf604640f8c28277ad0a(playwright@1.64.1)(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.43)(jiti@2.6.1)(jsdom@16.7.0)(terser@5.44.1)(yaml@2.8.2)):
+  vitest-environment-web-ext@https://codeload.github.com/crxjs/vitest-environment-web-ext/tar.gz/def232e64ed419deb1ebb10c997eee4599629859(playwright@1.64.1)(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.43)(jiti@2.6.1)(jsdom@16.7.0)(terser@5.44.1)(yaml@2.8.2)):
     dependencies:
       '@openpolyfill/firefox-addon-playwright-harness': 0.3.0(@playwright/test@1.64.1)
       '@playwright/test': 1.64.1

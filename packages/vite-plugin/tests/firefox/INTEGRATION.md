@@ -2,7 +2,7 @@
 
 This migration starts at `7d35cc1f37e3fb2b64e9a498b454bc647a27f2fd` (#1252).
 It depends on [vitest-environment-web-ext #4](https://github.com/crxjs/vitest-environment-web-ext/pull/4),
-currently pinned to commit `c7ed7218bb370dc46a84bf604640f8c28277ad0a`.
+currently pinned to commit `def232e64ed419deb1ebb10c997eee4599629859`.
 Neither PR is merged and the library is not published by this migration.
 
 ## Ownership
@@ -19,6 +19,11 @@ without `--mode e2e` and the existing default watch command retain their browser
 environment. That direct-command regression was checked RED→GREEN.
 The custom environment uses `autoLaunch: false`: each CRXJS test builds or serves
 its fixture before calling the environment's public `browser.launch(outDir)`.
+After fixture routes are installed, runners explicitly await declared background
+startup through the public API. Extensions without a background return immediately.
+The MAIN-world background-reload test also waits for the Vite HMR connection
+before editing its background module; its existing 15-second reload deadline and
+exactly-one-reload assertion remain unchanged, as do its retry policy and skips.
 The existing helper delegates background access to `browser.getBackground()`;
 Firefox URL matching obtains the scheme from `browser.getExtensionURL()`.
 
@@ -115,7 +120,7 @@ The local compat matrix also passed on Vite 6.4.1 (6 passed / 6 skipped),
 The immutable Git package was separately installed and passed two shared E2E
 scenarios in each browser, confirming distribution preparation before publication.
 The library's original 17 headless/unit tests passed with both Vitest 3.2.7 and
-4.0.18. The final 19-test suite (including target-replacement and slow-cleanup regressions)
+4.0.18. The final 20-test suite (including target-replacement and slow-cleanup regressions)
 passed locally on Vitest 4.0.18; its CI checks both versions.
 
 ### Output comparison controls

@@ -65,6 +65,8 @@ export async function build(dirname: string) {
     })
   })
 
+  // Register fixture routes before waiting for startup-created pages.
+  await globalThis.browser.getBackground(15000)
   return { browser, outDir, output }
 }
 
@@ -87,6 +89,7 @@ export async function serve(dirname: string) {
     routes.next(route)
   })
 
+  await globalThis.browser.getBackground(15000)
   return {
     browser,
     outDir,
