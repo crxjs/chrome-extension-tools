@@ -2,7 +2,7 @@
 
 This migration starts at `7d35cc1f37e3fb2b64e9a498b454bc647a27f2fd` (#1252).
 It depends on [vitest-environment-web-ext #4](https://github.com/crxjs/vitest-environment-web-ext/pull/4),
-currently pinned to commit `f6cdb7e8d9c51a682ae22393f4f58c61a00156c5`.
+currently pinned to commit `2171a2157070c9fee76634a260275bd2cb7d8c2e`.
 Neither PR is merged and the library is not published by this migration.
 
 ## Ownership
@@ -43,7 +43,10 @@ inheriting CRXJS's `injectWorkspacePackages` setting. Tests retain the normal
 `CI=true` environment and all existing retry/skip conditions. A clean-store
 reproduction failed with `ERR_PNPM_LOCKFILE_CONFIG_MISMATCH` before this change
 and successfully built/imported the package afterward. This workaround can be
-removed with the Git pin after publication. Once a release is separately approved,
+removed with the Git pin after publication. The library's plain-JavaScript
+build configuration is named `tsdown.config.mjs`, so Node 22 can load it when
+Git preparation runs inside pnpm's `node_modules`-based store; this was also
+reproduced locally before updating the Git pin. Once a release is separately approved,
 replace the Git pin with the published version and update the lockfile.
 A built tarball was used for the initial local integration checks, installed with
 `--ignore-scripts`; this does not require publication.
