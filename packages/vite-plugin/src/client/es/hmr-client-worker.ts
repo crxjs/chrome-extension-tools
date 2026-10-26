@@ -196,6 +196,7 @@ function handleCrxHmrPayload(payload: CrxHMRPayload) {
     case 'crx:runtime-reload':
       // immediate runtime reload
       console.log('[crx] runtime reload')
+      // Firefox-only background documents restore these tabs after restart.
       if (hasBackgroundDocument) {
         const tabs = [
           ...new Set(

@@ -34,6 +34,8 @@ export class HMRPort {
   private port: chrome.runtime.Port | undefined
   private callbacks = new Map<string, Set<(event: any) => void>>()
 
+  // Firefox-only: MAIN cannot connect through externally_connectable; receive
+  // dev HMR from the isolated loader in content-firefox-main-bridge.ts.
   private readonly mainBridge =
     !connectsToOwnRuntime &&
     location.protocol !== 'moz-extension:' &&

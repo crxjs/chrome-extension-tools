@@ -1,6 +1,8 @@
 declare const __MAIN_MODULE__: string
 declare const __CRX_HMR_TOKEN__: string
 
+// Firefox-only, serve and build: give MAIN imports an extension module URL
+// as their base. HMR forwarding below is enabled only during development.
 // This loader runs in the isolated world. The module element runs in MAIN,
 // with an extension URL as its base for imports. No extension API is exposed.
 if (__CRX_HMR_TOKEN__) {

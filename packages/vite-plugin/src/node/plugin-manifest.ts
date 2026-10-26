@@ -148,6 +148,8 @@ export const pluginManifest: CrxPluginFn = () => {
   let firefox = false
   let devServer: ViteDevServer
 
+  // Firefox-only development: background pages cannot proxy extension HTML
+  // through the service-worker fetch handler used by Chromium.
   async function firefoxHtml(file: string) {
     const origin = `${config.server.https ? 'https' : 'http'}://localhost:${
       config.server.port
@@ -240,6 +242,7 @@ export const pluginManifest: CrxPluginFn = () => {
       },
       configureServer(server) {
         devServer = server
+        // Firefox-only: emitted dev HTML loads its modules directly from Vite.
         if (firefox) {
           server.config.server.origin ??= `${
             server.config.server.https ? 'https' : 'http'

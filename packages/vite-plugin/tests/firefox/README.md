@@ -105,6 +105,37 @@ to MAIN; page code can request a connected notification but cannot relay command
 to extension APIs. Native MAIN IIFEs remain native manifest scripts.
 Production CSP and Chromium manifests are unchanged.
 
+## Firefox-only product code
+
+These are browser compatibility paths, separate from the OpenPolyfill test
+harness. Inline comments identify the reason at each integration point.
+
+| Path under `src/` | Mode | Firefox requirement |
+| --- | --- | --- |
+| `node/plugin-background.ts` | serve | Allow the local Vite origin in CSP and register startup listeners through static imports. |
+| `node/plugin-manifest.ts`, `node/html.ts` | serve | Emit transformed extension HTML with Vite asset URLs; retain extension-relative content assets and let HMR own isolated CSS. |
+| `client/es/hmr-client-worker.ts` | serve | Restore connected tabs after the background document restarts. |
+| `client/es/hmr-content-port.ts` | serve | Receive MAIN-world HMR through the isolated bridge. |
+| `client/iife/content-firefox-main-bridge.ts`, `node/contentScripts.ts`, `node/plugin-contentScripts.ts` | serve + build | Bootstrap MAIN modules through an isolated script; forward HMR only in serve mode. Native MAIN IIFEs keep their existing path. |
+| `node/plugin-webAccessibleResources.ts` | build | Expose sandbox module dependency graphs to their opaque origin. |
+
+### Output snapshots
+
+Existing `tests/out` fixtures use the default Chrome target, so Firefox-only
+branches do not change their snapshots. `E2E_BROWSER=firefox` is set by the
+Firefox E2E runner; the regular output suite does not run a browser matrix.
+The `tests/out/firefox` fixture explicitly selects `browser: 'firefox'` and
+records separate serve/build snapshots for the dev CSP/background/HTML paths,
+MAIN module bootstraps and production sandbox resources:
+
+```sh
+pnpm -C packages/vite-plugin exec vitest --run --mode out tests/out/firefox
+```
+
+The output helper omits the bundled HMR clients from source snapshots. Real
+browser E2E tests cover their runtime behaviour; unchanged output snapshots alone
+do not establish Firefox compatibility.
+
 ## CI and interpretation
 
 After the existing checks pass, CI runs both the stock-Firefox smoke test and the

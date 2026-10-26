@@ -249,6 +249,7 @@ export const pluginContentScripts: CrxPluginFn = () => {
         sub = new Subscription() // can't reuse subscriptions
       },
       transformCrxManifest(manifest) {
+        // Firefox-only: MAIN HMR uses the isolated bridge, not external messaging.
         if (firefox) return null
         if (worldMainExternallyConnectableMatches.size === 0) return null
 
@@ -286,6 +287,8 @@ export const pluginContentScripts: CrxPluginFn = () => {
       },
     },
     {
+      // Firefox-only (serve and build): register module bootstraps in ISOLATED;
+      // the inserted <script type=module> still executes user code in MAIN.
       name: 'crx:firefox-main-world',
       renderCrxManifest(manifest) {
         if (!firefox) return null
@@ -380,6 +383,7 @@ export function finalizeBuildContentScripts(
       if (shouldUseLoader) {
         if (typeof script.loaderName === 'undefined') {
           let mainModule: string | undefined
+          // Firefox-only production counterpart of the dev MAIN module bridge.
           if (firefox && worldMainIds.has(script.id)) {
             const mainRef = context.emitFile({
               type: 'asset',
