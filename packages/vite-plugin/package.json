@@ -91,8 +91,6 @@
     "@eslint/eslintrc": "3.3.5",
     "@eslint/js": "9.26.0",
     "@extend-chrome/messages": "1.2.2",
-    "@openpolyfill/firefox-addon-playwright-harness": "0.3.0",
-    "@playwright/test": "1.64.1",
     "@sveltejs/vite-plugin-svelte": "1.4.0",
     "@types/chrome": "0.0.237",
     "@types/convert-source-map": "^2.0.0",
@@ -128,8 +126,9 @@
     "unocss": "^66.5.12",
     "vite": "^3.2.11",
     "vite-plugin-inspect": "0.7.25",
-    "vitest": "0.34.6",
-    "vue": "3.2.47"
+    "vitest": "3.2.7",
+    "vue": "3.2.47",
+    "vitest-environment-web-ext": "github:crxjs/vitest-environment-web-ext#def232e64ed419deb1ebb10c997eee4599629859"
   },
   "peerDependencies": {
     "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"

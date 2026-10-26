@@ -1,5 +1,9 @@
 # Local Firefox compatibility results
 
+For the subsequent harness migration, see [INTEGRATION.md](./INTEGRATION.md).
+The evidence below records the original Firefox implementation.
+
+
 Local full run on 2026-10-23, macOS arm64, Node 22.23.3, Vite 3.2.11, OpenPolyfill 0.3.0, Playwright 1.64.1 / patched Firefox 157.0. See [README.md](./README.md) for reproduction and the experimental harness.
 
 **72 files / 78 tests: 71 passed, 0 failed, 7 skipped.** Previous complete run: 61 passed / 12 failed / 4 skipped (77 tests). This run adds one regression test for exactly one MAIN-world page reload after a background restart.

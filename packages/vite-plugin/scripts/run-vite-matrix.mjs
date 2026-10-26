@@ -171,7 +171,7 @@ function run(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd ?? packageDir,
-      env: process.env,
+      env: options.env ?? process.env,
       shell: false,
       stdio: 'inherit',
     })
@@ -197,7 +197,7 @@ function capture(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd ?? packageDir,
-      env: process.env,
+      env: options.env ?? process.env,
       shell: false,
       stdio: ['ignore', 'pipe', 'pipe'],
     })
@@ -278,12 +278,18 @@ async function main() {
         ['install', '--filter', 'vite-plugin', '--frozen-lockfile'],
         {
           cwd: rootDir,
+          env: { ...process.env, CI: 'false', PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' },
         },
       )
     }
 
     if (options.build) {
       await run(PNPM, ['build'])
+    }
+
+    if (JSON.parse(backups.packageJson).devDependencies['vitest-environment-web-ext']?.startsWith('github:')) {
+      switchedViteVersion = true
+      await run(process.execPath, [path.join(packageDir, 'scripts/use-packed-web-ext.mjs')])
     }
 
     for (const version of versions) {
@@ -314,10 +320,6 @@ async function main() {
       for (const mode of modes) {
         const vitestArgs = ['exec', 'vitest', '--run', '--mode', mode]
 
-        if (majorVersion === '8') {
-          vitestArgs.push('--threads', 'false')
-        }
-
         vitestArgs.push(...options.vitestArgs)
 
         await run(PNPM, vitestArgs)
@@ -335,9 +337,8 @@ async function main() {
         'install',
         '--filter',
         'vite-plugin',
-        '--ignore-scripts',
         '--frozen-lockfile',
-      ])
+      ], { env: { ...process.env, CI: 'false', PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1' } })
     }
   }
 

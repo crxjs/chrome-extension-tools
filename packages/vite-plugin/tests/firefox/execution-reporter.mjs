@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs'
 
-// Vitest 0.34's JSON reporter omits unhandled errors outside test assertions.
+// Persist unhandled errors separately for execution completeness verification.
 export default class FirefoxExecutionReporter {
   onFinished(files, errors) {
     writeFileSync(

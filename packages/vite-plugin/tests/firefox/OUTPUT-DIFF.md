@@ -1,5 +1,9 @@
 # Output comparison before and after Firefox compatibility fixes
 
+For the subsequent harness migration, see [INTEGRATION.md](./INTEGRATION.md).
+The evidence below records the original Firefox implementation.
+
+
 This compares each browser target against itself before and after the product
 changes. It does **not** compare Chrome output with Firefox output.
 
