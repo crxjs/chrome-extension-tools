@@ -14,6 +14,9 @@ evaluation and replacement actors after runtime reload. CRXJS no longer has a
 Firefox launcher, preparation script, worker-shaped RDP proxy or Chromium profile
 launcher/template implementation.
 
+The custom environment also matches E2E file paths, so selecting one file
+without `--mode e2e` and the existing default watch command retain their browser
+environment. That direct-command regression was checked RED→GREEN.
 The custom environment uses `autoLaunch: false`: each CRXJS test builds or serves
 its fixture before calling the environment's public `browser.launch(outDir)`.
 The existing helper delegates background access to `browser.getBackground()`;

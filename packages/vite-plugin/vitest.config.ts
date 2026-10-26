@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
     test: {
       expect: { poll: { timeout: 15_000 } },
       environment: mode === 'e2e' ? 'web-ext' : 'node',
+      environmentMatchGlobs: [['**/tests/e2e/**', 'web-ext']],
       environmentOptions: {
         'web-ext': {
           path: '.',
