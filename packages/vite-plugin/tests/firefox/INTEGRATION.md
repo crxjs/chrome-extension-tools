@@ -2,7 +2,7 @@
 
 This migration starts at `7d35cc1f37e3fb2b64e9a498b454bc647a27f2fd` (#1252).
 It depends on [vitest-environment-web-ext #4](https://github.com/crxjs/vitest-environment-web-ext/pull/4),
-currently pinned to commit `2171a2157070c9fee76634a260275bd2cb7d8c2e`.
+currently pinned to commit `c7ed7218bb370dc46a84bf604640f8c28277ad0a`.
 Neither PR is merged and the library is not published by this migration.
 
 ## Ownership
@@ -33,6 +33,10 @@ and fixture runners continue importing the separately installed `vite`, starting
 at Vite 3.2.11. The supported matrix remains Vite 3, 6, 7 and 8.1. There is no global
 Vite override and no product dependency upgrade. Sequential E2E execution uses
 forks with `fileParallelism: false`; the retired `--threads false` flag is removed.
+Cleanup hooks use the same timeout budget as tests (60 seconds by default),
+so Windows can finish deleting a fresh browser profile before the next test.
+Test assertion deadlines, retries and skips are unchanged. The library serializes
+relaunch against pending cleanup and concurrent closes share one cleanup promise.
 The old `meta.file` test context and snapshot string escaping are adapted to the
 new runner without changing assertions or stored snapshots.
 
@@ -111,7 +115,7 @@ The local compat matrix also passed on Vite 6.4.1 (6 passed / 6 skipped),
 The immutable Git package was separately installed and passed two shared E2E
 scenarios in each browser, confirming distribution preparation before publication.
 The library's original 17 headless/unit tests passed with both Vitest 3.2.7 and
-4.0.18. The final 18-test suite (including the target-replacement race regression)
+4.0.18. The final 19-test suite (including target-replacement and slow-cleanup regressions)
 passed locally on Vitest 4.0.18; its CI checks both versions.
 
 ### Output comparison controls

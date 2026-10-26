@@ -88,6 +88,7 @@ export default defineConfig(({ mode }) => {
         printBasicPrototype: true,
       },
       testTimeout,
+      hookTimeout: testTimeout,
       chaiConfig: { includeStack: false, showDiff: true, truncateThreshold: 0 },
     },
   }
