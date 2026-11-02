@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'pathe'
-import { firstValueFrom } from 'rxjs'
+import { firstValueFrom, timeout } from 'rxjs'
 import { expect, test } from 'vitest'
 import { createUpdate, getPage, waitForInnerHtml } from '../helpers'
 import { serve } from '../runners'
@@ -47,17 +47,18 @@ test.skipIf(process.env.CI)('crx page update on hmr', async () => {
   expect(reloads).toBeGreaterThanOrEqual(1) // full reload on jsx update
   expect(optionsPage.isClosed()).toBe(false) // no runtime reload on js update
 
-
   // update background.ts file -> trigger runtime reload
-  const closeEvent= optionsPage.waitForEvent('close', { timeout: 5000 })
-  await update('bg-onload.ts')
-  await firstValueFrom(routes)
-  await closeEvent;
-  
-
+  await Promise.all([
+    // Subscribe before writing: Firefox may finish reloading during the update.
+    firstValueFrom(routes.pipe(timeout(15_000))),
+    ...(process.env.E2E_BROWSER === 'firefox'
+      ? []
+      : [optionsPage.waitForEvent('close', { timeout: 5000 })]),
+    update('bg-onload.ts'),
+  ])
 
   expect(reloads).toBeGreaterThanOrEqual(2) // full reload on background script update
   await app.waitFor({ timeout: 15_000 })
 
-  expect(optionsPage.isClosed()).toBe(true)
+  expect(optionsPage.isClosed()).toBe(process.env.E2E_BROWSER !== 'firefox')
 })

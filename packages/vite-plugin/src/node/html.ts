@@ -15,3 +15,24 @@ export function extractScriptsAndRemove(html: string): ExtractScriptsResult {
   scripts.forEach((el) => el.remove())
   return { scriptSrcs, html: root.toString() }
 }
+
+/** Firefox extension pages cannot proxy requests through a service worker. */
+export function rewriteDevHtmlAssets(html: string, pageUrl: string): string {
+  const root = parse(html)
+  for (const selector of [
+    'script[src]',
+    'img[src]',
+    'source[src]',
+    'video[src]',
+    'audio[src]',
+    'input[src]',
+    'link[href]',
+  ]) {
+    for (const element of root.querySelectorAll(selector)) {
+      const attribute = selector === 'link[href]' ? 'href' : 'src'
+      const value = element.getAttribute(attribute)!
+      element.setAttribute(attribute, new URL(value, pageUrl).href)
+    }
+  }
+  return root.toString()
+}

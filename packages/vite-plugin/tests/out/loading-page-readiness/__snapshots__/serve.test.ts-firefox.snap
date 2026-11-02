@@ -1,0 +1,79 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serve loading page waits for the requested extension html > _00 manifest.json 1`] = `
+Object {
+  "action": Object {
+    "default_popup": "src/popup.html?page=default",
+  },
+  "background": Object {
+    "scripts": Array [
+      "service-worker-loader.js",
+    ],
+    "type": "module",
+  },
+  "browser_specific_settings": Object {
+    "gecko": Object {
+      "id": "e2e@crxjs.test",
+    },
+  },
+  "content_security_policy": Object {
+    "extension_pages": "script-src 'self' http://localhost:<port>; object-src 'self'",
+  },
+  "description": "loading page readiness test extension",
+  "manifest_version": 3,
+  "name": "Loading Page Readiness",
+  "version": "1.0.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`serve loading page waits for the requested extension html > _01 output files 1`] = `
+Array [
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/popup.html",
+]
+`;
+
+exports[`serve loading page waits for the requested extension html > _02 optimized deps 1`] = `
+Set {
+  "src/background.js",
+  "src/popup.html",
+}
+`;
+
+exports[`serve loading page waits for the requested extension html > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+import 'http://localhost:3000/src/background.js';
+"
+`;
+
+exports[`serve loading page waits for the requested extension html > src/popup.html 1`] = `
+"<!DOCTYPE html>
+<html lang=\\"en\\">
+  <head>
+    <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
+
+    <script type=\\"module\\" src=\\"http://localhost:3000/@vite/client\\"></script>
+
+    <meta charset=\\"UTF-8\\" >
+    <title>Popup Page</title>
+  </head>
+  <body>
+    <div id=\\"root\\"></div>
+    <script src=\\"http://localhost:3000/src/popup.js\\" type=\\"module\\"></script>
+  </body>
+</html>
+"
+`;

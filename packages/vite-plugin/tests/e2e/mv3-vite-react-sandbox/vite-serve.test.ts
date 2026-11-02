@@ -4,7 +4,10 @@ import { expect, test } from 'vitest'
 import { getServiceWorker } from '../helpers'
 import { serve } from '../runners'
 
-test('sandbox page loads and runs JavaScript in dev mode', async () => {
+// Firefox uses a separate dev HTML transport; its sandbox was already skipped.
+const sandboxTest = test.skipIf(process.env.E2E_BROWSER === 'firefox')
+
+sandboxTest('sandbox page loads and runs JavaScript in dev mode', async () => {
   const { browser } = await serve(__dirname)
   const worker = await getServiceWorker(browser, { timeout: 10000 })
   expect(worker).toBeDefined()
@@ -17,7 +20,7 @@ test('sandbox page loads and runs JavaScript in dev mode', async () => {
   expect(await page.getByRole('button').textContent()).toBe('count is: 1')
 })
 
-test('sandbox keeps its isolation and loads local assets in dev mode', async () => {
+sandboxTest('sandbox keeps its isolation and loads local assets in dev mode', async () => {
   const { browser } = await serve(__dirname)
   const worker = await getServiceWorker(browser, { timeout: 10000 })
   expect(worker).toBeDefined()
@@ -43,7 +46,7 @@ test('sandbox keeps its isolation and loads local assets in dev mode', async () 
   expect(failedRequests).toEqual([])
 })
 
-test('sandbox preserves component state during hot updates', async () => {
+sandboxTest('sandbox preserves component state during hot updates', async () => {
   const { browser } = await serve(__dirname)
   const worker = await getServiceWorker(browser, { timeout: 10000 })
   expect(worker).toBeDefined()

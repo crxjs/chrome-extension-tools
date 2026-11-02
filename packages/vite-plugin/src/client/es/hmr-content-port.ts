@@ -37,6 +37,13 @@ export class HMRPort {
 
   private socket: WebSocket | undefined
 
+  // Firefox-only: MAIN cannot connect through externally_connectable; receive
+  // dev HMR from the isolated loader in content-firefox-main-bridge.ts.
+  private readonly mainBridge =
+    !connectsToOwnRuntime &&
+    location.protocol !== 'moz-extension:' &&
+    import.meta.url.startsWith('moz-extension:')
+
   constructor(url?: string, protocols?: string | string[]) {
     // Sandboxed extension pages have no chrome.runtime and connect directly.
     if (!runtime && location.protocol === 'chrome-extension:' && url) {
@@ -51,6 +58,20 @@ export class HMRPort {
           this.handleMessage(event)
       })
       this.socket.addEventListener('close', this.handleDisconnect)
+      return
+    }
+
+    if (this.mainBridge) {
+      window.addEventListener('message', (event) => {
+        if (
+          event.source === window &&
+          event.data?.channel === `@crx/main:${__CRX_HMR_TOKEN__}` &&
+          typeof event.data?.data === 'string'
+        )
+          this.handleMessage(event.data)
+      })
+      // Vite attaches message listeners after construction.
+      queueMicrotask(this.initPort)
       return
     }
 
@@ -78,6 +99,13 @@ export class HMRPort {
   }
 
   initPort = () => {
+    if (this.mainBridge) {
+      window.postMessage(
+        { channel: `@crx/main:${__CRX_HMR_TOKEN__}`, ready: true },
+        '*',
+      )
+      return
+    }
     if (!runtime) throw new Error('[crx] chrome.runtime is not available')
 
     const connectInfo = { name: crxClientPortName }
@@ -135,6 +163,8 @@ export class HMRPort {
   }
 
   send = (data: string) => {
+    // Vite's keepalive/connected messages need no privileged forwarding.
+    if (this.mainBridge) return
     if (this.socket) this.socket.send(data)
     else if (this.port) this.port.postMessage({ data })
     else throw new Error('HMRPort is not initialized')

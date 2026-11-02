@@ -40,9 +40,7 @@ export const pluginBackground: CrxPluginFn = () => {
   let config: ResolvedConfig
   let browser: Browser
   let liveReload = true
-  let devBackgroundLoader:
-    | { worker: string; fileName: string }
-    | undefined
+  let devBackgroundLoader: { worker: string; fileName: string } | undefined
 
   return [
     {
@@ -130,16 +128,32 @@ export const pluginBackground: CrxPluginFn = () => {
             throw new Error('server port is undefined in watch mode')
 
           if (browser === 'firefox') {
-            // in FF, our "service worker" is actually a background page so we
-            // can't use import statements
+            // Temporary Firefox MV3 extensions (147+) can load localhost
+            // scripts only when the extension CSP explicitly permits them.
+            const origin = `${proto}://localhost:${port}`
+            const policy = manifest.content_security_policy ?? {}
+            const directives = (
+              policy.extension_pages ?? "script-src 'self'; object-src 'self'"
+            )
+              .split(';')
+              .map((directive) => directive.trim())
+              .filter(Boolean)
+            const scriptIndex = directives.findIndex((directive) =>
+              /^script-src(?:\s|$)/.test(directive),
+            )
+            if (scriptIndex === -1)
+              directives.push(`script-src 'self' ${origin}`)
+            else directives[scriptIndex] += ` ${origin}`
+            manifest.content_security_policy = {
+              ...policy,
+              extension_pages: directives.join('; '),
+            }
 
-            // development, required to define env vars
-            loader = `import('${proto}://localhost:${port}/@vite/env');\n`
-            // development, required hmr client
-            loader += `import('${proto}://localhost:${port}${workerClientId}');\n`
-            // development, optional service worker
-            if (worker)
-              loader += `import('${proto}://localhost:${port}/${worker}');\n`
+            // Static dependencies finish before Firefox dispatches startup events.
+            // Dynamic top-level imports can miss runtime.onInstalled.
+            loader = `import '${origin}/@vite/env';\n`
+            loader += `import '${origin}${workerClientId}';\n`
+            if (worker) loader += `import '${origin}/${worker}';\n`
           } else {
             // development, required to define env vars
             loader = `import '${proto}://localhost:${port}/@vite/env';\n`

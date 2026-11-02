@@ -104,3 +104,28 @@ test(
   },
   { retry: process.env.CI ? 5 : 2 },
 )
+
+test('MAIN world reloads once when the background restarts', async () => {
+  const src = await copyInitialFixture()
+  const { browser, routes } = await serve(__dirname)
+  const page = await browser.newPage()
+  await page.goto('https://example.com')
+  await waitForMainWorldMessage(page, 'MAIN world HMR before update')
+  let reloads = 0
+  routes.subscribe(() => {
+    reloads++
+  })
+  const update = createUpdate({
+    target: src,
+    src: path.join(__dirname, 'src2'),
+  })
+  await Promise.all([
+    page.waitForEvent('load', { timeout: 15000 }),
+    update('background.ts'),
+  ])
+  await waitForMainWorldMessage(page, 'MAIN world HMR before update')
+  // Content-side reload timers fire after 500ms. Detect duplicate reloads,
+  // rather than accepting the first successful load and closing the browser.
+  await page.waitForTimeout(1000)
+  expect(reloads).toBe(1)
+})

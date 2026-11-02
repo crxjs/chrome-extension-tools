@@ -1,0 +1,168 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`serve fs output > _00 manifest.json 1`] = `
+Object {
+  "background": Object {
+    "scripts": Array [
+      "service-worker-loader.js",
+    ],
+    "type": "module",
+  },
+  "browser_specific_settings": Object {
+    "gecko": Object {
+      "id": "e2e@crxjs.test",
+    },
+  },
+  "content_scripts": Array [
+    Object {
+      "js": Array [
+        "src/content1/index.ts-loader.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+    Object {
+      "js": Array [
+        "src/content2/index.ts-loader.js",
+      ],
+      "matches": Array [
+        "http://*/*",
+        "https://*/*",
+      ],
+    },
+  ],
+  "content_security_policy": Object {
+    "extension_pages": "script-src 'self' http://localhost:<port>; object-src 'self'",
+  },
+  "manifest_version": 3,
+  "name": "test extension",
+  "version": "0.1.0",
+  "web_accessible_resources": Array [
+    Object {
+      "matches": Array [
+        "<all_urls>",
+      ],
+      "resources": Array [
+        "*",
+        "**/*",
+      ],
+    },
+  ],
+}
+`;
+
+exports[`serve fs output > _01 output files 1`] = `
+Array [
+  "manifest.json",
+  "service-worker-loader.js",
+  "src/content1/index.ts-loader.js",
+  "src/content1/index.ts.js",
+  "src/content1/styles.css.js",
+  "src/content2/index.ts-loader.js",
+  "src/content2/index.ts.js",
+  "src/content2/styles.css.js",
+  "vendor/crx-client-port.js",
+  "vendor/vite-client.js",
+  "vendor/vite-dist-client-env.mjs.js",
+  "vendor/webcomponents-custom-elements.js",
+]
+`;
+
+exports[`serve fs output > _02 optimized deps 1`] = `
+Set {
+  "src/content1/index.ts",
+  "src/content2/index.ts",
+}
+`;
+
+exports[`serve fs output > service-worker-loader.js 1`] = `
+"import 'http://localhost:3000/@vite/env';
+import 'http://localhost:3000/@crx/client-worker';
+"
+`;
+
+exports[`serve fs output > src/content1/index.ts.js 1`] = `
+"import \\"/src/content1/styles.css.js\\";
+console.log(\\"content1\\");
+"
+`;
+
+exports[`serve fs output > src/content1/index.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content1/index.ts.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/content1/styles.css.js 1`] = `
+"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/content1/styles.css.js\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
+const __vite__id = \\"<root>/src/content1/styles.css\\"
+const __vite__css = \\"body {\\\\n  color: red;\\\\n}\\\\n\\"
+__vite__updateStyle(__vite__id, __vite__css)
+import.meta.hot.accept()
+export default __vite__css
+import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
+`;
+
+exports[`serve fs output > src/content2/index.ts.js 1`] = `
+"import \\"/src/content2/styles.css.js\\";
+console.log(\\"content2\\");
+"
+`;
+
+exports[`serve fs output > src/content2/index.ts-loader.js 1`] = `
+"(function () {
+  'use strict';
+
+  const injectTime = performance.now();
+  (async () => {
+    if (\\"\\")
+      await import(
+        /* @vite-ignore */
+        chrome.runtime.getURL(\\"\\")
+      );
+    await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"vendor/vite-client.js\\")
+    );
+    const { onExecute } = await import(
+      /* @vite-ignore */
+      chrome.runtime.getURL(\\"src/content2/index.ts.js\\")
+    );
+    onExecute?.({ perf: { injectTime, loadTime: performance.now() - injectTime } });
+  })().catch(console.error);
+
+})();
+"
+`;
+
+exports[`serve fs output > src/content2/styles.css.js 1`] = `
+"import { createHotContext as __vite__createHotContext } from \\"/vendor/vite-client.js\\";import.meta.hot = __vite__createHotContext(\\"/src/content2/styles.css.js\\");import { updateStyle as __vite__updateStyle, removeStyle as __vite__removeStyle } from \\"/vendor/vite-client.js\\"
+const __vite__id = \\"<root>/src/content2/styles.css\\"
+const __vite__css = \\"body {\\\\n  color: blue;\\\\n}\\\\n\\"
+__vite__updateStyle(__vite__id, __vite__css)
+import.meta.hot.accept()
+export default __vite__css
+import.meta.hot.prune(() => __vite__removeStyle(__vite__id))"
+`;

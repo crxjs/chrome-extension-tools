@@ -16,8 +16,14 @@ import {
   hashScriptId,
 } from './contentScripts'
 import { add } from './fileWriter'
-import { formatFileData, getFileName, prefix } from './fileWriter-utilities'
+import {
+  formatFileData,
+  getFileName,
+  getOutputPath,
+  prefix,
+} from './fileWriter-utilities'
 import { htmlFiles, manifestFiles } from './files'
+import { rewriteDevHtmlAssets } from './html'
 import {
   decodeManifest,
   encodeManifest,
@@ -44,6 +50,19 @@ import {
 const { readFile } = fs
 
 declare const structuredClone: <T>(value: T) => T
+
+/** Asset exports written into the extension must remain extension-relative. */
+export function stripDevAssetOrigin(code: string, origin: string): string {
+  return code.replace(
+    /^(export default )("(?:[^"\\]|\\.)*")/,
+    (match, prefix, value) => {
+      const url: string = JSON.parse(value)
+      return url.startsWith(`${origin}/`)
+        ? `${prefix}${JSON.stringify(url.slice(origin.length))}`
+        : match
+    },
+  )
+}
 
 export function getDocumentStartLoaderWarnings(
   manifest: Pick<ManifestV3, 'content_scripts'>,
@@ -145,17 +164,35 @@ async function renderSandboxHtml(server: ViteDevServer, fileName: string) {
  * renders them as output file names before `renderCrxManifest`.
  */
 export const pluginManifest: CrxPluginFn = () => {
-  let devServer: ViteDevServer
   let manifest: ManifestV3
   // Initialize plugins as empty array to prevent "plugins is not iterable" error
   // This is important for rolldown-vite (Vite 7) compatibility where buildStart
   // doesn't receive options.plugins
   let plugins: CrxPlugin[] = []
   let devHtmlFiles = new Set<string>()
+  let inputHtmlFiles: string[] = []
   let refId: string
   let config: ResolvedConfig
   let iifeReloadBridgeFileName: string | undefined
   let liveReload = true
+  let firefox = false
+  let devServer: ViteDevServer
+
+  // Firefox-only development: background pages cannot proxy extension HTML
+  // through the service-worker fetch handler used by Chromium.
+  async function firefoxHtml(file: string) {
+    const origin = `${config.server.https ? 'https' : 'http'}://localhost:${
+      config.server.port
+    }`
+    const sourceFile = existsSync(join(config.root, file))
+      ? join(config.root, file)
+      : join(config.publicDir, file)
+    const html = await devServer.transformIndexHtml(
+      `/${file}`,
+      await readFile(sourceFile, 'utf8'),
+    )
+    return rewriteDevHtmlAssets(html, `${origin}/${file}`)
+  }
 
   function getIifeReloadBridgeFileName() {
     if (iifeReloadBridgeFileName) return iifeReloadBridgeFileName
@@ -175,7 +212,8 @@ export const pluginManifest: CrxPluginFn = () => {
       name: 'crx:manifest-init',
       enforce: 'pre',
       async config(config: UserConfigWithRolldownOptions, env) {
-        const { manifest: _manifest } = await getOptions(config)
+        const { manifest: _manifest, browser } = await getOptions(config)
+        firefox = browser === 'firefox'
         manifest = await (typeof _manifest === 'function'
           ? _manifest(env)
           : _manifest)
@@ -212,6 +250,7 @@ export const pluginManifest: CrxPluginFn = () => {
             }
             return result
           })
+          inputHtmlFiles = input.filter((file) => file.endsWith('.html'))
           // Merging explicit entries and build inputs
           const set = new Set<string>([entries, input].flat())
           for (const x of [js, sw, html].flat()) set.add(x)
@@ -233,6 +272,12 @@ export const pluginManifest: CrxPluginFn = () => {
       },
       configureServer(server) {
         devServer = server
+        // Firefox-only: emitted dev HTML loads its modules directly from Vite.
+        if (firefox) {
+          server.config.server.origin ??= `${
+            server.config.server.https ? 'https' : 'http'
+          }://localhost:${server.config.server.port}`
+        }
         server.middlewares.use((req, res, next) => {
           const htmlPath = getLoadingPageReadyHtmlPath(req.url)
           if (typeof htmlPath === 'undefined') {
@@ -331,6 +376,27 @@ export const pluginManifest: CrxPluginFn = () => {
     {
       name: 'crx:manifest-post',
       enforce: 'post',
+      renderCrxDevScript(code, { id }) {
+        if (
+          firefox &&
+          config.server.origin &&
+          config.assetsInclude(id.split('?')[0])
+        ) {
+          // HTTP-served page modules need absolute Vite URLs. Content-script
+          // modules are copied into the extension and use runtime.getURL().
+          return stripDevAssetOrigin(code, config.server.origin)
+        }
+      },
+      async handleHotUpdate({ file }) {
+        if (!firefox) return
+        const htmlPath = relative(config.root, file)
+        if (devHtmlFiles.has(htmlPath)) {
+          await fs.writeFile(
+            getOutputPath(devServer, htmlPath),
+            await firefoxHtml(htmlPath),
+          )
+        }
+      },
       configResolved(_config) {
         config = _config
 
@@ -613,6 +679,9 @@ export const pluginManifest: CrxPluginFn = () => {
                   type: 'loader',
                 })
                 script.js = [cssLoader, ...jsLoaders]
+                // Firefox's manifest-injected CSS can override the updated
+                // style element. During development the HMR loader owns CSS.
+                if (firefox && script.world !== 'MAIN') delete script.css
               } else {
                 script.js = jsLoaders
               }
@@ -724,7 +793,9 @@ export const pluginManifest: CrxPluginFn = () => {
         const files = await manifestFiles(manifest, { cwd: config.root })
         if (config.command === 'serve') {
           devHtmlFiles = new Set(
-            files.html.map(normalizeHtmlPath).filter(isString),
+            [...files.html, ...(firefox ? inputHtmlFiles : [])]
+              .map(normalizeHtmlPath)
+              .filter(isString),
           )
         }
         await Promise.all(
@@ -770,7 +841,15 @@ Public dir: "${config.publicDir}"`,
 
         /* ---------- SETUP HTML PLACEHOLDER FILES --------- */
 
-        if (config.command === 'serve' && files.html.length) {
+        if (config.command === 'serve' && devHtmlFiles.size && firefox) {
+          for (const file of devHtmlFiles) {
+            this.emitFile({
+              type: 'asset',
+              fileName: file,
+              source: await firefoxHtml(file),
+            })
+          }
+        } else if (config.command === 'serve' && files.html.length) {
           const refId = this.emitFile({
             type: 'asset',
             name: 'loading-page.js',

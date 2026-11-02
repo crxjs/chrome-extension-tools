@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Favicon Popup Test",
+  "version": "1.0.0",
+  "permissions": ["favicon"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.ts"
+  }
+}

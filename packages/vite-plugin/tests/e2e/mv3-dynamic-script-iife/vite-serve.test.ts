@@ -37,10 +37,15 @@ test(
     // Now update ONLY the main-world.ts file (not background.ts)
     // This directly copies the file to avoid any race conditions
     const mainWorldScript = path.join(src, 'main-world.ts')
+    const reloaded = page.waitForEvent('load', { timeout: 15000 })
     await fs.copyFile(path.join(src2, 'main-world.ts'), mainWorldScript)
     if (process.platform === 'win32') {
       await ensureViteHmrSeesChangedFiles([mainWorldScript])
     }
+
+    // The runtime restart also reloads this tab. Wait before polling the new
+    // background or starting a manual navigation, which would race that reload.
+    await reloaded
 
     // Wait for the IIFE rebuild to finish by polling the on-disk bundle for
     // the updated content (more reliable than a fixed timeout).

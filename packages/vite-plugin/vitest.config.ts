@@ -25,6 +25,9 @@ export default defineConfig(({ mode }) => {
       timeout: 15_000,
     },
     test: {
+      ...(process.env.OUTPUT_BROWSER === 'firefox'
+        ? { include: ['tests/out/**/*.test.ts'] }
+        : {}),
       alias: [
         { find: 'src', replacement: path.resolve(__dirname, 'src/node') },
         { find: 'tests', replacement: path.resolve(__dirname, 'tests') },
@@ -44,6 +47,18 @@ export default defineConfig(({ mode }) => {
         '**/dist*/**',
         '**/.vite/**',
       ],
+      resolveSnapshotPath(testPath, extension) {
+        const suffix =
+          process.env.OUTPUT_BROWSER === 'firefox' &&
+          testPath.includes(`${path.sep}out${path.sep}`)
+            ? '-firefox'
+            : ''
+        return path.join(
+          path.dirname(testPath),
+          '__snapshots__',
+          `${path.basename(testPath)}${suffix}${extension}`,
+        )
+      },
       globalSetup: './tests/jest.globalSetup.ts',
       maxThreads: mode === 'e2e' ? 1 : undefined,
       minThreads: mode === 'e2e' ? 1 : undefined,

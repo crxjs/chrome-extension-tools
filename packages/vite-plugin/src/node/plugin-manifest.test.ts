@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getDocumentStartLoaderWarnings,
   pluginManifest,
+  stripDevAssetOrigin,
 } from './plugin-manifest'
 import { pluginOptionsProvider } from './plugin-optionsProvider'
 
@@ -113,5 +114,22 @@ describe('pluginManifest config hook', () => {
     ])
 
     expect(result?.optimizeDeps?.entries).toContain('options.html')
+  })
+})
+
+describe('Firefox dev asset origins', () => {
+  it('retains extension-relative asset exports for content scripts', () => {
+    expect(
+      stripDevAssetOrigin(
+        'export default "http://localhost:5200/src/logo.png"',
+        'http://localhost:5200',
+      ),
+    ).toBe('export default "/src/logo.png"')
+    expect(
+      stripDevAssetOrigin(
+        'export default "https://cdn.example/logo.png"',
+        'http://localhost:5200',
+      ),
+    ).toBe('export default "https://cdn.example/logo.png"')
   })
 })

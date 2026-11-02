@@ -25,3 +25,4 @@ packages/vite/LICENSE
 types
 **/.docusaurus
 crxjs.code-workspace
+packages/vite-plugin/tests/firefox/artifacts/
