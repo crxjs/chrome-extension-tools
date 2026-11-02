@@ -27,6 +27,11 @@ vanilla HMR checks passed locally on Vite 3.2.11, 6.4.1, 7.3.7 and 8.1.6 (4/4
 tests per version). Windows-specific validation remains in CI.
 The complete local Chromium suite with `CI=true` passed 74 tests with 0 failures
 and 6 existing skips (72 files / 80 tests).
+The sandbox asset check also awaits image decoding before asserting completion
+and positive natural width; a rendered React container does not establish that
+its image has loaded. The isolation and failed-request assertions remain intact.
+After that change, all three sandbox tests passed on each of the four Vite
+versions (12/12), and the complete local Chromium suite again passed 74 / 0 / 6.
 
 ## Ownership
 

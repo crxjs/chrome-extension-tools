@@ -31,6 +31,9 @@ sandboxTest('sandbox keeps its isolation and loads local assets in dev mode', as
   await page.locator('.App').waitFor()
 
   expect(await page.evaluate(() => typeof chrome.runtime)).toBe('undefined')
+  await page
+    .locator('.App-logo')
+    .evaluate((image: HTMLImageElement) => image.decode())
   expect(
     await page
       .locator('.App-logo')
