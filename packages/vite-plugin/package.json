@@ -128,7 +128,7 @@
     "vite-plugin-inspect": "0.7.25",
     "vitest": "3.2.7",
     "vue": "3.2.47",
-    "vitest-environment-web-ext": "github:crxjs/vitest-environment-web-ext#def232e64ed419deb1ebb10c997eee4599629859"
+    "vitest-environment-web-ext": "github:crxjs/vitest-environment-web-ext#e42ce8d5a3a6fef28a5480467a5aec466b790c44"
   },
   "peerDependencies": {
     "vite": "^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"

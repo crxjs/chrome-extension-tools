@@ -1,9 +1,21 @@
 # Shared browser environment migration
 
 This migration starts at `7d35cc1f37e3fb2b64e9a498b454bc647a27f2fd` (#1252).
-It depends on [vitest-environment-web-ext #4](https://github.com/crxjs/vitest-environment-web-ext/pull/4),
-currently pinned to commit `def232e64ed419deb1ebb10c997eee4599629859`.
-Neither PR is merged and the library is not published by this migration.
+It uses the merged [vitest-environment-web-ext #4](https://github.com/crxjs/vitest-environment-web-ext/pull/4),
+pinned to main commit `e42ce8d5a3a6fef28a5480467a5aec466b790c44`.
+As of 2026-11-02, npm's latest release is still 0.0.4 and does not include Firefox
+support, so the immutable Git dependency remains necessary. This migration does
+not publish the library.
+
+## Git pin update (2026-11-02)
+
+The pin advances from `def232e64ed419deb1ebb10c997eee4599629859` to the merged
+main commit above. Only the library's CI workflow differs; runtime sources and
+dependency declarations are unchanged. On Node 22.23.2/macOS arm64, a fresh-store
+frozen-lockfile installation built and imported the dependency successfully.
+Plugin build, ESLint and typecheck passed. The background-define and
+two-entrypoint HMR scenarios passed in Chromium (2/2) and Firefox (2/2).
+These filtered checks do not replace the complete CI matrix documented below.
 
 ## Ownership
 
