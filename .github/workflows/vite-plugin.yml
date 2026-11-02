@@ -35,6 +35,9 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -45,7 +48,11 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ env.cache-name }}-
 
       - name: Install dependencies
-        run: pnpm install --filter "vite-plugin" --ignore-scripts
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Lint
         run: pnpm lint
@@ -75,6 +82,9 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -87,7 +97,9 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Run unit and output tests
         run: pnpm test:run:out
@@ -116,6 +128,9 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -128,10 +143,15 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Build plugin (always on Vite 3)
         run: pnpm build
+
+      - name: Use built environment for the Vite matrix
+        run: node scripts/use-packed-web-ext.mjs
 
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
@@ -145,7 +165,7 @@ jobs:
         run: echo "Testing with Vite $(pnpm exec vite --version)"
 
       - name: Run compat tests
-        run: pnpm exec vitest --run --mode compat ${{ startsWith(matrix.vite-version, '8') && '--threads false' || '' }}
+        run: pnpm exec vitest --run --mode compat
 
   e2e:
     name: E2E Tests (${{ matrix.os }}, Vite ${{ matrix.vite-version }})
@@ -171,6 +191,9 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Cache pnpm modules
         uses: actions/cache@v3
         env:
@@ -183,14 +206,19 @@ jobs:
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --filter "vite-plugin"
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter "vite-plugin"
 
       - name: Install Chromium
         timeout-minutes: 10
-        run: pnpm exec playwright install --no-shell chromium
+        run: node node_modules/playwright-chromium/cli.js install --no-shell chromium
 
       - name: Build plugin (always on Vite 3)
         run: pnpm build
+
+      - name: Use built environment for the Vite matrix
+        run: node scripts/use-packed-web-ext.mjs
 
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
@@ -206,7 +234,7 @@ jobs:
       - name: Run e2e tests
         uses: coactions/setup-xvfb@v1
         with:
-          run: pnpm exec vitest --run --mode e2e ${{ startsWith(matrix.vite-version, '8') && '--threads false' || '' }}
+          run: pnpm exec vitest --run --mode e2e
           working-directory: packages/vite-plugin
 
       - uses: actions/upload-artifact@v4
@@ -241,13 +269,21 @@ jobs:
         with:
           version: 10.11.1
 
+      - name: Configure pnpm store
+        run: pnpm config set store-dir "$HOME/.pnpm-store"
+
       - name: Install dependencies
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
-        run: pnpm install --frozen-lockfile --filter @crxjs/vite-plugin --ignore-scripts
+          # The Git dependency builds in its own workspace; keep the outer lock frozen.
+          CI: "false"
+        run: pnpm install --frozen-lockfile --filter @crxjs/vite-plugin
 
       - name: Build plugin (always on Vite 3)
         run: pnpm build
+
+      - name: Use built environment for the Vite matrix
+        run: node scripts/use-packed-web-ext.mjs
 
       - name: Install Vite ${{ matrix.vite-version }} for testing
         if: matrix.vite-version != '3'
@@ -265,9 +301,9 @@ jobs:
         run: pnpm test:firefox
 
       - name: Install Playwright Firefox
-        # Both playwright-chromium and @playwright/test provide a playwright bin.
-        # Use the Firefox runner's package explicitly to install its revision.
-        run: node node_modules/@playwright/test/cli.js install --with-deps firefox
+        # The root package extension binds OpenPolyfill to its matching core.
+        # Resolve the Firefox driver through the environment's pinned installer.
+        run: pnpm exec web-ext-firefox install --with-deps
 
       - name: Install React plugin for Vite 8.x
         if: startsWith(matrix.vite-version, '8')

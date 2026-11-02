@@ -10,19 +10,20 @@ The complete local compatibility table is in [RESULTS.md](./RESULTS.md).
 Use Node.js 22 (matching CI). From the repository root:
 
 ```sh
-PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --frozen-lockfile --ignore-scripts
-pnpm -C packages/vite-plugin exec node node_modules/@playwright/test/cli.js install --with-deps firefox
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 pnpm install --frozen-lockfile
+pnpm -C packages/vite-plugin exec web-ext-firefox install --with-deps
 pnpm -C packages/vite-plugin test:firefox:e2e
 # Run even when the test command exits nonzero:
 pnpm -C packages/vite-plugin test:firefox:report
 ```
 
-The installer explicitly uses `@playwright/test/cli.js`: the shared `playwright`
-command can resolve to the older Chromium dependency and download the wrong Firefox.
+The library's installer resolves its pinned Playwright CLI. Chromium is installed
+separately through `node node_modules/playwright-chromium/cli.js install --no-shell chromium`;
+neither installer depends on the shared `playwright` executable.
 
 `test:firefox:e2e` runs the same Vitest discovery, fixture sources and assertions
-as `test:run:e2e`, sequentially in the main Vitest process (`--threads false`)
-to keep the Firefox driver lifecycle outside worker teardown. This includes build, development, HMR, framework and screenshot
+as `test:run:e2e`, sequentially in Vitest forks (`fileParallelism: false`) using the library's
+`web-ext` custom environment, which owns driver teardown. This includes build, development, HMR, framework and screenshot
 scenarios. It returns a nonzero exit code for failing tests. Optional Vitest CLI
 arguments are forwarded (for example a filename for diagnosis). The report
 command requires the **complete** suite, so a filtered run fails its completeness
@@ -40,19 +41,27 @@ accepts `moz-extension://`. A Firefox background page
 provides the `evaluate()` operations used by the shared service-worker helper;
 this does **not** establish Chromium service-worker lifecycle parity.
 
-The runner uses [OpenPolyfill](https://github.com/OpenPolyfill/FirefoxAddonPlaywrightHarness),
-pinned to `@openpolyfill/firefox-addon-playwright-harness` 0.3.0 and Playwright 1.64.1.
-It installs temporary extensions through Firefox RDP, including fixtures without a
-background. Each test gets an isolated profile and debugger port. The small adapter
-maps background evaluation to the shared worker helper and follows replacement
-background targets after runtime reloads; it never replays in-flight evaluations.
+The `vitest-environment-web-ext` library owns browser launch, temporary extension
+installation (including extensions without a background), isolated profiles and
+debugger ports, background evaluation, actor replacement after runtime reload,
+and cleanup. CRXJS keeps fixture builds, dev servers, assertions and report
+completeness checks. The deleted `runner.ts` and `setup.mjs` have no replacements
+inside this repository.
 
-`run-suite.mjs` explicitly applies the harness patches through `setup.mjs`, so
-installation with `--ignore-scripts` works in CI. For direct Vitest diagnosis, run
-`node tests/firefox/setup.mjs` first. The root pnpm package extension supplies the
-harness's undeclared `playwright-core` dependency at the matching pinned version;
-otherwise pnpm may resolve an unrelated hoisted version. Chromium keeps using its
-existing `playwright-chromium` dependency and does not import the Firefox runner.
+OpenPolyfill 0.3.0 and Playwright 1.64.1 are implementation dependencies of the
+library. `run-suite.mjs` calls its public `prepareFirefox()` and `getFirefoxInfo()`
+helpers; the environment also prepares Firefox during launch. Installation with
+`--ignore-scripts` works when using a built package. The temporary Git dependency
+must run its build during installation; pnpm explicitly permits that package in
+`onlyBuiltDependencies`. Chromium retains its existing `playwright-chromium`
+binary, selected through the library's `playwright.executablePath` option.
+
+Vitest 3.2.7 resolves its own compatible Vite independently of the Vite dependency
+used by the plugin and fixtures. The plugin still builds on Vite 3 and is tested
+on Vite 3, 6, 7 and 8.1. No global Vite override is used. Snapshot escaping is
+explicitly kept at its old setting, so the migration requires no output snapshot
+updates. See [INTEGRATION.md](./INTEGRATION.md) for migration validation and the
+unpublished library dependency.
 
 **This is an experimental test environment.** OpenPolyfill patches Playwright's
 selector bundle and cached Firefox resources (`omni.ja` and `playwright.cfg`).

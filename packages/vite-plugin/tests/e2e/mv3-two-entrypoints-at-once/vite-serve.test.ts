@@ -1,6 +1,6 @@
 import fs from 'fs-extra'
 import path from 'pathe'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 import { createUpdate } from '../helpers'
 import { serve } from '../runners'
 
@@ -12,7 +12,7 @@ test('hmr updates two content scripts and a shared dependency at once', async ()
   await fs.remove(src)
   await fs.copy(src1, src)
 
-  const { browser } = await serve(__dirname)
+  const { browser, devServer } = await serve(__dirname)
   const page = await browser.newPage()
   const update = createUpdate({ target: src, src: src2 })
 
@@ -28,6 +28,8 @@ test('hmr updates two content scripts and a shared dependency at once', async ()
     reloaded = true
   })
 
+  // Initial rendering can finish before the extension's HMR socket connects.
+  await vi.waitFor(() => expect(devServer.ws.clients.size).toBeGreaterThan(0), { timeout: 5000 })
   await update('jsx')
 
   await oneApp.filter({ hasText: 'one ready: entry v2: shared v2' }).waitFor()

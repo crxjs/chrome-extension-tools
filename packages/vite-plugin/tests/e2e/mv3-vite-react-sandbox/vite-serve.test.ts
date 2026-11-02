@@ -31,6 +31,9 @@ sandboxTest('sandbox keeps its isolation and loads local assets in dev mode', as
   await page.locator('.App').waitFor()
 
   expect(await page.evaluate(() => typeof chrome.runtime)).toBe('undefined')
+  await page
+    .locator('.App-logo')
+    .evaluate((image: HTMLImageElement) => image.decode())
   expect(
     await page
       .locator('.App-logo')
@@ -51,7 +54,14 @@ sandboxTest('sandbox preserves component state during hot updates', async () => 
   const worker = await getServiceWorker(browser, { timeout: 10000 })
   expect(worker).toBeDefined()
   const page = await browser.newPage()
-  await page.goto(new URL('src/sandbox.html', worker!.url()).href)
+  // Rendering can finish before the sandbox's own HMR socket connects.
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: (message) => message.text() === '[vite] connected.',
+      timeout: 10000,
+    }),
+    page.goto(new URL('src/sandbox.html', worker!.url()).href),
+  ])
   await page.getByRole('button', { name: 'count is: 0', exact: true }).click()
   const appPath = path.join(__dirname, 'src/App.jsx')
   const original = await fs.readFile(appPath, 'utf8')
