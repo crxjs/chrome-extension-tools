@@ -51,7 +51,18 @@ sandboxTest('sandbox preserves component state during hot updates', async () => 
   const worker = await getServiceWorker(browser, { timeout: 10000 })
   expect(worker).toBeDefined()
   const page = await browser.newPage()
-  await page.goto(new URL('src/sandbox.html', worker!.url()).href)
+  // Reproduce rendering before the sandbox's HMR connection is ready.
+  await page.routeWebSocket(/.*/, async (socket) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    socket.connectToServer()
+  })
+  await Promise.all([
+    page.waitForEvent('console', {
+      predicate: (message) => message.text() === '[vite] connected.',
+      timeout: 10000,
+    }),
+    page.goto(new URL('src/sandbox.html', worker!.url()).href),
+  ])
   await page.getByRole('button', { name: 'count is: 0', exact: true }).click()
   const appPath = path.join(__dirname, 'src/App.jsx')
   const original = await fs.readFile(appPath, 'utf8')

@@ -17,6 +17,15 @@ Plugin build, ESLint and typecheck passed. The background-define and
 two-entrypoint HMR scenarios passed in Chromium (2/2) and Firefox (2/2).
 These filtered checks do not replace the complete CI matrix documented below.
 
+After integrating main's #1246, the sandbox HMR test waits for its own Vite
+connection before editing its source. A one-second WebSocket delay reproduces
+the lost-update timeout without the wait and passes with it, preserving the
+component-state assertion and existing deadlines. The sandbox and sequential
+vanilla HMR checks passed locally on Vite 3.2.11, 6.4.1, 7.3.7 and 8.1.6 (4/4
+tests per version). Windows-specific validation remains in CI.
+The complete local Chromium suite with `CI=true` passed 74 tests with 0 failures
+and 6 existing skips (72 files / 80 tests).
+
 ## Ownership
 
 `vitest-environment-web-ext` owns Chromium and Firefox launch/close, temporary
@@ -157,8 +166,10 @@ file contents (both checkouts have identical hashes):
 The Firefox assertions remain advisory. Its report still fails on missing files,
 collection/setup failures, unhandled errors and invalid/missing run reports.
 Review actual test counts and assertions from each matrix artifact, not only the
-job conclusion. Expected CI baselines are Chromium 71 / 0 / 7 and Firefox
-68 / 0 / 10, each covering 72 files / 78 tests. A transient
+job conclusion. With main's #1246 sandbox coverage, expected CI baselines are
+Chromium 74 / 0 / 6 and Firefox 68 / 0 / 12, each covering 72 files / 80 tests.
+The 2026-10-26 migration results above predate those three sandbox tests replacing
+one skipped test. A transient
 `listAddons returned an invalid response` is still a setup error if it exhausts
 the test's existing retries; this migration adds no retry policy.
 
