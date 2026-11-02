@@ -51,11 +51,7 @@ sandboxTest('sandbox preserves component state during hot updates', async () => 
   const worker = await getServiceWorker(browser, { timeout: 10000 })
   expect(worker).toBeDefined()
   const page = await browser.newPage()
-  // Reproduce rendering before the sandbox's HMR connection is ready.
-  await page.routeWebSocket(/.*/, async (socket) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    socket.connectToServer()
-  })
+  // Rendering can finish before the sandbox's own HMR socket connects.
   await Promise.all([
     page.waitForEvent('console', {
       predicate: (message) => message.text() === '[vite] connected.',

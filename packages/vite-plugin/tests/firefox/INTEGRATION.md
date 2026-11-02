@@ -18,9 +18,11 @@ two-entrypoint HMR scenarios passed in Chromium (2/2) and Firefox (2/2).
 These filtered checks do not replace the complete CI matrix documented below.
 
 After integrating main's #1246, the sandbox HMR test waits for its own Vite
-connection before editing its source. A one-second WebSocket delay reproduces
-the lost-update timeout without the wait and passes with it, preserving the
-component-state assertion and existing deadlines. The sandbox and sequential
+connection before editing its source. A temporary one-second WebSocket delay
+reproduced the lost-update timeout locally without the wait and passed with it,
+preserving the component-state assertion and existing deadlines. That diagnostic
+interception is not retained: it did not report HMR readiness in Linux CI.
+The sandbox and sequential
 vanilla HMR checks passed locally on Vite 3.2.11, 6.4.1, 7.3.7 and 8.1.6 (4/4
 tests per version). Windows-specific validation remains in CI.
 The complete local Chromium suite with `CI=true` passed 74 tests with 0 failures
