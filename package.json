@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "bumpp": "^11.0.1",
-    "vitest": "3.2.7"
+    "vitest": "4.1.11"
   },
   "pnpm": {
     "peerDependencyRules": {
