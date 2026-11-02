@@ -52,6 +52,7 @@ Array [
   "main.js.js",
   "manifest.json",
   "sandbox.html",
+  "sandbox.js.js",
   "service-worker-loader.js",
   "vendor/crx-client-port.js",
   "vendor/vite-client.js",
@@ -376,16 +377,17 @@ exports[`serve fs output > main.js-loader.js 1`] = `
 `;
 
 exports[`serve fs output > sandbox.html 1`] = `
-"<!DOCTYPE html>
-<html lang=\\"en\\">
-  <head>
-    <title>CRXJS DEV MODE</title>
-    <script src=\\"/assets/loading-page.hash0.js\\" type=\\"module\\"></script>
-  </head>
-  <body>
-    <p>An unknown error occurred. Failed to load the script.</p>
-  </body>
-</html>
+"<!doctype html>
+<html>
+<script type=\\"module\\" src=\\"/vendor/vite-client.js\\"></script>
+
+<script type=\\"module\\" src=\\"/vendor/vite-client.js\\"></script>
+<body><script type=\\"module\\" src=\\"/sandbox.js.js\\"></script></body></html>
+"
+`;
+
+exports[`serve fs output > sandbox.js.js 1`] = `
+"document.body.textContent = 'Sandbox module'
 "
 `;
 

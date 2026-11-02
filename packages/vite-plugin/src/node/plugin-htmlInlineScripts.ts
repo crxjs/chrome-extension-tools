@@ -87,6 +87,7 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
     }
   }
 
+  let sandboxPages: string[] = []
   let base: string
   /** Reset the page tag cache at transform start */
   const prePlugin: CrxPlugin = {
@@ -143,6 +144,10 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
   return {
     name: 'crx:html-auditor',
     apply: 'serve',
+    transformCrxManifest(manifest) {
+      sandboxPages = manifest.sandbox?.pages ?? []
+      return null
+    },
     configResolved(config) {
       base = config.base // used by crx:html-auditor-pre
       const plugins = config.plugins as CrxPlugin[]
@@ -189,6 +194,13 @@ export const pluginHtmlInlineScripts: CrxPluginFn = () => {
             .filter(isString)
             .filter((src) => src !== '/@vite/client')
             .map((src) => (src.startsWith('.') ? resolve(dir, src) : src))
+          // Literal imports let the dev file writer discover sandbox dependencies.
+          if (sandboxPages.includes(page.path.replace(/^\//, ''))) {
+            return [
+              inline,
+              ...scripts.map((id) => `await import(${JSON.stringify(id)});`),
+            ].join('\n')
+          }
           const json = `"${jsesc(JSON.stringify(scripts), {
             quotes: 'double',
           })}"`

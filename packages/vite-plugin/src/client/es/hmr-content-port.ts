@@ -3,6 +3,7 @@
 import type { CrxHMRPayload } from 'src/types'
 import type { HMRPayload } from 'vite'
 
+declare const __CRX_DEV_SERVER_PORT__: number
 declare const __CRX_HMR_TIMEOUT__: number
 declare const __CRX_LIVE_RELOAD__: boolean
 declare const __CRX_HMR_TOKEN__: string
@@ -34,6 +35,8 @@ export class HMRPort {
   private port: chrome.runtime.Port | undefined
   private callbacks = new Map<string, Set<(event: any) => void>>()
 
+  private socket: WebSocket | undefined
+
   // Firefox-only: MAIN cannot connect through externally_connectable; receive
   // dev HMR from the isolated loader in content-firefox-main-bridge.ts.
   private readonly mainBridge =
@@ -41,7 +44,23 @@ export class HMRPort {
     location.protocol !== 'moz-extension:' &&
     import.meta.url.startsWith('moz-extension:')
 
-  constructor() {
+  constructor(url?: string, protocols?: string | string[]) {
+    // Sandboxed extension pages have no chrome.runtime and connect directly.
+    if (!runtime && location.protocol === 'chrome-extension:' && url) {
+      const socketUrl = new URL(url)
+      if (!socketUrl.port) socketUrl.port = String(__CRX_DEV_SERVER_PORT__)
+      this.socket = new WebSocket(socketUrl, protocols)
+      this.socket.addEventListener('message', (event) => {
+        const payload: HMRPayload = JSON.parse(event.data)
+        // Raw Vite updates refer to server URLs. Wait for the writer's payload
+        // with extension filenames after the corresponding files are ready.
+        if (payload.type === 'connected' || isCrxHMRPayload(payload))
+          this.handleMessage(event)
+      })
+      this.socket.addEventListener('close', this.handleDisconnect)
+      return
+    }
+
     if (this.mainBridge) {
       window.addEventListener('message', (event) => {
         if (
@@ -55,6 +74,7 @@ export class HMRPort {
       queueMicrotask(this.initPort)
       return
     }
+
     /**
      * To keep extension background alive:
      *
@@ -145,7 +165,8 @@ export class HMRPort {
   send = (data: string) => {
     // Vite's keepalive/connected messages need no privileged forwarding.
     if (this.mainBridge) return
-    if (this.port) this.port.postMessage({ data })
+    if (this.socket) this.socket.send(data)
+    else if (this.port) this.port.postMessage({ data })
     else throw new Error('HMRPort is not initialized')
   }
 }

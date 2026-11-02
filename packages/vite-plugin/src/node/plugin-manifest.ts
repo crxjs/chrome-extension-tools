@@ -1,3 +1,4 @@
+import { parse as parseHtml } from 'node-html-parser'
 import loadingPageScript from 'client/es/loading-page-script.ts'
 import loadingPageHtml from 'client/html/loading-page.html'
 import { existsSync, promises as fs } from 'fs'
@@ -125,6 +126,35 @@ function getLoadingPageReadyHtmlPath(requestUrl: string | undefined) {
   }
 
   return normalizeHtmlPath(pageUrl.pathname)
+}
+
+/** Sandbox requests bypass the extension worker, so emit their dependencies. */
+async function renderSandboxHtml(server: ViteDevServer, fileName: string) {
+  const source = await server.transformIndexHtml(
+    `/${fileName}`,
+    await readFile(join(server.config.root, fileName), 'utf8'),
+  )
+  const html = parseHtml(source)
+  for (const element of html.querySelectorAll(
+    'script[src], link[href], img[src]',
+  )) {
+    const attribute = element.hasAttribute('src') ? 'src' : 'href'
+    const value = element.getAttribute(attribute)!
+    const url = new URL(value, `http://localhost/${fileName}`)
+    if (url.origin !== 'http://localhost') continue
+    const id = url.pathname + url.search
+    const isScript = element.rawTagName === 'script'
+    if (!isScript && !existsSync(join(server.config.root, url.pathname)))
+      continue
+    const file = add(
+      isScript ? { id, type: 'module' } : { id: url.pathname, type: 'asset' },
+    )
+    element.setAttribute(
+      attribute,
+      `/${file.fileName}${isScript ? '' : url.search + url.hash}`,
+    )
+  }
+  return html.toString()
 }
 
 /**
@@ -829,16 +859,16 @@ Public dir: "${config.publicDir}"`,
               .replace('%READY_PATH%', loadingPageReadyPath),
           })
           const loadingPageScriptName = this.getFileName(refId)
-          files.html.map((f) =>
-            this.emitFile({
-              type: 'asset',
-              fileName: f,
-              source: loadingPageHtml.replace(
-                '%SCRIPT%',
-                `/${loadingPageScriptName}`,
-              ),
-            }),
-          )
+          for (const f of files.html) {
+            let source = loadingPageHtml.replace(
+              '%SCRIPT%',
+              `/${loadingPageScriptName}`,
+            )
+            if (manifest.sandbox?.pages?.includes(f)) {
+              source = await renderSandboxHtml(devServer, f)
+            }
+            this.emitFile({ type: 'asset', fileName: f, source })
+          }
         }
 
         /* -------------- OUTPUT MANIFEST FILE ------------- */
