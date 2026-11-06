@@ -139,7 +139,8 @@ export function add(script: CrxDevAssetId | CrxDevScriptId): OutputFile {
       script.id.startsWith('/@id/') || script.id.startsWith('/__')
     const isTimestampedModule =
       script.type === 'module' && /[?&]t=\d+/.test(script.id)
-    if (isVirtualModule || isTimestampedModule) {
+    const isSameVersion = file.id === prefix('/', script.id)
+    if (isVirtualModule || (isTimestampedModule && !isSameVersion)) {
       debug('add: module already exists, triggering re-write for %s', fileName)
       file = formatFileData({
         ...file,
