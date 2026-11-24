@@ -13,7 +13,7 @@ Build cross-browser extensions with native <code>HMR</code> and <code>zero-confi
 </p>
 
 <h2 align="center">
-<a href="https://crxjs.dev">📚 Documentation</a> |
+<a href="https://crxjs.netlify.app">📚 Documentation</a> |
 <a href="https://discord.com/invite/FnnE4XR7Wj">💬 Discord </a>
 </h2>
 
